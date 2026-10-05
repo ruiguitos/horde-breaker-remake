@@ -157,7 +157,9 @@ const BOAT_RADIUS: float = 4.0
 
 ## XP needed to go from level n to n+1.
 static func xp_for_level(level: int) -> int:
-	return 6 + level * 5
+	# Quadratic: early levels come fast, later ones need real effort.
+	# First playtest: the old linear curve (6 + 5n) maxed every card by ~300 kills.
+	return 8 + level * 6 + level * level
 
 
 static func enemy_types() -> Array[EnemyType]:
@@ -192,6 +194,10 @@ static func cards() -> Array[Card]:
 		Card.new(&"hollow_points", "Hollow Points", "+25% weapon damage.", 3),
 		Card.new(&"fast_hands", "Fast Hands", "+20% fire rate.", 3),
 		Card.new(&"magnet", "XP Magnet", "Pickup radius x2.", 1),
+		Card.new(&"adrenaline", "Adrenaline", "Each kill cuts 0.3 s off the breaker cooldown.", 1),
+		Card.new(&"executioner", "Executioner", "+60% damage to stunned enemies.", 2),
+		Card.new(&"bigger_mags", "Bigger Mags", "+30% max special ammo.", 2),
+		Card.new(&"grenadier", "Grenadier", "Grenade cooldown -20%.", 2),
 	]
 
 

@@ -142,6 +142,8 @@ func max_ammo(w: int) -> int:
 	var m: int = weapons[w].max_ammo
 	if m > 0 and has_perk(&"pack_rat"):
 		m = m * 3 / 2
+	if m > 0:
+		m = int(m * (1.0 + 0.3 * stacks(&"bigger_mags")))
 	if m > 0 and modifier == &"short":
 		m /= 2
 	return m
@@ -152,7 +154,7 @@ func has_perk(id: StringName) -> bool:
 
 
 func grenade_cooldown_total() -> float:
-	return GameData.GRENADE_COOLDOWN * (0.65 if has_perk(&"demolitions") else 1.0)
+	return GameData.GRENADE_COOLDOWN * (0.65 if has_perk(&"demolitions") else 1.0) * pow(0.8, stacks(&"grenadier"))
 
 
 ## Throws a grenade towards `aim` (vector from the player; its length is the
@@ -410,11 +412,15 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 		var to_src: Vector3 = from - horde.positions[i]
 		if v.length_squared() > 0.01 and v.normalized().dot(to_src.normalized()) > 0.3:
 			amount *= 1.0 - t.front_armor
+	if stacks(&"executioner") > 0 and horde.stun[i] > 0.0:
+		amount *= 1.0 + 0.6 * stacks(&"executioner")
 	horde.hp[i] -= amount
 	horde.flash[i] = 0.1
 	if horde.hp[i] <= 0.0:
 		_dead[i] = true
 		kills += 1
+		if stacks(&"adrenaline") > 0:
+			breaker_cd = maxf(0.0, breaker_cd - 0.3)
 		if headshot:
 			headshots += 1
 		var p: Vector3 = horde.positions[i]
@@ -470,6 +476,12 @@ func _roll_cards_if_needed() -> void:
 	for c in all_cards:
 		if stacks(c.id) < c.max_stacks:
 			pool.append(c)
+	if pool.is_empty():
+		# Every card maxed: levelling up still heals.
+		hp = minf(max_hp, hp + 20.0)
+		messages.append("Level up: +20 HP")
+		_roll_cards_if_needed()
+		return
 	for k in mini(3, pool.size()):
 		var pick: int = rng.randi_range(0, pool.size() - 1)
 		card_choices.append(pool[pick])

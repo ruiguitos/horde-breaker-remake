@@ -4,10 +4,8 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 
 ## Equilíbrio (afinar a jogar)
 
-- [ ] **Level-up demasiado fácil**: no primeiro playtest, com ~300 kills e
-  nível ~15, quase todas as cartas estavam no máximo. Opções: curva de XP
-  mais íngreme (`GameData.xp_for_level`), menos XP por inimigo, mais cartas
-  ou mais stacks, cartas raras. Valores em `game/data/game_data.gd`.
+- [ ] **Level-up**: curva passou a quadrática (`8 + 6n + n²`; 300 XP → nível 7
+  em vez de 10) e há 12 cartas (21 escolhas). Confirmar a jogar.
 - [ ] Dificuldade entre ilhas (HP ×1,3 por ilha, mais especiais) por validar.
 
 ## Gameplay
