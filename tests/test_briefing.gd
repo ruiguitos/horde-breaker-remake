@@ -63,4 +63,25 @@ func _run() -> void:
 	line = await dm.call("get_next_dialogue_line", res, "start", [{"briefing": b2}])
 	var allowed: Array = (line.get("responses") as Array).filter(func(r: Object) -> bool: return bool(r.get("is_allowed")))
 	_check(allowed.size() == 3, "hazard pay choice hidden after accepting (%d left)" % allowed.size())
+	await _test_origin(dm)
 	quit(1 if _failures > 0 else 0)
+
+
+## Story ending: plays only with all files and a won run; the choice is
+## saved and pays the bonus once.
+func _test_origin(dm: Node) -> void:
+	var p := Profile.new()
+	var ctx := RunContext.new(3)
+	ctx.won = true
+	_check(not OriginEnding.due(p, ctx), "no ending before all Intel files")
+	p.lore_pages = Story.FILES.size()
+	_check(OriginEnding.due(p, ctx), "ending due with all files and a won run")
+	var res: Resource = load(OriginEnding.RESOURCE)
+	var states: Array = [{"origin": OriginEnding.new(p)}]
+	var line: Object = await dm.call("get_next_dialogue_line", res, "choice", states)
+	var leak: Object = (line.get("responses") as Array).filter(func(r: Object) -> bool: return String(r.get("text")).contains("Broadcast"))[0]
+	line = await dm.call("get_next_dialogue_line", res, String(leak.get("next_id")), states)
+	_check(p.ending == "leak" and p.intel == OriginEnding.BONUS_INTEL, "Broadcast saves the Open Channel ending and pays once")
+	OriginEnding.new(p).choose("loyal")
+	_check(p.ending == "leak" and p.intel == OriginEnding.BONUS_INTEL, "the ending cannot be changed or paid twice")
+	_check(not OriginEnding.due(p, ctx), "the ending plays only once")

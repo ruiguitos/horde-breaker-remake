@@ -54,4 +54,4 @@ enabled=PackedStringArray("res://addons/guide/plugin.cfg", "res://addons/dialogu
 
 [internationalization]
 
-locale/translations_pot_files=PackedStringArray("res://game/data/dialogue/briefing.dialogue")
+locale/translations_pot_files=PackedStringArray("res://game/data/dialogue/briefing.dialogue", "res://game/data/dialogue/origin.dialogue")

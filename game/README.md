@@ -135,6 +135,17 @@ arquipélago Halvard, onde uma experiência ("Project TIDE") correu mal.
   aconteceu; são 10, em ordem.
 - O texto está todo em `data/story.gd`: dá para reescrever sem mexer no código.
 
+### Final
+
+Quando vences uma run com os 10 ficheiros de Intel recuperados, o debrief
+abre a conversa final com o Director Hale
+(`data/dialogue/origin.dialogue`). Ele confirma que o arquipélago é um teste
+e pede-te as *core logs*. Escolhes:
+- **Hand over the logs:** final "The Corner Office".
+- **Broadcast the logs:** final "Open Channel".
+
+A escolha fica gravada no perfil, dá +300 Intel e só acontece uma vez.
+
 ## Missões
 
 Cada rota mostra também a missão da ilha:
