@@ -165,12 +165,21 @@ As quatro ilhas da rota já são feitas à mão, em
 `game/world/handmade/islands/` (256 m cada). Só o vulcão (3.ª ilha, boss)
 continua gerado.
 
-| Ilha | Desenho |
-|---|---|
-| `beach_01` | Crescente com dunas, aldeia de pescadores a oeste do cais, falésia com farol a norte (rampa a sul), três bosques |
-| `town_01` | Ruas em grelha com quarteirões de casas, praça com parque ao centro, igreja num morro a este (rampa a oeste) |
-| `jungle_01` | Floresta densa cortada por trilhos, clareiras nos objetivos, colinas e um planalto de templo com ruínas (rampa a oeste) |
-| `port_01` | Porto plano em betão: armazéns a norte, parque de contentores com corredores, cais a sul |
+Cada ilha tem **gargalos** (passagens estreitas onde a horda se afunila:
+bom para o Breaker e a caçadeira), **arenas** (espaços abertos onde podes ser
+cercado) e **duas rotas para cada objetivo**: uma curta pelo gargalo, outra
+mais longa e segura. Os marcadores `Choke_*` e `Arena_*` na cena mostram
+onde estão (não mudam o jogo).
+
+| Ilha | Gargalos (rota curta) | Rota longa | Arenas |
+|---|---|---|---|
+| `beach_01` | Ponte estreita sobre o riacho; brecha nas dunas a este; rampa sul do farol | Vau largo a oeste pela aldeia; contornar as dunas pelo norte; rampa este do farol | Encruzilhada; praça da aldeia |
+| `town_01` | Ponte do meio sobre o canal; portão da frente do pátio murado; escadas da igreja; becos de 3 m entre casas | Pontes laterais; portão de trás do pátio; rampa norte da igreja | Praça sul; mercado a norte |
+| `jungle_01` | Ponte de corda sobre o rio; rampa sul do templo | Vaus a oeste e a este; rampa oeste do templo | Clareira sul; topo do templo |
+| `port_01` | Ponte basculante sobre a doca; brechas entre armazéns; corredores estreitos dos contentores | Contornar a doca; contornar os armazéns; avenida central | Cais sul; cruzamento central |
+
+O script verifica as duas rotas: fecha cada gargalo à vez e confirma que o
+barco e todos os geradores continuam acessíveis.
 
 Foram construídas por `tools/dev/build_islands.gd`, que esculpe o Terrain3D e
 coloca tudo a partir de um desenho escrito por bioma. Depois disso são cenas
