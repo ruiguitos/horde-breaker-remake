@@ -58,12 +58,12 @@ xp_needed(n) = 8 + 6 × (n − 1) + (n − 1)²
 |---|---|---|---|
 | 1 | 8 | 0 | início |
 | 2 | 15 | 8 | 1.º minuto (primeira carta cedo) |
-| 4 | 35 | 52 | fim de Dawn Beach |
-| 6 | 63 | 148 | ilha 1 |
-| 8 | 99 | 312 | ilha 2 |
-| 10 | 143 | 560 | ilha 3 |
-| 12 | 195 | 908 | Volcano |
-| 15 | 284 | 1652 | run excelente |
+| 4 | 35 | 47 | fim de Dawn Beach |
+| 6 | 63 | 130 | ilha 1 |
+| 8 | 99 | 273 | ilha 2 |
+| 10 | 143 | 492 | ilha 3 |
+| 12 | 195 | 803 | Volcano |
+| 15 | 288 | 1477 | run excelente |
 
 Com ~80–150 inimigos ativos e ~1 000–1 500 abates por run, isto dá a meta
 acima. **Os números são para ajustar com telemetria** (XP/minuto e nível
