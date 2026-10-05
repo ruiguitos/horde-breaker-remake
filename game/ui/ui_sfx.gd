@@ -9,6 +9,7 @@ var _last_hover: int = 0
 
 
 func _ready() -> void:
+	_player.bus = Profile.BUS_SFX
 	add_child(_player)
 	var menu: Node = get_parent()
 	for b in menu.find_children("*", "Button", true, false):

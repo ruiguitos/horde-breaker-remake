@@ -23,6 +23,8 @@ func _ready() -> void:
 	if _calm == null:
 		_calm = _build(false)
 		_combat = _build(true)
+	_calm_player.bus = Profile.BUS_MUSIC
+	_combat_player.bus = Profile.BUS_MUSIC
 	_calm_player.stream = _calm
 	_combat_player.stream = _combat
 	add_child(_calm_player)

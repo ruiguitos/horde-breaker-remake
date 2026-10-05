@@ -18,6 +18,7 @@ var _current: Node
 func _ready() -> void:
 	GameInput.setup()
 	profile = Profile.load_profile()
+	Profile.current = profile
 	profile.apply_volume()
 	Visuals.high_quality = profile.graphics_high
 	_go(GameFlow.TITLE)

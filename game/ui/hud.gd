@@ -199,6 +199,13 @@ func _init() -> void:
 	resume.custom_minimum_size = Vector2(0, 46)
 	resume.pressed.connect(func() -> void: resume_requested.emit())
 	pbox.add_child(resume)
+	var settings_btn := Button.new()
+	settings_btn.text = "SETTINGS"
+	settings_btn.custom_minimum_size = Vector2(0, 46)
+	settings_btn.pressed.connect(func() -> void:
+		if Profile.current != null:
+			SettingsPanel.open(_pause_panel, Profile.current))
+	pbox.add_child(settings_btn)
 	var abandon := Button.new()
 	abandon.text = "ABANDON RUN (Q)"
 	abandon.custom_minimum_size = Vector2(0, 46)

@@ -10,7 +10,6 @@ var profile: Profile
 var _list: VBoxContainer
 var _header: Label
 var _threat_row: HBoxContainer
-var _volume_label: Label
 
 
 func _ready() -> void:
@@ -46,27 +45,10 @@ func _ready() -> void:
 	box.add_child(threat_label)
 	_threat_row = HBoxContainer.new()
 	box.add_child(_threat_row)
-	var settings := HBoxContainer.new()
+	var settings := Button.new()
+	settings.text = "SETTINGS (volume, graphics)"
+	settings.pressed.connect(func() -> void: SettingsPanel.open(self, profile))
 	box.add_child(settings)
-	_volume_label = Label.new()
-	_volume_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	settings.add_child(_volume_label)
-	for delta in [-1, 1]:
-		var vb := Button.new()
-		vb.text = " - " if delta < 0 else " + "
-		vb.pressed.connect(func() -> void:
-			profile.volume = clampi(profile.volume + delta, 0, 10)
-			profile.apply_volume()
-			_act(true))
-		settings.add_child(vb)
-	var gfx := Button.new()
-	gfx.text = "GRAPHICS: %s" % ("HIGH (bloom + SSAO)" if profile.graphics_high else "LOW")
-	gfx.pressed.connect(func() -> void:
-		profile.graphics_high = not profile.graphics_high
-		Visuals.high_quality = profile.graphics_high
-		gfx.text = "GRAPHICS: %s" % ("HIGH (bloom + SSAO)" if profile.graphics_high else "LOW")
-		profile.save())
-	settings.add_child(gfx)
 	var files := Button.new()
 	files.text = "INTEL FILES (%d / %d)" % [profile.lore_pages, Story.FILES.size()]
 	files.disabled = profile.lore_pages == 0
@@ -89,7 +71,6 @@ func _rebuild() -> void:
 		c.queue_free()
 	_header.text = "Intel: %d   ·   Perk slots: %d (%d equipped)" % [
 		profile.intel, profile.slots, profile.equipped_perks.size()]
-	_volume_label.text = "Volume: %d/10   ·   F11: fullscreen" % profile.volume
 	for id in GameData.CLASSES:
 		var info: Dictionary = GameData.CLASS_INFO[id]
 		var crow := HBoxContainer.new()

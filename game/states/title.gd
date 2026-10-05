@@ -45,14 +45,15 @@ func _ready() -> void:
 	box.add_child(gap)
 	var play := _button(box, "DEPLOY", func() -> void:
 		var s := AudioStreamPlayer.new()
+		s.bus = Profile.BUS_SFX
 		s.stream = load(Sfx.PACK + String(Sfx.FILES[&"ui_start"]))
 		get_tree().root.add_child(s)
 		s.finished.connect(s.queue_free)
 		s.play()
 		play_requested.emit())
-	_button(box, "FULLSCREEN (F11)", func() -> void:
-		var full: bool = DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if full else DisplayServer.WINDOW_MODE_FULLSCREEN))
+	_button(box, "SETTINGS", func() -> void:
+		if profile != null:
+			SettingsPanel.open(root, profile))
 	_button(box, "QUIT", func() -> void: get_tree().quit())
 	var stats := Label.new()
 	stats.add_theme_color_override("font_color", UiTheme.MUTED)

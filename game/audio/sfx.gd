@@ -57,6 +57,7 @@ func _ready() -> void:
 		_load_recorded()
 	for i in POOL_SIZE:
 		var p := AudioStreamPlayer.new()
+		p.bus = Profile.BUS_SFX
 		add_child(p)
 		_players.append(p)
 

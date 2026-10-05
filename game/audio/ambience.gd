@@ -14,6 +14,7 @@ static func create(key: StringName, volume_db: float = -12.0) -> Ambience:
 
 
 func _ready() -> void:
+	bus = Profile.BUS_SFX
 	if stream == null:
 		return
 	volume_db = -40.0

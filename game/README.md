@@ -35,7 +35,11 @@ Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 | Painel de debug | F3 | — |
 | Ecrã inteiro | F11 | — |
 
-O volume ajusta-se no Armory (− / +) e fica gravado no perfil.
+**Settings** (no título, no Armory e na pausa): volumes Master, Sound effects e
+Music, cada um com um slider e um campo editável em percentagem (0–100;
+escrever e carregar Enter, ou mudar de campo, aplica o valor). Também tem
+gráficos High/Low e ecrã inteiro. Tudo fica gravado no perfil. Os sons vão
+para os buses de áudio SFX e Music, criados em código (`core/profile.gd`).
 
 ## Como se joga
 
@@ -255,6 +259,7 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 | `world/director.gd` | Ritmo da horda (crescer/pico/relax, intensidade). |
 | `horde/horde.gd`, `horde/flow_field.gd` | Horda como dados, vinda do spike `horde_flowfield`. |
 | `ui/hud.gd` | HUD em código. |
+| `ui/settings_panel.gd` | Painel de definições (volumes, gráficos, ecrã inteiro). |
 | `world/fx.gd`, `world/visuals.gd` | Partículas GPU; céu, pós-processamento e materiais partilhados. |
 | `audio/sfx.gd`, `audio/music.gd` | Sons e música sintetizados em código. |
 | `data/story.gd` | Falas do rádio e ficheiros de Intel. |
