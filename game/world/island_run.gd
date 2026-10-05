@@ -20,6 +20,7 @@ var max_hp: float = GameData.PLAYER_MAX_HP
 var hp: float = GameData.PLAYER_MAX_HP
 var perks: Array[StringName] = []
 var threat: int = 1
+var modifier: StringName = &"calm"
 var grenade_cd: float = 0.0
 ## Grenades in flight/fuse: position of impact and remaining fuse time.
 var grenades: PackedVector3Array = PackedVector3Array()
@@ -110,10 +111,16 @@ func load_context(ctx: RunContext) -> void:
 	time_alive = ctx.time_alive
 	horde.hp_scale = (1.0 + 0.3 * ctx.island_index) * GameData.threat_hp(threat)
 	director.max_alive = GameData.MAX_ALIVE + GameData.threat_extra_alive(threat)
-	if ctx.ammo.size() != ammo.size() and has_perk(&"pack_rat"):
-		for w in weapons.size():
-			if weapons[w].max_ammo > 0:
-				ammo[w] = max_ammo(w)
+	modifier = ctx.modifier
+	match modifier:
+		&"swarm":
+			director.max_alive += 40
+		&"elite":
+			director.specials_mult = 2.0
+	# Fresh ammo (start or Ammo Crate) fills to the max; carried ammo is capped.
+	for w in weapons.size():
+		if weapons[w].max_ammo > 0:
+			ammo[w] = max_ammo(w) if ctx.ammo.size() != ammo.size() else mini(ammo[w], max_ammo(w))
 	# A head start makes the director spawn more specials on later islands.
 	director.elapsed = 120.0 * ctx.island_index
 
@@ -133,7 +140,11 @@ func save_to_context(ctx: RunContext) -> void:
 
 func max_ammo(w: int) -> int:
 	var m: int = weapons[w].max_ammo
-	return m * 3 / 2 if m > 0 and has_perk(&"pack_rat") else m
+	if m > 0 and has_perk(&"pack_rat"):
+		m = m * 3 / 2
+	if m > 0 and modifier == &"short":
+		m /= 2
+	return m
 
 
 func has_perk(id: StringName) -> bool:
@@ -212,7 +223,7 @@ func intel_earned() -> int:
 			done += 1
 	var base: int = (kills - _kills_at_start) / 5 + done * 15 + (40 if objective == Objective.WON else 0)
 	base += 20 if boss_killed else 0
-	return int(base * GameData.threat_intel(threat))
+	return int(base * GameData.threat_intel(threat) * GameData.modifier(modifier).intel_mult)
 
 
 func switch_weapon(i: int) -> void:

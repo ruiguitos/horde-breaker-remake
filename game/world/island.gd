@@ -75,6 +75,11 @@ func _build_world() -> void:
 	env.environment.background_color = Color(0.45, 0.6, 0.75)
 	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.environment.ambient_light_color = Color(0.4, 0.42, 0.48)
+	if context != null and context.modifier == &"fog":
+		env.environment.fog_enabled = true
+		env.environment.fog_light_color = Color(0.62, 0.66, 0.7)
+		env.environment.fog_density = 0.025
+		env.environment.background_color = Color(0.62, 0.66, 0.7)
 	add_child(env)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-55, -30, 0)
@@ -354,6 +359,8 @@ func _process(delta: float) -> void:
 	var label: String = ""
 	if context != null:
 		label = "Island %d/%d" % [context.island_index + 1, RunContext.ISLAND_COUNT]
+		if context.modifier != &"calm":
+			label += " [%s]" % GameData.modifier(context.modifier).title
 	hud.refresh(run, _camera, _sim_ms, paused, label)
 
 

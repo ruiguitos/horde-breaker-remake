@@ -90,6 +90,19 @@ class Perk:
 		cost = p_cost
 
 
+class Modifier:
+	var id: StringName
+	var title: String
+	var description: String
+	var intel_mult: float
+
+	func _init(p_id: StringName, p_title: String, p_desc: String, p_mult: float) -> void:
+		id = p_id
+		title = p_title
+		description = p_desc
+		intel_mult = p_mult
+
+
 enum EnemyKind { WALKER, RUNNER, BRUTE, GRABBER, BOSS }
 
 ## Player
@@ -203,3 +216,21 @@ static func threat_intel(threat: int) -> float:
 
 static func threat_extra_alive(threat: int) -> int:
 	return 25 * (threat - 1)
+
+
+## Island modifiers offered as routes on the boat: harder islands pay more Intel.
+static func modifiers() -> Array[Modifier]:
+	return [
+		Modifier.new(&"calm", "Calm Waters", "No modifier.", 1.0),
+		Modifier.new(&"swarm", "Swarm", "+40 enemies alive at once.", 1.3),
+		Modifier.new(&"elite", "Elite Pack", "Brutes and Grabbers twice as common.", 1.3),
+		Modifier.new(&"fog", "Sea Fog", "Thick fog: you see enemies late.", 1.2),
+		Modifier.new(&"short", "Supply Shortage", "Special ammo halved; generators refill less.", 1.2),
+	]
+
+
+static func modifier(id: StringName) -> Modifier:
+	for m in modifiers():
+		if m.id == id:
+			return m
+	return modifiers()[0]

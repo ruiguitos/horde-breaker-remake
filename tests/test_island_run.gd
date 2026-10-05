@@ -20,6 +20,7 @@ func _initialize() -> void:
 	_test_perks_and_threat()
 	_test_meta_shop()
 	_test_boss_fight()
+	_test_modifiers()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -234,3 +235,17 @@ func _test_boss_fight() -> void:
 		run.step(DT, Vector2.ZERO, Vector3(-1, 0, 0), false)
 	_check(run.objective == IslandRun.Objective.RETURN_TO_BOAT and run.boss_killed and run.intel_earned() >= 65,
 		"killing the boss unlocks the return and gives Intel (%d)" % run.intel_earned())
+
+
+func _test_modifiers() -> void:
+	var ctx := RunContext.new(3)
+	ctx.modifier = &"short"
+	var run := IslandRun.new(ctx.island_seed())
+	run.load_context(ctx)
+	_check(run.ammo[1] == 20 and run.ammo[2] == 30, "Supply Shortage halves special ammo")
+	ctx.modifier = &"swarm"
+	var run2 := IslandRun.new(ctx.island_seed())
+	run2.load_context(ctx)
+	run2.kills = 50
+	_check(run2.director.max_alive == GameData.MAX_ALIVE + 40 and run2.intel_earned() == 13,
+		"Swarm adds 40 alive and pays Intel x1.3 (%d)" % run2.intel_earned())

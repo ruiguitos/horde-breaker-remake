@@ -24,6 +24,9 @@ func _process(_delta: float) -> bool:
 	var main: Node = root.get_node("Main")
 	var current: Node = main.get("_current")
 	# Optional third arg "boat" photographs the boat screen instead.
+	if OS.get_cmdline_user_args().size() > 2 and main.get("state") == 3:
+		current.call("_start")
+		return false
 	if OS.get_cmdline_user_args().size() > 2 and _frames >= _target:
 		var shot: Image = root.get_viewport().get_texture().get_image()
 		shot.save_png(_out)
@@ -35,6 +38,7 @@ func _process(_delta: float) -> bool:
 		return false
 	if main.get("state") == 0 and _frames > 3:
 		current.call("_pick", 0)
+		current.call("_pick_route", 0)
 		current.emit_signal("land_requested")
 		return false
 	var run: IslandRun = current.get("run") if main.get("state") == 1 else null

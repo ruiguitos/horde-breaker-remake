@@ -12,6 +12,9 @@ var _buttons: Array[Button] = []
 var _picked: bool = false
 var _land: Button
 var _status: Label
+var _routes: Array[GameData.Modifier] = []
+var _route_buttons: Array[Button] = []
+var _route_picked: bool = false
 
 
 func _ready() -> void:
@@ -55,6 +58,25 @@ func _ready() -> void:
 		b.pressed.connect(_pick.bind(i))
 		row.add_child(b)
 		_buttons.append(b)
+	var route_hint := Label.new()
+	route_hint.text = "Choose your route (4 / 5) — harder islands pay more Intel:"
+	route_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(route_hint)
+	var route_row := HBoxContainer.new()
+	route_row.add_theme_constant_override("separation", 10)
+	box.add_child(route_row)
+	var mods: Array[GameData.Modifier] = GameData.modifiers()
+	var a: int = _rng.randi_range(0, mods.size() - 1)
+	var b2: int = (a + _rng.randi_range(1, mods.size() - 1)) % mods.size()
+	_routes = [mods[a], mods[b2]]
+	for i in 2:
+		var rb := Button.new()
+		rb.custom_minimum_size = Vector2(335, 80)
+		rb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		rb.text = "%d. %s (Intel x%.1f)\n%s" % [i + 4, _routes[i].title, _routes[i].intel_mult, _routes[i].description]
+		rb.pressed.connect(_pick_route.bind(i))
+		route_row.add_child(rb)
+		_route_buttons.append(rb)
 	_land = Button.new()
 	_land.text = "LAND (Enter)"
 	_land.custom_minimum_size = Vector2(0, 50)
@@ -88,9 +110,29 @@ func _pick(i: int) -> void:
 		_buttons[k].disabled = true
 		if k == i:
 			_buttons[k].text = "✔ " + _buttons[k].text
-	_land.disabled = false
-	_land.grab_focus()
+	_update_land()
 	_refresh_status()
+
+
+func _pick_route(i: int) -> void:
+	if i < 0 or i >= _routes.size():
+		return
+	_route_picked = true
+	context.modifier = _routes[i].id
+	for k in _route_buttons.size():
+		var txt: String = _route_buttons[k].text.trim_prefix("✔ ")
+		_route_buttons[k].text = ("✔ " + txt) if k == i else txt
+	_update_land()
+
+
+func _update_land() -> void:
+	_land.disabled = not (_picked and _route_picked)
+	if not _land.disabled:
+		_land.grab_focus()
+
+
+func _can_land() -> bool:
+	return _picked and _route_picked
 
 
 func _refresh_status() -> void:
@@ -103,11 +145,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		var key: Key = event.physical_keycode
 		if key in [KEY_1, KEY_2, KEY_3]:
 			_pick(key - KEY_1)
-		elif key in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] and _picked:
+		elif key in [KEY_4, KEY_5]:
+			_pick_route(key - KEY_4)
+		elif key in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] and _can_land():
 			land_requested.emit()
 	elif event is InputEventJoypadButton and event.pressed:
 		var pads: Array = [JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_B]
 		if event.button_index in pads:
 			_pick(pads.find(event.button_index))
-		elif event.button_index == JOY_BUTTON_A and _picked:
+		elif event.button_index in [JOY_BUTTON_LEFT_SHOULDER, JOY_BUTTON_RIGHT_SHOULDER]:
+			_pick_route(0 if event.button_index == JOY_BUTTON_LEFT_SHOULDER else 1)
+		elif event.button_index == JOY_BUTTON_A and _can_land():
 			land_requested.emit()

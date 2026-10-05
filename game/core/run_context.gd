@@ -18,6 +18,8 @@ var time_alive: float = 0.0
 var intel: int = 0
 var won: bool = false
 var threat: int = 1
+## Modifier of the island being played (chosen on the boat as a route).
+var modifier: StringName = &"calm"
 var perks: Array[StringName] = []
 var max_hp: float = GameData.PLAYER_MAX_HP
 

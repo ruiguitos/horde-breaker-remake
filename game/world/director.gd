@@ -14,6 +14,8 @@ var phase_time: float = 0.0
 var intensity: float = 0.0
 var elapsed: float = 0.0
 var max_alive: int = GameData.MAX_ALIVE
+## Multiplies the chance of Brutes and Grabbers (Elite Pack modifier).
+var specials_mult: float = 1.0
 
 var _spawn_accum: float = 0.0
 var _peak_length: float = 15.0
@@ -81,8 +83,8 @@ func _set_phase(p: Phase) -> void:
 func pick_kind() -> int:
 	var specials: float = clampf(elapsed / 300.0, 0.0, 1.0)
 	var roll: float = _rng.randf() * 100.0
-	var brute: float = 2.0 + 4.0 * specials
-	var grabber: float = 4.0 + 5.0 * specials
+	var brute: float = (2.0 + 4.0 * specials) * specials_mult
+	var grabber: float = (4.0 + 5.0 * specials) * specials_mult
 	var runner: float = 15.0 + 10.0 * specials
 	if roll < brute:
 		return GameData.EnemyKind.BRUTE

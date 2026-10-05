@@ -12,7 +12,7 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 
 ## Gameplay
 
-- [ ] Escolha de rota entre ilhas (grafo com modificadores).
+- [ ] Rotas: mapa em grafo visível (agora são 2 opções por paragem).
 - [ ] Mais desbloqueios com Intel: armas e cartas no pool, classes.
 - [ ] Boss: segunda fase, ataque à distância, ilha própria (Volcano).
 - [ ] Caches/desvios opcionais na ilha.

@@ -34,6 +34,8 @@ func _process(_delta: float) -> bool:
 		10:
 			_check(_main.get("state") == 0, "starting a run goes to the boat")
 			_current().call("_pick", 0)
+			_current().call("_pick_route", 0)
+			_check(_current().call("_can_land"), "the boat allows landing after a supply and a route")
 			_current().emit_signal("land_requested")
 			_step = 1
 			_frames = 0

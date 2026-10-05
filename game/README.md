@@ -70,6 +70,19 @@ O perfil grava-se em `user://profile.json`. No Windows fica em
 `%APPDATA%\Godot\app_userdata\Horde Breaker Remake\`. Apagar o ficheiro
 recomeça o perfil.
 
+## Rotas (modificadores de ilha)
+
+No barco, além do mantimento (1/2/3), escolhes a rota (4/5, ou LB/RB no
+comando) entre duas ilhas sorteadas:
+
+| Modificador | Efeito | Intel |
+|---|---|---|
+| Calm Waters | nenhum | ×1,0 |
+| Swarm | +40 inimigos vivos | ×1,3 |
+| Elite Pack | Brutes e Grabbers 2× mais comuns | ×1,3 |
+| Sea Fog | nevoeiro: vês os inimigos mais tarde | ×1,2 |
+| Supply Shortage | munição especial a metade | ×1,2 |
+
 ## Boss (3.ª ilha)
 
 Na última ilha, depois dos 3 geradores, aparece o **Behemoth**: 2400 de HP,
