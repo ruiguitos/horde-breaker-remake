@@ -191,6 +191,13 @@ Pack ao fim de 3 min") em vez de impressões.
   avança devagar (~1 hora de jogo a cada 5 min), por isso a luz muda enquanto
   jogas. As horas estão em `world/island.gd` (`ISLAND_HOURS`). Sem o addon, o
   jogo volta ao céu simples anterior.
+- **Terrain3D** (addon): o chão da ilha é um terreno gerado do mapa
+  (`world/island_terrain.gd`). A terra jogável fica **plana a 0 m** (o jogo
+  corre numa grelha 2D, nada pode flutuar ou afundar) e a costa desce suave
+  para o fundo do mar (até −3 m). A cor vem do *color map* (areia na costa,
+  cor do bioma no interior) sobre uma textura clara gerada em código; mais
+  tarde podem entrar texturas reais (areia, relva, rocha). Sem o addon, volta
+  o chão de tiles.
 - Tonemap ACES sempre ligado. **Graphics: High** (Armory) liga também bloom e
   SSAO (oclusão ambiente); **Low** desliga-os, para PCs mais fracos.
 - Partículas GPU (`world/fx.gd`): faíscas nos impactos, sangue nas mortes e

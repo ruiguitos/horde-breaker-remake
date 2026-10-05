@@ -36,6 +36,7 @@ var _audio_scream_cd: float = 0.0
 var _audio_over: bool = false
 
 var _camera: Camera3D
+var _terrain: Node3D  ## Terrain3D ground, or null (flat tiles)
 var _player: Node3D
 var _enemy_mm := MultiMesh.new()
 var _head_mm := MultiMesh.new()
@@ -142,6 +143,8 @@ func _build_world() -> void:
 	# Distance to the sea (multi-source BFS) colours the ground: sand on the
 	# coast blending into grass inland, with a little per-tile noise.
 	var coast: PackedInt32Array = _coast_distance(in_building)
+	if _build_terrain(cells, coast, rng):
+		cells = []  # Terrain3D replaces the flat tiles
 	var ground_mm := MultiMesh.new()
 	ground_mm.transform_format = MultiMesh.TRANSFORM_3D
 	ground_mm.use_colors = true
@@ -352,6 +355,29 @@ func _build_world() -> void:
 	_camera = Camera3D.new()
 	_camera.fov = camera_fov
 	add_child(_camera)
+	if _terrain != null:
+		_terrain.call("set_camera", _camera)  # terrain LOD follows this camera
+
+
+## Terrain3D ground (sloping sea floor, colour-mapped land). False when the
+## addon is unavailable, so the flat tile ground is used instead.
+func _build_terrain(cells: Array[Vector2i], coast: PackedInt32Array, rng: RandomNumberGenerator) -> bool:
+	var f: FlowField = run.field
+	var land := PackedByteArray()
+	land.resize(f.width * f.height)
+	var colors := PackedColorArray()
+	colors.resize(f.width * f.height)
+	var sand: Color = _biome()["coast"]
+	var grass: Color = _biome()["inland"]
+	for c in cells:
+		var i: int = c.y * f.width + c.x
+		land[i] = 1
+		colors[i] = sand.lerp(grass, clampf((coast[i] - 4) / 8.0, 0.0, 1.0)).darkened(rng.randf() * 0.06)
+	var terrain: Node3D = IslandTerrain.build(self, f.width, f.height, land, colors, sand.darkened(0.25))
+	if terrain == null:
+		return false
+	_terrain = terrain
+	return true
 
 
 func _coast_distance(in_building: Dictionary) -> PackedInt32Array:
