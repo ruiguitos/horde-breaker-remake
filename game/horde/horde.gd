@@ -25,6 +25,8 @@ var target: Vector3 = Vector3.ZERO
 ## Outputs of the last tick, read by the island.
 var damage_to_player: float = 0.0
 var grabbed_by: int = -1
+## Position of the last enemy that hit the player (for the HUD indicator).
+var damage_from: Vector3 = Vector3.ZERO
 
 ## Enemy HP multiplier (later islands are tougher).
 var hp_scale: float = 1.0
@@ -140,6 +142,7 @@ func tick(dt: float) -> void:
 				if attack_cd[i] <= 0.0:
 					attack_cd[i] = t.attack_interval
 					damage_to_player += t.damage
+					damage_from = p
 					if t.grabs and grabbed_by == -1:
 						grabbed_by = i
 			else:

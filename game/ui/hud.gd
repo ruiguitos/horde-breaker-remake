@@ -15,6 +15,12 @@ var _breaker_bar: ProgressBar
 var _grenade_bar: ProgressBar
 var _boss_bar: ProgressBar
 var _minimap: Minimap
+var _hit_arc: Control
+var _hit_angle: float = 0.0
+var _hit_alpha: float = 0.0
+var _popups: Array[Label] = []
+var _popup_world: Array[Vector3] = []
+var _popup_life: PackedFloat32Array = PackedFloat32Array()
 var _radio_panel: PanelContainer
 var _radio_text: Label
 var _radio_queue: PackedStringArray = PackedStringArray()
@@ -119,6 +125,13 @@ func _init() -> void:
 	_radio_text.custom_minimum_size = Vector2(370, 0)
 	_radio_text.add_theme_font_size_override("font_size", 16)
 	rcol.add_child(_radio_text)
+
+	# Damage direction: a red arc around the screen centre.
+	_hit_arc = Control.new()
+	_hit_arc.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_hit_arc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hit_arc.draw.connect(_draw_hit_arc)
+	root.add_child(_hit_arc)
 
 	_minimap = Minimap.new()
 	_minimap.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -235,6 +248,8 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 			break
 	elif not paused:
 		_pause_panel.visible = false
+	_update_hit_arc(run, camera)
+	_update_popups(run, camera)
 	if _last_hp >= 0.0 and run.hp < _last_hp:
 		_damage_flash.color.a = clampf(_damage_flash.color.a + (_last_hp - run.hp) * 0.02, 0.0, 0.35)
 	_last_hp = run.hp
@@ -299,6 +314,54 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 		var won: bool = run.objective == IslandRun.Objective.WON
 		_end_label.text = "%s\n\nKills %d · Headshots %d · Level %d\nIntel from this island: %d\n\nEnter / A: continue" % [
 			"ISLAND CLEARED!" if won else "YOU DIED", run.kills, run.headshots, run.level, run.intel_earned()]
+
+
+func _update_hit_arc(run: IslandRun, camera: Camera3D) -> void:
+	if _last_hp >= 0.0 and run.hp < _last_hp and run.horde.damage_to_player > 0.0 and camera != null:
+		# Screen-space direction from the player to the attacker.
+		var a: Vector2 = camera.unproject_position(run.player_pos)
+		var b: Vector2 = camera.unproject_position(run.horde.damage_from)
+		_hit_angle = (b - a).angle()
+		_hit_alpha = 1.0
+	_hit_alpha = maxf(0.0, _hit_alpha - get_process_delta_time() * 1.5)
+	_hit_arc.queue_redraw()
+
+
+func _draw_hit_arc() -> void:
+	if _hit_alpha <= 0.0:
+		return
+	var c: Vector2 = _hit_arc.get_viewport_rect().size * 0.5
+	_hit_arc.draw_arc(c, 150.0, _hit_angle - 0.45, _hit_angle + 0.45, 24, Color(1, 0.1, 0.05, _hit_alpha * 0.85), 10.0)
+
+
+## Floating damage numbers for headshots and kills (rise and fade).
+func _update_popups(run: IslandRun, camera: Camera3D) -> void:
+	var dt: float = get_process_delta_time()
+	for p in run.popups:
+		if _popups.size() >= 24:
+			break
+		var l := Label.new()
+		l.text = str(int(p.z)) + ("!" if p.w > 0.5 else "")
+		l.add_theme_font_size_override("font_size", 22 if p.w > 0.5 else 16)
+		l.add_theme_color_override("font_color", UiTheme.ACCENT if p.w > 0.5 else UiTheme.TEXT)
+		_hit_arc.add_child(l)
+		_popups.append(l)
+		_popup_world.append(Vector3(p.x, 2.2, p.y))
+		_popup_life.append(0.8)
+	run.popups.clear()
+	var i: int = _popups.size() - 1
+	while i >= 0:
+		_popup_life[i] -= dt
+		_popup_world[i].y += dt * 1.5
+		if _popup_life[i] <= 0.0 or camera == null or camera.is_position_behind(_popup_world[i]):
+			_popups[i].queue_free()
+			_popups.remove_at(i)
+			_popup_world.remove_at(i)
+			_popup_life.remove_at(i)
+		else:
+			_popups[i].position = camera.unproject_position(_popup_world[i]) - Vector2(12, 10)
+			_popups[i].modulate.a = clampf(_popup_life[i] / 0.4, 0.0, 1.0)
+		i -= 1
 
 
 ## Shows queued radio lines one at a time, typed out letter by letter.

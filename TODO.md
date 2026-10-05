@@ -24,6 +24,9 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 - [ ] Afinar som e música a ouvido (volumes em `island.gd::_play_audio`, timbres em `audio/sfx.gd` e `audio/music.gd`).
 - [ ] Animação melhor que o "balançar" (Vertex Animation Textures, BRAINSTORM §8).
 
+- [ ] Animação dos zombies com Vertex Animation Textures (andar/atacar).
+- [ ] Final da história: 4.ª ilha "Origin" depois de recuperar os 10 ficheiros.
+
 ## Técnico
 
 - [ ] Medir FPS no PC (RTX 5060 8 GB) com 150 inimigos e preencher `game/README.md`.

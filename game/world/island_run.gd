@@ -102,6 +102,8 @@ var explosions: PackedVector3Array = PackedVector3Array()
 var messages: PackedStringArray = PackedStringArray()
 ## Radio events (Story.RADIO keys), consumed by the HUD.
 var radio: Array[StringName] = []
+## Damage numbers for the HUD: (x, z, damage, headshot 0/1), consumed per frame.
+var popups: Array[Vector4] = []
 ## Intel files recovered on this island (caches, boss).
 var lore_found: int = 0
 var _low_hp_cd: float = 0.0
@@ -627,6 +629,7 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 			headshots += 1
 		var p: Vector3 = horde.positions[i]
 		deaths.append(Vector4(p.x, p.z, horde.kinds[i], 1.0 if headshot else 0.0))
+		popups.append(Vector4(p.x, p.z, amount, 1.0 if headshot else 0.0))
 		if t.explodes:
 			explosions.append(p)
 			if player_pos.distance_to(p) <= GameData.BLOATER_RADIUS and dash_time <= 0.0:

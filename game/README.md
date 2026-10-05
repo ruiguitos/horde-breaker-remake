@@ -199,6 +199,8 @@ Pack ao fim de 3 min") em vez de impressões.
   vermelhos; num tiro ao corpo sai um braço. Os pedaços rodam no ar.
 - Tremor de câmara ao levar dano e no breaker. Usa um modelo de "trauma": o
   tremor cresce com o quadrado, por isso os toques pequenos quase não se notam.
+- Arco vermelho à volta do centro do ecrã a indicar de onde veio o último
+  golpe; números de dano nas mortes (a âmbar com "!" nos headshots).
 - Flash vermelho no ecrã ao levar dano; clarão de luz na arma ao disparar.
 - Edifícios entre a câmara e o jogador ficam translúcidos, para nunca o
   perderes de vista.
