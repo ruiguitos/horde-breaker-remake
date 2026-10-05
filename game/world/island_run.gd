@@ -31,6 +31,9 @@ var breaker_cd: float = 0.0
 var dash_time: float = 0.0
 var dash_dir: Vector3 = Vector3.ZERO
 var invulnerable: float = 0.0
+var stamina: float = GameData.STAMINA_MAX
+var sprinting: bool = false
+var _stamina_delay: float = 0.0
 
 # Weapons
 var weapons: Array[GameData.Weapon] = GameData.weapons()
@@ -278,20 +281,22 @@ func choose_card(i: int) -> void:
 
 
 ## One simulation step. move = desired direction (x, z), aim = facing on XZ.
-func step(dt: float, move: Vector2, aim: Vector3, breaker: bool) -> void:
+func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = false) -> void:
 	if is_paused():
 		return
 	time_alive += dt
 	var aim_flat := Vector3(aim.x, 0, aim.z)
 	if aim_flat.length_squared() > 0.0001:
 		facing = aim_flat.normalized()
+	_update_stamina(dt, sprint and move.length_squared() > 0.01)
 	_update_player(dt, move, breaker)
 	horde.set_target(player_pos)
 	horde.tick(dt)
 	if invulnerable <= 0.0 and dash_time <= 0.0:
 		hp -= horde.damage_to_player
 	invulnerable = maxf(0.0, invulnerable - dt)
-	_auto_fire(dt)
+	if not sprinting:
+		_auto_fire(dt)
 	_update_grenades(dt)
 	_update_screamers(dt)
 	_flush_dead()
@@ -304,6 +309,19 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool) -> void:
 	if hp <= 0.0:
 		hp = 0.0
 		objective = Objective.LOST
+
+
+## Sprint drains stamina; it regenerates after a short pause. Running on
+## empty is not possible, so the player must pick when to run.
+func _update_stamina(dt: float, wants_sprint: bool) -> void:
+	sprinting = wants_sprint and stamina > 0.0 and horde.grabbed_by == -1
+	if sprinting:
+		stamina = maxf(0.0, stamina - dt)
+		_stamina_delay = GameData.STAMINA_REGEN_DELAY
+	else:
+		_stamina_delay -= dt
+		if _stamina_delay <= 0.0:
+			stamina = minf(GameData.STAMINA_MAX, stamina + GameData.STAMINA_REGEN * dt)
 
 
 func _update_player(dt: float, move: Vector2, breaker: bool) -> void:
@@ -327,7 +345,7 @@ func _update_player(dt: float, move: Vector2, breaker: bool) -> void:
 		return
 	if move.length_squared() > 1.0:
 		move = move.normalized()
-	var v: Vector2 = move * GameData.PLAYER_SPEED * dt
+	var v: Vector2 = move * GameData.PLAYER_SPEED * (GameData.SPRINT_MULTIPLIER if sprinting else 1.0) * dt
 	player_pos = Horde.move_against_walls(field, player_pos, v.x, v.y, GameData.PLAYER_RADIUS)
 
 

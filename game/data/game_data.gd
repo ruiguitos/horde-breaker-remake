@@ -124,6 +124,12 @@ const AIM_CONE_DEG: float = 50.0
 const HEADSHOT_CONE_DEG: float = 9.0
 const HEADSHOT_MULTIPLIER: float = 2.5
 
+## Sprint: faster, but the gun stays silent while running.
+const SPRINT_MULTIPLIER: float = 1.6
+const STAMINA_MAX: float = 3.0       ## seconds of sprint
+const STAMINA_REGEN: float = 0.75    ## per second
+const STAMINA_REGEN_DELAY: float = 0.8
+
 ## Grenade (Recruit active ability)
 const GRENADE_COOLDOWN: float = 12.0
 const GRENADE_RANGE: float = 14.0

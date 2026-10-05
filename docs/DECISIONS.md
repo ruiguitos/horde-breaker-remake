@@ -13,7 +13,8 @@ ficheiro: propõem decisões nos seus documentos e o utilizador decide.
 | 2026-10-05 | Nesta fase: **design + spikes técnicos isolados**. O jogo em `game/` só começa depois de o brainstorm fechar visão, pilares e core loop. | Evitar construir antes de decidir (lição do original). |
 | 2026-10-05 | Direção: **A+B "Expedition Breaker"** — horde shooter de expedição por ilhas, single-player. | BRAINSTORM §10; GDD.md. |
 | 2026-10-05 | Mira: **auto-fire é o modo normal**, com prioridade pela orientação do personagem (cone para onde olha). Headshots mantêm-se. | O jogador "mira com o corpo"; comando natural. |
-| 2026-10-05 | **Breaker**: investida comum a todas as classes (~5 m, empurra/atordoa, solta Grabbers, ~6 s cooldown). Sem sprint. | Único verbo de movimento especial. |
+| 2026-10-05 | **Breaker**: investida comum a todas as classes (~5 m, empurra/atordoa, solta Grabbers, ~6 s cooldown). | Verbo de movimento principal. |
+| 2026-10-05 | **Sprint** (pedido do utilizador; substitui o "sem sprint" anterior): Shift / L3, ×1,6, estamina de 3 s, **sem disparar** enquanto corre. | Fugir ou lutar é uma escolha; não substitui o breaker. |
 | 2026-10-05 | Horda: **~150 inimigos ativos, teto de 300** simulados. Flow field + agentes como dados + MultiMesh. | Spike `horde_flowfield`: 150 ≈ 1,3 ms/tick em GDScript. |
 | 2026-10-05 | Base: **barco como ecrã de serviços** entre ilhas ("escolhe 1 de 3"), sem construção. **Sem Scrap** no slice. | Lição do original (sistemas órfãos). |
 | 2026-10-05 | Progressão: cartas na run (maioria de comportamento), **perks em slots** e meta em **Intel** (morrer conserva o Intel). | Duas camadas claras. |

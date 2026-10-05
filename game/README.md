@@ -26,6 +26,7 @@ Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 | Mover | WASD / setas | stick esquerdo |
 | Orientar (o auto-fire dispara para onde olhas) | rato | stick direito |
 | Breaker (investida) | Espaço ou botão direito | A ou RB |
+| Sprint (não dispara enquanto corre) | Shift | L3 (clicar stick esquerdo) |
 | Granada (lança para o rato) | G ou botão do meio | LB |
 | Trocar arma | 1–5 | D-pad ← ↑ →, ↓ roda |
 | Escolher carta | 1 / 2 / 3 ou clique | X / Y / B |

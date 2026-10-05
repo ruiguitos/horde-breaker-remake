@@ -23,6 +23,7 @@ func _initialize() -> void:
 	_test_modifiers()
 	_test_weapon_unlocks()
 	_test_bloater_and_screamer()
+	_test_sprint()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -290,3 +291,19 @@ func _test_bloater_and_screamer() -> void:
 		run2.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)  # facing away: it survives
 	_check(run2.director.phase == Director.Phase.PEAK and phase_before != Director.Phase.PEAK,
 		"a Screamer in sight for 3 s triggers a horde peak")
+
+
+func _test_sprint() -> void:
+	var run := IslandRun.new(5)
+	run.director.max_alive = 0
+	var start: Vector3 = run.player_pos
+	run.horde.add(start + Vector3(0, 0, -8), GameData.EnemyKind.WALKER, run.rng)
+	run.horde.stun[0] = 10.0
+	for t in 30:
+		run.step(DT, Vector2(1, 0), Vector3(0, 0, -1), false, true)
+	var sprint_dist: float = run.player_pos.distance_to(start)
+	_check(run.kills == 0 and sprint_dist > 0.5 * GameData.PLAYER_SPEED * GameData.SPRINT_MULTIPLIER * 0.9,
+		"sprinting is faster and the gun stays silent (%.2f m in 0.5 s)" % sprint_dist)
+	for t in int(GameData.STAMINA_MAX / DT) + 10:
+		run.step(DT, Vector2(-1, 0), Vector3(0, 0, -1), false, true)
+	_check(run.stamina == 0.0 and not run.sprinting, "stamina runs out and sprint stops")

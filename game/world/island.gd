@@ -474,7 +474,8 @@ func _physics_process(delta: float) -> void:
 	elif stick.length() > 0.2 and aim == Vector3.ZERO:
 		aim = Vector3(stick.x, 0, stick.y)
 	var t0: int = Time.get_ticks_usec()
-	run.step(delta, move, aim, _breaker_held)
+	var sprint: bool = Input.is_physical_key_pressed(KEY_SHIFT) or Input.is_joy_button_pressed(0, JOY_BUTTON_LEFT_STICK)
+	run.step(delta, move, aim, _breaker_held, sprint)
 	if _grenade_held:
 		# Without a mouse (gamepad) throw 8 m ahead.
 		run.throw_grenade(aim if aim.length() > 1.0 else run.facing * 8.0)
