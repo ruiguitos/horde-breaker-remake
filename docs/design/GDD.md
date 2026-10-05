@@ -136,7 +136,7 @@ média e as respostas da secção 10 do brainstorm.
 
 ## 7. Perguntas para o utilizador
 
-1. Câmara de yaw fixo no slice te parece bem, ou queres rodar a câmara com o rato/stick direito?
+1. Câmara de yaw fixo no slice parece-te bem, ou queres rodar a câmara com o rato/stick direito?
 2. A orientação do personagem deve vir do movimento (twin-stick "solto") ou do rato/stick direito (twin-stick clássico)?
 3. A 3.ª arma do slice: pistola pesada (precisão/headshots) ou lança-chamas (área/controlo)?
 4. O que conta como "morrer conserva o Intel": todo o Intel ganho, ou uma parte, com bónus ao extrair?
