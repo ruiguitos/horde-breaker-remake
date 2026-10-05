@@ -20,15 +20,16 @@ func _ready() -> void:
 	profile = Profile.load_profile()
 	Profile.current = profile
 	profile.apply_volume()
-	Visuals.high_quality = profile.graphics_high
+	GraphicsSettings.apply_all(profile, get_tree())
 	_go(GameFlow.TITLE)
 
 
 ## F11 toggles fullscreen anywhere in the game.
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_F11:
-		var full: bool = DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if full else DisplayServer.WINDOW_MODE_FULLSCREEN)
+		profile.window_mode = GraphicsSettings.WINDOWED if profile.window_mode != GraphicsSettings.WINDOWED else GraphicsSettings.BORDERLESS
+		GraphicsSettings.apply_display(profile)
+		profile.save()
 
 
 func _new_run() -> void:
@@ -81,6 +82,9 @@ func _go(next: GameFlow) -> void:
 			armory.connect("back_requested", _go.bind(GameFlow.TITLE), CONNECT_DEFERRED)
 			_current = armory
 	add_child(_current)
+	# Scenes build their sun/sky in _ready (Sky3D a frame later): re-apply
+	# the graphics preset to whatever lights they created.
+	get_tree().process_frame.connect(func() -> void: GraphicsSettings.apply_graphics(profile, get_tree()), CONNECT_ONE_SHOT)
 
 
 ## Writes a JSON summary of the run to user://runs/ for balancing.

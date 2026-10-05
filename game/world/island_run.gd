@@ -218,7 +218,7 @@ func grenade_cooldown_total() -> float:
 
 ## Throws a grenade towards `aim` (vector from the player; its length is the
 ## throw distance, clamped to the grenade range).
-## Uses the class ability (Recruit: grenade, Vanguard: War Cry, Medic: Med Kit).
+## Uses the class ability (Recruit: grenade, Vanguard: War Cry).
 func use_ability(aim: Vector3) -> bool:
 	if grenade_cd > 0.0 or is_paused():
 		return false
@@ -232,11 +232,6 @@ func use_ability(aim: Vector3) -> bool:
 			explosions.append(player_pos)
 			messages.append("WAR CRY!")
 			return true
-		&"medic":
-			hp = minf(max_hp, hp + GameData.MEDKIT_HEAL)
-			grenade_cd = ability_cooldown_total()
-			messages.append("Med Kit: +%d HP" % int(GameData.MEDKIT_HEAL))
-			return true
 	return throw_grenade(aim)
 
 
@@ -244,8 +239,6 @@ func ability_cooldown_total() -> float:
 	match player_class:
 		&"vanguard":
 			return GameData.WAR_CRY_COOLDOWN
-		&"medic":
-			return GameData.MEDKIT_COOLDOWN
 	return grenade_cooldown_total()
 
 
@@ -411,8 +404,6 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 		var melee: float = minf(horde.damage_to_player, GameData.MAX_MELEE_PER_FRAME)
 		hp -= melee * (0.6 if war_cry_time > 0.0 else 1.0)
 	war_cry_time = maxf(0.0, war_cry_time - dt)
-	if player_class == &"medic":
-		hp = minf(max_hp, hp + 1.0 * dt)
 	invulnerable = maxf(0.0, invulnerable - dt)
 	if not sprinting:
 		_auto_fire(dt)

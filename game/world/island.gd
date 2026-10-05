@@ -18,6 +18,12 @@ var showcase: bool = false
 @export var camera_pitch_deg: float = 35.0
 @export var camera_distance: float = 10.0
 @export var camera_fov: float = 60.0
+@export_group("Third-person camera")
+@export var tp_distance: float = 4.8
+@export var tp_height: float = 1.7  ## pivot above the feet (shoulders)
+@export var tp_shoulder: float = 0.9  ## sideways offset (over the right shoulder)
+@export var tp_pitch_min: float = -10.0
+@export var tp_pitch_max: float = 45.0
 
 const DEBRIS_MAX: int = 600
 
@@ -38,6 +44,13 @@ var _audio_over: bool = false
 var _camera: Camera3D
 var _terrain: Node3D  ## Terrain3D ground, or null (flat tiles)
 var _player: Node3D
+var _walk_speed: float = 0.0  ## 0..1, drives the soldier's walk cycle
+## Third-person camera: yaw/pitch in radians; the mouse (captured) or the
+## right stick turns it, WASD moves relative to it and you aim at the centre.
+var third_person: bool = true
+var _tp_yaw: float = 0.0
+var _tp_pitch: float = deg_to_rad(14.0)
+var _crosshair: Control
 var _enemy_mm := MultiMesh.new()
 var _head_mm := MultiMesh.new()
 var _arm_mm := MultiMesh.new()
@@ -98,7 +111,24 @@ func _ready() -> void:
 		sfx.process_mode = Node.PROCESS_MODE_DISABLED
 		run.player_pos = Vector3(run.field.width * 0.5, 0, run.field.height * 0.5)
 		run.director.trigger_peak(1000000.0)
+		third_person = false
 		return
+	third_person = profile.third_person if profile != null else true
+	_tp_yaw = atan2(-run.facing.x, -run.facing.z)
+	# Centre crosshair for the third-person camera (you aim where you look).
+	var layer := CanvasLayer.new()
+	add_child(layer)
+	_crosshair = CenterContainer.new()
+	_crosshair.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_crosshair.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var dot := Label.new()
+	dot.text = "+"
+	dot.add_theme_font_size_override("font_size", 28)
+	dot.add_theme_color_override("font_outline_color", Color.BLACK)
+	dot.add_theme_constant_override("outline_size", 6)
+	_crosshair.add_child(dot)
+	layer.add_child(_crosshair)
+	_crosshair.visible = third_person
 	hud = Hud.new()
 	hud.profile = profile if profile != null else Profile.new()
 	hud.add_child(UiSfx.new())
@@ -179,6 +209,7 @@ func _build_world() -> void:
 		_building_boxes.append(AABB(Vector3(r.position.x, 0, r.position.y), Vector3(r.size.x, h, r.size.y)))
 
 	_build_props(rng)
+	IslandRoads.build(self, IslandRoads.plan(run.map))
 	for k in run.map.lava.size():
 		var pool := MeshInstance3D.new()
 		var disc := CylinderMesh.new()
@@ -274,50 +305,14 @@ func _build_world() -> void:
 	_slam_ring = _ring(Vector3.ZERO, GameData.BOSS_SLAM_RADIUS, Color(1, 0.2, 0.1))
 	_slam_ring.visible = false
 
-	_player = Node3D.new()
-	var body := MeshInstance3D.new()
-	var cap := CapsuleMesh.new()
-	cap.radius = GameData.PLAYER_RADIUS
-	cap.height = 1.8
-	body.mesh = cap
-	body.position.y = 0.9
-	body.material_override = _mat(Color(0.2, 0.45, 0.95))
-	_player.add_child(body)
-	# Simple soldier: helmet head, backpack and a rifle pointing forward (-Z).
-	var head := MeshInstance3D.new()
-	head.mesh = _sphere(0.26)
-	head.position = Vector3(0, 1.95, 0)
-	head.material_override = _mat(Color(0.85, 0.7, 0.55))
-	_player.add_child(head)
-	var helmet := MeshInstance3D.new()
-	var helmet_mesh := SphereMesh.new()
-	helmet_mesh.radius = 0.3
-	helmet_mesh.height = 0.36
-	helmet_mesh.is_hemisphere = true
-	helmet.mesh = helmet_mesh
-	helmet.position = Vector3(0, 2.0, 0)
-	helmet.material_override = _mat(Color(0.25, 0.35, 0.2))
-	_player.add_child(helmet)
-	var pack := MeshInstance3D.new()
-	var pack_mesh := BoxMesh.new()
-	pack_mesh.size = Vector3(0.5, 0.6, 0.25)
-	pack.mesh = pack_mesh
-	pack.position = Vector3(0, 1.25, 0.42)
-	pack.material_override = _mat(Color(0.3, 0.3, 0.22))
-	_player.add_child(pack)
-	var gun := MeshInstance3D.new()
-	var gun_mesh := BoxMesh.new()
-	gun_mesh.size = Vector3(0.12, 0.16, 0.9)
-	gun.mesh = gun_mesh
-	gun.position = Vector3(0.22, 1.2, -0.55)
-	gun.material_override = _mat(Color(0.12, 0.12, 0.12))
-	_player.add_child(gun)
+	# Low-poly contractor in the selected class's kit (SoldierModel).
+	var soldier := SoldierModel.create(run.player_class)
+	_player = soldier
 	_muzzle = OmniLight3D.new()
-	_muzzle.position = Vector3(0.22, 1.2, -1.1)
 	_muzzle.light_color = Color(1, 0.8, 0.4)
 	_muzzle.omni_range = 6.0
 	_muzzle.light_energy = 0.0
-	_player.add_child(_muzzle)
+	soldier.muzzle.add_child(_muzzle)
 	add_child(_player)
 
 	_setup_multimesh(_enemy_mm, _capsule(0.35, 1.7), true)
@@ -412,6 +407,70 @@ func _coast_distance(in_building: Dictionary) -> PackedInt32Array:
 
 ## Trees (trunk + two-tier crown) and rocks, as MultiMeshes.
 func _build_props(rng: RandomNumberGenerator) -> void:
+	var biome: StringName = run.map.biome
+	if NatureKit.available() and NatureKit.TREES.has(biome):
+		_build_kit_trees(rng, NatureKit.TREES[biome], 4.5 if biome != &"volcano" else 4.0)
+	else:
+		_build_primitive_trees(rng)
+	if NatureKit.available():
+		_build_kit_rocks(rng)
+		_build_ground_cover(rng)
+	else:
+		_build_primitive_rocks(rng)
+
+
+## Quaternius trees: one MultiMesh per model variant (each tree picks one).
+func _build_kit_trees(rng: RandomNumberGenerator, models: Array, height: float) -> void:
+	_scatter_models(rng, run.map.trees, models, height, 0.25)
+
+
+func _build_kit_rocks(rng: RandomNumberGenerator) -> void:
+	_scatter_models(rng, run.map.rocks, NatureKit.ROCKS, 1.0, 0.3)
+
+
+## Grass, flowers, ferns or pebbles on free inland cells (decoration only:
+## the cells stay walkable, so it is small and never hides enemies).
+func _build_ground_cover(rng: RandomNumberGenerator) -> void:
+	var models: Array = NatureKit.COVER.get(run.map.biome, [])
+	if models.is_empty():
+		return
+	var f: FlowField = run.field
+	var cells: Array[Vector2i] = []
+	for i in 900:
+		var c := Vector2i(rng.randi_range(2, f.width - 3), rng.randi_range(2, f.height - 3))
+		if not f.is_blocked(c.x, c.y) and not f.is_blocked(c.x + 1, c.y) and not f.is_blocked(c.x, c.y + 1):
+			cells.append(c)
+	_scatter_models(rng, cells, models, 0.45, 0.4)
+
+
+## Places one model per cell (random variant, rotation and size) using one
+## MultiMesh per variant: a few draw calls for hundreds of props.
+func _scatter_models(rng: RandomNumberGenerator, cells: Array[Vector2i], models: Array, height: float, size_jitter: float) -> void:
+	var groups: Array[Array] = []
+	for m in models:
+		groups.append([])
+	for c in cells:
+		groups[rng.randi_range(0, models.size() - 1)].append(c)
+	for k in models.size():
+		var mesh: Mesh = NatureKit.mesh(models[k])
+		if mesh == null or groups[k].is_empty():
+			continue
+		var base: float = NatureKit.scale_for(mesh, height)
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.mesh = mesh
+		mm.instance_count = groups[k].size()
+		for i in groups[k].size():
+			var c: Vector2i = groups[k][i]
+			var sc: float = base * rng.randf_range(1.0 - size_jitter, 1.0 + size_jitter)
+			var jitter := Vector3(rng.randf_range(-0.25, 0.25), 0, rng.randf_range(-0.25, 0.25))
+			mm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * sc), Vector3(c.x + 0.5, 0, c.y + 0.5) + jitter))
+		var mmi := MultiMeshInstance3D.new()
+		mmi.multimesh = mm
+		add_child(mmi)
+
+
+func _build_primitive_trees(rng: RandomNumberGenerator) -> void:
 	var trunk_mm := MultiMesh.new()
 	var trunk := CylinderMesh.new()
 	trunk.top_radius = 0.15
@@ -443,6 +502,9 @@ func _build_props(rng: RandomNumberGenerator) -> void:
 			var ks: float = sc * (1.0 - 0.3 * k)
 			crown_mm.set_instance_transform(i * 2 + k, Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * ks), p + Vector3(0, (2.4 + 1.1 * k) * sc, 0)))
 			crown_mm.set_instance_color(i * 2 + k, green)
+
+
+func _build_primitive_rocks(rng: RandomNumberGenerator) -> void:
 	var rock_mm := MultiMesh.new()
 	var rock := SphereMesh.new()
 	rock.radius = 0.6
@@ -480,7 +542,7 @@ func _build_sky3d(island_i: int) -> bool:
 		sky.set("ambient_energy", 1.8)
 	var env: Environment = sky.environment
 	_apply_biome_fog(env, false)
-	Visuals.apply_post(env)
+	GraphicsSettings.apply_environment(env)
 	return true
 
 
@@ -499,10 +561,10 @@ func _build_simple_sky(island_i: int) -> void:
 	if not env.environment.fog_enabled or float(bio["fog"]) > 0.0:
 		env.environment.background_mode = Environment.BG_SKY
 		env.environment.sky = Visuals.sky(Color(bio["sky"]).lightened(0.15), Color(bio["sky"]).darkened(0.35))
-	Visuals.apply_post(env.environment)
+	GraphicsSettings.apply_environment(env.environment)
 	add_child(env)
 	var sun := DirectionalLight3D.new()
-	sun.shadow_enabled = true
+	GraphicsSettings.apply_sun(sun)
 	match island_i:
 		0:
 			sun.rotation_degrees = Vector3(-55, -30, 0)
@@ -585,6 +647,11 @@ func _ring(center: Vector3, radius: float, color: Color) -> MeshInstance3D:
 func _unhandled_input(event: InputEvent) -> void:
 	if showcase:
 		return
+	if third_person and event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		var sens: float = 0.0006 * (profile.mouse_sensitivity if profile != null else 50) / 10.0
+		_tp_yaw -= event.relative.x * sens
+		_tp_pitch = clampf(_tp_pitch + event.relative.y * sens, deg_to_rad(tp_pitch_min), deg_to_rad(tp_pitch_max))
+		return
 	# Actions come from GameInput (InputMap): keyboard, mouse and gamepad alike.
 	if event.is_echo() or not event.is_pressed():
 		return
@@ -609,6 +676,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		run.cycle_weapon()
 	elif event.is_action_pressed(&"debug"):
 		hud.debug_visible = not hud.debug_visible
+	elif event.is_action_pressed(&"camera_toggle"):
+		_set_third_person(not third_person)
 	else:
 		for i in 5:
 			if event.is_action_pressed(StringName("weapon_%d" % (i + 1))):
@@ -645,7 +714,16 @@ func _physics_process(delta: float) -> void:
 	var stick: Vector2 = move
 	var aim: Vector3 = _mouse_aim()
 	var right := Vector2(Input.get_joy_axis(0, JOY_AXIS_RIGHT_X), Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y))
-	if right.length() > 0.3:
+	if third_person:
+		# Right stick turns the camera; movement is relative to where it looks
+		# and you always aim at the centre of the screen.
+		if right.length() > 0.2:
+			_tp_yaw -= right.x * 2.6 * delta
+			_tp_pitch = clampf(_tp_pitch + right.y * 1.6 * delta, deg_to_rad(tp_pitch_min), deg_to_rad(tp_pitch_max))
+		var m3 := Vector3(move.x, 0, move.y).rotated(Vector3.UP, _tp_yaw)
+		move = Vector2(m3.x, m3.z)
+		aim = _tp_forward() * 12.0
+	elif right.length() > 0.3:
 		aim = Vector3(right.x, 0, right.y)
 	elif stick.length() > 0.2 and aim == Vector3.ZERO:
 		aim = Vector3(stick.x, 0, stick.y)
@@ -661,7 +739,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _mouse_aim() -> Vector3:
-	if _camera == null or DisplayServer.get_name() == "headless":
+	if third_person or _camera == null or DisplayServer.get_name() == "headless":
 		return Vector3.ZERO
 	var mouse: Vector2 = get_viewport().get_mouse_position()
 	var from: Vector3 = _camera.project_ray_origin(mouse)
@@ -676,6 +754,7 @@ func _mouse_aim() -> Vector3:
 
 func _process(delta: float) -> void:
 	_play_audio()  # before drawing: the draw functions consume the run's events
+	_update_mouse_mode()
 	_draw_player_and_camera()
 	_draw_enemies()
 	_draw_orbs()
@@ -765,8 +844,67 @@ func _play_audio() -> void:
 	_audio_generators = gens
 
 
+# --- Third-person camera ---------------------------------------------------
+
+## Horizontal direction the third-person camera looks at.
+func _tp_forward() -> Vector3:
+	return Vector3(0, 0, -1).rotated(Vector3.UP, _tp_yaw)
+
+
+func _set_third_person(on: bool) -> void:
+	third_person = on
+	if not on:
+		# Keep the soldier facing where the camera was looking.
+		run.facing = _tp_forward()
+	else:
+		_tp_yaw = atan2(-run.facing.x, -run.facing.z)
+	if _crosshair != null:
+		_crosshair.visible = on
+	if profile != null:
+		profile.third_person = on
+		profile.save()
+
+
+## The mouse is captured (hidden, turns the camera) only while playing in
+## third person; menus, cards, pause and the end screen get it back.
+func _update_mouse_mode() -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	var playing: bool = third_person and not paused and run.card_choices.is_empty() and not run.is_over()
+	var want: Input.MouseMode = Input.MOUSE_MODE_CAPTURED if playing else Input.MOUSE_MODE_VISIBLE
+	if Input.mouse_mode != want:
+		Input.mouse_mode = want
+	if _crosshair != null:
+		_crosshair.visible = playing
+
+
+## Over-the-shoulder: orbit behind the player at (yaw, pitch), offset to the
+## right shoulder, and pulled closer when a building is in the way.
+func _update_third_person_camera(jitter: Vector3) -> void:
+	var fwd: Vector3 = _tp_forward()
+	var right: Vector3 = fwd.cross(Vector3.UP).normalized()
+	var pivot: Vector3 = run.player_pos + Vector3(0, tp_height, 0) + right * tp_shoulder
+	var back: Vector3 = (-fwd * cos(_tp_pitch) + Vector3.UP * sin(_tp_pitch)).normalized()
+	var dist: float = tp_distance
+	for box in _building_boxes:
+		var hit: Variant = _segment_hits_box(pivot, pivot + back * tp_distance, box)
+		if hit != null:
+			dist = minf(dist, maxf(0.8, float(hit) - 0.3))
+	_camera.position = pivot + back * dist + jitter
+	_camera.look_at(pivot + fwd * 10.0 + Vector3(0, -0.4, 0) + jitter * 0.5)
+
+
+## Distance along the segment a→b to the box, or null if it does not hit.
+func _segment_hits_box(a: Vector3, b: Vector3, box: AABB) -> Variant:
+	var hit: Variant = box.intersects_segment(a, b)
+	return null if hit == null else a.distance_to(hit)
+
+
 func _draw_player_and_camera() -> void:
 	var delta: float = get_process_delta_time()
+	var moved: float = _player.position.distance_to(run.player_pos)
+	_walk_speed = lerpf(_walk_speed, clampf(moved / maxf(delta, 0.001) / 6.0, 0.0, 1.0), 0.2)
+	(_player as SoldierModel).animate(_walk_speed, Time.get_ticks_msec() / 1000.0)
 	_player.position = run.player_pos
 	_player.basis = Basis.looking_at(run.facing, Vector3.UP)
 	# Stretch along the dash direction while breaking through.
@@ -784,10 +922,13 @@ func _draw_player_and_camera() -> void:
 	_trauma = maxf(0.0, _trauma - delta * 1.8)
 	var shake: float = _trauma * _trauma * 0.6
 	var jitter := Vector3(randf_range(-1, 1), randf_range(-1, 1), randf_range(-1, 1)) * shake
-	var pitch: float = deg_to_rad(camera_pitch_deg)
-	var offset := Vector3(0, sin(pitch), cos(pitch)) * camera_distance
-	_camera.position = run.player_pos + Vector3(0, 1, 0) + offset + jitter
-	_camera.look_at(run.player_pos + Vector3(0, 1, 0) + jitter * 0.5)
+	if third_person:
+		_update_third_person_camera(jitter)
+	else:
+		var pitch: float = deg_to_rad(camera_pitch_deg)
+		var offset := Vector3(0, sin(pitch), cos(pitch)) * camera_distance
+		_camera.position = run.player_pos + Vector3(0, 1, 0) + offset + jitter
+		_camera.look_at(run.player_pos + Vector3(0, 1, 0) + jitter * 0.5)
 	# Muzzle flash: a short-lived light at the gun.
 	_muzzle.light_energy = maxf(0.0, _muzzle.light_energy - delta * 40.0)
 

@@ -10,8 +10,23 @@ royalty-free comercial). Cada entrada indica a origem e a licença.
 | `addons/sky_3d/` | Sky3D 2.1 (céu e ciclo dia/noite) | Cory Petkovsek, J. Cuéllar e contribuidores | MIT (`LICENSE.txt`) |
 | `addons/phantom_camera/` | Phantom Camera 0.11 (transições de câmara) | Marcus Skov | MIT (`LICENSE`) |
 | `assets/animations/AnimationLibrary_Godot_Standard.glb` | Universal Animation Library (animações humanoides) | Quaternius | CC0 (`QUATERNIUS_LICENSE.txt`) |
+| `assets/models/nature_megakit/` | Stylized Nature MegaKit (versão grátis, glTF): árvores, rochas, relva, flores | Quaternius | CC0 (`License_Standard.txt`) |
+| `addons/road-generator/` + `road_demos/` | Road Generator 0.9.4 (estradas 3D) | Moo-Ack! Productions | MIT (`LICENSE`) |
+| `addons/lit/` | Lit 1.1.6 (luz **2D**; não usado no 3D) | Shawn Deprey | MIT (`LICENSE`) |
+| `addons/guide/` + `guide_examples/` | G.U.I.D.E 0.14 (input e ícones de comandos) | Jan Thomä | MIT (`LICENSE.md`) |
+| `addons/boot_splash_plus/` | Boot Splash Plus 0.4.5 | GamingFirstOne | MIT (`LICENSE`) |
+| `addons/asset_placer/` | Godot Asset Placer 1.6 (ferramenta de editor) | Roman Levinzon | MIT (`LICENSE`) |
+| `addons/orchestrator/` | Orchestrator (visual scripting, GDExtension, 170 MB) | CraterCrash e contribuidores (`AUTHORS.md`) | Apache 2.0 (`LICENSE`) |
+| `addons/zylann.hterrain/` | HTerrain 1.8 (terreno por heightmap) | Marc Gilleron | MIT (`LICENSE.md`) |
+| `addons/Color grading/` + `Compositor/` | Color Grading (efeitos de compositor) | Rytelier | MIT (`LICENSE.txt` na raiz) |
+| `addons/dialogue_manager/` | Dialogue Manager 4.1 | Nathan Hoad | MIT (`LICENSE`) |
+| `addons/GD-Sync/` | GD-Sync 1.0.2 (multiplayer na cloud) | GD-Sync | BSD-style para o código; o **serviço** tem termos próprios (contas/planos em gd-sync.com) |
+| `PlayerCharacter/`, `Map/`, `Arts/` | Third Person Controller (cena de exemplo, *plush* do Godot, fontes) | Jeh3no | MIT (`LICENSE` na raiz) |
 | `assets/audio/ovani_sfx_starter_vol1/` | Sound FX Starter Pack Vol. 1 | Ovani Sound | Royalty-free (`Royalty-Free License (Link).pdf`; https://ovanisound.com/policies/terms-of-service) |
 
 Removidos na integração (não servem ao jogo): versões Unity/Unreal da
-biblioteca de animações, a demo do Terrain3D, o ThirdPerson Controller
-(câmara de 3.ª pessoa não encaixa na câmara média) e ficheiros `__MACOSX`.
+biblioteca de animações, a demo do Terrain3D, ficheiros `__MACOSX` e, do
+Nature MegaKit, as cópias FBX / FBX (Unity) / OBJ / `Textures/` e as imagens
+de preview (o glTF tem tudo; os OBJ/FBX apontavam para texturas em `C:/` e
+enchiam o import de erros). Recuperáveis no histórico do git (commit
+`d4f070c`). Avaliação de cada addon: `docs/tech/ASSETS.md`.

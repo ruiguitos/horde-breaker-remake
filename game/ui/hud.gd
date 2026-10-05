@@ -157,7 +157,7 @@ func _init() -> void:
 	var help := Label.new()
 	help.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	help.position = Vector2(16, -40)
-	help.text = "WASD move · mouse aim · Space breaker · G ability · Shift sprint · 1-5 weapons · Esc pause · F3 debug"
+	help.text = "WASD move · mouse look/aim · V camera · Space breaker · G ability · Shift sprint · 1-5 weapons · Esc pause · F3 debug"
 	help.modulate = Color(1, 1, 1, 0.7)
 	root.add_child(help)
 

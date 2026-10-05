@@ -34,7 +34,6 @@ func _ready() -> void:
 	var gap := Control.new()
 	gap.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	nav.add_child(gap)
-	UiTheme.button(nav, "SETTINGS", _settings)
 	UiTheme.button(nav, "INTEL ARCHIVE", _archive)
 	UiTheme.button(nav, "MAIN MENU", func() -> void: back_requested.emit())
 	_content = VBoxContainer.new()
@@ -105,8 +104,10 @@ func _classes() -> void:
 	var hero := HBoxContainer.new()
 	hero.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_content.add_child(hero)
-	var portrait := UiTheme.texture(UiTheme.CONTRACTOR, true)
-	portrait.custom_minimum_size.x = 200
+	# 3D turntable of the class's model (the one you play on the island).
+	var portrait := ClassPreview.create(profile.selected_class)
+	portrait.name = "ClassPreview"
+	portrait.custom_minimum_size = Vector2(200, 280)
 	portrait.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hero.add_child(portrait)
 	var detail := VBoxContainer.new()
@@ -231,11 +232,6 @@ func _loadout() -> void:
 		(plate.get_parent() as Control).tooltip_text = description
 	_start_button = UiTheme.button(_summary_footer, "START RUN   →", _start, true)
 	_start_button.name = "StartRun"
-
-
-func _settings() -> void:
-	if not is_instance_valid(_dialog):
-		_dialog = MenuDialog.settings(self, profile)
 
 
 func _archive() -> void:

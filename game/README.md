@@ -23,8 +23,9 @@ Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 
 | Ação | Teclado/rato | Comando |
 |---|---|---|
-| Mover | WASD / setas | stick esquerdo |
-| Orientar (o auto-fire dispara para onde olhas) | rato | stick direito |
+| Mover (relativo à câmara em 3.ª pessoa) | WASD / setas | stick esquerdo |
+| Olhar / apontar (o auto-fire dispara para onde olhas) | rato | stick direito |
+| Câmara: 3.ª pessoa ↔ vista de cima | V | Back / Select |
 | Breaker (investida) | Espaço ou botão direito | A ou RB |
 | Sprint (não dispara enquanto corre) | Shift | L3 (clicar stick esquerdo) |
 | Granada (lança para o rato) | G ou botão do meio | LB |
@@ -35,11 +36,21 @@ Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 | Painel de debug | F3 | — |
 | Ecrã inteiro | F11 | — |
 
-**Settings** (no título, no Armory e na pausa): volumes Master, Sound effects e
-Music, cada um com um slider e um campo editável em percentagem (0–100;
-escrever e carregar Enter, ou mudar de campo, aplica o valor). Também tem
-gráficos High/Low e ecrã inteiro. Tudo fica gravado no perfil. Os sons vão
-para os buses de áudio SFX e Music, criados em código (`core/profile.gd`).
+**Settings** (no título e na pausa), em três separadores; tudo se aplica na
+hora e fica gravado no perfil (`core/graphics_settings.gd` aplica ecrã e
+gráficos):
+- **Display:** modo de janela (janela, ecrã inteiro sem bordas, ecrã inteiro
+  exclusivo), resolução (em janela), VSync e limite de FPS.
+- **Graphics:** preset Low / Medium / High / Ultra, que muda de facto o jogo:
+  - **Low:** sem sombras, bloom nem SSAO, e menos detalhe ao longe.
+  - **Medium:** sombras do sol com 2 divisões e bloom.
+  - **High:** sombras suaves com 4 divisões, bloom e SSAO.
+  - **Ultra:** sombras mais nítidas e ao longe, e luz indireta (SSIL).
+
+  Também tem a escala do render 3D (50–100 %: menos píxeis 3D, mais FPS) e o
+  anti-aliasing (FXAA, MSAA 2x/4x, TAA).
+- **Audio:** volumes Master, Sound effects e Music, cada um com slider e campo
+  editável em percentagem. Os sons vão para os buses SFX e Music.
 
 ## Como se joga
 
@@ -175,8 +186,8 @@ Pack ao fim de 3 min") em vez de impressões.
   opções e não poder bruto.
 - **Classes** (escolhe-se uma no Armory; a tecla G usa a habilidade):
   Recruit (grátis; Granada), Vanguard (150; +40 HP, breaker −30 %; War Cry:
-  atordoa a 7 m e −40 % de dano recebido durante 5 s) e Field Medic (200;
-  regenera 1 HP/s; Med Kit: +35 HP).
+  atordoa a 7 m e −40 % de dano recebido durante 5 s). O Field Medic foi
+  retirado a pedido; perfis antigos com ele voltam ao Recruit.
 - **Armas**: SMG (60 Intel; 16 tiros/s, 18 m) e Marksman Rifle (80 Intel;
   110 de dano, atravessa 6). Depois de compradas ficam nas teclas 4 e 5.
 - **Threat 1–3**: cada nível dá +20 % de HP aos inimigos, mais 25 vivos e
@@ -198,8 +209,16 @@ Pack ao fim de 3 min") em vez de impressões.
   cor do bioma no interior) sobre uma textura clara gerada em código; mais
   tarde podem entrar texturas reais (areia, relva, rocha). Sem o addon, volta
   o chão de tiles.
-- Tonemap ACES sempre ligado. **Graphics: High** (Armory) liga também bloom e
-  SSAO (oclusão ambiente); **Low** desliga-os, para PCs mais fracos.
+- **Estradas** (addon Road Generator, `world/island_roads.gd`): do cais a
+  cada objetivo, com candeeiros acesos (`OmniLight3D`). São só decoração.
+- **Natureza** (Quaternius Nature MegaKit, `world/nature_kit.gd`): árvores e
+  rochas reais, e relva, fetos, flores ou seixos por bioma, desenhados com
+  `MultiMesh`. A praia e o porto mantêm as palmeiras feitas em código.
+- **Soldado** (`world/soldier_model.gd`): o contratado low-poly, com farda e
+  arma por classe (Recruit: caqui e espingarda; Vanguard: armadura pesada e
+  caçadeira). Anda com pernas a balançar e aparece a rodar no Armory.
+- Tonemap ACES sempre ligado. O preset de Graphics (Settings) decide
+  sombras, bloom, SSAO e SSIL.
 - Partículas GPU (`world/fx.gd`): faíscas nos impactos, sangue nas mortes e
   pó no breaker, a partir de emissores reutilizados.
 - As capturas da cloud usam o renderer de compatibilidade (sem SSAO): o

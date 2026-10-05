@@ -211,20 +211,16 @@ const STARTING_WEAPONS: Array[StringName] = [&"rifle", &"shotgun", &"pistol"]
 const WEAPON_COSTS: Dictionary = {&"smg": 60, &"marksman": 80}
 
 ## Classes: passive + active ability. The Recruit is free; the others are bought.
-const CLASSES: Array[StringName] = [&"recruit", &"vanguard", &"medic"]
+const CLASSES: Array[StringName] = [&"recruit", &"vanguard"]
 const CLASS_INFO: Dictionary = {
 	&"recruit": {"name": "Recruit", "cost": 0, "ability": "Grenade",
 		"text": "Balanced. Ability: Grenade (5 m blast)."},
 	&"vanguard": {"name": "Vanguard", "cost": 150, "ability": "War Cry",
 		"text": "+40 max HP, breaker cooldown -30%. Ability: War Cry (stun 7 m, -40% damage taken for 5 s)."},
-	&"medic": {"name": "Field Medic", "cost": 200, "ability": "Med Kit",
-		"text": "Regenerates 1 HP/s. Ability: Med Kit (heal 35 HP)."},
 }
 const WAR_CRY_RADIUS: float = 7.0
 const WAR_CRY_TIME: float = 5.0
 const WAR_CRY_COOLDOWN: float = 16.0
-const MEDKIT_HEAL: float = 35.0
-const MEDKIT_COOLDOWN: float = 18.0
 
 ## Meta progression
 const SLOT_COSTS: Array[int] = [0, 100, 250]  ## cost of the 1st, 2nd, 3rd perk slot

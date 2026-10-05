@@ -343,19 +343,13 @@ func _test_classes() -> void:
 	var cried: bool = run.use_ability(Vector3.ZERO)
 	_check(run.max_hp == 140.0 and cried and run.horde.stun[0] > 1.0 and run.war_cry_time > 0.0,
 		"Vanguard: 140 HP, War Cry stuns nearby enemies")
-	var ctx2 := RunContext.new(8)
-	ctx2.apply_class(&"medic")
-	var run2 := IslandRun.new(8)
-	run2.load_context(ctx2)
-	run2.director.max_alive = 0
-	run2.hp = 40.0
-	run2.use_ability(Vector3.ZERO)
-	for t in 60:
-		run2.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)
-	_check(run2.hp >= 40.0 + GameData.MEDKIT_HEAL + 0.9, "Medic: Med Kit heals and HP regenerates (%.1f)" % run2.hp)
 	var p := Profile.new()
+	p.intel = 100
+	_check(not p.buy_class(&"vanguard"), "classes need enough Intel")
 	p.intel = 160
-	_check(p.buy_class(&"vanguard") and not p.buy_class(&"medic"), "classes are bought with Intel")
+	_check(p.buy_class(&"vanguard") and p.intel == 10, "classes are bought with Intel")
+	var old := Profile.from_dict({"unlocked_classes": ["recruit", "medic"], "selected_class": "medic"})
+	_check(old.selected_class == &"recruit" and not old.unlocked_classes.has(&"medic"), "removed Field Medic falls back to Recruit")
 
 
 func _test_caches() -> void:

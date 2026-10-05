@@ -50,8 +50,7 @@ func _run_tests() -> void:
 	_check(profile.selected_class == &"vanguard" and profile.intel == 0, "class purchase selects and charges once")
 	armory.call("_choose_class", &"vanguard")
 	_check(profile.intel == 0, "owned class is not charged twice")
-	armory.call("_choose_class", &"medic")
-	_check(profile.selected_class == &"vanguard", "unaffordable class is rejected")
+	_check(armory.find_child("Class_medic", true, false) == null, "Field Medic class is gone")
 	profile.intel = 80
 	armory.call("_select_category", "PERKS")
 	await _settle()
@@ -71,7 +70,9 @@ func _run_tests() -> void:
 	start = armory.get("_start_button")
 	start.grab_focus()
 	var saves_before: int = profile.saves
-	armory.call("_settings")
+	var nav_texts: Array = armory.find_children("*", "Button", true, false).map(func(b: Button) -> String: return b.text)
+	_check(not nav_texts.has("SETTINGS"), "Armory no longer has a Settings tab")
+	armory.set("_dialog", MenuDialog.settings(armory, profile))
 	await _settle()
 	var dialog: MenuDialog = armory.get("_dialog")
 	var focus := root.gui_get_focus_owner()

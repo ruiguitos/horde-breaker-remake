@@ -4,7 +4,7 @@ extends RefCounted
 ## user:// (on Windows: %APPDATA%/Godot/app_userdata/Horde Breaker Remake).
 
 const PATH: String = "user://profile.json"
-const VERSION: int = 3
+const VERSION: int = 4
 
 var intel: int = 0
 var runs: int = 0
@@ -27,7 +27,16 @@ var unlocked_weapons: Array[StringName] = []  ## bought in the armory
 var unlocked_classes: Array[StringName] = [&"recruit"]
 var selected_class: StringName = &"recruit"
 var lore_pages: int = 0
-var graphics_high: bool = true  ## Intel files unlocked (Story.FILES, in order)
+## Display and graphics (applied by GraphicsSettings).
+var window_mode: int = GraphicsSettings.WINDOWED
+var resolution: Vector2i = Vector2i(1600, 900)  ## window size when windowed
+var vsync: bool = true
+var max_fps: int = 0  ## 0 = unlimited
+var quality: int = GraphicsSettings.HIGH  ## Low / Medium / High / Ultra preset
+var render_scale: int = 100  ## 3D resolution in percent of the window
+var antialias: int = GraphicsSettings.AA_FXAA
+var third_person: bool = true  ## island camera: over-the-shoulder (V toggles top-down)
+var mouse_sensitivity: int = 50  ## percent
 
 
 static func load_profile(path: String = PATH) -> Profile:
@@ -39,7 +48,11 @@ static func load_profile(path: String = PATH) -> Profile:
 	if not data is Dictionary:
 		push_warning("Profile: unreadable save, starting fresh")
 		return p
-	var d: Dictionary = data
+	return from_dict(data)
+
+
+static func from_dict(d: Dictionary) -> Profile:
+	var p := Profile.new()
 	# Version 1 had no perks or threat: the defaults above are the migration.
 	p.intel = int(d.get("intel", 0))
 	p.runs = int(d.get("runs", 0))
@@ -52,13 +65,25 @@ static func load_profile(path: String = PATH) -> Profile:
 	p.slots = int(d.get("slots", 1))
 	p.max_threat = int(d.get("max_threat", 1))
 	p.lore_pages = int(d.get("lore_pages", 0))
-	p.graphics_high = bool(d.get("graphics_high", true))
+	# Version 3 had one High/Low toggle; version 4 has a quality preset.
+	p.quality = clampi(int(d.get("quality", GraphicsSettings.HIGH if bool(d.get("graphics_high", true)) else GraphicsSettings.LOW)), 0, GraphicsSettings.QUALITY_NAMES.size() - 1)
+	p.window_mode = clampi(int(d.get("window_mode", GraphicsSettings.WINDOWED)), 0, GraphicsSettings.WINDOW_MODE_NAMES.size() - 1)
+	var res: PackedStringArray = String(d.get("resolution", "1600x900")).split("x")
+	if res.size() == 2 and res[0].is_valid_int() and res[1].is_valid_int():
+		p.resolution = Vector2i(maxi(640, int(res[0])), maxi(360, int(res[1])))
+	p.vsync = bool(d.get("vsync", true))
+	p.third_person = bool(d.get("third_person", true))
+	p.mouse_sensitivity = clampi(int(d.get("mouse_sensitivity", 50)), 1, 100)
+	p.max_fps = maxi(0, int(d.get("max_fps", 0)))
+	p.render_scale = clampi(int(d.get("render_scale", 100)), 50, 100)
+	p.antialias = clampi(int(d.get("antialias", GraphicsSettings.AA_FXAA)), 0, GraphicsSettings.AA_NAMES.size() - 1)
 	# Version 2 stored one master volume 0..10; version 3 stores percentages.
 	p.master_volume = clampi(int(d.get("master_volume", int(d.get("volume", 8)) * 10)), 0, 100)
 	p.sfx_volume = clampi(int(d.get("sfx_volume", 100)), 0, 100)
 	p.music_volume = clampi(int(d.get("music_volume", 70)), 0, 100)
 	for id in d.get("unlocked_classes", []):
-		if not p.unlocked_classes.has(StringName(id)):
+		# Classes removed from the game (e.g. Field Medic) are dropped.
+		if GameData.CLASSES.has(StringName(id)) and not p.unlocked_classes.has(StringName(id)):
 			p.unlocked_classes.append(StringName(id))
 	p.selected_class = StringName(d.get("selected_class", "recruit"))
 	if not p.unlocked_classes.has(p.selected_class):
@@ -79,9 +104,11 @@ func save(path: String = PATH) -> bool:
 		"extractions": extractions, "best_kills": best_kills,
 		"owned_perks": owned_perks.map(func(x: StringName) -> String: return String(x)),
 		"equipped_perks": equipped_perks.map(func(x: StringName) -> String: return String(x)),
-		"slots": slots, "max_threat": max_threat, "threat": threat, "master_volume": master_volume, "sfx_volume": sfx_volume, "music_volume": music_volume, "lore_pages": lore_pages, "graphics_high": graphics_high, "selected_class": String(selected_class),
+		"slots": slots, "max_threat": max_threat, "threat": threat, "master_volume": master_volume, "sfx_volume": sfx_volume, "music_volume": music_volume, "lore_pages": lore_pages, "selected_class": String(selected_class),
 		"unlocked_classes": unlocked_classes.map(func(x: StringName) -> String: return String(x)),
-		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x))}, "  "))
+		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x)),
+		"quality": quality, "window_mode": window_mode, "resolution": "%dx%d" % [resolution.x, resolution.y],
+		"vsync": vsync, "third_person": third_person, "mouse_sensitivity": mouse_sensitivity, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias}, "  "))
 	return true
 
 

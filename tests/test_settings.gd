@@ -23,9 +23,46 @@ func _initialize() -> void:
 	_panel = SettingsPanel.open(host, _profile)
 
 
+## Display and Graphics tabs: the options exist and change the engine.
+func _test_display_graphics() -> void:
+	_check(_panel.find_child("Option_Window_mode", true, false) != null and _panel.find_child("Toggle_VSync", true, false) != null,
+		"Display tab: window mode, resolution, VSync, FPS limit")
+	var fps: OptionButton = _panel.find_child("Option_FPS_limit", true, false)
+	fps.select(2)
+	fps.item_selected.emit(2)
+	_check(_profile.max_fps == 60 and Engine.max_fps == 60, "FPS limit 60 caps the engine")
+	_panel.call("_show", "GRAPHICS")
+	var q: OptionButton = _panel.find_child("Option_Quality", true, false)
+	q.select(GraphicsSettings.LOW)
+	q.item_selected.emit(GraphicsSettings.LOW)
+	var env := Environment.new()
+	var sun := DirectionalLight3D.new()
+	GraphicsSettings.apply_environment(env)
+	GraphicsSettings.apply_sun(sun)
+	_check(not env.ssao_enabled and not env.glow_enabled and not sun.shadow_enabled, "Low: no SSAO, bloom or shadows")
+	q.select(GraphicsSettings.ULTRA)
+	q.item_selected.emit(GraphicsSettings.ULTRA)
+	GraphicsSettings.apply_environment(env)
+	GraphicsSettings.apply_sun(sun)
+	_check(env.ssao_enabled and env.ssil_enabled and sun.shadow_enabled, "Ultra: SSAO, SSIL and shadows")
+	var scale: HSlider = _panel.find_child("Slider_3D_render_scale", true, false)
+	scale.value = 70
+	_check(is_equal_approx(root.scaling_3d_scale, 0.7), "render scale 70% reaches the viewport")
+	var aa: OptionButton = _panel.find_child("Option_Anti-aliasing", true, false)
+	aa.select(GraphicsSettings.AA_MSAA4)
+	aa.item_selected.emit(GraphicsSettings.AA_MSAA4)
+	_check(root.msaa_3d == Viewport.MSAA_4X, "MSAA 4x reaches the viewport")
+	sun.free()
+	Engine.max_fps = 0
+
+
 func _process(_delta: float) -> bool:
 	_frames += 1
-	if _frames < 2:
+	if _frames == 2:
+		_test_display_graphics()
+		_panel.call("_show", "AUDIO")
+		return false
+	if _frames < 4:
 		return false
 	var sliders: Array = _panel.find_children("*", "HSlider", true, false)
 	var fields: Array = _panel.find_children("*", "LineEdit", true, false)
@@ -53,5 +90,7 @@ func _process(_delta: float) -> bool:
 	var old: Profile = Profile.load_profile(path)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	_check(old.master_volume == 60 and old.sfx_volume == 100, "a v2 profile volume of 6/10 becomes 60%")
+	var v3 := Profile.from_dict({"version": 3, "graphics_high": false})
+	_check(v3.quality == GraphicsSettings.LOW, "a v3 Graphics: Low profile becomes the Low preset")
 	quit(1 if _failures > 0 else 0)
 	return false
