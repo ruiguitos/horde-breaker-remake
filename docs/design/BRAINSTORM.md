@@ -147,3 +147,31 @@ precisas (som, borda do ecrã)?
 - Vertical slice em grey-box: 1 ilha, 1 classe, 3 armas, 4 inimigos,
   1 missão — 10 minutos divertidos antes de mais nada.
 - Cada feature serve um pilar; playtests curtos com perguntas definidas.
+
+## 10. Respostas do utilizador (2026-10-05)
+
+Respostas às 10 perguntas abertas. Ainda **não** estão em `DECISIONS.md`:
+o utilizador regista-as lá quando as confirmar.
+
+1. **Direção**: A+B ("Expedition Breaker").
+2. **Mira**: resposta "Auto-Fire pff" — a confirmar se o auto-fire é o modo
+   por omissão ou só opção de acessibilidade (a mira manual com assistência
+   era a proposta).
+3. **Headshots**: mantêm-se; há tiros à cabeça e ao corpo (pontos fracos
+   visíveis nos especiais podem somar-se a isto).
+4. **Breaker**: investida comum a todas as classes, sem sprint. O Bull Rush
+   do Renegade tem de mudar.
+5. **Horda**: ~80–150 inimigos ativos; o número final vem do spike S2.
+6. **Base**: o barco como ecrã de loja e serviços entre ilhas, sem construção.
+7. **Progressão**: perks em slots em vez de skill tree; meta em "Intel";
+   morrer conserva o Intel. Dúvida do utilizador: faz sentido haver Scrap?
+   - Proposta: **cortar o Scrap** no vertical slice. Entre ilhas, o barco
+     oferece "escolhe 1 de 3" (carta, arma, cura) em vez de uma loja com
+     moeda. Uma moeda a menos para equilibrar e explicar. Volta a ser
+     considerado só se os playtests pedirem decisões de gasto na run.
+8. **Vertical slice**: Recruit; 4.º inimigo = Grabber (testa o breaker).
+9. **Contexto**: projeto por divertimento, a solo, sem experiência prévia em
+   desenvolvimento de jogos e sem prazo. Implica: âmbito pequeno, passos
+   explicados, nada que exija arte ou rede.
+10. **Tom**: humor ao estilo DRG; desmembramento simples (com primitivas:
+    partes da cápsula que se soltam).
