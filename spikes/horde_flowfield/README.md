@@ -106,7 +106,7 @@ dos quais ~150 "ativos" a perseguir; margem para picos e para o resto do jogo.
   (só reaproveita a thread e descarta pedidos intermédios). Se 50 ms de
   latência incomodar: BFS limitado a um raio, grelha de 2 m, ou portar o
   BFS para C++/GDExtension.
-- Velocidade de cálculo de direção a 8 vizinhos sobre distâncias de 4
+- Direções a 8 vizinhos calculadas sobre distâncias de 4
   vizinhos dá caminhos a 45°/90°, não perfeitamente retos.
 
 ## Decisões propostas
