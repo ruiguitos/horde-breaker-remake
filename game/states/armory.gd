@@ -1,195 +1,246 @@
 extends Control
-## Between runs: spend Intel on perks and slots, equip perks, pick the Threat
-## level and start a run. Unlocks are horizontal (new options, small bonuses)
-## as in docs/design/PROGRESSION_AND_ECONOMY.md §3.
+## Native equipment screen; progression remains owned by Profile.
 
 signal start_requested
+signal back_requested
 
 var profile: Profile
-
-var _list: VBoxContainer
-var _header: Label
-var _threat_row: HBoxContainer
+var _category: String = "CLASS"
+var _content: VBoxContainer
+var _summary: VBoxContainer
+var _summary_footer: VBoxContainer
+var _nav: Array[Button] = []
+var _start_button: Button
+var _dialog: MenuDialog
 
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	size = get_viewport_rect().size
 	theme = UiTheme.get_theme()
-	var bg := ColorRect.new()
-	bg.color = UiTheme.BG
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
-	var box: VBoxContainer = UiTheme.centered_panel(self, 760)
-	box.add_child(UiTheme.title("ARMORY", 34))
-	if profile.runs == 0:
-		var tips := Label.new()
-		tips.text = "First time? Your gun fires by itself at enemies in front of you: aim with your body (the laser turns red for headshots). Space = breaker dash through the horde, G = grenade, Shift = sprint. Activate 3 generators, then get back to the boat."
-		tips.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		tips.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		tips.add_theme_color_override("font_color", Color(0.7, 0.9, 1.0))
-		box.add_child(tips)
-	_header = Label.new()
-	_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(_header)
-	# The list scrolls so the menu fits small windows (default 1152x648).
+	UiTheme.backdrop(self)
+	var screen := UiTheme.screen(self)
+	UiTheme.header(screen, "ARMORY / CONTRACTOR EQUIPMENT")
+	var body := HBoxContainer.new()
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_theme_constant_override("separation", 24)
+	screen.add_child(body)
+	var nav := VBoxContainer.new()
+	nav.custom_minimum_size.x = 160
+	body.add_child(nav)
+	for category in ["CLASS", "WEAPONS", "PERKS"]:
+		var b := UiTheme.button(nav, category + "   ›", _select_category.bind(category))
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		_nav.append(b)
+	var gap := Control.new()
+	gap.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	nav.add_child(gap)
+	UiTheme.button(nav, "SETTINGS", _settings)
+	UiTheme.button(nav, "INTEL ARCHIVE", _archive)
+	UiTheme.button(nav, "MAIN MENU", func() -> void: back_requested.emit())
+	_content = VBoxContainer.new()
+	_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(_content)
+	body.add_child(VSeparator.new())
+	var summary_column := VBoxContainer.new()
+	summary_column.custom_minimum_size.x = 272
+	body.add_child(summary_column)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 230 if profile.runs == 0 else 280)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	box.add_child(scroll)
-	_list = VBoxContainer.new()
-	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(_list)
-	var threat_label := Label.new()
-	threat_label.text = "Threat (extract on your highest Threat to unlock the next):"
-	box.add_child(threat_label)
-	_threat_row = HBoxContainer.new()
-	box.add_child(_threat_row)
-	var settings := Button.new()
-	settings.text = "SETTINGS (volume, graphics)"
-	settings.pressed.connect(func() -> void: SettingsPanel.open(self, profile))
-	box.add_child(settings)
-	var files := Button.new()
-	files.text = "INTEL FILES (%d / %d)" % [profile.lore_pages, Story.FILES.size()]
-	files.disabled = profile.lore_pages == 0
-	files.pressed.connect(_show_files)
-	box.add_child(files)
-	var start := Button.new()
-	start.text = "START RUN (Enter)"
-	start.custom_minimum_size = Vector2(0, 50)
-	start.pressed.connect(_start)
-	box.add_child(start)
+	scroll.follow_focus = true
+	summary_column.add_child(scroll)
+	_summary = VBoxContainer.new()
+	_summary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(_summary)
+	_summary_footer = VBoxContainer.new()
+	summary_column.add_child(_summary_footer)
+	UiTheme.hints(screen)
 	_rebuild()
-	start.grab_focus()
+	_start_button.grab_focus()
 	add_child(UiSfx.new())
 
 
+func _clear(parent: Node) -> void:
+	for child in parent.get_children():
+		parent.remove_child(child)
+		child.queue_free()
+
+
+func _select_category(category: String) -> void:
+	_category = category
+	_rebuild()
+
+
 func _rebuild() -> void:
-	for c in _list.get_children():
-		c.queue_free()
-	for c in _threat_row.get_children():
-		c.queue_free()
-	_header.text = "Intel: %d   ·   Perk slots: %d (%d equipped)" % [
-		profile.intel, profile.slots, profile.equipped_perks.size()]
+	var focused := get_viewport().gui_get_focus_owner()
+	var focus_name: String = String(focused.name) if focused != null else ""
+	_clear(_content)
+	_clear(_summary)
+	_clear(_summary_footer)
+	for i in _nav.size():
+		_nav[i].theme_type_variation = &"PrimaryButton" if ["CLASS", "WEAPONS", "PERKS"][i] == _category else &""
+	match _category:
+		"CLASS": _classes()
+		"WEAPONS": _weapons()
+		"PERKS": _perks()
+	_loadout()
+	if focus_name != "":
+		call_deferred("_restore_focus", focus_name)
+
+
+func _restore_focus(focus_name: String) -> void:
+	for node in find_children(focus_name, "Button", true, false):
+		var candidate := node as Button
+		if candidate.is_visible_in_tree() and not candidate.disabled:
+			candidate.grab_focus()
+			return
+
+
+func _classes() -> void:
+	var info: Dictionary = GameData.CLASS_INFO[profile.selected_class]
+	_content.add_child(UiTheme.label("SELECTED CLASS", 16, UiTheme.MUTED, true))
+	var heading := UiTheme.title(String(info["name"]).to_upper(), 40)
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_content.add_child(heading)
+	var hero := HBoxContainer.new()
+	hero.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_content.add_child(hero)
+	var portrait := UiTheme.texture(UiTheme.CONTRACTOR, true)
+	portrait.custom_minimum_size.x = 200
+	portrait.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hero.add_child(portrait)
+	var detail := VBoxContainer.new()
+	detail.custom_minimum_size.x = 180
+	detail.alignment = BoxContainer.ALIGNMENT_CENTER
+	hero.add_child(detail)
+	detail.add_child(UiTheme.label("CLASS ABILITY / G", 16, UiTheme.MUTED, true))
+	detail.add_child(UiTheme.title(String(info["ability"]).to_upper(), 24))
+	detail.add_child(UiTheme.label(String(info["text"]), 16))
+	detail.add_child(HSeparator.new())
+	detail.add_child(UiTheme.label("Steady lines.\nStronger teams.\nMore island tomorrows.", 16, UiTheme.MUTED, true))
+	var choices := HBoxContainer.new()
+	_content.add_child(choices)
 	for id in GameData.CLASSES:
-		var info: Dictionary = GameData.CLASS_INFO[id]
-		var crow := HBoxContainer.new()
-		var cl := Label.new()
-		cl.text = "Class: %s — %s" % [info["name"], info["text"]]
-		cl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		cl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		crow.add_child(cl)
-		var cb := Button.new()
-		cb.custom_minimum_size = Vector2(150, 0)
-		if not profile.unlocked_classes.has(id):
-			cb.text = "Buy (%d)" % int(info["cost"])
-			cb.disabled = profile.intel < int(info["cost"])
-			cb.pressed.connect(func() -> void: _act(profile.buy_class(id)))
-		elif profile.selected_class == id:
-			cb.text = "✔ Selected"
-			cb.disabled = true
-		else:
-			cb.text = "Select"
-			cb.pressed.connect(func() -> void:
-				profile.selected_class = id
-				_act(true))
-		crow.add_child(cb)
-		_list.add_child(crow)
-	for perk in GameData.perks():
-		var row := HBoxContainer.new()
-		var label := Label.new()
-		label.text = "%s — %s" % [perk.title, perk.description]
-		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(label)
-		var b := Button.new()
-		b.custom_minimum_size = Vector2(150, 0)
-		if not profile.owned_perks.has(perk.id):
-			b.text = "Buy (%d)" % perk.cost
-			b.disabled = profile.intel < perk.cost
-			b.pressed.connect(func() -> void: _act(profile.buy_perk(perk)))
-		elif profile.equipped_perks.has(perk.id):
-			b.text = "✔ Equipped"
-			b.pressed.connect(func() -> void: _act(profile.toggle_equip(perk.id)))
-		else:
-			b.text = "Equip"
-			b.disabled = profile.equipped_perks.size() >= profile.slots
-			b.pressed.connect(func() -> void: _act(profile.toggle_equip(perk.id)))
-		row.add_child(b)
-		_list.add_child(row)
-	for w in GameData.weapons():
-		if not GameData.WEAPON_COSTS.has(w.id):
-			continue
-		var row := HBoxContainer.new()
-		var label := Label.new()
-		label.text = "Weapon: %s — %d dmg, %.0f shots/s, %d m" % [w.display_name, int(w.damage), w.fire_rate, int(w.range_m)]
-		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(label)
-		var b := Button.new()
-		b.custom_minimum_size = Vector2(150, 0)
-		var cost_w: int = int(GameData.WEAPON_COSTS[w.id])
-		if profile.unlocked_weapons.has(w.id):
-			b.text = "✔ Unlocked"
-			b.disabled = true
-		else:
-			b.text = "Buy (%d)" % cost_w
-			b.disabled = profile.intel < cost_w
-			b.pressed.connect(func() -> void: _act(profile.buy_weapon(w.id)))
-		row.add_child(b)
-		_list.add_child(row)
-	var cost: int = profile.next_slot_cost()
-	if cost > 0:
-		var slot := Button.new()
-		slot.text = "Buy perk slot %d (%d Intel)" % [profile.slots + 1, cost]
-		slot.disabled = profile.intel < cost
-		slot.pressed.connect(func() -> void: _act(profile.buy_slot()))
-		_list.add_child(slot)
-	for t in range(1, GameData.MAX_THREAT + 1):
-		var tb := Button.new()
-		tb.text = "Threat %d%s  (Intel x%.2f)" % [t, " ✔" if t == profile.threat else "", GameData.threat_intel(t)]
-		tb.disabled = t > profile.max_threat
-		tb.pressed.connect(func() -> void:
-			profile.threat = t
-			_act(true))
-		_threat_row.add_child(tb)
+		var class_info: Dictionary = GameData.CLASS_INFO[id]
+		var owned: bool = profile.unlocked_classes.has(id)
+		var selected: bool = profile.selected_class == id
+		var status: String = "SELECTED" if selected else ("SELECT" if owned else "%d INTEL" % int(class_info["cost"]))
+		var b := UiTheme.button(choices, String(class_info["name"]).to_upper() + "\n" + status, _choose_class.bind(id))
+		b.name = "Class_" + String(id)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.add_theme_font_size_override("font_size", 16)
+		b.disabled = not owned and profile.intel < int(class_info["cost"])
+		if selected:
+			b.theme_type_variation = &"SelectedButton"
 
 
-## Overlay with the recovered story pages (Story.FILES, in order).
-func _show_files() -> void:
-	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.7)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(dim)
-	var box: VBoxContainer = UiTheme.centered_panel(dim, 700)
-	box.add_child(UiTheme.title("RECOVERED INTEL", 30))
+func _choose_class(id: StringName) -> void:
+	if not profile.unlocked_classes.has(id) and not profile.buy_class(id):
+		return
+	profile.selected_class = id
+	_act(true)
+
+
+func _scroll_list() -> VBoxContainer:
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 380)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	box.add_child(scroll)
+	scroll.follow_focus = true
+	_content.add_child(scroll)
 	var list := VBoxContainer.new()
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	list.add_theme_constant_override("separation", 14)
 	scroll.add_child(list)
-	for i in Story.FILES.size():
-		var t := Label.new()
-		var body := Label.new()
-		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		if i < profile.lore_pages:
-			t.text = Story.FILES[i]["title"]
-			t.add_theme_color_override("font_color", UiTheme.ACCENT)
-			body.text = Story.FILES[i]["text"]
-		else:
-			t.text = "File %02d — [encrypted]" % (i + 1)
-			t.add_theme_color_override("font_color", UiTheme.MUTED)
-			body.text = "Recover it from supply caches or by killing the Behemoth."
-			body.add_theme_color_override("font_color", UiTheme.MUTED)
-		list.add_child(t)
-		list.add_child(body)
-	var close := Button.new()
-	close.text = "CLOSE"
-	close.custom_minimum_size = Vector2(0, 44)
-	close.pressed.connect(func() -> void: dim.queue_free())
-	box.add_child(close)
-	close.grab_focus()
+	return list
+
+
+func _weapons() -> void:
+	_content.add_child(UiTheme.title("WEAPONS", 36))
+	_content.add_child(UiTheme.label("Unlock additional weapons for every expedition.", 16, UiTheme.MUTED))
+	var list := _scroll_list()
+	for weapon in GameData.weapons():
+		var card := UiTheme.panel(list)
+		card.add_child(UiTheme.title(weapon.display_name.to_upper(), 22))
+		card.add_child(UiTheme.label("%d DAMAGE / %.1f SHOTS PER SECOND / %d M" % [int(weapon.damage), weapon.fire_rate, int(weapon.range_m)], 16, UiTheme.MUTED, true))
+		var cost: int = int(GameData.WEAPON_COSTS.get(weapon.id, 0))
+		var owned: bool = cost == 0 or profile.unlocked_weapons.has(weapon.id)
+		var b := UiTheme.button(card, "IN LOADOUT" if owned else "UNLOCK / %d INTEL" % cost, func() -> void: _act(profile.buy_weapon(weapon.id)))
+		b.name = "Weapon_" + String(weapon.id)
+		b.disabled = owned or profile.intel < cost
+
+
+func _perks() -> void:
+	_content.add_child(UiTheme.title("PERKS", 36))
+	_content.add_child(UiTheme.label("Choose how you break the horde. Equipped perks: %d / %d." % [profile.equipped_perks.size(), profile.slots], 16, UiTheme.MUTED))
+	var list := _scroll_list()
+	for perk in GameData.perks():
+		var card := UiTheme.panel(list)
+		card.add_child(UiTheme.title(perk.title.to_upper(), 22))
+		card.add_child(UiTheme.label(perk.description, 16))
+		var owned: bool = profile.owned_perks.has(perk.id)
+		var equipped: bool = profile.equipped_perks.has(perk.id)
+		var text: String = "EQUIPPED / REMOVE" if equipped else ("EQUIP" if owned else "UNLOCK / %d INTEL" % perk.cost)
+		var b := UiTheme.button(card, text, func() -> void:
+			_act(profile.toggle_equip(perk.id) if owned else profile.buy_perk(perk)))
+		b.name = "Perk_" + String(perk.id)
+		b.disabled = (not owned and profile.intel < perk.cost) or (owned and not equipped and profile.equipped_perks.size() >= profile.slots)
+		if equipped:
+			b.theme_type_variation = &"SelectedButton"
+	var cost: int = profile.next_slot_cost()
+	if cost > 0:
+		var slot := UiTheme.button(list, "UNLOCK SLOT %d / %d INTEL" % [profile.slots + 1, cost], func() -> void: _act(profile.buy_slot()))
+		slot.disabled = profile.intel < cost
+
+
+func _loadout() -> void:
+	UiTheme.section(_summary, "LOADOUT SUMMARY")
+	var row := HBoxContainer.new()
+	_summary.add_child(row)
+	var threat := UiTheme.label("THREAT LEVEL", 16, UiTheme.MUTED, true)
+	threat.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(threat)
+	var value := UiTheme.label("%02d" % profile.threat, 24, UiTheme.TEXT, true)
+	value.custom_minimum_size.x = 32
+	row.add_child(value)
+	var levels := HBoxContainer.new()
+	_summary.add_child(levels)
+	for t in range(1, GameData.MAX_THREAT + 1):
+		var b := UiTheme.button(levels, "%02d" % t, func() -> void:
+			profile.threat = t
+			_act(true))
+		b.name = "Threat_%d" % t
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.disabled = t > profile.max_threat
+		b.tooltip_text = "Extract on your highest Threat to unlock the next level."
+		if t == profile.threat:
+			b.theme_type_variation = &"SelectedButton"
+	_summary.add_child(UiTheme.label("INTEL MULTIPLIER / ×%.2f" % GameData.threat_intel(profile.threat), 16, UiTheme.MUTED, true))
+	_summary.add_child(HSeparator.new())
+	_summary.add_child(UiTheme.label("INTEL  %d" % profile.intel, 28, UiTheme.TEXT, true))
+	_summary.add_child(UiTheme.label("PERK SLOTS  %d / %d" % [profile.equipped_perks.size(), profile.slots], 16, UiTheme.MUTED, true))
+	for i in profile.slots:
+		var plate := UiTheme.panel(_summary)
+		var name_text: String = "+ EMPTY SLOT"
+		var description: String = "Equip a perk in the Perks tab."
+		if i < profile.equipped_perks.size():
+			for perk in GameData.perks():
+				if perk.id == profile.equipped_perks[i]:
+					name_text = perk.title.to_upper()
+					description = perk.description
+					break
+		plate.add_child(UiTheme.title(name_text, 18))
+		(plate.get_parent() as Control).tooltip_text = description
+	_start_button = UiTheme.button(_summary_footer, "START RUN   →", _start, true)
+	_start_button.name = "StartRun"
+
+
+func _settings() -> void:
+	if not is_instance_valid(_dialog):
+		_dialog = MenuDialog.settings(self, profile)
+
+
+func _archive() -> void:
+	if not is_instance_valid(_dialog):
+		_dialog = MenuDialog.archive(self, profile)
 
 
 func _act(changed: bool) -> void:
@@ -199,13 +250,18 @@ func _act(changed: bool) -> void:
 
 
 func _start() -> void:
+	if is_instance_valid(_dialog):
+		return
 	profile.save()
 	start_requested.emit()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if (event is InputEventKey and event.pressed and not event.echo
-			and event.physical_keycode in [KEY_ENTER, KEY_KP_ENTER]):
-		_start()
+	if is_instance_valid(_dialog):
+		return
+	if event.is_action_pressed(&"ui_cancel"):
+		get_viewport().set_input_as_handled()
+		back_requested.emit()
 	elif event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_START:
+		get_viewport().set_input_as_handled()
 		_start()

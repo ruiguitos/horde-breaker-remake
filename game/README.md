@@ -110,7 +110,7 @@ arquipélago Halvard, onde uma experiência ("Project TIDE") correu mal.
   humor seco. Comenta a aterragem (o briefing da missão), os geradores, o
   sobrevivente, o boss, a vida baixa e os Screamers.
 - **Ficheiros de Intel**: metade das caixas e todos os bosses dão uma página.
-  Lês as páginas no Armory (botão INTEL FILES). Juntas contam o que realmente
+  Lês as páginas no título ou Armory (botão INTEL ARCHIVE). Juntas contam o que realmente
   aconteceu; são 10, em ordem.
 - O texto está todo em `data/story.gd`: dá para reescrever sem mexer no código.
 
@@ -250,8 +250,10 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 | `core/run_context.gd` | O que passa de ilha para ilha. |
 | `core/game_input.gd` | Ações de input (InputMap): teclas e botões do comando por ação. |
 | `core/profile.gd` | Perfil gravado (Intel, runs), JSON versionado. |
-| `states/title.gd` | Ecrã de título com uma ilha viva ao fundo (Island em modo `showcase`). |
+| `states/title.gd` | Título com porto ilustrado e botões nativos. |
 | `ui/ui_theme.gd` | Tema partilhado por menus e HUD (painéis, botões, cores). |
+| `ui/menu_dialog.gd` | Foco e input modal; arquivo e controlos. |
+| `ui/route_map.gd`, `ui/route_preview.gd` | Mapa decorativo e miniaturas das rotas. |
 | `states/armory.gd`, `states/boat.gd`, `states/debrief.gd` | Ecrãs entre runs, entre ilhas e do fim da run. |
 | `world/island_run.gd` | **Todas as regras**, sem nós: jogador, auto-fire, breaker, cartas, missão. Testável em headless. |
 | `world/island.gd` | Input, render (MultiMesh), câmara média e efeitos. |

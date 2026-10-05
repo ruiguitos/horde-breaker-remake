@@ -9,6 +9,7 @@ signal finished(won: bool)
 
 ## Set by main before the scene enters the tree; null when run with F6.
 var context: RunContext
+var profile: Profile
 var paused: bool = false
 ## Title-screen backdrop: no HUD, no input, hidden immortal player in the
 ## middle (the horde gathers around), slowly orbiting camera.
@@ -98,6 +99,7 @@ func _ready() -> void:
 		run.director.trigger_peak(1000000.0)
 		return
 	hud = Hud.new()
+	hud.profile = profile if profile != null else Profile.new()
 	hud.add_child(UiSfx.new())
 	hud.card_chosen.connect(func(i: int) -> void: run.choose_card(i))
 	hud.resume_requested.connect(func() -> void: paused = false)

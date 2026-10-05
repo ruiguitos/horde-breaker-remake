@@ -25,6 +25,8 @@ static var ACTIONS: Dictionary = {
 	&"card_1": [KEY_1, "joy:%d" % JOY_BUTTON_X],
 	&"card_2": [KEY_2, "joy:%d" % JOY_BUTTON_Y],
 	&"card_3": [KEY_3, "joy:%d" % JOY_BUTTON_B],
+	&"menu_route_1": [KEY_4, "joy:%d" % JOY_BUTTON_LEFT_SHOULDER],
+	&"menu_route_2": [KEY_5, "joy:%d" % JOY_BUTTON_RIGHT_SHOULDER],
 	&"weapon_1": [KEY_1, "joy:%d" % JOY_BUTTON_DPAD_LEFT],
 	&"weapon_2": [KEY_2, "joy:%d" % JOY_BUTTON_DPAD_UP],
 	&"weapon_3": [KEY_3, "joy:%d" % JOY_BUTTON_DPAD_RIGHT],
@@ -41,6 +43,23 @@ static func setup() -> void:
 		InputMap.add_action(action, 0.2)
 		for binding: Variant in ACTIONS[action]:
 			InputMap.action_add_event(action, _event(binding))
+	# Built-in UI actions may only contain keyboard defaults in this project.
+	# Merge controller bindings so native Buttons and modal Back work alike.
+	var menu_bindings: Dictionary = {
+		&"ui_accept": ["joy:%d" % JOY_BUTTON_A],
+		&"ui_cancel": ["joy:%d" % JOY_BUTTON_B],
+		&"ui_left": ["joy:%d" % JOY_BUTTON_DPAD_LEFT, "axis:%d:-1" % JOY_AXIS_LEFT_X],
+		&"ui_right": ["joy:%d" % JOY_BUTTON_DPAD_RIGHT, "axis:%d:1" % JOY_AXIS_LEFT_X],
+		&"ui_up": ["joy:%d" % JOY_BUTTON_DPAD_UP, "axis:%d:-1" % JOY_AXIS_LEFT_Y],
+		&"ui_down": ["joy:%d" % JOY_BUTTON_DPAD_DOWN, "axis:%d:1" % JOY_AXIS_LEFT_Y],
+	}
+	for action: StringName in menu_bindings:
+		if not InputMap.has_action(action):
+			InputMap.add_action(action, 0.2)
+		for binding: Variant in menu_bindings[action]:
+			var event := _event(binding)
+			if not InputMap.action_has_event(action, event):
+				InputMap.action_add_event(action, event)
 
 
 static func _event(binding: Variant) -> InputEvent:

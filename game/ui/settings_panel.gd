@@ -1,63 +1,47 @@
 class_name SettingsPanel
-extends ColorRect
-## Settings overlay (title, armory and pause menus): Master / Sound Effects /
-## Music volume, graphics quality and fullscreen. Each volume row has a
-## slider and an editable percentage field that stay in sync. Changes apply
-## immediately and are saved in the profile.
-
-signal closed
+extends MenuDialog
+## Three audio percentages share the menus' modal focus and input isolation.
 
 var profile: Profile
 
 
 static func open(parent: Control, p: Profile) -> SettingsPanel:
-	var s := SettingsPanel.new()
-	s.profile = p
-	parent.add_child(s)
-	return s
+	var panel := SettingsPanel.new()
+	panel.profile = p
+	parent.add_child(panel)
+	return panel
 
 
 func _ready() -> void:
-	color = Color(0, 0, 0, 0.7)
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	theme = UiTheme.get_theme()
-	var box: VBoxContainer = UiTheme.centered_panel(self, 560)
-	box.add_child(UiTheme.title("SETTINGS", 30))
-	var first: HSlider = _volume_row(box, "Master volume", profile.master_volume,
-		func(v: int) -> void: profile.master_volume = v)
-	_volume_row(box, "Sound effects", profile.sfx_volume, func(v: int) -> void: profile.sfx_volume = v)
-	_volume_row(box, "Music", profile.music_volume, func(v: int) -> void: profile.music_volume = v)
-
-	var gfx := Button.new()
-	gfx.text = _gfx_text()
-	gfx.pressed.connect(func() -> void:
+	super()
+	content.add_child(UiTheme.title("SETTINGS", 36))
+	content.add_child(UiTheme.label("SALVAGE & CO. / PERSONAL PREFERENCES", 16, UiTheme.MUTED, true))
+	_volume_row(content, "Master volume", profile.master_volume, func(v: int) -> void: profile.master_volume = v)
+	_volume_row(content, "Sound effects", profile.sfx_volume, func(v: int) -> void: profile.sfx_volume = v)
+	_volume_row(content, "Music", profile.music_volume, func(v: int) -> void: profile.music_volume = v)
+	var graphics := Button.new()
+	graphics.custom_minimum_size.y = 48
+	graphics.text = _gfx_text()
+	content.add_child(graphics)
+	graphics.pressed.connect(func() -> void:
 		profile.graphics_high = not profile.graphics_high
 		Visuals.high_quality = profile.graphics_high
-		gfx.text = _gfx_text()
+		graphics.text = _gfx_text()
+		for environment in get_tree().root.find_children("*", "WorldEnvironment", true, false):
+			Visuals.apply_post((environment as WorldEnvironment).environment)
 		profile.save())
-	box.add_child(gfx)
-	var full := Button.new()
-	full.text = "TOGGLE FULLSCREEN (F11)"
-	full.pressed.connect(func() -> void:
-		var is_full: bool = DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if is_full else DisplayServer.WINDOW_MODE_FULLSCREEN))
-	box.add_child(full)
-	var close := Button.new()
-	close.text = "BACK (Esc)"
-	close.custom_minimum_size = Vector2(0, 46)
-	close.pressed.connect(_close)
-	box.add_child(close)
-	add_child(UiSfx.new())
-	first.grab_focus()
+	UiTheme.button(content, "TOGGLE FULLSCREEN / F11", func() -> void:
+		var full: bool = DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if full else DisplayServer.WINDOW_MODE_FULLSCREEN))
+	content.add_child(UiTheme.label("Changes apply immediately and are saved to your profile.", 16, UiTheme.MUTED))
+	UiTheme.button(content, "DONE", _close, true)
+	closed.connect(func() -> void: profile.save())
 
 
 func _gfx_text() -> String:
-	return "GRAPHICS: %s" % ("HIGH (bloom + SSAO)" if profile.graphics_high else "LOW")
+	return "GRAPHICS: " + ("HIGH / BLOOM + SSAO" if profile.graphics_high else "LOW")
 
 
-## One row: name | slider 0-100 | editable "NN" field + "%".
-## Returns the slider (so the panel can focus it for gamepad/keyboard use).
 func _volume_row(parent: Control, label_text: String, value: int, setter: Callable) -> HSlider:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
@@ -112,13 +96,5 @@ func _volume_row(parent: Control, label_text: String, value: int, setter: Callab
 	return slider
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"pause") or (event is InputEventKey and event.pressed and event.physical_keycode == KEY_ESCAPE):
-		get_viewport().set_input_as_handled()
-		_close()
-
-
 func _close() -> void:
-	profile.save()
-	closed.emit()
-	queue_free()
+	close()

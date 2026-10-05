@@ -54,6 +54,7 @@ func _go(next: GameFlow) -> void:
 		GameFlow.ISLAND:
 			var island: Node = (load(ISLAND_SCENE) as PackedScene).instantiate()
 			island.set("context", context)
+			island.set("profile", profile)
 			island.connect("finished", _on_island_finished, CONNECT_DEFERRED)
 			_current = island
 		GameFlow.DEBRIEF:
@@ -77,6 +78,7 @@ func _go(next: GameFlow) -> void:
 			armory.set_script(load("res://game/states/armory.gd"))
 			armory.set("profile", profile)
 			armory.connect("start_requested", _new_run, CONNECT_DEFERRED)
+			armory.connect("back_requested", _go.bind(GameFlow.TITLE), CONNECT_DEFERRED)
 			_current = armory
 	add_child(_current)
 

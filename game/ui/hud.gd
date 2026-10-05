@@ -8,6 +8,8 @@ signal resume_requested
 signal abandon_requested
 
 var debug_visible: bool = true
+var profile: Profile
+var _pause_dialog: MenuDialog
 
 var _hp_bar: ProgressBar
 var _xp_bar: ProgressBar
@@ -186,37 +188,28 @@ func _init() -> void:
 	_end_panel.custom_minimum_size = Vector2(400, 200)
 	_end_panel.visible = false
 	root.add_child(_end_panel)
-	# Pause menu: a dimmed screen with a small panel of buttons.
+	# Pause overlays the current game with a screen-texture blur.
 	_pause_panel = ColorRect.new()
-	(_pause_panel as ColorRect).color = Color(0, 0, 0, 0.55)
+	(_pause_panel as ColorRect).color = Color(0, 0, 0, 0.75)
+	var blur := Shader.new()
+	blur.code = "shader_type canvas_item; uniform sampler2D screen_texture : hint_screen_texture, filter_linear_mipmap; void fragment() { COLOR = vec4(textureLod(screen_texture, SCREEN_UV, 2.2).rgb * 0.4, 1.0); }"
+	var blur_material := ShaderMaterial.new()
+	blur_material.shader = blur
+	_pause_panel.material = blur_material
 	_pause_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_pause_panel.visible = false
 	root.add_child(_pause_panel)
-	var pbox: VBoxContainer = UiTheme.centered_panel(_pause_panel, 360)
-	pbox.add_child(UiTheme.title("PAUSED", 32))
-	var resume := Button.new()
-	resume.text = "RESUME (Esc)"
-	resume.custom_minimum_size = Vector2(0, 46)
-	resume.pressed.connect(func() -> void: resume_requested.emit())
-	pbox.add_child(resume)
-	var settings_btn := Button.new()
-	settings_btn.text = "SETTINGS"
-	settings_btn.custom_minimum_size = Vector2(0, 46)
-	settings_btn.pressed.connect(func() -> void:
-		if Profile.current != null:
-			SettingsPanel.open(_pause_panel, Profile.current))
-	pbox.add_child(settings_btn)
-	var abandon := Button.new()
-	abandon.text = "ABANDON RUN (Q)"
-	abandon.custom_minimum_size = Vector2(0, 46)
-	abandon.pressed.connect(func() -> void: abandon_requested.emit())
-	pbox.add_child(abandon)
-	var hint := Label.new()
-	hint.text = "Intel already earned on finished islands is kept."
-	hint.add_theme_color_override("font_color", UiTheme.MUTED)
-	hint.add_theme_font_size_override("font_size", 14)
-	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	pbox.add_child(hint)
+	var pbox: VBoxContainer = UiTheme.centered_panel(_pause_panel, 380)
+	pbox.add_child(UiTheme.label("SALVAGE & CO. / PROJECT TIDE", 16, UiTheme.MUTED, true))
+	pbox.add_child(UiTheme.title("PAUSED", 44))
+	UiTheme.button(pbox, "RESUME   ›", func() -> void: resume_requested.emit(), true)
+	UiTheme.button(pbox, "SETTINGS", _settings)
+	UiTheme.button(pbox, "CONTROLS", _controls)
+	var abandon := UiTheme.button(pbox, "ABANDON RUN", func() -> void: abandon_requested.emit())
+	abandon.theme_type_variation = &"DangerButton"
+	pbox.add_child(HSeparator.new())
+	pbox.add_child(UiTheme.label("Intel from completed islands is retained.", 16, UiTheme.MUTED, true))
+	UiTheme.hints(pbox, "[ ENTER / A ] SELECT   [ ESC / B ] BACK", 14)
 	# Red screen flash when the player takes damage (drawn behind panels).
 	_damage_flash = ColorRect.new()
 	_damage_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -437,3 +430,18 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	screen.x = clampf(screen.x, 60.0, size.x - 200.0)
 	screen.y = clampf(screen.y, 170.0, size.y - 80.0)
 	_marker.position = screen - Vector2(40, 0)
+
+func _settings() -> void:
+	if not is_instance_valid(_pause_dialog) and profile != null:
+		_pause_dialog = MenuDialog.settings(_pause_panel, profile)
+
+
+func _controls() -> void:
+	if not is_instance_valid(_pause_dialog):
+		_pause_dialog = MenuDialog.controls(_pause_panel)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _pause_panel.visible and not is_instance_valid(_pause_dialog) and event.is_action_pressed(&"ui_cancel"):
+		get_viewport().set_input_as_handled()
+		resume_requested.emit()

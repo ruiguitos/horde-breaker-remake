@@ -1,13 +1,11 @@
 extends Control
-## The boat between islands: pick 1 of 3 rewards, then land on the next island.
-## Keys: 1/2/3 pick, Enter lands. Gamepad: X/Y/B pick, A lands.
+## Supply choice followed by two routes; existing rewards and RNG order retained.
 
 signal land_requested
 
 var context: RunContext
-
 var _rng := RandomNumberGenerator.new()
-var _options: Array[Dictionary] = []  ## {title, text, apply: Callable}
+var _options: Array[Dictionary] = []
 var _buttons: Array[Button] = []
 var _picked: bool = false
 var _land: Button
@@ -17,50 +15,81 @@ var _route_buttons: Array[Button] = []
 var _route_picked: bool = false
 var _route_biomes: Array[StringName] = []
 var _route_missions: Array[StringName] = []
-var _boat: Node3D
-var _island_mat: StandardMaterial3D
+var _map: RouteMap
+var _supplies: ColorRect
 
 
 func _ready() -> void:
-	# The parent is a plain Node, so fill the window explicitly.
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	size = get_viewport_rect().size
 	_rng.seed = context.island_seed() + 1
 	theme = UiTheme.get_theme()
-	_build_scene()
-	var box: VBoxContainer = UiTheme.side_panel(self, 600)
-	box.add_child(UiTheme.title("THE BOAT — island %d of %d next" % [context.island_index + 1, RunContext.ISLAND_COUNT], 28))
-	_status = Label.new()
-	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(_status)
-	var hint := Label.new()
-	hint.text = "Pick one supply (1 / 2 / 3):"
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(hint)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
-	box.add_child(row)
+	UiTheme.backdrop(self)
 	_make_options()
-	for i in _options.size():
-		var b := Button.new()
-		b.custom_minimum_size = Vector2(186, 130)
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		b.text = "%d. %s\n\n%s" % [i + 1, _options[i]["title"], _options[i]["text"]]
-		b.pressed.connect(_pick.bind(i))
-		row.add_child(b)
-		_buttons.append(b)
-	var route_hint := Label.new()
-	route_hint.text = "Choose your route (4 / 5) — harder islands pay more Intel:"
-	route_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(route_hint)
-	var route_row := HBoxContainer.new()
-	route_row.add_theme_constant_override("separation", 10)
-	box.add_child(route_row)
+	_make_routes()
+	var screen := UiTheme.screen(self)
+	UiTheme.header(screen, "NEXT LANDING / ISLAND %02d OF %02d" % [context.island_index + 1, RunContext.ISLAND_COUNT])
+	var body := HBoxContainer.new()
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_theme_constant_override("separation", 24)
+	screen.add_child(body)
+	_map = RouteMap.new()
+	_map.biomes = _route_biomes
+	_map.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(_map)
+	for i in 2:
+		var rb := Button.new()
+		rb.custom_minimum_size.x = 252
+		rb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		rb.size_flags_stretch_ratio = 0.7
+		rb.pressed.connect(_pick_route.bind(i))
+		rb.accessibility_name = "%s / %s / Intel ×%.1f" % [GameData.BIOMES[_route_biomes[i]]["name"], _routes[i].title, _routes[i].intel_mult]
+		rb.tooltip_text = GameData.MISSIONS[_route_missions[i]]["text"]
+		body.add_child(rb)
+		_route_buttons.append(rb)
+		var margin := MarginContainer.new()
+		margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+		for edge in ["left", "right", "top", "bottom"]:
+			margin.add_theme_constant_override("margin_" + edge, 12)
+		rb.add_child(margin)
+		var card := VBoxContainer.new()
+		card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_theme_constant_override("separation", 6)
+		margin.add_child(card)
+		var preview := RoutePreview.new()
+		preview.biome = _route_biomes[i]
+		preview.custom_minimum_size.y = 64
+		card.add_child(preview)
+		card.add_child(UiTheme.title(String(GameData.BIOMES[_route_biomes[i]]["name"]).to_upper(), 25))
+		card.add_child(UiTheme.label(_routes[i].title.to_upper(), 20, UiTheme.SUCCESS if _routes[i].id == &"calm" else UiTheme.DANGER, true))
+		card.add_child(UiTheme.label(_routes[i].description, 16, UiTheme.MUTED))
+		card.add_child(HSeparator.new())
+		card.add_child(UiTheme.label("OBJECTIVE", 16, UiTheme.MUTED, true))
+		card.add_child(UiTheme.title(String(GameData.MISSIONS[_route_missions[i]]["name"]).to_upper(), 22))
+		var gap := Control.new()
+		gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		gap.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		card.add_child(gap)
+		card.add_child(UiTheme.label("INTEL MULTIPLIER / ×%.1f" % _routes[i].intel_mult, 20, UiTheme.ACCENT, true))
+		var selection := UiTheme.label("[%d] / SELECT ROUTE" % (i + 4), 16, UiTheme.MUTED, true)
+		selection.name = "SelectionState"
+		card.add_child(selection)
+	_status = UiTheme.label("", 16, UiTheme.MUTED, true)
+	screen.add_child(_status)
+	_land = UiTheme.button(screen, "CONFIRM ROUTE   →", _land_now, true)
+	_land.disabled = true
+	UiTheme.hints(screen, "[ 4–5 / LB–RB ] ROUTE     [ ENTER / A ] CONFIRM")
+	_refresh_status()
+	_show_supplies()
+	add_child(UiSfx.new())
+	add_child(Ambience.create(&"menu", -12.0))
+
+
+func _make_routes() -> void:
 	var mods: Array[GameData.Modifier] = GameData.modifiers()
 	var a: int = _rng.randi_range(0, mods.size() - 1)
-	var b2: int = (a + _rng.randi_range(1, mods.size() - 1)) % mods.size()
-	_routes = [mods[a], mods[b2]]
-	# Each route also has a biome (the last island is always the volcano).
+	var b: int = (a + _rng.randi_range(1, mods.size() - 1)) % mods.size()
+	_routes = [mods[a], mods[b]]
 	var biomes: Array[StringName] = GameData.ISLAND_BIOMES.duplicate()
 	var missions: Array = GameData.MISSIONS.keys()
 	for i in 2:
@@ -71,92 +100,6 @@ func _ready() -> void:
 			var pick: int = _rng.randi_range(0, biomes.size() - 1)
 			_route_biomes.append(biomes[pick])
 			biomes.remove_at(pick)
-	for i in 2:
-		var rb := Button.new()
-		rb.custom_minimum_size = Vector2(286, 96)
-		rb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		rb.text = "%d. %s · %s — %s (Intel x%.1f)\n%s" % [i + 4, GameData.BIOMES[_route_biomes[i]]["name"],
-			GameData.MISSIONS[_route_missions[i]]["name"], _routes[i].title, _routes[i].intel_mult, _routes[i].description]
-		rb.pressed.connect(_pick_route.bind(i))
-		route_row.add_child(rb)
-		_route_buttons.append(rb)
-	_land = Button.new()
-	_land.text = "LAND (Enter)"
-	_land.custom_minimum_size = Vector2(0, 50)
-	_land.disabled = true
-	_land.pressed.connect(func() -> void: land_requested.emit())
-	box.add_child(_land)
-	_refresh_status()
-
-
-## 3D backdrop: the boat bobbing on the sea, the next island on the horizon
-## (coloured by the chosen route's biome), a low sun.
-func _build_scene() -> void:
-	var world := Node3D.new()
-	add_child(world)
-	var env := WorldEnvironment.new()
-	env.environment = Environment.new()
-	env.environment.background_mode = Environment.BG_COLOR
-	env.environment.background_color = Color(0.85, 0.6, 0.45) if not context.is_last_island() else Color(0.4, 0.18, 0.14)
-	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.environment.ambient_light_color = Color(0.45, 0.42, 0.45)
-	env.environment.fog_enabled = true
-	env.environment.fog_light_color = env.environment.background_color
-	env.environment.fog_density = 0.003
-	Visuals.apply_post(env.environment)
-	world.add_child(env)
-	var sun := DirectionalLight3D.new()
-	sun.rotation_degrees = Vector3(-18, 160, 0)
-	sun.light_color = Color(1.0, 0.8, 0.6)
-	sun.shadow_enabled = true
-	world.add_child(sun)
-	var sea := MeshInstance3D.new()
-	var plane := PlaneMesh.new()
-	plane.size = Vector2(500, 500)
-	plane.subdivide_width = 150
-	plane.subdivide_depth = 150
-	sea.mesh = plane
-	sea.material_override = Visuals.sea_material()
-	world.add_child(sea)
-	_boat = Node3D.new()
-	_boat.add_child(Visuals.box(Vector3(3.2, 1.0, 8.0), Vector3(0, 0.3, 0), Color(0.45, 0.3, 0.18)))
-	_boat.add_child(Visuals.box(Vector3(2.0, 1.4, 2.4), Vector3(0, 1.5, 1.4), Color(0.85, 0.85, 0.8)))
-	_boat.add_child(Visuals.box(Vector3(0.15, 4.0, 0.15), Vector3(0, 3.2, -1.5), Color(0.3, 0.25, 0.2)))
-	_boat.add_child(Visuals.box(Vector3(2.6, 0.12, 1.6), Vector3(0, 0.85, -2.2), Color(0.3, 0.32, 0.28)))  # map table
-	world.add_child(_boat)
-	# The next island on the horizon: a flattened dome in the biome's colour.
-	var island := MeshInstance3D.new()
-	var dome := SphereMesh.new()
-	dome.radius = 26.0
-	dome.height = 18.0
-	island.mesh = dome
-	island.position = Vector3(-80, -3, -45)
-	_island_mat = Visuals.mat(Color(0.35, 0.45, 0.3))
-	island.material_override = _island_mat
-	world.add_child(island)
-	if context.is_last_island():
-		var cone := MeshInstance3D.new()
-		var cm := CylinderMesh.new()
-		cm.top_radius = 4.0
-		cm.bottom_radius = 26.0
-		cm.height = 30.0
-		cone.mesh = cm
-		cone.position = Vector3(-84, 14, -50)
-		cone.material_override = Visuals.mat(Color(0.25, 0.18, 0.16))
-		world.add_child(cone)
-	var cam := Camera3D.new()
-	cam.position = Vector3(14, 6, 16)
-	world.add_child(cam)
-	cam.look_at(Vector3(-14, 2, -30))
-	cam.fov = 60.0
-
-
-func _process(_delta: float) -> void:
-	if _boat == null:
-		return
-	var t: float = Time.get_ticks_msec() * 0.001
-	_boat.position.y = sin(t * 1.3) * 0.25
-	_boat.rotation = Vector3(sin(t * 0.9) * 0.03, 0.6, sin(t * 1.1) * 0.05)
 
 
 func _make_options() -> void:
@@ -174,6 +117,36 @@ func _make_options() -> void:
 			"apply": func() -> void: context.card_stacks[card.id] = context.card_stacks.get(card.id, 0) + 1})
 
 
+func _show_supplies() -> void:
+	_supplies = ColorRect.new()
+	_supplies.color = Color(0, 0, 0, 0.8)
+	_supplies.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_supplies)
+	var box := UiTheme.centered_panel(_supplies, 780)
+	box.add_child(UiTheme.label("SALVAGE & CO. / QUARTERMASTER", 16, UiTheme.MUTED, true))
+	box.add_child(UiTheme.title("01 / CHOOSE YOUR SUPPLY", 32))
+	box.add_child(UiTheme.label("One allowance per landing. Generosity has a budget.", 16, UiTheme.MUTED))
+	var row := HBoxContainer.new()
+	box.add_child(row)
+	for i in _options.size():
+		var b := UiTheme.button(row, "%d / %s\n\n%s" % [i + 1, _options[i]["title"], _options[i]["text"]], _pick.bind(i))
+		b.custom_minimum_size = Vector2(220, 160)
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		b.add_theme_font_size_override("font_size", 20)
+		_buttons.append(b)
+	for i in _buttons.size():
+		var prev: NodePath = _buttons[i].get_path_to(_buttons[posmod(i - 1, _buttons.size())])
+		var next: NodePath = _buttons[i].get_path_to(_buttons[(i + 1) % _buttons.size()])
+		_buttons[i].focus_previous = prev
+		_buttons[i].focus_next = next
+		_buttons[i].focus_neighbor_left = prev
+		_buttons[i].focus_neighbor_top = prev
+		_buttons[i].focus_neighbor_right = next
+		_buttons[i].focus_neighbor_bottom = next
+	UiTheme.hints(box, "[ 1–3 / X–Y–B ] SUPPLY     [ ENTER / A ] SELECT")
+	_buttons[0].grab_focus()
+
+
 func _pick(i: int) -> void:
 	if _picked or i < 0 or i >= _options.size():
 		return
@@ -182,11 +155,10 @@ func _pick(i: int) -> void:
 	for k in _buttons.size():
 		_buttons[k].disabled = true
 		if k == i:
-			_buttons[k].text = "✔ " + _buttons[k].text
+			_buttons[k].theme_type_variation = &"SelectedButton"
+	_supplies.hide()
+	_route_buttons[0].grab_focus()
 	_update_land()
-	_refresh_status()
-	add_child(UiSfx.new())
-	add_child(Ambience.create(&"menu", -12.0))
 
 
 func _pick_route(i: int) -> void:
@@ -195,16 +167,18 @@ func _pick_route(i: int) -> void:
 	_route_picked = true
 	context.modifier = _routes[i].id
 	context.biome = _route_biomes[i]
-	_island_mat.albedo_color = GameData.BIOMES[context.biome]["inland"]
 	context.mission = _route_missions[i]
+	_map.selected = i
 	for k in _route_buttons.size():
-		var txt: String = _route_buttons[k].text.trim_prefix("✔ ")
-		_route_buttons[k].text = ("✔ " + txt) if k == i else txt
+		_route_buttons[k].theme_type_variation = &"SelectedButton" if k == i else &""
+		var label: Label = _route_buttons[k].find_child("SelectionState", true, false) as Label
+		label.text = "✓ SELECTED" if k == i else "[%d] / SELECT ROUTE" % (k + 4)
 	_update_land()
 
 
 func _update_land() -> void:
-	_land.disabled = not (_picked and _route_picked)
+	_land.disabled = not _can_land()
+	_refresh_status()
 	if not _land.disabled:
 		_land.grab_focus()
 
@@ -213,25 +187,29 @@ func _can_land() -> bool:
 	return _picked and _route_picked
 
 
+func _land_now() -> void:
+	if _can_land():
+		land_requested.emit()
+
+
 func _refresh_status() -> void:
-	_status.text = "HP %d/%d · Level %d · Kills %d · Intel this run %d" % [
-		int(context.hp), int(context.max_hp), context.level, context.kills, context.intel]
+	var stage: String = "READY TO LAND" if _can_land() else ("02 / CHOOSE YOUR ROUTE" if _picked else "01 / CHOOSE YOUR SUPPLY")
+	_status.text = "HP %d/%d / LEVEL %d / KILLS %d / INTEL %d   ·   %s" % [int(context.hp), int(context.max_hp), context.level, context.kills, context.intel, stage]
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo:
-		var key: Key = event.physical_keycode
-		if key in [KEY_1, KEY_2, KEY_3]:
-			_pick(key - KEY_1)
-		elif key in [KEY_4, KEY_5]:
-			_pick_route(key - KEY_4)
-		elif key in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] and _can_land():
-			land_requested.emit()
-	elif event is InputEventJoypadButton and event.pressed:
-		var pads: Array = [JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_B]
-		if event.button_index in pads:
-			_pick(pads.find(event.button_index))
-		elif event.button_index in [JOY_BUTTON_LEFT_SHOULDER, JOY_BUTTON_RIGHT_SHOULDER]:
-			_pick_route(0 if event.button_index == JOY_BUTTON_LEFT_SHOULDER else 1)
-		elif event.button_index == JOY_BUTTON_A and _can_land():
-			land_requested.emit()
+	if event.is_echo() or not event.is_pressed():
+		return
+	for i in 3:
+		if event.is_action_pressed(StringName("card_%d" % (i + 1))):
+			_pick(i)
+			get_viewport().set_input_as_handled()
+			return
+	for i in 2:
+		if event.is_action_pressed(StringName("menu_route_%d" % (i + 1))):
+			_pick_route(i)
+			get_viewport().set_input_as_handled()
+			return
+	if event.is_action_pressed(&"confirm") and _can_land():
+		get_viewport().set_input_as_handled()
+		_land_now()

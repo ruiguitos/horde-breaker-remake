@@ -1,75 +1,91 @@
 extends Node
-## Title screen: a live island in the background (Island in showcase mode,
-## the horde milling about under an orbiting camera) with the menu on top.
+## Illustrated harbor with native, focusable controls.
 
 signal play_requested
 
-const ISLAND_SCENE: String = "res://game/world/island.tscn"
-
 var profile: Profile
+var _root: Control
+var _dialog: MenuDialog
 
 
 func _ready() -> void:
-	var island: Node = (load(ISLAND_SCENE) as PackedScene).instantiate()
-	island.set("showcase", true)
-	island.set("rng_seed", randi() % 1000 + 1)
-	add_child(island)
-
 	var layer := CanvasLayer.new()
 	add_child(layer)
-	var root := Control.new()
-	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	root.theme = UiTheme.get_theme()
-	layer.add_child(root)
-	# Dark gradient on the left so the menu reads over the 3D scene.
+	_root = Control.new()
+	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_root.theme = UiTheme.get_theme()
+	layer.add_child(_root)
+	UiTheme.backdrop(_root, UiTheme.HARBOR)
 	var shade := ColorRect.new()
-	shade.color = Color(0, 0, 0, 0.45)
+	shade.color = Color(0.035, 0.045, 0.03, 0.97)
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	shade.set_anchors_preset(Control.PRESET_LEFT_WIDE)
-	shade.custom_minimum_size = Vector2(460, 0)
-	shade.size = Vector2(460, root.get_viewport_rect().size.y)
-	root.add_child(shade)
-
+	shade.offset_right = 420
+	_root.add_child(shade)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_LEFT_WIDE)
+	margin.offset_right = 420
+	for edge in ["left", "right"]:
+		margin.add_theme_constant_override("margin_" + edge, 36)
+	for edge in ["top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + edge, 28)
+	_root.add_child(margin)
 	var box := VBoxContainer.new()
-	box.position = Vector2(60, 110)
-	box.custom_minimum_size = Vector2(340, 0)
-	box.add_theme_constant_override("separation", 14)
-	root.add_child(box)
-	box.add_child(UiTheme.title("HORDE\nBREAKER", 56))
-	var tag := Label.new()
-	tag.text = "Salvage & Co. — Archipelago Recovery Division"
-	tag.add_theme_color_override("font_color", UiTheme.MUTED)
-	tag.add_theme_font_size_override("font_size", 15)
-	box.add_child(tag)
+	margin.add_child(box)
+	box.add_child(UiTheme.label("SALVAGE & CO.\nHALVARD OPERATIONS", 16, UiTheme.TEXT, true))
+	var logo := UiTheme.texture(UiTheme.WORDMARK, true)
+	logo.custom_minimum_size.y = 172
+	box.add_child(logo)
+	box.add_child(UiTheme.label("ISLAND EXPEDITION / ZOMBIE HORDE SHOOTER", 14, UiTheme.MUTED, true))
+	box.add_child(HSeparator.new())
+	var deploy := UiTheme.button(box, "DEPLOY", _deploy, true)
+	deploy.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	var arrow := UiTheme.title("›", 26)
+	arrow.add_theme_color_override("font_color", UiTheme.BG)
+	arrow.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
+	arrow.offset_left = -36
+	arrow.offset_right = -12
+	arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	deploy.add_child(arrow)
+	for item in [
+		["SETTINGS", _settings],
+		["INTEL ARCHIVE", _archive],
+		["QUIT", func() -> void: get_tree().quit()]]:
+		var b := UiTheme.button(box, item[0], item[1])
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var gap := Control.new()
-	gap.custom_minimum_size = Vector2(0, 30)
+	gap.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(gap)
-	var play := _button(box, "DEPLOY", func() -> void:
-		var s := AudioStreamPlayer.new()
-		s.bus = Profile.BUS_SFX
-		s.stream = load(Sfx.PACK + String(Sfx.FILES[&"ui_start"]))
-		get_tree().root.add_child(s)
-		s.finished.connect(s.queue_free)
-		s.play()
-		play_requested.emit())
-	_button(box, "SETTINGS", func() -> void:
-		if profile != null:
-			SettingsPanel.open(root, profile))
-	_button(box, "QUIT", func() -> void: get_tree().quit())
-	var stats := Label.new()
-	stats.add_theme_color_override("font_color", UiTheme.MUTED)
-	stats.add_theme_font_size_override("font_size", 15)
-	if profile != null and profile.runs > 0:
-		stats.text = "Intel %d · Runs %d · Extractions %d" % [profile.intel, profile.runs, profile.extractions]
-	box.add_child(stats)
-	play.grab_focus()
-	root.add_child(UiSfx.new())
+	box.add_child(UiTheme.label("Recovery is mandatory.\nSurvival is encouraged.", 16, UiTheme.MUTED, true))
+	if profile.runs > 0:
+		box.add_child(UiTheme.label("Intel %d / Runs %d / Extractions %d" % [profile.intel, profile.runs, profile.extractions], 16, UiTheme.MUTED, true))
+	var hint := UiTheme.label("[ ENTER / A ] SELECT · F11 FULLSCREEN", 16, UiTheme.TEXT, true)
+	hint.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	hint.offset_left = -440
+	hint.offset_right = -32
+	hint.offset_top = -48
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_root.add_child(hint)
+	deploy.grab_focus()
+	_root.add_child(UiSfx.new())
+	add_child(Ambience.create(&"menu", -12.0))
 
 
-func _button(parent: Control, text: String, action: Callable) -> Button:
-	var b := Button.new()
-	b.text = text
-	b.custom_minimum_size = Vector2(0, 52)
-	b.add_theme_font_size_override("font_size", 22)
-	b.pressed.connect(action)
-	parent.add_child(b)
-	return b
+func _deploy() -> void:
+	var sound := AudioStreamPlayer.new()
+	sound.bus = Profile.BUS_SFX
+	sound.stream = load(Sfx.PACK + String(Sfx.FILES[&"ui_start"]))
+	get_tree().root.add_child(sound)
+	sound.finished.connect(sound.queue_free)
+	sound.play()
+	play_requested.emit()
+
+
+func _settings() -> void:
+	if not is_instance_valid(_dialog):
+		_dialog = MenuDialog.settings(_root, profile)
+
+
+func _archive() -> void:
+	if not is_instance_valid(_dialog):
+		_dialog = MenuDialog.archive(_root, profile)
