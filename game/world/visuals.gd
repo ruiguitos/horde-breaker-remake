@@ -2,6 +2,35 @@ class_name Visuals
 extends RefCounted
 ## Shared visual helpers used by more than one scene (island, boat).
 
+## Graphics quality (Armory setting): High adds glow (bloom) and SSAO.
+static var high_quality: bool = true
+
+
+## Post-processing shared by 3D scenes: filmic tonemap always; bloom and
+## ambient occlusion only on High.
+static func apply_post(env: Environment) -> void:
+	env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	env.tonemap_exposure = 1.0
+	env.glow_enabled = high_quality
+	env.glow_intensity = 0.6
+	env.glow_bloom = 0.08
+	env.glow_hdr_threshold = 1.2
+	env.ssao_enabled = high_quality
+	env.ssao_radius = 1.5
+	env.ssao_intensity = 1.5
+
+
+## Sky with a horizon gradient instead of a flat colour.
+static func sky(horizon: Color, top: Color) -> Sky:
+	var mat := ProceduralSkyMaterial.new()
+	mat.sky_horizon_color = horizon
+	mat.sky_top_color = top
+	mat.ground_horizon_color = horizon.darkened(0.2)
+	mat.ground_bottom_color = horizon.darkened(0.5)
+	var s := Sky.new()
+	s.sky_material = mat
+	return s
+
 
 ## Animated sea: vertices bob with two crossing sine waves (vertex shader),
 ## and the colour gets lighter on the crests.

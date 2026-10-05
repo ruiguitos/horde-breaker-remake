@@ -23,6 +23,7 @@ const DEBRIS_MAX: int = 600
 var run: IslandRun
 var hud: Hud
 var sfx: Sfx
+var fx: Fx
 var music: Music
 var _audio_hp: float = -1.0
 var _audio_xp: int = 0
@@ -84,6 +85,8 @@ func _ready() -> void:
 	_build_world()
 	sfx = Sfx.new()
 	add_child(sfx)
+	fx = Fx.new()
+	add_child(fx)
 	music = Music.new()
 	add_child(music)
 	if showcase:
@@ -108,7 +111,7 @@ func _build_world() -> void:
 	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.environment.ambient_light_color = Color(0.4, 0.42, 0.48)
 	if _is_volcano():
-		env.environment.ambient_light_color = Color(0.5, 0.3, 0.25)
+		env.environment.ambient_light_color = Color(0.42, 0.34, 0.32)
 	if float(bio["fog"]) > 0.0:
 		# Jungle haze: green-tinted, light enough to still read enemies.
 		env.environment.fog_enabled = true
@@ -116,16 +119,30 @@ func _build_world() -> void:
 		env.environment.fog_density = bio["fog"]
 	if context != null and context.modifier == &"fog":
 		env.environment.fog_enabled = true
-		env.environment.fog_light_color = Color(0.62, 0.66, 0.7)
-		env.environment.fog_density = 0.025
-		env.environment.background_color = Color(0.62, 0.66, 0.7)
+		env.environment.fog_light_color = Color(0.48, 0.52, 0.56)
+		env.environment.fog_density = 0.018
+		env.environment.background_color = Color(0.48, 0.52, 0.56)
+	if not env.environment.fog_enabled or float(bio["fog"]) > 0.0:
+		env.environment.background_mode = Environment.BG_SKY
+		env.environment.sky = Visuals.sky(Color(bio["sky"]).lightened(0.15), Color(bio["sky"]).darkened(0.35))
+	Visuals.apply_post(env.environment)
 	add_child(env)
+	# Time of day by island: morning, golden afternoon, red dusk on the volcano.
 	var sun := DirectionalLight3D.new()
-	sun.rotation_degrees = Vector3(-55, -30, 0)
 	sun.shadow_enabled = true
-	sun.light_energy = 0.8
-	if _is_volcano():
-		sun.light_color = Color(1.0, 0.6, 0.4)
+	var island_i: int = context.island_index if context != null else 0
+	match island_i:
+		0:
+			sun.rotation_degrees = Vector3(-55, -30, 0)
+			sun.light_energy = 0.85
+		1:
+			sun.rotation_degrees = Vector3(-28, -65, 0)
+			sun.light_color = Color(1.0, 0.82, 0.6)
+			sun.light_energy = 0.95
+		_:
+			sun.rotation_degrees = Vector3(-18, -100, 0)
+			sun.light_color = Color(1.0, 0.72, 0.58) if _is_volcano() else Color(1.0, 0.6, 0.45)
+			sun.light_energy = 0.8
 	add_child(sun)
 
 	var f: FlowField = run.field
@@ -671,6 +688,7 @@ func _draw_player_and_camera() -> void:
 		_player.basis = Basis.looking_at(run.dash_dir, Vector3.UP).scaled(Vector3(0.8, 0.9, 1.6))
 		if not _was_dashing:
 			_trauma = minf(1.0, _trauma + 0.35)
+			fx.emit(&"dust", run.player_pos + Vector3(0, 0.3, 0))
 	_was_dashing = run.dash_time > 0.0
 	# Camera shake ("trauma" model): damage adds trauma, it decays quickly and
 	# the offset grows with trauma squared so small hits stay subtle.
@@ -811,6 +829,10 @@ func _draw_orbs() -> void:
 func _draw_effects(delta: float) -> void:
 	# Tracers: keep the last frame's shots visible for a few frames.
 	if not run.tracers.is_empty():
+		# Sparks where shots land (a few per frame is plenty).
+		for k in mini(run.tracers.size(), 4):
+			var seg: PackedVector3Array = run.tracers[k]
+			fx.emit(&"spark", seg[1] + Vector3(0, 1.2, 0), seg[0] - seg[1])
 		_tracers = run.tracers.duplicate()
 		_muzzle.light_energy = 3.0
 		run.tracers.clear()
@@ -827,6 +849,7 @@ func _draw_effects(delta: float) -> void:
 	# Dismemberment with primitives: chunks fly off killed enemies.
 	for d in run.deaths:
 		var t: GameData.EnemyType = run.horde.types[int(d.z)]
+		fx.emit(&"blood", Vector3(d.x, t.height * 0.7, d.y))
 		if int(d.z) in [GameData.EnemyKind.BRUTE, GameData.EnemyKind.BOSS]:
 			_hitstop = 0.08  # freeze the simulation briefly: the kill "lands"
 			_trauma = minf(1.0, _trauma + 0.3)

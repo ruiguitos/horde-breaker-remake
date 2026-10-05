@@ -180,6 +180,17 @@ Pack ao fim de 3 min") em vez de impressões.
 - **Granada**: cai onde está o rato (até 14 m), rebenta após 0,8 s (5 m,
   90 de dano) e tem 12 s de cooldown. O anel vermelho mostra a área.
 
+## Luz e gráficos
+
+- Céu procedural (gradiente) e **hora do dia por ilha**: manhã na 1.ª,
+  tarde dourada na 2.ª, crepúsculo no Vulcão.
+- Tonemap ACES sempre ligado. **Graphics: High** (Armory) liga também bloom e
+  SSAO (oclusão ambiente); **Low** desliga-os, para PCs mais fracos.
+- Partículas GPU (`world/fx.gd`): faíscas nos impactos, sangue nas mortes e
+  pó no breaker, a partir de emissores reutilizados.
+- As capturas da cloud usam o renderer de compatibilidade (sem SSAO): o
+  aspeto final vê-se no editor em Forward+.
+
 ## Feedback visual (sem animações nem assets)
 
 - Inimigos balançam, saltitam e inclinam-se ao andar, proporcional à
@@ -233,6 +244,7 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 | `world/director.gd` | Ritmo da horda (crescer/pico/relax, intensidade). |
 | `horde/horde.gd`, `horde/flow_field.gd` | Horda como dados, vinda do spike `horde_flowfield`. |
 | `ui/hud.gd` | HUD em código. |
+| `world/fx.gd`, `world/visuals.gd` | Partículas GPU; céu, pós-processamento e materiais partilhados. |
 | `audio/sfx.gd`, `audio/music.gd` | Sons e música sintetizados em código. |
 | `data/story.gd` | Falas do rádio e ficheiros de Intel. |
 | `data/game_data.gd` | Dados e valores de equilíbrio. |

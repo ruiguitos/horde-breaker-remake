@@ -103,6 +103,7 @@ func _build_scene() -> void:
 	env.environment.fog_enabled = true
 	env.environment.fog_light_color = env.environment.background_color
 	env.environment.fog_density = 0.003
+	Visuals.apply_post(env.environment)
 	world.add_child(env)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-18, 160, 0)

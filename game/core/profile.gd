@@ -19,7 +19,8 @@ var volume: int = 8  ## master volume, 0..10
 var unlocked_weapons: Array[StringName] = []  ## bought in the armory
 var unlocked_classes: Array[StringName] = [&"recruit"]
 var selected_class: StringName = &"recruit"
-var lore_pages: int = 0  ## Intel files unlocked (Story.FILES, in order)
+var lore_pages: int = 0
+var graphics_high: bool = true  ## Intel files unlocked (Story.FILES, in order)
 
 
 static func load_profile(path: String = PATH) -> Profile:
@@ -44,6 +45,7 @@ static func load_profile(path: String = PATH) -> Profile:
 	p.slots = int(d.get("slots", 1))
 	p.max_threat = int(d.get("max_threat", 1))
 	p.lore_pages = int(d.get("lore_pages", 0))
+	p.graphics_high = bool(d.get("graphics_high", true))
 	p.volume = clampi(int(d.get("volume", 8)), 0, 10)
 	for id in d.get("unlocked_classes", []):
 		if not p.unlocked_classes.has(StringName(id)):
@@ -67,7 +69,7 @@ func save(path: String = PATH) -> bool:
 		"extractions": extractions, "best_kills": best_kills,
 		"owned_perks": owned_perks.map(func(x: StringName) -> String: return String(x)),
 		"equipped_perks": equipped_perks.map(func(x: StringName) -> String: return String(x)),
-		"slots": slots, "max_threat": max_threat, "threat": threat, "volume": volume, "lore_pages": lore_pages, "selected_class": String(selected_class),
+		"slots": slots, "max_threat": max_threat, "threat": threat, "volume": volume, "lore_pages": lore_pages, "graphics_high": graphics_high, "selected_class": String(selected_class),
 		"unlocked_classes": unlocked_classes.map(func(x: StringName) -> String: return String(x)),
 		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x))}, "  "))
 	return true

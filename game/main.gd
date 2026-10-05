@@ -19,6 +19,7 @@ func _ready() -> void:
 	GameInput.setup()
 	profile = Profile.load_profile()
 	profile.apply_volume()
+	Visuals.high_quality = profile.graphics_high
 	_go(State.TITLE)
 
 

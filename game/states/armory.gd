@@ -59,6 +59,14 @@ func _ready() -> void:
 			profile.apply_volume()
 			_act(true))
 		settings.add_child(vb)
+	var gfx := Button.new()
+	gfx.text = "GRAPHICS: %s" % ("HIGH (bloom + SSAO)" if profile.graphics_high else "LOW")
+	gfx.pressed.connect(func() -> void:
+		profile.graphics_high = not profile.graphics_high
+		Visuals.high_quality = profile.graphics_high
+		gfx.text = "GRAPHICS: %s" % ("HIGH (bloom + SSAO)" if profile.graphics_high else "LOW")
+		profile.save())
+	settings.add_child(gfx)
 	var files := Button.new()
 	files.text = "INTEL FILES (%d / %d)" % [profile.lore_pages, Story.FILES.size()]
 	files.disabled = profile.lore_pages == 0
