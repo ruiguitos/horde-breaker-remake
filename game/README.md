@@ -113,6 +113,8 @@ blindado à frente (−50 %) e não é empurrado.
 - Tremor de câmara ao levar dano e no breaker. Usa um modelo de "trauma": o
   tremor cresce com o quadrado, por isso os toques pequenos quase não se notam.
 - Flash vermelho no ecrã ao levar dano; clarão de luz na arma ao disparar.
+- Edifícios entre a câmara e o jogador ficam translúcidos, para nunca o
+  perderes de vista.
 - Hit-stop de 80 ms ao matar um Brute: o jogo congela por um instante para o
   golpe "pesar".
 

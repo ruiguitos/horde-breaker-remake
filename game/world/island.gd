@@ -36,6 +36,8 @@ var _tracer_mesh := ImmediateMesh.new()
 var _generators: Array[MeshInstance3D] = []
 var _generator_rings: Array[MeshInstance3D] = []
 var _boat_ring: MeshInstance3D
+var _buildings: Array[MeshInstance3D] = []
+var _building_boxes: Array[AABB] = []
 var _slam_ring: MeshInstance3D
 var _explosions: Array[MeshInstance3D] = []
 var _tracers: Array[PackedVector3Array] = []
@@ -131,6 +133,8 @@ func _build_world() -> void:
 		b.position = Vector3(r.position.x + r.size.x * 0.5, h * 0.5, r.position.y + r.size.y * 0.5)
 		b.material_override = _mat(Color(0.5, 0.5, 0.52).darkened(rng.randf() * 0.25))
 		add_child(b)
+		_buildings.append(b)
+		_building_boxes.append(AABB(Vector3(r.position.x, 0, r.position.y), Vector3(r.size.x, h, r.size.y)))
 
 	for g in run.map.generators:
 		var gen := MeshInstance3D.new()
@@ -356,6 +360,7 @@ func _process(delta: float) -> void:
 	_draw_grenades()
 	_draw_effects(delta)
 	_draw_mission()
+	_fade_occluders(delta)
 	var label: String = ""
 	if context != null:
 		label = "Island %d/%d" % [context.island_index + 1, RunContext.ISLAND_COUNT]
@@ -562,6 +567,20 @@ func _add_debris(p: Vector3, v: Vector3, c: Color) -> void:
 	_debris_vel.append(v)
 	_debris_life.append(1.5)
 	_debris_color.append(c)
+
+
+## Buildings between the camera and the player fade out so the player is
+## never hidden (AABB vs segment test: ~50 boxes per frame is cheap).
+func _fade_occluders(delta: float) -> void:
+	var from: Vector3 = _camera.global_position
+	var to: Vector3 = run.player_pos + Vector3(0, 1.0, 0)
+	for i in _buildings.size():
+		var hit: bool = _building_boxes[i].grow(0.3).intersects_segment(from, to) != null
+		var m: StandardMaterial3D = _buildings[i].material_override
+		var target: float = 0.25 if hit else 1.0
+		m.albedo_color.a = move_toward(m.albedo_color.a, target, delta * 4.0)
+		# Opaque materials are cheaper and cast shadows: only go transparent when needed.
+		m.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED if m.albedo_color.a >= 0.999 else BaseMaterial3D.TRANSPARENCY_ALPHA
 
 
 func _draw_mission() -> void:

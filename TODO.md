@@ -20,7 +20,6 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 - [ ] Afinar o som sintetizado a ouvido (volumes em `island.gd::_play_audio`, timbres em `audio/sfx.gd`); música do diretor.
 - [ ] Animação melhor que o "balançar" (Vertex Animation Textures, BRAINSTORM §8).
 - [ ] Desmembramento por partes da cápsula (agora são cubos).
-- [ ] Fade de edifícios entre câmara e jogador (spike `camera_medium`).
 
 ## Técnico
 
