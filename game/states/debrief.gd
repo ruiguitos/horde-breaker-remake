@@ -11,8 +11,9 @@ func _ready() -> void:
 	# The parent is a plain Node, so fill the window explicitly.
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	size = get_viewport_rect().size
+	theme = UiTheme.get_theme()
 	var bg := ColorRect.new()
-	bg.color = Color(0.1, 0.1, 0.12)
+	bg.color = UiTheme.BG
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 	var label := Label.new()

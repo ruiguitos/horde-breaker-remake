@@ -22,23 +22,13 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	size = get_viewport_rect().size
 	_rng.seed = context.island_seed() + 1
+	theme = UiTheme.get_theme()
 	var bg := ColorRect.new()
-	bg.color = Color(0.08, 0.16, 0.24)
+	bg.color = Color(0.06, 0.1, 0.14)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
-	# CenterContainer keeps the menu centred at any window size.
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
-	var box := VBoxContainer.new()
-	box.custom_minimum_size = Vector2(680, 0)
-	box.add_theme_constant_override("separation", 14)
-	center.add_child(box)
-	var title := Label.new()
-	title.text = "THE BOAT — next: island %d of %d" % [context.island_index + 1, RunContext.ISLAND_COUNT]
-	title.add_theme_font_size_override("font_size", 28)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(title)
+	var box: VBoxContainer = UiTheme.centered_panel(self, 720)
+	box.add_child(UiTheme.title("THE BOAT — island %d of %d next" % [context.island_index + 1, RunContext.ISLAND_COUNT], 28))
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_status)

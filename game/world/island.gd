@@ -10,6 +10,9 @@ signal finished(won: bool)
 ## Set by main before the scene enters the tree; null when run with F6.
 var context: RunContext
 var paused: bool = false
+## Title-screen backdrop: no HUD, no input, hidden immortal player in the
+## middle (the horde gathers around), slowly orbiting camera.
+var showcase: bool = false
 @export_group("Camera")
 @export var camera_pitch_deg: float = 35.0
 @export var camera_distance: float = 10.0
@@ -80,6 +83,12 @@ func _ready() -> void:
 	add_child(sfx)
 	music = Music.new()
 	add_child(music)
+	if showcase:
+		_player.visible = false
+		sfx.process_mode = Node.PROCESS_MODE_DISABLED
+		run.player_pos = Vector3(run.field.width * 0.5, 0, run.field.height * 0.5)
+		run.director.trigger_peak(1000000.0)
+		return
 	hud = Hud.new()
 	hud.card_chosen.connect(func(i: int) -> void: run.choose_card(i))
 	add_child(hud)
@@ -464,6 +473,8 @@ func _ring(center: Vector3, radius: float, color: Color) -> MeshInstance3D:
 # --- Input and simulation -------------------------------------------------
 
 func _unhandled_input(event: InputEvent) -> void:
+	if showcase:
+		return
 	# Actions come from GameInput (InputMap): keyboard, mouse and gamepad alike.
 	if event.is_echo() or not event.is_pressed():
 		return
@@ -506,6 +517,11 @@ func _finish() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if showcase:
+		run.hp = run.max_hp
+		run.card_choices.clear()
+		run.step(delta, Vector2.ZERO, Vector3(1, 0, 0), false, true)  # sprint = gun silent
+		return
 	if paused:
 		return
 	if _hitstop > 0.0:
@@ -555,6 +571,12 @@ func _process(delta: float) -> void:
 	_draw_effects(delta)
 	_draw_mission()
 	_fade_occluders(delta)
+	if showcase:
+		var a: float = Time.get_ticks_msec() * 0.00006
+		var c := Vector3(run.field.width * 0.5, 0, run.field.height * 0.5)
+		_camera.position = c + Vector3(cos(a) * 45.0, 28.0, sin(a) * 45.0)
+		_camera.look_at(c)
+		return
 	var label: String = ""
 	if context != null:
 		label = "Island %d/%d" % [context.island_index + 1, RunContext.ISLAND_COUNT]
@@ -565,6 +587,10 @@ func _process(delta: float) -> void:
 
 ## Turns this frame's gameplay events into sounds.
 func _play_audio() -> void:
+	if showcase:
+		music.update_mix(0.15, get_process_delta_time())
+		run.tracers.clear()
+		return
 	# Music follows the director: peak = combat, build-up = halfway, relax = calm.
 	var target: float = [0.5, 1.0, 0.0][run.director.phase]
 	if run.objective == IslandRun.Objective.BOSS:
@@ -686,7 +712,7 @@ func _draw_enemies() -> void:
 ## would be a headshot, faint white otherwise.
 func _draw_laser() -> void:
 	_laser_mesh.clear_surfaces()
-	if run.is_paused() or run.sprinting:
+	if showcase or run.is_paused() or run.sprinting:
 		return
 	var info: Array = run.aim_info()
 	var right := Vector3(-run.facing.z, 0, run.facing.x)

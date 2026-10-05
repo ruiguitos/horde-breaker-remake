@@ -35,11 +35,8 @@ func _init() -> void:
 	var root := Control.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# Dark outline so text reads over any background.
-	var theme := Theme.new()
-	theme.set_constant("outline_size", "Label", 5)
-	theme.set_color("font_outline_color", "Label", Color(0, 0, 0, 0.85))
-	root.theme = theme
+	# Shared theme: outlined labels, styled buttons and bars.
+	root.theme = UiTheme.get_theme()
 	add_child(root)
 
 	var bars := VBoxContainer.new()

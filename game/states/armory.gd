@@ -16,28 +16,13 @@ var _volume_label: Label
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	size = get_viewport_rect().size
+	theme = UiTheme.get_theme()
 	var bg := ColorRect.new()
-	bg.color = Color(0.12, 0.13, 0.1)
+	bg.color = UiTheme.BG
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
-	var box := VBoxContainer.new()
-	box.custom_minimum_size = Vector2(720, 0)
-	box.add_theme_constant_override("separation", 10)
-	center.add_child(box)
-	var game_title := Label.new()
-	game_title.text = "HORDE BREAKER"
-	game_title.add_theme_font_size_override("font_size", 40)
-	game_title.add_theme_color_override("font_color", Color(1.0, 0.75, 0.2))
-	game_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(game_title)
-	var title := Label.new()
-	title.text = "— ARMORY —"
-	title.add_theme_font_size_override("font_size", 22)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(title)
+	var box: VBoxContainer = UiTheme.centered_panel(self, 760)
+	box.add_child(UiTheme.title("ARMORY", 34))
 	if profile.runs == 0:
 		var tips := Label.new()
 		tips.text = "First time? Your gun fires by itself at enemies in front of you: aim with your body (the laser turns red for headshots). Space = breaker dash through the horde, G = grenade, Shift = sprint. Activate 3 generators, then get back to the boat."

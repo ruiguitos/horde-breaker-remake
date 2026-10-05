@@ -1,11 +1,11 @@
 extends Node
 ## Root of the game: a small run state machine.
-##   ARMORY -> BOAT -> ISLAND -> (cleared and more islands) BOAT
+##   TITLE -> ARMORY -> BOAT -> ISLAND -> (cleared and more islands) BOAT
 ##                  -> (last island cleared, or death) DEBRIEF -> ARMORY
 ## Each state is a scene that is freed when the state changes; RunContext is
 ## the only thing that crosses states.
 
-enum State { BOAT, ISLAND, DEBRIEF, ARMORY }
+enum State { BOAT, ISLAND, DEBRIEF, ARMORY, TITLE }
 
 const ISLAND_SCENE: String = "res://game/world/island.tscn"
 
@@ -19,7 +19,7 @@ func _ready() -> void:
 	GameInput.setup()
 	profile = Profile.load_profile()
 	profile.apply_volume()
-	_go(State.ARMORY)
+	_go(State.TITLE)
 
 
 ## F11 toggles fullscreen anywhere in the game.
@@ -64,6 +64,12 @@ func _go(next: State) -> void:
 			debrief.set("profile", profile)
 			debrief.connect("new_run_requested", _go.bind(State.ARMORY), CONNECT_DEFERRED)
 			_current = debrief
+		State.TITLE:
+			var title := Node.new()
+			title.set_script(load("res://game/states/title.gd"))
+			title.set("profile", profile)
+			title.connect("play_requested", _go.bind(State.ARMORY), CONNECT_DEFERRED)
+			_current = title
 		State.ARMORY:
 			var armory := Control.new()
 			armory.set_script(load("res://game/states/armory.gd"))

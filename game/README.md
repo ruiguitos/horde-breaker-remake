@@ -75,7 +75,7 @@ O volume ajusta-se no Armory (− / +) e fica gravado no perfil.
 
 ## Fluxo da run
 
-**Armory** (gastar Intel, equipar perks, escolher Threat) → barco (1 de 3: cura, munição ou carta) → ilha → ilha limpa → barco → … →
+**Título** → **Armory** (gastar Intel, equipar perks, escolher Threat) → barco (1 de 3: cura, munição ou carta) → ilha → ilha limpa → barco → … →
 3.ª ilha limpa ou morte → debrief → Armory. Extrair (ganhar a 3.ª ilha)
 multiplica o Intel da run por 1,5. Cada ilha é
 mais dura: o HP dos inimigos sobe 30 % e há mais especiais. A vida, o nível,
@@ -187,6 +187,8 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 | `core/run_context.gd` | O que passa de ilha para ilha. |
 | `core/game_input.gd` | Ações de input (InputMap): teclas e botões do comando por ação. |
 | `core/profile.gd` | Perfil gravado (Intel, runs), JSON versionado. |
+| `states/title.gd` | Ecrã de título com uma ilha viva ao fundo (Island em modo `showcase`). |
+| `ui/ui_theme.gd` | Tema partilhado por menus e HUD (painéis, botões, cores). |
 | `states/armory.gd`, `states/boat.gd`, `states/debrief.gd` | Ecrãs entre runs, entre ilhas e do fim da run. |
 | `world/island_run.gd` | **Todas as regras**, sem nós: jogador, auto-fire, breaker, cartas, missão. Testável em headless. |
 | `world/island.gd` | Input, render (MultiMesh), câmara média e efeitos. |

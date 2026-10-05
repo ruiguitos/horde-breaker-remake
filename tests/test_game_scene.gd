@@ -28,7 +28,11 @@ func _process(_delta: float) -> bool:
 	_frames += 1
 	match _step:
 		0:
-			_check(_main.get("state") == 3, "the game opens in the armory")
+			_check(_main.get("state") == 4, "the game opens on the title screen")
+			_current().emit_signal("play_requested")
+			_step = 9
+		9:
+			_check(_main.get("state") == 3, "deploy opens the armory")
 			_current().call("_start")
 			_step = 10
 		10:
