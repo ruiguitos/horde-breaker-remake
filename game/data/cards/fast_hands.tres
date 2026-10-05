@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://ceqytbr0y4hun"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_45wkq"]
+
+[resource]
+script = ExtResource("1_45wkq")
+title = "Fast Hands"
+description = "+20% fire rate."
+max_stacks = 3
+order = 6

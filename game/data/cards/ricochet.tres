@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://brcbxrw3heetg"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_mhno7"]
+
+[resource]
+script = ExtResource("1_mhno7")
+title = "Ricochet"
+description = "Every 4th shot also hits the nearest enemy to the target."
+order = 2

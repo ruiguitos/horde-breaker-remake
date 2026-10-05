@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://0fxgqecudt2u"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_i1t86"]
+
+[resource]
+script = ExtResource("1_i1t86")
+title = "Hollow Points"
+description = "+25% weapon damage."
+max_stacks = 3
+order = 5

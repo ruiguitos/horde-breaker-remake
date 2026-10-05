@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://bgdvrnk3a2865"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_igqtp"]
+
+[resource]
+script = ExtResource("1_igqtp")
+title = "Bigger Mags"
+description = "+30% max special ammo."
+max_stacks = 2
+order = 10

@@ -1,0 +1,58 @@
+[gd_resource type="Resource" script_class="Registry" format=3]
+
+[ext_resource type="Script" path="res://addons/yard/registry.gd" id="1_d2jca"]
+
+[resource]
+script = ExtResource("1_d2jca")
+_class_restriction = &"CardData"
+_scan_directory = "res://game/data/cards/"
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://0fxgqecudt2u": &"hollow_points",
+&"uid://4b7qurp1ant6": &"grenadier",
+&"uid://b8s2flql0jbw1": &"explosive_heads",
+&"uid://bgdvrnk3a2865": &"bigger_mags",
+&"uid://brcbxrw3heetg": &"ricochet",
+&"uid://bvbt742oui5ry": &"quick_breaker",
+&"uid://bw010yu5e5o56": &"magnet",
+&"uid://ceqytbr0y4hun": &"fast_hands",
+&"uid://cjtqolns7rvro": &"executioner",
+&"uid://cypgjsbjcjlpj": &"adrenaline",
+&"uid://doh8g61omarm1": &"shockwave",
+&"uid://wdvx3li3g4bc": &"vampire"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"adrenaline": &"uid://cypgjsbjcjlpj",
+&"bigger_mags": &"uid://bgdvrnk3a2865",
+&"executioner": &"uid://cjtqolns7rvro",
+&"explosive_heads": &"uid://b8s2flql0jbw1",
+&"fast_hands": &"uid://ceqytbr0y4hun",
+&"grenadier": &"uid://4b7qurp1ant6",
+&"hollow_points": &"uid://0fxgqecudt2u",
+&"magnet": &"uid://bw010yu5e5o56",
+&"quick_breaker": &"uid://bvbt742oui5ry",
+&"ricochet": &"uid://brcbxrw3heetg",
+&"shockwave": &"uid://doh8g61omarm1",
+&"vampire": &"uid://wdvx3li3g4bc"
+})
+_property_index = Dictionary[StringName, Dictionary]({
+&"max_stacks": {
+1: {
+&"adrenaline": true,
+&"explosive_heads": true,
+&"magnet": true,
+&"ricochet": true
+},
+2: {
+&"bigger_mags": true,
+&"executioner": true,
+&"grenadier": true,
+&"quick_breaker": true,
+&"shockwave": true,
+&"vampire": true
+},
+3: {
+&"fast_hands": true,
+&"hollow_points": true
+}
+}
+})

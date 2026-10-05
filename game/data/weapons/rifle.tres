@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://6ghxtfj36a8j"]
+
+[ext_resource type="Script" path="res://game/data/resources/weapon_data.gd" id="1_jtmr2"]
+
+[resource]
+script = ExtResource("1_jtmr2")
+display_name = "Assault Rifle"
+damage = 12.0
+fire_rate = 9.0
+range_m = 30.0
+spread_deg = 2.0
+knockback = 0.05

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://bldi83as4farn"]
+
+[ext_resource type="Script" path="res://game/data/resources/weapon_data.gd" id="1_44dq0"]
+
+[resource]
+script = ExtResource("1_44dq0")
+display_name = "Marksman Rifle"
+damage = 110.0
+fire_rate = 1.2
+range_m = 45.0
+pierce = 6
+max_ammo = 30
+knockback = 0.5
+unlock_cost = 80
+order = 4

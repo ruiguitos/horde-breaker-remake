@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://cwehc575wai4h"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_47ji0"]
+
+[resource]
+script = ExtResource("1_47ji0")
+title = "Thick Skin"
+description = "+30 max HP."

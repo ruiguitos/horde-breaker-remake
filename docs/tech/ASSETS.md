@@ -18,6 +18,7 @@ mão no editor). Licenças: `assets/LICENSES.md`.
 | Boot Splash Plus | **Usar** | Ecrã de arranque (porto + logótipo + barra) |
 | Color Grading | **Usar** | Cor por bioma em High/Ultra (`world/grading.gd`; só Forward+) |
 | Dialogue Manager | **Usar** | Briefing no barco com escolhas (`data/dialogue/briefing.dialogue`) |
+| YARD | **Usar** | Registos de armas, cartas e perks (`game/data/*.tres`) |
 | GD-Sync | Avaliar | Ver `docs/tech/MULTIPLAYER.md` |
 | Lit | **Não serve** | Só ilumina 2D |
 | HTerrain | **Não usar** | Duplica o Terrain3D |

@@ -126,7 +126,7 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach") -> void:
 	horde.set_target(player_pos)
 	for w in weapons:
 		ammo.append(w.max_ammo)
-		weapon_unlocked.append(GameData.STARTING_WEAPONS.has(w.id))
+		weapon_unlocked.append(GameData.starting_weapons().has(w.id))
 	for c in map.caches:
 		cache_progress.append(0.0)
 	for i in GameData.GENERATOR_COUNT:

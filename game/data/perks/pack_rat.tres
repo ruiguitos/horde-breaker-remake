@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://d1mk31bg77twy"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_lk0sq"]
+
+[resource]
+script = ExtResource("1_lk0sq")
+title = "Pack Rat"
+description = "+50% Shotgun and Heavy Pistol ammo."
+order = 1

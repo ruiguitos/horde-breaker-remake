@@ -210,8 +210,6 @@ const BOSS_SUMMON_INTERVAL: float = 9.0
 const BOSS_SUMMON_COUNT: int = 4
 
 ## Weapons available from the start; the others are bought in the armory.
-const STARTING_WEAPONS: Array[StringName] = [&"rifle", &"shotgun", &"pistol"]
-const WEAPON_COSTS: Dictionary = {&"smg": 60, &"marksman": 80}
 
 ## Classes: passive + active ability. The Recruit is free; the others are bought.
 const CLASSES: Array[StringName] = [&"recruit", &"vanguard"]
@@ -267,41 +265,80 @@ static func enemy_types() -> Array[EnemyType]:
 	return [walker, runner, brute, grabber, boss, bloater, screamer]
 
 
+## Weapons, cards and perks live in .tres files (one per entry) listed in
+## YARD registries (addons/yard): edit them in the inspector or in the
+## editor's Registry tab. Loaded once and cached; ordered by `order`.
+const WEAPON_REGISTRY: String = "res://game/data/weapons.tres"
+const CARD_REGISTRY: String = "res://game/data/cards.tres"
+const PERK_REGISTRY: String = "res://game/data/perks.tres"
+
+static var _weapon_data: Array = []  ## [id, WeaponData] sorted by order
+static var _cards: Array[Card] = []
+static var _perks: Array[Perk] = []
+
+
+## [id, resource] pairs of a registry, sorted by the resources' `order`.
+static func _entries(registry_path: String) -> Array:
+	var reg: Resource = load(registry_path)
+	if reg == null:
+		push_error("GameData: missing registry " + registry_path)
+		return []
+	var all: Dictionary = reg.call("load_all_blocking")
+	var out: Array = []
+	for id: StringName in all:
+		out.append([id, all[id]])
+	out.sort_custom(func(a: Array, b: Array) -> bool: return int(a[1].get("order")) < int(b[1].get("order")))
+	return out
+
+
+static func _weapon_entries() -> Array:
+	if _weapon_data.is_empty():
+		_weapon_data = _entries(WEAPON_REGISTRY)
+	return _weapon_data
+
+
+## Fresh Weapon objects each call (IslandRun may change them with cards).
 static func weapons() -> Array[Weapon]:
-	return [
-		Weapon.new(&"rifle", "Assault Rifle", 12.0, 9.0, 30.0, 1, 2.0, 1, -1, 0.05),
-		Weapon.new(&"shotgun", "Shotgun", 9.0, 1.4, 12.0, 8, 22.0, 2, 40, 0.6),
-		Weapon.new(&"pistol", "Heavy Pistol", 60.0, 2.2, 35.0, 1, 0.0, 4, 60, 0.3),
-		Weapon.new(&"smg", "SMG", 7.0, 16.0, 18.0, 1, 7.0, 1, 300, 0.02),
-		Weapon.new(&"marksman", "Marksman Rifle", 110.0, 1.2, 45.0, 1, 0.0, 6, 30, 0.5),
-	]
+	var list: Array[Weapon] = []
+	for e: Array in _weapon_entries():
+		var d: WeaponData = e[1]
+		list.append(Weapon.new(e[0], d.display_name, d.damage, d.fire_rate, d.range_m,
+			d.pellets, d.spread_deg, d.pierce, d.max_ammo, d.knockback))
+	return list
+
+
+## Weapons every run starts with (unlock cost 0).
+static func starting_weapons() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for e: Array in _weapon_entries():
+		if (e[1] as WeaponData).unlock_cost <= 0:
+			ids.append(e[0])
+	return ids
+
+
+## Intel cost to unlock a weapon in the Armory; -1 if it is not for sale.
+static func weapon_cost(id: StringName) -> int:
+	for e: Array in _weapon_entries():
+		if e[0] == id:
+			var cost: int = (e[1] as WeaponData).unlock_cost
+			return cost if cost > 0 else -1
+	return -1
 
 
 static func cards() -> Array[Card]:
-	return [
-		Card.new(&"shockwave", "Shockwave Breaker", "The breaker releases a shockwave: double radius and +30 damage.", 2),
-		Card.new(&"quick_breaker", "Hair Trigger", "Breaker cooldown -30%.", 2),
-		Card.new(&"ricochet", "Ricochet", "Every 4th shot also hits the nearest enemy to the target.", 1),
-		Card.new(&"explosive_heads", "Pop Goes the Head", "Headshot kills explode (3 m, 30 damage).", 1),
-		Card.new(&"vampire", "Field Medic", "Headshot kills heal 2 HP.", 2),
-		Card.new(&"hollow_points", "Hollow Points", "+25% weapon damage.", 3),
-		Card.new(&"fast_hands", "Fast Hands", "+20% fire rate.", 3),
-		Card.new(&"magnet", "XP Magnet", "Pickup radius x2.", 1),
-		Card.new(&"adrenaline", "Adrenaline", "Each kill cuts 0.3 s off the breaker cooldown.", 1),
-		Card.new(&"executioner", "Executioner", "+60% damage to stunned enemies.", 2),
-		Card.new(&"bigger_mags", "Bigger Mags", "+30% max special ammo.", 2),
-		Card.new(&"grenadier", "Grenadier", "Grenade cooldown -20%.", 2),
-	]
+	if _cards.is_empty():
+		for e: Array in _entries(CARD_REGISTRY):
+			var d: CardData = e[1]
+			_cards.append(Card.new(e[0], d.title, d.description, d.max_stacks))
+	return _cards.duplicate()
 
 
 static func perks() -> Array[Perk]:
-	return [
-		Perk.new(&"thick_skin", "Thick Skin", "+30 max HP.", 40),
-		Perk.new(&"pack_rat", "Pack Rat", "+50% Shotgun and Heavy Pistol ammo.", 40),
-		Perk.new(&"head_hunter", "Head Hunter", "Wider headshot cone (9° -> 15°).", 60),
-		Perk.new(&"long_breaker", "Battering Ram", "Breaker goes 40% further.", 50),
-		Perk.new(&"demolitions", "Demolitions", "Grenade cooldown -35%, radius +1 m.", 50),
-	]
+	if _perks.is_empty():
+		for e: Array in _entries(PERK_REGISTRY):
+			var d: PerkData = e[1]
+			_perks.append(Perk.new(e[0], d.title, d.description, d.cost))
+	return _perks.duplicate()
 
 
 ## Threat level rules: enemy HP and Intel multipliers, extra enemies alive.

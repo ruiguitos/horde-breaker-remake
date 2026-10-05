@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://d0wt54cacykqt"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_nkv3t"]
+
+[resource]
+script = ExtResource("1_nkv3t")
+title = "Demolitions"
+description = "Grenade cooldown -35%, radius +1 m."
+cost = 50
+order = 4

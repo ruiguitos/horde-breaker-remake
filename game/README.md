@@ -309,6 +309,18 @@ Como as transições são cross-fades, não há cortes.
 
 ## Onde mexer nos valores
 
+**Armas, cartas e perks** estão em ficheiros `.tres`, um por item:
+`game/data/weapons/`, `game/data/cards/` e `game/data/perks/`. Cada pasta
+tem um registo **YARD** (`game/data/weapons.tres`, `cards.tres`,
+`perks.tres`).
+- No editor, o separador **Registry** mostra cada registo como uma folha de
+  cálculo: mudas o dano, o custo ou o texto sem tocar em código.
+- Um ficheiro novo na pasta entra sozinho no registo.
+- O `order` define a ordem: teclas das armas e listas do Armory.
+- Numa arma, `unlock_cost` 0 quer dizer arma inicial e mais de 0 é o preço em
+  Intel no Armory.
+
+
 Todos os números de equilíbrio (HP, dano, velocidades, cooldowns, cartas)
 estão em `game/data/game_data.gd`. São hipóteses para afinar a jogar. A câmara
 (ângulo, distância, FOV) é exportada no nó `Island` (`game/world/island.tscn`).

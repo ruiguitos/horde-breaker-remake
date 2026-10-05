@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://b6ddxb643fhnc"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_dkbmd"]
+
+[resource]
+script = ExtResource("1_dkbmd")
+title = "Head Hunter"
+description = "Wider headshot cone (9° -> 15°)."
+cost = 60
+order = 2

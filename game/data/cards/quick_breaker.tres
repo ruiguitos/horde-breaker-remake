@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://bvbt742oui5ry"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_ivaag"]
+
+[resource]
+script = ExtResource("1_ivaag")
+title = "Hair Trigger"
+description = "Breaker cooldown -30%."
+max_stacks = 2
+order = 1

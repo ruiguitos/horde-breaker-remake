@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://3xd1wwpvu3ht"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_wgfsv"]
+
+[resource]
+script = ExtResource("1_wgfsv")
+title = "Battering Ram"
+description = "Breaker goes 40% further."
+cost = 50
+order = 3

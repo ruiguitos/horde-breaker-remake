@@ -162,7 +162,7 @@ func _weapons() -> void:
 		var card := UiTheme.panel(list)
 		card.add_child(UiTheme.title(weapon.display_name.to_upper(), 22))
 		card.add_child(UiTheme.label("%d DAMAGE / %.1f SHOTS PER SECOND / %d M" % [int(weapon.damage), weapon.fire_rate, int(weapon.range_m)], 16, UiTheme.MUTED, true))
-		var cost: int = int(GameData.WEAPON_COSTS.get(weapon.id, 0))
+		var cost: int = maxi(0, GameData.weapon_cost(weapon.id))
 		var owned: bool = cost == 0 or profile.unlocked_weapons.has(weapon.id)
 		var b := UiTheme.button(card, "IN LOADOUT" if owned else "UNLOCK / %d INTEL" % cost, func() -> void: _act(profile.buy_weapon(weapon.id)))
 		b.name = "Weapon_" + String(weapon.id)

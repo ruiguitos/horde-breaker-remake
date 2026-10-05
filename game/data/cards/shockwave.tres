@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://doh8g61omarm1"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_rh5uk"]
+
+[resource]
+script = ExtResource("1_rh5uk")
+title = "Shockwave Breaker"
+description = "The breaker releases a shockwave: double radius and +30 damage."
+max_stacks = 2

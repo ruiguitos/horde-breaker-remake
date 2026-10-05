@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://qyxwk66tcfre"]
+
+[ext_resource type="Script" path="res://game/data/resources/weapon_data.gd" id="1_bxdo3"]
+
+[resource]
+script = ExtResource("1_bxdo3")
+display_name = "Shotgun"
+damage = 9.0
+fire_rate = 1.4
+range_m = 12.0
+pellets = 8
+spread_deg = 22.0
+pierce = 2
+max_ammo = 40
+knockback = 0.6
+order = 1

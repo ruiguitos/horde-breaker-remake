@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://caqregr32ifx6"]
+
+[ext_resource type="Script" path="res://game/data/resources/weapon_data.gd" id="1_imhj6"]
+
+[resource]
+script = ExtResource("1_imhj6")
+display_name = "SMG"
+damage = 7.0
+fire_rate = 16.0
+range_m = 18.0
+spread_deg = 7.0
+max_ammo = 300
+knockback = 0.02
+unlock_cost = 60
+order = 3

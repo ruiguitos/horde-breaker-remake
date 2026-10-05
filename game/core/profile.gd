@@ -153,7 +153,7 @@ func buy_class(id: StringName) -> bool:
 
 
 func buy_weapon(id: StringName) -> bool:
-	var cost: int = int(GameData.WEAPON_COSTS.get(id, -1))
+	var cost: int = GameData.weapon_cost(id)
 	if cost < 0 or unlocked_weapons.has(id) or intel < cost:
 		return false
 	intel -= cost

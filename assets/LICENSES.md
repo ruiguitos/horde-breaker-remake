@@ -19,6 +19,7 @@ royalty-free comercial). Cada entrada indica a origem e a licença.
 | `addons/orchestrator/` | Orchestrator (visual scripting, GDExtension, 170 MB) | CraterCrash e contribuidores (`AUTHORS.md`) | Apache 2.0 (`LICENSE`) |
 | `addons/zylann.hterrain/` | HTerrain 1.8 (terreno por heightmap) | Marc Gilleron | MIT (`LICENSE.md`) |
 | `addons/Color grading/` + `Compositor/` | Color Grading (efeitos de compositor) | Rytelier | MIT (`LICENSE.txt` na raiz) |
+| `addons/yard/` | YARD 1.3 (registos de Resources) | Elliot Fontaine e contribuidores | MIT (`LICENSE`) |
 | `addons/dialogue_manager/` | Dialogue Manager 4.1 | Nathan Hoad | MIT (`LICENSE`) |
 | `addons/GD-Sync/` | GD-Sync 1.0.2 (multiplayer na cloud) | GD-Sync | BSD-style para o código; o **serviço** tem termos próprios (contas/planos em gd-sync.com) |
 | `PlayerCharacter/`, `Map/`, `Arts/` | Third Person Controller (cena de exemplo, *plush* do Godot, fontes) | Jeh3no | MIT (`LICENSE` na raiz) |

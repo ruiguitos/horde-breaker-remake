@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://bw010yu5e5o56"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_mb2b1"]
+
+[resource]
+script = ExtResource("1_mb2b1")
+title = "XP Magnet"
+description = "Pickup radius x2."
+order = 7

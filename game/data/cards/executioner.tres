@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://cjtqolns7rvro"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_b3af7"]
+
+[resource]
+script = ExtResource("1_b3af7")
+title = "Executioner"
+description = "+60% damage to stunned enemies."
+max_stacks = 2
+order = 9

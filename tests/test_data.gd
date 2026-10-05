@@ -1,0 +1,30 @@
+extends SceneTree
+## Game data from YARD registries: every entry loads, ids and order are
+## stable, derived rules (starting weapons, unlock costs) match the design,
+## and the registry index answers queries without loading resources.
+## Run: godot --headless --path . --script res://tests/test_data.gd
+
+var _failures: int = 0
+
+
+func _check(ok: bool, what: String) -> void:
+	print(("TEST: " if ok else "TEST FAIL: ") + what)
+	if not ok:
+		_failures += 1
+
+
+func _initialize() -> void:
+	var weapons: Array[GameData.Weapon] = GameData.weapons()
+	var ids: Array = weapons.map(func(w: GameData.Weapon) -> StringName: return w.id)
+	_check(ids == [&"rifle", &"shotgun", &"pistol", &"smg", &"marksman"], "5 weapons in slot order (%s)" % [ids])
+	_check(GameData.starting_weapons() == ([&"rifle", &"shotgun", &"pistol"] as Array[StringName]), "starting weapons are the free ones")
+	_check(GameData.weapon_cost(&"smg") == 60 and GameData.weapon_cost(&"marksman") == 80 and GameData.weapon_cost(&"rifle") == -1,
+		"unlock costs: SMG 60, Marksman 80, Rifle not for sale")
+	_check(weapons[1].pellets == 8 and is_equal_approx(weapons[0].fire_rate, 9.0), "weapon stats come from the .tres files")
+	_check(GameData.cards().size() == 12 and GameData.perks().size() == 5, "12 cards and 5 perks")
+	_check(GameData.perks()[0].id == &"thick_skin" and GameData.perks()[0].cost == 40, "perk order and cost")
+	var reg: Registry = load(GameData.PERK_REGISTRY)
+	var cheap: Array[StringName] = reg.filter(&"cost", func(v: int) -> bool: return v <= 40)
+	cheap.sort()
+	_check(cheap == ([&"pack_rat", &"thick_skin"] as Array[StringName]), "registry index query: perks costing <= 40 Intel")
+	quit(1 if _failures > 0 else 0)
