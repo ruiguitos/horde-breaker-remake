@@ -59,6 +59,10 @@ func _draw() -> void:
 		var done: bool = run.generator_progress[g] >= GameData.GENERATOR_HOLD_SECONDS
 		var gp: Vector3 = run.map.generators[g]
 		draw_circle(Vector2(gp.x, gp.z) * scale, 4.0, Color(0.3, 1, 0.4) if done else Color(1, 0.85, 0.2))
+	for c in run.map.caches.size():
+		if run.cache_progress[c] < GameData.CACHE_OPEN_TIME:
+			var cp: Vector3 = run.map.caches[c]
+			draw_rect(Rect2(Vector2(cp.x, cp.z) * scale - Vector2(2.5, 2.5), Vector2(5, 5)), Color(0.4, 0.95, 1.0))
 	var bp: Vector3 = run.map.boat
 	draw_rect(Rect2(Vector2(bp.x, bp.z) * scale - Vector2(3, 3), Vector2(6, 6)), Color(0.6, 0.4, 0.2))
 	# Player: a white triangle pointing where they face.

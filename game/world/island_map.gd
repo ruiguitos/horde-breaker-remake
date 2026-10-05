@@ -14,6 +14,8 @@ var buildings: Array[Rect2i] = []
 ## Single-cell blocking props (cells), rendered as trees and rocks.
 var trees: Array[Vector2i] = []
 var rocks: Array[Vector2i] = []
+## Optional supply caches (detours with a reward).
+var caches: Array[Vector3] = []
 
 
 static func build(rng_seed: int = 7) -> IslandMap:
@@ -72,6 +74,19 @@ static func build(rng_seed: int = 7) -> IslandMap:
 		f.set_blocked_rect(x0, z0, x0 + w - 1, z0 + h - 1)
 		map.buildings.append(rect)
 		placed += 1
+	# Caches: free spots away from the boat and generators.
+	attempts = 0
+	while map.caches.size() < 4 and attempts < 2000:
+		attempts += 1
+		var cp := Vector3(rng.randi_range(15, SIZE - 15) + 0.5, 0, rng.randi_range(15, SIZE - 15) + 0.5)
+		var ok_cache: bool = not _blocked_near(f, Vector2i(int(cp.x), int(cp.z)), 2)
+		for p in keep_free + map.caches:
+			if Vector2(cp.x - p.x, cp.z - p.z).length() < 25.0:
+				ok_cache = false
+				break
+		if ok_cache:
+			map.caches.append(cp)
+	keep_free.append_array(map.caches)
 	# Trees and rocks: single blocked cells whose 3x3 neighbourhood is free,
 	# so they add cover without ever sealing a corridor.
 	var props: int = 0
@@ -93,6 +108,14 @@ static func build(rng_seed: int = 7) -> IslandMap:
 			map.rocks.append(cell)
 		props += 1
 	return map
+
+
+static func _blocked_near(f: FlowField, c: Vector2i, r: int) -> bool:
+	for dz in range(-r, r + 1):
+		for dx in range(-r, r + 1):
+			if f.is_blocked(c.x + dx, c.y + dz):
+				return true
+	return false
 
 
 static func _free_around(f: FlowField, c: Vector2i) -> bool:

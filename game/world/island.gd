@@ -40,6 +40,7 @@ var _tracer_mesh := ImmediateMesh.new()
 var _generators: Array[MeshInstance3D] = []
 var _generator_rings: Array[MeshInstance3D] = []
 var _boat_ring: MeshInstance3D
+var _caches: Array[MeshInstance3D] = []
 var _buildings: Array[MeshInstance3D] = []
 var _building_boxes: Array[AABB] = []
 var _slam_ring: MeshInstance3D
@@ -162,6 +163,15 @@ func _build_world() -> void:
 		_building_boxes.append(AABB(Vector3(r.position.x, 0, r.position.y), Vector3(r.size.x, h, r.size.y)))
 
 	_build_props(rng)
+	for c in run.map.caches:
+		var crate := MeshInstance3D.new()
+		var cm := BoxMesh.new()
+		cm.size = Vector3(1.0, 0.7, 0.7)
+		crate.mesh = cm
+		crate.position = c + Vector3(0, 0.35, 0)
+		crate.material_override = _mat(Color(0.3, 0.75, 0.85))
+		add_child(crate)
+		_caches.append(crate)
 
 	for g in run.map.generators:
 		var gen := MeshInstance3D.new()
@@ -794,6 +804,10 @@ func _draw_mission() -> void:
 		elif p > 0.0:
 			m.albedo_color = Color(0.7, 0.2, 0.15).lerp(Color(1, 0.85, 0.2), p)
 	_boat_ring.visible = run.objective == IslandRun.Objective.RETURN_TO_BOAT
+	for c in _caches.size():
+		var opened: bool = run.cache_progress[c] >= GameData.CACHE_OPEN_TIME
+		var m: StandardMaterial3D = _caches[c].material_override
+		m.albedo_color = Color(0.25, 0.25, 0.25) if opened else Color(0.3, 0.75, 0.85).lerp(Color.WHITE, run.cache_progress[c] / GameData.CACHE_OPEN_TIME)
 	# Boss slam telegraph: a ring that pulses faster as the slam gets closer.
 	_slam_ring.visible = run.slam_time > 0.0
 	if _slam_ring.visible:

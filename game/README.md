@@ -63,6 +63,9 @@ O volume ajusta-se no Armory (− / +) e fica gravado no perfil.
 - **Missão**: segue o marcador amarelo até cada gerador e fica dentro do anel
   8 s. Ao começares, a horda entra em pico. Com os 3 ligados, volta ao barco
   (anel verde).
+- **Caixas de mantimentos** (azul-claro, também no minimapa): 4 por ilha,
+  longe do caminho. Ficas 1,5 s junto de uma e recebes cura (+30), munição,
+  XP ou +10 de Intel. São desvios opcionais: vale a pena o risco?
 - O **diretor** alterna calma → crescer → pico (ver F3). O máximo é de 150
   inimigos vivos.
 

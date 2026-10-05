@@ -25,6 +25,7 @@ func _initialize() -> void:
 	_test_bloater_and_screamer()
 	_test_sprint()
 	_test_classes()
+	_test_caches()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -339,3 +340,15 @@ func _test_classes() -> void:
 	var p := Profile.new()
 	p.intel = 160
 	_check(p.buy_class(&"vanguard") and not p.buy_class(&"medic"), "classes are bought with Intel")
+
+
+func _test_caches() -> void:
+	var run := IslandRun.new(7)
+	run.director.max_alive = 0
+	var reachable: bool = run.map.caches.size() == 4
+	for c in run.map.caches:
+		reachable = reachable and run.field.distance_at(c) < FlowField.UNREACHABLE
+	run.player_pos = run.map.caches[0]
+	for t in int(GameData.CACHE_OPEN_TIME / DT) + 5:
+		run.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)
+	_check(reachable and run.cache_progress[0] >= GameData.CACHE_OPEN_TIME, "4 reachable caches; standing at one opens it")

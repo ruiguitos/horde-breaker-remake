@@ -62,6 +62,8 @@ var generator_progress: PackedFloat32Array = PackedFloat32Array()
 var generator_started: Array[bool] = []
 ## The last island ends with a boss fight before the return to the boat.
 var has_boss: bool = false
+var cache_progress: PackedFloat32Array = PackedFloat32Array()  ## >= CACHE_OPEN_TIME = opened
+var cache_intel: int = 0
 var boss_max_hp: float = 0.0
 var slam_pos: Vector3 = Vector3.ZERO
 var slam_time: float = 0.0  ## > 0 while a slam is winding up
@@ -100,6 +102,8 @@ func _init(rng_seed: int = 7) -> void:
 	for w in weapons:
 		ammo.append(w.max_ammo)
 		weapon_unlocked.append(GameData.STARTING_WEAPONS.has(w.id))
+	for c in map.caches:
+		cache_progress.append(0.0)
 	for i in GameData.GENERATOR_COUNT:
 		generator_progress.append(0.0)
 		generator_started.append(false)
@@ -289,6 +293,7 @@ func intel_earned() -> int:
 			done += 1
 	var base: int = (kills - _kills_at_start) / 5 + done * 15 + (40 if objective == Objective.WON else 0)
 	base += 20 if boss_killed else 0
+	base += cache_intel
 	return int(base * GameData.threat_intel(threat) * GameData.modifier(modifier).intel_mult)
 
 
@@ -341,6 +346,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	_flush_dead()
 	_update_orbs(dt)
 	_update_mission(dt)
+	_update_caches(dt)
 	var near: int = horde.query_radius(player_pos, 6.0).size()
 	var to_spawn: int = director.update(dt, horde.count, horde.damage_to_player, near)
 	for k in to_spawn:
@@ -627,6 +633,37 @@ func _update_mission(dt: float) -> void:
 		Objective.RETURN_TO_BOAT:
 			if player_pos.distance_to(map.boat) <= GameData.BOAT_RADIUS:
 				objective = Objective.WON
+
+
+func _update_caches(dt: float) -> void:
+	for c in map.caches.size():
+		if cache_progress[c] >= GameData.CACHE_OPEN_TIME:
+			continue
+		if player_pos.distance_to(map.caches[c]) <= GameData.CACHE_RADIUS:
+			cache_progress[c] += dt
+			if cache_progress[c] >= GameData.CACHE_OPEN_TIME:
+				_open_cache()
+		else:
+			cache_progress[c] = 0.0
+
+
+func _open_cache() -> void:
+	match rng.randi_range(0, 3):
+		0:
+			hp = minf(max_hp, hp + 30.0)
+			messages.append("Cache: med supplies (+30 HP)")
+		1:
+			for w in weapons.size():
+				if weapons[w].max_ammo > 0:
+					ammo[w] = max_ammo(w)
+			messages.append("Cache: ammo (specials refilled)")
+		2:
+			orbs.append(player_pos)
+			orb_values.append(xp_needed() / 2)
+			messages.append("Cache: field notes (XP)")
+		_:
+			cache_intel += 10
+			messages.append("Cache: Intel (+10)")
 
 
 ## Index of the boss in the horde, or -1 (indices change when enemies die).

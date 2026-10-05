@@ -13,7 +13,6 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 - [ ] Rotas: mapa em grafo visível (agora são 2 opções por paragem).
 - [ ] Mais desbloqueios com Intel: cartas no pool. Equilibrar classes.
 - [ ] Boss: ataque à distância, ilha própria (Volcano).
-- [ ] Caches/desvios opcionais na ilha.
 
 ## Gráficos e feel
 

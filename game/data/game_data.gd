@@ -145,6 +145,10 @@ const SCREAM_RANGE: float = 22.0
 const SCREAM_TIME: float = 3.0             ## seconds in sight before it screams
 const SCREAM_COOLDOWN: float = 15.0
 
+## Supply caches
+const CACHE_RADIUS: float = 2.0
+const CACHE_OPEN_TIME: float = 1.5
+
 ## Boss (last island)
 const BOSS_SLAM_RANGE: float = 9.0     ## starts a slam when the player is this close
 const BOSS_SLAM_RADIUS: float = 6.0
