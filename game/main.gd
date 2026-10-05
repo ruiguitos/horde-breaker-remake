@@ -5,7 +5,7 @@ extends Node
 ## Each state is a scene that is freed when the state changes; RunContext is
 ## the only thing that crosses states.
 
-enum GameFlow { BOAT, ISLAND, DEBRIEF, ARMORY, TITLE }
+enum GameFlow { BOAT, ISLAND, DEBRIEF, ARMORY, TITLE, SANDBOX }
 
 const ISLAND_SCENE: String = "res://game/world/island.tscn"
 
@@ -59,6 +59,13 @@ func _go(next: GameFlow) -> void:
 			island.set("profile", profile)
 			island.connect("finished", _on_island_finished, CONNECT_DEFERRED)
 			_current = island
+		GameFlow.SANDBOX:
+			# Test map: no run context, nothing is saved; leaving returns to the title.
+			var sandbox: Node = (load(ISLAND_SCENE) as PackedScene).instantiate()
+			sandbox.set("sandbox", true)
+			sandbox.set("profile", profile)
+			sandbox.connect("finished", func(_won: bool) -> void: _go(GameFlow.TITLE), CONNECT_DEFERRED)
+			_current = sandbox
 		GameFlow.DEBRIEF:
 			profile.record_run(context)
 			_write_telemetry()
@@ -74,6 +81,7 @@ func _go(next: GameFlow) -> void:
 			title.set_script(load("res://game/states/title.gd"))
 			title.set("profile", profile)
 			title.connect("play_requested", _go.bind(GameFlow.ARMORY), CONNECT_DEFERRED)
+			title.connect("sandbox_requested", _go.bind(GameFlow.SANDBOX), CONNECT_DEFERRED)
 			_current = title
 		GameFlow.ARMORY:
 			var armory := Control.new()

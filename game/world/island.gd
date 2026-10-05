@@ -14,6 +14,9 @@ var paused: bool = false
 ## Title-screen backdrop: no HUD, no input, hidden immortal player in the
 ## middle (the horde gathers around), slowly orbiting camera.
 var showcase: bool = false
+## Test session from the title menu: hand-made map (IslandMap.SANDBOX_MAP),
+## no enemies, no mission, no damage.
+var sandbox: bool = false
 @export_group("Camera")
 @export var camera_pitch_deg: float = 35.0
 @export var camera_distance: float = 10.0
@@ -102,7 +105,9 @@ var _sim_ms: float = 0.0
 func _ready() -> void:
 	GameInput.setup()
 	run = IslandRun.new(context.island_seed() if context != null else rng_seed,
-		context.biome if context != null else &"beach")
+		context.biome if context != null else &"beach",
+		IslandMap.from_image() if sandbox else null)
+	run.sandbox = sandbox
 	if context != null:
 		run.load_context(context)
 	_build_world()
@@ -706,7 +711,9 @@ func _abandon() -> void:
 
 func _finish() -> void:
 	var won: bool = run.objective == IslandRun.Objective.WON
-	if context != null:
+	if sandbox:
+		finished.emit(false)
+	elif context != null:
 		run.save_to_context(context)
 		finished.emit(won)
 	else:

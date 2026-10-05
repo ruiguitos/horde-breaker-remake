@@ -110,6 +110,119 @@ static func build(rng_seed: int = 7, biome: StringName = &"beach") -> IslandMap:
 	return map
 
 
+## Hand-made map for the sandbox: each pixel of the PNG is one 1 m cell.
+## Colours (see game/README.md, "Mapa feito à mão"):
+##   blue = sea, grey = building, dark green = tree, brown = rock,
+##   yellow = boat (you start 5 m above it), red = generator,
+##   cyan = supply cache; anything else is open ground.
+## Missing file -> an empty island (coast only).
+const SANDBOX_MAP: String = "res://game/data/maps/sandbox.png"
+const LEGEND: Dictionary = {
+	&"sea": Color(0, 0, 1), &"building": Color(0.5, 0.5, 0.5), &"tree": Color(0, 0.5, 0),
+	&"rock": Color(0.5, 0.25, 0), &"boat": Color(1, 1, 0), &"generator": Color(1, 0, 0),
+	&"cache": Color(0, 1, 1),
+}
+
+
+static func from_image(path: String = SANDBOX_MAP, biome: StringName = &"beach") -> IslandMap:
+	var img: Image = null
+	if ResourceLoader.exists(path):
+		var tex: Texture2D = load(path)
+		img = tex.get_image() if tex != null else null
+	if img == null:
+		img = Image.load_from_file(path) if FileAccess.file_exists(path) else null
+	if img == null:
+		return empty_island(biome)
+	if img.is_compressed():
+		img.decompress()
+	img.convert(Image.FORMAT_RGBA8)
+	var w: int = img.get_width()
+	var h: int = img.get_height()
+	var map := IslandMap.new()
+	map.biome = biome
+	var f := FlowField.new(w, h, 1.0)
+	map.field = f
+	map.boat = Vector3(w * 0.5, 0, h - 10.5)
+	var kinds: PackedByteArray = PackedByteArray()
+	kinds.resize(w * h)
+	var names: Array = LEGEND.keys()
+	for z in h:
+		for x in w:
+			var k: int = _legend_index(img.get_pixel(x, z), names)
+			kinds[z * w + x] = k
+			match names[k] if k >= 0 else &"":
+				&"sea":
+					f.blocked[z * w + x] = 1
+				&"tree":
+					f.blocked[z * w + x] = 1
+					map.trees.append(Vector2i(x, z))
+				&"rock":
+					f.blocked[z * w + x] = 1
+					map.rocks.append(Vector2i(x, z))
+				&"boat":
+					map.boat = Vector3(x + 0.5, 0, z + 0.5)
+				&"generator":
+					map.generators.append(Vector3(x + 0.5, 0, z + 0.5))
+				&"cache":
+					map.caches.append(Vector3(x + 0.5, 0, z + 0.5))
+			if x == 0 or z == 0 or x == w - 1 or z == h - 1:
+				f.blocked[z * w + x] = 1
+	# Grey pixels -> as few rectangles as possible (greedy: widest run, then down).
+	var building: int = names.find(&"building")
+	for z in h:
+		for x in w:
+			if kinds[z * w + x] != building:
+				continue
+			var rw: int = 0
+			while x + rw < w and kinds[z * w + x + rw] == building:
+				rw += 1
+			var rh: int = 1
+			while z + rh < h and _row_is(kinds, w, x, z + rh, rw, building):
+				rh += 1
+			for zz in range(z, z + rh):
+				for xx in range(x, x + rw):
+					kinds[zz * w + xx] = 255
+			f.set_blocked_rect(x, z, x + rw - 1, z + rh - 1)
+			map.buildings.append(Rect2i(x, z, rw, rh))
+	map.player_start = map.boat + Vector3(0, 0, -5)
+	return map
+
+
+## The sandbox default: the usual coastline and nothing on it.
+static func empty_island(biome: StringName = &"beach") -> IslandMap:
+	var map := IslandMap.new()
+	map.biome = biome
+	var f := FlowField.new(SIZE, SIZE, 1.0)
+	map.field = f
+	var c: float = SIZE * 0.5
+	for z in SIZE:
+		for x in SIZE:
+			var dx: float = x + 0.5 - c
+			var dz: float = z + 0.5 - c
+			if dx * dx + dz * dz > pow(K * 70.0, 2) or x == 0 or z == 0 or x == SIZE - 1 or z == SIZE - 1:
+				f.blocked[z * SIZE + x] = 1
+	map.boat = Vector3(c, 0.0, c + 58.0 * K)
+	map.player_start = map.boat + Vector3(0, 0, -5)
+	return map
+
+
+static func _legend_index(px: Color, names: Array) -> int:
+	if px.a < 0.5:
+		return -1
+	for i in names.size():
+		var col: Color = LEGEND[names[i]]
+		if absf(px.r - col.r) < 0.15 and absf(px.g - col.g) < 0.15 and absf(px.b - col.b) < 0.15:
+			return i
+	return -1
+
+
+static func _row_is(kinds: PackedByteArray, w: int, x: int, z: int, n: int, k: int) -> bool:
+	for i in n:
+		if kinds[z * w + x + i] != k:
+			return false
+	return true
+
+
 static func _blocked_near(f: FlowField, c: Vector2i, r: int) -> bool:
 	for dz in range(-r, r + 1):
 		for dx in range(-r, r + 1):

@@ -32,6 +32,8 @@ var dash_time: float = 0.0
 var dash_dir: Vector3 = Vector3.ZERO
 var invulnerable: float = 0.0
 ## Debug noclip (Mouse 4/5): move through walls and sea, faster, no damage.
+## Sandbox (test map): no enemies, no mission, no damage.
+var sandbox: bool = false
 var noclip: bool = false
 var player_class: StringName = &"recruit"
 var hazard_pay: bool = false  ## boat briefing deal (see RunContext)
@@ -117,9 +119,9 @@ var _scream_cd: float = 0.0
 var _dead: Dictionary = {}  ## enemy index -> true, removed at the end of step()
 
 
-func _init(rng_seed: int = 7, biome: StringName = &"beach") -> void:
+func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMap = null) -> void:
 	rng.seed = rng_seed
-	map = IslandMap.build(rng_seed, biome)
+	map = custom_map if custom_map != null else IslandMap.build(rng_seed, biome)
 	field = map.field
 	horde = Horde.new(field)
 	director = Director.new(rng_seed)
@@ -131,7 +133,7 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach") -> void:
 		weapon_unlocked.append(GameData.starting_weapons().has(w.id))
 	for c in map.caches:
 		cache_progress.append(0.0)
-	for i in GameData.GENERATOR_COUNT:
+	for i in map.generators.size():
 		generator_progress.append(0.0)
 		generator_started.append(false)
 
@@ -419,14 +421,16 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	_update_screamers(dt)
 	_flush_dead()
 	_update_orbs(dt)
-	_update_mission(dt)
-	_update_caches(dt)
+	if not sandbox:
+		_update_mission(dt)
+		_update_caches(dt)
 	_update_lava(dt)
-	var near: int = horde.query_radius(player_pos, 6.0).size()
-	var to_spawn: int = director.update(dt, horde.count, horde.damage_to_player, near)
-	for k in to_spawn:
-		_spawn_enemy()
-	if noclip:
+	if not sandbox:
+		var near: int = horde.query_radius(player_pos, 6.0).size()
+		var to_spawn: int = director.update(dt, horde.count, horde.damage_to_player, near)
+		for k in to_spawn:
+			_spawn_enemy()
+	if noclip or sandbox:
 		hp = maxf(hp, _hp_at_step_start)  # no damage while testing
 	damage_taken += maxf(0.0, _hp_at_step_start - hp)
 	_low_hp_cd -= dt
@@ -789,7 +793,7 @@ func _update_rescue(dt: float) -> void:
 
 
 func _update_generators(dt: float) -> void:
-	for g in GameData.GENERATOR_COUNT:
+	for g in map.generators.size():
 		if generator_progress[g] >= GameData.GENERATOR_HOLD_SECONDS:
 			continue
 		if player_pos.distance_to(map.generators[g]) <= GameData.GENERATOR_RADIUS:
@@ -966,6 +970,8 @@ func _spawn_enemy() -> void:
 
 ## Objective text for the HUD.
 func objective_text() -> String:
+	if sandbox:
+		return "Sandbox: free roam (Mouse 4/5 = noclip)"
 	match objective:
 		Objective.GENERATORS:
 			if mission == &"defend":
