@@ -154,9 +154,8 @@ Respostas às 10 perguntas abertas. Ainda **não** estão em `DECISIONS.md`:
 o utilizador regista-as lá quando as confirmar.
 
 1. **Direção**: A+B ("Expedition Breaker").
-2. **Mira**: resposta "Auto-Fire pff" — a confirmar se o auto-fire é o modo
-   por omissão ou só opção de acessibilidade (a mira manual com assistência
-   era a proposta).
+2. **Mira**: **auto-fire como modo de disparo normal** do jogo (não só
+   acessibilidade).
 3. **Headshots**: mantêm-se; há tiros à cabeça e ao corpo (pontos fracos
    visíveis nos especiais podem somar-se a isto).
 4. **Breaker**: investida comum a todas as classes, sem sprint. O Bull Rush
