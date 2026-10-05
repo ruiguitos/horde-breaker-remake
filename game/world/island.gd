@@ -106,47 +106,9 @@ func _ready() -> void:
 
 
 func _build_world() -> void:
-	var env := WorldEnvironment.new()
-	env.environment = Environment.new()
-	env.environment.background_mode = Environment.BG_COLOR
-	var bio: Dictionary = _biome()
-	env.environment.background_color = bio["sky"]
-	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.environment.ambient_light_color = Color(0.4, 0.42, 0.48)
-	if _is_volcano():
-		env.environment.ambient_light_color = Color(0.42, 0.34, 0.32)
-	if float(bio["fog"]) > 0.0:
-		# Jungle haze: green-tinted, light enough to still read enemies.
-		env.environment.fog_enabled = true
-		env.environment.fog_light_color = Color(bio["sky"])
-		env.environment.fog_density = bio["fog"]
-	if context != null and context.modifier == &"fog":
-		env.environment.fog_enabled = true
-		env.environment.fog_light_color = Color(0.48, 0.52, 0.56)
-		env.environment.fog_density = 0.018
-		env.environment.background_color = Color(0.48, 0.52, 0.56)
-	if not env.environment.fog_enabled or float(bio["fog"]) > 0.0:
-		env.environment.background_mode = Environment.BG_SKY
-		env.environment.sky = Visuals.sky(Color(bio["sky"]).lightened(0.15), Color(bio["sky"]).darkened(0.35))
-	Visuals.apply_post(env.environment)
-	add_child(env)
-	# Time of day by island: morning, golden afternoon, red dusk on the volcano.
-	var sun := DirectionalLight3D.new()
-	sun.shadow_enabled = true
 	var island_i: int = context.island_index if context != null else 0
-	match island_i:
-		0:
-			sun.rotation_degrees = Vector3(-55, -30, 0)
-			sun.light_energy = 0.85
-		1:
-			sun.rotation_degrees = Vector3(-28, -65, 0)
-			sun.light_color = Color(1.0, 0.82, 0.6)
-			sun.light_energy = 0.95
-		_:
-			sun.rotation_degrees = Vector3(-18, -100, 0)
-			sun.light_color = Color(1.0, 0.72, 0.58) if _is_volcano() else Color(1.0, 0.6, 0.45)
-			sun.light_energy = 0.8
-	add_child(sun)
+	if not _build_sky3d(island_i):
+		_build_simple_sky(island_i)
 
 	var f: FlowField = run.field
 	var sea := MeshInstance3D.new()
@@ -465,6 +427,83 @@ func _build_props(rng: RandomNumberGenerator) -> void:
 		var c: Vector2i = run.map.rocks[i]
 		var b := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(rng.randf_range(0.8, 1.1), rng.randf_range(0.7, 1.2), rng.randf_range(0.8, 1.1)))
 		rock_mm.set_instance_transform(i, Transform3D(b, Vector3(c.x + 0.5, 0.25, c.y + 0.5)))
+
+
+## Sky3D addon (MIT): physically based sky, clouds, sun and moon driven by a
+## time-of-day clock. Returns false if the addon is missing (fallback below).
+## Loaded by path so the game still parses without the addon.
+const SKY3D_SCRIPT: String = "res://addons/sky_3d/src/Sky3D.gd"
+## Starting hour per island: morning, golden afternoon, dusk on the volcano.
+const ISLAND_HOURS: Array[float] = [9.0, 16.5, 16.25]
+
+
+func _build_sky3d(island_i: int) -> bool:
+	if not ResourceLoader.exists(SKY3D_SCRIPT):
+		return false
+	var sky: WorldEnvironment = (load(SKY3D_SCRIPT) as GDScript).new()
+	add_child(sky)
+	sky.set("current_time", ISLAND_HOURS[mini(island_i, ISLAND_HOURS.size() - 1)])
+	# About one in-game hour per 5 real minutes: light shifts slowly while you play.
+	sky.set("minutes_per_day", 120.0)
+	sky.set("game_time_enabled", not showcase)
+	sky.set("sun_energy", 1.1)
+	if _is_volcano():
+		# Dark ash reflects little light: lift the ambient so enemies still read.
+		sky.set("ambient_energy", 1.8)
+	var env: Environment = sky.environment
+	_apply_biome_fog(env, false)
+	Visuals.apply_post(env)
+	return true
+
+
+## Fallback: flat procedural sky and a fixed sun (no addon needed).
+func _build_simple_sky(island_i: int) -> void:
+	var env := WorldEnvironment.new()
+	env.environment = Environment.new()
+	env.environment.background_mode = Environment.BG_COLOR
+	var bio: Dictionary = _biome()
+	env.environment.background_color = bio["sky"]
+	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.environment.ambient_light_color = Color(0.4, 0.42, 0.48)
+	if _is_volcano():
+		env.environment.ambient_light_color = Color(0.42, 0.34, 0.32)
+	_apply_biome_fog(env.environment, true)
+	if not env.environment.fog_enabled or float(bio["fog"]) > 0.0:
+		env.environment.background_mode = Environment.BG_SKY
+		env.environment.sky = Visuals.sky(Color(bio["sky"]).lightened(0.15), Color(bio["sky"]).darkened(0.35))
+	Visuals.apply_post(env.environment)
+	add_child(env)
+	var sun := DirectionalLight3D.new()
+	sun.shadow_enabled = true
+	match island_i:
+		0:
+			sun.rotation_degrees = Vector3(-55, -30, 0)
+			sun.light_energy = 0.85
+		1:
+			sun.rotation_degrees = Vector3(-28, -65, 0)
+			sun.light_color = Color(1.0, 0.82, 0.6)
+			sun.light_energy = 0.95
+		_:
+			sun.rotation_degrees = Vector3(-18, -100, 0)
+			sun.light_color = Color(1.0, 0.72, 0.58) if _is_volcano() else Color(1.0, 0.6, 0.45)
+			sun.light_energy = 0.8
+	add_child(sun)
+
+
+## Jungle haze and the Sea Fog modifier, on whichever environment is used.
+func _apply_biome_fog(env: Environment, flat_background: bool) -> void:
+	var bio: Dictionary = _biome()
+	if float(bio["fog"]) > 0.0:
+		env.fog_enabled = true
+		env.fog_light_color = Color(bio["sky"])
+		env.fog_density = bio["fog"]
+	if context != null and context.modifier == &"fog":
+		env.fog_enabled = true
+		env.fog_light_color = Color(0.48, 0.52, 0.56)
+		env.fog_density = 0.018
+		if flat_background:
+			env.background_color = Color(0.48, 0.52, 0.56)
+
 
 
 func _setup_multimesh(mm: MultiMesh, mesh: Mesh, colors: bool, color: Color = Color.WHITE, unshaded: bool = false) -> void:

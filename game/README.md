@@ -182,8 +182,11 @@ Pack ao fim de 3 min") em vez de impressões.
 
 ## Luz e gráficos
 
-- Céu procedural (gradiente) e **hora do dia por ilha**: manhã na 1.ª,
-  tarde dourada na 2.ª, crepúsculo no Vulcão.
+- **Sky3D** (addon): céu físico com nuvens, sol e lua, e um relógio. Cada
+  ilha começa a uma hora diferente (9h00, 16h30, 16h15 no Vulcão) e o tempo
+  avança devagar (~1 hora de jogo a cada 5 min), por isso a luz muda enquanto
+  jogas. As horas estão em `world/island.gd` (`ISLAND_HOURS`). Sem o addon, o
+  jogo volta ao céu simples anterior.
 - Tonemap ACES sempre ligado. **Graphics: High** (Armory) liga também bloom e
   SSAO (oclusão ambiente); **Low** desliga-os, para PCs mais fracos.
 - Partículas GPU (`world/fx.gd`): faíscas nos impactos, sangue nas mortes e
