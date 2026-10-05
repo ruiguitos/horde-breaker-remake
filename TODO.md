@@ -14,6 +14,9 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 
 ## Gameplay
 
+- [ ] **Ilhas demasiado iguais** (playtest): variar biomas, layouts e
+  objetivos por ilha.
+
 - [ ] Rotas: mapa em grafo visível (agora são 2 opções por paragem).
 - [ ] Mais desbloqueios com Intel: cartas no pool. Equilibrar classes.
 
@@ -24,5 +27,5 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 
 ## Técnico
 
-- [ ] Medir FPS no PC (RX 590) com 150 inimigos e preencher `game/README.md`.
+- [ ] Medir FPS no PC (RTX 5060 8 GB) com 150 inimigos e preencher `game/README.md`.
 - [ ] Ecrã de título; mais opções (sensibilidade do comando, remapear teclas).
