@@ -1,0 +1,405 @@
+extends Node3D
+## The island scene: reads input, steps IslandRun at a fixed 60 Hz and draws
+## its state with primitives (MultiMesh for the horde, orbs and debris).
+
+signal restart_requested
+
+@export var rng_seed: int = 7
+@export_group("Camera")
+@export var camera_pitch_deg: float = 35.0
+@export var camera_distance: float = 10.0
+@export var camera_fov: float = 60.0
+
+const DEBRIS_MAX: int = 600
+
+var run: IslandRun
+var hud: Hud
+
+var _camera: Camera3D
+var _player: Node3D
+var _enemy_mm := MultiMesh.new()
+var _orb_mm := MultiMesh.new()
+var _debris_mm := MultiMesh.new()
+var _tracer_mesh := ImmediateMesh.new()
+var _generators: Array[MeshInstance3D] = []
+var _generator_rings: Array[MeshInstance3D] = []
+var _boat_ring: MeshInstance3D
+var _explosions: Array[MeshInstance3D] = []
+var _tracers: Array[PackedVector3Array] = []
+var _tracer_life: float = 0.0
+var _debris_pos := PackedVector3Array()
+var _debris_vel := PackedVector3Array()
+var _debris_life := PackedFloat32Array()
+var _debris_color := PackedColorArray()
+var _breaker_held: bool = false
+var _sim_ms: float = 0.0
+
+
+func _ready() -> void:
+	run = IslandRun.new(rng_seed)
+	_build_world()
+	hud = Hud.new()
+	hud.card_chosen.connect(func(i: int) -> void: run.choose_card(i))
+	add_child(hud)
+
+
+func _build_world() -> void:
+	var env := WorldEnvironment.new()
+	env.environment = Environment.new()
+	env.environment.background_mode = Environment.BG_COLOR
+	env.environment.background_color = Color(0.45, 0.6, 0.75)
+	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.environment.ambient_light_color = Color(0.4, 0.42, 0.48)
+	add_child(env)
+	var sun := DirectionalLight3D.new()
+	sun.rotation_degrees = Vector3(-55, -30, 0)
+	sun.shadow_enabled = true
+	sun.light_energy = 0.8
+	add_child(sun)
+
+	var f: FlowField = run.field
+	var sea := MeshInstance3D.new()
+	var sea_mesh := PlaneMesh.new()
+	sea_mesh.size = Vector2(600, 600)
+	sea.mesh = sea_mesh
+	sea.position = Vector3(f.width * 0.5, -0.3, f.height * 0.5)
+	sea.material_override = _mat(Color(0.15, 0.35, 0.55))
+	add_child(sea)
+
+	# Island ground: one flat tile per walkable or building cell (one draw call).
+	var cells: Array[Vector2i] = []
+	var in_building := {}
+	for r in run.map.buildings:
+		for z in range(r.position.y, r.end.y):
+			for x in range(r.position.x, r.end.x):
+				in_building[Vector2i(x, z)] = true
+	for z in f.height:
+		for x in f.width:
+			if not f.is_blocked(x, z) or in_building.has(Vector2i(x, z)):
+				cells.append(Vector2i(x, z))
+	var ground_mm := MultiMesh.new()
+	ground_mm.transform_format = MultiMesh.TRANSFORM_3D
+	var tile := BoxMesh.new()
+	tile.size = Vector3(1, 0.3, 1)
+	ground_mm.mesh = tile
+	ground_mm.instance_count = cells.size()
+	for i in cells.size():
+		ground_mm.set_instance_transform(i, Transform3D(Basis(), Vector3(cells[i].x + 0.5, -0.15, cells[i].y + 0.5)))
+	var ground := MultiMeshInstance3D.new()
+	ground.multimesh = ground_mm
+	ground.material_override = _mat(Color(0.55, 0.52, 0.4))
+	add_child(ground)
+
+	var rng := RandomNumberGenerator.new()
+	rng.seed = rng_seed
+	for r in run.map.buildings:
+		var b := MeshInstance3D.new()
+		var box := BoxMesh.new()
+		var h: float = rng.randf_range(2.0, 5.0) if r.size.x > 1 and r.size.y > 1 else 1.6
+		box.size = Vector3(r.size.x, h, r.size.y)
+		b.mesh = box
+		b.position = Vector3(r.position.x + r.size.x * 0.5, h * 0.5, r.position.y + r.size.y * 0.5)
+		b.material_override = _mat(Color(0.5, 0.5, 0.52).darkened(rng.randf() * 0.25))
+		add_child(b)
+
+	for g in run.map.generators:
+		var gen := MeshInstance3D.new()
+		var cyl := CylinderMesh.new()
+		cyl.top_radius = 0.8
+		cyl.bottom_radius = 1.0
+		cyl.height = 2.0
+		gen.mesh = cyl
+		gen.position = g + Vector3(0, 1, 0)
+		gen.material_override = _mat(Color(0.7, 0.2, 0.15))
+		add_child(gen)
+		_generators.append(gen)
+		_generator_rings.append(_ring(g, GameData.GENERATOR_RADIUS, Color(1, 0.8, 0.2)))
+
+	var boat := MeshInstance3D.new()
+	var hull := BoxMesh.new()
+	hull.size = Vector3(4, 1.2, 8)
+	boat.mesh = hull
+	boat.position = run.map.boat + Vector3(0, 0.3, 3)
+	boat.material_override = _mat(Color(0.45, 0.3, 0.18))
+	add_child(boat)
+	_boat_ring = _ring(run.map.boat, GameData.BOAT_RADIUS, Color(0.3, 1, 0.4))
+	_boat_ring.visible = false
+
+	_player = Node3D.new()
+	var body := MeshInstance3D.new()
+	var cap := CapsuleMesh.new()
+	cap.radius = GameData.PLAYER_RADIUS
+	cap.height = 1.8
+	body.mesh = cap
+	body.position.y = 0.9
+	body.material_override = _mat(Color(0.2, 0.45, 0.95))
+	_player.add_child(body)
+	var nose := MeshInstance3D.new()
+	var nose_mesh := BoxMesh.new()
+	nose_mesh.size = Vector3(0.15, 0.15, 0.7)
+	nose.mesh = nose_mesh
+	nose.position = Vector3(0, 1.2, -0.5)
+	nose.material_override = _mat(Color(0.1, 0.1, 0.1))
+	_player.add_child(nose)
+	add_child(_player)
+
+	_setup_multimesh(_enemy_mm, _capsule(0.35, 1.7), true)
+	_setup_multimesh(_orb_mm, _sphere(0.18), false, Color(0.3, 0.9, 1.0), true)
+	var chunk := BoxMesh.new()
+	chunk.size = Vector3(0.25, 0.25, 0.25)
+	_setup_multimesh(_debris_mm, chunk, true)
+
+	var tracer := MeshInstance3D.new()
+	tracer.mesh = _tracer_mesh
+	var tmat := _mat(Color(1, 0.9, 0.4), true)
+	tracer.material_override = tmat
+	add_child(tracer)
+
+	_camera = Camera3D.new()
+	_camera.fov = camera_fov
+	add_child(_camera)
+
+
+func _setup_multimesh(mm: MultiMesh, mesh: Mesh, colors: bool, color: Color = Color.WHITE, unshaded: bool = false) -> void:
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.use_colors = colors
+	mm.mesh = mesh
+	var inst := MultiMeshInstance3D.new()
+	inst.multimesh = mm
+	var m := _mat(color, unshaded)
+	m.vertex_color_use_as_albedo = colors
+	inst.material_override = m
+	add_child(inst)
+
+
+func _mat(c: Color, unshaded: bool = false) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = c
+	if unshaded:
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	return m
+
+
+func _capsule(r: float, h: float) -> CapsuleMesh:
+	var c := CapsuleMesh.new()
+	c.radius = r
+	c.height = h
+	return c
+
+
+func _sphere(r: float) -> SphereMesh:
+	var s := SphereMesh.new()
+	s.radius = r
+	s.height = r * 2.0
+	return s
+
+
+func _ring(center: Vector3, radius: float, color: Color) -> MeshInstance3D:
+	var ring := MeshInstance3D.new()
+	var torus := TorusMesh.new()
+	torus.inner_radius = radius - 0.12
+	torus.outer_radius = radius
+	ring.mesh = torus
+	ring.position = center + Vector3(0, 0.05, 0)
+	ring.material_override = _mat(color, true)
+	add_child(ring)
+	return ring
+
+
+# --- Input and simulation -------------------------------------------------
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		var key: Key = event.physical_keycode
+		if run.is_over() and key == KEY_R:
+			restart_requested.emit()
+		elif not run.card_choices.is_empty() and key in [KEY_1, KEY_2, KEY_3]:
+			run.choose_card(key - KEY_1)
+		elif key in [KEY_1, KEY_2, KEY_3]:
+			run.switch_weapon(key - KEY_1)
+		elif key == KEY_SPACE:
+			_breaker_held = true
+		elif key == KEY_F3:
+			hud.debug_visible = not hud.debug_visible
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+		_breaker_held = true
+	elif event is InputEventJoypadButton and event.pressed:
+		if run.is_over() and event.button_index == JOY_BUTTON_START:
+			restart_requested.emit()
+		elif not run.card_choices.is_empty() and event.button_index in [JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_B]:
+			run.choose_card([JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_B].find(event.button_index))
+		elif event.button_index in [JOY_BUTTON_A, JOY_BUTTON_RIGHT_SHOULDER]:
+			_breaker_held = true
+		elif event.button_index == JOY_BUTTON_DPAD_LEFT:
+			run.switch_weapon(0)
+		elif event.button_index == JOY_BUTTON_DPAD_UP:
+			run.switch_weapon(1)
+		elif event.button_index == JOY_BUTTON_DPAD_RIGHT:
+			run.switch_weapon(2)
+
+
+func _physics_process(delta: float) -> void:
+	var move := Vector2(
+		float(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT))
+			- float(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT)),
+		float(Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN))
+			- float(Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP)))
+	var stick := Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y))
+	if stick.length() > 0.2:
+		move = stick
+	var aim: Vector3 = _mouse_aim()
+	var right := Vector2(Input.get_joy_axis(0, JOY_AXIS_RIGHT_X), Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y))
+	if right.length() > 0.3:
+		aim = Vector3(right.x, 0, right.y)
+	elif stick.length() > 0.2 and aim == Vector3.ZERO:
+		aim = Vector3(stick.x, 0, stick.y)
+	var t0: int = Time.get_ticks_usec()
+	run.step(delta, move, aim, _breaker_held)
+	_sim_ms = lerpf(_sim_ms, (Time.get_ticks_usec() - t0) / 1000.0, 0.05)
+	_breaker_held = false
+
+
+func _mouse_aim() -> Vector3:
+	if _camera == null or DisplayServer.get_name() == "headless":
+		return Vector3.ZERO
+	var mouse: Vector2 = get_viewport().get_mouse_position()
+	var from: Vector3 = _camera.project_ray_origin(mouse)
+	var dir: Vector3 = _camera.project_ray_normal(mouse)
+	if dir.y > -0.001:
+		return Vector3.ZERO
+	var hit: Vector3 = from + dir * ((1.0 - from.y) / dir.y)
+	return Vector3(hit.x - run.player_pos.x, 0, hit.z - run.player_pos.z)
+
+
+# --- Rendering -------------------------------------------------------------
+
+func _process(delta: float) -> void:
+	_draw_player_and_camera()
+	_draw_enemies()
+	_draw_orbs()
+	_draw_effects(delta)
+	_draw_mission()
+	hud.refresh(run, _camera, _sim_ms)
+
+
+func _draw_player_and_camera() -> void:
+	_player.position = run.player_pos
+	_player.basis = Basis.looking_at(run.facing, Vector3.UP)
+	var pitch: float = deg_to_rad(camera_pitch_deg)
+	var offset := Vector3(0, sin(pitch), cos(pitch)) * camera_distance
+	_camera.position = run.player_pos + Vector3(0, 1, 0) + offset
+	_camera.look_at(run.player_pos + Vector3(0, 1, 0))
+
+
+func _draw_enemies() -> void:
+	var h: Horde = run.horde
+	_enemy_mm.instance_count = h.count
+	for i in h.count:
+		var t: GameData.EnemyType = h.types[h.kinds[i]]
+		var v: Vector3 = h.velocities[i]
+		var yaw: float = atan2(v.x, v.z) if v.length_squared() > 0.01 else 0.0
+		var sy: float = t.height / 1.7
+		var basis := Basis(Vector3.UP, yaw).scaled(Vector3(t.radius_scale, sy, t.radius_scale))
+		_enemy_mm.set_instance_transform(i, Transform3D(basis, h.positions[i] + Vector3(0, t.height * 0.5, 0)))
+		var c: Color = t.color
+		if h.flash[i] > 0.0:
+			c = Color.WHITE
+		elif h.stun[i] > 0.0:
+			c = c.lightened(0.35)
+		_enemy_mm.set_instance_color(i, c)
+
+
+func _draw_orbs() -> void:
+	_orb_mm.instance_count = run.orbs.size()
+	var bob: float = sin(Time.get_ticks_msec() * 0.006) * 0.15
+	for i in run.orbs.size():
+		_orb_mm.set_instance_transform(i, Transform3D(Basis(), run.orbs[i] + Vector3(0, 0.5 + bob, 0)))
+
+
+func _draw_effects(delta: float) -> void:
+	# Tracers: keep the last frame's shots visible for a few frames.
+	if not run.tracers.is_empty():
+		_tracers = run.tracers.duplicate()
+		run.tracers.clear()
+		_tracer_life = 0.05
+	_tracer_life -= delta
+	_tracer_mesh.clear_surfaces()
+	if _tracer_life > 0.0 and not _tracers.is_empty():
+		_tracer_mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+		for seg in _tracers:
+			_tracer_mesh.surface_add_vertex(seg[0] + Vector3(0, 1.2, 0))
+			_tracer_mesh.surface_add_vertex(seg[1] + Vector3(0, 1.2, 0))
+		_tracer_mesh.surface_end()
+
+	# Dismemberment with primitives: chunks fly off killed enemies.
+	for d in run.deaths:
+		var t: GameData.EnemyType = run.horde.types[int(d.z)]
+		var origin := Vector3(d.x, 1.0, d.y)
+		var pieces: int = 5 if d.w > 0.5 else 3
+		for k in pieces:
+			var vel := Vector3(randf_range(-3, 3), randf_range(3, 7), randf_range(-3, 3))
+			var col: Color = t.color
+			if d.w > 0.5 and k == 0:
+				vel.y += 5.0  # the head goes up
+				col = Color(0.8, 0.15, 0.1)
+			_add_debris(origin + Vector3(0, t.height * 0.4, 0), vel, col)
+	run.deaths.clear()
+	var i: int = _debris_pos.size() - 1
+	while i >= 0:
+		_debris_life[i] -= delta
+		if _debris_life[i] <= 0.0:
+			_debris_pos.remove_at(i)
+			_debris_vel.remove_at(i)
+			_debris_life.remove_at(i)
+			_debris_color.remove_at(i)
+		else:
+			var v: Vector3 = _debris_vel[i]
+			v.y -= 20.0 * delta
+			var p: Vector3 = _debris_pos[i] + v * delta
+			if p.y < 0.12:
+				p.y = 0.12
+				v = Vector3(v.x * 0.5, -v.y * 0.3, v.z * 0.5)
+			_debris_pos[i] = p
+			_debris_vel[i] = v
+		i -= 1
+	_debris_mm.instance_count = _debris_pos.size()
+	for k in _debris_pos.size():
+		_debris_mm.set_instance_transform(k, Transform3D(Basis(), _debris_pos[k]))
+		_debris_mm.set_instance_color(k, _debris_color[k])
+
+	for e in run.explosions:
+		var boom := MeshInstance3D.new()
+		boom.mesh = _sphere(3.0)
+		boom.position = e + Vector3(0, 0.5, 0)
+		boom.material_override = _mat(Color(1, 0.55, 0.1), true)
+		boom.scale = Vector3.ONE * 0.2
+		add_child(boom)
+		_explosions.append(boom)
+	run.explosions.clear()
+	for k in range(_explosions.size() - 1, -1, -1):
+		var b: MeshInstance3D = _explosions[k]
+		b.scale += Vector3.ONE * delta * 5.0
+		if b.scale.x >= 1.0:
+			b.queue_free()
+			_explosions.remove_at(k)
+
+
+func _add_debris(p: Vector3, v: Vector3, c: Color) -> void:
+	if _debris_pos.size() >= DEBRIS_MAX:
+		return
+	_debris_pos.append(p)
+	_debris_vel.append(v)
+	_debris_life.append(1.5)
+	_debris_color.append(c)
+
+
+func _draw_mission() -> void:
+	for g in _generators.size():
+		var p: float = run.generator_progress[g] / GameData.GENERATOR_HOLD_SECONDS
+		var m: StandardMaterial3D = _generators[g].material_override
+		if p >= 1.0:
+			m.albedo_color = Color(0.2, 0.85, 0.3)
+			_generator_rings[g].visible = false
+		elif p > 0.0:
+			m.albedo_color = Color(0.7, 0.2, 0.15).lerp(Color(1, 0.85, 0.2), p)
+	_boat_ring.visible = run.objective == IslandRun.Objective.RETURN_TO_BOAT

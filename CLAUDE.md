@@ -2,8 +2,8 @@
 
 Remake do Horde Breaker (repositório original: `ruiguitos/horde-breaker`).
 O jogo está a ser **reformulado a partir dos documentos de design**, não do
-código antigo. Estado atual: **pré-produção** (brainstorm, design e spikes
-técnicos). Ainda não há jogo implementado.
+código antigo. Estado atual: **vertical slice em grey-box** (1 ilha, missão
+"Activate 3"); ver `game/README.md`.
 
 ## Idioma
 
@@ -33,7 +33,7 @@ técnicos). Ainda não há jogo implementado.
 ## Estrutura
 
 ```
-game/          código e cenas do jogo (vazio até o brainstorm fechar)
+game/          código e cenas do jogo (vertical slice; ver game/README.md)
 spikes/<nome>/ protótipos isolados; cada spike tem cena, scripts, tests/ e README.md
 tests/         testes headless do jogo
 tools/         ferramentas (tools/cloud/ = setup das sessões na cloud)

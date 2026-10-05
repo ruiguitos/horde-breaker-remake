@@ -1,8 +1,7 @@
 # Horde Breaker Remake
 
 Remake do Horde Breaker em **Godot 4.7 + GDScript**, reformulado a partir dos
-documentos de design do original. Estado: **pré-produção** (design e spikes
-técnicos).
+documentos de design do original. Estado: **vertical slice jogável em grey-box**.
 
 - Contexto e regras do projeto: [CLAUDE.md](CLAUDE.md)
 - Decisões fechadas: [docs/DECISIONS.md](docs/DECISIONS.md)
@@ -18,9 +17,14 @@ técnicos).
   [director](spikes/director/README.md)
 - Documentos do original (referência): [docs/legacy/](docs/legacy/README.md)
 
+## Jogar
+
+Ver [game/README.md](game/README.md): abrir a pasta no Godot 4.7 e carregar
+em F5.
+
 ## Testar
 
 ```bash
 godot --headless --path . --import
-godot --headless --path . --script res://tests/test_smoke.gd
+godot --headless --path . --script res://tests/run_all.gd   # todos os testes
 ```
