@@ -12,6 +12,7 @@ var _xp_bar: ProgressBar
 var _breaker_bar: ProgressBar
 var _grenade_bar: ProgressBar
 var _boss_bar: ProgressBar
+var _minimap: Minimap
 var _stamina_bar: ProgressBar
 var _info: Label
 var _objective: Label
@@ -79,6 +80,11 @@ func _init() -> void:
 	_boss_bar.visible = false
 	root.add_child(_boss_bar)
 
+	_minimap = Minimap.new()
+	_minimap.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	_minimap.position = Vector2(-Minimap.SIZE_PX - 16, -Minimap.SIZE_PX - 16)
+	root.add_child(_minimap)
+
 	_messages = Label.new()
 	_messages.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	_messages.position = Vector2(-250, 56)
@@ -96,7 +102,7 @@ func _init() -> void:
 	var help := Label.new()
 	help.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	help.position = Vector2(16, -40)
-	help.text = "WASD move · mouse aims (auto-fire) · Space/RMB breaker · G/MMB ability · Shift sprint (no firing) · 1-5 weapons · Esc pause · F3 debug"
+	help.text = "WASD move · mouse aim · Space breaker · G ability · Shift sprint · 1-5 weapons · Esc pause · F3 debug"
 	help.modulate = Color(1, 1, 1, 0.7)
 	root.add_child(help)
 
@@ -195,6 +201,8 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 		_info.text += "\nA SCREAMER SEES YOU! (%d%%)" % int(100.0 * run.scream_progress / GameData.SCREAM_TIME)
 	_objective.text = (island_text + " — " if island_text != "" else "") + run.objective_text()
 
+	if _minimap.run != run:
+		_minimap.set_run(run)
 	_boss_bar.visible = run.objective == IslandRun.Objective.BOSS
 	_boss_bar.value = run.boss_hp_fraction()
 	_messages.position.y = 84.0 if _boss_bar.visible else 56.0
