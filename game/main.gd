@@ -17,7 +17,15 @@ var _current: Node
 
 func _ready() -> void:
 	profile = Profile.load_profile()
+	profile.apply_volume()
 	_go(State.ARMORY)
+
+
+## F11 toggles fullscreen anywhere in the game.
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_F11:
+		var full: bool = DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if full else DisplayServer.WINDOW_MODE_FULLSCREEN)
 
 
 func _new_run() -> void:

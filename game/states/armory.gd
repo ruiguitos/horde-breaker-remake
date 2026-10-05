@@ -10,6 +10,7 @@ var profile: Profile
 var _list: VBoxContainer
 var _header: Label
 var _threat_row: HBoxContainer
+var _volume_label: Label
 
 
 func _ready() -> void:
@@ -41,6 +42,19 @@ func _ready() -> void:
 	box.add_child(threat_label)
 	_threat_row = HBoxContainer.new()
 	box.add_child(_threat_row)
+	var settings := HBoxContainer.new()
+	box.add_child(settings)
+	_volume_label = Label.new()
+	_volume_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	settings.add_child(_volume_label)
+	for delta in [-1, 1]:
+		var vb := Button.new()
+		vb.text = " - " if delta < 0 else " + "
+		vb.pressed.connect(func() -> void:
+			profile.volume = clampi(profile.volume + delta, 0, 10)
+			profile.apply_volume()
+			_act(true))
+		settings.add_child(vb)
 	var start := Button.new()
 	start.text = "START RUN (Enter)"
 	start.custom_minimum_size = Vector2(0, 50)
@@ -57,6 +71,7 @@ func _rebuild() -> void:
 		c.queue_free()
 	_header.text = "Intel: %d   ·   Perk slots: %d (%d equipped)" % [
 		profile.intel, profile.slots, profile.equipped_perks.size()]
+	_volume_label.text = "Volume: %d/10   ·   F11: fullscreen" % profile.volume
 	for perk in GameData.perks():
 		var row := HBoxContainer.new()
 		var label := Label.new()

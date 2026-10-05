@@ -32,6 +32,9 @@ Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 | Continuar no fim da ilha | Enter / R | A / Start |
 | Pausa (Q na pausa abandona) | Esc | Start |
 | Painel de debug | F3 | — |
+| Ecrã inteiro | F11 | — |
+
+O volume ajusta-se no Armory (− / +) e fica gravado no perfil.
 
 ## Como se joga
 

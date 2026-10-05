@@ -172,15 +172,37 @@ func _build_world() -> void:
 	body.position.y = 0.9
 	body.material_override = _mat(Color(0.2, 0.45, 0.95))
 	_player.add_child(body)
-	var nose := MeshInstance3D.new()
-	var nose_mesh := BoxMesh.new()
-	nose_mesh.size = Vector3(0.15, 0.15, 0.7)
-	nose.mesh = nose_mesh
-	nose.position = Vector3(0, 1.2, -0.5)
-	nose.material_override = _mat(Color(0.1, 0.1, 0.1))
-	_player.add_child(nose)
+	# Simple soldier: helmet head, backpack and a rifle pointing forward (-Z).
+	var head := MeshInstance3D.new()
+	head.mesh = _sphere(0.26)
+	head.position = Vector3(0, 1.95, 0)
+	head.material_override = _mat(Color(0.85, 0.7, 0.55))
+	_player.add_child(head)
+	var helmet := MeshInstance3D.new()
+	var helmet_mesh := SphereMesh.new()
+	helmet_mesh.radius = 0.3
+	helmet_mesh.height = 0.36
+	helmet_mesh.is_hemisphere = true
+	helmet.mesh = helmet_mesh
+	helmet.position = Vector3(0, 2.0, 0)
+	helmet.material_override = _mat(Color(0.25, 0.35, 0.2))
+	_player.add_child(helmet)
+	var pack := MeshInstance3D.new()
+	var pack_mesh := BoxMesh.new()
+	pack_mesh.size = Vector3(0.5, 0.6, 0.25)
+	pack.mesh = pack_mesh
+	pack.position = Vector3(0, 1.25, 0.42)
+	pack.material_override = _mat(Color(0.3, 0.3, 0.22))
+	_player.add_child(pack)
+	var gun := MeshInstance3D.new()
+	var gun_mesh := BoxMesh.new()
+	gun_mesh.size = Vector3(0.12, 0.16, 0.9)
+	gun.mesh = gun_mesh
+	gun.position = Vector3(0.22, 1.2, -0.55)
+	gun.material_override = _mat(Color(0.12, 0.12, 0.12))
+	_player.add_child(gun)
 	_muzzle = OmniLight3D.new()
-	_muzzle.position = Vector3(0, 1.2, -1.0)
+	_muzzle.position = Vector3(0.22, 1.2, -1.1)
 	_muzzle.light_color = Color(1, 0.8, 0.4)
 	_muzzle.omni_range = 6.0
 	_muzzle.light_energy = 0.0

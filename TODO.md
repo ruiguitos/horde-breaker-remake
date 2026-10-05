@@ -24,4 +24,4 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 ## Técnico
 
 - [ ] Medir FPS no PC (RX 590) com 150 inimigos e preencher `game/README.md`.
-- [ ] Ecrã de título e opções (volume, sensibilidade).
+- [ ] Ecrã de título; mais opções (sensibilidade do comando, remapear teclas).

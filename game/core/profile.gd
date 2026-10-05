@@ -15,6 +15,7 @@ var equipped_perks: Array[StringName] = []
 var slots: int = 1
 var max_threat: int = 1  ## highest Threat unlocked (extract on N to unlock N+1)
 var threat: int = 1  ## last chosen
+var volume: int = 8  ## master volume, 0..10
 
 
 static func load_profile(path: String = PATH) -> Profile:
@@ -38,6 +39,7 @@ static func load_profile(path: String = PATH) -> Profile:
 		p.equipped_perks.append(StringName(id))
 	p.slots = int(d.get("slots", 1))
 	p.max_threat = int(d.get("max_threat", 1))
+	p.volume = clampi(int(d.get("volume", 8)), 0, 10)
 	p.threat = clampi(int(d.get("threat", 1)), 1, p.max_threat)
 	return p
 
@@ -52,7 +54,7 @@ func save(path: String = PATH) -> bool:
 		"extractions": extractions, "best_kills": best_kills,
 		"owned_perks": owned_perks.map(func(x: StringName) -> String: return String(x)),
 		"equipped_perks": equipped_perks.map(func(x: StringName) -> String: return String(x)),
-		"slots": slots, "max_threat": max_threat, "threat": threat}, "  "))
+		"slots": slots, "max_threat": max_threat, "threat": threat, "volume": volume}, "  "))
 	return true
 
 
@@ -98,3 +100,9 @@ func toggle_equip(id: StringName) -> bool:
 		equipped_perks.append(id)
 		return true
 	return false
+
+
+## Applies the master volume (0 = mute, 10 = full) to the Master audio bus.
+func apply_volume() -> void:
+	AudioServer.set_bus_mute(0, volume == 0)
+	AudioServer.set_bus_volume_db(0, linear_to_db(volume / 10.0) if volume > 0 else -80.0)
