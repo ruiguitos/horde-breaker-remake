@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://ch7judxonpvdr"
+
+[deps]
+
+files=["res://spikes/director/output/l4d_medium.intensity.translation", "res://spikes/director/output/l4d_medium.phase.translation", "res://spikes/director/output/l4d_medium.active.translation", "res://spikes/director/output/l4d_medium.near.translation", "res://spikes/director/output/l4d_medium.budget.translation", "res://spikes/director/output/l4d_medium.spawns.translation", "res://spikes/director/output/l4d_medium.hp.translation", "res://spikes/director/output/l4d_medium.kills.translation", "res://spikes/director/output/l4d_medium.deaths.translation", "res://spikes/director/output/l4d_medium.event.translation"]
+
+source_file="res://spikes/director/output/l4d_medium.csv"
+dest_files=["res://spikes/director/output/l4d_medium.intensity.translation", "res://spikes/director/output/l4d_medium.phase.translation", "res://spikes/director/output/l4d_medium.active.translation", "res://spikes/director/output/l4d_medium.near.translation", "res://spikes/director/output/l4d_medium.budget.translation", "res://spikes/director/output/l4d_medium.spawns.translation", "res://spikes/director/output/l4d_medium.hp.translation", "res://spikes/director/output/l4d_medium.kills.translation", "res://spikes/director/output/l4d_medium.deaths.translation", "res://spikes/director/output/l4d_medium.event.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

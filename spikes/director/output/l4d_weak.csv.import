@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://y52bymtuavf"
+
+[deps]
+
+files=["res://spikes/director/output/l4d_weak.intensity.translation", "res://spikes/director/output/l4d_weak.phase.translation", "res://spikes/director/output/l4d_weak.active.translation", "res://spikes/director/output/l4d_weak.near.translation", "res://spikes/director/output/l4d_weak.budget.translation", "res://spikes/director/output/l4d_weak.spawns.translation", "res://spikes/director/output/l4d_weak.hp.translation", "res://spikes/director/output/l4d_weak.kills.translation", "res://spikes/director/output/l4d_weak.deaths.translation", "res://spikes/director/output/l4d_weak.event.translation"]
+
+source_file="res://spikes/director/output/l4d_weak.csv"
+dest_files=["res://spikes/director/output/l4d_weak.intensity.translation", "res://spikes/director/output/l4d_weak.phase.translation", "res://spikes/director/output/l4d_weak.active.translation", "res://spikes/director/output/l4d_weak.near.translation", "res://spikes/director/output/l4d_weak.budget.translation", "res://spikes/director/output/l4d_weak.spawns.translation", "res://spikes/director/output/l4d_weak.hp.translation", "res://spikes/director/output/l4d_weak.kills.translation", "res://spikes/director/output/l4d_weak.deaths.translation", "res://spikes/director/output/l4d_weak.event.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

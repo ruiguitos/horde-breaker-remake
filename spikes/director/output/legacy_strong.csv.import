@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dkjpa8qv6auxp"
+
+[deps]
+
+files=["res://spikes/director/output/legacy_strong.intensity.translation", "res://spikes/director/output/legacy_strong.phase.translation", "res://spikes/director/output/legacy_strong.active.translation", "res://spikes/director/output/legacy_strong.near.translation", "res://spikes/director/output/legacy_strong.budget.translation", "res://spikes/director/output/legacy_strong.spawns.translation", "res://spikes/director/output/legacy_strong.hp.translation", "res://spikes/director/output/legacy_strong.kills.translation", "res://spikes/director/output/legacy_strong.deaths.translation", "res://spikes/director/output/legacy_strong.event.translation"]
+
+source_file="res://spikes/director/output/legacy_strong.csv"
+dest_files=["res://spikes/director/output/legacy_strong.intensity.translation", "res://spikes/director/output/legacy_strong.phase.translation", "res://spikes/director/output/legacy_strong.active.translation", "res://spikes/director/output/legacy_strong.near.translation", "res://spikes/director/output/legacy_strong.budget.translation", "res://spikes/director/output/legacy_strong.spawns.translation", "res://spikes/director/output/legacy_strong.hp.translation", "res://spikes/director/output/legacy_strong.kills.translation", "res://spikes/director/output/legacy_strong.deaths.translation", "res://spikes/director/output/legacy_strong.event.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true
