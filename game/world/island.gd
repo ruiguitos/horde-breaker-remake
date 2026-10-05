@@ -37,6 +37,8 @@ var _arm_mm := MultiMesh.new()
 var _orb_mm := MultiMesh.new()
 var _debris_mm := MultiMesh.new()
 var _tracer_mesh := ImmediateMesh.new()
+var _laser_mesh := ImmediateMesh.new()
+var _laser_mat: StandardMaterial3D
 var _generators: Array[MeshInstance3D] = []
 var _generator_rings: Array[MeshInstance3D] = []
 var _boat_ring: MeshInstance3D
@@ -303,6 +305,13 @@ func _build_world() -> void:
 	tracer.material_override = tmat
 	add_child(tracer)
 
+	var laser := MeshInstance3D.new()
+	laser.mesh = _laser_mesh
+	_laser_mat = _mat(Color(1, 1, 1, 0.35), true)
+	_laser_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	laser.material_override = _laser_mat
+	add_child(laser)
+
 	_camera = Camera3D.new()
 	_camera.fov = camera_fov
 	add_child(_camera)
@@ -559,6 +568,7 @@ func _process(delta: float) -> void:
 	_draw_enemies()
 	_draw_orbs()
 	_draw_grenades()
+	_draw_laser()
 	_draw_rocks()
 	_draw_effects(delta)
 	_draw_mission()
@@ -688,6 +698,25 @@ func _draw_enemies() -> void:
 		_arm_mm.set_instance_color(i * 2 + 1, c)
 		# Heads are paler so they read as the target for headshots.
 		_head_mm.set_instance_color(i, c if h.flash[i] > 0.0 else c.lerp(Color(0.85, 0.8, 0.7), 0.45))
+
+
+## Laser sight from the gun: to the current target, red when a shot now
+## would be a headshot, faint white otherwise.
+func _draw_laser() -> void:
+	_laser_mesh.clear_surfaces()
+	if run.is_paused() or run.sprinting:
+		return
+	var info: Array = run.aim_info()
+	var right := Vector3(-run.facing.z, 0, run.facing.x)
+	var from: Vector3 = run.player_pos + Vector3(0, 1.2, 0) + right * 0.22 + run.facing * 0.9
+	var to: Vector3 = from + run.facing * 12.0
+	if info[0] != -1:
+		to = run.horde.positions[info[0]] + Vector3(0, 1.5, 0)
+	_laser_mat.albedo_color = Color(1, 0.15, 0.1, 0.8) if info[1] else Color(1, 1, 1, 0.3)
+	_laser_mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+	_laser_mesh.surface_add_vertex(from)
+	_laser_mesh.surface_add_vertex(to)
+	_laser_mesh.surface_end()
 
 
 func _is_volcano() -> bool:

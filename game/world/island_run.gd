@@ -471,6 +471,21 @@ func _line_of_sight(a: Vector3, b: Vector3) -> bool:
 	return true
 
 
+func headshot_cone_cos() -> float:
+	return cos(deg_to_rad(15.0 if has_perk(&"head_hunter") else GameData.HEADSHOT_CONE_DEG))
+
+
+## For the laser sight: current auto-fire target (-1 if none) and whether a
+## shot now would be a headshot.
+func aim_info() -> Array:
+	var target: int = _pick_target(weapons[weapon_index].range_m)
+	if target == -1:
+		return [-1, false]
+	var to: Vector3 = horde.positions[target] - player_pos
+	to.y = 0.0
+	return [target, facing.dot(to.normalized()) >= headshot_cone_cos()]
+
+
 func _fire(w: GameData.Weapon, target: int) -> void:
 	_shots += 1
 	if w.max_ammo > 0:
@@ -479,7 +494,7 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 	to.y = 0.0
 	var dir: Vector3 = to.normalized()
 	# Headshot when the target sits where the player is facing.
-	var headshot: bool = facing.dot(dir) >= cos(deg_to_rad(15.0 if has_perk(&"head_hunter") else GameData.HEADSHOT_CONE_DEG))
+	var headshot: bool = facing.dot(dir) >= headshot_cone_cos()
 	var dmg: float = w.damage * (1.0 + 0.25 * stacks(&"hollow_points"))
 	for p in w.pellets:
 		var pellet_dir: Vector3 = dir

@@ -41,7 +41,8 @@ O volume ajusta-se no Armory (− / +) e fica gravado no perfil.
 
 - A arma **dispara sozinha** contra o inimigo mais próximo dentro de um cone
   de 50° à tua frente. Se o alvo estiver quase exatamente onde olhas (±9°),
-  é **headshot** (dano ×2,5). Ou seja: mira-se com o corpo.
+  é **headshot** (dano ×2,5). Ou seja: mira-se com o corpo. A **mira laser**
+  liga a arma ao alvo atual e fica vermelha quando o próximo tiro é headshot.
 - **Breaker**: investida de 5 m que empurra e atordoa tudo no caminho, dá dano
   no fim e solta-te de um Grabber. Cooldown de 6 s (barra amarela).
 - Inimigos:
