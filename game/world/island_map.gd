@@ -25,6 +25,10 @@ var biome: StringName = &"beach"
 ## Lava pools (volcano): centre and radius; they hurt anyone standing in them.
 var lava: Array[Vector3] = []
 var lava_radius: PackedFloat32Array = PackedFloat32Array()
+## True when the map comes from a hand-made scene (HandmadeIsland).
+var handmade: bool = false
+## Ground height per cell (row-major); empty on generated (flat) islands.
+var heights: PackedFloat32Array = PackedFloat32Array()
 
 
 static func build(rng_seed: int = 7, biome: StringName = &"beach") -> IslandMap:

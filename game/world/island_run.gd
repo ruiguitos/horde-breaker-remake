@@ -117,9 +117,11 @@ var _scream_cd: float = 0.0
 var _dead: Dictionary = {}  ## enemy index -> true, removed at the end of step()
 
 
-func _init(rng_seed: int = 7, biome: StringName = &"beach") -> void:
+## `custom_map`: a ready map (e.g. HandmadeIsland.build_map()) instead of
+## generating one from the seed.
+func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMap = null) -> void:
 	rng.seed = rng_seed
-	map = IslandMap.build(rng_seed, biome)
+	map = custom_map if custom_map != null else IslandMap.build(rng_seed, biome)
 	field = map.field
 	horde = Horde.new(field)
 	director = Director.new(rng_seed)

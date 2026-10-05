@@ -159,6 +159,83 @@ mar, andas 3× mais depressa (6× a correr) e não levas dano. **Espaço** sobe
 e **Ctrl** desce (até 120 m; Shift sobe/desce 3× mais rápido). Ao desligar
 o noclip, desces suavemente até ao chão.
 
+## Ilhas feitas à mão (em construção)
+
+Em vez do gerador automático, podes construir uma ilha no editor. O jogo
+continua a correr numa grelha 2D (1 célula = 1 m), por isso
+`HandmadeIsland.build_map()` (`world/handmade/handmade_island.gd`) lê a cena
+e converte-a para a grelha.
+
+**Estado:** a cena e a conversão existem e estão testadas. Ainda não se joga
+nelas: falta a altura do terreno no jogador e nos zombies (passo 3) e a
+escolha da ilha na run (passo 4).
+
+### Começar uma ilha nova
+
+1. No FileSystem, duplica `game/world/handmade/island_template.tscn` (por
+   exemplo `beach_01.tscn`) e abre-a.
+2. Seleciona o nó **Terrain3D** e, no inspetor, muda **Data Directory** para
+   uma pasta nova (por exemplo `res://game/world/handmade/beach_01_data`).
+   Se não mudares, vais esculpir por cima do modelo.
+3. Grava a cena (Ctrl+S).
+
+### Estrutura da cena
+
+| Nó | O que faz na grelha |
+|---|---|
+| `Terrain3D` | Abaixo do mar (-0,3 m) é mar; degrau maior que 0,9 m por metro (cerca de 42°) é falésia: bloqueia |
+| `Buildings/` | Cada filho bloqueia as células por baixo da sua caixa (vista de cima) |
+| `Rocks/` | Igual aos edifícios |
+| `Trees/` | Cada filho bloqueia só a célula do tronco (a copa não conta) |
+| `Decor/` | Nunca bloqueia: relva, flores, estradas, luzes, água de pré-visualização |
+| `Markers/` | `Boat` (obrigatório), `PlayerStart`, `Generator1..3`, `Cache1..` (nós `Marker3D`) |
+
+A ilha ocupa o quadrado de 0 a `size` metros em X e Z (160 por omissão;
+muda no inspetor do nó raiz). Mantém tudo lá dentro.
+
+### Relevo com o Terrain3D
+
+Seleciona o nó `Terrain3D`; aparece uma barra de ferramentas à esquerda da
+vista 3D.
+- **Raise / Lower:** sobe e desce o chão (colinas, dunas). Shift suaviza.
+- **Flatten:** aplana à altura que escolheres (praças, planaltos).
+- **Smooth:** suaviza degraus.
+- **Paint color:** pinta a cor do chão (areia, relva, terra).
+- **Regras:** colinas suaves andam-se; paredes íngremes viram falésias. O mar é
+  tudo o que fica abaixo de -0,3 m: desce a costa para baixo de 0 para fazer
+  praia.
+
+### Objetos
+
+- **Modelos:** arrasta os `.gltf` de `assets/models/nature_megakit/` (árvores,
+  rochas) para dentro de `Trees/` ou `Rocks/`.
+- **Edifícios:** qualquer modelo ou `MeshInstance3D` dentro de `Buildings/`.
+- **Estradas** (Road Generator) e **decoração:** em `Decor/`.
+- **Marcadores:** adiciona um `Marker3D` em `Markers/` com o nome certo.
+- **Alinhar ao chão:** com um objeto selecionado, a tecla **Page Down** no
+  editor encosta-o ao terreno.
+
+### Verificar
+
+Seleciona o nó raiz e, no inspetor, carrega em **Check map**. Na consola
+(Output) aparece um relatório: células transitáveis, número de objetos e
+problemas (barco em falta, gerador inacessível, início bloqueado...). Também
+grava `<cena>_grid.png` ao lado da cena, que é a grelha vista de cima:
+
+| Cor | Significado |
+|---|---|
+| Azul | Mar |
+| Castanho-escuro | Falésia |
+| Verde a branco | Chão (mais claro = mais alto) |
+| Cinzento | Edifícios e rochas |
+| Verde-escuro | Árvores |
+| Amarelo | Barco |
+| Vermelho | Geradores |
+| Ciano | Caches |
+
+O modelo foi criado por `tools/dev/make_handmade_template.gd`; o teste está
+em `tests/test_handmade.gd`.
+
 ## Fluxo da run
 
 **Título** → **Armory** (gastar Intel, equipar perks, escolher Threat) → barco (1 de 3: cura, munição ou carta) → ilha → ilha limpa → barco → … →
