@@ -93,6 +93,26 @@ func _rebuild() -> void:
 			b.pressed.connect(func() -> void: _act(profile.toggle_equip(perk.id)))
 		row.add_child(b)
 		_list.add_child(row)
+	for w in GameData.weapons():
+		if not GameData.WEAPON_COSTS.has(w.id):
+			continue
+		var row := HBoxContainer.new()
+		var label := Label.new()
+		label.text = "Weapon: %s — %d dmg, %.0f shots/s, %d m" % [w.display_name, int(w.damage), w.fire_rate, int(w.range_m)]
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(label)
+		var b := Button.new()
+		b.custom_minimum_size = Vector2(150, 0)
+		var cost_w: int = int(GameData.WEAPON_COSTS[w.id])
+		if profile.unlocked_weapons.has(w.id):
+			b.text = "✔ Unlocked"
+			b.disabled = true
+		else:
+			b.text = "Buy (%d)" % cost_w
+			b.disabled = profile.intel < cost_w
+			b.pressed.connect(func() -> void: _act(profile.buy_weapon(w.id)))
+		row.add_child(b)
+		_list.add_child(row)
 	var cost: int = profile.next_slot_cost()
 	if cost > 0:
 		var slot := Button.new()

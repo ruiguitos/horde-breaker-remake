@@ -22,6 +22,8 @@ var threat: int = 1
 var modifier: StringName = &"calm"
 var perks: Array[StringName] = []
 var max_hp: float = GameData.PLAYER_MAX_HP
+## Weapons usable in this run (starting ones + armory unlocks).
+var weapons: Array[StringName] = GameData.STARTING_WEAPONS.duplicate()
 
 
 ## Applies the equipped perks that change starting values.

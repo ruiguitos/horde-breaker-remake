@@ -27,7 +27,7 @@ Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 | Orientar (o auto-fire dispara para onde olhas) | rato | stick direito |
 | Breaker (investida) | Espaço ou botão direito | A ou RB |
 | Granada (lança para o rato) | G ou botão do meio | LB |
-| Trocar arma | 1 / 2 / 3 | D-pad ← ↑ → |
+| Trocar arma | 1–5 | D-pad ← ↑ →, ↓ roda |
 | Escolher carta | 1 / 2 / 3 ou clique | X / Y / B |
 | Continuar no fim da ilha | Enter / R | A / Start |
 | Pausa (Q na pausa abandona) | Esc | Start |
@@ -104,6 +104,8 @@ blindado à frente (−50 %) e não é empurrado.
   1 slot, o 2.º custa 100 e o 3.º 250. São 5 perks: Thick Skin, Pack Rat,
   Head Hunter, Battering Ram e Demolitions. São bónus pequenos, para dar
   opções e não poder bruto.
+- **Armas**: SMG (60 Intel; 16 tiros/s, 18 m) e Marksman Rifle (80 Intel;
+  110 de dano, atravessa 6). Depois de compradas ficam nas teclas 4 e 5.
 - **Threat 1–3**: cada nível dá +20 % de HP aos inimigos, mais 25 vivos e
   +25 % de Intel. Extrair no Threat mais alto desbloqueia o seguinte.
 - **Granada**: cai onde está o rato (até 14 m), rebenta após 0,8 s (5 m,

@@ -16,6 +16,7 @@ var slots: int = 1
 var max_threat: int = 1  ## highest Threat unlocked (extract on N to unlock N+1)
 var threat: int = 1  ## last chosen
 var volume: int = 8  ## master volume, 0..10
+var unlocked_weapons: Array[StringName] = []  ## bought in the armory
 
 
 static func load_profile(path: String = PATH) -> Profile:
@@ -40,6 +41,8 @@ static func load_profile(path: String = PATH) -> Profile:
 	p.slots = int(d.get("slots", 1))
 	p.max_threat = int(d.get("max_threat", 1))
 	p.volume = clampi(int(d.get("volume", 8)), 0, 10)
+	for id in d.get("unlocked_weapons", []):
+		p.unlocked_weapons.append(StringName(id))
 	p.threat = clampi(int(d.get("threat", 1)), 1, p.max_threat)
 	return p
 
@@ -54,7 +57,8 @@ func save(path: String = PATH) -> bool:
 		"extractions": extractions, "best_kills": best_kills,
 		"owned_perks": owned_perks.map(func(x: StringName) -> String: return String(x)),
 		"equipped_perks": equipped_perks.map(func(x: StringName) -> String: return String(x)),
-		"slots": slots, "max_threat": max_threat, "threat": threat, "volume": volume}, "  "))
+		"slots": slots, "max_threat": max_threat, "threat": threat, "volume": volume,
+		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x))}, "  "))
 	return true
 
 
@@ -75,6 +79,15 @@ func buy_perk(perk: GameData.Perk) -> bool:
 		return false
 	intel -= perk.cost
 	owned_perks.append(perk.id)
+	return true
+
+
+func buy_weapon(id: StringName) -> bool:
+	var cost: int = int(GameData.WEAPON_COSTS.get(id, -1))
+	if cost < 0 or unlocked_weapons.has(id) or intel < cost:
+		return false
+	intel -= cost
+	unlocked_weapons.append(id)
 	return true
 
 

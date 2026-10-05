@@ -410,7 +410,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			paused = false
 		elif not run.card_choices.is_empty() and key in [KEY_1, KEY_2, KEY_3]:
 			run.choose_card(key - KEY_1)
-		elif key in [KEY_1, KEY_2, KEY_3]:
+		elif key in [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5]:
 			run.switch_weapon(key - KEY_1)
 		elif key == KEY_SPACE:
 			_breaker_held = true
@@ -439,6 +439,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			run.switch_weapon(1)
 		elif event.button_index == JOY_BUTTON_DPAD_RIGHT:
 			run.switch_weapon(2)
+		elif event.button_index == JOY_BUTTON_DPAD_DOWN:
+			run.cycle_weapon()
 
 
 func _finish() -> void:
@@ -514,7 +516,7 @@ func _process(delta: float) -> void:
 ## Turns this frame's gameplay events into sounds.
 func _play_audio() -> void:
 	if not run.tracers.is_empty():
-		sfx.play([&"rifle", &"shotgun", &"pistol"][run.weapon_index], -6.0, 0.06, 40)
+		sfx.play([&"rifle", &"shotgun", &"pistol", &"rifle", &"pistol"][run.weapon_index], -6.0, 0.06, 40)
 	for d in run.deaths:
 		if d.w > 0.5:
 			sfx.play(&"headshot", -4.0, 0.1, 50)

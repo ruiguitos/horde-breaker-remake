@@ -138,6 +138,10 @@ const BOSS_SLAM_COOLDOWN: float = 5.0
 const BOSS_SUMMON_INTERVAL: float = 9.0
 const BOSS_SUMMON_COUNT: int = 6
 
+## Weapons available from the start; the others are bought in the armory.
+const STARTING_WEAPONS: Array[StringName] = [&"rifle", &"shotgun", &"pistol"]
+const WEAPON_COSTS: Dictionary = {&"smg": 60, &"marksman": 80}
+
 ## Meta progression
 const SLOT_COSTS: Array[int] = [0, 100, 250]  ## cost of the 1st, 2nd, 3rd perk slot
 const MAX_THREAT: int = 3
@@ -181,6 +185,8 @@ static func weapons() -> Array[Weapon]:
 		Weapon.new(&"rifle", "Assault Rifle", 12.0, 9.0, 30.0, 1, 2.0, 1, -1, 0.05),
 		Weapon.new(&"shotgun", "Shotgun", 9.0, 1.4, 12.0, 8, 22.0, 2, 40, 0.6),
 		Weapon.new(&"pistol", "Heavy Pistol", 60.0, 2.2, 35.0, 1, 0.0, 4, 60, 0.3),
+		Weapon.new(&"smg", "SMG", 7.0, 16.0, 18.0, 1, 7.0, 1, 300, 0.02),
+		Weapon.new(&"marksman", "Marksman Rifle", 110.0, 1.2, 45.0, 1, 0.0, 6, 30, 0.5),
 	]
 
 

@@ -32,6 +32,7 @@ func _new_run() -> void:
 	context = RunContext.new()
 	context.threat = profile.threat
 	context.apply_perks(profile.equipped_perks)
+	context.weapons.append_array(profile.unlocked_weapons)
 	_go(State.BOAT)
 
 

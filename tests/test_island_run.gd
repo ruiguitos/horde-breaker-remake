@@ -21,6 +21,7 @@ func _initialize() -> void:
 	_test_meta_shop()
 	_test_boss_fight()
 	_test_modifiers()
+	_test_weapon_unlocks()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -249,3 +250,20 @@ func _test_modifiers() -> void:
 	run2.kills = 50
 	_check(run2.director.max_alive == GameData.MAX_ALIVE + 40 and run2.intel_earned() == 13,
 		"Swarm adds 40 alive and pays Intel x1.3 (%d)" % run2.intel_earned())
+
+
+func _test_weapon_unlocks() -> void:
+	var run := IslandRun.new(5)
+	run.switch_weapon(3)
+	var locked: bool = run.weapon_index == 0
+	var p := Profile.new()
+	p.intel = 70
+	var bought: bool = p.buy_weapon(&"smg")
+	var too_poor: bool = not p.buy_weapon(&"marksman")
+	var ctx := RunContext.new(5)
+	ctx.weapons.append_array(p.unlocked_weapons)
+	var run2 := IslandRun.new(5)
+	run2.load_context(ctx)
+	run2.switch_weapon(3)
+	_check(locked and bought and too_poor and run2.weapon_index == 3 and run2.weapons[3].id == &"smg",
+		"SMG is locked until bought in the armory, then usable on key 4")

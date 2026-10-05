@@ -35,6 +35,8 @@ var invulnerable: float = 0.0
 # Weapons
 var weapons: Array[GameData.Weapon] = GameData.weapons()
 var weapon_index: int = 0
+## Which weapons can be used this run (locked ones are skipped).
+var weapon_unlocked: Array[bool] = []
 var ammo: PackedInt32Array = PackedInt32Array()
 var _fire_cd: float = 0.0
 var _shots: int = 0
@@ -88,6 +90,7 @@ func _init(rng_seed: int = 7) -> void:
 	horde.set_target(player_pos)
 	for w in weapons:
 		ammo.append(w.max_ammo)
+		weapon_unlocked.append(GameData.STARTING_WEAPONS.has(w.id))
 	for i in GameData.GENERATOR_COUNT:
 		generator_progress.append(0.0)
 		generator_started.append(false)
@@ -96,6 +99,8 @@ func _init(rng_seed: int = 7) -> void:
 ## Loads the run state carried from previous islands and scales difficulty.
 func load_context(ctx: RunContext) -> void:
 	perks = ctx.perks.duplicate()
+	for w in weapons.size():
+		weapon_unlocked[w] = ctx.weapons.has(weapons[w].id)
 	has_boss = ctx.is_last_island()
 	threat = ctx.threat
 	max_hp = ctx.max_hp
@@ -229,8 +234,17 @@ func intel_earned() -> int:
 
 
 func switch_weapon(i: int) -> void:
-	if i >= 0 and i < weapons.size() and ammo[i] != 0:
+	if i >= 0 and i < weapons.size() and ammo[i] != 0 and weapon_unlocked[i]:
 		weapon_index = i
+
+
+## Next usable weapon (gamepad cycling).
+func cycle_weapon() -> void:
+	for k in range(1, weapons.size() + 1):
+		var i: int = (weapon_index + k) % weapons.size()
+		if weapon_unlocked[i] and ammo[i] != 0:
+			weapon_index = i
+			return
 
 
 func choose_card(i: int) -> void:
