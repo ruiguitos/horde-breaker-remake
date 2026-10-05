@@ -36,6 +36,8 @@ código antigo. Estado atual: **vertical slice em grey-box** (1 ilha, missão
 game/          código e cenas do jogo (vertical slice; ver game/README.md)
 spikes/<nome>/ protótipos isolados; cada spike tem cena, scripts, tests/ e README.md
 tests/         testes headless do jogo
+assets/        assets de terceiros (áudio, animações…; ver assets/LICENSES.md)
+addons/        addons Godot (Terrain3D, TerraBrush, Sky3D, Phantom Camera)
 tools/         ferramentas (tools/cloud/ = setup das sessões na cloud)
 docs/          DECISIONS, design/, tech/, legacy/
 ```
@@ -59,8 +61,10 @@ Testes: `extends SceneTree`, lógica em `_initialize()`, imprimem `TEST: ...` ou
   de cada push, `git pull --rebase origin master`.
 - **Não editar `docs/DECISIONS.md`.** Propor decisões numa secção
   "Decisões propostas" do teu próprio documento; o utilizador decide.
-- **Sem assets externos** nem downloads de addons: usar primitivas Godot
-  (`BoxMesh`, `CapsuleMesh`, CSG, materiais simples).
+- **Assets externos só com licença livre** (CC0, MIT, OFL ou royalty-free
+  comercial) e registados em `assets/LICENSES.md`. Addons em `addons/`,
+  assets do jogo em `assets/`. O jogo tem de continuar a funcionar sem GPU
+  (testes headless).
 - Spikes ficam em `spikes/<nome>/` e não dependem uns dos outros nem de `game/`.
 - Depois de criar um `class_name`, correr `--import` antes de testar.
 - Commitar os ficheiros `.uid` que o Godot gera; nunca commitar `.godot/`.

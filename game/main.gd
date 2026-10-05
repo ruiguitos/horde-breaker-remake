@@ -5,11 +5,11 @@ extends Node
 ## Each state is a scene that is freed when the state changes; RunContext is
 ## the only thing that crosses states.
 
-enum State { BOAT, ISLAND, DEBRIEF, ARMORY, TITLE }
+enum GameFlow { BOAT, ISLAND, DEBRIEF, ARMORY, TITLE }
 
 const ISLAND_SCENE: String = "res://game/world/island.tscn"
 
-var state: State = State.BOAT
+var state: GameFlow = GameFlow.BOAT
 var context: RunContext
 var profile: Profile
 var _current: Node
@@ -20,7 +20,7 @@ func _ready() -> void:
 	profile = Profile.load_profile()
 	profile.apply_volume()
 	Visuals.high_quality = profile.graphics_high
-	_go(State.TITLE)
+	_go(GameFlow.TITLE)
 
 
 ## F11 toggles fullscreen anywhere in the game.
@@ -36,26 +36,26 @@ func _new_run() -> void:
 	context.apply_class(profile.selected_class)
 	context.apply_perks(profile.equipped_perks)
 	context.weapons.append_array(profile.unlocked_weapons)
-	_go(State.BOAT)
+	_go(GameFlow.BOAT)
 
 
-func _go(next: State) -> void:
+func _go(next: GameFlow) -> void:
 	if _current != null:
 		_current.queue_free()
 	state = next
 	match next:
-		State.BOAT:
+		GameFlow.BOAT:
 			var boat := Control.new()
 			boat.set_script(load("res://game/states/boat.gd"))
 			boat.set("context", context)
-			boat.connect("land_requested", _go.bind(State.ISLAND), CONNECT_DEFERRED)
+			boat.connect("land_requested", _go.bind(GameFlow.ISLAND), CONNECT_DEFERRED)
 			_current = boat
-		State.ISLAND:
+		GameFlow.ISLAND:
 			var island: Node = (load(ISLAND_SCENE) as PackedScene).instantiate()
 			island.set("context", context)
 			island.connect("finished", _on_island_finished, CONNECT_DEFERRED)
 			_current = island
-		State.DEBRIEF:
+		GameFlow.DEBRIEF:
 			profile.record_run(context)
 			_write_telemetry()
 			profile.save()
@@ -63,15 +63,15 @@ func _go(next: State) -> void:
 			debrief.set_script(load("res://game/states/debrief.gd"))
 			debrief.set("context", context)
 			debrief.set("profile", profile)
-			debrief.connect("new_run_requested", _go.bind(State.ARMORY), CONNECT_DEFERRED)
+			debrief.connect("new_run_requested", _go.bind(GameFlow.ARMORY), CONNECT_DEFERRED)
 			_current = debrief
-		State.TITLE:
+		GameFlow.TITLE:
 			var title := Node.new()
 			title.set_script(load("res://game/states/title.gd"))
 			title.set("profile", profile)
-			title.connect("play_requested", _go.bind(State.ARMORY), CONNECT_DEFERRED)
+			title.connect("play_requested", _go.bind(GameFlow.ARMORY), CONNECT_DEFERRED)
 			_current = title
-		State.ARMORY:
+		GameFlow.ARMORY:
 			var armory := Control.new()
 			armory.set_script(load("res://game/states/armory.gd"))
 			armory.set("profile", profile)
@@ -98,10 +98,10 @@ func _write_telemetry() -> void:
 func _on_island_finished(won: bool) -> void:
 	if won and not context.is_last_island():
 		context.island_index += 1
-		_go(State.BOAT)
+		_go(GameFlow.BOAT)
 	else:
 		context.won = won
 		if won:
 			# Extracting multiplies everything earned in the run.
 			context.intel = int(context.intel * GameData.EXTRACTION_INTEL_MULTIPLIER)
-		_go(State.DEBRIEF)
+		_go(GameFlow.DEBRIEF)

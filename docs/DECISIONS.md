@@ -22,6 +22,8 @@ ficheiro: propõem decisões nos seus documentos e o utilizador decide.
 | 2026-10-05 | Contexto: projeto a solo, por diversão e aprendizagem, sem prazo. Começar já o **vertical slice em grey-box** em `game/`. | Fim da pré-produção. |
 | 2026-10-05 | Câmara do slice: preset médio (~35°, ~10 m, FOV 60) com **yaw fixo**. | Spike `camera_medium`; auto-fire dispensa rodar. |
 
+| 2026-10-05 | **Assets externos permitidos** (pedido do utilizador; substitui "só primitivas"): só com licença livre, registados em `assets/LICENSES.md`. Estilo alvo: low-poly estilizado com boa luz. | Mais qualidade visual e sonora sem arte própria. |
+
 ## Em aberto
 
 - Valores de jogo (HP, dano, velocidades, cooldowns): hipóteses de playtest em `game/data/catalog.gd`.
