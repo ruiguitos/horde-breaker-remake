@@ -19,9 +19,11 @@ var showcase: bool = false
 @export var camera_distance: float = 10.0
 @export var camera_fov: float = 60.0
 @export_group("Third-person camera")
-@export var tp_distance: float = 4.8
-@export var tp_height: float = 1.7  ## pivot above the feet (shoulders)
-@export var tp_shoulder: float = 0.9  ## sideways offset (over the right shoulder)
+@export var tp_distance: float = 5.6
+## Pivot height (chest). The pivot sits at the screen centre, so the soldier
+## is framed above the bottom HUD panels and left of the crosshair.
+@export var tp_height: float = 1.2
+@export var tp_shoulder: float = 1.0  ## sideways offset (over the right shoulder)
 @export var tp_pitch_min: float = -10.0
 @export var tp_pitch_max: float = 45.0
 
@@ -51,6 +53,11 @@ var third_person: bool = true
 var _tp_yaw: float = 0.0
 var _tp_pitch: float = deg_to_rad(14.0)
 var _crosshair: Control
+## Phantom Camera (addon) drives the third-person camera: a SpringArm3D
+## follows `_tp_pivot` with damping. Null when the addon is missing.
+var _pcam: Node3D
+var _pcam_host: Node
+var _tp_pivot: Node3D
 var _enemy_mm := MultiMesh.new()
 var _head_mm := MultiMesh.new()
 var _arm_mm := MultiMesh.new()
@@ -355,6 +362,7 @@ func _build_world() -> void:
 	# Biome colour grading (Color Grading addon; Forward+ only, High/Ultra).
 	_camera.compositor = Grading.compositor_for(run.map.biome)
 	Grading.apply(_camera)
+	_setup_phantom_camera()
 
 
 ## Terrain3D ground (sloping sea floor, colour-mapped land). False when the
@@ -863,6 +871,9 @@ func _set_third_person(on: bool) -> void:
 		_tp_yaw = atan2(-run.facing.x, -run.facing.z)
 	if _crosshair != null:
 		_crosshair.visible = on
+	_set_pcam_active(on)
+	_camera.h_offset = 0.0
+	_camera.v_offset = 0.0
 	if profile != null:
 		profile.third_person = on
 		profile.save()
@@ -883,7 +894,62 @@ func _update_mouse_mode() -> void:
 
 ## Over-the-shoulder: orbit behind the player at (yaw, pitch), offset to the
 ## right shoulder, and pulled closer when a building is in the way.
+const PCAM_SCRIPT: String = "res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd"
+const PCAM_HOST_SCRIPT: String = "res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd"
+
+
+## Phantom Camera in Third Person mode: the pivot node follows the player's
+## chest + shoulder offset; the PCam's spring arm orbits it at (pitch, yaw).
+func _setup_phantom_camera() -> void:
+	if showcase or not ResourceLoader.exists(PCAM_SCRIPT) or not Engine.has_singleton(&"PhantomCameraManager"):
+		return
+	_tp_pivot = Node3D.new()
+	_tp_pivot.name = "CameraPivot"
+	add_child(_tp_pivot)
+	_tp_pivot.global_position = run.player_pos + Vector3(0, tp_height, 0)
+	_pcam_host = (load(PCAM_HOST_SCRIPT) as GDScript).new()
+	_camera.add_child(_pcam_host)
+	_pcam = (load(PCAM_SCRIPT) as GDScript).new()
+	_pcam.set("follow_mode", 6)  # THIRD_PERSON
+	_pcam.set("follow_target", _tp_pivot)
+	_pcam.set("spring_length", tp_distance)
+	_pcam.set("collision_mask", 0)  # buildings are not physics bodies; see below
+	_pcam.set("follow_damping", true)
+	_pcam.set("follow_damping_value", Vector3(0.08, 0.08, 0.08))
+	_pcam.set("priority", 10)
+	add_child(_pcam)
+	_set_pcam_active(third_person)
+
+
+func _set_pcam_active(on: bool) -> void:
+	if _pcam_host != null:
+		_pcam_host.process_mode = Node.PROCESS_MODE_INHERIT if on else Node.PROCESS_MODE_DISABLED
+
+
 func _update_third_person_camera(jitter: Vector3) -> void:
+	if _pcam != null and is_instance_valid(_pcam) and bool(_pcam.get("_has_follow_spring_arm")):
+		var fwd: Vector3 = _tp_forward()
+		var right: Vector3 = fwd.cross(Vector3.UP).normalized()
+		_tp_pivot.global_position = run.player_pos + Vector3(0, tp_height, 0) + right * tp_shoulder
+		_pcam.call("set_third_person_rotation", Vector3(-_tp_pitch, _tp_yaw, 0))
+		# Spring arm without physics: shorten it ourselves when a building is
+		# between the pivot and the camera.
+		var back: Vector3 = (-fwd * cos(_tp_pitch) + Vector3.UP * sin(_tp_pitch)).normalized()
+		var dist: float = tp_distance
+		for box in _building_boxes:
+			var hit: Variant = _segment_hits_box(_tp_pivot.global_position, _tp_pivot.global_position + back * tp_distance, box)
+			if hit != null:
+				dist = minf(dist, maxf(0.8, float(hit) - 0.3))
+		_pcam.call("set_spring_length", dist)
+		# Shake through the camera's offsets (Phantom Camera owns its transform).
+		_camera.h_offset = jitter.x
+		_camera.v_offset = jitter.y
+		return
+	_update_manual_third_person_camera(jitter)
+
+
+## Fallback without Phantom Camera (same framing, no damping).
+func _update_manual_third_person_camera(jitter: Vector3) -> void:
 	var fwd: Vector3 = _tp_forward()
 	var right: Vector3 = fwd.cross(Vector3.UP).normalized()
 	var pivot: Vector3 = run.player_pos + Vector3(0, tp_height, 0) + right * tp_shoulder
@@ -894,7 +960,7 @@ func _update_third_person_camera(jitter: Vector3) -> void:
 		if hit != null:
 			dist = minf(dist, maxf(0.8, float(hit) - 0.3))
 	_camera.position = pivot + back * dist + jitter
-	_camera.look_at(pivot + fwd * 10.0 + Vector3(0, -0.4, 0) + jitter * 0.5)
+	_camera.look_at(pivot + jitter * 0.5)
 
 
 ## Distance along the segment a→b to the box, or null if it does not hit.

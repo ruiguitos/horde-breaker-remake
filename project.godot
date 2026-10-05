@@ -43,6 +43,7 @@ boot_splash+/progress_bar/background_color=Color(1, 1, 1, 0.15)
 BootSplashPlus="*res://addons/boot_splash_plus/boot_splash_plus_runtime.gd"
 GUIDE="*res://addons/guide/guide.gd"
 DialogueManager="*res://addons/dialogue_manager/dialogue_manager.gd"
+PhantomCameraManager="*res://addons/phantom_camera/scripts/managers/phantom_camera_manager.gd"
 
 [display]
 
@@ -50,7 +51,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/guide/plugin.cfg", "res://addons/dialogue_manager/plugin.cfg", "res://addons/Color grading/plugin.cfg", "res://addons/road-generator/plugin.cfg", "res://addons/terrain_3d/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/yard/plugin.cfg")
+enabled=PackedStringArray("res://addons/guide/plugin.cfg", "res://addons/dialogue_manager/plugin.cfg", "res://addons/Color grading/plugin.cfg", "res://addons/road-generator/plugin.cfg", "res://addons/terrain_3d/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/yard/plugin.cfg", "res://addons/phantom_camera/plugin.cfg")
 
 [internationalization]
 

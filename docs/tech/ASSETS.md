@@ -13,6 +13,7 @@ mão no editor). Licenças: `assets/LICENSES.md`.
 | Road Generator | **Usar** | Estradas do cais aos objetivos (`world/island_roads.gd`) |
 | Stylized Nature MegaKit (Quaternius) | **Usar** | Árvores, rochas e vegetação (`world/nature_kit.gd`) |
 | Third Person Controller | **Usar a ideia, não o código** | Câmara de 3.ª pessoa própria (V alterna) |
+| Phantom Camera | **Usar** | Câmara de 3.ª pessoa (Third Person + amortecimento), enquadrada acima do HUD |
 | G.U.I.D.E | **Usar** | Separador CONTROLS: ícones de teclas/comando e remapeamento |
 | Controller Icons | Usar mais tarde | **Não está no repositório** (falta o push) |
 | Boot Splash Plus | **Usar** | Ecrã de arranque (porto + logótipo + barra) |
