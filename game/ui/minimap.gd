@@ -66,7 +66,7 @@ func _draw() -> void:
 		draw_circle(Vector2(run.site.x, run.site.z) * scale, 5.0, Color(0.3, 0.8, 1.0))
 	elif run.mission == &"rescue" and not run.survivor_lost:
 		draw_circle(Vector2(run.survivor_pos.x, run.survivor_pos.z) * scale, 4.0, Color(1.0, 0.55, 0.1))
-	for g in run.map.generators.size():
+	for g in GameData.GENERATOR_COUNT:
 		if run.mission != &"activate":
 			break
 		var done: bool = run.generator_progress[g] >= GameData.GENERATOR_HOLD_SECONDS

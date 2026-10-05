@@ -2,8 +2,6 @@ extends Node
 ## Illustrated harbor with native, focusable controls.
 
 signal play_requested
-## Test map without enemies (see IslandMap.from_image).
-signal sandbox_requested
 
 var profile: Profile
 var _root: Control
@@ -50,7 +48,6 @@ func _ready() -> void:
 	arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	deploy.add_child(arrow)
 	for item in [
-		["SANDBOX (TEST MAP)", func() -> void: sandbox_requested.emit()],
 		["SETTINGS", _settings],
 		["INTEL ARCHIVE", _archive],
 		["QUIT", func() -> void: get_tree().quit()]]:

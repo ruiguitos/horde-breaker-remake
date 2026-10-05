@@ -633,7 +633,7 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 		goal_name = "Survivor"
 	elif run.objective == IslandRun.Objective.GENERATORS:
 		var best: float = INF
-		for g in run.map.generators.size():
+		for g in GameData.GENERATOR_COUNT:
 			if run.generator_progress[g] < GameData.GENERATOR_HOLD_SECONDS:
 				var d: float = run.player_pos.distance_to(run.map.generators[g])
 				if d < best:

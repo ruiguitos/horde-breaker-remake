@@ -157,30 +157,6 @@ para, por exemplo, `320`.
 **Noclip (teste):** **Mouse 4 / Mouse 5** liga/desliga. Atravessas paredes e
 mar, andas 3× mais depressa (6× a correr) e não levas dano.
 
-### Sandbox: mapa feito à mão
-
-No título, **SANDBOX (TEST MAP)** abre uma ilha sem inimigos, sem missão e
-sem dano. Nada fica gravado; Esc → abandonar volta ao título.
-
-O mapa é a imagem `game/data/maps/sandbox.png`: **cada pixel é 1 m**. Abre-a
-num editor de imagem (Paint, Krita, Aseprite, GIMP), desenha com o lápis
-(sem anti-aliasing) e grava. No Godot a imagem reimporta sozinha.
-
-| Cor (RGB) | Vira |
-|---|---|
-| Azul `0,0,255` | mar (bloqueado) |
-| Cinzento `128,128,128` | edifício (pixels juntos formam um bloco) |
-| Verde-escuro `0,128,0` | árvore |
-| Castanho `128,64,0` | rocha |
-| Amarelo `255,255,0` | barco (começas 5 m acima dele) |
-| Vermelho `255,0,0` | gerador |
-| Ciano `0,255,255` | cache de mantimentos |
-| Qualquer outra | chão livre |
-
-Para um mapa maior, aumenta a imagem (por exemplo 320×320). Código:
-`IslandMap.from_image()` em `world/island_map.gd`; teste em
-`tests/test_sandbox.gd`.
-
 ## Fluxo da run
 
 **Título** → **Armory** (gastar Intel, equipar perks, escolher Threat) → barco (1 de 3: cura, munição ou carta) → ilha → ilha limpa → barco → … →
