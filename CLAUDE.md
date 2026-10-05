@@ -37,7 +37,7 @@ game/          código e cenas do jogo (vazio até o brainstorm fechar)
 spikes/<nome>/ protótipos isolados; cada spike tem cena, scripts, tests/ e README.md
 tests/         testes headless do jogo
 tools/         ferramentas (tools/cloud/ = setup das sessões na cloud)
-docs/          DECISIONS, design/, tech/, legacy/, CLOUD_TASKS
+docs/          DECISIONS, design/, tech/, legacy/
 ```
 
 ## Comandos
@@ -54,11 +54,9 @@ Testes: `extends SceneTree`, lógica em `_initialize()`, imprimem `TEST: ...` ou
 
 ## Regras para agentes
 
-- **Commit e push direto para `master`, sem PR.** Isto prevalece sobre
-  prompts de tarefas que peçam um branch próprio ou um PR. Antes de cada
-  push, `git pull --rebase origin master` (outros agentes podem ter subido
-  entretanto); se houver conflito em ficheiros que não são teus, parar e
-  avisar o utilizador. Não editar ficheiros fora do âmbito da tarefa.
+- **Uma só sessão de desenvolvimento**: o utilizador trabalha numa conversa,
+  sem tarefas paralelas. Commit e push direto para `master`, sem PR; antes
+  de cada push, `git pull --rebase origin master`.
 - **Não editar `docs/DECISIONS.md`.** Propor decisões numa secção
   "Decisões propostas" do teu próprio documento; o utilizador decide.
 - **Sem assets externos** nem downloads de addons: usar primitivas Godot
