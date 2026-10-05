@@ -71,6 +71,7 @@ var _sim_ms: float = 0.0
 
 
 func _ready() -> void:
+	GameInput.setup()
 	run = IslandRun.new(context.island_seed() if context != null else rng_seed)
 	if context != null:
 		run.load_context(context)
@@ -463,49 +464,36 @@ func _ring(center: Vector3, radius: float, color: Color) -> MeshInstance3D:
 # --- Input and simulation -------------------------------------------------
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo:
-		var key: Key = event.physical_keycode
-		if run.is_over() and key in [KEY_R, KEY_ENTER, KEY_KP_ENTER]:
+	# Actions come from GameInput (InputMap): keyboard, mouse and gamepad alike.
+	if event.is_echo() or not event.is_pressed():
+		return
+	if run.is_over():
+		if event.is_action_pressed(&"confirm"):
 			_finish()
-		elif key == KEY_ESCAPE and not run.is_over():
-			paused = not paused
-		elif paused and key == KEY_Q:
+		return
+	if event.is_action_pressed(&"pause"):
+		paused = not paused
+	elif paused:
+		if event.is_action_pressed(&"abandon"):
 			run.hp = 0.0
 			run.objective = IslandRun.Objective.LOST
 			paused = false
-		elif not run.card_choices.is_empty() and key in [KEY_1, KEY_2, KEY_3]:
-			run.choose_card(key - KEY_1)
-		elif key in [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5]:
-			run.switch_weapon(key - KEY_1)
-		elif key == KEY_SPACE:
-			_breaker_held = true
-		elif key == KEY_G:
-			_grenade_held = true
-		elif key == KEY_F3:
-			hud.debug_visible = not hud.debug_visible
-	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+	elif not run.card_choices.is_empty():
+		for i in 3:
+			if event.is_action_pressed(StringName("card_%d" % (i + 1))):
+				run.choose_card(i)
+	elif event.is_action_pressed(&"breaker"):
 		_breaker_held = true
-	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_MIDDLE:
+	elif event.is_action_pressed(&"ability"):
 		_grenade_held = true
-	elif event is InputEventJoypadButton and event.pressed:
-		if run.is_over() and event.button_index in [JOY_BUTTON_START, JOY_BUTTON_A]:
-			_finish()
-		elif event.button_index == JOY_BUTTON_START:
-			paused = not paused
-		elif not run.card_choices.is_empty() and event.button_index in [JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_B]:
-			run.choose_card([JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_B].find(event.button_index))
-		elif event.button_index in [JOY_BUTTON_A, JOY_BUTTON_RIGHT_SHOULDER]:
-			_breaker_held = true
-		elif event.button_index == JOY_BUTTON_LEFT_SHOULDER:
-			_grenade_held = true
-		elif event.button_index == JOY_BUTTON_DPAD_LEFT:
-			run.switch_weapon(0)
-		elif event.button_index == JOY_BUTTON_DPAD_UP:
-			run.switch_weapon(1)
-		elif event.button_index == JOY_BUTTON_DPAD_RIGHT:
-			run.switch_weapon(2)
-		elif event.button_index == JOY_BUTTON_DPAD_DOWN:
-			run.cycle_weapon()
+	elif event.is_action_pressed(&"weapon_next"):
+		run.cycle_weapon()
+	elif event.is_action_pressed(&"debug"):
+		hud.debug_visible = not hud.debug_visible
+	else:
+		for i in 5:
+			if event.is_action_pressed(StringName("weapon_%d" % (i + 1))):
+				run.switch_weapon(i)
 
 
 func _finish() -> void:
@@ -523,14 +511,8 @@ func _physics_process(delta: float) -> void:
 	if _hitstop > 0.0:
 		_hitstop -= delta
 		return
-	var move := Vector2(
-		float(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT))
-			- float(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT)),
-		float(Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN))
-			- float(Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP)))
-	var stick := Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y))
-	if stick.length() > 0.2:
-		move = stick
+	var move: Vector2 = GameInput.move_vector()
+	var stick: Vector2 = move
 	var aim: Vector3 = _mouse_aim()
 	var right := Vector2(Input.get_joy_axis(0, JOY_AXIS_RIGHT_X), Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y))
 	if right.length() > 0.3:
@@ -538,7 +520,7 @@ func _physics_process(delta: float) -> void:
 	elif stick.length() > 0.2 and aim == Vector3.ZERO:
 		aim = Vector3(stick.x, 0, stick.y)
 	var t0: int = Time.get_ticks_usec()
-	var sprint: bool = Input.is_physical_key_pressed(KEY_SHIFT) or Input.is_joy_button_pressed(0, JOY_BUTTON_LEFT_STICK)
+	var sprint: bool = Input.is_action_pressed(&"sprint")
 	run.step(delta, move, aim, _breaker_held, sprint)
 	if _grenade_held:
 		# Without a mouse (gamepad) throw 8 m ahead.

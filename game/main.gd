@@ -16,6 +16,7 @@ var _current: Node
 
 
 func _ready() -> void:
+	GameInput.setup()
 	profile = Profile.load_profile()
 	profile.apply_volume()
 	_go(State.ARMORY)

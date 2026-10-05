@@ -27,6 +27,7 @@ func _initialize() -> void:
 	_test_classes()
 	_test_caches()
 	_test_target_priority()
+	_test_input_actions()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -377,3 +378,18 @@ func _test_target_priority() -> void:
 	_check(run.aim_info()[0] == ahead and run.aim_info()[1], "facing an enemy makes it the target (headshot) over a nearer one off to the side")
 	run.horde.positions[side] = p + Vector3(-1.0, 0, -1.6)
 	_check(run.aim_info()[0] == side, "an enemy within 2.5 m always takes priority")
+
+
+func _test_input_actions() -> void:
+	GameInput.setup()
+	var space := InputEventKey.new()
+	space.physical_keycode = KEY_SPACE
+	space.pressed = true
+	var pad_a := InputEventJoypadButton.new()
+	pad_a.button_index = JOY_BUTTON_A
+	pad_a.pressed = true
+	var g := InputEventKey.new()
+	g.physical_keycode = KEY_G
+	g.pressed = true
+	_check(space.is_action_pressed(&"breaker") and pad_a.is_action_pressed(&"breaker") and g.is_action_pressed(&"ability")
+		and not space.is_action_pressed(&"ability"), "InputMap actions: Space and pad A break, G uses the ability")

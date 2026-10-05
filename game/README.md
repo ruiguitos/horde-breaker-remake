@@ -185,6 +185,7 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 |---|---|
 | `main.gd` | Máquina de estados da run: barco → ilha → debrief. |
 | `core/run_context.gd` | O que passa de ilha para ilha. |
+| `core/game_input.gd` | Ações de input (InputMap): teclas e botões do comando por ação. |
 | `core/profile.gd` | Perfil gravado (Intel, runs), JSON versionado. |
 | `states/armory.gd`, `states/boat.gd`, `states/debrief.gd` | Ecrãs entre runs, entre ilhas e do fim da run. |
 | `world/island_run.gd` | **Todas as regras**, sem nós: jogador, auto-fire, breaker, cartas, missão. Testável em headless. |
