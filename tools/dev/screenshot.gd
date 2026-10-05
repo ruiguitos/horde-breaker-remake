@@ -1,69 +1,73 @@
 extends SceneTree
-## Dev tool: runs the game for N frames with a scripted player and saves a
-## screenshot. Needs a display (e.g. xvfb-run) and a non-headless renderer:
-## xvfb-run godot --rendering-driver opengl3 --path . --script res://tools/dev/screenshot.gd -- out.png 600
+## Renders pictures of a scene for review without a GPU (software OpenGL):
+##   xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 \
+##     --resolution 1280x720 --script res://tools/dev/screenshot.gd -- <scene.tscn> <out_dir>
+## Writes top.png (orthographic, whole island) and four oblique views
+## (view_n/e/s/w.png). Lighting is a plain sun and sky colour.
 
-var _frames: int = 0
-var _target: int = 600
-var _out: String = "user://screenshot.png"
-var _island: Node
+var _scene: Node3D
+var _cam: Camera3D
+var _out: String
+var _frame: int = 0
+var _shots: Array = []
+var _size: float = 160.0
 
 
 func _initialize() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
-	if args.size() > 0:
-		_out = args[0]
-	if args.size() > 1:
-		_target = int(args[1])
-	var main: Node = (load("res://game/main.tscn") as PackedScene).instantiate()
-	root.add_child(main)
+	var path: String = args[0] if args.size() > 0 else "res://game/world/handmade/island_template.tscn"
+	_out = args[1] if args.size() > 1 else "user://shots"
+	DirAccess.make_dir_recursive_absolute(_out)
+	_scene = (load(path) as PackedScene).instantiate()
+	root.add_child(_scene)
+	if _scene.get("size") != null:
+		_size = float(_scene.get("size"))
+	_cam = Camera3D.new()
+	_cam.far = 2000.0
+	root.add_child(_cam)
+	var sun := DirectionalLight3D.new()
+	sun.rotation_degrees = Vector3(-55, 35, 0)
+	sun.shadow_enabled = true
+	root.add_child(sun)
+	var env := WorldEnvironment.new()
+	env.environment = Environment.new()
+	env.environment.background_mode = Environment.BG_COLOR
+	env.environment.background_color = Color(0.6, 0.75, 0.9)
+	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.environment.ambient_light_color = Color(0.7, 0.7, 0.75)
+	root.add_child(env)
+	var c := Vector3(_size * 0.5, 0, _size * 0.5)
+	_shots = [
+		["top", c + Vector3(0, 300, 0.01), c, true],
+		["view_s", c + Vector3(0, _size * 0.55, _size * 0.95), c, false],
+		["view_n", c + Vector3(0, _size * 0.55, -_size * 0.95), c, false],
+		["view_e", c + Vector3(_size * 0.95, _size * 0.55, 0), c, false],
+		["view_w", c + Vector3(-_size * 0.95, _size * 0.55, 0), c, false],
+	]
+	var terrain: Node = _scene.get_node_or_null("Terrain3D")
+	if terrain != null:
+		terrain.call("set_camera", _cam)
 
 
 func _process(_delta: float) -> bool:
-	_frames += 1
-	var main: Node = root.get_node("Main")
-	var current: Node = main.get("_current")
-	# Optional third arg "boat" photographs the boat screen instead.
-	if main.get("state") == 4:
-		current.emit_signal("play_requested")
+	_frame += 1
+	# Wait for the boot splash and terrain, then one shot every 20 frames.
+	var start: int = 240
+	if _frame < start:
 		return false
-	if OS.get_cmdline_user_args().size() > 2 and main.get("state") == 3:
-		current.call("_start")
-		return false
-	if OS.get_cmdline_user_args().size() > 2 and _frames >= _target:
-		var shot: Image = root.get_viewport().get_texture().get_image()
-		shot.save_png(_out)
-		print("saved ", _out)
+	var k: int = (_frame - start) / 20
+	var phase: int = (_frame - start) % 20
+	if k >= _shots.size():
+		print("screenshots in ", ProjectSettings.globalize_path(_out))
 		quit(0)
-		return false
-	if main.get("state") == 3 and _frames > 3:
-		current.call("_start")
-		return false
-	if main.get("state") == 0 and _frames > 3:
-		current.call("_pick", 0)
-		current.call("_pick_route", 0)
-		current.emit_signal("land_requested")
-		return false
-	var run: IslandRun = current.get("run") if main.get("state") == 1 else null
-	if run != null:
-		if run.horde.count < 10:
-			for k in 40:
-				var a: float = k * 0.7
-				var pos: Vector3 = run.player_pos + Vector3(cos(a), 0, sin(a)) * (6.0 + k * 0.15)
-				if not Horde.overlaps_wall(run.field, pos.x, pos.z, 0.4):
-					run.horde.add(pos, k % 4, run.rng)
-		run.choose_card(0)
-		# Walk towards the first generator and keep healthy for the picture.
-		var to: Vector3 = run.map.generators[0] - run.player_pos
-		if to.length() > 2.0:
-			run.player_pos = Horde.move_against_walls(run.field, run.player_pos, to.normalized().x * 0.1, to.normalized().z * 0.1, 0.4)
-		run.hp = GameData.PLAYER_MAX_HP
-		var near: PackedInt32Array = run.horde.query_radius(run.player_pos, 20.0)
-		if near.size() > 0:
-			run.facing = (run.horde.positions[near[0]] - run.player_pos).normalized()
-	if _frames >= _target:
-		var img: Image = root.get_viewport().get_texture().get_image()
-		img.save_png(_out)
-		print("saved ", _out, " ", img.get_size())
-		quit(0)
+		return true
+	var s: Array = _shots[k]
+	if phase == 0:
+		_cam.projection = Camera3D.PROJECTION_ORTHOGONAL if s[3] else Camera3D.PROJECTION_PERSPECTIVE
+		_cam.size = _size * 1.1
+		_cam.fov = 60.0
+		_cam.look_at_from_position(s[1], s[2])
+		_cam.current = true
+	elif phase == 19:
+		root.get_viewport().get_texture().get_image().save_png(_out.path_join(s[0] + ".png"))
 	return false

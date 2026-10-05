@@ -42,19 +42,22 @@ func _build() -> void:
 	# Heights: island disc at 0 m, sea floor at -3 m, a round hill (8 m) and
 	# a flat plateau (4 m) with a cliff edge, so both slope rules show up.
 	var c: float = SIZE * 0.5
-	var height := Image.create_empty(SIZE + 1, SIZE + 1, false, Image.FORMAT_RF)
-	var color := Image.create_empty(SIZE + 1, SIZE + 1, false, Image.FORMAT_RGBA8)
+	# Fill the whole 256 m region, so the part outside the island is sea floor.
+	var region: int = 256
+	var height := Image.create_empty(region, region, false, Image.FORMAT_RF)
+	var color := Image.create_empty(region, region, false, Image.FORMAT_RGBA8)
 	var sand := Color(0.86, 0.78, 0.55)
 	var grass := Color(0.42, 0.55, 0.3)
-	for z in SIZE + 1:
-		for x in SIZE + 1:
+	for z in region:
+		for x in region:
 			var d: float = Vector2(x - c, z - c).length()
 			var h: float = -3.0 * smoothstep(64.0, 74.0, d)
 			h += 8.0 * exp(-Vector2(x - c - 30, z - c + 25).length_squared() / 300.0)
 			if Vector2(x - c + 35, z - c + 30).length() < 16.0:
 				h = maxf(h, 4.0)
 			height.set_pixel(x, z, Color(h, 0, 0))
-			color.set_pixel(x, z, sand.lerp(grass, clampf((62.0 - d) / 10.0, 0.0, 1.0)))
+			var col: Color = sand.lerp(grass, clampf((62.0 - d) / 10.0, 0.0, 1.0))
+			color.set_pixel(x, z, col if h > -0.3 else sand.darkened(0.3))
 	var mat: Object = _terrain.get("material")
 	if mat != null:
 		mat.set("world_background", 0)
@@ -77,7 +80,7 @@ func _build() -> void:
 	var sea := MeshInstance3D.new()
 	sea.name = "SeaPreview"
 	var plane := PlaneMesh.new()
-	plane.size = Vector2(SIZE + 80, SIZE + 80)
+	plane.size = Vector2(600, 600)
 	sea.mesh = plane
 	sea.position = Vector3(c, -0.3, c)
 	var water := StandardMaterial3D.new()

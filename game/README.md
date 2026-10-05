@@ -246,6 +246,11 @@ grava `<cena>_grid.png` ao lado da cena, que é a grelha vista de cima:
 | Vermelho | Geradores |
 | Ciano | Caches |
 
+**Fotografias para revisão (Claude na cloud):** `tools/dev/screenshot.gd`
+renderiza a cena por software (sem GPU) e grava uma vista de cima e quatro
+vistas oblíquas. É assim que o Claude vê as tuas ilhas: faz push e pede-lhe
+para as rever.
+
 O modelo foi criado por `tools/dev/make_handmade_template.gd`; o teste está
 em `tests/test_handmade.gd`.
 

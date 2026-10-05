@@ -55,63 +55,63 @@ transparency = 1
 albedo_color = Color(0.15, 0.35, 0.55, 0.8)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_txchl"]
-size = Vector2(240, 240)
+size = Vector2(600, 600)
 
-[node name="IslandTemplate" type="Node3D" unique_id=365206021]
+[node name="IslandTemplate" type="Node3D" unique_id=1821144564]
 script = ExtResource("1_i4gog")
 
-[node name="Terrain3D" type="Terrain3D" parent="." unique_id=1679831762]
+[node name="Terrain3D" type="Terrain3D" parent="." unique_id=646463833]
 data_directory = "res://game/world/handmade/island_template_data"
 material = SubResource("Terrain3DMaterial_kuchn")
 assets = ExtResource("2_suudd")
 top_level = true
 metadata/_edit_lock_ = true
 
-[node name="Buildings" type="Node3D" parent="." unique_id=870981290]
+[node name="Buildings" type="Node3D" parent="." unique_id=516448319]
 
-[node name="House" type="MeshInstance3D" parent="Buildings" unique_id=682296984]
+[node name="House" type="MeshInstance3D" parent="Buildings" unique_id=1252406112]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68, 2, 90)
 mesh = SubResource("BoxMesh_xl10h")
 
-[node name="Trees" type="Node3D" parent="." unique_id=307186365]
+[node name="Trees" type="Node3D" parent="." unique_id=1736683020]
 
 [node name="Tree" type="Node3D" parent="Trees" unique_id=699547461 instance=ExtResource("3_uvq84")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, 0, 92)
 
-[node name="Rocks" type="Node3D" parent="." unique_id=1626010353]
+[node name="Rocks" type="Node3D" parent="." unique_id=985417894]
 
 [node name="Rock" type="Node3D" parent="Rocks" unique_id=1283432621 instance=ExtResource("4_bwndj")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84, 0, 74)
 
-[node name="Decor" type="Node3D" parent="." unique_id=998752576]
+[node name="Decor" type="Node3D" parent="." unique_id=1304178822]
 
-[node name="SeaPreview" type="MeshInstance3D" parent="Decor" unique_id=1774995889]
+[node name="SeaPreview" type="MeshInstance3D" parent="Decor" unique_id=909776007]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, -0.3, 80)
 material_override = SubResource("StandardMaterial3D_cyp50")
 mesh = SubResource("PlaneMesh_txchl")
 
-[node name="Markers" type="Node3D" parent="." unique_id=35475586]
+[node name="Markers" type="Node3D" parent="." unique_id=555697795]
 
-[node name="Boat" type="Marker3D" parent="Markers" unique_id=1323199840]
+[node name="Boat" type="Marker3D" parent="Markers" unique_id=1402413926]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, 138)
 gizmo_extents = 3.0
 
-[node name="PlayerStart" type="Marker3D" parent="Markers" unique_id=997204732]
+[node name="PlayerStart" type="Marker3D" parent="Markers" unique_id=1635655897]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, 133)
 gizmo_extents = 3.0
 
-[node name="Generator1" type="Marker3D" parent="Markers" unique_id=926225944]
+[node name="Generator1" type="Marker3D" parent="Markers" unique_id=1826985203]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 0, 70)
 gizmo_extents = 3.0
 
-[node name="Generator2" type="Marker3D" parent="Markers" unique_id=660601956]
+[node name="Generator2" type="Marker3D" parent="Markers" unique_id=1414090100]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 120, 0, 75)
 gizmo_extents = 3.0
 
-[node name="Generator3" type="Marker3D" parent="Markers" unique_id=147497891]
+[node name="Generator3" type="Marker3D" parent="Markers" unique_id=142088941]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82, 0, 30)
 gizmo_extents = 3.0
 
-[node name="Cache1" type="Marker3D" parent="Markers" unique_id=1127556550]
+[node name="Cache1" type="Marker3D" parent="Markers" unique_id=437116952]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 105, 0, 110)
 gizmo_extents = 3.0
