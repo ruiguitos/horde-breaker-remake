@@ -12,14 +12,13 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 
 - [ ] Rotas: mapa em grafo visível (agora são 2 opções por paragem).
 - [ ] Mais desbloqueios com Intel: cartas no pool. Equilibrar classes.
-- [ ] Boss: segunda fase, ataque à distância, ilha própria (Volcano).
+- [ ] Boss: ataque à distância, ilha própria (Volcano).
 - [ ] Caches/desvios opcionais na ilha.
 
 ## Gráficos e feel
 
 - [ ] Afinar o som sintetizado a ouvido (volumes em `island.gd::_play_audio`, timbres em `audio/sfx.gd`); música do diretor.
 - [ ] Animação melhor que o "balançar" (Vertex Animation Textures, BRAINSTORM §8).
-- [ ] Desmembramento por partes da cápsula (agora são cubos).
 
 ## Técnico
 

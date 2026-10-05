@@ -100,6 +100,8 @@ blindado à frente (−50 %) e não é empurrado.
   rebenta: 30 de dano se estiveres dentro. Sai do anel ou usa o breaker,
   que te torna invulnerável.
 - **Chama Runners**: a cada 9 s aparecem 6 à volta dele.
+- **Fase 2** (abaixo de 50 % de HP): fica mais rápido, golpeia mais vezes e
+  chama também um Brute.
 - Matá-lo dá +20 de Intel e abre o regresso ao barco. Tem uma barra de vida
   no topo e o marcador aponta para ele.
 
@@ -124,6 +126,8 @@ blindado à frente (−50 %) e não é empurrado.
 
 - Inimigos balançam, saltitam e inclinam-se ao andar, proporcional à
   velocidade, e tremem quando atordoados.
+- Desmembramento com primitivas: num headshot a cabeça salta com salpicos
+  vermelhos; num tiro ao corpo sai um braço. Os pedaços rodam no ar.
 - Tremor de câmara ao levar dano e no breaker. Usa um modelo de "trauma": o
   tremor cresce com o quadrado, por isso os toques pequenos quase não se notam.
 - Flash vermelho no ecrã ao levar dano; clarão de luz na arma ao disparar.

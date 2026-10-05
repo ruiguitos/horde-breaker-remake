@@ -49,6 +49,9 @@ var _debris_pos := PackedVector3Array()
 var _debris_vel := PackedVector3Array()
 var _debris_life := PackedFloat32Array()
 var _debris_color := PackedColorArray()
+## Debris size; a negative value marks a severed head (drawn as a sphere).
+var _debris_size := PackedFloat32Array()
+var _head_debris_mm := MultiMesh.new()
 var _breaker_held: bool = false
 var _trauma: float = 0.0
 var _last_hp: float = -1.0
@@ -243,6 +246,7 @@ func _build_world() -> void:
 	var chunk := BoxMesh.new()
 	chunk.size = Vector3(0.25, 0.25, 0.25)
 	_setup_multimesh(_debris_mm, chunk, true)
+	_setup_multimesh(_head_debris_mm, _sphere(0.24), true)
 
 	var tracer := MeshInstance3D.new()
 	tracer.mesh = _tracer_mesh
@@ -673,14 +677,19 @@ func _draw_effects(delta: float) -> void:
 			_hitstop = 0.08  # freeze the simulation briefly: the kill "lands"
 			_trauma = minf(1.0, _trauma + 0.3)
 		var origin := Vector3(d.x, 1.0, d.y)
-		var pieces: int = 5 if d.w > 0.5 else 3
-		for k in pieces:
+		var sx: float = t.radius_scale
+		for k in 3:
 			var vel := Vector3(randf_range(-3, 3), randf_range(3, 7), randf_range(-3, 3))
-			var col: Color = t.color
-			if d.w > 0.5 and k == 0:
-				vel.y += 5.0  # the head goes up
-				col = Color(0.8, 0.15, 0.1)
-			_add_debris(origin + Vector3(0, t.height * 0.4, 0), vel, col)
+			_add_debris(origin + Vector3(0, t.height * 0.4, 0), vel, t.color, sx)
+		if d.w > 0.5:
+			# Headshot: the head pops off, upwards, with a spray of red bits.
+			var head_col: Color = t.color.lerp(Color(0.85, 0.8, 0.7), 0.45)
+			_add_debris(Vector3(d.x, t.height + 0.1, d.y), Vector3(randf_range(-2, 2), 9.0, randf_range(-2, 2)), head_col, -sx)
+			for k in 4:
+				_add_debris(Vector3(d.x, t.height, d.y), Vector3(randf_range(-4, 4), randf_range(4, 8), randf_range(-4, 4)), Color(0.75, 0.05, 0.05), 0.4)
+		else:
+			# Body shot: an arm comes off.
+			_add_debris(origin + Vector3(0, t.height * 0.3, 0), Vector3(randf_range(-4, 4), 5.0, randf_range(-4, 4)), t.color, sx * 1.6)
 	run.deaths.clear()
 	var i: int = _debris_pos.size() - 1
 	while i >= 0:
@@ -690,6 +699,7 @@ func _draw_effects(delta: float) -> void:
 			_debris_vel.remove_at(i)
 			_debris_life.remove_at(i)
 			_debris_color.remove_at(i)
+			_debris_size.remove_at(i)
 		else:
 			var v: Vector3 = _debris_vel[i]
 			v.y -= 20.0 * delta
@@ -700,10 +710,27 @@ func _draw_effects(delta: float) -> void:
 			_debris_pos[i] = p
 			_debris_vel[i] = v
 		i -= 1
-	_debris_mm.instance_count = _debris_pos.size()
+	var heads: int = 0
+	for sz in _debris_size:
+		if sz < 0.0:
+			heads += 1
+	_debris_mm.instance_count = _debris_pos.size() - heads
+	_head_debris_mm.instance_count = heads
+	var bi: int = 0
+	var hi: int = 0
 	for k in _debris_pos.size():
-		_debris_mm.set_instance_transform(k, Transform3D(Basis(), _debris_pos[k]))
-		_debris_mm.set_instance_color(k, _debris_color[k])
+		var sz: float = _debris_size[k]
+		# Chunks tumble as they fly (rotation from remaining life).
+		var spin := Basis(Vector3(1, 1, 0).normalized(), _debris_life[k] * 8.0)
+		if sz < 0.0:
+			_head_debris_mm.set_instance_transform(hi, Transform3D(Basis().scaled(Vector3.ONE * -sz), _debris_pos[k]))
+			_head_debris_mm.set_instance_color(hi, _debris_color[k])
+			hi += 1
+		else:
+			var scale := Vector3(sz, sz, sz) if sz < 1.2 else Vector3(0.5, 0.5, sz * 1.5)
+			_debris_mm.set_instance_transform(bi, Transform3D(spin.scaled(scale), _debris_pos[k]))
+			_debris_mm.set_instance_color(bi, _debris_color[k])
+			bi += 1
 
 	for e in run.explosions:
 		var boom := MeshInstance3D.new()
@@ -725,9 +752,10 @@ func _draw_effects(delta: float) -> void:
 			_explosions.remove_at(k)
 
 
-func _add_debris(p: Vector3, v: Vector3, c: Color) -> void:
+func _add_debris(p: Vector3, v: Vector3, c: Color, size: float = 1.0) -> void:
 	if _debris_pos.size() >= DEBRIS_MAX:
 		return
+	_debris_size.append(size)
 	_debris_pos.append(p)
 	_debris_vel.append(v)
 	_debris_life.append(1.5)

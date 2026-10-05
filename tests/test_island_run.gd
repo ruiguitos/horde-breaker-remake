@@ -233,6 +233,10 @@ func _test_boss_fight() -> void:
 		run.horde.positions[run.boss_index()] = bp  # keep it in place for the test
 	_check(saw_windup and run.hp <= hp_before - GameData.BOSS_SLAM_DAMAGE, "the slam is telegraphed and hurts inside the ring")
 	b = run.boss_index()
+	run.horde.hp[b] = run.boss_max_hp * 0.4
+	run.step(DT, Vector2.ZERO, Vector3(1, 0, 0), false)
+	_check(run.boss_enraged and run.horde.speeds[run.boss_index()] > 2.5, "below half HP the boss enrages (phase 2)")
+	b = run.boss_index()
 	run.horde.hp[b] = 1.0
 	run.player_pos = bp + Vector3(6, 0, 0)
 	for t in 30:

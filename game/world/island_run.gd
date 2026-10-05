@@ -66,6 +66,8 @@ var boss_max_hp: float = 0.0
 var slam_pos: Vector3 = Vector3.ZERO
 var slam_time: float = 0.0  ## > 0 while a slam is winding up
 var boss_killed: bool = false
+## Phase 2 below half HP: faster, slams more often, summons a Brute too.
+var boss_enraged: bool = false
 var _slam_cd: float = 2.0
 var _summon_cd: float = GameData.BOSS_SUMMON_INTERVAL
 
@@ -659,6 +661,10 @@ func _spawn_boss() -> void:
 
 func _update_boss(dt: float, b: int) -> void:
 	var bp: Vector3 = horde.positions[b]
+	if not boss_enraged and horde.hp[b] < boss_max_hp * 0.5:
+		boss_enraged = true
+		horde.speeds[b] = 2.7
+		messages.append("The Behemoth is ENRAGED!")
 	_slam_cd -= dt
 	_summon_cd -= dt
 	if slam_time > 0.0:
@@ -676,9 +682,13 @@ func _update_boss(dt: float, b: int) -> void:
 	elif _slam_cd <= 0.0 and bp.distance_to(player_pos) <= GameData.BOSS_SLAM_RANGE:
 		slam_pos = bp
 		slam_time = GameData.BOSS_SLAM_WINDUP
-		_slam_cd = GameData.BOSS_SLAM_COOLDOWN
+		_slam_cd = GameData.BOSS_SLAM_COOLDOWN * (0.6 if boss_enraged else 1.0)
 	if _summon_cd <= 0.0:
 		_summon_cd = GameData.BOSS_SUMMON_INTERVAL
+		if boss_enraged:
+			var bpos: Vector3 = bp + Vector3(0, 0, 3.5)
+			if not Horde.overlaps_wall(field, bpos.x, bpos.z, Horde.RADIUS + 0.05):
+				horde.add(bpos, GameData.EnemyKind.BRUTE, rng)
 		for k in GameData.BOSS_SUMMON_COUNT:
 			var p: Vector3 = bp + Vector3(cos(k * 1.05), 0, sin(k * 1.05)) * 3.0
 			if not Horde.overlaps_wall(field, p.x, p.z, Horde.RADIUS + 0.05):
