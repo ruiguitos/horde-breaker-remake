@@ -98,9 +98,9 @@ var _scream_cd: float = 0.0
 var _dead: Dictionary = {}  ## enemy index -> true, removed at the end of step()
 
 
-func _init(rng_seed: int = 7) -> void:
+func _init(rng_seed: int = 7, biome: StringName = &"beach") -> void:
 	rng.seed = rng_seed
-	map = IslandMap.build(rng_seed)
+	map = IslandMap.build(rng_seed, biome)
 	field = map.field
 	horde = Horde.new(field)
 	director = Director.new(rng_seed)
@@ -139,6 +139,8 @@ func load_context(ctx: RunContext) -> void:
 	horde.hp_scale = (1.0 + 0.3 * ctx.island_index) * GameData.threat_hp(threat)
 	director.max_alive = GameData.MAX_ALIVE + GameData.threat_extra_alive(threat)
 	modifier = ctx.modifier
+	if map.biome == &"jungle":
+		director.specials_mult *= 1.4
 	match modifier:
 		&"swarm":
 			director.max_alive += 40
@@ -367,6 +369,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	_update_orbs(dt)
 	_update_mission(dt)
 	_update_caches(dt)
+	_update_lava(dt)
 	var near: int = horde.query_radius(player_pos, 6.0).size()
 	var to_spawn: int = director.update(dt, horde.count, horde.damage_to_player, near)
 	for k in to_spawn:
@@ -682,6 +685,19 @@ func _update_mission(dt: float) -> void:
 		Objective.RETURN_TO_BOAT:
 			if player_pos.distance_to(map.boat) <= GameData.BOAT_RADIUS:
 				objective = Objective.WON
+
+
+## Lava pools burn the player (unless dashing) and enemies alike.
+func _update_lava(dt: float) -> void:
+	for k in map.lava.size():
+		var c: Vector3 = map.lava[k]
+		var r: float = map.lava_radius[k]
+		if dash_time <= 0.0 and Vector2(player_pos.x - c.x, player_pos.z - c.z).length() <= r:
+			hp -= GameData.LAVA_PLAYER_DPS * dt
+		for i in horde.query_radius(c, r):
+			if horde.kinds[i] != GameData.EnemyKind.BOSS:
+				_damage(i, GameData.LAVA_ENEMY_DPS * dt, c, false, true)
+	_flush_dead()
 
 
 func caches_opened() -> int:

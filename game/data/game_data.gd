@@ -157,6 +157,29 @@ const BOSS_ROCK_RADIUS: float = 2.5
 const BOSS_ROCK_DAMAGE: float = 20.0
 const BOSS_ROCK_COOLDOWN: float = 3.5
 
+## Biomes: look and feel of each island. Islands 1-2 pick one on the boat;
+## the last island is always the volcano.
+const BIOMES: Dictionary = {
+	&"beach": {"name": "Beach", "coast": Color(0.78, 0.7, 0.5), "inland": Color(0.62, 0.6, 0.42),
+		"building": Color(0.55, 0.42, 0.3), "foliage": Color(0.3, 0.55, 0.25), "sky": Color(0.5, 0.7, 0.85),
+		"fog": 0.0, "palms": true},
+	&"town": {"name": "Coastal Town", "coast": Color(0.7, 0.66, 0.5), "inland": Color(0.4, 0.4, 0.38),
+		"building": Color(0.62, 0.55, 0.5), "foliage": Color(0.25, 0.42, 0.22), "sky": Color(0.55, 0.62, 0.7),
+		"fog": 0.0, "palms": false},
+	&"jungle": {"name": "Jungle", "coast": Color(0.6, 0.58, 0.4), "inland": Color(0.2, 0.35, 0.15),
+		"building": Color(0.4, 0.42, 0.36), "foliage": Color(0.12, 0.38, 0.14), "sky": Color(0.3, 0.42, 0.34),
+		"fog": 0.006, "palms": true},
+	&"port": {"name": "Industrial Port", "coast": Color(0.5, 0.5, 0.48), "inland": Color(0.36, 0.36, 0.36),
+		"building": Color(0.7, 0.3, 0.2), "foliage": Color(0.25, 0.4, 0.22), "sky": Color(0.6, 0.62, 0.66),
+		"fog": 0.0, "palms": false},
+	&"volcano": {"name": "Volcano", "coast": Color(0.22, 0.2, 0.2), "inland": Color(0.32, 0.28, 0.26),
+		"building": Color(0.3, 0.27, 0.26), "foliage": Color(0.16, 0.13, 0.12), "sky": Color(0.35, 0.18, 0.14),
+		"fog": 0.0, "palms": false},
+}
+const ISLAND_BIOMES: Array[StringName] = [&"beach", &"town", &"jungle", &"port"]
+const LAVA_PLAYER_DPS: float = 18.0
+const LAVA_ENEMY_DPS: float = 30.0
+
 ## Supply caches
 const CACHE_RADIUS: float = 2.0
 const CACHE_OPEN_TIME: float = 1.5

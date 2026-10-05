@@ -85,6 +85,19 @@ O perfil grava-se em `user://profile.json`. No Windows fica em
 `%APPDATA%\Godot\app_userdata\Horde Breaker Remake\`. Apagar o ficheiro
 recomeça o perfil.
 
+## Biomas
+
+Cada rota no barco mostra o bioma da próxima ilha. A 3.ª ilha é sempre o
+Vulcão.
+
+| Bioma | Layout | Particularidade |
+|---|---|---|
+| Beach | aberto, cabanas e palmeiras espaçadas | poucos sítios para te esconderes |
+| Coastal Town | quarteirões em grelha, ruas de 5 m | corredores e esquinas |
+| Jungle | palmeiras muito densas, ruínas, névoa | +40 % de especiais (mais Grabbers) |
+| Industrial Port | filas de contentores coloridos | corredores estreitos |
+| Volcano | cinza, árvores queimadas | poças de lava que ferem toda a gente (atrai a horda para lá) |
+
 ## Rotas (modificadores de ilha)
 
 No barco, além do mantimento (1/2/3), escolhes a rota (4/5, ou LB/RB no

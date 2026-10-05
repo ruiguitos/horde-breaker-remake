@@ -26,7 +26,8 @@ func _soak(run_seed: int) -> void:
 	for island in RunContext.ISLAND_COUNT:
 		ctx.island_index = island
 		ctx.modifier = GameData.modifiers()[(run_seed + island) % GameData.modifiers().size()].id
-		var run := IslandRun.new(ctx.island_seed())
+		ctx.biome = &"volcano" if ctx.is_last_island() else GameData.ISLAND_BIOMES[(run_seed / 101 * 2 + island) % GameData.ISLAND_BIOMES.size()]
+		var run := IslandRun.new(ctx.island_seed(), ctx.biome)
 		run.load_context(ctx)
 		var nav := FlowField.new(run.field.width, run.field.height)
 		nav.blocked = run.field.blocked
@@ -59,8 +60,8 @@ func _soak(run_seed: int) -> void:
 			if steps % 600 == 0:
 				run.use_ability(aim)
 		var ok: bool = run.objective == IslandRun.Objective.WON
-		print("%s seed %d island %d (%s): %s in %.0f s, kills %d, level %d, boss %s" % [
-			"TEST:" if ok else "TEST FAIL:", run_seed, island + 1, ctx.modifier, run.objective_text(),
+		print("%s seed %d island %d (%s, %s): %s in %.0f s, kills %d, level %d, boss %s" % [
+			"TEST:" if ok else "TEST FAIL:", run_seed, island + 1, ctx.biome, ctx.modifier, run.objective_text(),
 			run.time_alive - ctx.time_alive, run.kills - ctx.kills, run.level, run.boss_killed])
 		if not ok:
 			_failures += 1

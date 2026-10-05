@@ -20,6 +20,8 @@ var won: bool = false
 var threat: int = 1
 ## Modifier of the island being played (chosen on the boat as a route).
 var modifier: StringName = &"calm"
+## Biome of the island being played (chosen with the route).
+var biome: StringName = &"beach"
 var perks: Array[StringName] = []
 var max_hp: float = GameData.PLAYER_MAX_HP
 ## Weapons usable in this run (starting ones + armory unlocks).

@@ -14,8 +14,8 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 
 ## Gameplay
 
-- [ ] **Ilhas demasiado iguais** (playtest): variar biomas, layouts e
-  objetivos por ilha.
+- [ ] Ilhas: há 5 biomas; faltam objetivos variados e peças "à mão" (farol,
+  forte, ponte).
 
 - [ ] Rotas: mapa em grafo visível (agora são 2 opções por paragem).
 - [ ] Mais desbloqueios com Intel: cartas no pool. Equilibrar classes.

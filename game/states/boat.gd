@@ -15,6 +15,7 @@ var _status: Label
 var _routes: Array[GameData.Modifier] = []
 var _route_buttons: Array[Button] = []
 var _route_picked: bool = false
+var _route_biomes: Array[StringName] = []
 
 
 func _ready() -> void:
@@ -59,11 +60,21 @@ func _ready() -> void:
 	var a: int = _rng.randi_range(0, mods.size() - 1)
 	var b2: int = (a + _rng.randi_range(1, mods.size() - 1)) % mods.size()
 	_routes = [mods[a], mods[b2]]
+	# Each route also has a biome (the last island is always the volcano).
+	var biomes: Array[StringName] = GameData.ISLAND_BIOMES.duplicate()
+	for i in 2:
+		if context.is_last_island():
+			_route_biomes.append(&"volcano")
+		else:
+			var pick: int = _rng.randi_range(0, biomes.size() - 1)
+			_route_biomes.append(biomes[pick])
+			biomes.remove_at(pick)
 	for i in 2:
 		var rb := Button.new()
 		rb.custom_minimum_size = Vector2(335, 80)
 		rb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		rb.text = "%d. %s (Intel x%.1f)\n%s" % [i + 4, _routes[i].title, _routes[i].intel_mult, _routes[i].description]
+		rb.text = "%d. %s — %s (Intel x%.1f)\n%s" % [i + 4, GameData.BIOMES[_route_biomes[i]]["name"],
+			_routes[i].title, _routes[i].intel_mult, _routes[i].description]
 		rb.pressed.connect(_pick_route.bind(i))
 		route_row.add_child(rb)
 		_route_buttons.append(rb)
@@ -109,6 +120,7 @@ func _pick_route(i: int) -> void:
 		return
 	_route_picked = true
 	context.modifier = _routes[i].id
+	context.biome = _route_biomes[i]
 	for k in _route_buttons.size():
 		var txt: String = _route_buttons[k].text.trim_prefix("✔ ")
 		_route_buttons[k].text = ("✔ " + txt) if k == i else txt

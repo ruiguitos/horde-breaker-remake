@@ -75,7 +75,8 @@ var _sim_ms: float = 0.0
 
 func _ready() -> void:
 	GameInput.setup()
-	run = IslandRun.new(context.island_seed() if context != null else rng_seed)
+	run = IslandRun.new(context.island_seed() if context != null else rng_seed,
+		context.biome if context != null else &"beach")
 	if context != null:
 		run.load_context(context)
 	_build_world()
@@ -100,12 +101,17 @@ func _build_world() -> void:
 	var env := WorldEnvironment.new()
 	env.environment = Environment.new()
 	env.environment.background_mode = Environment.BG_COLOR
-	env.environment.background_color = Color(0.45, 0.6, 0.75)
-	if _is_volcano():
-		env.environment.background_color = Color(0.35, 0.18, 0.14)
-		env.environment.ambient_light_color = Color(0.5, 0.3, 0.25)
+	var bio: Dictionary = _biome()
+	env.environment.background_color = bio["sky"]
 	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.environment.ambient_light_color = Color(0.4, 0.42, 0.48)
+	if _is_volcano():
+		env.environment.ambient_light_color = Color(0.5, 0.3, 0.25)
+	if float(bio["fog"]) > 0.0:
+		# Jungle haze: green-tinted, light enough to still read enemies.
+		env.environment.fog_enabled = true
+		env.environment.fog_light_color = Color(bio["sky"])
+		env.environment.fog_density = bio["fog"]
 	if context != null and context.modifier == &"fog":
 		env.environment.fog_enabled = true
 		env.environment.fog_light_color = Color(0.62, 0.66, 0.7)
@@ -160,12 +166,8 @@ func _build_world() -> void:
 	for i in cells.size():
 		ground_mm.set_instance_transform(i, Transform3D(Basis(), Vector3(cells[i].x + 0.5, -0.15, cells[i].y + 0.5)))
 		var d: int = coast[cells[i].y * f.width + cells[i].x]
-		var sand := Color(0.72, 0.66, 0.48)
-		var grass := Color(0.36, 0.5, 0.26)
-		if _is_volcano():
-			# Black sand and ash; lighter cracks scattered by the noise below.
-			sand = Color(0.22, 0.2, 0.2)
-			grass = Color(0.32, 0.28, 0.26)
+		var sand: Color = _biome()["coast"]
+		var grass: Color = _biome()["inland"]
 		var c: Color = sand.lerp(grass, clampf((d - 4) / 8.0, 0.0, 1.0))
 		ground_mm.set_instance_color(i, c.darkened(rng.randf() * 0.06))
 	var ground := MultiMeshInstance3D.new()
@@ -182,12 +184,28 @@ func _build_world() -> void:
 		box.size = Vector3(r.size.x, h, r.size.y)
 		b.mesh = box
 		b.position = Vector3(r.position.x + r.size.x * 0.5, h * 0.5, r.position.y + r.size.y * 0.5)
-		b.material_override = _mat(Color(0.5, 0.5, 0.52).darkened(rng.randf() * 0.25))
+		b.material_override = _mat(_building_color(r, rng))
 		add_child(b)
 		_buildings.append(b)
 		_building_boxes.append(AABB(Vector3(r.position.x, 0, r.position.y), Vector3(r.size.x, h, r.size.y)))
 
 	_build_props(rng)
+	for k in run.map.lava.size():
+		var pool := MeshInstance3D.new()
+		var disc := CylinderMesh.new()
+		disc.top_radius = run.map.lava_radius[k]
+		disc.bottom_radius = run.map.lava_radius[k]
+		disc.height = 0.08
+		pool.mesh = disc
+		pool.position = run.map.lava[k] + Vector3(0, 0.03, 0)
+		pool.material_override = _mat(Color(1.0, 0.4, 0.05), true)
+		add_child(pool)
+		var heat := OmniLight3D.new()
+		heat.light_color = Color(1, 0.45, 0.1)
+		heat.omni_range = run.map.lava_radius[k] * 2.5
+		heat.light_energy = 0.6
+		heat.position = run.map.lava[k] + Vector3(0, 1.0, 0)
+		add_child(heat)
 	if _is_volcano():
 		# The volcano itself, rising from the sea north of the island.
 		var cone := MeshInstance3D.new()
@@ -405,9 +423,14 @@ func _build_props(rng: RandomNumberGenerator) -> void:
 		var p := Vector3(trees[i].x + 0.5, 0, trees[i].y + 0.5)
 		var sc: float = rng.randf_range(0.8, 1.3)
 		trunk_mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * sc), p + Vector3(0, 1.1 * sc, 0)))
-		var green := Color(0.2, 0.42, 0.2).lightened(rng.randf() * 0.15)
-		if _is_volcano():
-			green = Color(0.16, 0.13, 0.12).lightened(rng.randf() * 0.1)  # charred
+		var green: Color = Color(_biome()["foliage"]).lightened(rng.randf() * 0.15)
+		if _biome()["palms"]:
+			# Palm: tall thin trunk, one flat wide crown.
+			trunk_mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3(0.7, 1.5, 0.7) * sc), p + Vector3(0, 1.65 * sc, 0)))
+			crown_mm.set_instance_transform(i * 2, Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(1.7, 0.3, 1.7) * sc), p + Vector3(0, 3.4 * sc, 0)))
+			crown_mm.set_instance_color(i * 2, green)
+			crown_mm.set_instance_transform(i * 2 + 1, Transform3D(Basis().scaled(Vector3.ZERO), p))
+			continue
 		for k in 2:
 			var ks: float = sc * (1.0 - 0.3 * k)
 			crown_mm.set_instance_transform(i * 2 + k, Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * ks), p + Vector3(0, (2.4 + 1.1 * k) * sc, 0)))
@@ -734,7 +757,24 @@ func _draw_laser() -> void:
 
 
 func _is_volcano() -> bool:
-	return context != null and context.is_last_island()
+	return run.map.biome == &"volcano"
+
+
+func _biome() -> Dictionary:
+	return GameData.BIOMES.get(run.map.biome, GameData.BIOMES[&"beach"])
+
+
+## Building colour by biome: painted houses in town, bright containers in the
+## port, weathered stone elsewhere.
+func _building_color(r: Rect2i, rng: RandomNumberGenerator) -> Color:
+	match run.map.biome:
+		&"town":
+			var paints: Array[Color] = [Color(0.85, 0.8, 0.65), Color(0.75, 0.55, 0.45), Color(0.6, 0.7, 0.75), Color(0.85, 0.85, 0.82)]
+			return paints[rng.randi_range(0, paints.size() - 1)]
+		&"port":
+			var paints: Array[Color] = [Color(0.75, 0.25, 0.15), Color(0.2, 0.4, 0.7), Color(0.85, 0.6, 0.15), Color(0.25, 0.55, 0.3)]
+			return paints[rng.randi_range(0, paints.size() - 1)]
+	return Color(_biome()["building"]).darkened(rng.randf() * 0.2)
 
 
 func _draw_rocks() -> void:
