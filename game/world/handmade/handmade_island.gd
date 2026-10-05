@@ -25,6 +25,9 @@ extends Node3D
 ## prints a report: what blocks, what is unreachable from the boat.
 @export_tool_button("Check map", "Search") var check_button: Callable = check_map
 
+## Islands used by the run: <biome>_<anything>.tscn (beach_01.tscn,
+## town_harbour.tscn...). One is picked per island; none = generated island.
+const ISLANDS_DIR: String = "res://game/world/handmade/islands/"
 const GROUND_MARGIN: float = 0.15
 const NO_TERRAIN: float = 0.0  ## height used when there is no Terrain3D
 
@@ -40,18 +43,14 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	# Ground: height per cell (centre), sea and cliffs.
 	var heights := PackedFloat32Array()
 	heights.resize(size * size)
-	var terrain: Node = get_node_or_null("Terrain3D")
-	var data: Object = terrain.get("data") if terrain != null else null
-	if terrain != null and data == null:
-		problems.append("Terrain3D has no data yet (open the scene in the editor once).")
+	var regions: Dictionary = _load_regions(problems)
 	for z in size:
 		for x in size:
-			var h: float = NO_TERRAIN
-			if data != null:
-				h = data.call("get_height", Vector3(x + 0.5, 0, z + 0.5))
-				if is_nan(h):
-					h = sea_level - 10.0  # outside the sculpted regions: open sea
-			heights[z * size + x] = h
+			# Cell centre = mean of its four corner vertices (1 m spacing).
+			var h: float = 0.0
+			for o: Vector2i in [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]:
+				h += _vertex_height(regions, x + o.x, z + o.y)
+			heights[z * size + x] = h * 0.25 if not regions.is_empty() else NO_TERRAIN
 	for z in size:
 		for x in size:
 			var i: int = z * size + x
@@ -109,6 +108,18 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	return map
 
 
+## A hand-made island for this biome (stable per seed), or null.
+static func pick(biome_id: StringName, seed_value: int) -> PackedScene:
+	var found: PackedStringArray = []
+	for file in ResourceLoader.list_directory(ISLANDS_DIR) if DirAccess.dir_exists_absolute(ISLANDS_DIR) else PackedStringArray():
+		if file.ends_with(".tscn") and file.begins_with(String(biome_id) + "_"):
+			found.append(ISLANDS_DIR + file)
+	if found.is_empty():
+		return null
+	found.sort()
+	return load(found[absi(seed_value) % found.size()]) as PackedScene
+
+
 ## Editor button: report + grid picture (<scene>_grid.png).
 func check_map() -> void:
 	var problems: Array[String] = []
@@ -151,6 +162,52 @@ static func grid_image(map: IslandMap) -> Image:
 		img.fill_rect(Rect2i(int(p.x) - 1, int(p.z) - 1, 3, 3), Color.CYAN)
 	img.fill_rect(Rect2i(int(map.boat.x) - 2, int(map.boat.z) - 1, 5, 3), Color.YELLOW)
 	return img
+
+
+## Terrain3D region files (terrain3d_00_00.res, terrain3d-01_00.res...) of the
+## Terrain3D node's data directory: Vector2i location -> height Image. Read
+## straight from disk, so it works before the node has loaded its data.
+func _load_regions(problems: Array[String]) -> Dictionary:
+	var out: Dictionary = {}
+	var terrain: Node = get_node_or_null("Terrain3D")
+	if terrain == null:
+		return out
+	var dir: String = terrain.get("data_directory")
+	if dir == "" or not DirAccess.dir_exists_absolute(dir):
+		problems.append("Terrain3D has no data directory: the ground is flat.")
+		return out
+	if not is_equal_approx(float(terrain.get("vertex_spacing")), 1.0):
+		problems.append("Terrain3D vertex_spacing must be 1.0.")
+	var re := RegEx.create_from_string("terrain3d([_-]\\d+)([_-]\\d+)\\.res$")
+	for file in DirAccess.get_files_at(dir):
+		var m: RegExMatch = re.search(file.trim_suffix(".remap"))
+		if m == null:
+			continue
+		var region: Resource = load(dir.path_join(file.trim_suffix(".remap")))
+		var img: Image = region.get("height_map") if region != null else null
+		if img == null:
+			continue
+		if img.is_compressed():
+			img.decompress()
+		out[Vector2i(_loc(m.get_string(1)), _loc(m.get_string(2)))] = img
+	return out
+
+
+static func _loc(part: String) -> int:
+	return int(part.substr(1)) * (-1 if part.begins_with("-") else 1)
+
+
+## Height of the terrain vertex (x, z); far below the sea when no region
+## covers it (unsculpted area = open sea).
+func _vertex_height(regions: Dictionary, x: int, z: int) -> float:
+	for loc: Vector2i in regions:
+		var img: Image = regions[loc]
+		var rs: int = img.get_width()
+		var px: int = x - loc.x * rs
+		var pz: int = z - loc.y * rs
+		if px >= 0 and pz >= 0 and px < rs and pz < rs:
+			return img.get_pixel(px, pz).r
+	return sea_level - 10.0
 
 
 func _children_of(group: String) -> Array[Node3D]:

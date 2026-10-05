@@ -166,16 +166,29 @@ continua a correr numa grelha 2D (1 célula = 1 m), por isso
 `HandmadeIsland.build_map()` (`world/handmade/handmade_island.gd`) lê a cena
 e converte-a para a grelha.
 
-**Estado:** a cena e a conversão existem e estão testadas. Ainda não se joga
-nelas: falta a altura do terreno no jogador e nos zombies (passo 3) e a
-escolha da ilha na run (passo 4).
+O jogador, os zombies, os objetivos e a câmara seguem a altura do terreno
+(`IslandMap.ground_y()`); a simulação continua plana na grelha, a altura é
+só visual. A câmara de 3.ª pessoa encurta para não entrar nas colinas.
+
+### Jogar uma ilha tua
+
+- **Testar já:** abre `world/island.tscn`, seleciona o nó raiz e arrasta a
+  tua cena para **Handmade Scene** no inspetor. Depois carrega em **F6**.
+  Lembra-te de limpar o campo antes de fazer push.
+- **Na run:** grava a cena em `game/world/handmade/islands/` com o nome
+  `<bioma>_<qualquer coisa>.tscn` (por exemplo `beach_01.tscn`; biomas:
+  `beach`, `town`, `jungle`, `port`). Quando a rota calhar nesse bioma, a
+  ilha usada é a tua em vez da gerada. Se houver várias do mesmo bioma, é
+  escolhida uma por seed.
+- **Problemas:** os problemas do *Check map* aparecem também como avisos
+  (Debugger → Errors) quando a ilha carrega.
 
 ### Começar uma ilha nova
 
-1. No FileSystem, duplica `game/world/handmade/island_template.tscn` (por
-   exemplo `beach_01.tscn`) e abre-a.
+1. No FileSystem, duplica `game/world/handmade/island_template.tscn` para
+   `game/world/handmade/islands/beach_01.tscn` (por exemplo) e abre-a.
 2. Seleciona o nó **Terrain3D** e, no inspetor, muda **Data Directory** para
-   uma pasta nova (por exemplo `res://game/world/handmade/beach_01_data`).
+   uma pasta nova (por exemplo `res://game/world/handmade/islands/beach_01_data`).
    Se não mudares, vais esculpir por cima do modelo.
 3. Grava a cena (Ctrl+S).
 

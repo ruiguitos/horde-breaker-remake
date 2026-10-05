@@ -31,6 +31,24 @@ var handmade: bool = false
 var heights: PackedFloat32Array = PackedFloat32Array()
 
 
+## Ground height under a world point (0 on flat, generated islands):
+## bilinear between cell centres, so units glide smoothly over hills.
+func ground_y(p: Vector3) -> float:
+	if heights.is_empty():
+		return 0.0
+	var w: int = field.width
+	var h: int = field.height
+	var fx: float = clampf(p.x - 0.5, 0.0, w - 1.0)
+	var fz: float = clampf(p.z - 0.5, 0.0, h - 1.0)
+	var x0: int = mini(int(fx), w - 2)
+	var z0: int = mini(int(fz), h - 2)
+	var tx: float = fx - x0
+	var tz: float = fz - z0
+	var a: float = lerpf(heights[z0 * w + x0], heights[z0 * w + x0 + 1], tx)
+	var b: float = lerpf(heights[(z0 + 1) * w + x0], heights[(z0 + 1) * w + x0 + 1], tx)
+	return maxf(lerpf(a, b, tz), -0.3)  # never under the sea surface
+
+
 static func build(rng_seed: int = 7, biome: StringName = &"beach") -> IslandMap:
 	var map := IslandMap.new()
 	map.biome = biome

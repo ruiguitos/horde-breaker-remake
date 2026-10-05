@@ -7,6 +7,8 @@ extends SceneTree
 var _failures: int = 0
 var _island: HandmadeIsland
 var _frames: int = 0
+var _scene: Node
+var _scene_frames: int = 0
 
 
 func _check(ok: bool, what: String) -> void:
@@ -25,9 +27,31 @@ func _process(_delta: float) -> bool:
 	var terrain: Node = _island.get_node("Terrain3D")
 	if (terrain.get("data") == null or terrain.get("data").call("get_region_count") == 0) and _frames < 60:
 		return false
-	_run_checks()
+	if _scene == null:
+		_run_checks()
+		# The island scene playing the template (as F6 with handmade_scene set).
+		_scene = (load("res://game/world/island.tscn") as PackedScene).instantiate()
+		_scene.set("handmade_scene", load("res://game/world/handmade/island_template.tscn"))
+		root.add_child(_scene)
+		return false
+	_scene_frames += 1
+	if _scene_frames < 10:
+		return false
+	_scene_checks()
 	quit(1 if _failures > 0 else 0)
 	return true
+
+
+func _scene_checks() -> void:
+	var run: IslandRun = _scene.get("run")
+	_check(run.map.handmade and _scene.get_node_or_null("IslandTemplate") != null, "island scene uses the hand-made map and its models")
+	_check(absf(run.map.ground_y(Vector3(110.5, 0, 55.5)) - 8.0) < 0.1 and absf(run.map.ground_y(run.map.player_start)) < 0.05,
+		"ground_y follows the terrain (hill 8 m, beach 0 m)")
+	run.player_pos = Vector3(110.5, 0, 55.5)
+	_scene.call("_draw_player_and_camera")
+	var player: Node3D = _scene.get("_player")
+	_check(absf(player.position.y - 8.0) < 0.1, "player stands on the hill (y %.2f)" % player.position.y)
+	_check(HandmadeIsland.pick(&"volcano", 1) == null, "no hand-made island for a biome -> generated")
 
 
 func _run_checks() -> void:

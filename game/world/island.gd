@@ -6,6 +6,9 @@ extends Node3D
 signal finished(won: bool)
 
 @export var rng_seed: int = 7
+## Play this hand-made island (F6 on island.tscn to test one). Empty: the run
+## picks one from HandmadeIsland.ISLANDS_DIR for the biome, or generates.
+@export var handmade_scene: PackedScene
 
 ## Set by main before the scene enters the tree; null when run with F6.
 var context: RunContext
@@ -14,6 +17,7 @@ var paused: bool = false
 ## Title-screen backdrop: no HUD, no input, hidden immortal player in the
 ## middle (the horde gathers around), slowly orbiting camera.
 var showcase: bool = false
+var _handmade: HandmadeIsland
 @export_group("Camera")
 @export var camera_pitch_deg: float = 35.0
 @export var camera_distance: float = 10.0
@@ -101,8 +105,20 @@ var _sim_ms: float = 0.0
 
 func _ready() -> void:
 	GameInput.setup()
-	run = IslandRun.new(context.island_seed() if context != null else rng_seed,
-		context.biome if context != null else &"beach")
+	var biome: StringName = context.biome if context != null else &"beach"
+	var island_seed: int = context.island_seed() if context != null else rng_seed
+	var custom: IslandMap = null
+	var scene: PackedScene = handmade_scene
+	if scene == null and not showcase:
+		scene = HandmadeIsland.pick(biome, island_seed)
+	if scene != null:
+		_handmade = scene.instantiate() as HandmadeIsland
+		add_child(_handmade)
+		var problems: Array[String] = []
+		custom = _handmade.build_map(problems)
+		for p in problems:
+			push_warning("Hand-made island %s: %s" % [scene.resource_path, p])
+	run = IslandRun.new(island_seed, biome, custom)
 	if context != null:
 		run.load_context(context)
 	_build_world()
@@ -161,6 +177,123 @@ func _build_world() -> void:
 	sea.material_override = Visuals.sea_material()
 	add_child(sea)
 
+	if _handmade != null:
+		_use_handmade_world()
+	else:
+		_build_generated_world()
+	for c in run.map.caches:
+		var crate := MeshInstance3D.new()
+		var cm := BoxMesh.new()
+		cm.size = Vector3(1.0, 0.7, 0.7)
+		crate.mesh = cm
+		crate.position = _on_ground(c) + Vector3(0, 0.35, 0)
+		crate.material_override = _mat(Color(0.3, 0.75, 0.85))
+		add_child(crate)
+		_caches.append(crate)
+
+	for g in run.map.generators:
+		var gen := MeshInstance3D.new()
+		var cyl := CylinderMesh.new()
+		cyl.top_radius = 0.8
+		cyl.bottom_radius = 1.0
+		cyl.height = 2.0
+		gen.mesh = cyl
+		gen.position = _on_ground(g) + Vector3(0, 1, 0)
+		gen.material_override = _mat(Color(0.7, 0.2, 0.15))
+		add_child(gen)
+		_generators.append(gen)
+		_generator_rings.append(_ring(g, GameData.GENERATOR_RADIUS, Color(1, 0.8, 0.2)))
+		if run.mission != &"activate":
+			gen.visible = false
+			_generator_rings[-1].visible = false
+	# Defend: an antenna in the middle of a big ring. Rescue: the survivor.
+	_defend_ring = _ring(run.site, GameData.DEFEND_RADIUS, Color(0.3, 0.8, 1.0))
+	_defend_ring.visible = run.mission == &"defend"
+	if run.mission == &"defend":
+		var mast := MeshInstance3D.new()
+		var mm := CylinderMesh.new()
+		mm.top_radius = 0.08
+		mm.bottom_radius = 0.25
+		mm.height = 6.0
+		mast.mesh = mm
+		mast.position = _on_ground(run.site) + Vector3(0, 3, 0)
+		mast.material_override = _mat(Color(0.6, 0.65, 0.7))
+		add_child(mast)
+	_survivor = MeshInstance3D.new()
+	_survivor.mesh = _capsule(0.35, 1.7)
+	_survivor.material_override = _mat(Color(1.0, 0.55, 0.1))
+	_survivor.visible = run.mission == &"rescue"
+	add_child(_survivor)
+
+	var boat := MeshInstance3D.new()
+	var hull := BoxMesh.new()
+	hull.size = Vector3(4, 1.2, 8)
+	boat.mesh = hull
+	boat.position = run.map.boat + Vector3(0, 0.3, 3)
+	boat.material_override = _mat(Color(0.45, 0.3, 0.18))
+	add_child(boat)
+	_boat_ring = _ring(run.map.boat, GameData.BOAT_RADIUS, Color(0.3, 1, 0.4))
+	_boat_ring.visible = false
+	_slam_ring = _ring(Vector3.ZERO, GameData.BOSS_SLAM_RADIUS, Color(1, 0.2, 0.1))
+	_slam_ring.visible = false
+
+	# Low-poly contractor in the selected class's kit (SoldierModel).
+	var soldier := SoldierModel.create(run.player_class)
+	_player = soldier
+	_muzzle = OmniLight3D.new()
+	_muzzle.light_color = Color(1, 0.8, 0.4)
+	_muzzle.omni_range = 6.0
+	_muzzle.light_energy = 0.0
+	soldier.muzzle.add_child(_muzzle)
+	add_child(_player)
+
+	_setup_multimesh(_enemy_mm, _capsule(0.35, 1.7), true)
+	# Heads and arms: separate MultiMeshes that follow the body transform.
+	_setup_multimesh(_head_mm, _sphere(0.24), true)
+	var arm := BoxMesh.new()
+	arm.size = Vector3(0.13, 0.13, 0.65)
+	_setup_multimesh(_arm_mm, arm, true)
+	_setup_multimesh(_orb_mm, _sphere(0.18), false, Color(0.3, 0.9, 1.0), true)
+	_setup_multimesh(_grenade_mm, _sphere(0.22), false, Color(0.15, 0.3, 0.1))
+	var warn := TorusMesh.new()
+	warn.inner_radius = 0.92
+	warn.outer_radius = 1.0
+	_setup_multimesh(_grenade_ring_mm, warn, false, Color(1, 0.25, 0.1), true)
+	_setup_multimesh(_rock_mm, _sphere(0.6), false, Color(0.3, 0.22, 0.2))
+	_setup_multimesh(_rock_ring_mm, warn, false, Color(1, 0.5, 0.1), true)
+	var chunk := BoxMesh.new()
+	chunk.size = Vector3(0.25, 0.25, 0.25)
+	_setup_multimesh(_debris_mm, chunk, true)
+	_setup_multimesh(_head_debris_mm, _sphere(0.24), true)
+
+	var tracer := MeshInstance3D.new()
+	tracer.mesh = _tracer_mesh
+	var tmat := _mat(Color(1, 0.9, 0.4), true)
+	tracer.material_override = tmat
+	add_child(tracer)
+
+	var laser := MeshInstance3D.new()
+	laser.mesh = _laser_mesh
+	_laser_mat = _mat(Color(1, 1, 1, 0.35), true)
+	_laser_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	laser.material_override = _laser_mat
+	add_child(laser)
+
+	_camera = Camera3D.new()
+	_camera.fov = camera_fov
+	add_child(_camera)
+	if _terrain != null:
+		_terrain.call("set_camera", _camera)  # terrain LOD follows this camera
+	# Biome colour grading (Color Grading addon; Forward+ only, High/Ultra).
+	_camera.compositor = Grading.compositor_for(run.map.biome)
+	Grading.apply(_camera)
+	_setup_phantom_camera()
+
+
+## Generated islands: ground (Terrain3D or tiles), buildings, props, roads,
+## lava and the volcano, all drawn from the grid map.
+func _build_generated_world() -> void:
+	var f: FlowField = run.field
 	var rng := RandomNumberGenerator.new()
 	rng.seed = rng_seed
 	# Island ground: one flat tile per walkable or building cell (one draw call).
@@ -256,113 +389,18 @@ func _build_world() -> void:
 		glow.light_energy = 2.0
 		glow.position = lava.position
 		add_child(glow)
-	for c in run.map.caches:
-		var crate := MeshInstance3D.new()
-		var cm := BoxMesh.new()
-		cm.size = Vector3(1.0, 0.7, 0.7)
-		crate.mesh = cm
-		crate.position = c + Vector3(0, 0.35, 0)
-		crate.material_override = _mat(Color(0.3, 0.75, 0.85))
-		add_child(crate)
-		_caches.append(crate)
 
-	for g in run.map.generators:
-		var gen := MeshInstance3D.new()
-		var cyl := CylinderMesh.new()
-		cyl.top_radius = 0.8
-		cyl.bottom_radius = 1.0
-		cyl.height = 2.0
-		gen.mesh = cyl
-		gen.position = g + Vector3(0, 1, 0)
-		gen.material_override = _mat(Color(0.7, 0.2, 0.15))
-		add_child(gen)
-		_generators.append(gen)
-		_generator_rings.append(_ring(g, GameData.GENERATOR_RADIUS, Color(1, 0.8, 0.2)))
-		if run.mission != &"activate":
-			gen.visible = false
-			_generator_rings[-1].visible = false
-	# Defend: an antenna in the middle of a big ring. Rescue: the survivor.
-	_defend_ring = _ring(run.site, GameData.DEFEND_RADIUS, Color(0.3, 0.8, 1.0))
-	_defend_ring.visible = run.mission == &"defend"
-	if run.mission == &"defend":
-		var mast := MeshInstance3D.new()
-		var mm := CylinderMesh.new()
-		mm.top_radius = 0.08
-		mm.bottom_radius = 0.25
-		mm.height = 6.0
-		mast.mesh = mm
-		mast.position = run.site + Vector3(0, 3, 0)
-		mast.material_override = _mat(Color(0.6, 0.65, 0.7))
-		add_child(mast)
-	_survivor = MeshInstance3D.new()
-	_survivor.mesh = _capsule(0.35, 1.7)
-	_survivor.material_override = _mat(Color(1.0, 0.55, 0.1))
-	_survivor.visible = run.mission == &"rescue"
-	add_child(_survivor)
 
-	var boat := MeshInstance3D.new()
-	var hull := BoxMesh.new()
-	hull.size = Vector3(4, 1.2, 8)
-	boat.mesh = hull
-	boat.position = run.map.boat + Vector3(0, 0.3, 3)
-	boat.material_override = _mat(Color(0.45, 0.3, 0.18))
-	add_child(boat)
-	_boat_ring = _ring(run.map.boat, GameData.BOAT_RADIUS, Color(0.3, 1, 0.4))
-	_boat_ring.visible = false
-	_slam_ring = _ring(Vector3.ZERO, GameData.BOSS_SLAM_RADIUS, Color(1, 0.2, 0.1))
-	_slam_ring.visible = false
-
-	# Low-poly contractor in the selected class's kit (SoldierModel).
-	var soldier := SoldierModel.create(run.player_class)
-	_player = soldier
-	_muzzle = OmniLight3D.new()
-	_muzzle.light_color = Color(1, 0.8, 0.4)
-	_muzzle.omni_range = 6.0
-	_muzzle.light_energy = 0.0
-	soldier.muzzle.add_child(_muzzle)
-	add_child(_player)
-
-	_setup_multimesh(_enemy_mm, _capsule(0.35, 1.7), true)
-	# Heads and arms: separate MultiMeshes that follow the body transform.
-	_setup_multimesh(_head_mm, _sphere(0.24), true)
-	var arm := BoxMesh.new()
-	arm.size = Vector3(0.13, 0.13, 0.65)
-	_setup_multimesh(_arm_mm, arm, true)
-	_setup_multimesh(_orb_mm, _sphere(0.18), false, Color(0.3, 0.9, 1.0), true)
-	_setup_multimesh(_grenade_mm, _sphere(0.22), false, Color(0.15, 0.3, 0.1))
-	var warn := TorusMesh.new()
-	warn.inner_radius = 0.92
-	warn.outer_radius = 1.0
-	_setup_multimesh(_grenade_ring_mm, warn, false, Color(1, 0.25, 0.1), true)
-	_setup_multimesh(_rock_mm, _sphere(0.6), false, Color(0.3, 0.22, 0.2))
-	_setup_multimesh(_rock_ring_mm, warn, false, Color(1, 0.5, 0.1), true)
-	var chunk := BoxMesh.new()
-	chunk.size = Vector3(0.25, 0.25, 0.25)
-	_setup_multimesh(_debris_mm, chunk, true)
-	_setup_multimesh(_head_debris_mm, _sphere(0.24), true)
-
-	var tracer := MeshInstance3D.new()
-	tracer.mesh = _tracer_mesh
-	var tmat := _mat(Color(1, 0.9, 0.4), true)
-	tracer.material_override = tmat
-	add_child(tracer)
-
-	var laser := MeshInstance3D.new()
-	laser.mesh = _laser_mesh
-	_laser_mat = _mat(Color(1, 1, 1, 0.35), true)
-	_laser_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	laser.material_override = _laser_mat
-	add_child(laser)
-
-	_camera = Camera3D.new()
-	_camera.fov = camera_fov
-	add_child(_camera)
-	if _terrain != null:
-		_terrain.call("set_camera", _camera)  # terrain LOD follows this camera
-	# Biome colour grading (Color Grading addon; Forward+ only, High/Ultra).
-	_camera.compositor = Grading.compositor_for(run.map.biome)
-	Grading.apply(_camera)
-	_setup_phantom_camera()
+## Hand-made islands: the scene already holds terrain, models and decor.
+## Only the camera boxes are taken from the grid (buildings and rocks).
+func _use_handmade_world() -> void:
+	_terrain = _handmade.get_node_or_null("Terrain3D")
+	var preview: Node3D = _handmade.get_node_or_null("Decor/SeaPreview")
+	if preview != null:
+		preview.visible = false  # the game draws its own animated sea
+	for r in run.map.buildings:
+		var base: float = run.map.ground_y(Vector3(r.get_center().x, 0, r.get_center().y))
+		_building_boxes.append(AABB(Vector3(r.position.x, base, r.position.y), Vector3(r.size.x, 6.0, r.size.y)))
 
 
 ## Terrain3D ground (sloping sea floor, colour-mapped land). False when the
@@ -647,7 +685,7 @@ func _ring(center: Vector3, radius: float, color: Color) -> MeshInstance3D:
 	torus.inner_radius = radius - 0.12
 	torus.outer_radius = radius
 	ring.mesh = torus
-	ring.position = center + Vector3(0, 0.05, 0)
+	ring.position = _on_ground(center) + Vector3(0, 0.05, 0)
 	ring.material_override = _mat(color, true)
 	add_child(ring)
 	return ring
@@ -943,6 +981,7 @@ func _update_third_person_camera(jitter: Vector3) -> void:
 			var hit: Variant = _segment_hits_box(_tp_pivot.global_position, _tp_pivot.global_position + back * tp_distance, box)
 			if hit != null:
 				dist = minf(dist, maxf(0.8, float(hit) - 0.3))
+		dist = _terrain_limit(_tp_pivot.global_position, back, dist)
 		_pcam.call("set_spring_length", dist)
 		# Shake through the camera's offsets (Phantom Camera owns its transform).
 		_camera.h_offset = jitter.x
@@ -962,8 +1001,20 @@ func _update_manual_third_person_camera(jitter: Vector3) -> void:
 		var hit: Variant = _segment_hits_box(pivot, pivot + back * tp_distance, box)
 		if hit != null:
 			dist = minf(dist, maxf(0.8, float(hit) - 0.3))
+	dist = _terrain_limit(pivot, back, dist)
 	_camera.position = pivot + back * dist + jitter
 	_camera.look_at(pivot + jitter * 0.5)
+
+
+## Shortens the camera arm so the camera never ends up inside a hill.
+func _terrain_limit(pivot: Vector3, back: Vector3, dist: float) -> float:
+	var d: float = 0.5
+	while d <= dist:
+		var p: Vector3 = pivot + back * d
+		if p.y < run.map.ground_y(p) + 0.4:
+			return maxf(0.8, d - 0.5)
+		d += 0.5
+	return dist
 
 
 ## Distance along the segment a→b to the box, or null if it does not hit.
@@ -979,8 +1030,13 @@ const FLY_SPEED: float = 12.0
 const FLY_MAX: float = 120.0
 
 
+## A simulation point (y = 0) lifted onto the terrain.
+func _on_ground(p: Vector3) -> Vector3:
+	return Vector3(p.x, p.y + run.map.ground_y(p), p.z)
+
+
 func _view_pos() -> Vector3:
-	return run.player_pos + Vector3(0, _fly, 0)
+	return _on_ground(run.player_pos) + Vector3(0, _fly, 0)
 
 
 func _draw_player_and_camera() -> void:
@@ -1001,7 +1057,7 @@ func _draw_player_and_camera() -> void:
 		_player.basis = Basis.looking_at(run.dash_dir, Vector3.UP).scaled(Vector3(0.8, 0.9, 1.6))
 		if not _was_dashing:
 			_trauma = minf(1.0, _trauma + 0.35)
-			fx.emit(&"dust", run.player_pos + Vector3(0, 0.3, 0))
+			fx.emit(&"dust", _on_ground(run.player_pos) + Vector3(0, 0.3, 0))
 	_was_dashing = run.dash_time > 0.0
 	# Camera shake ("trauma" model): damage adds trauma, it decays quickly and
 	# the offset grows with trauma squared so small hits stay subtle.
@@ -1046,7 +1102,7 @@ func _draw_enemies() -> void:
 		var rot := Basis(Vector3.UP, yaw) * Basis(Vector3.RIGHT, lean) * Basis(Vector3.FORWARD, roll)
 		var sx: float = t.radius_scale
 		var bob: float = absf(sin(phase)) * 0.12 * walk
-		var center: Vector3 = h.positions[i] + Vector3(0, t.height * 0.5 + bob, 0)
+		var center: Vector3 = _on_ground(h.positions[i]) + Vector3(0, t.height * 0.5 + bob, 0)
 		_enemy_mm.set_instance_transform(i, Transform3D(rot.scaled(Vector3(sx, sy, sx)), center))
 		# Local +Z is the walking direction (yaw = atan2(v.x, v.z)).
 		var head_pos: Vector3 = center + rot * Vector3(0, t.height * 0.5 + 0.08 * sx, 0.06 * sx)
@@ -1077,10 +1133,10 @@ func _draw_laser() -> void:
 		return
 	var info: Array = run.aim_info()
 	var right := Vector3(-run.facing.z, 0, run.facing.x)
-	var from: Vector3 = run.player_pos + Vector3(0, 1.2, 0) + right * 0.22 + run.facing * 0.9
+	var from: Vector3 = _view_pos() + Vector3(0, 1.2, 0) + right * 0.22 + run.facing * 0.9
 	var to: Vector3 = from + run.facing * 12.0
 	if info[0] != -1:
-		to = run.horde.positions[info[0]] + Vector3(0, 1.5, 0)
+		to = _on_ground(run.horde.positions[info[0]]) + Vector3(0, 1.5, 0)
 	_laser_mat.albedo_color = Color(1, 0.15, 0.1, 0.8) if info[1] else Color(1, 1, 1, 0.3)
 	_laser_mesh.surface_begin(Mesh.PRIMITIVE_LINES)
 	_laser_mesh.surface_add_vertex(from)
@@ -1118,7 +1174,7 @@ func _draw_rocks() -> void:
 		var target: Vector3 = run.rocks[i]
 		var p: Vector3 = run.rock_origins[i].lerp(target, t) + Vector3(0, sin(t * PI) * 6.0, 0)
 		_rock_mm.set_instance_transform(i, Transform3D(Basis(), p))
-		_rock_ring_mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * GameData.BOSS_ROCK_RADIUS), target + Vector3(0, 0.07, 0)))
+		_rock_ring_mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * GameData.BOSS_ROCK_RADIUS), _on_ground(target) + Vector3(0, 0.07, 0)))
 
 
 func _draw_grenades() -> void:
@@ -1127,7 +1183,7 @@ func _draw_grenades() -> void:
 	_grenade_ring_mm.instance_count = n
 	var radius: float = GameData.GRENADE_RADIUS + (1.0 if run.has_perk(&"demolitions") else 0.0)
 	for i in n:
-		var p: Vector3 = run.grenades[i]
+		var p: Vector3 = _on_ground(run.grenades[i])
 		# Small arc: the grenade drops onto the target as the fuse runs out.
 		var t: float = 1.0 - run.grenade_fuses[i] / GameData.GRENADE_FUSE
 		var height: float = 0.25 + 2.0 * (1.0 - t) * t * 4.0 * 0.5
@@ -1139,7 +1195,7 @@ func _draw_orbs() -> void:
 	_orb_mm.instance_count = run.orbs.size()
 	var bob: float = sin(Time.get_ticks_msec() * 0.006) * 0.15
 	for i in run.orbs.size():
-		_orb_mm.set_instance_transform(i, Transform3D(Basis(), run.orbs[i] + Vector3(0, 0.5 + bob, 0)))
+		_orb_mm.set_instance_transform(i, Transform3D(Basis(), _on_ground(run.orbs[i]) + Vector3(0, 0.5 + bob, 0)))
 
 
 func _draw_effects(delta: float) -> void:
@@ -1148,7 +1204,7 @@ func _draw_effects(delta: float) -> void:
 		# Sparks where shots land (a few per frame is plenty).
 		for k in mini(run.tracers.size(), 4):
 			var seg: PackedVector3Array = run.tracers[k]
-			fx.emit(&"spark", seg[1] + Vector3(0, 1.2, 0), seg[0] - seg[1])
+			fx.emit(&"spark", _on_ground(seg[1]) + Vector3(0, 1.2, 0), seg[0] - seg[1])
 		_tracers = run.tracers.duplicate()
 		_muzzle.light_energy = 3.0
 		run.tracers.clear()
@@ -1158,18 +1214,19 @@ func _draw_effects(delta: float) -> void:
 	if _tracer_life > 0.0 and not _tracers.is_empty():
 		_tracer_mesh.surface_begin(Mesh.PRIMITIVE_LINES)
 		for seg in _tracers:
-			_tracer_mesh.surface_add_vertex(seg[0] + Vector3(0, 1.2, 0))
-			_tracer_mesh.surface_add_vertex(seg[1] + Vector3(0, 1.2, 0))
+			_tracer_mesh.surface_add_vertex(_on_ground(seg[0]) + Vector3(0, 1.2, 0))
+			_tracer_mesh.surface_add_vertex(_on_ground(seg[1]) + Vector3(0, 1.2, 0))
 		_tracer_mesh.surface_end()
 
 	# Dismemberment with primitives: chunks fly off killed enemies.
 	for d in run.deaths:
 		var t: GameData.EnemyType = run.horde.types[int(d.z)]
-		fx.emit(&"blood", Vector3(d.x, t.height * 0.7, d.y))
+		var gy: float = run.map.ground_y(Vector3(d.x, 0, d.y))
+		fx.emit(&"blood", Vector3(d.x, gy + t.height * 0.7, d.y))
 		if int(d.z) in [GameData.EnemyKind.BRUTE, GameData.EnemyKind.BOSS]:
 			_hitstop = 0.08  # freeze the simulation briefly: the kill "lands"
 			_trauma = minf(1.0, _trauma + 0.3)
-		var origin := Vector3(d.x, 1.0, d.y)
+		var origin := Vector3(d.x, gy + 1.0, d.y)
 		var sx: float = t.radius_scale
 		for k in 3:
 			var vel := Vector3(randf_range(-3, 3), randf_range(3, 7), randf_range(-3, 3))
@@ -1177,9 +1234,9 @@ func _draw_effects(delta: float) -> void:
 		if d.w > 0.5:
 			# Headshot: the head pops off, upwards, with a spray of red bits.
 			var head_col: Color = t.color.lerp(Color(0.85, 0.8, 0.7), 0.45)
-			_add_debris(Vector3(d.x, t.height + 0.1, d.y), Vector3(randf_range(-2, 2), 9.0, randf_range(-2, 2)), head_col, -sx)
+			_add_debris(Vector3(d.x, gy + t.height + 0.1, d.y), Vector3(randf_range(-2, 2), 9.0, randf_range(-2, 2)), head_col, -sx)
 			for k in 4:
-				_add_debris(Vector3(d.x, t.height, d.y), Vector3(randf_range(-4, 4), randf_range(4, 8), randf_range(-4, 4)), Color(0.75, 0.05, 0.05), 0.4)
+				_add_debris(Vector3(d.x, gy + t.height, d.y), Vector3(randf_range(-4, 4), randf_range(4, 8), randf_range(-4, 4)), Color(0.75, 0.05, 0.05), 0.4)
 		else:
 			# Body shot: an arm comes off.
 			_add_debris(origin + Vector3(0, t.height * 0.3, 0), Vector3(randf_range(-4, 4), 5.0, randf_range(-4, 4)), t.color, sx * 1.6)
@@ -1197,8 +1254,9 @@ func _draw_effects(delta: float) -> void:
 			var v: Vector3 = _debris_vel[i]
 			v.y -= 20.0 * delta
 			var p: Vector3 = _debris_pos[i] + v * delta
-			if p.y < 0.12:
-				p.y = 0.12
+			var floor_y: float = run.map.ground_y(p) + 0.12
+			if p.y < floor_y:
+				p.y = floor_y
 				v = Vector3(v.x * 0.5, -v.y * 0.3, v.z * 0.5)
 			_debris_pos[i] = p
 			_debris_vel[i] = v
@@ -1228,7 +1286,7 @@ func _draw_effects(delta: float) -> void:
 	for e in run.explosions:
 		var boom := MeshInstance3D.new()
 		boom.mesh = _sphere(3.0)
-		boom.position = e + Vector3(0, 0.5, 0)
+		boom.position = _on_ground(e) + Vector3(0, 0.5, 0)
 		var bm := _mat(Color(1, 0.55, 0.1, 0.55), true)
 		bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		boom.material_override = bm
@@ -1272,7 +1330,7 @@ func _fade_occluders(delta: float) -> void:
 func _draw_mission() -> void:
 	if run.mission == &"rescue":
 		_survivor.visible = not run.survivor_lost
-		_survivor.position = run.survivor_pos + Vector3(0, 0.85 + (0.0 if run.survivor_found else absf(sin(Time.get_ticks_msec() * 0.006)) * 0.3), 0)
+		_survivor.position = _on_ground(run.survivor_pos) + Vector3(0, 0.85 + (0.0 if run.survivor_found else absf(sin(Time.get_ticks_msec() * 0.006)) * 0.3), 0)
 	if run.mission == &"defend":
 		var m2: StandardMaterial3D = _defend_ring.material_override
 		var inside: bool = run.player_pos.distance_to(run.site) <= GameData.DEFEND_RADIUS
@@ -1294,7 +1352,7 @@ func _draw_mission() -> void:
 	# Boss slam telegraph: a ring that pulses faster as the slam gets closer.
 	_slam_ring.visible = run.slam_time > 0.0
 	if _slam_ring.visible:
-		_slam_ring.position = run.slam_pos + Vector3(0, 0.08, 0)
+		_slam_ring.position = _on_ground(run.slam_pos) + Vector3(0, 0.08, 0)
 		var urgency: float = 1.0 - run.slam_time / GameData.BOSS_SLAM_WINDUP
 		var m: StandardMaterial3D = _slam_ring.material_override
 		m.albedo_color = Color(1, 0.2, 0.1).lerp(Color(1, 1, 1), absf(sin(urgency * urgency * 30.0)))
