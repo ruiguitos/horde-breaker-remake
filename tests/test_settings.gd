@@ -54,6 +54,17 @@ func _test_display_graphics() -> void:
 	_check(root.msaa_3d == Viewport.MSAA_4X, "MSAA 4x reaches the viewport")
 	sun.free()
 	Engine.max_fps = 0
+	# HUD size: the slider scales the HUD's field panels live.
+	var hud := Hud.new()
+	hud.profile = _profile
+	root.add_child(hud)
+	_panel.call("_show", "DISPLAY")
+	var hud_slider: HSlider = _panel.find_child("Slider_HUD_size", true, false)
+	hud_slider.value = 70
+	var field: Control = hud.find_child("FieldPanels", true, false)
+	_check(_profile.hud_scale == 70 and field != null and is_equal_approx(field.scale.x, 0.7)
+		and is_equal_approx(field.size.x * 0.7, root.get_visible_rect().size.x), "HUD size 70% scales the panels and keeps them full-screen")
+	hud.queue_free()
 
 
 ## Controls tab: rebinding through the G.U.I.D.E detector result updates the

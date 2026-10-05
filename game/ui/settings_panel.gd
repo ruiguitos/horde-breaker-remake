@@ -87,6 +87,10 @@ func _display() -> void:
 	var caps: Array[String] = []
 	for c in GraphicsSettings.FPS_CAPS:
 		caps.append("Unlimited" if c == 0 else str(c))
+	_percent_row("HUD size", profile.hud_scale, 60, func(v: int) -> void:
+		profile.hud_scale = v
+		profile.save()
+		get_tree().call_group(&"hud", &"apply_hud_scale"))
 	_options("FPS limit", caps, maxi(0, GraphicsSettings.FPS_CAPS.find(profile.max_fps)), func(i: int) -> void:
 		profile.max_fps = GraphicsSettings.FPS_CAPS[i]
 		_apply_display())

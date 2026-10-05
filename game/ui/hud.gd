@@ -31,6 +31,7 @@ var _stamina_bar: ProgressBar
 var _info: Label
 var _objective: Label
 var _marker: Label
+var _field: Control  ## scaled by the HUD size setting
 var _messages: Label
 var _debug: Label
 var _cards_panel: PanelContainer
@@ -116,7 +117,14 @@ func _init() -> void:
 	root.theme = UiTheme.get_theme()
 	add_child(root)
 
-	_build_field_hud(root)
+	# Field panels live in their own full-screen layer so "HUD size"
+	# (Settings > Display) can scale them; world markers stay unscaled.
+	_field = Control.new()
+	_field.name = "FieldPanels"
+	_field.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(_field)
+	_build_field_hud(_field)
+	add_to_group(&"hud")
 
 	_marker = Label.new()
 	_marker.add_theme_font_size_override("font_size", 18)
@@ -677,3 +685,23 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _pause_panel.visible and not is_instance_valid(_pause_dialog) and event.is_action_pressed(&"ui_cancel"):
 		get_viewport().set_input_as_handled()
 		resume_requested.emit()
+
+
+## HUD size (Settings > Display): scales the field panels around the screen
+## edges. The layer is resized to viewport / scale so anchored panels still
+## hug the corners at any size.
+func apply_hud_scale() -> void:
+	if _field == null or not is_inside_tree():
+		return
+	var percent: int = profile.hud_scale if profile != null else 100
+	var s: float = clampf(percent / 100.0, 0.5, 1.0)
+	var view: Vector2 = get_viewport().get_visible_rect().size
+	_field.scale = Vector2(s, s)
+	_field.position = Vector2.ZERO
+	_field.size = view / s
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_READY:
+		apply_hud_scale()
+		get_viewport().size_changed.connect(apply_hud_scale)

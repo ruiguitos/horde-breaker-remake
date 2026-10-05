@@ -39,6 +39,7 @@ var render_scale: int = 100  ## 3D resolution in percent of the window
 var antialias: int = GraphicsSettings.AA_FXAA
 var third_person: bool = true  ## island camera: over-the-shoulder (V toggles top-down)
 var mouse_sensitivity: int = 50  ## percent
+var hud_scale: int = 100  ## HUD size in percent (60..100)
 ## Rebound keys: action -> "key:N" / "mouse:N" (see GameInput.REBINDABLE).
 var key_bindings: Dictionary = {}
 
@@ -77,6 +78,7 @@ static func from_dict(d: Dictionary) -> Profile:
 	if res.size() == 2 and res[0].is_valid_int() and res[1].is_valid_int():
 		p.resolution = Vector2i(maxi(640, int(res[0])), maxi(360, int(res[1])))
 	p.vsync = bool(d.get("vsync", true))
+	p.hud_scale = clampi(int(d.get("hud_scale", 100)), 60, 100)
 	p.third_person = bool(d.get("third_person", true))
 	var kb: Variant = d.get("key_bindings", {})
 	if kb is Dictionary:
@@ -118,7 +120,7 @@ func save(path: String = PATH) -> bool:
 		"unlocked_classes": unlocked_classes.map(func(x: StringName) -> String: return String(x)),
 		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x)),
 		"quality": quality, "window_mode": window_mode, "resolution": "%dx%d" % [resolution.x, resolution.y],
-		"vsync": vsync, "third_person": third_person, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias}, "  "))
+		"vsync": vsync, "hud_scale": hud_scale, "third_person": third_person, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias}, "  "))
 	return true
 
 

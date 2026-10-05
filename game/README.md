@@ -41,6 +41,8 @@ hora e fica gravado no perfil (`core/graphics_settings.gd` aplica ecrã e
 gráficos):
 - **Display:** modo de janela (janela, ecrã inteiro sem bordas, ecrã inteiro
   exclusivo), resolução (em janela), VSync e limite de FPS.
+  Também tem **HUD size** (60–100 %), que encolhe os painéis do HUD e os
+  mantém encostados aos cantos.
 - **Graphics:** preset Low / Medium / High / Ultra, que muda de facto o jogo:
   - **Low:** sem sombras, bloom nem SSAO, e menos detalhe ao longe.
   - **Medium:** sombras do sol com 2 divisões e bloom.

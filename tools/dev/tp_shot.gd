@@ -1,6 +1,6 @@
 extends SceneTree
 ## Dev tool: screenshot of an island with the third-person camera.
-## xvfb-run godot --rendering-driver opengl3 --path . --script res://tools/dev/tp_shot.gd -- out.png [biome]
+## xvfb-run godot --rendering-driver opengl3 --path . --script res://tools/dev/tp_shot.gd -- out.png [biome] [hud%]
 var _f: int = 0
 var _island: Node
 func _initialize() -> void:
@@ -9,6 +9,10 @@ func _initialize() -> void:
 	var ctx := RunContext.new(31)
 	ctx.biome = StringName(args[1]) if args.size() > 1 else &"town"
 	_island.set("context", ctx)
+	if args.size() > 2:  # optional HUD size in percent
+		var prof := Profile.new()
+		prof.hud_scale = int(args[2])
+		_island.set("profile", prof)
 	root.add_child(_island)
 func _process(_d: float) -> bool:
 	_f += 1
