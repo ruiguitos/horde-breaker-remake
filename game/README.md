@@ -39,8 +39,11 @@ O volume ajusta-se no Armory (− / +) e fica gravado no perfil.
 
 ## Como se joga
 
-- A arma **dispara sozinha** contra o inimigo mais próximo dentro de um cone
-  de 50° à tua frente. Se o alvo estiver quase exatamente onde olhas (±9°),
+- A arma **dispara sozinha** contra um inimigo dentro de um cone de 50° à tua
+  frente. Ganha o que tiver menor "distância + 0,4 m por grau de desvio",
+  por isso **virar-te para um inimigo torna-o o alvo**, mesmo que haja outros
+  mais perto de lado. Exceção: quem estiver a menos de 2,5 m é sempre
+  alvejado primeiro. Se o alvo estiver quase exatamente onde olhas (±9°),
   é **headshot** (dano ×2,5). Ou seja: mira-se com o corpo. A **mira laser**
   liga a arma ao alvo atual e fica vermelha quando o próximo tiro é headshot.
 - **Breaker**: investida de 5 m que empurra e atordoa tudo no caminho, dá dano
@@ -100,13 +103,13 @@ comando) entre duas ilhas sorteadas:
 A última ilha tem outro ambiente: cinza preta, árvores queimadas, luz
 vermelha e o vulcão a norte.
 
-Na última ilha, depois dos 3 geradores, aparece o **Behemoth**: 2400 de HP,
+Na última ilha, depois dos 3 geradores, aparece o **Behemoth**: 1800 de HP base,
 blindado à frente (−50 %) e não é empurrado.
 - **Golpe no chão**: quando estás a menos de 9 m, para e mostra um anel
   vermelho de 6 m, que pisca cada vez mais depressa. Ao fim de 1,2 s
   rebenta: 30 de dano se estiveres dentro. Sai do anel ou usa o breaker,
   que te torna invulnerável.
-- **Chama Runners**: a cada 9 s aparecem 6 à volta dele.
+- **Chama Runners**: a cada 9 s aparecem 4 à volta dele.
 - **Rochas**: se te afastas mais de 12 m, atira rochas para onde estás. Um
   anel laranja marca o sítio e caem 1,5 s depois (20 de dano). Não dá para
   fugir dele para sempre.
@@ -192,6 +195,10 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 | `ui/hud.gd` | HUD em código. |
 | `audio/sfx.gd`, `audio/music.gd` | Sons e música sintetizados em código. |
 | `data/game_data.gd` | Dados e valores de equilíbrio. |
+
+`tests/test_soak_run.gd` é um bot que joga runs completas (3 ilhas, boss
+incluído, invencível) e garante que se conseguem acabar. Foi ele que mostrou
+que o boss demorava 6 minutos: o auto-fire disparava nos Runners à volta.
 
 Porquê separar `island_run` (regras) de `island` (cena): assim os testes
 correm o jogo inteiro sem janela (`tests/test_island_run.gd` tem um bot que

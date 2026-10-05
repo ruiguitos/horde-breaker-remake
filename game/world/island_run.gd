@@ -456,23 +456,33 @@ func _auto_fire(dt: float) -> void:
 
 
 ## Nearest visible enemy inside the aim cone.
+## Best visible enemy inside the aim cone. Score = distance + 0.4 m per
+## degree off the facing direction, so turning towards an enemy (a special,
+## the boss) makes it the target ("aim with your body"). Enemies within
+## 2.5 m always win: whoever is biting you gets shot first.
 func _pick_target(range_m: float) -> int:
 	var best: int = -1
-	var best_d2: float = INF
+	var best_score: float = INF
 	var cos_cone: float = cos(deg_to_rad(GameData.AIM_CONE_DEG))
 	for i in horde.query_radius(player_pos, range_m):
 		if _dead.has(i):
 			continue
 		var to: Vector3 = horde.positions[i] - player_pos
-		var d2: float = to.x * to.x + to.z * to.z
-		if d2 >= best_d2 or d2 < 0.0001:
+		var d: float = sqrt(to.x * to.x + to.z * to.z)
+		if d < 0.01:
 			continue
-		if facing.dot(Vector3(to.x, 0, to.z) / sqrt(d2)) < cos_cone:
+		var c: float = facing.dot(Vector3(to.x, 0, to.z) / d)
+		if c < cos_cone:
+			continue
+		var score: float = d + rad_to_deg(acos(clampf(c, -1.0, 1.0))) * 0.4
+		if d < 2.5:
+			score -= 100.0
+		if score >= best_score:
 			continue
 		if not _line_of_sight(player_pos, horde.positions[i]):
 			continue
 		best = i
-		best_d2 = d2
+		best_score = score
 	return best
 
 

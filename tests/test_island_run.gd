@@ -26,6 +26,7 @@ func _initialize() -> void:
 	_test_sprint()
 	_test_classes()
 	_test_caches()
+	_test_target_priority()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -364,3 +365,15 @@ func _test_caches() -> void:
 	for t in int(GameData.CACHE_OPEN_TIME / DT) + 5:
 		run.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)
 	_check(reachable and run.cache_progress[0] >= GameData.CACHE_OPEN_TIME, "4 reachable caches; standing at one opens it")
+
+
+func _test_target_priority() -> void:
+	var run := IslandRun.new(7)
+	run.director.max_alive = 0
+	var p: Vector3 = run.player_pos
+	var side: int = run.horde.add(p + Vector3(-3.5, 0, -5), GameData.EnemyKind.WALKER, run.rng)  # nearer, ~35° off
+	var ahead: int = run.horde.add(p + Vector3(0, 0, -9), GameData.EnemyKind.BRUTE, run.rng)  # farther, dead ahead
+	run.facing = Vector3(0, 0, -1)
+	_check(run.aim_info()[0] == ahead and run.aim_info()[1], "facing an enemy makes it the target (headshot) over a nearer one off to the side")
+	run.horde.positions[side] = p + Vector3(-1.0, 0, -1.6)
+	_check(run.aim_info()[0] == side, "an enemy within 2.5 m always takes priority")

@@ -163,7 +163,7 @@ const BOSS_SLAM_WINDUP: float = 1.2    ## telegraph time: get out of the ring!
 const BOSS_SLAM_DAMAGE: float = 30.0
 const BOSS_SLAM_COOLDOWN: float = 5.0
 const BOSS_SUMMON_INTERVAL: float = 9.0
-const BOSS_SUMMON_COUNT: int = 6
+const BOSS_SUMMON_COUNT: int = 4
 
 ## Weapons available from the start; the others are bought in the armory.
 const STARTING_WEAPONS: Array[StringName] = [&"rifle", &"shotgun", &"pistol"]
@@ -217,7 +217,7 @@ static func enemy_types() -> Array[EnemyType]:
 	brute.pushable = false
 	var grabber := EnemyType.new(&"grabber", "Grabber", 70.0, Vector2(2.8, 3.2), 4.0, 0.5, 1.1, 1.9, Color(0.55, 0.35, 0.75), 3)
 	grabber.grabs = true
-	var boss := EnemyType.new(&"behemoth", "Behemoth", 2400.0, Vector2(1.7, 1.7), 35.0, 1.4, 3.0, 4.2, Color(0.3, 0.12, 0.15), 40)
+	var boss := EnemyType.new(&"behemoth", "Behemoth", 1800.0, Vector2(1.7, 1.7), 35.0, 1.4, 3.0, 4.2, Color(0.3, 0.12, 0.15), 40)
 	boss.front_armor = 0.5
 	boss.pushable = false
 	var bloater := EnemyType.new(&"bloater", "Bloater", 90.0, Vector2(1.3, 1.5), 10.0, 1.2, 1.7, 1.6, Color(0.5, 0.65, 0.2), 3)
