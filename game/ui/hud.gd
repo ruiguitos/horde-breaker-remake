@@ -4,6 +4,8 @@ extends CanvasLayer
 ## card choice and end screen. Reads IslandRun every frame.
 
 signal card_chosen(index: int)
+signal resume_requested
+signal abandon_requested
 
 var debug_visible: bool = true
 
@@ -26,7 +28,7 @@ var _end_label: Label
 var _message_log: PackedStringArray = PackedStringArray()
 var _message_time: float = 0.0
 var _shown_choices: int = -1
-var _pause_label: Label
+var _pause_panel: Control
 var _damage_flash: ColorRect
 var _last_hp: float = -1.0
 
@@ -130,15 +132,30 @@ func _init() -> void:
 	_end_panel.custom_minimum_size = Vector2(400, 200)
 	_end_panel.visible = false
 	root.add_child(_end_panel)
-	_pause_label = Label.new()
-	_pause_label.set_anchors_preset(Control.PRESET_CENTER)
-	_pause_label.position = Vector2(-200, -40)
-	_pause_label.custom_minimum_size = Vector2(400, 0)
-	_pause_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_pause_label.add_theme_font_size_override("font_size", 26)
-	_pause_label.text = "PAUSED\n\nEsc: resume · Q: abandon run"
-	_pause_label.visible = false
-	root.add_child(_pause_label)
+	# Pause menu: a dimmed screen with a small panel of buttons.
+	_pause_panel = ColorRect.new()
+	(_pause_panel as ColorRect).color = Color(0, 0, 0, 0.55)
+	_pause_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_pause_panel.visible = false
+	root.add_child(_pause_panel)
+	var pbox: VBoxContainer = UiTheme.centered_panel(_pause_panel, 360)
+	pbox.add_child(UiTheme.title("PAUSED", 32))
+	var resume := Button.new()
+	resume.text = "RESUME (Esc)"
+	resume.custom_minimum_size = Vector2(0, 46)
+	resume.pressed.connect(func() -> void: resume_requested.emit())
+	pbox.add_child(resume)
+	var abandon := Button.new()
+	abandon.text = "ABANDON RUN (Q)"
+	abandon.custom_minimum_size = Vector2(0, 46)
+	abandon.pressed.connect(func() -> void: abandon_requested.emit())
+	pbox.add_child(abandon)
+	var hint := Label.new()
+	hint.text = "Intel already earned on finished islands is kept."
+	hint.add_theme_color_override("font_color", UiTheme.MUTED)
+	hint.add_theme_font_size_override("font_size", 14)
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	pbox.add_child(hint)
 	# Red screen flash when the player takes damage (drawn behind panels).
 	_damage_flash = ColorRect.new()
 	_damage_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -170,7 +187,13 @@ func _bar(parent: Control, label: String, color: Color) -> ProgressBar:
 
 
 func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = false, island_text: String = "") -> void:
-	_pause_label.visible = paused
+	if paused and not _pause_panel.visible:
+		_pause_panel.visible = true
+		for b in _pause_panel.find_children("*", "Button", true, false):
+			(b as Button).grab_focus()
+			break
+	elif not paused:
+		_pause_panel.visible = false
 	if _last_hp >= 0.0 and run.hp < _last_hp:
 		_damage_flash.color.a = clampf(_damage_flash.color.a + (_last_hp - run.hp) * 0.02, 0.0, 0.35)
 	_last_hp = run.hp

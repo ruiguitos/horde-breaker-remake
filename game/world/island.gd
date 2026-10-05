@@ -91,6 +91,8 @@ func _ready() -> void:
 		return
 	hud = Hud.new()
 	hud.card_chosen.connect(func(i: int) -> void: run.choose_card(i))
+	hud.resume_requested.connect(func() -> void: paused = false)
+	hud.abandon_requested.connect(_abandon)
 	add_child(hud)
 
 
@@ -486,9 +488,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		paused = not paused
 	elif paused:
 		if event.is_action_pressed(&"abandon"):
-			run.hp = 0.0
-			run.objective = IslandRun.Objective.LOST
-			paused = false
+			_abandon()
 	elif not run.card_choices.is_empty():
 		for i in 3:
 			if event.is_action_pressed(StringName("card_%d" % (i + 1))):
@@ -505,6 +505,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		for i in 5:
 			if event.is_action_pressed(StringName("weapon_%d" % (i + 1))):
 				run.switch_weapon(i)
+
+
+func _abandon() -> void:
+	run.hp = 0.0
+	run.objective = IslandRun.Objective.LOST
+	paused = false
 
 
 func _finish() -> void:
