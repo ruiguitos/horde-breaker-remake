@@ -22,6 +22,9 @@ var _end_label: Label
 var _message_log: PackedStringArray = PackedStringArray()
 var _message_time: float = 0.0
 var _shown_choices: int = -1
+var _pause_label: Label
+var _damage_flash: ColorRect
+var _last_hp: float = -1.0
 
 
 func _init() -> void:
@@ -75,7 +78,7 @@ func _init() -> void:
 	var help := Label.new()
 	help.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	help.position = Vector2(16, -40)
-	help.text = "WASD move · mouse aims (auto-fire) · Space/RMB breaker · 1-3 weapons · F3 debug"
+	help.text = "WASD move · mouse aims (auto-fire) · Space/RMB breaker · 1-3 weapons · Esc pause · F3 debug"
 	help.modulate = Color(1, 1, 1, 0.7)
 	root.add_child(help)
 
@@ -106,6 +109,22 @@ func _init() -> void:
 	_end_panel.custom_minimum_size = Vector2(400, 200)
 	_end_panel.visible = false
 	root.add_child(_end_panel)
+	_pause_label = Label.new()
+	_pause_label.set_anchors_preset(Control.PRESET_CENTER)
+	_pause_label.position = Vector2(-200, -40)
+	_pause_label.custom_minimum_size = Vector2(400, 0)
+	_pause_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_pause_label.add_theme_font_size_override("font_size", 26)
+	_pause_label.text = "PAUSED\n\nEsc: resume · Q: abandon run"
+	_pause_label.visible = false
+	root.add_child(_pause_label)
+	# Red screen flash when the player takes damage (drawn behind panels).
+	_damage_flash = ColorRect.new()
+	_damage_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_damage_flash.color = Color(0.8, 0, 0, 0)
+	_damage_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(_damage_flash)
+	root.move_child(_damage_flash, 0)
 	_end_label = Label.new()
 	_end_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_end_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -129,7 +148,12 @@ func _bar(parent: Control, label: String, color: Color) -> ProgressBar:
 	return bar
 
 
-func refresh(run: IslandRun, camera: Camera3D, sim_ms: float) -> void:
+func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = false, island_text: String = "") -> void:
+	_pause_label.visible = paused
+	if _last_hp >= 0.0 and run.hp < _last_hp:
+		_damage_flash.color.a = clampf(_damage_flash.color.a + (_last_hp - run.hp) * 0.02, 0.0, 0.35)
+	_last_hp = run.hp
+	_damage_flash.color.a = maxf(0.0, _damage_flash.color.a - get_process_delta_time() * 1.5)
 	_hp_bar.max_value = GameData.PLAYER_MAX_HP
 	_hp_bar.value = run.hp
 	_xp_bar.max_value = run.xp_needed()
@@ -143,7 +167,7 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float) -> void:
 		run.level, run.kills, run.headshots, run.weapon_index + 1, w.display_name, ammo_text]
 	if run.horde.grabbed_by != -1:
 		_info.text += "\nGRABBED! Use the breaker!"
-	_objective.text = run.objective_text()
+	_objective.text = (island_text + " — " if island_text != "" else "") + run.objective_text()
 
 	_update_marker(run, camera)
 
@@ -174,8 +198,8 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float) -> void:
 	_end_panel.visible = run.is_over()
 	if run.is_over():
 		var won: bool = run.objective == IslandRun.Objective.WON
-		_end_label.text = "%s\n\nTime %d s · Kills %d · Headshots %d · Level %d\nIntel earned: %d\n\nPress R (or Start) to play again" % [
-			"EXTRACTED!" if won else "YOU DIED", int(run.time_alive), run.kills, run.headshots, run.level, run.intel_earned()]
+		_end_label.text = "%s\n\nKills %d · Headshots %d · Level %d\nIntel from this island: %d\n\nEnter / A: continue" % [
+			"ISLAND CLEARED!" if won else "YOU DIED", run.kills, run.headshots, run.level, run.intel_earned()]
 
 
 ## Points at the current goal; sticks to the screen edge when off-screen.

@@ -21,10 +21,22 @@ func _initialize() -> void:
 
 func _process(_delta: float) -> bool:
 	_frames += 1
-	var island: Node = root.get_node("Main").get_child(0)
-	var run: IslandRun = island.get("run")
+	var main: Node = root.get_node("Main")
+	var current: Node = main.get("_current")
+	# Optional third arg "boat" photographs the boat screen instead.
+	if OS.get_cmdline_user_args().size() > 2 and _frames >= _target:
+		var shot: Image = root.get_viewport().get_texture().get_image()
+		shot.save_png(_out)
+		print("saved ", _out)
+		quit(0)
+		return false
+	if main.get("state") == 0 and _frames > 3:
+		current.call("_pick", 0)
+		current.emit_signal("land_requested")
+		return false
+	var run: IslandRun = current.get("run") if main.get("state") == 1 else null
 	if run != null:
-		if _frames == 2:
+		if run.horde.count < 10:
 			for k in 40:
 				var a: float = k * 0.7
 				var pos: Vector3 = run.player_pos + Vector3(cos(a), 0, sin(a)) * (6.0 + k * 0.15)

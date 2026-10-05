@@ -15,6 +15,7 @@ func _initialize() -> void:
 	_test_breaker_frees_grab()
 	_test_mission_flow()
 	_test_bot_survives_a_while()
+	_test_profile_roundtrip()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -139,3 +140,17 @@ func _test_bot_survives_a_while() -> void:
 	print("  bot: %.0f s, objective %s, kills %d, level %d, hp %.0f, max alive %d, %.2f ms/step" % [
 		run.time_alive, run.objective_text(), run.kills, run.level, run.hp, max_alive, ms])
 	_check(run.kills > 20 and max_alive <= GameData.MAX_ALIVE, "bot run: enemies spawn, die and stay under the cap")
+
+
+func _test_profile_roundtrip() -> void:
+	var path: String = "user://test_profile.json"
+	var ctx := RunContext.new(5)
+	ctx.intel = 42
+	ctx.kills = 300
+	ctx.won = true
+	var p := Profile.new()
+	p.record_run(ctx)
+	p.save(path)
+	var q: Profile = Profile.load_profile(path)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	_check(q.intel == 42 and q.runs == 1 and q.extractions == 1 and q.best_kills == 300, "profile saves and loads Intel and stats")

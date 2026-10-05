@@ -26,6 +26,8 @@ var target: Vector3 = Vector3.ZERO
 var damage_to_player: float = 0.0
 var grabbed_by: int = -1
 
+## Enemy HP multiplier (later islands are tougher).
+var hp_scale: float = 1.0
 var separation_strength: float = 6.0
 var field_budget: int = 2000
 var steering: float = 10.0
@@ -48,7 +50,7 @@ func add(pos: Vector3, kind: int, rng: RandomNumberGenerator) -> int:
 	velocities.append(Vector3.ZERO)
 	speeds.append(rng.randf_range(t.speed_min, t.speed_max))
 	kinds.append(kind)
-	hp.append(t.hp)
+	hp.append(t.hp * hp_scale)
 	stun.append(0.0)
 	attack_cd.append(rng.randf_range(0.0, t.attack_interval))
 	flash.append(0.0)

@@ -1,7 +1,9 @@
 # Vertical slice — Dawn Beach
 
-Grey-box jogável (só primitivas Godot): 1 ilha, 1 classe (Recruit),
-3 armas, 4 inimigos, missão "Activate 3" e regresso ao barco.
+Grey-box jogável (só primitivas Godot): uma run de **3 ilhas** (layout
+diferente em cada uma), 1 classe (Recruit), 3 armas, 4 inimigos, missão
+"Activate 3" e regresso ao barco. Entre ilhas, o barco oferece "escolhe 1 de 3".
+O Intel ganho fica gravado no perfil, mesmo quando se morre.
 
 ## Como correr no Godot (Windows)
 
@@ -26,7 +28,8 @@ Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 | Breaker (investida) | Espaço ou botão direito | A ou RB |
 | Trocar arma | 1 / 2 / 3 | D-pad ← ↑ → |
 | Escolher carta | 1 / 2 / 3 ou clique | X / Y / B |
-| Recomeçar no fim | R | Start |
+| Continuar no fim da ilha | Enter / R | A / Start |
+| Pausa (Q na pausa abandona) | Esc | Start |
 | Painel de debug | F3 | — |
 
 ## Como se joga
@@ -54,6 +57,27 @@ Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 - O **diretor** alterna calma → crescer → pico (ver F3). O máximo é de 150
   inimigos vivos.
 
+## Fluxo da run
+
+Barco (1 de 3: cura, munição ou carta) → ilha → ilha limpa → barco → … →
+3.ª ilha limpa ou morte → debrief, com o Intel total → nova run. Cada ilha é
+mais dura: o HP dos inimigos sobe 30 % e há mais especiais. A vida, o nível,
+as cartas e a munição passam de ilha para ilha (`core/run_context.gd`).
+
+O perfil grava-se em `user://profile.json`. No Windows fica em
+`%APPDATA%\Godot\app_userdata\Horde Breaker Remake\`. Apagar o ficheiro
+recomeça o perfil.
+
+## Feedback visual (sem animações nem assets)
+
+- Inimigos balançam, saltitam e inclinam-se ao andar, proporcional à
+  velocidade, e tremem quando atordoados.
+- Tremor de câmara ao levar dano e no breaker. Usa um modelo de "trauma": o
+  tremor cresce com o quadrado, por isso os toques pequenos quase não se notam.
+- Flash vermelho no ecrã ao levar dano; clarão de luz na arma ao disparar.
+- Hit-stop de 80 ms ao matar um Brute: o jogo congela por um instante para o
+  golpe "pesar".
+
 ## Onde mexer nos valores
 
 Todos os números de equilíbrio (HP, dano, velocidades, cooldowns, cartas)
@@ -66,7 +90,10 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 
 | Ficheiro | O quê |
 |---|---|
-| `main.gd` | Cria a ilha e recomeça-a. |
+| `main.gd` | Máquina de estados da run: barco → ilha → debrief. |
+| `core/run_context.gd` | O que passa de ilha para ilha. |
+| `core/profile.gd` | Perfil gravado (Intel, runs), JSON versionado. |
+| `states/boat.gd`, `states/debrief.gd` | Ecrãs do barco e do fim da run. |
 | `world/island_run.gd` | **Todas as regras**, sem nós: jogador, auto-fire, breaker, cartas, missão. Testável em headless. |
 | `world/island.gd` | Input, render (MultiMesh), câmara média e efeitos. |
 | `world/island_map.gd` | Gera a ilha (costa irregular, edifícios, geradores, barco). |
@@ -81,6 +108,4 @@ joga 90 s). E qualquer bug de regras reproduz-se em headless.
 
 ## O que ainda não existe
 
-Barco entre ilhas com "1 de 3", Intel e perks guardados entre runs, mais
-ilhas, som, animação (os inimigos deslizam), granada da classe, ecrã de
-título, pausa (Esc).
+Ver `TODO.md` na raiz.

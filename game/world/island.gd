@@ -2,9 +2,14 @@ extends Node3D
 ## The island scene: reads input, steps IslandRun at a fixed 60 Hz and draws
 ## its state with primitives (MultiMesh for the horde, orbs and debris).
 
-signal restart_requested
+## Emitted when the player leaves the end-of-island panel.
+signal finished(won: bool)
 
 @export var rng_seed: int = 7
+
+## Set by main before the scene enters the tree; null when run with F6.
+var context: RunContext
+var paused: bool = false
 @export_group("Camera")
 @export var camera_pitch_deg: float = 35.0
 @export var camera_distance: float = 10.0
@@ -32,11 +37,18 @@ var _debris_vel := PackedVector3Array()
 var _debris_life := PackedFloat32Array()
 var _debris_color := PackedColorArray()
 var _breaker_held: bool = false
+var _trauma: float = 0.0
+var _last_hp: float = -1.0
+var _was_dashing: bool = false
+var _muzzle: OmniLight3D
+var _hitstop: float = 0.0
 var _sim_ms: float = 0.0
 
 
 func _ready() -> void:
-	run = IslandRun.new(rng_seed)
+	run = IslandRun.new(context.island_seed() if context != null else rng_seed)
+	if context != null:
+		run.load_context(context)
 	_build_world()
 	hud = Hud.new()
 	hud.card_chosen.connect(func(i: int) -> void: run.choose_card(i))
@@ -141,6 +153,12 @@ func _build_world() -> void:
 	nose.position = Vector3(0, 1.2, -0.5)
 	nose.material_override = _mat(Color(0.1, 0.1, 0.1))
 	_player.add_child(nose)
+	_muzzle = OmniLight3D.new()
+	_muzzle.position = Vector3(0, 1.2, -1.0)
+	_muzzle.light_color = Color(1, 0.8, 0.4)
+	_muzzle.omni_range = 6.0
+	_muzzle.light_energy = 0.0
+	_player.add_child(_muzzle)
 	add_child(_player)
 
 	_setup_multimesh(_enemy_mm, _capsule(0.35, 1.7), true)
@@ -211,8 +229,14 @@ func _ring(center: Vector3, radius: float, color: Color) -> MeshInstance3D:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		var key: Key = event.physical_keycode
-		if run.is_over() and key == KEY_R:
-			restart_requested.emit()
+		if run.is_over() and key in [KEY_R, KEY_ENTER, KEY_KP_ENTER]:
+			_finish()
+		elif key == KEY_ESCAPE and not run.is_over():
+			paused = not paused
+		elif paused and key == KEY_Q:
+			run.hp = 0.0
+			run.objective = IslandRun.Objective.LOST
+			paused = false
 		elif not run.card_choices.is_empty() and key in [KEY_1, KEY_2, KEY_3]:
 			run.choose_card(key - KEY_1)
 		elif key in [KEY_1, KEY_2, KEY_3]:
@@ -224,8 +248,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 		_breaker_held = true
 	elif event is InputEventJoypadButton and event.pressed:
-		if run.is_over() and event.button_index == JOY_BUTTON_START:
-			restart_requested.emit()
+		if run.is_over() and event.button_index in [JOY_BUTTON_START, JOY_BUTTON_A]:
+			_finish()
+		elif event.button_index == JOY_BUTTON_START:
+			paused = not paused
 		elif not run.card_choices.is_empty() and event.button_index in [JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_B]:
 			run.choose_card([JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_B].find(event.button_index))
 		elif event.button_index in [JOY_BUTTON_A, JOY_BUTTON_RIGHT_SHOULDER]:
@@ -238,7 +264,21 @@ func _unhandled_input(event: InputEvent) -> void:
 			run.switch_weapon(2)
 
 
+func _finish() -> void:
+	var won: bool = run.objective == IslandRun.Objective.WON
+	if context != null:
+		run.save_to_context(context)
+		finished.emit(won)
+	else:
+		get_tree().reload_current_scene()
+
+
 func _physics_process(delta: float) -> void:
+	if paused:
+		return
+	if _hitstop > 0.0:
+		_hitstop -= delta
+		return
 	var move := Vector2(
 		float(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT))
 			- float(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT)),
@@ -279,28 +319,61 @@ func _process(delta: float) -> void:
 	_draw_orbs()
 	_draw_effects(delta)
 	_draw_mission()
-	hud.refresh(run, _camera, _sim_ms)
+	var label: String = ""
+	if context != null:
+		label = "Island %d/%d" % [context.island_index + 1, RunContext.ISLAND_COUNT]
+	hud.refresh(run, _camera, _sim_ms, paused, label)
 
 
 func _draw_player_and_camera() -> void:
+	var delta: float = get_process_delta_time()
 	_player.position = run.player_pos
 	_player.basis = Basis.looking_at(run.facing, Vector3.UP)
+	# Stretch along the dash direction while breaking through.
+	if run.dash_time > 0.0:
+		_player.basis = Basis.looking_at(run.dash_dir, Vector3.UP).scaled(Vector3(0.8, 0.9, 1.6))
+		if not _was_dashing:
+			_trauma = minf(1.0, _trauma + 0.35)
+	_was_dashing = run.dash_time > 0.0
+	# Camera shake ("trauma" model): damage adds trauma, it decays quickly and
+	# the offset grows with trauma squared so small hits stay subtle.
+	if _last_hp >= 0.0 and run.hp < _last_hp:
+		_trauma = minf(1.0, _trauma + (_last_hp - run.hp) * 0.04)
+	_last_hp = run.hp
+	_trauma = maxf(0.0, _trauma - delta * 1.8)
+	var shake: float = _trauma * _trauma * 0.6
+	var jitter := Vector3(randf_range(-1, 1), randf_range(-1, 1), randf_range(-1, 1)) * shake
 	var pitch: float = deg_to_rad(camera_pitch_deg)
 	var offset := Vector3(0, sin(pitch), cos(pitch)) * camera_distance
-	_camera.position = run.player_pos + Vector3(0, 1, 0) + offset
-	_camera.look_at(run.player_pos + Vector3(0, 1, 0))
+	_camera.position = run.player_pos + Vector3(0, 1, 0) + offset + jitter
+	_camera.look_at(run.player_pos + Vector3(0, 1, 0) + jitter * 0.5)
+	# Muzzle flash: a short-lived light at the gun.
+	_muzzle.light_energy = maxf(0.0, _muzzle.light_energy - delta * 40.0)
 
 
 func _draw_enemies() -> void:
 	var h: Horde = run.horde
+	var now: float = Time.get_ticks_msec() * 0.001
 	_enemy_mm.instance_count = h.count
 	for i in h.count:
 		var t: GameData.EnemyType = h.types[h.kinds[i]]
 		var v: Vector3 = h.velocities[i]
-		var yaw: float = atan2(v.x, v.z) if v.length_squared() > 0.01 else 0.0
+		var speed: float = Vector2(v.x, v.z).length()
+		var yaw: float = atan2(v.x, v.z) if speed > 0.1 else 0.0
 		var sy: float = t.height / 1.7
-		var basis := Basis(Vector3.UP, yaw).scaled(Vector3(t.radius_scale, sy, t.radius_scale))
-		_enemy_mm.set_instance_transform(i, Transform3D(basis, h.positions[i] + Vector3(0, t.height * 0.5, 0)))
+		# Zombie waddle without bones: roll side to side, bob and lean forward
+		# in proportion to speed. Stunned enemies wobble harder.
+		var walk: float = clampf(speed / 2.5, 0.0, 1.0)
+		var phase: float = now * (4.0 + speed * 2.0) + i * 1.7
+		var roll: float = sin(phase) * 0.14 * walk
+		var lean: float = 0.18 * walk
+		if h.stun[i] > 0.0:
+			roll = sin(now * 25.0 + i) * 0.3
+			lean = -0.25
+		var basis := Basis(Vector3.UP, yaw) * Basis(Vector3.RIGHT, lean) * Basis(Vector3.FORWARD, roll)
+		basis = basis.scaled(Vector3(t.radius_scale, sy, t.radius_scale))
+		var bob: float = absf(sin(phase)) * 0.12 * walk
+		_enemy_mm.set_instance_transform(i, Transform3D(basis, h.positions[i] + Vector3(0, t.height * 0.5 + bob, 0)))
 		var c: Color = t.color
 		if h.flash[i] > 0.0:
 			c = Color.WHITE
@@ -320,6 +393,7 @@ func _draw_effects(delta: float) -> void:
 	# Tracers: keep the last frame's shots visible for a few frames.
 	if not run.tracers.is_empty():
 		_tracers = run.tracers.duplicate()
+		_muzzle.light_energy = 3.0
 		run.tracers.clear()
 		_tracer_life = 0.05
 	_tracer_life -= delta
@@ -334,6 +408,9 @@ func _draw_effects(delta: float) -> void:
 	# Dismemberment with primitives: chunks fly off killed enemies.
 	for d in run.deaths:
 		var t: GameData.EnemyType = run.horde.types[int(d.z)]
+		if int(d.z) == GameData.EnemyKind.BRUTE:
+			_hitstop = 0.08  # freeze the simulation briefly: the kill "lands"
+			_trauma = minf(1.0, _trauma + 0.3)
 		var origin := Vector3(d.x, 1.0, d.y)
 		var pieces: int = 5 if d.w > 0.5 else 3
 		for k in pieces:
@@ -371,7 +448,9 @@ func _draw_effects(delta: float) -> void:
 		var boom := MeshInstance3D.new()
 		boom.mesh = _sphere(3.0)
 		boom.position = e + Vector3(0, 0.5, 0)
-		boom.material_override = _mat(Color(1, 0.55, 0.1), true)
+		var bm := _mat(Color(1, 0.55, 0.1, 0.55), true)
+		bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		boom.material_override = bm
 		boom.scale = Vector3.ONE * 0.2
 		add_child(boom)
 		_explosions.append(boom)
@@ -379,6 +458,7 @@ func _draw_effects(delta: float) -> void:
 	for k in range(_explosions.size() - 1, -1, -1):
 		var b: MeshInstance3D = _explosions[k]
 		b.scale += Vector3.ONE * delta * 5.0
+		(b.material_override as StandardMaterial3D).albedo_color.a = 0.55 * (1.0 - b.scale.x)
 		if b.scale.x >= 1.0:
 			b.queue_free()
 			_explosions.remove_at(k)

@@ -57,6 +57,7 @@ var deaths: Array[Vector4] = []  ## (x, z, kind, headshot 0/1)
 var explosions: PackedVector3Array = PackedVector3Array()
 var messages: PackedStringArray = PackedStringArray()
 
+var _kills_at_start: int = 0
 var _dead: Dictionary = {}  ## enemy index -> true, removed at the end of step()
 
 
@@ -74,6 +75,36 @@ func _init(rng_seed: int = 7) -> void:
 	for i in GameData.GENERATOR_COUNT:
 		generator_progress.append(0.0)
 		generator_started.append(false)
+
+
+## Loads the run state carried from previous islands and scales difficulty.
+func load_context(ctx: RunContext) -> void:
+	hp = ctx.hp
+	level = ctx.level
+	xp = ctx.xp
+	card_stacks = ctx.card_stacks.duplicate()
+	if ctx.ammo.size() == ammo.size():
+		ammo = ctx.ammo.duplicate()
+	kills = ctx.kills
+	_kills_at_start = kills
+	headshots = ctx.headshots
+	time_alive = ctx.time_alive
+	horde.hp_scale = 1.0 + 0.3 * ctx.island_index
+	# A head start makes the director spawn more specials on later islands.
+	director.elapsed = 120.0 * ctx.island_index
+
+
+## Writes the run state back when the island ends.
+func save_to_context(ctx: RunContext) -> void:
+	ctx.intel += intel_earned()
+	ctx.hp = maxf(hp, 1.0)
+	ctx.level = level
+	ctx.xp = xp
+	ctx.card_stacks = card_stacks.duplicate()
+	ctx.ammo = ammo.duplicate()
+	ctx.kills = kills
+	ctx.headshots = headshots
+	ctx.time_alive = time_alive
 
 
 func is_paused() -> bool:
@@ -101,7 +132,7 @@ func intel_earned() -> int:
 	for p in generator_progress:
 		if p >= GameData.GENERATOR_HOLD_SECONDS:
 			done += 1
-	return kills / 5 + done * 15 + (40 if objective == Objective.WON else 0)
+	return (kills - _kills_at_start) / 5 + done * 15 + (40 if objective == Objective.WON else 0)
 
 
 func switch_weapon(i: int) -> void:
