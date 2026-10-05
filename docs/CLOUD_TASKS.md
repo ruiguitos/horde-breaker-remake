@@ -1,25 +1,25 @@
 # Tarefas para sessões na cloud
 
 Cada tarefa é independente e pode correr **em paralelo**: escreve só nos
-seus próprios ficheiros, num branch próprio, e termina com um PR para
-`master`. Copiar o bloco do prompt tal como está para uma sessão nova em
+seus próprios ficheiros, e termina com commit e push direto para
+`master` (sem PR). Copiar o bloco do prompt tal como está para uma sessão nova em
 [claude.ai/code](https://claude.ai/code) com o repositório
 `ruiguitos/horde-breaker-remake` selecionado.
 
 Preparado a 2026-10-05. As tarefas de design produzem **propostas**: o
 utilizador decide e regista em `docs/DECISIONS.md`.
 
-| ID | Tipo | Entrega | Branch |
-|---|---|---|---|
-| D1 | Design | `docs/design/GDD.md` | `design/gdd-v2` |
-| D2 | Design | `docs/design/COMBAT_AND_ENEMIES.md` | `design/combat-enemies` |
-| D3 | Design | `docs/design/PROGRESSION_AND_ECONOMY.md` | `design/progression` |
-| D4 | Design | `docs/design/WORLD_AND_MISSIONS.md` | `design/world-missions` |
-| D5 | Design | `docs/design/CAMERA_CONTROLS_HUD.md` | `design/camera-hud` |
-| T1 | Técnico | `docs/tech/ARCHITECTURE.md` | `tech/architecture` |
-| S1 | Spike | `spikes/camera_medium/` | `spike/camera-medium` |
-| S2 | Spike | `spikes/horde_flowfield/` | `spike/horde-flowfield` |
-| S3 | Spike | `spikes/director/` | `spike/director` |
+| ID | Tipo | Entrega |
+|---|---|---|
+| D1 | Design | `docs/design/GDD.md` |
+| D2 | Design | `docs/design/COMBAT_AND_ENEMIES.md` |
+| D3 | Design | `docs/design/PROGRESSION_AND_ECONOMY.md` |
+| D4 | Design | `docs/design/WORLD_AND_MISSIONS.md` |
+| D5 | Design | `docs/design/CAMERA_CONTROLS_HUD.md` |
+| T1 | Técnico | `docs/tech/ARCHITECTURE.md` |
+| S1 | Spike | `spikes/camera_medium/` |
+| S2 | Spike | `spikes/horde_flowfield/` |
+| S3 | Spike | `spikes/director/` |
 
 Ordem sugerida se não der para lançar todas: S1, S2, D1, D2, T1, D5, D3, D4, S3.
 
@@ -39,7 +39,7 @@ Tarefa: escreve docs/design/GDD.md, o GDD v2 do remake, em português de Portuga
 6. Decisões propostas: para cada ponto em aberto de docs/DECISIONS.md, 2–3 opções com prós/contras e a tua recomendação, coerente com a câmara média já decidida.
 7. Perguntas para o utilizador.
 
-Não edites docs/DECISIONS.md nem outros ficheiros. Trabalha no branch design/gdd-v2 e abre um PR para master com um resumo das recomendações.
+Não edites docs/DECISIONS.md nem outros ficheiros. Resume as recomendações na mensagem final ao utilizador.
 ```
 
 ## D2 — Combate e inimigos
@@ -56,7 +56,7 @@ Tarefa: escreve docs/design/COMBAT_AND_ENEMIES.md em português de Portugal. Con
 6. Game feel: lista priorizada (hit-stop, knockback, som, partículas) com custo estimado.
 7. Decisões propostas e perguntas para o utilizador.
 
-Não edites outros ficheiros. Branch design/combat-enemies, PR para master.
+Não edites outros ficheiros.
 ```
 
 ## D3 — Progressão e economia
@@ -72,7 +72,7 @@ Tarefa: escreve docs/design/PROGRESSION_AND_ECONOMY.md em português de Portugal
 5. Tabela de ritmo: o que o jogador desbloqueia nas primeiras 1, 5, 10 e 20 runs.
 6. Decisões propostas e perguntas para o utilizador.
 
-Não edites outros ficheiros. Branch design/progression, PR para master.
+Não edites outros ficheiros.
 ```
 
 ## D4 — Mundo, ilhas e missões
@@ -89,7 +89,7 @@ Tarefa: escreve docs/design/WORLD_AND_MISSIONS.md em português de Portugal. Con
 6. Modificadores de ilha para rejogabilidade (6–10).
 7. Decisões propostas e perguntas para o utilizador.
 
-Não edites outros ficheiros. Branch design/world-missions, PR para master.
+Não edites outros ficheiros.
 ```
 
 ## D5 — Câmara média, controlos e HUD
@@ -105,7 +105,7 @@ Tarefa: escreve docs/design/CAMERA_CONTROLS_HUD.md em português de Portugal. Co
 5. Critérios de playtest para escolher o preset final.
 6. Decisões propostas e perguntas para o utilizador.
 
-Não edites outros ficheiros. Branch design/camera-hud, PR para master.
+Não edites outros ficheiros.
 ```
 
 ## T1 — Arquitetura técnica
@@ -125,7 +125,7 @@ Tarefa: escreve docs/tech/ARCHITECTURE.md em português de Portugal para o remak
 
 Inclui também tests/run_all.gd: um runner headless que descobre e corre todos os tests/test_*.gd e spikes/*/tests/test_*.gd em subprocessos (OS.execute com o executável atual) e devolve exit code ≠ 0 se algum falhar; valida-o com tests/test_smoke.gd.
 
-Não edites outros ficheiros. Branch tech/architecture, PR para master.
+Não edites outros ficheiros.
 ```
 
 ## S1 — Spike da câmara média
@@ -143,7 +143,7 @@ Tarefa: cria o spike spikes/camera_medium/ em Godot 4.7 com GDScript tipado, só
 - Testes headless em spikes/camera_medium/tests/: a cena carrega, os presets aplicam os valores certos, a contagem de zombies no frustum funciona, o raycast de mira acerta no plano.
 - README.md do spike: como abrir no editor (Windows) e testar (F6 na cena), o que observar em cada preset, e limites (na cloud não houve verificação visual).
 
-Não edites ficheiros fora de spikes/camera_medium/. Corre os testes antes do PR. Branch spike/camera-medium, PR para master.
+Não edites ficheiros fora de spikes/camera_medium/. Corre os testes antes do push.
 ```
 
 ## S2 — Spike da horda com flow field
@@ -160,7 +160,7 @@ Tarefa: cria o spike spikes/horde_flowfield/ em Godot 4.7 com GDScript tipado, s
 - Testes headless: agentes contornam um obstáculo e chegam ao alvo; nenhum agente atravessa paredes; hitscan devolve o agente mais próximo na linha.
 - README.md do spike com os números medidos, o ambiente (CPU da cloud, headless, sem GPU) e o que fica por medir no PC do utilizador (render, GPU).
 
-Não edites ficheiros fora de spikes/horde_flowfield/. Branch spike/horde-flowfield, PR para master.
+Não edites ficheiros fora de spikes/horde_flowfield/.
 ```
 
 ## S3 — Spike do diretor de horda
@@ -176,5 +176,5 @@ Tarefa: cria o spike spikes/director/ em Godot 4.7 com GDScript tipado, totalmen
 - Testes: as fases alternam; o orçamento nunca é excedido; o perfil fraco recebe mais períodos de alívio do que o forte.
 - README.md com a explicação do modelo, gráficos em ASCII ou tabelas resumidas dos CSV e recomendações de parâmetros.
 
-Não edites ficheiros fora de spikes/director/. Branch spike/director, PR para master.
+Não edites ficheiros fora de spikes/director/.
 ```
