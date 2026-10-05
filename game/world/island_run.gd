@@ -780,6 +780,12 @@ func _update_rescue(dt: float) -> void:
 	var to: Vector3 = player_pos - survivor_pos
 	to.y = 0.0
 	if to.length() > 2.0:
+		# Follow the flow field (it leads to the player round cliffs and
+		# trees); straight at the player only when already in the same cell.
+		var step: Vector2 = field.direction_at(survivor_pos)
+		if step != Vector2.ZERO:
+			var cell := Vector3(floorf(survivor_pos.x) + step.x + 0.5, 0, floorf(survivor_pos.z) + step.y + 0.5)
+			to = cell - Vector3(survivor_pos.x, 0, survivor_pos.z)
 		var v: Vector3 = to.normalized() * GameData.SURVIVOR_SPEED * dt
 		survivor_pos = Horde.move_against_walls(field, survivor_pos, v.x, v.z, 0.35)
 	var touching: int = horde.query_radius(survivor_pos, 1.3).size()

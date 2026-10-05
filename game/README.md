@@ -143,8 +143,8 @@ Cada ilha é gerada a partir de uma *seed*, sem cenas feitas à mão.
 | `ui/minimap.gd` | Minimapa |
 | `data/biomes/*.tres` | Cores, nevoeiro e palmeiras de cada bioma (YARD) |
 
-**Mapas grandes:** em `world/island_map.gd`, muda `const SIZE: int = 160`
-para, por exemplo, `320`.
+**Tamanho:** as ilhas têm 256 × 256 m (uma região do Terrain3D). Nas ilhas
+geradas o tamanho é `const SIZE` em `world/island_map.gd`.
 - Crescem com o tamanho: a costa, a posição do cais e dos geradores, e o
   número de edifícios, árvores e rochas (proporcional à área). A densidade
   mantém-se.
@@ -159,7 +159,24 @@ mar, andas 3× mais depressa (6× a correr) e não levas dano. **Espaço** sobe
 e **Ctrl** desce (até 120 m; Shift sobe/desce 3× mais rápido). Ao desligar
 o noclip, desces suavemente até ao chão.
 
-## Ilhas feitas à mão (em construção)
+## Ilhas feitas à mão
+
+As quatro ilhas da rota já são feitas à mão, em
+`game/world/handmade/islands/` (256 m cada). Só o vulcão (3.ª ilha, boss)
+continua gerado.
+
+| Ilha | Desenho |
+|---|---|
+| `beach_01` | Crescente com dunas, aldeia de pescadores a oeste do cais, falésia com farol a norte (rampa a sul), três bosques |
+| `town_01` | Ruas em grelha com quarteirões de casas, praça com parque ao centro, igreja num morro a este (rampa a oeste) |
+| `jungle_01` | Floresta densa cortada por trilhos, clareiras nos objetivos, colinas e um planalto de templo com ruínas (rampa a oeste) |
+| `port_01` | Porto plano em betão: armazéns a norte, parque de contentores com corredores, cais a sul |
+
+Foram construídas por `tools/dev/build_islands.gd`, que esculpe o Terrain3D e
+coloca tudo a partir de um desenho escrito por bioma. Depois disso são cenas
+normais: podes abri-las e mexer à mão. Atenção: correr o script outra vez
+**apaga as tuas alterações** nessas ilhas.
+
 
 Em vez do gerador automático, podes construir uma ilha no editor. O jogo
 continua a correr numa grelha 2D (1 célula = 1 m), por isso

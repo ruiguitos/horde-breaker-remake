@@ -5,7 +5,7 @@ extends RefCounted
 
 ## Island grid size in metres (cells). Change this one number for bigger
 ## maps: coast, objectives and prop counts scale with it (see K).
-const SIZE: int = 160
+const SIZE: int = 256
 ## Scale relative to the original 160 m island.
 const K: float = SIZE / 160.0
 

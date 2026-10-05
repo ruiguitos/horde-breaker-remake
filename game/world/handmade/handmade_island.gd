@@ -75,7 +75,8 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 		f.set_blocked_rect(rect.position.x, rect.position.y, rect.end.x - 1, rect.end.y - 1)
 		map.buildings.append(rect)
 	for node in _children_of("Trees"):
-		var cell := Vector2i(floori(node.global_position.x), floori(node.global_position.z))
+		var tp: Vector3 = _local(node).origin
+		var cell := Vector2i(floori(tp.x), floori(tp.z))
 		if _inside(cell):
 			f.blocked[cell.y * size + cell.x] = 1
 			map.trees.append(cell)
@@ -85,14 +86,14 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 		problems.append("Missing Markers/Boat: using the bottom centre.")
 		map.boat = Vector3(size * 0.5, 0, size - 10.5)
 	else:
-		map.boat = _flat(boat.global_position)
+		map.boat = _flat(_local(boat).origin)
 	var start: Node3D = get_node_or_null("Markers/PlayerStart")
-	map.player_start = _flat(start.global_position) if start != null else map.boat + Vector3(0, 0, -5)
+	map.player_start = _flat(_local(start).origin) if start != null else map.boat + Vector3(0, 0, -5)
 	for node in _children_of("Markers"):
 		if node.name.begins_with("Generator"):
-			map.generators.append(_flat(node.global_position))
+			map.generators.append(_flat(_local(node).origin))
 		elif node.name.begins_with("Cache"):
-			map.caches.append(_flat(node.global_position))
+			map.caches.append(_flat(_local(node).origin))
 	if map.generators.size() != GameData.GENERATOR_COUNT:
 		problems.append("Markers: %d generators found, the Activate mission needs %d." % [map.generators.size(), GameData.GENERATOR_COUNT])
 	# Reachability from the player start (the horde and the player walk the grid).
@@ -231,7 +232,7 @@ func _footprint(node: Node3D) -> Rect2i:
 		if not m is VisualInstance3D:
 			continue
 		var vi := m as VisualInstance3D
-		var b: AABB = vi.global_transform * vi.get_aabb()
+		var b: AABB = _local(vi) * vi.get_aabb()
 		if b.size == Vector3.ZERO:
 			continue
 		box = b if first else box.merge(b)
@@ -243,6 +244,17 @@ func _footprint(node: Node3D) -> Rect2i:
 	var x1: int = clampi(ceili(box.end.x - 0.25), x0 + 1, size)
 	var z1: int = clampi(ceili(box.end.z - 0.25), z0 + 1, size)
 	return Rect2i(x0, z0, x1 - x0, z1 - z0)
+
+
+## Transform of `n` relative to this island (works before the scene is in
+## the tree, where global transforms are not available).
+func _local(n: Node) -> Transform3D:
+	var t := Transform3D.IDENTITY
+	while n != null and n != self:
+		if n is Node3D:
+			t = (n as Node3D).transform * t
+		n = n.get_parent()
+	return t
 
 
 func _inside(c: Vector2i) -> bool:

@@ -28,7 +28,15 @@ func _soak(run_seed: int) -> void:
 		ctx.modifier = GameData.modifiers()[(run_seed + island) % GameData.modifiers().size()].id
 		ctx.biome = &"volcano" if ctx.is_last_island() else GameData.ISLAND_BIOMES[(run_seed / 101 * 2 + island) % GameData.ISLAND_BIOMES.size()]
 		ctx.mission = GameData.MISSIONS.keys()[(run_seed + island) % 3]
-		var run := IslandRun.new(ctx.island_seed(), ctx.biome)
+		# Same island choice as the game: hand-made when one exists.
+		var custom: IslandMap = null
+		var scene: PackedScene = HandmadeIsland.pick(ctx.biome, ctx.island_seed())
+		if scene != null:
+			var hm: HandmadeIsland = scene.instantiate()
+			root.add_child(hm)
+			custom = hm.build_map()
+			hm.free()
+		var run := IslandRun.new(ctx.island_seed(), ctx.biome, custom)
 		run.load_context(ctx)
 		var nav := FlowField.new(run.field.width, run.field.height)
 		nav.blocked = run.field.blocked

@@ -1,0 +1,969 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://game/world/handmade/handmade_island.gd" id="1_ekbcs"]
+[ext_resource type="Terrain3DAssets" path="res://game/world/handmade/ground_assets.res" id="2_3jme0"]
+[ext_resource type="PackedScene" path="res://assets/models/nature_megakit/CommonTree_2.gltf" id="3_28kg7"]
+[ext_resource type="PackedScene" path="res://assets/models/nature_megakit/CommonTree_4.gltf" id="4_mknnx"]
+[ext_resource type="PackedScene" path="res://assets/models/nature_megakit/Rock_Medium_3.gltf" id="5_0eb0n"]
+[ext_resource type="PackedScene" path="res://assets/models/nature_megakit/Rock_Medium_1.gltf" id="6_txnxc"]
+[ext_resource type="PackedScene" path="res://assets/models/nature_megakit/Rock_Medium_2.gltf" id="7_0pbbt"]
+[ext_resource type="Texture2D" path="res://assets/models/nature_megakit/Grass.png" id="8_gljj6"]
+[ext_resource type="Texture2D" path="res://assets/models/nature_megakit/PathRocks_Diffuse.png" id="9_x66a1"]
+
+[sub_resource type="Gradient" id="Gradient_h2fih"]
+offsets = PackedFloat32Array(0.2, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_kuryt"]
+noise_type = 2
+frequency = 0.03
+cellular_jitter = 3.0
+cellular_return_type = 0
+domain_warp_enabled = true
+domain_warp_type = 1
+domain_warp_amplitude = 50.0
+domain_warp_fractal_type = 2
+domain_warp_fractal_lacunarity = 1.5
+domain_warp_fractal_gain = 1.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_kyymf"]
+noise = SubResource("FastNoiseLite_kuryt")
+color_ramp = SubResource("Gradient_h2fih")
+seamless = true
+
+[sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_haert"]
+_shader_parameters = {
+&"bias_distance": null,
+&"blend_sharpness": null,
+&"depth_blur": null,
+&"enable_macro_variation": null,
+&"enable_projection": null,
+&"flat_terrain_normals": null,
+&"macro_variation1": null,
+&"macro_variation2": null,
+&"macro_variation_slope": null,
+&"mipmap_bias": null,
+&"noise1_angle": null,
+&"noise1_offset": null,
+&"noise1_scale": null,
+&"noise2_scale": null,
+&"noise_texture": SubResource("NoiseTexture2D_kyymf"),
+&"projection_threshold": null
+}
+world_background = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kso8g"]
+albedo_color = Color(0.55, 0.5, 0.45, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_gy21s"]
+size = Vector3(30, 9, 18)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1b3p5"]
+albedo_color = Color(0.55, 0.5, 0.45, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_6bc6o"]
+size = Vector3(30, 9, 18)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_epf6o"]
+albedo_color = Color(0.55, 0.5, 0.45, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_0gjhe"]
+size = Vector3(30, 9, 18)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_07a8k"]
+albedo_color = Color(0.55, 0.5, 0.45, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_kd3sl"]
+size = Vector3(30, 9, 18)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5fm5o"]
+albedo_color = Color(0.85, 0.6, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_tj13a"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ohgp8"]
+albedo_color = Color(0.2, 0.4, 0.7, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_1wh4f"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ut0so"]
+albedo_color = Color(0.176, 0.352, 0.616, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_d335w"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4umlh"]
+albedo_color = Color(0.85, 0.6, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_4vsvv"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cvv5p"]
+albedo_color = Color(0.85, 0.6, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_b1ilv"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oaj5p"]
+albedo_color = Color(0.748, 0.528, 0.132, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_pymo2"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nu1uh"]
+albedo_color = Color(0.75, 0.25, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_fj6xm"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xhq3n"]
+albedo_color = Color(0.65999997, 0.22, 0.132, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_tb7l1"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3i453"]
+albedo_color = Color(0.57, 0.19, 0.114, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_ywm5m"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7dccm"]
+albedo_color = Color(0.25, 0.55, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_dqxbi"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fauwc"]
+albedo_color = Color(0.22, 0.484, 0.264, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_mwhxf"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n2j2u"]
+albedo_color = Color(0.19, 0.418, 0.228, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_c72yr"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_loivx"]
+albedo_color = Color(0.2, 0.4, 0.7, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_yyxbw"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3wnjw"]
+albedo_color = Color(0.176, 0.352, 0.616, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_xwcca"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4srrm"]
+albedo_color = Color(0.75, 0.25, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_8vdno"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6kmyl"]
+albedo_color = Color(0.65999997, 0.22, 0.132, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_yd4nh"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qyw0h"]
+albedo_color = Color(0.85, 0.6, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_l43ku"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cl50d"]
+albedo_color = Color(0.748, 0.528, 0.132, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_catre"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_brqao"]
+albedo_color = Color(0.646, 0.456, 0.114, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_gk26g"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_blis8"]
+albedo_color = Color(0.25, 0.55, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_la1tc"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6ix2n"]
+albedo_color = Color(0.22, 0.484, 0.264, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_6lu8h"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_80bco"]
+albedo_color = Color(0.2, 0.4, 0.7, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_ou37e"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b6n63"]
+albedo_color = Color(0.176, 0.352, 0.616, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_tywnp"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4oxpf"]
+albedo_color = Color(0.85, 0.6, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_x8m8t"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m7kb8"]
+albedo_color = Color(0.748, 0.528, 0.132, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_8j8us"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3fq3c"]
+albedo_color = Color(0.646, 0.456, 0.114, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_g2704"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pj1ck"]
+albedo_color = Color(0.25, 0.55, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_ul4rj"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g5uba"]
+albedo_color = Color(0.22, 0.484, 0.264, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_dfavk"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vhcm0"]
+albedo_color = Color(0.19, 0.418, 0.228, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_hw8f4"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_35wkw"]
+albedo_color = Color(0.2, 0.4, 0.7, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_kmflf"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fws82"]
+albedo_color = Color(0.85, 0.6, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_qutjp"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q831m"]
+albedo_color = Color(0.748, 0.528, 0.132, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_ik3rq"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ywxn6"]
+albedo_color = Color(0.75, 0.25, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_jar4m"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e6lbt"]
+albedo_color = Color(0.65999997, 0.22, 0.132, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_6u1n0"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_otc5b"]
+albedo_color = Color(0.57, 0.19, 0.114, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_opxa6"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s0vsu"]
+albedo_color = Color(0.25, 0.55, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_w5ntr"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fownx"]
+albedo_color = Color(0.22, 0.484, 0.264, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_hd707"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8n2bx"]
+albedo_color = Color(0.25, 0.55, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_nufmu"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vtm2m"]
+albedo_color = Color(0.22, 0.484, 0.264, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_k4rah"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iuknk"]
+albedo_color = Color(0.25, 0.55, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_cg7tp"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vhavg"]
+albedo_color = Color(0.2, 0.4, 0.7, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_pqnhm"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3tjrl"]
+albedo_color = Color(0.176, 0.352, 0.616, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_d2av3"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_48wmv"]
+albedo_color = Color(0.152, 0.304, 0.532, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_ddb2y"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8wu41"]
+albedo_color = Color(0.75, 0.25, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_g1lmo"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ka74k"]
+albedo_color = Color(0.65999997, 0.22, 0.132, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_8rhn8"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8ibeo"]
+albedo_color = Color(0.2, 0.4, 0.7, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_wnixc"]
+size = Vector3(18, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f64mj"]
+transparency = 1
+albedo_color = Color(0.15, 0.35, 0.55, 0.8)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_wkf1g"]
+size = Vector2(700, 700)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_06211"]
+resource_name = "Grass"
+cull_mode = 2
+albedo_texture = ExtResource("8_gljj6")
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_si6jv"]
+_surfaces = [{
+"aabb": AABB(-0.3556424, -0.022385215, -0.47937828, 0.6388705, 1.3341035, 0.73726547),
+"format": 34896613377,
+"index_count": 465,
+"index_data": PackedByteArray("AAABAAIAAAADAAEAAwAAAAQABQADAAQAAwAFAAYABgAFAAcAAwAGAAgABgAHAAkACAAGAAoACQAHAAsACAAKAAwACQALAA0ADAAKAA4ADQALAA8ADQAPABAAEAAPABEADAAOABIAEgAOABMAEgATABQAJQAmACcAKAAlACcAKAApACUAKQAqACUAKQArACoAJQAsACYAKgAsACUALAAtACYAKgAuACwALAAvAC0ALgAvACwALwAwAC0ALgAxAC8ALwAyADAAMQAyAC8AMgAzADAAMQA0ADIAMgA1ADMANAA1ADIANQA2ADMANAA3ADUANQA4ADYANwA4ADUANwA5ADgAOgA7ADwAOgA9ADsAOwA+ADwAOwA/AD4APwBAAD4APwBBAEAAQQBCAEAAQwBEAEUAQwBGAEQARABGAEcARABHAEgASABHAEkASABJAEoASgBJAEsATABNAE4ATABPAE0ATQBQAE4ATQBRAFAAUQBSAFAAUQBTAFIAUwBUAFIAVQBWAFcAVQBYAFYAVwBZAFUAVwBaAFkAWgBXAFsAWgBbAFwAXABdAFoAWwBeAFwAXABfAF0AWwBgAF4AXwBhAF0AYABiAF4AXwBjAGEAYABkAGIAZABlAGIAZABmAGUAYwBnAGEAYwBoAGcAaABpAGcAFQAXAGoAFQAWABcAGQAVAGoAGQBqABoAagAbABoAFwBrAGoAagBrABsAFwAYAGsAawAcABsAGABsAGsAawBsABwAGAAdAGwAbAAeABwAHQBtAGwAbABtAB4AHQAfAG0AbQAgAB4AHwBuAG0AbQBuACAAbgAhACAAHwAiAG4AbgAjACEAIgAjAG4AIgAkACMAbwBwAHEAbwByAHAAcwBvAHEAcwBxAHQAcQB1AHQAcAB2AHEAcQB2AHUAcAB3AHYAdgB4AHUAdwB5AHYAdgB5AHgAdwB6AHkAeQB7AHgAegB8AHkAeQB8AHsAegB9AHwAfAB+AHsAfQB/AHwAfAB/AH4AfwCAAH4AfQCBAH8AfwCCAIAAgQCCAH8AgQCDAIIAhACFAIYAhACHAIUAiACEAIYAiACGAIkAhgCKAIkAhQCLAIYAhgCLAIoAhQCMAIsAiwCNAIoAjACOAIsAiwCOAI0AjACPAI4AjgCQAI0AjwCRAI4AjgCRAJAAjwCSAJEAkQCTAJAAkgCUAJEAkQCUAJMAlACVAJMAkgCWAJQAlACXAJUAlgCXAJQAlgCYAJcA"),
+"lods": [0.6771018, PackedByteArray("AAABAAIAAAADAAEAAwAAAAQABQADAAQAAwAFAAYABgAFAAcAAwAGAAgABgAHAAkACAAGAAoACQAHAAsACAAKAAwACQALAA0ADAAKAA4ADQALAA8ADQAPABAAEAAPABEADAAOABIAEgAOABMAEgATABQAFQAWABcAFwAYABUAGQAVABoAFQAbABoAFQAYABsAGAAcABsAGAAdABwAHQAeABwAHQAfAB4AHwAgAB4AHwAhACAAHwAiACEAIgAjACEAIgAkACMA")],
+"name": "Grass",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 153,
+"vertex_data": PackedByteArray("5CqjELGmAACsQWEBwaUAAIEqYQGxpQAAuj3PHsGnAAAHIB0kEKgAAO0Oo1UbqgAAFi0hXJuqAAAFB85y2KgAAOlCsk+4qgAAPSSDdx2pAADlMv9/iKgAAGACYZPLpAAA0UdDf+yoAACjF8WZHaQAAFk/qsuvmAAAAABSqMWgAAAjD9ytwJ8AANgCeLtbnAAAtE0SxemaAACAS+Dyio0AACRV//8rigAAtl9hAdnAAADATGEBfLsAAApRrRWbtwAA9FUjO2O0AACzcWEBeK0AAPdzRxdXqgAAI3Z1O0aoAAACe7d2/qsAAMJbvXXMtwAADHsEkiyzAAC2XaWQVb4AAN50t8jz0QAACGvn4onrAABdXg/HctoAAH5d3/X//wAA3FoT64v2AACozqQaTl0AABvZbzvicQAA9dZYHBB0AABp1WEB53MAAFTMYQFsXAAAgrsWGltdAABluGEBwFsAAN/RUjr+WwAAtOAKbhNoAADLv1o66FwAANfZp2yDUgAAVuQVhcldAAAhyGpswlMAADzejIPWSAAAVOxvsvw3AABJzSqDs0oAAOTo3rBUJQAAEu6Wx64ZAACb2nOweykAABjqxtYAAAAAjOPzzXMJAADpzWEByJMAAFDUmCjLjwAAxMzkJ/GdAABL02EBR4kAANbSZD3rpAAABtqMPdGXAAA137hQ5qkAAGTiQk/joQAAquZdWgGqAABOK2EBXcsAAMw3biwL1AAAhTphAW/QAAAzI14q3cwAAJgdaUT91AAAlzC5RdDbAADQGhpch+MAABMm9lpU5gAA3xwgaP/rAACrRWEBW3oAAMIvsyVzggAAjEXPKQl4AADYNWEBKYIAAL0+/kUpcQAAgCqPQY56AADLL0deq2cAADwlwFnkbQAAsiSOaaZkAAAVjZ0ShpoAAHeSXQP5oQAAkpdbH3WhAABPiF0DsJkAAFKMAiMzlwAAooogSwiOAAD/n51KEaEAALaXj1O3lwAArofvYCuFAAB4miFxLpEAAEeUnWhojgAAf6P4ctmYAAB1hCR4O3kAAKae5qkAeQAAm41RgIh+AAAcpVunKIEAAPCm/MYtbwAAWK1L0TJvAABRgo6GV3AAAOuIHY2JcwAA4oKElIdpAAD8YnoWWL0AAIdmTDu0ugAA3ms6dkS+AADdbFWRIMUAABlq48eS4gAAbXJhAYV4AACQgvYY43wAANBvhRmHeQAAHIZhAVJ7AAAXZGEB+Y0AAGhiDBtsjgAAoGAnOq6MAADHbDQ5dngAAEd+OjmAfAAAKFvTbACDAADfZptrCG8AAPB3W2tScwAA11nyg9x4AACsZJOCXGUAANl0LIIeagAAfVqVsY9TAAAuYimw10EAAKpf+MYXNgAAN2+2r2FIAABqaVnW/x0AALJtdM0tKAAAVLJGAFzIAAB2uCoTALkAAJWvKhSixwAAV7wAAGy5AAARlg4BRsQAAHOUqxU+wwAAVJWeN/TCAAASr8I2tccAAJC2ZjZvuQAAPZsbb4rIAAB6tPNtcs0AAHe7TG1UvwAAzKODiOzNAAAOvDKHI9MAAA/CY4ZVxQAALcbtulPhAADZ2pS5hecAABTkstLA7gAARd28uLDaAAD//73jNfYAAH75x9mj7QAA")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_1fwu4"]
+resource_name = "Grass_Common_Short_Plane_014"
+_surfaces = [{
+"aabb": AABB(-0.3556424, -0.022385215, -0.47937828, 0.6388705, 1.3341035, 0.73726547),
+"attribute_data": PackedByteArray("AwMD/ywvdu0AAAD/eC84/AAAAP8qLzj8Dg4O/2svwN8PDw//By+f2j4+Pv/OLriqSkpK/zMvcKSUlJT/tC6Bji8vL/98L3iwmJiY/xUv9ImLi4v/Ri+/gf////+kLv9uiYmJ/4wvdYL/////6y7RaPPz8/9wL484/////5wuvlr/////zy5jVf////+mLjlI6+vr/6Av7z7/////mS+iEv////+5L/EFAAAA/9wwOPwAAAD/nTA4/AEBAf+rMJboEhIS/7wwWsQAAAD/GTE4/AEBAf8gMQnnExMT/ycxC8RUVFT/ODG5ilNTU//PMKuLoqKi/zgxUXCkpKT/1jCkcebm5v8jMWk7+Pj4/wIxFCLm5ub/2DACPfz8/P/VMLsP/////8wwLBoBAQH/qzPI4xMTE//OMxDEAQEB/8czIuIAAAD/wjM4/AAAAP+jMzj8AQEB/2szUuQAAAD/YDM4/BMTE/+2MyTFVFRU/+czHpMSEhL/eTMdxVRUVP/QM3WUoqKi//Mz1HxTU1P/lTOwlKSkpP/fM09+5ubm/w409lCkpKT/pjOvfubm5v8DNHpS+Pj4/xQ0gDzm5ub/0zPhUvz8/P8HNNAt//////EzWTYAAAD/TTI4/AkJCf9jMknWCAgI/0ky99YAAAD/XzI4/Dc3N/9eMizCR0dH/3YyBcLi4uL/hzJ6r9XV1f+SMuSw+Pj4/6AyJqYAAAD/LTA4/AkJCf9XMJTSAAAA/2AwOPwICAj/EjCS1Dc3N///L2K7R0dH/z8wHbri4uL/9i93pNXV1f8bMJGl+Pj4//0v1pgAAAD/MzM4/AkJCf/pMhbZCAgI/zIzHdUAAAD//jI4/Dc3N/8cM9q5R0dH/9gyJL7i4uL/6jJdotXV1f/GMr6m+Pj4/8QydJcDAwP/VDSM6wAAAP9mNEz6Dg4O/3c0Od8AAAD/RDRM+g8PD/9RNLHbPj4+/0w047QvLy//kzRitUpKSv94NLuslJSU/0I0y5+Li4v/gTQhkJiYmP9sNF2YiYmJ/580WY7/////NzRYifPz8/+PNDdZ/////1Y0cIHr6+v/pDStW/////+qNBU9/////8A0HTP/////MDRne/////9GNA91/////zI05m0BAQH/5zDQ5xMTE//zMDLEVFRU/wUxMoukpKT/CDH7cObm5v//MDY8AAAA/1suOPwBAQH/kS5o5QEBAf9SLt7kAAAA/50uOPwAAAD/Ky44/AEBAf8mLmTjExMT/yAuTsUTExP/SC45xhISEv+DLjPGVFRU/w0uSpRUVFT/NS54lVNTU/9uLraVoqKi/wku7X2kpKT/LS5Bf6SkpP9jLqR/5ubm/wsuyVHm5ub/JS4pU/j4+P8cLhk95ubm/1AumFP8/Pz/PS45Lv////9LLtM2AAAA//ExSf0BAQH/BTIE6wEBAf/oMQzqAAAA/xIyjv0AAAD/kjGI/AEBAf+NMZjoExMT/5AxwccTExP/5jGWyBISEv//Me/IVFRU/6QxFZJUVFT/+DE0k1NTU/8PMtWToqKi/8Axg3mkpKT/ETLIeqSkpP8lMpF75ubm/zMyv0jm5ub/eDINSvj4+P+XMsIx5ubm/4Ay3Ur8/Pz/9TJFIf/////fMucq"),
+"format": 34896613407,
+"index_count": 465,
+"index_data": PackedByteArray("AAABAAIAAAADAAEAAwAAAAQABQADAAQAAwAFAAYABgAFAAcAAwAGAAgABgAHAAkACAAGAAoACQAHAAsACAAKAAwACQALAA0ADAAKAA4ADQALAA8ADQAPABAAEAAPABEADAAOABIAEgAOABMAEgATABQAJQAmACcAKAAlACcAKAApACUAKQAqACUAKQArACoAJQAsACYAKgAsACUALAAtACYAKgAuACwALAAvAC0ALgAvACwALwAwAC0ALgAxAC8ALwAyADAAMQAyAC8AMgAzADAAMQA0ADIAMgA1ADMANAA1ADIANQA2ADMANAA3ADUANQA4ADYANwA4ADUANwA5ADgAOgA7ADwAOgA9ADsAOwA+ADwAOwA/AD4APwBAAD4APwBBAEAAQQBCAEAAQwBEAEUAQwBGAEQARABGAEcARABHAEgASABHAEkASABJAEoASgBJAEsATABNAE4ATABPAE0ATQBQAE4ATQBRAFAAUQBSAFAAUQBTAFIAUwBUAFIAVQBWAFcAVQBYAFYAVwBZAFUAVwBaAFkAWgBXAFsAWgBbAFwAXABdAFoAWwBeAFwAXABfAF0AWwBgAF4AXwBhAF0AYABiAF4AXwBjAGEAYABkAGIAZABlAGIAZABmAGUAYwBnAGEAYwBoAGcAaABpAGcAFQAXAGoAFQAWABcAGQAVAGoAGQBqABoAagAbABoAFwBrAGoAagBrABsAFwAYAGsAawAcABsAGABsAGsAawBsABwAGAAdAGwAbAAeABwAHQBtAGwAbABtAB4AHQAfAG0AbQAgAB4AHwBuAG0AbQBuACAAbgAhACAAHwAiAG4AbgAjACEAIgAjAG4AIgAkACMAbwBwAHEAbwByAHAAcwBvAHEAcwBxAHQAcQB1AHQAcAB2AHEAcQB2AHUAcAB3AHYAdgB4AHUAdwB5AHYAdgB5AHgAdwB6AHkAeQB7AHgAegB8AHkAeQB8AHsAegB9AHwAfAB+AHsAfQB/AHwAfAB/AH4AfwCAAH4AfQCBAH8AfwCCAIAAgQCCAH8AgQCDAIIAhACFAIYAhACHAIUAiACEAIYAiACGAIkAhgCKAIkAhQCLAIYAhgCLAIoAhQCMAIsAiwCNAIoAjACOAIsAiwCOAI0AjACPAI4AjgCQAI0AjwCRAI4AjgCRAJAAjwCSAJEAkQCTAJAAkgCUAJEAkQCUAJMAlACVAJMAkgCWAJQAlACXAJUAlgCXAJQAlgCYAJcA"),
+"lods": [0.6771018, PackedByteArray("AAABAAIAAAADAAEAAwAAAAQABQADAAQAAwAFAAYABgAFAAcAAwAGAAgABgAHAAkACAAGAAoACQAHAAsACAAKAAwACQALAA0ADAAKAA4ADQALAA8ADQAPABAAEAAPABEADAAOABIAEgAOABMAEgATABQAFQAWABcAFwAYABUAGQAVABoAFQAbABoAFQAYABsAGAAcABsAGAAdABwAHQAeABwAHQAfAB4AHwAgAB4AHwAhACAAHwAiACEAIgAjACEAIgAkACMA")],
+"material": SubResource("StandardMaterial3D_06211"),
+"name": "Grass",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 153,
+"vertex_data": PackedByteArray("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")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_si6jv")
+
+[sub_resource type="MultiMesh" id="MultiMesh_rmcgo"]
+transform_format = 1
+instance_count = 213
+mesh = SubResource("ArrayMesh_1fwu4")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pvdv2"]
+resource_name = "PathRocks"
+cull_mode = 2
+albedo_texture = ExtResource("9_x66a1")
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_7fyxi"]
+_surfaces = [{
+"aabb": AABB(-0.20063154, -0.0051642824, -0.119389325, 0.391096, 0.14044392, 0.28025424),
+"format": 34896613377,
+"index_count": 234,
+"index_data": PackedByteArray("FQAWABcAFwAWABgAFQAAABYAAAACABYAAgAYABYAAAABAAIABAABAAAABAAAABUAAwACAAEAAQAEAAMAAwAFAAIABAAFAAMABAACAAUABAAZAAIAGQAEABoAAgAZAAYAGgAGABkACQAEABUACQAaAAQACQAVAAoACQALABoAFQAMAAoADAAJAAoADAALAAkAFQAXAAwAGwALAAwAGwAaAAsAGwAMABcAGgAOAAYAGwAOABoAGwAcAA4ABgAOABMAEwAOABwADwAcABsAEwAcABQAHQAPABsAGwAXAB0AHgAcAA8AHQAeAA8AHAARABQAHAAeABEAEgATABQAEgAUABEABgATABIAHwASABEABgASAB8AIAARAB4AHwARACAAIQAeAB0AIQAdABcAIAAeACIAIQAiAB4AIwAfACAAHwAjAAYAJAAgACIAIwAgACQAIQAXACUABwAGACMAAgAGAAcABwAjAAgAAgAHABgAFwAYACUAGAAHAAgACAAjACQAJQAYACYAGAAIACYAJwAhACUAJQAmACcAJwAiACEAJAAiACgAJwAoACIACAAkABAAJwAmAA0ACAANACYAJwANACgACAAQAA0ADQAkACgADQAQACQA"),
+"lods": [0.036896937, PackedByteArray("AAABAAIAAwACAAEAAQAEAAMABAABAAAAAwAFAAIABAAFAAMABAACAAUABAAGAAIAAgAHAAAAAgAGAAcAAAAHAAgABwAGAAgACQAEAAAACQAAAAoACQALAAQABgAEAAsADAAJAAoAAAAMAAoADAALAAkAAAANAAwAAAAIAA0ADAAOAAsACwAOAAYADAANAA8ADAAPAA4ACAAQAA0AEAAPAA0ACAARABAAEAARAA8AEgAIAAYACAASABEABgAOABMAEwAOAA8ABgATABIADwARABQAEwAPABQAEgAUABEAEgATABQA")],
+"name": "PathRocks",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 41,
+"vertex_data": PackedByteArray("A/9PB7j9AAAg+exVNfUAAGnu+9tZxAAAt+JHrJ7sAABfpFTDPeoAAIPgJtEt2QAA8lv//3VbAABO6474zrMAAC3oCPCGNwAAUCs8vtTpAAA9HYMSe/wAAG0TlssuxQAA3gJMDfzYAADB/wwNIQQAAFAWS+4ziQAAAADqCo8AAAAx7eHLQRoAAKMvTcT9FQAA3jmX9m0vAABzHfHzDUwAABkUWJJTEAAAmqvDB///AAD//3ELmJIAALCdAAANpAAA4//JDFhoAAANYzT5c3IAAN8U8dwwpwAAKQFzBxmJAADbBt1QRQ4AABoxAABYPgAAXR5wAgAAAADGck/35DAAALVx1MasFQAACmkAAP4sAAA6atkDJQAAALDPxfHILAAAJrk5wBgVAACItgAAE2cAALD/Pw8QIwAAPr8AAGMsAADvvkMFRwAAAA==")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ehmes"]
+resource_name = "Pebble_Square_2_Cube_017_Retopology_004"
+_surfaces = [{
+"aabb": AABB(-0.20063154, -0.0051642824, -0.119389325, 0.391096, 0.14044392, 0.28025424),
+"attribute_data": PackedByteArray("PKqpVQWnB1kdnyJd5JzXXdOPiF7EhoVUnoxvXTuldmcFpwdZPKqpVf2jGF7FpEN6zK36f0HcntZq4P7+VdzF+uX4hNY/+X//BKi7hRuaQ33voMp9t4mOiJOTSHztjJ2AdJR0czuldmfvoMp9xaRDehuaQ30dnyJd5JzXXZKh9F50lHRzk5NIfB+Qn3jTj4he5JzXXQSou4XFpEN6zK36f++gyn0fkJ947YydgMWMS3uTk0h8t4mOiMWMS3vtjJ2AnoxvXcSGhVTTj4hexYxLe56Mb10fkJ94/aMYXh2fIl0FpwdZkqH0XjuldmeSofRe/aMYXvnb+OOL6HbWhuY15h2fIl0mmztRO6V2Z/+vzGQFpwdZ+dv444bmNeb/r8xkhuY15mTtetaG7T7ii+h21iz0pu6G5jXmhu0+4izymfdB9NvglulF/4bmNeYs8pn3auD+/iz0pu5R+Zz6LPKZ91L5d+4s8pn3lulF/1H5nPogjM+EtZzsibWc7ImUnRF+IIzPhLWc7ImUnRF+KpdBcjuldmeUnRF+lJ0RfnSUdHMql0FyG5pDfZSdEX47pXZnIIzPhBuaQ30ql0FyLI87cKmOEWJ0lHRzqY4RYnSUdHN0lHRzH5CfeCyPO3Asjztwt4rEcCCMz4QVhY6Dt4rEcBWFjoNwfwV0xYxLe5mKG2VwfwV0cH+iYbeKxHCpjhFit4rEcJmKG2UsjztwmYobZXB/omGZihtlqY4RYtOPiF40izJS+JRMUTSLMlKG7T7iWPWD1kH02+Bk7XrWQfTb4FL55+BY9YPWQfTb4FL5d+4s9KbuUvnn4PiUTFEmmztR5JzXXR2fIl0ql0FyO6V2ZxWFjoMgjM+E"),
+"format": 34896613399,
+"index_count": 234,
+"index_data": PackedByteArray("PQA+AD8APQANAD4AAABAAEEAAAABAEAAQgAJAEMAQgBEAAkARQAOAA8ARQBGAA4ACwBHAAwACwAHAEcASABJAEoASABLAEkATABNAE4ATABPAE0AUABMAE4AUQBSAFMAUQBUAFIAVQBWAFcAVQBYAFYAWQARAFoAWQBbABEAFQBcAF0AXgATAF8AXgBgABMAYQAUABIAYQBiABQAYwBkAGUAZgBnAGgAZgBpAGcAGwBqAGsAGwAaAGoAJQAmACcAJQAoACYAFgBsABcAFgBtAGwAIAAhACIAIAAcACEAHQAYAB4AHQBuABgAbwBwAHEAJAByACMAJABzAHIAdAB1AHYAKQAqACsAKQAsACoAdwAzAHgAdwA1ADMAeQAuAC8AeQB6AC4AewB8AH0AewB+AHwAfwCAAIEAfwCCAIAAgwCEAIUAgwCGAIQAMQCHAIgAMQAwAIcAMgCJADQAMgCKAIkAiwAFAIwAiwAGAAUAjQAEAI4AjQADAAQAjwCQAJEAjwCSAJAAkwAQAJQAkwCVABAAlgCXAJgAlgCZAJcAAgCaAJsAAgCcAJoANgA3ADgANgA5ADcAGQCdAB8AGQCeAJ0AOgA7ADwACACfAAoAoAChAC0A"),
+"lods": [0.036896937, PackedByteArray("AAABAAIAAgADAAAAAAADAAQAAAAEAAUABAAGAAUABwAIAAkACAAHAAoACwAHAAkACwAJAAwADQAOAA8ADQAQAA4ADgAQABEAEgATABQAEgAVABMAFgATABUAFgAVABcAGAAZABoAGwAaABkAGgAcABgAGQAYAB0AHQAYAB4AGQAdAB8AIAAcACEAIAAhACIAIgAjACAAJAAgACMAJQAmACcAJQAoACYAKQAqACsAKQAsACoALQAuAC8AMAAuAC0AMAAtADEAMgAzADQAMgA1ADMANgA3ADgANgA5ADcAOgA7ADwA")],
+"material": SubResource("StandardMaterial3D_pvdv2"),
+"name": "PathRocks",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 162,
+"vertex_data": PackedByteArray("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")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_7fyxi")
+
+[sub_resource type="MultiMesh" id="MultiMesh_vfry2"]
+transform_format = 1
+instance_count = 225
+mesh = SubResource("ArrayMesh_ehmes")
+
+[node name="PortIsland" type="Node3D" unique_id=1393806001]
+script = ExtResource("1_ekbcs")
+size = 256
+biome = &"port"
+
+[node name="Terrain3D" type="Terrain3D" parent="." unique_id=1032070151]
+data_directory = "res://game/world/handmade/islands/port_01_data"
+material = SubResource("Terrain3DMaterial_haert")
+assets = ExtResource("2_3jme0")
+top_level = true
+metadata/_edit_lock_ = true
+
+[node name="Buildings" type="Node3D" parent="." unique_id=1087571945]
+
+[node name="Warehouse_01" type="Node3D" parent="Buildings" unique_id=1274849911]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 61, 0.68213665, 65)
+
+[node name="Body" type="MeshInstance3D" parent="Buildings/Warehouse_01" unique_id=1125497280]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
+material_override = SubResource("StandardMaterial3D_kso8g")
+mesh = SubResource("BoxMesh_gy21s")
+
+[node name="Warehouse_02" type="Node3D" parent="Buildings" unique_id=363279952]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 105, 0.68213665, 65)
+
+[node name="Body" type="MeshInstance3D" parent="Buildings/Warehouse_02" unique_id=19103389]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
+material_override = SubResource("StandardMaterial3D_1b3p5")
+mesh = SubResource("BoxMesh_6bc6o")
+
+[node name="Warehouse_03" type="Node3D" parent="Buildings" unique_id=1877825555]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 159, 0.68213665, 65)
+
+[node name="Body" type="MeshInstance3D" parent="Buildings/Warehouse_03" unique_id=1087491085]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
+material_override = SubResource("StandardMaterial3D_epf6o")
+mesh = SubResource("BoxMesh_0gjhe")
+
+[node name="Warehouse_04" type="Node3D" parent="Buildings" unique_id=2071816335]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 203, 0.68213665, 65)
+
+[node name="Body" type="MeshInstance3D" parent="Buildings/Warehouse_04" unique_id=1346351268]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
+material_override = SubResource("StandardMaterial3D_07a8k")
+mesh = SubResource("BoxMesh_kd3sl")
+
+[node name="Containers_01" type="Node3D" parent="Buildings" unique_id=1081737356]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82, 0.68213665, 119.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_01" unique_id=1487263188]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_5fm5o")
+mesh = SubResource("BoxMesh_tj13a")
+
+[node name="Containers_02" type="Node3D" parent="Buildings" unique_id=546443044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103, 0.68213665, 119.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_02" unique_id=269208585]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_ohgp8")
+mesh = SubResource("BoxMesh_1wh4f")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_02" unique_id=1708021417]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_ut0so")
+mesh = SubResource("BoxMesh_d335w")
+
+[node name="Containers_03" type="Node3D" parent="Buildings" unique_id=1621933098]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 61, 0.68213665, 132.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_03" unique_id=274575595]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_4umlh")
+mesh = SubResource("BoxMesh_4vsvv")
+
+[node name="Containers_04" type="Node3D" parent="Buildings" unique_id=219929566]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82, 0.68213665, 132.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_04" unique_id=278862296]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_cvv5p")
+mesh = SubResource("BoxMesh_b1ilv")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_04" unique_id=321588190]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_oaj5p")
+mesh = SubResource("BoxMesh_pymo2")
+
+[node name="Containers_05" type="Node3D" parent="Buildings" unique_id=646764860]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103, 0.68213665, 132.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_05" unique_id=1038255754]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_nu1uh")
+mesh = SubResource("BoxMesh_fj6xm")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_05" unique_id=1155052973]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_xhq3n")
+mesh = SubResource("BoxMesh_tb7l1")
+
+[node name="Container2" type="MeshInstance3D" parent="Buildings/Containers_05" unique_id=1558626337]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.45, 0)
+material_override = SubResource("StandardMaterial3D_3i453")
+mesh = SubResource("BoxMesh_ywm5m")
+
+[node name="Containers_06" type="Node3D" parent="Buildings" unique_id=1415713006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 61, 0.68213665, 145.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_06" unique_id=605474490]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_7dccm")
+mesh = SubResource("BoxMesh_dqxbi")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_06" unique_id=1300938257]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_fauwc")
+mesh = SubResource("BoxMesh_mwhxf")
+
+[node name="Container2" type="MeshInstance3D" parent="Buildings/Containers_06" unique_id=689095518]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.45, 0)
+material_override = SubResource("StandardMaterial3D_n2j2u")
+mesh = SubResource("BoxMesh_c72yr")
+
+[node name="Containers_07" type="Node3D" parent="Buildings" unique_id=1012088840]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82, 0.68213665, 145.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_07" unique_id=2100372189]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_loivx")
+mesh = SubResource("BoxMesh_yyxbw")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_07" unique_id=899574866]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_3wnjw")
+mesh = SubResource("BoxMesh_xwcca")
+
+[node name="Containers_08" type="Node3D" parent="Buildings" unique_id=1555200425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103, 0.68213665, 145.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_08" unique_id=880413060]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_4srrm")
+mesh = SubResource("BoxMesh_8vdno")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_08" unique_id=905585089]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_6kmyl")
+mesh = SubResource("BoxMesh_yd4nh")
+
+[node name="Containers_09" type="Node3D" parent="Buildings" unique_id=1586465765]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82, 0.68213665, 171.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_09" unique_id=1346271703]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_qyw0h")
+mesh = SubResource("BoxMesh_l43ku")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_09" unique_id=2031624094]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_cl50d")
+mesh = SubResource("BoxMesh_catre")
+
+[node name="Container2" type="MeshInstance3D" parent="Buildings/Containers_09" unique_id=1901550982]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.45, 0)
+material_override = SubResource("StandardMaterial3D_brqao")
+mesh = SubResource("BoxMesh_gk26g")
+
+[node name="Containers_10" type="Node3D" parent="Buildings" unique_id=1335901755]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103, 0.68213665, 171.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_10" unique_id=1749521515]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_blis8")
+mesh = SubResource("BoxMesh_la1tc")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_10" unique_id=1017786641]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_6ix2n")
+mesh = SubResource("BoxMesh_6lu8h")
+
+[node name="Containers_11" type="Node3D" parent="Buildings" unique_id=637341803]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 61, 0.68213665, 184.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_11" unique_id=1151790977]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_80bco")
+mesh = SubResource("BoxMesh_ou37e")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_11" unique_id=426769741]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_b6n63")
+mesh = SubResource("BoxMesh_tywnp")
+
+[node name="Containers_12" type="Node3D" parent="Buildings" unique_id=1220251116]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82, 0.68213665, 184.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_12" unique_id=1019764694]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_4oxpf")
+mesh = SubResource("BoxMesh_x8m8t")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_12" unique_id=973062470]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_m7kb8")
+mesh = SubResource("BoxMesh_8j8us")
+
+[node name="Container2" type="MeshInstance3D" parent="Buildings/Containers_12" unique_id=829213367]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.45, 0)
+material_override = SubResource("StandardMaterial3D_3fq3c")
+mesh = SubResource("BoxMesh_g2704")
+
+[node name="Containers_13" type="Node3D" parent="Buildings" unique_id=901166365]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103, 0.68213665, 184.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_13" unique_id=1296829902]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_pj1ck")
+mesh = SubResource("BoxMesh_ul4rj")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_13" unique_id=671855121]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_g5uba")
+mesh = SubResource("BoxMesh_dfavk")
+
+[node name="Container2" type="MeshInstance3D" parent="Buildings/Containers_13" unique_id=1721525531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.45, 0)
+material_override = SubResource("StandardMaterial3D_vhcm0")
+mesh = SubResource("BoxMesh_hw8f4")
+
+[node name="Containers_14" type="Node3D" parent="Buildings" unique_id=966337051]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 149, 0.68213665, 119.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_14" unique_id=1530666178]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_35wkw")
+mesh = SubResource("BoxMesh_kmflf")
+
+[node name="Containers_15" type="Node3D" parent="Buildings" unique_id=59059445]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170, 0.68213665, 119.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_15" unique_id=1129846441]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_fws82")
+mesh = SubResource("BoxMesh_qutjp")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_15" unique_id=972622984]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_q831m")
+mesh = SubResource("BoxMesh_ik3rq")
+
+[node name="Containers_16" type="Node3D" parent="Buildings" unique_id=1254674813]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 149, 0.68213665, 132.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_16" unique_id=579733534]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_ywxn6")
+mesh = SubResource("BoxMesh_jar4m")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_16" unique_id=1383221924]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_e6lbt")
+mesh = SubResource("BoxMesh_6u1n0")
+
+[node name="Container2" type="MeshInstance3D" parent="Buildings/Containers_16" unique_id=934276800]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.45, 0)
+material_override = SubResource("StandardMaterial3D_otc5b")
+mesh = SubResource("BoxMesh_opxa6")
+
+[node name="Containers_17" type="Node3D" parent="Buildings" unique_id=1069153101]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170, 0.68213665, 132.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_17" unique_id=406931696]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_s0vsu")
+mesh = SubResource("BoxMesh_w5ntr")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_17" unique_id=2134851319]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_fownx")
+mesh = SubResource("BoxMesh_hd707")
+
+[node name="Containers_18" type="Node3D" parent="Buildings" unique_id=353925948]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 191, 0.68213665, 132.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_18" unique_id=911399386]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_8n2bx")
+mesh = SubResource("BoxMesh_nufmu")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_18" unique_id=949690485]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_vtm2m")
+mesh = SubResource("BoxMesh_k4rah")
+
+[node name="Containers_19" type="Node3D" parent="Buildings" unique_id=1646647680]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 149, 0.68213665, 145.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_19" unique_id=480657856]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_iuknk")
+mesh = SubResource("BoxMesh_cg7tp")
+
+[node name="Containers_20" type="Node3D" parent="Buildings" unique_id=51820409]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 191, 0.68213665, 171.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_20" unique_id=527287523]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_vhavg")
+mesh = SubResource("BoxMesh_pqnhm")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_20" unique_id=199293428]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_3tjrl")
+mesh = SubResource("BoxMesh_d2av3")
+
+[node name="Container2" type="MeshInstance3D" parent="Buildings/Containers_20" unique_id=26359621]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.45, 0)
+material_override = SubResource("StandardMaterial3D_48wmv")
+mesh = SubResource("BoxMesh_ddb2y")
+
+[node name="Containers_21" type="Node3D" parent="Buildings" unique_id=616705123]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170, 0.68213665, 184.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_21" unique_id=1157425436]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_8wu41")
+mesh = SubResource("BoxMesh_g1lmo")
+
+[node name="Container1" type="MeshInstance3D" parent="Buildings/Containers_21" unique_id=1280974116]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.85, 0)
+material_override = SubResource("StandardMaterial3D_ka74k")
+mesh = SubResource("BoxMesh_8rhn8")
+
+[node name="Containers_22" type="Node3D" parent="Buildings" unique_id=720930138]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 191, 0.68213665, 184.5)
+
+[node name="Container0" type="MeshInstance3D" parent="Buildings/Containers_22" unique_id=1846414473]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_8ibeo")
+mesh = SubResource("BoxMesh_wnixc")
+
+[node name="Trees" type="Node3D" parent="." unique_id=432867029]
+
+[node name="Tree_001" type="Node3D" parent="Trees" unique_id=662313085 instance=ExtResource("3_28kg7")]
+transform = Transform3D(0.11038389, 0, 0.6670367, 0, 0.6761084, 0, -0.6670367, 0, 0.11038389, 34.5, 0.56434995, 125.5)
+
+[node name="Tree_002" type="Node3D" parent="Trees" unique_id=1141859104 instance=ExtResource("3_28kg7")]
+transform = Transform3D(-0.31703874, 0, 0.85761094, 0, 0.91433585, 0, -0.85761094, 0, -0.31703874, 44.5, 0.58213663, 130.5)
+
+[node name="Tree_003" type="Node3D" parent="Trees" unique_id=994461085 instance=ExtResource("3_28kg7")]
+transform = Transform3D(0.034177862, 0, -0.80691797, 0, 0.80764145, 0, 0.80691797, 0, 0.034177862, 32.5, 0.4563454, 118.5)
+
+[node name="Tree_004" type="Node3D" parent="Trees" unique_id=1161779413 instance=ExtResource("3_28kg7")]
+transform = Transform3D(0.90669274, 0, 0.043756407, 0, 0.907748, 0, -0.043756407, 0, 0.90669274, 40.5, 0.58213663, 137.5)
+
+[node name="Tree_005" type="Node3D" parent="Trees" unique_id=1076148004 instance=ExtResource("3_28kg7")]
+transform = Transform3D(-0.81876767, 0, 0.21358159, 0, 0.84616643, 0, -0.21358159, 0, -0.81876767, 31.5, 0.4269059, 133.5)
+
+[node name="Tree_006" type="Node3D" parent="Trees" unique_id=830832487 instance=ExtResource("3_28kg7")]
+transform = Transform3D(-0.11097805, 0, 0.87302595, 0, 0.8800514, 0, -0.87302595, 0, -0.11097805, 27.5, 0.3572982, 124.5)
+
+[node name="Tree_007" type="Node3D" parent="Trees" unique_id=298305335 instance=ExtResource("3_28kg7")]
+transform = Transform3D(-0.67858404, 0, -0.532495, 0, 0.86257017, 0, 0.532495, 0, -0.67858404, 39.5, 0.6234339, 118.5)
+
+[node name="Tree_008" type="Node3D" parent="Trees" unique_id=1268389341 instance=ExtResource("3_28kg7")]
+transform = Transform3D(0.32422662, 0, 0.6335814, 0, 0.7117221, 0, -0.6335814, 0, 0.32422662, 40.5, 0.58213663, 124.5)
+
+[node name="Tree_009" type="Node3D" parent="Trees" unique_id=1804112924 instance=ExtResource("4_mknnx")]
+transform = Transform3D(-0.024604298, 0, 0.72076267, 0, 0.7211825, 0, -0.72076267, 0, -0.024604298, 230.5, 0.29465476, 145.5)
+
+[node name="Tree_010" type="Node3D" parent="Trees" unique_id=1054207917 instance=ExtResource("4_mknnx")]
+transform = Transform3D(0.29411796, 0, 0.43241146, 0, 0.522958, 0, -0.43241146, 0, 0.29411796, 219.5, 0.65981865, 138.5)
+
+[node name="Tree_011" type="Node3D" parent="Trees" unique_id=1918230671 instance=ExtResource("4_mknnx")]
+transform = Transform3D(0.43134508, 0, -0.56664175, 0, 0.71213865, 0, 0.56664175, 0, 0.43134508, 229.5, 0.31059015, 132.5)
+
+[node name="Tree_012" type="Node3D" parent="Trees" unique_id=1543143186 instance=ExtResource("4_mknnx")]
+transform = Transform3D(-0.5223346, 0, -0.31206843, 0, 0.60845715, 0, 0.31206843, 0, -0.5223346, 222.5, 0.5506843, 146.5)
+
+[node name="Tree_013" type="Node3D" parent="Trees" unique_id=105261729 instance=ExtResource("4_mknnx")]
+transform = Transform3D(0.5519019, 0, 0.44371325, 0, 0.7081505, 0, -0.44371325, 0, 0.5519019, 212.5, 0.58213663, 139.5)
+
+[node name="Tree_014" type="Node3D" parent="Trees" unique_id=601335732 instance=ExtResource("4_mknnx")]
+transform = Transform3D(-0.07666577, 0, -0.5641531, 0, 0.5693385, 0, 0.5641531, 0, -0.07666577, 217.5, 0.6973449, 132.5)
+
+[node name="Tree_015" type="Node3D" parent="Trees" unique_id=1058486544 instance=ExtResource("4_mknnx")]
+transform = Transform3D(-0.13366577, 0, 0.6671058, 0, 0.6803651, 0, -0.6671058, 0, -0.13366577, 224.5, 0.47308856, 128.5)
+
+[node name="Tree_016" type="Node3D" parent="Trees" unique_id=983538105 instance=ExtResource("4_mknnx")]
+transform = Transform3D(0.68922514, 0, -0.2948852, 0, 0.749659, 0, 0.2948852, 0, 0.68922514, 215.5, 0.58213663, 145.5)
+
+[node name="Rocks" type="Node3D" parent="." unique_id=757711156]
+
+[node name="Rock_01" type="Node3D" parent="Rocks" unique_id=2096496993 instance=ExtResource("5_0eb0n")]
+transform = Transform3D(-0.75256765, 0, -0.33662644, 0, 0.8244243, 0, 0.33662644, 0, -0.75256765, 212.37894, 0.48213667, 92.942764)
+
+[node name="Rock_02" type="Node3D" parent="Rocks" unique_id=1283432621 instance=ExtResource("6_txnxc")]
+transform = Transform3D(0.7889617, 0, -0.1301978, 0, 0.79963243, 0, 0.1301978, 0, 0.7889617, 96.30777, 0.48213667, 89.968544)
+
+[node name="Rock_03" type="Node3D" parent="Rocks" unique_id=341877195 instance=ExtResource("7_0pbbt")]
+transform = Transform3D(0.36853662, 0, -0.52280736, 0, 0.6396458, 0, 0.52280736, 0, 0.36853662, 80.48549, 0.48213667, 158.9739)
+
+[node name="Rock_04" type="Node3D" parent="Rocks" unique_id=651909275 instance=ExtResource("5_0eb0n")]
+transform = Transform3D(0.63168573, 0, -0.28404623, 0, 0.6926104, 0, 0.28404623, 0, 0.63168573, 187.04967, 0.48213667, 191.40596)
+
+[node name="Rock_05" type="Node3D" parent="Rocks" unique_id=1011936911 instance=ExtResource("6_txnxc")]
+transform = Transform3D(-0.4299959, 0, -0.6345245, 0, 0.76649714, 0, 0.6345245, 0, -0.4299959, 118.91938, 0.48213667, 117.29742)
+
+[node name="Rock_06" type="Node3D" parent="Rocks" unique_id=1137485981 instance=ExtResource("7_0pbbt")]
+transform = Transform3D(0.50025237, 0, 0.60846645, 0, 0.787708, 0, -0.60846645, 0, 0.50025237, 201.6118, 0.48213667, 77.836845)
+
+[node name="Rock_07" type="Node3D" parent="Rocks" unique_id=138337499 instance=ExtResource("7_0pbbt")]
+transform = Transform3D(0.5347814, 0, 0.47006646, 0, 0.71200675, 0, -0.47006646, 0, 0.5347814, 82.47908, 0.48213667, 93.67454)
+
+[node name="Rock_08" type="Node3D" parent="Rocks" unique_id=1678919324 instance=ExtResource("6_txnxc")]
+transform = Transform3D(-0.65420043, 0, -0.42565385, 0, 0.78048664, 0, 0.42565385, 0, -0.65420043, 135.20676, 0.34274113, 34.518044)
+
+[node name="Decor" type="Node3D" parent="." unique_id=575005685]
+
+[node name="SeaPreview" type="MeshInstance3D" parent="Decor" unique_id=1964669546]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, -0.3, 128)
+material_override = SubResource("StandardMaterial3D_f64mj")
+mesh = SubResource("PlaneMesh_wkf1g")
+
+[node name="Cover_Grass_Common_Short" type="MultiMeshInstance3D" parent="Decor" unique_id=919974667]
+multimesh = SubResource("MultiMesh_rmcgo")
+
+[node name="Cover_Pebble_Square_2" type="MultiMeshInstance3D" parent="Decor" unique_id=623538804]
+multimesh = SubResource("MultiMesh_vfry2")
+
+[node name="Markers" type="Node3D" parent="." unique_id=420702073]
+
+[node name="Boat" type="Marker3D" parent="Markers" unique_id=1097584414]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 0.4500357, 224.91307)
+gizmo_extents = 3.0
+
+[node name="PlayerStart" type="Marker3D" parent="Markers" unique_id=1615316639]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 0.68213665, 217.91307)
+gizmo_extents = 3.0
+
+[node name="Generator1" type="Marker3D" parent="Markers" unique_id=210619273]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 0.68213665, 150)
+gizmo_extents = 3.0
+
+[node name="Generator2" type="Marker3D" parent="Markers" unique_id=1830490194]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 212, 0.68213665, 160)
+gizmo_extents = 3.0
+
+[node name="Generator3" type="Marker3D" parent="Markers" unique_id=190344151]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 0.68213665, 48)
+gizmo_extents = 3.0
+
+[node name="Cache1" type="Marker3D" parent="Markers" unique_id=285136690]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, 0.68213665, 150)
+gizmo_extents = 3.0
+
+[node name="Cache2" type="Marker3D" parent="Markers" unique_id=336849470]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 166, 0.68213665, 80)
+gizmo_extents = 3.0
+
+[node name="Cache3" type="Marker3D" parent="Markers" unique_id=536195120]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 78, 0.68213665, 206)
+gizmo_extents = 3.0
+
+[node name="Cache4" type="Marker3D" parent="Markers" unique_id=1181111892]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 178, 0.68213665, 206)
+gizmo_extents = 3.0
