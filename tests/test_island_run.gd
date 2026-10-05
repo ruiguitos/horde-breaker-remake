@@ -19,6 +19,7 @@ func _initialize() -> void:
 	_test_grenade()
 	_test_perks_and_threat()
 	_test_meta_shop()
+	_test_boss_fight()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -202,3 +203,34 @@ func _test_meta_shop() -> void:
 	ctx.threat = 1
 	p.record_run(ctx)
 	_check(p.max_threat == 2, "extracting on the highest Threat unlocks the next")
+
+
+func _test_boss_fight() -> void:
+	var ctx := RunContext.new(11)
+	ctx.island_index = RunContext.ISLAND_COUNT - 1
+	var run := IslandRun.new(ctx.island_seed())
+	run.load_context(ctx)
+	run.director.max_alive = 0
+	for g in GameData.GENERATOR_COUNT:
+		run.generator_progress[g] = GameData.GENERATOR_HOLD_SECONDS
+	run.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)
+	var b: int = run.boss_index()
+	_check(run.objective == IslandRun.Objective.BOSS and b != -1, "last island: generators done spawn the Behemoth")
+	# Stand next to it, facing away so auto-fire does not interfere.
+	var bp: Vector3 = run.horde.positions[b]
+	run.player_pos = bp + Vector3(2.5, 0, 0)
+	run.hp = 1000.0
+	var saw_windup: bool = false
+	var hp_before: float = run.hp
+	for t in 260:
+		run.step(DT, Vector2.ZERO, Vector3(1, 0, 0), false)
+		saw_windup = saw_windup or run.slam_time > 0.0
+		run.horde.positions[run.boss_index()] = bp  # keep it in place for the test
+	_check(saw_windup and run.hp <= hp_before - GameData.BOSS_SLAM_DAMAGE, "the slam is telegraphed and hurts inside the ring")
+	b = run.boss_index()
+	run.horde.hp[b] = 1.0
+	run.player_pos = bp + Vector3(6, 0, 0)
+	for t in 30:
+		run.step(DT, Vector2.ZERO, Vector3(-1, 0, 0), false)
+	_check(run.objective == IslandRun.Objective.RETURN_TO_BOAT and run.boss_killed and run.intel_earned() >= 65,
+		"killing the boss unlocks the return and gives Intel (%d)" % run.intel_earned())

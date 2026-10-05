@@ -90,7 +90,7 @@ class Perk:
 		cost = p_cost
 
 
-enum EnemyKind { WALKER, RUNNER, BRUTE, GRABBER }
+enum EnemyKind { WALKER, RUNNER, BRUTE, GRABBER, BOSS }
 
 ## Player
 const PLAYER_MAX_HP: float = 100.0
@@ -115,6 +115,15 @@ const GRENADE_RANGE: float = 14.0
 const GRENADE_FUSE: float = 0.8
 const GRENADE_RADIUS: float = 5.0
 const GRENADE_DAMAGE: float = 90.0
+
+## Boss (last island)
+const BOSS_SLAM_RANGE: float = 9.0     ## starts a slam when the player is this close
+const BOSS_SLAM_RADIUS: float = 6.0
+const BOSS_SLAM_WINDUP: float = 1.2    ## telegraph time: get out of the ring!
+const BOSS_SLAM_DAMAGE: float = 30.0
+const BOSS_SLAM_COOLDOWN: float = 5.0
+const BOSS_SUMMON_INTERVAL: float = 9.0
+const BOSS_SUMMON_COUNT: int = 6
 
 ## Meta progression
 const SLOT_COSTS: Array[int] = [0, 100, 250]  ## cost of the 1st, 2nd, 3rd perk slot
@@ -146,7 +155,10 @@ static func enemy_types() -> Array[EnemyType]:
 	brute.pushable = false
 	var grabber := EnemyType.new(&"grabber", "Grabber", 70.0, Vector2(2.8, 3.2), 4.0, 0.5, 1.1, 1.9, Color(0.55, 0.35, 0.75), 3)
 	grabber.grabs = true
-	return [walker, runner, brute, grabber]
+	var boss := EnemyType.new(&"behemoth", "Behemoth", 2400.0, Vector2(1.7, 1.7), 35.0, 1.4, 3.0, 4.2, Color(0.3, 0.12, 0.15), 40)
+	boss.front_armor = 0.5
+	boss.pushable = false
+	return [walker, runner, brute, grabber, boss]
 
 
 static func weapons() -> Array[Weapon]:

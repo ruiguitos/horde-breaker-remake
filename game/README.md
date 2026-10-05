@@ -70,6 +70,18 @@ O perfil grava-se em `user://profile.json`. No Windows fica em
 `%APPDATA%\Godot\app_userdata\Horde Breaker Remake\`. Apagar o ficheiro
 recomeça o perfil.
 
+## Boss (3.ª ilha)
+
+Na última ilha, depois dos 3 geradores, aparece o **Behemoth**: 2400 de HP,
+blindado à frente (−50 %) e não é empurrado.
+- **Golpe no chão**: quando estás a menos de 9 m, para e mostra um anel
+  vermelho de 6 m, que pisca cada vez mais depressa. Ao fim de 1,2 s
+  rebenta: 30 de dano se estiveres dentro. Sai do anel ou usa o breaker,
+  que te torna invulnerável.
+- **Chama Runners**: a cada 9 s aparecem 6 à volta dele.
+- Matá-lo dá +20 de Intel e abre o regresso ao barco. Tem uma barra de vida
+  no topo e o marcador aponta para ele.
+
 ## Meta: Intel, perks e Threat
 
 - **Perks** compram-se uma vez com Intel e equipam-se em slots: começas com

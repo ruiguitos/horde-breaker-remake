@@ -5,7 +5,7 @@ extends RefCounted
 ## The Island scene feeds input into step() and draws the resulting state,
 ## so the whole game loop can also run headless in tests.
 
-enum Objective { GENERATORS, RETURN_TO_BOAT, WON, LOST }
+enum Objective { GENERATORS, BOSS, RETURN_TO_BOAT, WON, LOST }
 
 var map: IslandMap
 var field: FlowField
@@ -52,6 +52,14 @@ var orb_values: PackedInt32Array = PackedInt32Array()
 var objective: Objective = Objective.GENERATORS
 var generator_progress: PackedFloat32Array = PackedFloat32Array()
 var generator_started: Array[bool] = []
+## The last island ends with a boss fight before the return to the boat.
+var has_boss: bool = false
+var boss_max_hp: float = 0.0
+var slam_pos: Vector3 = Vector3.ZERO
+var slam_time: float = 0.0  ## > 0 while a slam is winding up
+var boss_killed: bool = false
+var _slam_cd: float = 2.0
+var _summon_cd: float = GameData.BOSS_SUMMON_INTERVAL
 
 # Stats
 var kills: int = 0
@@ -87,6 +95,7 @@ func _init(rng_seed: int = 7) -> void:
 ## Loads the run state carried from previous islands and scales difficulty.
 func load_context(ctx: RunContext) -> void:
 	perks = ctx.perks.duplicate()
+	has_boss = ctx.is_last_island()
 	threat = ctx.threat
 	max_hp = ctx.max_hp
 	hp = ctx.hp
@@ -202,6 +211,7 @@ func intel_earned() -> int:
 		if p >= GameData.GENERATOR_HOLD_SECONDS:
 			done += 1
 	var base: int = (kills - _kills_at_start) / 5 + done * 15 + (40 if objective == Objective.WON else 0)
+	base += 20 if boss_killed else 0
 	return int(base * GameData.threat_intel(threat))
 
 
@@ -474,13 +484,85 @@ func _update_mission(dt: float) -> void:
 						for w in weapons.size():
 							if weapons[w].max_ammo > 0:
 								ammo[w] = mini(max_ammo(w), ammo[w] + max_ammo(w) / 2)
-			if all_done:
+			if all_done and has_boss:
+				objective = Objective.BOSS
+				_spawn_boss()
+				messages.append("Something huge is coming... Kill the Behemoth!")
+			elif all_done:
 				objective = Objective.RETURN_TO_BOAT
 				director.trigger_peak(25.0)
 				messages.append("All generators online. Get back to the boat!")
+		Objective.BOSS:
+			var b: int = boss_index()
+			if b == -1:
+				boss_killed = true
+				objective = Objective.RETURN_TO_BOAT
+				slam_time = 0.0
+				director.trigger_peak(20.0)
+				messages.append("Behemoth down! Get back to the boat!")
+			else:
+				_update_boss(dt, b)
 		Objective.RETURN_TO_BOAT:
 			if player_pos.distance_to(map.boat) <= GameData.BOAT_RADIUS:
 				objective = Objective.WON
+
+
+## Index of the boss in the horde, or -1 (indices change when enemies die).
+func boss_index() -> int:
+	for i in horde.count:
+		if horde.kinds[i] == GameData.EnemyKind.BOSS:
+			return i
+	return -1
+
+
+func boss_hp_fraction() -> float:
+	var b: int = boss_index()
+	return horde.hp[b] / boss_max_hp if b != -1 and boss_max_hp > 0.0 else 0.0
+
+
+func _spawn_boss() -> void:
+	# Arrives from the far side of the player's position, on reachable ground.
+	for attempt in 40:
+		var ang: float = rng.randf() * TAU
+		var p: Vector3 = player_pos + Vector3(cos(ang), 0, sin(ang)) * 22.0
+		if Horde.overlaps_wall(field, p.x, p.z, Horde.RADIUS + 0.05):
+			continue
+		if field.distance_at(p) >= FlowField.UNREACHABLE:
+			continue
+		var i: int = horde.add(p, GameData.EnemyKind.BOSS, rng)
+		boss_max_hp = horde.hp[i]
+		return
+	# Fallback: right at a generator (always free).
+	var j: int = horde.add(map.generators[0], GameData.EnemyKind.BOSS, rng)
+	boss_max_hp = horde.hp[j]
+
+
+func _update_boss(dt: float, b: int) -> void:
+	var bp: Vector3 = horde.positions[b]
+	_slam_cd -= dt
+	_summon_cd -= dt
+	if slam_time > 0.0:
+		# Winding up: the boss stands still while the ring is shown.
+		horde.stun[b] = maxf(horde.stun[b], 0.05)
+		slam_time -= dt
+		if slam_time <= 0.0:
+			explosions.append(slam_pos)
+			if dash_time <= 0.0 and player_pos.distance_to(slam_pos) <= GameData.BOSS_SLAM_RADIUS:
+				hp -= GameData.BOSS_SLAM_DAMAGE
+				messages.append("SLAMMED!")
+			for j in horde.query_radius(slam_pos, GameData.BOSS_SLAM_RADIUS):
+				if j != b:
+					horde.knock_back(j, slam_pos, 2.0)
+	elif _slam_cd <= 0.0 and bp.distance_to(player_pos) <= GameData.BOSS_SLAM_RANGE:
+		slam_pos = bp
+		slam_time = GameData.BOSS_SLAM_WINDUP
+		_slam_cd = GameData.BOSS_SLAM_COOLDOWN
+	if _summon_cd <= 0.0:
+		_summon_cd = GameData.BOSS_SUMMON_INTERVAL
+		for k in GameData.BOSS_SUMMON_COUNT:
+			var p: Vector3 = bp + Vector3(cos(k * 1.05), 0, sin(k * 1.05)) * 3.0
+			if not Horde.overlaps_wall(field, p.x, p.z, Horde.RADIUS + 0.05):
+				horde.add(p, GameData.EnemyKind.RUNNER, rng)
 
 
 func _spawn_enemy() -> void:
@@ -509,6 +591,8 @@ func objective_text() -> String:
 				if p >= GameData.GENERATOR_HOLD_SECONDS:
 					done += 1
 			return "Activate the generators (%d/%d)" % [done, GameData.GENERATOR_COUNT]
+		Objective.BOSS:
+			return "Kill the Behemoth!"
 		Objective.RETURN_TO_BOAT:
 			return "Return to the boat!"
 		Objective.WON:

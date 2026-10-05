@@ -29,6 +29,7 @@ var _tracer_mesh := ImmediateMesh.new()
 var _generators: Array[MeshInstance3D] = []
 var _generator_rings: Array[MeshInstance3D] = []
 var _boat_ring: MeshInstance3D
+var _slam_ring: MeshInstance3D
 var _explosions: Array[MeshInstance3D] = []
 var _tracers: Array[PackedVector3Array] = []
 var _tracer_life: float = 0.0
@@ -139,6 +140,8 @@ func _build_world() -> void:
 	add_child(boat)
 	_boat_ring = _ring(run.map.boat, GameData.BOAT_RADIUS, Color(0.3, 1, 0.4))
 	_boat_ring.visible = false
+	_slam_ring = _ring(Vector3.ZERO, GameData.BOSS_SLAM_RADIUS, Color(1, 0.2, 0.1))
+	_slam_ring.visible = false
 
 	_player = Node3D.new()
 	var body := MeshInstance3D.new()
@@ -441,7 +444,7 @@ func _draw_effects(delta: float) -> void:
 	# Dismemberment with primitives: chunks fly off killed enemies.
 	for d in run.deaths:
 		var t: GameData.EnemyType = run.horde.types[int(d.z)]
-		if int(d.z) == GameData.EnemyKind.BRUTE:
+		if int(d.z) in [GameData.EnemyKind.BRUTE, GameData.EnemyKind.BOSS]:
 			_hitstop = 0.08  # freeze the simulation briefly: the kill "lands"
 			_trauma = minf(1.0, _trauma + 0.3)
 		var origin := Vector3(d.x, 1.0, d.y)
@@ -516,3 +519,10 @@ func _draw_mission() -> void:
 		elif p > 0.0:
 			m.albedo_color = Color(0.7, 0.2, 0.15).lerp(Color(1, 0.85, 0.2), p)
 	_boat_ring.visible = run.objective == IslandRun.Objective.RETURN_TO_BOAT
+	# Boss slam telegraph: a ring that pulses faster as the slam gets closer.
+	_slam_ring.visible = run.slam_time > 0.0
+	if _slam_ring.visible:
+		_slam_ring.position = run.slam_pos + Vector3(0, 0.08, 0)
+		var urgency: float = 1.0 - run.slam_time / GameData.BOSS_SLAM_WINDUP
+		var m: StandardMaterial3D = _slam_ring.material_override
+		m.albedo_color = Color(1, 0.2, 0.1).lerp(Color(1, 1, 1), absf(sin(urgency * urgency * 30.0)))

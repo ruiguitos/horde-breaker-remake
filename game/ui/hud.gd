@@ -11,6 +11,7 @@ var _hp_bar: ProgressBar
 var _xp_bar: ProgressBar
 var _breaker_bar: ProgressBar
 var _grenade_bar: ProgressBar
+var _boss_bar: ProgressBar
 var _info: Label
 var _objective: Label
 var _marker: Label
@@ -62,6 +63,19 @@ func _init() -> void:
 	_marker.add_theme_font_size_override("font_size", 18)
 	_marker.add_theme_color_override("font_color", Color(1, 0.9, 0.3))
 	root.add_child(_marker)
+
+	# Boss health bar under the objective.
+	_boss_bar = ProgressBar.new()
+	_boss_bar.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_boss_bar.position = Vector2(-250, 52)
+	_boss_bar.custom_minimum_size = Vector2(500, 22)
+	_boss_bar.show_percentage = false
+	var boss_fill := StyleBoxFlat.new()
+	boss_fill.bg_color = Color(0.7, 0.1, 0.15)
+	_boss_bar.add_theme_stylebox_override("fill", boss_fill)
+	_boss_bar.max_value = 1.0
+	_boss_bar.visible = false
+	root.add_child(_boss_bar)
 
 	_messages = Label.new()
 	_messages.set_anchors_preset(Control.PRESET_CENTER_TOP)
@@ -173,6 +187,9 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 		_info.text += "\nGRABBED! Use the breaker!"
 	_objective.text = (island_text + " — " if island_text != "" else "") + run.objective_text()
 
+	_boss_bar.visible = run.objective == IslandRun.Objective.BOSS
+	_boss_bar.value = run.boss_hp_fraction()
+	_messages.position.y = 84.0 if _boss_bar.visible else 56.0
 	_update_marker(run, camera)
 
 	_message_time -= get_process_delta_time()
@@ -219,6 +236,9 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 					best = d
 					goal = run.map.generators[g]
 					goal_name = "Generator"
+	elif run.objective == IslandRun.Objective.BOSS and run.boss_index() != -1:
+		goal = run.horde.positions[run.boss_index()]
+		goal_name = "Behemoth"
 	elif run.objective == IslandRun.Objective.RETURN_TO_BOAT:
 		goal = run.map.boat
 		goal_name = "Boat"

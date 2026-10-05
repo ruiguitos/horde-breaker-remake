@@ -14,7 +14,7 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 
 - [ ] Escolha de rota entre ilhas (grafo com modificadores).
 - [ ] Mais desbloqueios com Intel: armas e cartas no pool, classes.
-- [ ] Boss na última ilha (Volcano).
+- [ ] Boss: segunda fase, ataque à distância, ilha própria (Volcano).
 - [ ] Caches/desvios opcionais na ilha.
 
 ## Gráficos e feel
