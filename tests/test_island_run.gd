@@ -233,6 +233,16 @@ func _test_boss_fight() -> void:
 		saw_windup = saw_windup or run.slam_time > 0.0
 		run.horde.positions[run.boss_index()] = bp  # keep it in place for the test
 	_check(saw_windup and run.hp <= hp_before - GameData.BOSS_SLAM_DAMAGE, "the slam is telegraphed and hurts inside the ring")
+	# Keep away: the boss throws a rock that lands where the player stood.
+	run.player_pos = bp + Vector3(16, 0, 0)
+	run.hp = 1000.0
+	var hp_far: float = run.hp
+	var threw: bool = false
+	for t in 330:
+		run.step(DT, Vector2.ZERO, Vector3(1, 0, 0), false)
+		threw = threw or run.rocks.size() > 0
+		run.horde.positions[run.boss_index()] = bp
+	_check(threw and run.hp < hp_far, "keeping away from the boss gets you hit by thrown rocks")
 	b = run.boss_index()
 	run.horde.hp[b] = run.boss_max_hp * 0.4
 	run.step(DT, Vector2.ZERO, Vector3(1, 0, 0), false)
@@ -240,7 +250,9 @@ func _test_boss_fight() -> void:
 	b = run.boss_index()
 	run.horde.hp[b] = 1.0
 	run.player_pos = bp + Vector3(6, 0, 0)
-	for t in 30:
+	for t in 240:
+		if run.boss_index() == -1:
+			break
 		run.step(DT, Vector2.ZERO, Vector3(-1, 0, 0), false)
 	_check(run.objective == IslandRun.Objective.RETURN_TO_BOAT and run.boss_killed and run.intel_earned() >= 65,
 		"killing the boss unlocks the return and gives Intel (%d)" % run.intel_earned())

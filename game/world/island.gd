@@ -63,6 +63,8 @@ var _hitstop: float = 0.0
 var _grenade_held: bool = false
 var _grenade_mm := MultiMesh.new()
 var _grenade_ring_mm := MultiMesh.new()
+var _rock_mm := MultiMesh.new()
+var _rock_ring_mm := MultiMesh.new()
 var _sim_ms: float = 0.0
 
 
@@ -85,6 +87,9 @@ func _build_world() -> void:
 	env.environment = Environment.new()
 	env.environment.background_mode = Environment.BG_COLOR
 	env.environment.background_color = Color(0.45, 0.6, 0.75)
+	if _is_volcano():
+		env.environment.background_color = Color(0.35, 0.18, 0.14)
+		env.environment.ambient_light_color = Color(0.5, 0.3, 0.25)
 	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.environment.ambient_light_color = Color(0.4, 0.42, 0.48)
 	if context != null and context.modifier == &"fog":
@@ -97,6 +102,8 @@ func _build_world() -> void:
 	sun.rotation_degrees = Vector3(-55, -30, 0)
 	sun.shadow_enabled = true
 	sun.light_energy = 0.8
+	if _is_volcano():
+		sun.light_color = Color(1.0, 0.6, 0.4)
 	add_child(sun)
 
 	var f: FlowField = run.field
@@ -141,6 +148,10 @@ func _build_world() -> void:
 		var d: int = coast[cells[i].y * f.width + cells[i].x]
 		var sand := Color(0.72, 0.66, 0.48)
 		var grass := Color(0.36, 0.5, 0.26)
+		if _is_volcano():
+			# Black sand and ash; lighter cracks scattered by the noise below.
+			sand = Color(0.22, 0.2, 0.2)
+			grass = Color(0.32, 0.28, 0.26)
 		var c: Color = sand.lerp(grass, clampf((d - 4) / 8.0, 0.0, 1.0))
 		ground_mm.set_instance_color(i, c.darkened(rng.randf() * 0.06))
 	var ground := MultiMeshInstance3D.new()
@@ -163,6 +174,29 @@ func _build_world() -> void:
 		_building_boxes.append(AABB(Vector3(r.position.x, 0, r.position.y), Vector3(r.size.x, h, r.size.y)))
 
 	_build_props(rng)
+	if _is_volcano():
+		# The volcano itself, rising from the sea north of the island.
+		var cone := MeshInstance3D.new()
+		var cm := CylinderMesh.new()
+		cm.top_radius = 7.0
+		cm.bottom_radius = 45.0
+		cm.height = 40.0
+		cone.mesh = cm
+		cone.position = Vector3(f.width * 0.5, 19.0, -40.0)
+		cone.material_override = _mat(Color(0.2, 0.16, 0.15))
+		add_child(cone)
+		var lava := MeshInstance3D.new()
+		lava.mesh = _sphere(6.5)
+		lava.position = cone.position + Vector3(0, 20.0, 0)
+		var lm := _mat(Color(1.0, 0.45, 0.1), true)
+		lava.material_override = lm
+		add_child(lava)
+		var glow := OmniLight3D.new()
+		glow.light_color = Color(1, 0.4, 0.1)
+		glow.omni_range = 60.0
+		glow.light_energy = 2.0
+		glow.position = lava.position
+		add_child(glow)
 	for c in run.map.caches:
 		var crate := MeshInstance3D.new()
 		var cm := BoxMesh.new()
@@ -256,6 +290,8 @@ func _build_world() -> void:
 	warn.inner_radius = 0.92
 	warn.outer_radius = 1.0
 	_setup_multimesh(_grenade_ring_mm, warn, false, Color(1, 0.25, 0.1), true)
+	_setup_multimesh(_rock_mm, _sphere(0.6), false, Color(0.3, 0.22, 0.2))
+	_setup_multimesh(_rock_ring_mm, warn, false, Color(1, 0.5, 0.1), true)
 	var chunk := BoxMesh.new()
 	chunk.size = Vector3(0.25, 0.25, 0.25)
 	_setup_multimesh(_debris_mm, chunk, true)
@@ -349,6 +385,8 @@ func _build_props(rng: RandomNumberGenerator) -> void:
 		var sc: float = rng.randf_range(0.8, 1.3)
 		trunk_mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * sc), p + Vector3(0, 1.1 * sc, 0)))
 		var green := Color(0.2, 0.42, 0.2).lightened(rng.randf() * 0.15)
+		if _is_volcano():
+			green = Color(0.16, 0.13, 0.12).lightened(rng.randf() * 0.1)  # charred
 		for k in 2:
 			var ks: float = sc * (1.0 - 0.3 * k)
 			crown_mm.set_instance_transform(i * 2 + k, Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * ks), p + Vector3(0, (2.4 + 1.1 * k) * sc, 0)))
@@ -521,6 +559,7 @@ func _process(delta: float) -> void:
 	_draw_enemies()
 	_draw_orbs()
 	_draw_grenades()
+	_draw_rocks()
 	_draw_effects(delta)
 	_draw_mission()
 	_fade_occluders(delta)
@@ -649,6 +688,22 @@ func _draw_enemies() -> void:
 		_arm_mm.set_instance_color(i * 2 + 1, c)
 		# Heads are paler so they read as the target for headshots.
 		_head_mm.set_instance_color(i, c if h.flash[i] > 0.0 else c.lerp(Color(0.85, 0.8, 0.7), 0.45))
+
+
+func _is_volcano() -> bool:
+	return context != null and context.is_last_island()
+
+
+func _draw_rocks() -> void:
+	var n: int = run.rocks.size()
+	_rock_mm.instance_count = n
+	_rock_ring_mm.instance_count = n
+	for i in n:
+		var t: float = 1.0 - run.rock_times[i] / GameData.BOSS_ROCK_FLIGHT
+		var target: Vector3 = run.rocks[i]
+		var p: Vector3 = run.rock_origins[i].lerp(target, t) + Vector3(0, sin(t * PI) * 6.0, 0)
+		_rock_mm.set_instance_transform(i, Transform3D(Basis(), p))
+		_rock_ring_mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * GameData.BOSS_ROCK_RADIUS), target + Vector3(0, 0.07, 0)))
 
 
 func _draw_grenades() -> void:

@@ -94,7 +94,10 @@ comando) entre duas ilhas sorteadas:
 | Sea Fog | nevoeiro: vês os inimigos mais tarde | ×1,2 |
 | Supply Shortage | munição especial a metade | ×1,2 |
 
-## Boss (3.ª ilha)
+## Boss (3.ª ilha: o Vulcão)
+
+A última ilha tem outro ambiente: cinza preta, árvores queimadas, luz
+vermelha e o vulcão a norte.
 
 Na última ilha, depois dos 3 geradores, aparece o **Behemoth**: 2400 de HP,
 blindado à frente (−50 %) e não é empurrado.
@@ -103,6 +106,9 @@ blindado à frente (−50 %) e não é empurrado.
   rebenta: 30 de dano se estiveres dentro. Sai do anel ou usa o breaker,
   que te torna invulnerável.
 - **Chama Runners**: a cada 9 s aparecem 6 à volta dele.
+- **Rochas**: se te afastas mais de 12 m, atira rochas para onde estás. Um
+  anel laranja marca o sítio e caem 1,5 s depois (20 de dano). Não dá para
+  fugir dele para sempre.
 - **Fase 2** (abaixo de 50 % de HP): fica mais rápido, golpeia mais vezes e
   chama também um Brute.
 - Matá-lo dá +20 de Intel e abre o regresso ao barco. Tem uma barra de vida

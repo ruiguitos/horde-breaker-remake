@@ -70,6 +70,11 @@ var slam_time: float = 0.0  ## > 0 while a slam is winding up
 var boss_killed: bool = false
 ## Phase 2 below half HP: faster, slams more often, summons a Brute too.
 var boss_enraged: bool = false
+## Rocks thrown by the boss: target point and remaining flight time.
+var rocks: PackedVector3Array = PackedVector3Array()
+var rock_times: PackedFloat32Array = PackedFloat32Array()
+var rock_origins: PackedVector3Array = PackedVector3Array()
+var _rock_cd: float = 3.0
 var _slam_cd: float = 2.0
 var _summon_cd: float = GameData.BOSS_SUMMON_INTERVAL
 
@@ -624,6 +629,9 @@ func _update_mission(dt: float) -> void:
 			var b: int = boss_index()
 			if b == -1:
 				boss_killed = true
+				rocks.clear()
+				rock_times.clear()
+				rock_origins.clear()
 				objective = Objective.RETURN_TO_BOAT
 				slam_time = 0.0
 				director.trigger_peak(20.0)
@@ -720,6 +728,24 @@ func _update_boss(dt: float, b: int) -> void:
 		slam_pos = bp
 		slam_time = GameData.BOSS_SLAM_WINDUP
 		_slam_cd = GameData.BOSS_SLAM_COOLDOWN * (0.6 if boss_enraged else 1.0)
+	# Kiting the boss gets punished with rocks aimed where the player stands.
+	_rock_cd -= dt
+	if _rock_cd <= 0.0 and slam_time <= 0.0 and bp.distance_to(player_pos) >= GameData.BOSS_ROCK_MIN_RANGE:
+		_rock_cd = GameData.BOSS_ROCK_COOLDOWN * (0.6 if boss_enraged else 1.0)
+		rocks.append(player_pos)
+		rock_times.append(GameData.BOSS_ROCK_FLIGHT)
+		rock_origins.append(bp + Vector3(0, 4.0, 0))
+	var r: int = rocks.size() - 1
+	while r >= 0:
+		rock_times[r] -= dt
+		if rock_times[r] <= 0.0:
+			explosions.append(rocks[r])
+			if dash_time <= 0.0 and player_pos.distance_to(rocks[r]) <= GameData.BOSS_ROCK_RADIUS:
+				hp -= GameData.BOSS_ROCK_DAMAGE
+			rocks.remove_at(r)
+			rock_times.remove_at(r)
+			rock_origins.remove_at(r)
+		r -= 1
 	if _summon_cd <= 0.0:
 		_summon_cd = GameData.BOSS_SUMMON_INTERVAL
 		if boss_enraged:

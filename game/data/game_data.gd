@@ -145,6 +145,13 @@ const SCREAM_RANGE: float = 22.0
 const SCREAM_TIME: float = 3.0             ## seconds in sight before it screams
 const SCREAM_COOLDOWN: float = 15.0
 
+## Boss rock throw (when the player keeps their distance)
+const BOSS_ROCK_MIN_RANGE: float = 12.0
+const BOSS_ROCK_FLIGHT: float = 1.5     ## time to land: the ring shows where
+const BOSS_ROCK_RADIUS: float = 2.5
+const BOSS_ROCK_DAMAGE: float = 20.0
+const BOSS_ROCK_COOLDOWN: float = 3.5
+
 ## Supply caches
 const CACHE_RADIUS: float = 2.0
 const CACHE_OPEN_TIME: float = 1.5
