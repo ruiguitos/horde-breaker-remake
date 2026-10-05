@@ -136,7 +136,7 @@ func _build_world() -> void:
 	sea.position = Vector3(f.width * 0.5, -0.3, f.height * 0.5)
 	sea_mesh.subdivide_width = 120
 	sea_mesh.subdivide_depth = 120
-	sea.material_override = _sea_material()
+	sea.material_override = Visuals.sea_material()
 	add_child(sea)
 
 	var rng := RandomNumberGenerator.new()
@@ -368,31 +368,6 @@ func _build_world() -> void:
 	_camera = Camera3D.new()
 	_camera.fov = camera_fov
 	add_child(_camera)
-
-
-## Animated sea: vertices bob with two crossing sine waves (vertex shader),
-## and the colour gets lighter on the crests.
-func _sea_material() -> ShaderMaterial:
-	var sh := Shader.new()
-	sh.code = """
-shader_type spatial;
-uniform vec3 deep = vec3(0.1, 0.28, 0.45);
-uniform vec3 crest = vec3(0.35, 0.6, 0.75);
-varying float h;
-void vertex() {
-	vec3 w = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-	h = sin(w.x * 0.15 + TIME * 1.3) * 0.5 + sin(w.z * 0.11 - TIME * 0.9) * 0.5;
-	VERTEX.y += h * 0.25;
-}
-void fragment() {
-	ALBEDO = mix(deep, crest, clamp(h * 0.5 + 0.5, 0.0, 1.0) * 0.5);
-	ROUGHNESS = 0.25;
-	SPECULAR = 0.6;
-}
-"""
-	var m := ShaderMaterial.new()
-	m.shader = sh
-	return m
 
 
 func _coast_distance(in_building: Dictionary) -> PackedInt32Array:

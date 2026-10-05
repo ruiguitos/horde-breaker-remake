@@ -70,6 +70,26 @@ static func title(text: String, size: int = 44) -> Label:
 	return l
 
 
+## A panel docked to the right edge (full height, with margins), so a 3D
+## scene stays visible on the left.
+static func side_panel(parent: Control, width: float) -> VBoxContainer:
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
+	margin.offset_left = -width - 24
+	margin.add_theme_constant_override("margin_top", 24)
+	margin.add_theme_constant_override("margin_bottom", 24)
+	margin.add_theme_constant_override("margin_right", 24)
+	parent.add_child(margin)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(width, 0)
+	margin.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	panel.add_child(box)
+	return box
+
+
 ## A centred panel filling at most `max_width`, returned with its content box.
 static func centered_panel(parent: Control, max_width: float) -> VBoxContainer:
 	var center := CenterContainer.new()

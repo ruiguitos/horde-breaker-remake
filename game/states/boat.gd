@@ -17,6 +17,8 @@ var _route_buttons: Array[Button] = []
 var _route_picked: bool = false
 var _route_biomes: Array[StringName] = []
 var _route_missions: Array[StringName] = []
+var _boat: Node3D
+var _island_mat: StandardMaterial3D
 
 
 func _ready() -> void:
@@ -25,11 +27,8 @@ func _ready() -> void:
 	size = get_viewport_rect().size
 	_rng.seed = context.island_seed() + 1
 	theme = UiTheme.get_theme()
-	var bg := ColorRect.new()
-	bg.color = Color(0.06, 0.1, 0.14)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
-	var box: VBoxContainer = UiTheme.centered_panel(self, 720)
+	_build_scene()
+	var box: VBoxContainer = UiTheme.side_panel(self, 600)
 	box.add_child(UiTheme.title("THE BOAT — island %d of %d next" % [context.island_index + 1, RunContext.ISLAND_COUNT], 28))
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -44,7 +43,7 @@ func _ready() -> void:
 	_make_options()
 	for i in _options.size():
 		var b := Button.new()
-		b.custom_minimum_size = Vector2(220, 140)
+		b.custom_minimum_size = Vector2(186, 130)
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		b.text = "%d. %s\n\n%s" % [i + 1, _options[i]["title"], _options[i]["text"]]
 		b.pressed.connect(_pick.bind(i))
@@ -74,7 +73,7 @@ func _ready() -> void:
 			biomes.remove_at(pick)
 	for i in 2:
 		var rb := Button.new()
-		rb.custom_minimum_size = Vector2(335, 80)
+		rb.custom_minimum_size = Vector2(286, 96)
 		rb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		rb.text = "%d. %s · %s — %s (Intel x%.1f)\n%s" % [i + 4, GameData.BIOMES[_route_biomes[i]]["name"],
 			GameData.MISSIONS[_route_missions[i]]["name"], _routes[i].title, _routes[i].intel_mult, _routes[i].description]
@@ -88,6 +87,75 @@ func _ready() -> void:
 	_land.pressed.connect(func() -> void: land_requested.emit())
 	box.add_child(_land)
 	_refresh_status()
+
+
+## 3D backdrop: the boat bobbing on the sea, the next island on the horizon
+## (coloured by the chosen route's biome), a low sun.
+func _build_scene() -> void:
+	var world := Node3D.new()
+	add_child(world)
+	var env := WorldEnvironment.new()
+	env.environment = Environment.new()
+	env.environment.background_mode = Environment.BG_COLOR
+	env.environment.background_color = Color(0.85, 0.6, 0.45) if not context.is_last_island() else Color(0.4, 0.18, 0.14)
+	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.environment.ambient_light_color = Color(0.45, 0.42, 0.45)
+	env.environment.fog_enabled = true
+	env.environment.fog_light_color = env.environment.background_color
+	env.environment.fog_density = 0.003
+	world.add_child(env)
+	var sun := DirectionalLight3D.new()
+	sun.rotation_degrees = Vector3(-18, 160, 0)
+	sun.light_color = Color(1.0, 0.8, 0.6)
+	sun.shadow_enabled = true
+	world.add_child(sun)
+	var sea := MeshInstance3D.new()
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(500, 500)
+	plane.subdivide_width = 150
+	plane.subdivide_depth = 150
+	sea.mesh = plane
+	sea.material_override = Visuals.sea_material()
+	world.add_child(sea)
+	_boat = Node3D.new()
+	_boat.add_child(Visuals.box(Vector3(3.2, 1.0, 8.0), Vector3(0, 0.3, 0), Color(0.45, 0.3, 0.18)))
+	_boat.add_child(Visuals.box(Vector3(2.0, 1.4, 2.4), Vector3(0, 1.5, 1.4), Color(0.85, 0.85, 0.8)))
+	_boat.add_child(Visuals.box(Vector3(0.15, 4.0, 0.15), Vector3(0, 3.2, -1.5), Color(0.3, 0.25, 0.2)))
+	_boat.add_child(Visuals.box(Vector3(2.6, 0.12, 1.6), Vector3(0, 0.85, -2.2), Color(0.3, 0.32, 0.28)))  # map table
+	world.add_child(_boat)
+	# The next island on the horizon: a flattened dome in the biome's colour.
+	var island := MeshInstance3D.new()
+	var dome := SphereMesh.new()
+	dome.radius = 26.0
+	dome.height = 18.0
+	island.mesh = dome
+	island.position = Vector3(-80, -3, -45)
+	_island_mat = Visuals.mat(Color(0.35, 0.45, 0.3))
+	island.material_override = _island_mat
+	world.add_child(island)
+	if context.is_last_island():
+		var cone := MeshInstance3D.new()
+		var cm := CylinderMesh.new()
+		cm.top_radius = 4.0
+		cm.bottom_radius = 26.0
+		cm.height = 30.0
+		cone.mesh = cm
+		cone.position = Vector3(-84, 14, -50)
+		cone.material_override = Visuals.mat(Color(0.25, 0.18, 0.16))
+		world.add_child(cone)
+	var cam := Camera3D.new()
+	cam.position = Vector3(14, 6, 16)
+	world.add_child(cam)
+	cam.look_at(Vector3(-14, 2, -30))
+	cam.fov = 60.0
+
+
+func _process(_delta: float) -> void:
+	if _boat == null:
+		return
+	var t: float = Time.get_ticks_msec() * 0.001
+	_boat.position.y = sin(t * 1.3) * 0.25
+	_boat.rotation = Vector3(sin(t * 0.9) * 0.03, 0.6, sin(t * 1.1) * 0.05)
 
 
 func _make_options() -> void:
@@ -124,6 +192,7 @@ func _pick_route(i: int) -> void:
 	_route_picked = true
 	context.modifier = _routes[i].id
 	context.biome = _route_biomes[i]
+	_island_mat.albedo_color = GameData.BIOMES[context.biome]["inland"]
 	context.mission = _route_missions[i]
 	for k in _route_buttons.size():
 		var txt: String = _route_buttons[k].text.trim_prefix("✔ ")
