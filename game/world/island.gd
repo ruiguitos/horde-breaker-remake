@@ -26,6 +26,7 @@ var _audio_dashing: bool = false
 var _audio_cards: bool = false
 var _audio_slam: bool = false
 var _audio_generators: int = 0
+var _audio_scream_cd: float = 0.0
 
 var _camera: Camera3D
 var _player: Node3D
@@ -542,6 +543,9 @@ func _play_audio() -> void:
 	if slam and not _audio_slam:
 		sfx.play(&"slam_warn", 0.0, 0.0)
 	_audio_slam = slam
+	if run._scream_cd > _audio_scream_cd:
+		sfx.play(&"scream", 0.0, 0.05)
+	_audio_scream_cd = run._scream_cd
 	var gens: int = 0
 	for g in run.generator_progress:
 		if g >= GameData.GENERATOR_HOLD_SECONDS:

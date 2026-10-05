@@ -185,6 +185,8 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 		run.level, run.kills, run.headshots, run.weapon_index + 1, w.display_name, ammo_text]
 	if run.horde.grabbed_by != -1:
 		_info.text += "\nGRABBED! Use the breaker!"
+	if run.scream_progress > 0.3:
+		_info.text += "\nA SCREAMER SEES YOU! (%d%%)" % int(100.0 * run.scream_progress / GameData.SCREAM_TIME)
 	_objective.text = (island_text + " — " if island_text != "" else "") + run.objective_text()
 
 	_boss_bar.visible = run.objective == IslandRun.Objective.BOSS

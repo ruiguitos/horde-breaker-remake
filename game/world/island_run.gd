@@ -76,6 +76,8 @@ var explosions: PackedVector3Array = PackedVector3Array()
 var messages: PackedStringArray = PackedStringArray()
 
 var _kills_at_start: int = 0
+var scream_progress: float = 0.0  ## seconds a Screamer has seen the player
+var _scream_cd: float = 0.0
 var _dead: Dictionary = {}  ## enemy index -> true, removed at the end of step()
 
 
@@ -185,6 +187,24 @@ func throw_grenade(aim: Vector3) -> bool:
 	return true
 
 
+## A Screamer that sees the player for SCREAM_TIME seconds calls a horde peak.
+func _update_screamers(dt: float) -> void:
+	_scream_cd = maxf(0.0, _scream_cd - dt)
+	var seen: bool = false
+	for i in horde.count:
+		if horde.kinds[i] == GameData.EnemyKind.SCREAMER and horde.stun[i] <= 0.0 \
+				and horde.positions[i].distance_to(player_pos) <= GameData.SCREAM_RANGE \
+				and _line_of_sight(horde.positions[i], player_pos):
+			seen = true
+			break
+	scream_progress = scream_progress + dt if seen else maxf(0.0, scream_progress - dt)
+	if scream_progress >= GameData.SCREAM_TIME and _scream_cd <= 0.0:
+		scream_progress = 0.0
+		_scream_cd = GameData.SCREAM_COOLDOWN
+		director.trigger_peak(15.0)
+		messages.append("A Screamer called the horde!")
+
+
 func _update_grenades(dt: float) -> void:
 	grenade_cd = maxf(0.0, grenade_cd - dt)
 	var radius: float = GameData.GRENADE_RADIUS + (1.0 if has_perk(&"demolitions") else 0.0)
@@ -273,6 +293,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool) -> void:
 	invulnerable = maxf(0.0, invulnerable - dt)
 	_auto_fire(dt)
 	_update_grenades(dt)
+	_update_screamers(dt)
 	_flush_dead()
 	_update_orbs(dt)
 	_update_mission(dt)
@@ -439,6 +460,13 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 			headshots += 1
 		var p: Vector3 = horde.positions[i]
 		deaths.append(Vector4(p.x, p.z, horde.kinds[i], 1.0 if headshot else 0.0))
+		if t.explodes:
+			explosions.append(p)
+			if player_pos.distance_to(p) <= GameData.BLOATER_RADIUS and dash_time <= 0.0:
+				hp -= GameData.BLOATER_PLAYER_DAMAGE
+			for j in horde.query_radius(p, GameData.BLOATER_RADIUS):
+				_damage(j, GameData.BLOATER_DAMAGE, p, false, true)
+				horde.knock_back(j, p, 1.5)
 		orbs.append(p)
 		orb_values.append(t.xp)
 		if headshot and stacks(&"vampire") > 0:

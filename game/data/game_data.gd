@@ -19,6 +19,8 @@ class EnemyType:
 	var front_armor: float     ## 0..1 damage reduction when hit from the front
 	var grabs: bool            ## holds the player until killed or broken free
 	var pushable: bool         ## breaker pushes it away
+	var keep_away: float = 0.0 ## > 0: backs off when the player is closer than this
+	var explodes: bool = false ## blows up on death, hurting everyone around
 
 	func _init(p_id: StringName, p_name: String, p_hp: float, p_speed: Vector2, p_damage: float,
 			p_interval: float, p_scale: float, p_height: float, p_color: Color, p_xp: int) -> void:
@@ -103,7 +105,7 @@ class Modifier:
 		intel_mult = p_mult
 
 
-enum EnemyKind { WALKER, RUNNER, BRUTE, GRABBER, BOSS }
+enum EnemyKind { WALKER, RUNNER, BRUTE, GRABBER, BOSS, BLOATER, SCREAMER }
 
 ## Player
 const PLAYER_MAX_HP: float = 100.0
@@ -128,6 +130,14 @@ const GRENADE_RANGE: float = 14.0
 const GRENADE_FUSE: float = 0.8
 const GRENADE_RADIUS: float = 5.0
 const GRENADE_DAMAGE: float = 90.0
+
+## Bloater explosion and Screamer call
+const BLOATER_RADIUS: float = 3.5
+const BLOATER_DAMAGE: float = 45.0         ## to enemies
+const BLOATER_PLAYER_DAMAGE: float = 20.0
+const SCREAM_RANGE: float = 22.0
+const SCREAM_TIME: float = 3.0             ## seconds in sight before it screams
+const SCREAM_COOLDOWN: float = 15.0
 
 ## Boss (last island)
 const BOSS_SLAM_RANGE: float = 9.0     ## starts a slam when the player is this close
@@ -177,7 +187,11 @@ static func enemy_types() -> Array[EnemyType]:
 	var boss := EnemyType.new(&"behemoth", "Behemoth", 2400.0, Vector2(1.7, 1.7), 35.0, 1.4, 3.0, 4.2, Color(0.3, 0.12, 0.15), 40)
 	boss.front_armor = 0.5
 	boss.pushable = false
-	return [walker, runner, brute, grabber, boss]
+	var bloater := EnemyType.new(&"bloater", "Bloater", 90.0, Vector2(1.3, 1.5), 10.0, 1.2, 1.7, 1.6, Color(0.5, 0.65, 0.2), 3)
+	bloater.explodes = true
+	var screamer := EnemyType.new(&"screamer", "Screamer", 45.0, Vector2(3.0, 3.4), 3.0, 1.0, 0.8, 1.8, Color(0.95, 0.9, 0.55), 4)
+	screamer.keep_away = 11.0
+	return [walker, runner, brute, grabber, boss, bloater, screamer]
 
 
 static func weapons() -> Array[Weapon]:

@@ -86,6 +86,14 @@ func pick_kind() -> int:
 	var brute: float = (2.0 + 4.0 * specials) * specials_mult
 	var grabber: float = (4.0 + 5.0 * specials) * specials_mult
 	var runner: float = 15.0 + 10.0 * specials
+	var bloater: float = (2.0 + 3.0 * specials) * specials_mult
+	var screamer: float = (1.0 + 2.0 * specials) * specials_mult
+	if roll < bloater:
+		return GameData.EnemyKind.BLOATER
+	roll -= bloater
+	if roll < screamer:
+		return GameData.EnemyKind.SCREAMER
+	roll -= screamer
 	if roll < brute:
 		return GameData.EnemyKind.BRUTE
 	if roll < brute + grabber:

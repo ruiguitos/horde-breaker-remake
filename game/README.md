@@ -48,6 +48,10 @@ O volume ajusta-se no Armory (− / +) e fica gravado no perfil.
   - **Runner** (amarelo): rápido e frágil.
   - **Brute** (vermelho escuro, grande): blindado à frente (−75 % de dano);
     acerta-lhe de lado ou por trás, ou com o breaker.
+  - **Bloater** (verde-oliva, gordo e lento): explode ao morrer (3,5 m) e
+    fere toda a gente, também os zombies. Mata-o no meio da horda.
+  - **Screamer** (amarelo-pálido): foge de ti. Se te vir durante 3 s, grita e
+    o diretor manda um pico de horda. O HUD avisa: mata-o primeiro.
   - **Grabber** (roxo): agarra-te e não te deixa andar até o matares ou usares
     o breaker.
 - Mortes largam **orbes de XP** (azuis). Ao subir de nível o jogo pausa e

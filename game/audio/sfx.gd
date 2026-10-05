@@ -55,6 +55,7 @@ static func _build_all() -> void:
 	_streams[&"pickup"] = _make(0.07, 880.0, 1320.0, 0.0, 30.0, 0.0)
 	_streams[&"level_up"] = _make_chord([523.25, 659.25, 783.99, 1046.5], 0.5)
 	_streams[&"generator"] = _make_chord([392.0, 587.33, 783.99], 0.6)
+	_streams[&"scream"] = _make(0.8, 500.0, 1400.0, 0.35, 2.5, 0.0)
 	_streams[&"slam_warn"] = _make(0.5, 55.0, 110.0, 0.2, 2.0, 0.0)
 
 

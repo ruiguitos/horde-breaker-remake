@@ -154,6 +154,9 @@ func tick(dt: float) -> void:
 					if step != Vector2.ZERO:
 						dir = Vector2((cx + step.x + 0.5) * cs - p.x, (cz + step.y + 0.5) * cs - p.z).normalized()
 				desired = Vector3(dir.x, 0.0, dir.y) * speeds[i]
+				# Ranged specials back off instead of closing in.
+				if t.keep_away > 0.0 and to_target2 < t.keep_away * t.keep_away:
+					desired = -Vector3(tx, 0.0, tz).normalized() * speeds[i]
 		# Separation against the 3x3 neighbouring hash cells.
 		var push_x: float = 0.0
 		var push_z: float = 0.0

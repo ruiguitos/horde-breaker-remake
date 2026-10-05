@@ -22,6 +22,7 @@ func _initialize() -> void:
 	_test_boss_fight()
 	_test_modifiers()
 	_test_weapon_unlocks()
+	_test_bloater_and_screamer()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -267,3 +268,25 @@ func _test_weapon_unlocks() -> void:
 	run2.switch_weapon(3)
 	_check(locked and bought and too_poor and run2.weapon_index == 3 and run2.weapons[3].id == &"smg",
 		"SMG is locked until bought in the armory, then usable on key 4")
+
+
+func _test_bloater_and_screamer() -> void:
+	var run := IslandRun.new(5)
+	run.director.max_alive = 0
+	var p: Vector3 = run.player_pos + Vector3(0, 0, -10)
+	var b: int = run.horde.add(p, GameData.EnemyKind.BLOATER, run.rng)
+	for k in 4:
+		run.horde.add(p + Vector3(cos(k * 1.6), 0, sin(k * 1.6)) * 1.5, GameData.EnemyKind.WALKER, run.rng)
+	var kills_before: int = run.kills
+	run._damage(b, 1000.0, run.player_pos, false, false)  # pop the Bloater directly
+	run._flush_dead()
+	_check(run.kills - kills_before >= 4, "a Bloater's death blast kills nearby walkers (%d kills)" % (run.kills - kills_before))
+	var run2 := IslandRun.new(5)
+	run2.director.max_alive = 0
+	var s: int = run2.horde.add(run2.player_pos + Vector3(0, 0, 15), GameData.EnemyKind.SCREAMER, run2.rng)
+	run2.horde.hp[s] = 100000.0
+	var phase_before: int = run2.director.phase
+	for t in int(GameData.SCREAM_TIME / DT) + 30:
+		run2.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)  # facing away: it survives
+	_check(run2.director.phase == Director.Phase.PEAK and phase_before != Director.Phase.PEAK,
+		"a Screamer in sight for 3 s triggers a horde peak")
