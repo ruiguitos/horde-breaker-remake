@@ -45,6 +45,8 @@ var _laser_mat: StandardMaterial3D
 var _generators: Array[MeshInstance3D] = []
 var _generator_rings: Array[MeshInstance3D] = []
 var _boat_ring: MeshInstance3D
+var _defend_ring: MeshInstance3D
+var _survivor: MeshInstance3D
 var _caches: Array[MeshInstance3D] = []
 var _buildings: Array[MeshInstance3D] = []
 var _building_boxes: Array[AABB] = []
@@ -251,6 +253,27 @@ func _build_world() -> void:
 		add_child(gen)
 		_generators.append(gen)
 		_generator_rings.append(_ring(g, GameData.GENERATOR_RADIUS, Color(1, 0.8, 0.2)))
+		if run.mission != &"activate":
+			gen.visible = false
+			_generator_rings[-1].visible = false
+	# Defend: an antenna in the middle of a big ring. Rescue: the survivor.
+	_defend_ring = _ring(run.site, GameData.DEFEND_RADIUS, Color(0.3, 0.8, 1.0))
+	_defend_ring.visible = run.mission == &"defend"
+	if run.mission == &"defend":
+		var mast := MeshInstance3D.new()
+		var mm := CylinderMesh.new()
+		mm.top_radius = 0.08
+		mm.bottom_radius = 0.25
+		mm.height = 6.0
+		mast.mesh = mm
+		mast.position = run.site + Vector3(0, 3, 0)
+		mast.material_override = _mat(Color(0.6, 0.65, 0.7))
+		add_child(mast)
+	_survivor = MeshInstance3D.new()
+	_survivor.mesh = _capsule(0.35, 1.7)
+	_survivor.material_override = _mat(Color(1.0, 0.55, 0.1))
+	_survivor.visible = run.mission == &"rescue"
+	add_child(_survivor)
 
 	var boat := MeshInstance3D.new()
 	var hull := BoxMesh.new()
@@ -933,6 +956,14 @@ func _fade_occluders(delta: float) -> void:
 
 
 func _draw_mission() -> void:
+	if run.mission == &"rescue":
+		_survivor.visible = not run.survivor_lost
+		_survivor.position = run.survivor_pos + Vector3(0, 0.85 + (0.0 if run.survivor_found else absf(sin(Time.get_ticks_msec() * 0.006)) * 0.3), 0)
+	if run.mission == &"defend":
+		var m2: StandardMaterial3D = _defend_ring.material_override
+		var inside: bool = run.player_pos.distance_to(run.site) <= GameData.DEFEND_RADIUS
+		m2.albedo_color = Color(0.3, 1.0, 0.5) if inside else Color(0.3, 0.8, 1.0)
+		_defend_ring.visible = run.objective == IslandRun.Objective.GENERATORS
 	for g in _generators.size():
 		var p: float = run.generator_progress[g] / GameData.GENERATOR_HOLD_SECONDS
 		var m: StandardMaterial3D = _generators[g].material_override

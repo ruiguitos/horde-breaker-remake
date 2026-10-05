@@ -180,6 +180,19 @@ const ISLAND_BIOMES: Array[StringName] = [&"beach", &"town", &"jungle", &"port"]
 const LAVA_PLAYER_DPS: float = 18.0
 const LAVA_ENEMY_DPS: float = 30.0
 
+## Missions (one per island, shown with the route on the boat)
+const MISSIONS: Dictionary = {
+	&"activate": {"name": "Activate 3", "text": "Power up three generators."},
+	&"defend": {"name": "Defend", "text": "Hold the uplink zone for 75 s."},
+	&"rescue": {"name": "Rescue", "text": "Find the survivor and bring them to the boat alive."},
+}
+const DEFEND_TIME: float = 75.0
+const DEFEND_RADIUS: float = 6.0
+const SURVIVOR_SPEED: float = 5.6
+const SURVIVOR_HP: float = 100.0
+const SURVIVOR_HIT_DPS: float = 7.0   ## per enemy touching the survivor
+const SURVIVOR_FIND_RADIUS: float = 3.0
+
 ## Supply caches
 const CACHE_RADIUS: float = 2.0
 const CACHE_OPEN_TIME: float = 1.5

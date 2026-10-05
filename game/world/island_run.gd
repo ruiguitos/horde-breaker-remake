@@ -62,6 +62,15 @@ var generator_progress: PackedFloat32Array = PackedFloat32Array()
 var generator_started: Array[bool] = []
 ## The last island ends with a boss fight before the return to the boat.
 var has_boss: bool = false
+var mission: StringName = &"activate"
+## Defend / rescue site: the generator spot farthest from the boat.
+var site: Vector3 = Vector3.ZERO
+var defend_time: float = 0.0
+var _defend_peak_cd: float = 0.0
+var survivor_pos: Vector3 = Vector3.ZERO
+var survivor_hp: float = GameData.SURVIVOR_HP
+var survivor_found: bool = false
+var survivor_lost: bool = false
 var cache_progress: PackedFloat32Array = PackedFloat32Array()  ## >= CACHE_OPEN_TIME = opened
 var cache_intel: int = 0
 var damage_taken: float = 0.0
@@ -120,6 +129,7 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach") -> void:
 ## Loads the run state carried from previous islands and scales difficulty.
 func load_context(ctx: RunContext) -> void:
 	perks = ctx.perks.duplicate()
+	set_mission(ctx.mission)
 	player_class = ctx.player_class
 	for w in weapons.size():
 		weapon_unlocked[w] = ctx.weapons.has(weapons[w].id)
@@ -285,6 +295,30 @@ func _update_grenades(dt: float) -> void:
 		i -= 1
 
 
+func set_mission(id: StringName) -> void:
+	mission = id
+	var best: float = -1.0
+	for g in map.generators:
+		var d: float = g.distance_to(map.boat)
+		if d > best:
+			best = d
+			site = g
+	survivor_pos = site
+
+
+## True once the island's main task is done (the boss / boat come next).
+func _main_task_done() -> bool:
+	match mission:
+		&"defend":
+			return defend_time >= GameData.DEFEND_TIME
+		&"rescue":
+			return survivor_found or survivor_lost
+	for p in generator_progress:
+		if p < GameData.GENERATOR_HOLD_SECONDS:
+			return false
+	return true
+
+
 func is_paused() -> bool:
 	return not card_choices.is_empty() or is_over()
 
@@ -310,7 +344,14 @@ func intel_earned() -> int:
 	for p in generator_progress:
 		if p >= GameData.GENERATOR_HOLD_SECONDS:
 			done += 1
-	var base: int = (kills - _kills_at_start) / 5 + done * 15 + (40 if objective == Objective.WON else 0)
+	var base: int = (kills - _kills_at_start) / 5 + (40 if objective == Objective.WON else 0)
+	match mission:
+		&"defend":
+			base += 45 if defend_time >= GameData.DEFEND_TIME else int(defend_time / GameData.DEFEND_TIME * 30.0)
+		&"rescue":
+			base += 40 if survivor_found and not survivor_lost and objective == Objective.WON else 0
+		_:
+			base += done * 15
 	base += 20 if boss_killed else 0
 	base += cache_intel
 	return int(base * GameData.threat_intel(threat) * GameData.modifier(modifier).intel_mult)
@@ -645,31 +686,23 @@ func _roll_cards_if_needed() -> void:
 func _update_mission(dt: float) -> void:
 	match objective:
 		Objective.GENERATORS:
-			var all_done: bool = true
-			for g in GameData.GENERATOR_COUNT:
-				if generator_progress[g] >= GameData.GENERATOR_HOLD_SECONDS:
-					continue
-				all_done = false
-				if player_pos.distance_to(map.generators[g]) <= GameData.GENERATOR_RADIUS:
-					if not generator_started[g]:
-						generator_started[g] = true
-						director.trigger_peak(GameData.GENERATOR_HOLD_SECONDS + 10.0)
-						messages.append("Generator starting: hold the zone!")
-					generator_progress[g] += dt
-					if generator_progress[g] >= GameData.GENERATOR_HOLD_SECONDS:
-						messages.append("Generator online")
-						for w in weapons.size():
-							if weapons[w].max_ammo > 0:
-								ammo[w] = mini(max_ammo(w), ammo[w] + max_ammo(w) / 2)
-			if all_done and has_boss:
+			match mission:
+				&"defend":
+					_update_defend(dt)
+				&"rescue":
+					_update_rescue(dt)
+				_:
+					_update_generators(dt)
+			if _main_task_done() and has_boss:
 				objective = Objective.BOSS
 				_spawn_boss()
 				messages.append("Something huge is coming... Kill the Behemoth!")
-			elif all_done:
+			elif _main_task_done():
 				objective = Objective.RETURN_TO_BOAT
 				director.trigger_peak(25.0)
-				messages.append("All generators online. Get back to the boat!")
+				messages.append("Objective complete. Get back to the boat!")
 		Objective.BOSS:
+			_update_rescue(dt)
 			var b: int = boss_index()
 			if b == -1:
 				boss_killed = true
@@ -683,8 +716,60 @@ func _update_mission(dt: float) -> void:
 			else:
 				_update_boss(dt, b)
 		Objective.RETURN_TO_BOAT:
-			if player_pos.distance_to(map.boat) <= GameData.BOAT_RADIUS:
+			_update_rescue(dt)
+			# A rescued survivor must make it to the boat too.
+			var survivor_ok: bool = mission != &"rescue" or survivor_lost or survivor_pos.distance_to(map.boat) <= GameData.BOAT_RADIUS + 2.0
+			if player_pos.distance_to(map.boat) <= GameData.BOAT_RADIUS and survivor_ok:
 				objective = Objective.WON
+
+
+func _update_defend(dt: float) -> void:
+	if player_pos.distance_to(site) <= GameData.DEFEND_RADIUS:
+		if defend_time == 0.0:
+			messages.append("Uplink started: hold the zone!")
+		defend_time += dt
+		_defend_peak_cd -= dt
+		if _defend_peak_cd <= 0.0:
+			_defend_peak_cd = 25.0
+			director.trigger_peak(18.0)
+
+
+## The survivor waits at the site, then follows the player and can be hurt.
+func _update_rescue(dt: float) -> void:
+	if mission != &"rescue" or survivor_lost:
+		return
+	if not survivor_found:
+		if player_pos.distance_to(survivor_pos) <= GameData.SURVIVOR_FIND_RADIUS:
+			survivor_found = true
+			messages.append("Survivor found! Escort them to the boat.")
+		return
+	var to: Vector3 = player_pos - survivor_pos
+	to.y = 0.0
+	if to.length() > 2.0:
+		var v: Vector3 = to.normalized() * GameData.SURVIVOR_SPEED * dt
+		survivor_pos = Horde.move_against_walls(field, survivor_pos, v.x, v.z, 0.35)
+	var touching: int = horde.query_radius(survivor_pos, 1.3).size()
+	survivor_hp -= mini(touching, 6) * GameData.SURVIVOR_HIT_DPS * dt
+	if survivor_hp <= 0.0:
+		survivor_lost = true
+		messages.append("The survivor is dead.")
+
+
+func _update_generators(dt: float) -> void:
+	for g in GameData.GENERATOR_COUNT:
+		if generator_progress[g] >= GameData.GENERATOR_HOLD_SECONDS:
+			continue
+		if player_pos.distance_to(map.generators[g]) <= GameData.GENERATOR_RADIUS:
+			if not generator_started[g]:
+				generator_started[g] = true
+				director.trigger_peak(GameData.GENERATOR_HOLD_SECONDS + 10.0)
+				messages.append("Generator starting: hold the zone!")
+			generator_progress[g] += dt
+			if generator_progress[g] >= GameData.GENERATOR_HOLD_SECONDS:
+				messages.append("Generator online")
+				for w in weapons.size():
+					if weapons[w].max_ammo > 0:
+						ammo[w] = mini(max_ammo(w), ammo[w] + max_ammo(w) / 2)
 
 
 ## Lava pools burn the player (unless dashing) and enemies alike.
@@ -844,6 +929,10 @@ func _spawn_enemy() -> void:
 func objective_text() -> String:
 	match objective:
 		Objective.GENERATORS:
+			if mission == &"defend":
+				return "Hold the uplink zone (%d / %d s)" % [int(defend_time), int(GameData.DEFEND_TIME)]
+			if mission == &"rescue":
+				return "Find the survivor"
 			var done: int = 0
 			for p in generator_progress:
 				if p >= GameData.GENERATOR_HOLD_SECONDS:
@@ -852,6 +941,8 @@ func objective_text() -> String:
 		Objective.BOSS:
 			return "Kill the Behemoth!"
 		Objective.RETURN_TO_BOAT:
+			if mission == &"rescue" and survivor_found and not survivor_lost:
+				return "Escort the survivor to the boat! (HP %d)" % int(survivor_hp)
 			return "Return to the boat!"
 		Objective.WON:
 			return "Extracted!"

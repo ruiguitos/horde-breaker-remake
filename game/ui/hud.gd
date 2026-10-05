@@ -263,7 +263,13 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	var goal := Vector3.INF
 	var goal_name := ""
-	if run.objective == IslandRun.Objective.GENERATORS:
+	if run.objective == IslandRun.Objective.GENERATORS and run.mission == &"defend":
+		goal = run.site
+		goal_name = "Uplink"
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"rescue":
+		goal = run.survivor_pos
+		goal_name = "Survivor"
+	elif run.objective == IslandRun.Objective.GENERATORS:
 		var best: float = INF
 		for g in GameData.GENERATOR_COUNT:
 			if run.generator_progress[g] < GameData.GENERATOR_HOLD_SECONDS:
@@ -283,7 +289,9 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 		return
 	_marker.visible = true
 	var dist: float = run.player_pos.distance_to(goal)
-	if run.objective == IslandRun.Objective.GENERATORS and dist <= GameData.GENERATOR_RADIUS:
+	if run.objective == IslandRun.Objective.GENERATORS and run.mission != &"activate":
+		_marker.text = "▼ %s %d m" % [goal_name, int(dist)]
+	elif run.objective == IslandRun.Objective.GENERATORS and dist <= GameData.GENERATOR_RADIUS:
 		var g_idx: int = run.map.generators.find(goal)
 		_marker.text = "Holding... %d%%" % int(100.0 * run.generator_progress[g_idx] / GameData.GENERATOR_HOLD_SECONDS)
 	else:

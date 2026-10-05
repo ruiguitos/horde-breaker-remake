@@ -22,6 +22,8 @@ var threat: int = 1
 var modifier: StringName = &"calm"
 ## Biome of the island being played (chosen with the route).
 var biome: StringName = &"beach"
+## Mission of the island being played: activate, defend or rescue.
+var mission: StringName = &"activate"
 var perks: Array[StringName] = []
 var max_hp: float = GameData.PLAYER_MAX_HP
 ## Weapons usable in this run (starting ones + armory unlocks).

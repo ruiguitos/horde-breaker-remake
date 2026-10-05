@@ -27,6 +27,7 @@ func _soak(run_seed: int) -> void:
 		ctx.island_index = island
 		ctx.modifier = GameData.modifiers()[(run_seed + island) % GameData.modifiers().size()].id
 		ctx.biome = &"volcano" if ctx.is_last_island() else GameData.ISLAND_BIOMES[(run_seed / 101 * 2 + island) % GameData.ISLAND_BIOMES.size()]
+		ctx.mission = GameData.MISSIONS.keys()[(run_seed + island) % 3]
 		var run := IslandRun.new(ctx.island_seed(), ctx.biome)
 		run.load_context(ctx)
 		var nav := FlowField.new(run.field.width, run.field.height)
@@ -60,8 +61,8 @@ func _soak(run_seed: int) -> void:
 			if steps % 600 == 0:
 				run.use_ability(aim)
 		var ok: bool = run.objective == IslandRun.Objective.WON
-		print("%s seed %d island %d (%s, %s): %s in %.0f s, kills %d, level %d, boss %s" % [
-			"TEST:" if ok else "TEST FAIL:", run_seed, island + 1, ctx.biome, ctx.modifier, run.objective_text(),
+		print("%s seed %d island %d (%s, %s, %s): %s in %.0f s, kills %d, level %d, boss %s" % [
+			"TEST:" if ok else "TEST FAIL:", run_seed, island + 1, ctx.biome, ctx.mission, ctx.modifier, run.objective_text(),
 			run.time_alive - ctx.time_alive, run.kills - ctx.kills, run.level, run.boss_killed])
 		if not ok:
 			_failures += 1
@@ -74,6 +75,10 @@ func _soak(run_seed: int) -> void:
 ## then the boat.
 func _goal(run: IslandRun) -> Vector3:
 	match run.objective:
+		IslandRun.Objective.GENERATORS when run.mission == &"defend":
+			return run.site
+		IslandRun.Objective.GENERATORS when run.mission == &"rescue":
+			return run.survivor_pos
 		IslandRun.Objective.GENERATORS:
 			var best := Vector3.INF
 			var best_d: float = INF

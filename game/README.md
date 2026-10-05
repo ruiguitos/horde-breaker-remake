@@ -98,6 +98,18 @@ Vulcão.
 | Industrial Port | filas de contentores coloridos | corredores estreitos |
 | Volcano | cinza, árvores queimadas | poças de lava que ferem toda a gente (atrai a horda para lá) |
 
+## Missões
+
+Cada rota mostra também a missão da ilha:
+- **Activate 3**: liga os três geradores (8 s em cada).
+- **Defend**: fica dentro da zona da antena (anel azul, 6 m) durante 75 s ao
+  todo. O tempo pára se saíres, e a horda manda picos seguidos.
+- **Rescue**: encontra o sobrevivente (cápsula laranja, também no minimapa).
+  Depois ele segue-te; se muitos zombies lhe tocarem, morre. Só podes partir
+  com ele no barco, ou depois de ele morrer, e aí sem o bónus de +40 de Intel.
+
+No Vulcão, o boss aparece depois de cumprires a missão.
+
 ## Rotas (modificadores de ilha)
 
 No barco, além do mantimento (1/2/3), escolhes a rota (4/5, ou LB/RB no

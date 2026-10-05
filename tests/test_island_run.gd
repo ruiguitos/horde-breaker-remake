@@ -28,6 +28,7 @@ func _initialize() -> void:
 	_test_caches()
 	_test_target_priority()
 	_test_input_actions()
+	_test_missions()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -393,3 +394,25 @@ func _test_input_actions() -> void:
 	g.pressed = true
 	_check(space.is_action_pressed(&"breaker") and pad_a.is_action_pressed(&"breaker") and g.is_action_pressed(&"ability")
 		and not space.is_action_pressed(&"ability"), "InputMap actions: Space and pad A break, G uses the ability")
+
+
+func _test_missions() -> void:
+	var run := IslandRun.new(9)
+	run.set_mission(&"defend")
+	run.director.max_alive = 0
+	run.player_pos = run.site
+	for t in int(GameData.DEFEND_TIME / DT) + 5:
+		run.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)
+	_check(run.objective == IslandRun.Objective.RETURN_TO_BOAT, "Defend: holding the zone for 75 s completes the mission")
+	var r := IslandRun.new(9)
+	r.set_mission(&"rescue")
+	r.director.max_alive = 0
+	r.player_pos = r.site
+	r.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)
+	_check(r.survivor_found and r.objective == IslandRun.Objective.RETURN_TO_BOAT, "Rescue: reaching the survivor starts the escort")
+	r.player_pos = r.map.boat
+	r.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)
+	_check(r.objective != IslandRun.Objective.WON, "Rescue: you cannot leave without the survivor")
+	r.survivor_pos = r.map.boat
+	r.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)
+	_check(r.objective == IslandRun.Objective.WON and r.intel_earned() >= 80, "Rescue: survivor at the boat wins with the bonus (%d)" % r.intel_earned())
