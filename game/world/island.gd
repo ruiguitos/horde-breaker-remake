@@ -97,9 +97,13 @@ func _build_world() -> void:
 	sea_mesh.size = Vector2(600, 600)
 	sea.mesh = sea_mesh
 	sea.position = Vector3(f.width * 0.5, -0.3, f.height * 0.5)
-	sea.material_override = _mat(Color(0.15, 0.35, 0.55))
+	sea_mesh.subdivide_width = 120
+	sea_mesh.subdivide_depth = 120
+	sea.material_override = _sea_material()
 	add_child(sea)
 
+	var rng := RandomNumberGenerator.new()
+	rng.seed = rng_seed
 	# Island ground: one flat tile per walkable or building cell (one draw call).
 	var cells: Array[Vector2i] = []
 	var in_building := {}
@@ -107,25 +111,37 @@ func _build_world() -> void:
 		for z in range(r.position.y, r.end.y):
 			for x in range(r.position.x, r.end.x):
 				in_building[Vector2i(x, z)] = true
+	# Trees and rocks stand on ground too (otherwise the sea shows through).
+	for c in run.map.trees + run.map.rocks:
+		in_building[c] = true
 	for z in f.height:
 		for x in f.width:
 			if not f.is_blocked(x, z) or in_building.has(Vector2i(x, z)):
 				cells.append(Vector2i(x, z))
+	# Distance to the sea (multi-source BFS) colours the ground: sand on the
+	# coast blending into grass inland, with a little per-tile noise.
+	var coast: PackedInt32Array = _coast_distance(in_building)
 	var ground_mm := MultiMesh.new()
 	ground_mm.transform_format = MultiMesh.TRANSFORM_3D
+	ground_mm.use_colors = true
 	var tile := BoxMesh.new()
 	tile.size = Vector3(1, 0.3, 1)
 	ground_mm.mesh = tile
 	ground_mm.instance_count = cells.size()
 	for i in cells.size():
 		ground_mm.set_instance_transform(i, Transform3D(Basis(), Vector3(cells[i].x + 0.5, -0.15, cells[i].y + 0.5)))
+		var d: int = coast[cells[i].y * f.width + cells[i].x]
+		var sand := Color(0.72, 0.66, 0.48)
+		var grass := Color(0.36, 0.5, 0.26)
+		var c: Color = sand.lerp(grass, clampf((d - 4) / 8.0, 0.0, 1.0))
+		ground_mm.set_instance_color(i, c.darkened(rng.randf() * 0.06))
 	var ground := MultiMeshInstance3D.new()
 	ground.multimesh = ground_mm
-	ground.material_override = _mat(Color(0.55, 0.52, 0.4))
+	var gm := _mat(Color.WHITE)
+	gm.vertex_color_use_as_albedo = true
+	ground.material_override = gm
 	add_child(ground)
 
-	var rng := RandomNumberGenerator.new()
-	rng.seed = rng_seed
 	for r in run.map.buildings:
 		var b := MeshInstance3D.new()
 		var box := BoxMesh.new()
@@ -137,6 +153,8 @@ func _build_world() -> void:
 		add_child(b)
 		_buildings.append(b)
 		_building_boxes.append(AABB(Vector3(r.position.x, 0, r.position.y), Vector3(r.size.x, h, r.size.y)))
+
+	_build_props(rng)
 
 	for g in run.map.generators:
 		var gen := MeshInstance3D.new()
@@ -234,6 +252,101 @@ func _build_world() -> void:
 	_camera = Camera3D.new()
 	_camera.fov = camera_fov
 	add_child(_camera)
+
+
+## Animated sea: vertices bob with two crossing sine waves (vertex shader),
+## and the colour gets lighter on the crests.
+func _sea_material() -> ShaderMaterial:
+	var sh := Shader.new()
+	sh.code = """
+shader_type spatial;
+uniform vec3 deep = vec3(0.1, 0.28, 0.45);
+uniform vec3 crest = vec3(0.35, 0.6, 0.75);
+varying float h;
+void vertex() {
+	vec3 w = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	h = sin(w.x * 0.15 + TIME * 1.3) * 0.5 + sin(w.z * 0.11 - TIME * 0.9) * 0.5;
+	VERTEX.y += h * 0.25;
+}
+void fragment() {
+	ALBEDO = mix(deep, crest, clamp(h * 0.5 + 0.5, 0.0, 1.0) * 0.5);
+	ROUGHNESS = 0.25;
+	SPECULAR = 0.6;
+}
+"""
+	var m := ShaderMaterial.new()
+	m.shader = sh
+	return m
+
+
+func _coast_distance(in_building: Dictionary) -> PackedInt32Array:
+	var f: FlowField = run.field
+	var dist := PackedInt32Array()
+	dist.resize(f.width * f.height)
+	dist.fill(-1)
+	var queue := PackedInt32Array()
+	for z in f.height:
+		for x in f.width:
+			var cell := Vector2i(x, z)
+			if f.is_blocked(x, z) and not in_building.has(cell):
+				dist[z * f.width + x] = 0
+				queue.append(z * f.width + x)
+	var head: int = 0
+	while head < queue.size():
+		var idx: int = queue[head]
+		head += 1
+		var x: int = idx % f.width
+		var z: int = idx / f.width
+		for o in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var nx: int = x + o.x
+			var nz: int = z + o.y
+			if nx < 0 or nz < 0 or nx >= f.width or nz >= f.height:
+				continue
+			var n: int = nz * f.width + nx
+			if dist[n] == -1:
+				dist[n] = dist[idx] + 1
+				queue.append(n)
+	return dist
+
+
+## Trees (trunk + two-tier crown) and rocks, as MultiMeshes.
+func _build_props(rng: RandomNumberGenerator) -> void:
+	var trunk_mm := MultiMesh.new()
+	var trunk := CylinderMesh.new()
+	trunk.top_radius = 0.15
+	trunk.bottom_radius = 0.22
+	trunk.height = 2.2
+	_setup_multimesh(trunk_mm, trunk, false, Color(0.4, 0.28, 0.18))
+	var crown_mm := MultiMesh.new()
+	var crown := CylinderMesh.new()
+	crown.top_radius = 0.0
+	crown.bottom_radius = 1.1
+	crown.height = 2.4
+	_setup_multimesh(crown_mm, crown, true)
+	var trees: Array[Vector2i] = run.map.trees
+	trunk_mm.instance_count = trees.size()
+	crown_mm.instance_count = trees.size() * 2
+	for i in trees.size():
+		var p := Vector3(trees[i].x + 0.5, 0, trees[i].y + 0.5)
+		var sc: float = rng.randf_range(0.8, 1.3)
+		trunk_mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * sc), p + Vector3(0, 1.1 * sc, 0)))
+		var green := Color(0.2, 0.42, 0.2).lightened(rng.randf() * 0.15)
+		for k in 2:
+			var ks: float = sc * (1.0 - 0.3 * k)
+			crown_mm.set_instance_transform(i * 2 + k, Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * ks), p + Vector3(0, (2.4 + 1.1 * k) * sc, 0)))
+			crown_mm.set_instance_color(i * 2 + k, green)
+	var rock_mm := MultiMesh.new()
+	var rock := SphereMesh.new()
+	rock.radius = 0.6
+	rock.height = 0.9
+	rock.radial_segments = 7
+	rock.rings = 4
+	_setup_multimesh(rock_mm, rock, false, Color(0.45, 0.44, 0.42))
+	rock_mm.instance_count = run.map.rocks.size()
+	for i in run.map.rocks.size():
+		var c: Vector2i = run.map.rocks[i]
+		var b := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(rng.randf_range(0.8, 1.1), rng.randf_range(0.7, 1.2), rng.randf_range(0.8, 1.1)))
+		rock_mm.set_instance_transform(i, Transform3D(b, Vector3(c.x + 0.5, 0.25, c.y + 0.5)))
 
 
 func _setup_multimesh(mm: MultiMesh, mesh: Mesh, colors: bool, color: Color = Color.WHITE, unshaded: bool = false) -> void:

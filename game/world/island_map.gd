@@ -11,6 +11,9 @@ var player_start: Vector3
 var generators: Array[Vector3] = []
 ## Wall rectangles (x0, z0, w, h) in cells, for rendering buildings.
 var buildings: Array[Rect2i] = []
+## Single-cell blocking props (cells), rendered as trees and rocks.
+var trees: Array[Vector2i] = []
+var rocks: Array[Vector2i] = []
 
 
 static func build(rng_seed: int = 7) -> IslandMap:
@@ -69,4 +72,32 @@ static func build(rng_seed: int = 7) -> IslandMap:
 		f.set_blocked_rect(x0, z0, x0 + w - 1, z0 + h - 1)
 		map.buildings.append(rect)
 		placed += 1
+	# Trees and rocks: single blocked cells whose 3x3 neighbourhood is free,
+	# so they add cover without ever sealing a corridor.
+	var props: int = 0
+	attempts = 0
+	while props < 160 and attempts < 4000:
+		attempts += 1
+		var cell := Vector2i(rng.randi_range(2, SIZE - 3), rng.randi_range(2, SIZE - 3))
+		var near_goal: bool = false
+		for p in keep_free:
+			if Vector2(cell.x - p.x, cell.y - p.z).length() < 7.0:
+				near_goal = true
+				break
+		if near_goal or not _free_around(f, cell):
+			continue
+		f.blocked[cell.y * SIZE + cell.x] = 1
+		if rng.randf() < 0.7:
+			map.trees.append(cell)
+		else:
+			map.rocks.append(cell)
+		props += 1
 	return map
+
+
+static func _free_around(f: FlowField, c: Vector2i) -> bool:
+	for dz in range(-2, 3):
+		for dx in range(-2, 3):
+			if f.is_blocked(c.x + dx, c.y + dz):
+				return false
+	return true
