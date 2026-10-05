@@ -19,6 +19,13 @@ const DEBRIS_MAX: int = 600
 
 var run: IslandRun
 var hud: Hud
+var sfx: Sfx
+var _audio_hp: float = -1.0
+var _audio_xp: int = 0
+var _audio_dashing: bool = false
+var _audio_cards: bool = false
+var _audio_slam: bool = false
+var _audio_generators: int = 0
 
 var _camera: Camera3D
 var _player: Node3D
@@ -54,6 +61,8 @@ func _ready() -> void:
 	if context != null:
 		run.load_context(context)
 	_build_world()
+	sfx = Sfx.new()
+	add_child(sfx)
 	hud = Hud.new()
 	hud.card_chosen.connect(func(i: int) -> void: run.choose_card(i))
 	add_child(hud)
@@ -335,6 +344,7 @@ func _mouse_aim() -> Vector3:
 # --- Rendering -------------------------------------------------------------
 
 func _process(delta: float) -> void:
+	_play_audio()  # before drawing: the draw functions consume the run's events
 	_draw_player_and_camera()
 	_draw_enemies()
 	_draw_orbs()
@@ -345,6 +355,44 @@ func _process(delta: float) -> void:
 	if context != null:
 		label = "Island %d/%d" % [context.island_index + 1, RunContext.ISLAND_COUNT]
 	hud.refresh(run, _camera, _sim_ms, paused, label)
+
+
+## Turns this frame's gameplay events into sounds.
+func _play_audio() -> void:
+	if not run.tracers.is_empty():
+		sfx.play([&"rifle", &"shotgun", &"pistol"][run.weapon_index], -6.0, 0.06, 40)
+	for d in run.deaths:
+		if d.w > 0.5:
+			sfx.play(&"headshot", -4.0, 0.1, 50)
+		else:
+			sfx.play(&"kill", -8.0, 0.15, 50)
+	if not run.explosions.is_empty():
+		sfx.play(&"explosion", 0.0, 0.1, 80)
+	if run.dash_time > 0.0 and not _audio_dashing:
+		sfx.play(&"breaker", -2.0)
+	_audio_dashing = run.dash_time > 0.0
+	if _audio_hp >= 0.0 and run.hp < _audio_hp:
+		sfx.play(&"hurt", -6.0, 0.1, 180)
+	_audio_hp = run.hp
+	var total_xp: int = run.level * 1000 + run.xp
+	if total_xp > _audio_xp and _audio_xp > 0:
+		sfx.play(&"pickup", -12.0, 0.15, 45)
+	_audio_xp = total_xp
+	var cards: bool = not run.card_choices.is_empty()
+	if cards and not _audio_cards:
+		sfx.play(&"level_up", -4.0, 0.0)
+	_audio_cards = cards
+	var slam: bool = run.slam_time > 0.0
+	if slam and not _audio_slam:
+		sfx.play(&"slam_warn", 0.0, 0.0)
+	_audio_slam = slam
+	var gens: int = 0
+	for g in run.generator_progress:
+		if g >= GameData.GENERATOR_HOLD_SECONDS:
+			gens += 1
+	if gens > _audio_generators:
+		sfx.play(&"generator", -2.0, 0.0)
+	_audio_generators = gens
 
 
 func _draw_player_and_camera() -> void:
