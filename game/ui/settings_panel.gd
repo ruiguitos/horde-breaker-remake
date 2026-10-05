@@ -1,17 +1,20 @@
 class_name SettingsPanel
 extends MenuDialog
-## Settings split in three categories (tabs): DISPLAY (window mode,
-## resolution, VSync, FPS cap), GRAPHICS (quality preset, render scale,
-## anti-aliasing) and AUDIO (master / effects / music percentages).
+## Settings split in categories (tabs): DISPLAY (window mode, resolution,
+## VSync, FPS cap), GRAPHICS (quality preset, render scale, anti-aliasing),
+## AUDIO (master / effects / music percentages) and CONTROLS (key icons and
+## rebinding through G.U.I.D.E, mouse sensitivity).
 ## Every change is applied at once through GraphicsSettings / Profile and
 ## saved to the profile.
 
-const TABS: Array[String] = ["DISPLAY", "GRAPHICS", "AUDIO"]
+const TABS: Array[String] = ["DISPLAY", "GRAPHICS", "AUDIO", "CONTROLS"]
 
 var profile: Profile
 var tab: String = "DISPLAY"
 var _body: VBoxContainer
 var _tab_buttons: Array[Button] = []
+var _capturing: StringName = &""  ## action waiting for a new key, or empty
+var _detector: Node
 
 
 static func open(parent: Control, p: Profile) -> SettingsPanel:
@@ -54,6 +57,7 @@ func _show(t: String) -> void:
 		"DISPLAY": _display()
 		"GRAPHICS": _graphics()
 		"AUDIO": _audio()
+		"CONTROLS": _controls()
 	call_deferred("_trap_focus")
 	# Keep focus on the tab that was pressed (the trap focuses the first one).
 	call_deferred("_focus_tab", t)
@@ -112,6 +116,95 @@ func _audio() -> void:
 	_percent_row("Master volume", profile.master_volume, 0, set_audio.call(func(v: int) -> void: profile.master_volume = v))
 	_percent_row("Sound effects", profile.sfx_volume, 0, set_audio.call(func(v: int) -> void: profile.sfx_volume = v))
 	_percent_row("Music", profile.music_volume, 0, set_audio.call(func(v: int) -> void: profile.music_volume = v))
+
+
+func _controls() -> void:
+	_percent_row("Mouse sensitivity", profile.mouse_sensitivity, 1, func(v: int) -> void:
+		profile.mouse_sensitivity = v
+		profile.save())
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size.y = 240
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	_body.add_child(scroll)
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(list)
+	for action: StringName in GameInput.REBINDABLE:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		list.add_child(row)
+		var name_label := Label.new()
+		name_label.text = GameInput.REBINDABLE[action]
+		name_label.custom_minimum_size.x = 180
+		row.add_child(name_label)
+		var key_icon := _icon_label()
+		key_icon.name = "Key_" + String(action)
+		row.add_child(key_icon)
+		var pad: Array = GameInput.ACTIONS[action].filter(func(b: Variant) -> bool: return not GameInput.is_kbm(b)).slice(0, 1)
+		var pad_icon := _icon_label()
+		row.add_child(pad_icon)
+		var b := Button.new()
+		b.name = "Rebind_" + String(action)
+		b.text = "PRESS A KEY…  (Esc cancels)" if _capturing == action else "REBIND"
+		b.custom_minimum_size.x = 120
+		b.pressed.connect(_start_rebind.bind(action))
+		row.add_child(b)
+		InputIcons.fill(key_icon, [GameInput.current_binding(action, profile.key_bindings)])
+		InputIcons.fill(pad_icon, pad)
+	var reset := UiTheme.button(_body, "RESET DEFAULT KEYS", func() -> void:
+		profile.key_bindings.clear()
+		GameInput.apply_overrides(profile.key_bindings)
+		profile.save()
+		_show("CONTROLS"))
+	reset.name = "ResetKeys"
+
+
+func _icon_label() -> RichTextLabel:
+	var l := RichTextLabel.new()
+	l.bbcode_enabled = true
+	l.fit_content = true
+	l.scroll_active = false
+	l.autowrap_mode = TextServer.AUTOWRAP_OFF
+	l.custom_minimum_size = Vector2(110, 32)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return l
+
+
+## Waits for the next key or mouse button (G.U.I.D.E input detector).
+func _start_rebind(action: StringName) -> void:
+	_capturing = action
+	_show("CONTROLS")
+	if not InputIcons.available() or not has_node("/root/GUIDE"):
+		return
+	if _detector == null:
+		_detector = load("res://addons/guide/remapping/guide_input_detector.gd").new()
+		_detector.set("detection_countdown_seconds", 0.25)
+		var esc: Resource = InputIcons.to_guide(KEY_ESCAPE)
+		var abort: Array[GUIDEInput] = [esc as GUIDEInput]
+		_detector.set("abort_detection_on", abort)
+		add_child(_detector)
+		_detector.connect("input_detected", func(input: Resource) -> void: _on_detected(_capturing, input))
+	var devices: Array[GUIDEInput.DeviceType] = [GUIDEInput.DeviceType.KEYBOARD, GUIDEInput.DeviceType.MOUSE]
+	_detector.call("detect_bool", devices)
+
+
+## New binding detected (null = cancelled with Esc).
+func _on_detected(action: StringName, input: Resource) -> void:
+	var binding: Variant = InputIcons.from_guide(input)
+	if action != &"" and binding != null and not GameInput.same(binding, KEY_ESCAPE):
+		profile.key_bindings[String(action)] = GameInput.encode(binding)
+		GameInput.apply_overrides(profile.key_bindings)
+		profile.save()
+	_capturing = &""
+	_show("CONTROLS")
+
+
+func _input(event: InputEvent) -> void:
+	# While waiting for a key, Esc cancels the capture instead of closing.
+	if _capturing != &"":
+		return
+	super(event)
 
 
 func _apply_display() -> void:

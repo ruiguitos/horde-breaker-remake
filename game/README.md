@@ -49,6 +49,9 @@ gráficos):
 
   Também tem a escala do render 3D (50–100 %: menos píxeis 3D, mais FPS) e o
   anti-aliasing (FXAA, MSAA 2x/4x, TAA).
+- **Controls:** a tecla e o botão do comando de cada ação, com ícones
+  (G.U.I.D.E), **REBIND** para trocar a tecla (Esc cancela), sensibilidade
+  do rato e "Reset default keys".
 - **Audio:** volumes Master, Sound effects e Music, cada um com slider e campo
   editável em percentagem. Os sons vão para os buses SFX e Music.
 
@@ -87,6 +90,13 @@ gráficos):
   XP ou +10 de Intel. São desvios opcionais: vale a pena o risco?
 - O **diretor** alterna calma → crescer → pico (ver F3). O máximo é de 150
   inimigos vivos.
+
+## Briefing no barco
+
+Depois de escolher a rota, o Director Hale faz o briefing (Dialogue Manager,
+`data/dialogue/briefing.dialogue`). Podes perguntar pela ilha ou pedir
+conselhos, ou aceitar **hazard pay**: +25 % de Intel e +25 % de inimigos, só
+na ilha seguinte.
 
 ## Fluxo da run
 

@@ -31,6 +31,9 @@ var max_hp: float = GameData.PLAYER_MAX_HP
 ## Weapons usable in this run (starting ones + armory unlocks).
 var weapons: Array[StringName] = GameData.STARTING_WEAPONS.duplicate()
 var player_class: StringName = &"recruit"
+## Hazard pay accepted in the boat briefing: +25% Intel, +25% enemies on
+## the next island only (reset when the island ends).
+var hazard_pay: bool = false
 ## Telemetry: one Dictionary per island played (see IslandRun.save_to_context).
 var island_log: Array[Dictionary] = []
 

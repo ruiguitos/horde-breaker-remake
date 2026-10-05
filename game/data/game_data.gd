@@ -187,6 +187,9 @@ const MISSIONS: Dictionary = {
 	&"rescue": {"name": "Rescue", "text": "Find the survivor and bring them to the boat alive."},
 }
 const DEFEND_TIME: float = 75.0
+## Hazard pay (boat briefing): bonus Intel and extra enemies, one island.
+const HAZARD_INTEL_MULT: float = 1.25
+const HAZARD_ALIVE_MULT: float = 1.25
 const DEFEND_RADIUS: float = 6.0
 const SURVIVOR_SPEED: float = 5.6
 const SURVIVOR_HP: float = 100.0

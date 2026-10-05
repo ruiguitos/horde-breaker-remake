@@ -157,7 +157,13 @@ func _init() -> void:
 	var help := Label.new()
 	help.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	help.position = Vector2(16, -40)
-	help.text = "WASD move · mouse look/aim · V camera · Space breaker · G ability · Shift sprint · 1-5 weapons · Esc pause · F3 debug"
+	# Built from the current bindings, so rebound keys show up here too.
+	var kb: Dictionary = profile.key_bindings if profile != null else {}
+	var key := func(action: StringName) -> String:
+		return InputIcons.text(GameInput.current_binding(action, kb))
+	help.text = "%s%s%s%s move · mouse look/aim · %s camera · %s breaker · %s ability · %s sprint · 1-5 weapons · %s pause · F3 debug" % [
+		key.call(&"move_up"), key.call(&"move_left"), key.call(&"move_down"), key.call(&"move_right"),
+		key.call(&"camera_toggle"), key.call(&"breaker"), key.call(&"ability"), key.call(&"sprint"), key.call(&"pause")]
 	help.modulate = Color(1, 1, 1, 0.7)
 	root.add_child(help)
 

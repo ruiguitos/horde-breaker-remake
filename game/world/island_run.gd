@@ -32,6 +32,7 @@ var dash_time: float = 0.0
 var dash_dir: Vector3 = Vector3.ZERO
 var invulnerable: float = 0.0
 var player_class: StringName = &"recruit"
+var hazard_pay: bool = false  ## boat briefing deal (see RunContext)
 var war_cry_time: float = 0.0  ## > 0 while War Cry reduces damage taken
 var stamina: float = GameData.STAMINA_MAX
 var sprinting: bool = false
@@ -159,6 +160,9 @@ func load_context(ctx: RunContext) -> void:
 	horde.hp_scale = (1.0 + 0.3 * ctx.island_index) * GameData.threat_hp(threat)
 	director.max_alive = GameData.MAX_ALIVE + GameData.threat_extra_alive(threat)
 	modifier = ctx.modifier
+	hazard_pay = ctx.hazard_pay
+	if hazard_pay:
+		director.max_alive = int(director.max_alive * GameData.HAZARD_ALIVE_MULT)
 	if map.biome == &"jungle":
 		director.specials_mult *= 1.4
 	match modifier:
@@ -186,6 +190,7 @@ func save_to_context(ctx: RunContext) -> void:
 		"cards_picked": cards_picked.map(func(x: StringName) -> String: return String(x)),
 	})
 	ctx.intel += intel_earned()
+	ctx.hazard_pay = false  # one island only
 	ctx.lore_found += lore_found
 	ctx.hp = clampf(hp, 1.0, max_hp)
 	ctx.level = level
@@ -359,7 +364,8 @@ func intel_earned() -> int:
 			base += done * 15
 	base += 20 if boss_killed else 0
 	base += cache_intel
-	return int(base * GameData.threat_intel(threat) * GameData.modifier(modifier).intel_mult)
+	var hazard: float = GameData.HAZARD_INTEL_MULT if hazard_pay else 1.0
+	return int(base * GameData.threat_intel(threat) * GameData.modifier(modifier).intel_mult * hazard)
 
 
 func switch_weapon(i: int) -> void:

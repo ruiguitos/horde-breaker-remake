@@ -352,6 +352,9 @@ func _build_world() -> void:
 	add_child(_camera)
 	if _terrain != null:
 		_terrain.call("set_camera", _camera)  # terrain LOD follows this camera
+	# Biome colour grading (Color Grading addon; Forward+ only, High/Ultra).
+	_camera.compositor = Grading.compositor_for(run.map.biome)
+	Grading.apply(_camera)
 
 
 ## Terrain3D ground (sloping sea floor, colour-mapped land). False when the
