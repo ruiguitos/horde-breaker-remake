@@ -88,6 +88,32 @@ gráficos):
 - O **diretor** alterna calma → crescer → pico (ver F3). O máximo é de 150
   inimigos vivos.
 
+## HUD tático
+
+Painéis escuros, títulos condensados e apontamentos âmbar, a combinar com os
+menus. O centro do ecrã fica disponível para o combate.
+
+- **Em baixo**: vida numérica e XP à esquerda; Breaker, habilidade da classe e
+  estamina ao centro; arma e munição à direita. Recargas mostram segundos ou
+  `READY`; correr mostra `SPRINTING` e uma arma vazia mostra `NO AMMO`.
+- **Em cima**: objetivo, progresso e modificador da rota; vida do sobrevivente
+  durante a escolta ou barra do Behemoth com indicação da fase 2. Minimapa à
+  direita, com grelha discreta e barco em forma de losango âmbar.
+- **Avisos**: pouca vida, Grabber, Screamer, perda do sobrevivente e War Cry
+  mantêm-se visíveis. As legendas de Hale aparecem acima da vida. Dano
+  direcional, números de dano, cartas e pausa mantêm o funcionamento anterior.
+- **Controlos**: os atalhos mudam com o último dispositivo usado (teclado ou
+  comando). F3 mostra o diagnóstico, escondido por omissão. Os painéis de
+  combate deixam passar o rato para a mira.
+
+`tests/test_hud.gd` verifica os estados e o encaixe em 960×540, 1152×648 e
+1920×1080. `tools/dev/hud_preview.gd` captura o HUD real, com perfil temporário
+em memória, nos estados `normal`, `danger`, `boss` ou `third_person`:
+
+```bash
+godot --path . --resolution 1152x648 --windowed --script res://tools/dev/hud_preview.gd -- <caminho-absoluto.png> normal
+```
+
 ## Fluxo da run
 
 **Título** → **Armory** (gastar Intel, equipar perks, escolher Threat) → barco (1 de 3: cura, munição ou carta) → ilha → ilha limpa → barco → … →
