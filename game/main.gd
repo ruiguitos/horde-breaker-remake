@@ -55,6 +55,7 @@ func _go(next: State) -> void:
 			_current = island
 		State.DEBRIEF:
 			profile.record_run(context)
+			_write_telemetry()
 			profile.save()
 			var debrief := Control.new()
 			debrief.set_script(load("res://game/states/debrief.gd"))
@@ -69,6 +70,21 @@ func _go(next: State) -> void:
 			armory.connect("start_requested", _new_run, CONNECT_DEFERRED)
 			_current = armory
 	add_child(_current)
+
+
+## Writes a JSON summary of the run to user://runs/ for balancing.
+func _write_telemetry() -> void:
+	DirAccess.make_dir_recursive_absolute("user://runs")
+	var stamp: String = Time.get_datetime_string_from_system().replace(":", "-")
+	var f := FileAccess.open("user://runs/run_%s.json" % stamp, FileAccess.WRITE)
+	if f == null:
+		return
+	f.store_string(JSON.stringify({
+		"version": 1, "won": context.won, "threat": context.threat,
+		"class": String(context.player_class),
+		"perks": context.perks.map(func(x: StringName) -> String: return String(x)),
+		"intel": context.intel, "total_seconds": snappedf(context.time_alive, 0.1),
+		"islands": context.island_log}, "  "))
 
 
 func _on_island_finished(won: bool) -> void:

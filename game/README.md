@@ -115,6 +115,14 @@ blindado à frente (−50 %) e não é empurrado.
 - Matá-lo dá +20 de Intel e abre o regresso ao barco. Tem uma barra de vida
   no topo e o marcador aponta para ele.
 
+## Telemetria
+
+No fim de cada run grava-se `user://runs/run_<data>.json`, ao lado do
+perfil. Tem, por ilha: modificador, resultado, segundos, mortes, headshots,
+dano recebido, vida restante, nível, Intel, caixas abertas e cartas
+escolhidas. Serve para equilibrar com números ("morri na ilha 2 com Elite
+Pack ao fim de 3 min") em vez de impressões.
+
 ## Meta: Intel, perks e Threat
 
 - **Perks** compram-se uma vez com Intel e equipam-se em slots: começas com

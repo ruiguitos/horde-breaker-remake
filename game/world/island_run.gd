@@ -64,6 +64,9 @@ var generator_started: Array[bool] = []
 var has_boss: bool = false
 var cache_progress: PackedFloat32Array = PackedFloat32Array()  ## >= CACHE_OPEN_TIME = opened
 var cache_intel: int = 0
+var damage_taken: float = 0.0
+var _hp_at_step_start: float = 0.0
+var cards_picked: Array[StringName] = []
 var boss_max_hp: float = 0.0
 var slam_pos: Vector3 = Vector3.ZERO
 var slam_time: float = 0.0  ## > 0 while a slam is winding up
@@ -151,6 +154,15 @@ func load_context(ctx: RunContext) -> void:
 
 ## Writes the run state back when the island ends.
 func save_to_context(ctx: RunContext) -> void:
+	ctx.island_log.append({
+		"island": ctx.island_index + 1, "modifier": String(modifier),
+		"result": "cleared" if objective == Objective.WON else "died",
+		"seconds": snappedf(time_alive - ctx.time_alive, 0.1),
+		"kills": kills - _kills_at_start, "headshots": headshots - ctx.headshots,
+		"damage_taken": int(damage_taken), "hp_left": int(hp), "level": level,
+		"intel": intel_earned(), "caches_opened": caches_opened(),
+		"cards_picked": cards_picked.map(func(x: StringName) -> String: return String(x)),
+	})
 	ctx.intel += intel_earned()
 	ctx.hp = clampf(hp, 1.0, max_hp)
 	ctx.level = level
@@ -321,6 +333,7 @@ func choose_card(i: int) -> void:
 		return
 	var c: GameData.Card = card_choices[i]
 	card_stacks[c.id] = stacks(c.id) + 1
+	cards_picked.append(c.id)
 	messages.append("Card: " + c.title)
 	card_choices.clear()
 	_roll_cards_if_needed()
@@ -331,6 +344,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	if is_paused():
 		return
 	time_alive += dt
+	_hp_at_step_start = hp
 	var aim_flat := Vector3(aim.x, 0, aim.z)
 	if aim_flat.length_squared() > 0.0001:
 		facing = aim_flat.normalized()
@@ -356,6 +370,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	var to_spawn: int = director.update(dt, horde.count, horde.damage_to_player, near)
 	for k in to_spawn:
 		_spawn_enemy()
+	damage_taken += maxf(0.0, _hp_at_step_start - hp)
 	if hp <= 0.0:
 		hp = 0.0
 		objective = Objective.LOST
@@ -656,6 +671,14 @@ func _update_mission(dt: float) -> void:
 		Objective.RETURN_TO_BOAT:
 			if player_pos.distance_to(map.boat) <= GameData.BOAT_RADIUS:
 				objective = Objective.WON
+
+
+func caches_opened() -> int:
+	var n: int = 0
+	for p in cache_progress:
+		if p >= GameData.CACHE_OPEN_TIME:
+			n += 1
+	return n
 
 
 func _update_caches(dt: float) -> void:

@@ -25,6 +25,8 @@ var max_hp: float = GameData.PLAYER_MAX_HP
 ## Weapons usable in this run (starting ones + armory unlocks).
 var weapons: Array[StringName] = GameData.STARTING_WEAPONS.duplicate()
 var player_class: StringName = &"recruit"
+## Telemetry: one Dictionary per island played (see IslandRun.save_to_context).
+var island_log: Array[Dictionary] = []
 
 
 ## Sets the class; call before apply_perks (both change max HP).
