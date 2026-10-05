@@ -29,6 +29,7 @@ func _initialize() -> void:
 	_test_target_priority()
 	_test_input_actions()
 	_test_missions()
+	_test_story()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -416,3 +417,19 @@ func _test_missions() -> void:
 	r.survivor_pos = r.map.boat
 	r.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)
 	_check(r.objective == IslandRun.Objective.WON and r.intel_earned() >= 80, "Rescue: survivor at the boat wins with the bonus (%d)" % r.intel_earned())
+
+
+func _test_story() -> void:
+	var ctx := RunContext.new(4)
+	ctx.mission = &"defend"
+	var run := IslandRun.new(4)
+	run.load_context(ctx)
+	_check(run.radio.has(&"land_defend") and Story.radio_line(&"land_defend", run.rng) != "", "landing queues a mission briefing on the radio")
+	var p := Profile.new()
+	ctx.lore_found = 3
+	p.record_run(ctx)
+	_check(p.lore_pages == 3, "recovered Intel files are added to the profile")
+	var all_keys: bool = true
+	for k in [&"generator", &"boss", &"survivor_found", &"low_hp", &"screamer", &"cache"]:
+		all_keys = all_keys and Story.RADIO.has(k)
+	_check(all_keys and Story.FILES.size() >= 10, "every radio event has lines; 10 Intel files exist")

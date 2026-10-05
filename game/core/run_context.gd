@@ -24,6 +24,8 @@ var modifier: StringName = &"calm"
 var biome: StringName = &"beach"
 ## Mission of the island being played: activate, defend or rescue.
 var mission: StringName = &"activate"
+## Story pages recovered during this run.
+var lore_found: int = 0
 var perks: Array[StringName] = []
 var max_hp: float = GameData.PLAYER_MAX_HP
 ## Weapons usable in this run (starting ones + armory unlocks).

@@ -100,6 +100,11 @@ var tracers: Array[PackedVector3Array] = []
 var deaths: Array[Vector4] = []  ## (x, z, kind, headshot 0/1)
 var explosions: PackedVector3Array = PackedVector3Array()
 var messages: PackedStringArray = PackedStringArray()
+## Radio events (Story.RADIO keys), consumed by the HUD.
+var radio: Array[StringName] = []
+## Intel files recovered on this island (caches, boss).
+var lore_found: int = 0
+var _low_hp_cd: float = 0.0
 
 var _kills_at_start: int = 0
 var scream_progress: float = 0.0  ## seconds a Screamer has seen the player
@@ -130,6 +135,9 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach") -> void:
 func load_context(ctx: RunContext) -> void:
 	perks = ctx.perks.duplicate()
 	set_mission(ctx.mission)
+	radio.append(StringName("land_" + String(mission)))
+	if ctx.is_last_island():
+		radio.append(&"land_boss")
 	player_class = ctx.player_class
 	for w in weapons.size():
 		weapon_unlocked[w] = ctx.weapons.has(weapons[w].id)
@@ -176,6 +184,7 @@ func save_to_context(ctx: RunContext) -> void:
 		"cards_picked": cards_picked.map(func(x: StringName) -> String: return String(x)),
 	})
 	ctx.intel += intel_earned()
+	ctx.lore_found += lore_found
 	ctx.hp = clampf(hp, 1.0, max_hp)
 	ctx.level = level
 	ctx.xp = xp
@@ -275,6 +284,7 @@ func _update_screamers(dt: float) -> void:
 		_scream_cd = GameData.SCREAM_COOLDOWN
 		director.trigger_peak(15.0)
 		messages.append("A Screamer called the horde!")
+		radio.append(&"screamer")
 
 
 func _update_grenades(dt: float) -> void:
@@ -416,6 +426,10 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	for k in to_spawn:
 		_spawn_enemy()
 	damage_taken += maxf(0.0, _hp_at_step_start - hp)
+	_low_hp_cd -= dt
+	if hp < max_hp * 0.3 and _low_hp_cd <= 0.0 and hp > 0.0:
+		_low_hp_cd = 40.0
+		radio.append(&"low_hp")
 	if hp <= 0.0:
 		hp = 0.0
 		objective = Objective.LOST
@@ -697,10 +711,13 @@ func _update_mission(dt: float) -> void:
 				objective = Objective.BOSS
 				_spawn_boss()
 				messages.append("Something huge is coming... Kill the Behemoth!")
+				radio.append(&"boss")
 			elif _main_task_done():
 				objective = Objective.RETURN_TO_BOAT
 				director.trigger_peak(25.0)
 				messages.append("Objective complete. Get back to the boat!")
+				if mission != &"rescue":
+					radio.append(&"objective_done")
 		Objective.BOSS:
 			_update_rescue(dt)
 			var b: int = boss_index()
@@ -713,6 +730,8 @@ func _update_mission(dt: float) -> void:
 				slam_time = 0.0
 				director.trigger_peak(20.0)
 				messages.append("Behemoth down! Get back to the boat!")
+				radio.append(&"boss_down")
+				lore_found += 1
 			else:
 				_update_boss(dt, b)
 		Objective.RETURN_TO_BOAT:
@@ -742,6 +761,7 @@ func _update_rescue(dt: float) -> void:
 		if player_pos.distance_to(survivor_pos) <= GameData.SURVIVOR_FIND_RADIUS:
 			survivor_found = true
 			messages.append("Survivor found! Escort them to the boat.")
+			radio.append(&"survivor_found")
 		return
 	var to: Vector3 = player_pos - survivor_pos
 	to.y = 0.0
@@ -753,6 +773,7 @@ func _update_rescue(dt: float) -> void:
 	if survivor_hp <= 0.0:
 		survivor_lost = true
 		messages.append("The survivor is dead.")
+		radio.append(&"survivor_lost")
 
 
 func _update_generators(dt: float) -> void:
@@ -767,6 +788,7 @@ func _update_generators(dt: float) -> void:
 			generator_progress[g] += dt
 			if generator_progress[g] >= GameData.GENERATOR_HOLD_SECONDS:
 				messages.append("Generator online")
+				radio.append(&"generator")
 				for w in weapons.size():
 					if weapons[w].max_ammo > 0:
 						ammo[w] = mini(max_ammo(w), ammo[w] + max_ammo(w) / 2)
@@ -806,6 +828,11 @@ func _update_caches(dt: float) -> void:
 
 
 func _open_cache() -> void:
+	radio.append(&"cache")
+	# Half the caches also hold an Intel file (story page).
+	if rng.randf() < 0.5:
+		lore_found += 1
+		messages.append("Intel file recovered!")
 	match rng.randi_range(0, 3):
 		0:
 			hp = minf(max_hp, hp + 30.0)

@@ -15,6 +15,11 @@ var _breaker_bar: ProgressBar
 var _grenade_bar: ProgressBar
 var _boss_bar: ProgressBar
 var _minimap: Minimap
+var _radio_panel: PanelContainer
+var _radio_text: Label
+var _radio_queue: PackedStringArray = PackedStringArray()
+var _radio_time: float = 0.0
+var _radio_rng := RandomNumberGenerator.new()
 var _stamina_bar: ProgressBar
 var _info: Label
 var _objective: Label
@@ -78,6 +83,42 @@ func _init() -> void:
 	_boss_bar.max_value = 1.0
 	_boss_bar.visible = false
 	root.add_child(_boss_bar)
+
+	# Radio: Director Hale talks from the bottom-left corner.
+	_radio_panel = PanelContainer.new()
+	_radio_panel.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_radio_panel.position = Vector2(16, -150)
+	_radio_panel.custom_minimum_size = Vector2(470, 0)
+	_radio_panel.visible = false
+	root.add_child(_radio_panel)
+	var rrow := HBoxContainer.new()
+	rrow.add_theme_constant_override("separation", 12)
+	_radio_panel.add_child(rrow)
+	var portrait := ColorRect.new()
+	portrait.color = Color(0.25, 0.3, 0.28)
+	portrait.custom_minimum_size = Vector2(64, 64)
+	var initial := Label.new()
+	initial.text = "H"
+	initial.add_theme_font_size_override("font_size", 38)
+	initial.add_theme_color_override("font_color", UiTheme.ACCENT)
+	initial.set_anchors_preset(Control.PRESET_FULL_RECT)
+	initial.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	initial.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	portrait.add_child(initial)
+	rrow.add_child(portrait)
+	var rcol := VBoxContainer.new()
+	rcol.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rrow.add_child(rcol)
+	var speaker := Label.new()
+	speaker.text = Story.SPEAKER
+	speaker.add_theme_font_size_override("font_size", 14)
+	speaker.add_theme_color_override("font_color", UiTheme.ACCENT)
+	rcol.add_child(speaker)
+	_radio_text = Label.new()
+	_radio_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_radio_text.custom_minimum_size = Vector2(370, 0)
+	_radio_text.add_theme_font_size_override("font_size", 16)
+	rcol.add_child(_radio_text)
 
 	_minimap = Minimap.new()
 	_minimap.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -221,6 +262,7 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 		_info.text += "\nA SCREAMER SEES YOU! (%d%%)" % int(100.0 * run.scream_progress / GameData.SCREAM_TIME)
 	_objective.text = (island_text + " — " if island_text != "" else "") + run.objective_text()
 
+	_update_radio(run)
 	if _minimap.run != run:
 		_minimap.set_run(run)
 	_boss_bar.visible = run.objective == IslandRun.Objective.BOSS
@@ -257,6 +299,27 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 		var won: bool = run.objective == IslandRun.Objective.WON
 		_end_label.text = "%s\n\nKills %d · Headshots %d · Level %d\nIntel from this island: %d\n\nEnter / A: continue" % [
 			"ISLAND CLEARED!" if won else "YOU DIED", run.kills, run.headshots, run.level, run.intel_earned()]
+
+
+## Shows queued radio lines one at a time, typed out letter by letter.
+func _update_radio(run: IslandRun) -> void:
+	for key in run.radio:
+		var line: String = Story.radio_line(key, _radio_rng)
+		if line != "" and _radio_queue.size() < 3:
+			_radio_queue.append(line)
+	run.radio.clear()
+	var dt: float = get_process_delta_time()
+	if _radio_time > 0.0:
+		_radio_time -= dt
+		_radio_text.visible_ratio = minf(1.0, _radio_text.visible_ratio + dt * 2.0)
+		if _radio_time <= 0.0:
+			_radio_panel.visible = false
+	elif not _radio_queue.is_empty():
+		_radio_text.text = _radio_queue[0]
+		_radio_queue.remove_at(0)
+		_radio_text.visible_ratio = 0.0
+		_radio_time = 2.5 + _radio_text.text.length() * 0.045
+		_radio_panel.visible = true
 
 
 ## Points at the current goal; sticks to the screen edge when off-screen.

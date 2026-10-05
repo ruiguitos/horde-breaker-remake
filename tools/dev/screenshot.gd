@@ -24,6 +24,9 @@ func _process(_delta: float) -> bool:
 	var main: Node = root.get_node("Main")
 	var current: Node = main.get("_current")
 	# Optional third arg "boat" photographs the boat screen instead.
+	if main.get("state") == 4:
+		current.emit_signal("play_requested")
+		return false
 	if OS.get_cmdline_user_args().size() > 2 and main.get("state") == 3:
 		current.call("_start")
 		return false

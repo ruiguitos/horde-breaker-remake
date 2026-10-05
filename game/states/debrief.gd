@@ -27,6 +27,8 @@ func _ready() -> void:
 	_row(box, "Level reached", str(context.level))
 	_row(box, "Intel earned", "+%d" % context.intel, UiTheme.ACCENT)
 	_row(box, "Total Intel", str(profile.intel))
+	if context.lore_found > 0:
+		_row(box, "Intel files recovered", "+%d  (read them in the Armory)" % context.lore_found, UiTheme.ACCENT)
 	var meta := Label.new()
 	meta.text = "Runs %d · Extractions %d · Best kills %d" % [profile.runs, profile.extractions, profile.best_kills]
 	meta.add_theme_color_override("font_color", UiTheme.MUTED)

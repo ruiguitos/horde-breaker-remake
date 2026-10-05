@@ -98,6 +98,18 @@ Vulcão.
 | Industrial Port | filas de contentores coloridos | corredores estreitos |
 | Volcano | cinza, árvores queimadas | poças de lava que ferem toda a gente (atrai a horda para lá) |
 
+## História
+
+Trabalhas para a **Salvage & Co.**, contratado para recuperar dados do
+arquipélago Halvard, onde uma experiência ("Project TIDE") correu mal.
+- **Rádio**: o Director Hale fala contigo no canto inferior esquerdo, com
+  humor seco. Comenta a aterragem (o briefing da missão), os geradores, o
+  sobrevivente, o boss, a vida baixa e os Screamers.
+- **Ficheiros de Intel**: metade das caixas e todos os bosses dão uma página.
+  Lês as páginas no Armory (botão INTEL FILES). Juntas contam o que realmente
+  aconteceu; são 10, em ordem.
+- O texto está todo em `data/story.gd`: dá para reescrever sem mexer no código.
+
 ## Missões
 
 Cada rota mostra também a missão da ilha:
@@ -222,6 +234,7 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 | `horde/horde.gd`, `horde/flow_field.gd` | Horda como dados, vinda do spike `horde_flowfield`. |
 | `ui/hud.gd` | HUD em código. |
 | `audio/sfx.gd`, `audio/music.gd` | Sons e música sintetizados em código. |
+| `data/story.gd` | Falas do rádio e ficheiros de Intel. |
 | `data/game_data.gd` | Dados e valores de equilíbrio. |
 
 `tests/test_soak_run.gd` é um bot que joga runs completas (3 ilhas, boss

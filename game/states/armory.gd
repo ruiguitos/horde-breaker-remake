@@ -59,6 +59,11 @@ func _ready() -> void:
 			profile.apply_volume()
 			_act(true))
 		settings.add_child(vb)
+	var files := Button.new()
+	files.text = "INTEL FILES (%d / %d)" % [profile.lore_pages, Story.FILES.size()]
+	files.disabled = profile.lore_pages == 0
+	files.pressed.connect(_show_files)
+	box.add_child(files)
 	var start := Button.new()
 	start.text = "START RUN (Enter)"
 	start.custom_minimum_size = Vector2(0, 50)
@@ -156,6 +161,45 @@ func _rebuild() -> void:
 			profile.threat = t
 			_act(true))
 		_threat_row.add_child(tb)
+
+
+## Overlay with the recovered story pages (Story.FILES, in order).
+func _show_files() -> void:
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.7)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(dim)
+	var box: VBoxContainer = UiTheme.centered_panel(dim, 700)
+	box.add_child(UiTheme.title("RECOVERED INTEL", 30))
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, 380)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	box.add_child(scroll)
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 14)
+	scroll.add_child(list)
+	for i in Story.FILES.size():
+		var t := Label.new()
+		var body := Label.new()
+		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		if i < profile.lore_pages:
+			t.text = Story.FILES[i]["title"]
+			t.add_theme_color_override("font_color", UiTheme.ACCENT)
+			body.text = Story.FILES[i]["text"]
+		else:
+			t.text = "File %02d — [encrypted]" % (i + 1)
+			t.add_theme_color_override("font_color", UiTheme.MUTED)
+			body.text = "Recover it from supply caches or by killing the Behemoth."
+			body.add_theme_color_override("font_color", UiTheme.MUTED)
+		list.add_child(t)
+		list.add_child(body)
+	var close := Button.new()
+	close.text = "CLOSE"
+	close.custom_minimum_size = Vector2(0, 44)
+	close.pressed.connect(func() -> void: dim.queue_free())
+	box.add_child(close)
+	close.grab_focus()
 
 
 func _act(changed: bool) -> void:
