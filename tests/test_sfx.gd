@@ -24,4 +24,14 @@ func _initialize() -> void:
 		print("%s %s: %.2f s, peak %d, clipped %d" % ["TEST:" if ok else "TEST FAIL:", sound, secs, peak, clipped])
 		if not ok:
 			failures += 1
+	for combat in [false, true]:
+		var m: AudioStreamWAV = Music._build(combat)
+		var secs: float = float(m.data.size() / 2) / Music.MIX_RATE
+		var peak: int = 0
+		for i in range(0, m.data.size() / 2, 7):
+			peak = maxi(peak, absi(m.data.decode_s16(i * 2)))
+		var ok: bool = absf(secs - 8.0) < 0.01 and m.loop_mode == AudioStreamWAV.LOOP_FORWARD and peak > 3000 and peak < 32767
+		print("%s music loop (combat=%s): %.2f s, peak %d" % ["TEST:" if ok else "TEST FAIL:", combat, secs, peak])
+		if not ok:
+			failures += 1
 	quit(1 if failures > 0 else 0)

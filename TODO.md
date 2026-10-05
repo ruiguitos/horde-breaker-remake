@@ -17,7 +17,7 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 
 ## Gráficos e feel
 
-- [ ] Afinar o som sintetizado a ouvido (volumes em `island.gd::_play_audio`, timbres em `audio/sfx.gd`); música do diretor.
+- [ ] Afinar som e música a ouvido (volumes em `island.gd::_play_audio`, timbres em `audio/sfx.gd` e `audio/music.gd`).
 - [ ] Animação melhor que o "balançar" (Vertex Animation Textures, BRAINSTORM §8).
 
 ## Técnico

@@ -20,6 +20,7 @@ const DEBRIS_MAX: int = 600
 var run: IslandRun
 var hud: Hud
 var sfx: Sfx
+var music: Music
 var _audio_hp: float = -1.0
 var _audio_xp: int = 0
 var _audio_dashing: bool = false
@@ -71,6 +72,8 @@ func _ready() -> void:
 	_build_world()
 	sfx = Sfx.new()
 	add_child(sfx)
+	music = Music.new()
+	add_child(music)
 	hud = Hud.new()
 	hud.card_chosen.connect(func(i: int) -> void: run.choose_card(i))
 	add_child(hud)
@@ -521,6 +524,11 @@ func _process(delta: float) -> void:
 
 ## Turns this frame's gameplay events into sounds.
 func _play_audio() -> void:
+	# Music follows the director: peak = combat, build-up = halfway, relax = calm.
+	var target: float = [0.5, 1.0, 0.0][run.director.phase]
+	if run.objective == IslandRun.Objective.BOSS:
+		target = 1.0
+	music.update_mix(target if not run.is_over() else 0.0, get_process_delta_time())
 	if not run.tracers.is_empty():
 		sfx.play([&"rifle", &"shotgun", &"pistol", &"rifle", &"pistol"][run.weapon_index], -6.0, 0.06, 40)
 	for d in run.deaths:

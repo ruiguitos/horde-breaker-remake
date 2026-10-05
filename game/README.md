@@ -144,6 +144,12 @@ para tiros por arma, mortes, headshots, breaker, explosões, dano, XP,
 level-up, gerador e o aviso do golpe do boss. Os volumes estão em
 `world/island.gd::_play_audio`. Ainda não foram afinados a ouvido.
 
+**Música adaptativa** (`audio/music.gd`): dois loops sintetizados de 8 s
+(lá menor, 120 BPM), um calmo (drone e acorde) e um de combate (o mesmo
+drone com bombo, baixo e chimbal). Tocam sempre juntos e o volume de cada um
+segue o diretor: relax → calmo, crescer → mistura, pico e boss → combate.
+Como as transições são cross-fades, não há cortes.
+
 ## Onde mexer nos valores
 
 Todos os números de equilíbrio (HP, dano, velocidades, cooldowns, cartas)
@@ -166,7 +172,7 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 | `world/director.gd` | Ritmo da horda (crescer/pico/relax, intensidade). |
 | `horde/horde.gd`, `horde/flow_field.gd` | Horda como dados, vinda do spike `horde_flowfield`. |
 | `ui/hud.gd` | HUD em código. |
-| `audio/sfx.gd` | Sons sintetizados em código e pool de players. |
+| `audio/sfx.gd`, `audio/music.gd` | Sons e música sintetizados em código. |
 | `data/game_data.gd` | Dados e valores de equilíbrio. |
 
 Porquê separar `island_run` (regras) de `island` (cena): assim os testes
