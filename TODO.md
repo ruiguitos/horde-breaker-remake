@@ -11,7 +11,7 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 ## Gameplay
 
 - [ ] Rotas: mapa em grafo visível (agora são 2 opções por paragem).
-- [ ] Mais desbloqueios com Intel: cartas no pool, classes (Vanguard, Field Medic).
+- [ ] Mais desbloqueios com Intel: cartas no pool. Equilibrar classes.
 - [ ] Boss: segunda fase, ataque à distância, ilha própria (Volcano).
 - [ ] Caches/desvios opcionais na ilha.
 

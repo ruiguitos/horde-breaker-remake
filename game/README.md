@@ -109,6 +109,10 @@ blindado à frente (−50 %) e não é empurrado.
   1 slot, o 2.º custa 100 e o 3.º 250. São 5 perks: Thick Skin, Pack Rat,
   Head Hunter, Battering Ram e Demolitions. São bónus pequenos, para dar
   opções e não poder bruto.
+- **Classes** (escolhe-se uma no Armory; a tecla G usa a habilidade):
+  Recruit (grátis; Granada), Vanguard (150; +40 HP, breaker −30 %; War Cry:
+  atordoa a 7 m e −40 % de dano recebido durante 5 s) e Field Medic (200;
+  regenera 1 HP/s; Med Kit: +35 HP).
 - **Armas**: SMG (60 Intel; 16 tiros/s, 18 m) e Marksman Rifle (80 Intel;
   110 de dano, atravessa 6). Depois de compradas ficam nas teclas 4 e 5.
 - **Threat 1–3**: cada nível dá +20 % de HP aos inimigos, mais 25 vivos e

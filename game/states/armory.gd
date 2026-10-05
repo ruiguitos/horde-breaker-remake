@@ -35,8 +35,14 @@ func _ready() -> void:
 	_header = Label.new()
 	_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_header)
+	# The list scrolls so the menu fits small windows (default 1152x648).
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, 300)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	box.add_child(scroll)
 	_list = VBoxContainer.new()
-	box.add_child(_list)
+	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(_list)
 	var threat_label := Label.new()
 	threat_label.text = "Threat (extract on your highest Threat to unlock the next):"
 	box.add_child(threat_label)
@@ -72,6 +78,30 @@ func _rebuild() -> void:
 	_header.text = "Intel: %d   ·   Perk slots: %d (%d equipped)" % [
 		profile.intel, profile.slots, profile.equipped_perks.size()]
 	_volume_label.text = "Volume: %d/10   ·   F11: fullscreen" % profile.volume
+	for id in GameData.CLASSES:
+		var info: Dictionary = GameData.CLASS_INFO[id]
+		var crow := HBoxContainer.new()
+		var cl := Label.new()
+		cl.text = "Class: %s — %s" % [info["name"], info["text"]]
+		cl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		cl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		crow.add_child(cl)
+		var cb := Button.new()
+		cb.custom_minimum_size = Vector2(150, 0)
+		if not profile.unlocked_classes.has(id):
+			cb.text = "Buy (%d)" % int(info["cost"])
+			cb.disabled = profile.intel < int(info["cost"])
+			cb.pressed.connect(func() -> void: _act(profile.buy_class(id)))
+		elif profile.selected_class == id:
+			cb.text = "✔ Selected"
+			cb.disabled = true
+		else:
+			cb.text = "Select"
+			cb.pressed.connect(func() -> void:
+				profile.selected_class = id
+				_act(true))
+		crow.add_child(cb)
+		_list.add_child(crow)
 	for perk in GameData.perks():
 		var row := HBoxContainer.new()
 		var label := Label.new()

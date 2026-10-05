@@ -31,6 +31,8 @@ var breaker_cd: float = 0.0
 var dash_time: float = 0.0
 var dash_dir: Vector3 = Vector3.ZERO
 var invulnerable: float = 0.0
+var player_class: StringName = &"recruit"
+var war_cry_time: float = 0.0  ## > 0 while War Cry reduces damage taken
 var stamina: float = GameData.STAMINA_MAX
 var sprinting: bool = false
 var _stamina_delay: float = 0.0
@@ -104,6 +106,7 @@ func _init(rng_seed: int = 7) -> void:
 ## Loads the run state carried from previous islands and scales difficulty.
 func load_context(ctx: RunContext) -> void:
 	perks = ctx.perks.duplicate()
+	player_class = ctx.player_class
 	for w in weapons.size():
 		weapon_unlocked[w] = ctx.weapons.has(weapons[w].id)
 	has_boss = ctx.is_last_island()
@@ -169,6 +172,37 @@ func grenade_cooldown_total() -> float:
 
 ## Throws a grenade towards `aim` (vector from the player; its length is the
 ## throw distance, clamped to the grenade range).
+## Uses the class ability (Recruit: grenade, Vanguard: War Cry, Medic: Med Kit).
+func use_ability(aim: Vector3) -> bool:
+	if grenade_cd > 0.0 or is_paused():
+		return false
+	match player_class:
+		&"vanguard":
+			for i in horde.query_radius(player_pos, GameData.WAR_CRY_RADIUS):
+				horde.stun[i] = maxf(horde.stun[i], 1.5)
+				horde.knock_back(i, player_pos, 1.0)
+			war_cry_time = GameData.WAR_CRY_TIME
+			grenade_cd = ability_cooldown_total()
+			explosions.append(player_pos)
+			messages.append("WAR CRY!")
+			return true
+		&"medic":
+			hp = minf(max_hp, hp + GameData.MEDKIT_HEAL)
+			grenade_cd = ability_cooldown_total()
+			messages.append("Med Kit: +%d HP" % int(GameData.MEDKIT_HEAL))
+			return true
+	return throw_grenade(aim)
+
+
+func ability_cooldown_total() -> float:
+	match player_class:
+		&"vanguard":
+			return GameData.WAR_CRY_COOLDOWN
+		&"medic":
+			return GameData.MEDKIT_COOLDOWN
+	return grenade_cooldown_total()
+
+
 func throw_grenade(aim: Vector3) -> bool:
 	if grenade_cd > 0.0 or is_paused():
 		return false
@@ -243,7 +277,7 @@ func stacks(id: StringName) -> int:
 
 
 func breaker_cooldown_total() -> float:
-	return GameData.BREAKER_COOLDOWN * pow(0.7, stacks(&"quick_breaker"))
+	return (0.7 if player_class == &"vanguard" else 1.0) * GameData.BREAKER_COOLDOWN * pow(0.7, stacks(&"quick_breaker"))
 
 
 func intel_earned() -> int:
@@ -293,7 +327,10 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	horde.set_target(player_pos)
 	horde.tick(dt)
 	if invulnerable <= 0.0 and dash_time <= 0.0:
-		hp -= horde.damage_to_player
+		hp -= horde.damage_to_player * (0.6 if war_cry_time > 0.0 else 1.0)
+	war_cry_time = maxf(0.0, war_cry_time - dt)
+	if player_class == &"medic":
+		hp = minf(max_hp, hp + 1.0 * dt)
 	invulnerable = maxf(0.0, invulnerable - dt)
 	if not sprinting:
 		_auto_fire(dt)

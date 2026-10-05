@@ -24,6 +24,15 @@ var perks: Array[StringName] = []
 var max_hp: float = GameData.PLAYER_MAX_HP
 ## Weapons usable in this run (starting ones + armory unlocks).
 var weapons: Array[StringName] = GameData.STARTING_WEAPONS.duplicate()
+var player_class: StringName = &"recruit"
+
+
+## Sets the class; call before apply_perks (both change max HP).
+func apply_class(id: StringName) -> void:
+	player_class = id
+	if id == &"vanguard":
+		max_hp += 40.0
+	hp = max_hp
 
 
 ## Applies the equipped perks that change starting values.

@@ -478,7 +478,7 @@ func _physics_process(delta: float) -> void:
 	run.step(delta, move, aim, _breaker_held, sprint)
 	if _grenade_held:
 		# Without a mouse (gamepad) throw 8 m ahead.
-		run.throw_grenade(aim if aim.length() > 1.0 else run.facing * 8.0)
+		run.use_ability(aim if aim.length() > 1.0 else run.facing * 8.0)
 		_grenade_held = false
 	_sim_ms = lerpf(_sim_ms, (Time.get_ticks_usec() - t0) / 1000.0, 0.05)
 	_breaker_held = false

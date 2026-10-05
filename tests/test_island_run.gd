@@ -24,6 +24,7 @@ func _initialize() -> void:
 	_test_weapon_unlocks()
 	_test_bloater_and_screamer()
 	_test_sprint()
+	_test_classes()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -307,3 +308,30 @@ func _test_sprint() -> void:
 	for t in int(GameData.STAMINA_MAX / DT) + 10:
 		run.step(DT, Vector2(-1, 0), Vector3(0, 0, -1), false, true)
 	_check(run.stamina == 0.0 and not run.sprinting, "stamina runs out and sprint stops")
+
+
+func _test_classes() -> void:
+	var ctx := RunContext.new(8)
+	ctx.apply_class(&"vanguard")
+	var perks: Array[StringName] = []
+	ctx.apply_perks(perks)
+	var run := IslandRun.new(8)
+	run.load_context(ctx)
+	run.director.max_alive = 0
+	run.horde.add(run.player_pos + Vector3(3, 0, 0), GameData.EnemyKind.WALKER, run.rng)
+	var cried: bool = run.use_ability(Vector3.ZERO)
+	_check(run.max_hp == 140.0 and cried and run.horde.stun[0] > 1.0 and run.war_cry_time > 0.0,
+		"Vanguard: 140 HP, War Cry stuns nearby enemies")
+	var ctx2 := RunContext.new(8)
+	ctx2.apply_class(&"medic")
+	var run2 := IslandRun.new(8)
+	run2.load_context(ctx2)
+	run2.director.max_alive = 0
+	run2.hp = 40.0
+	run2.use_ability(Vector3.ZERO)
+	for t in 60:
+		run2.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)
+	_check(run2.hp >= 40.0 + GameData.MEDKIT_HEAL + 0.9, "Medic: Med Kit heals and HP regenerates (%.1f)" % run2.hp)
+	var p := Profile.new()
+	p.intel = 160
+	_check(p.buy_class(&"vanguard") and not p.buy_class(&"medic"), "classes are bought with Intel")

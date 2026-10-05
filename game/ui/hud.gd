@@ -48,7 +48,7 @@ func _init() -> void:
 	_hp_bar = _bar(bars, "HP", Color(0.85, 0.2, 0.2))
 	_xp_bar = _bar(bars, "XP", Color(0.3, 0.8, 1.0))
 	_breaker_bar = _bar(bars, "Breaker", Color(1.0, 0.75, 0.2))
-	_grenade_bar = _bar(bars, "Grenade", Color(0.5, 0.85, 0.3))
+	_grenade_bar = _bar(bars, "Ability", Color(0.5, 0.85, 0.3))
 	_stamina_bar = _bar(bars, "Stamina", Color(0.85, 0.85, 0.85))
 	_info = Label.new()
 	bars.add_child(_info)
@@ -96,7 +96,7 @@ func _init() -> void:
 	var help := Label.new()
 	help.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	help.position = Vector2(16, -40)
-	help.text = "WASD move · mouse aims (auto-fire) · Space/RMB breaker · G/MMB grenade · Shift sprint (no firing) · 1-5 weapons · Esc pause · F3 debug"
+	help.text = "WASD move · mouse aims (auto-fire) · Space/RMB breaker · G/MMB ability · Shift sprint (no firing) · 1-5 weapons · Esc pause · F3 debug"
 	help.modulate = Color(1, 1, 1, 0.7)
 	root.add_child(help)
 
@@ -181,12 +181,14 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_breaker_bar.value = total - run.breaker_cd
 	_stamina_bar.max_value = GameData.STAMINA_MAX
 	_stamina_bar.value = run.stamina
-	_grenade_bar.max_value = run.grenade_cooldown_total()
-	_grenade_bar.value = run.grenade_cooldown_total() - run.grenade_cd
+	_grenade_bar.max_value = run.ability_cooldown_total()
+	_grenade_bar.value = run.ability_cooldown_total() - run.grenade_cd
 	var w: GameData.Weapon = run.weapons[run.weapon_index]
 	var ammo_text: String = "∞" if w.max_ammo < 0 else str(run.ammo[run.weapon_index])
-	_info.text = "Level %d   Kills %d   Headshots %d\n[%d] %s  %s" % [
-		run.level, run.kills, run.headshots, run.weapon_index + 1, w.display_name, ammo_text]
+	_info.text = "%s · Level %d   Kills %d   Headshots %d\n[%d] %s  %s" % [
+		GameData.CLASS_INFO[run.player_class]["name"], run.level, run.kills, run.headshots, run.weapon_index + 1, w.display_name, ammo_text]
+	if run.war_cry_time > 0.0:
+		_info.text += "\nWAR CRY: -40% damage"
 	if run.horde.grabbed_by != -1:
 		_info.text += "\nGRABBED! Use the breaker!"
 	if run.scream_progress > 0.3:
