@@ -155,7 +155,9 @@ para, por exemplo, `320`.
   mapa maior parecem menos: sobe-o se quiseres a mesma pressão.
 
 **Noclip (teste):** **Mouse 4 / Mouse 5** liga/desliga. Atravessas paredes e
-mar, andas 3× mais depressa (6× a correr) e não levas dano.
+mar, andas 3× mais depressa (6× a correr) e não levas dano. **Espaço** sobe
+e **Ctrl** desce (até 120 m; Shift sobe/desce 3× mais rápido). Ao desligar
+o noclip, desces suavemente até ao chão.
 
 ## Fluxo da run
 

@@ -689,7 +689,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		hud.debug_visible = not hud.debug_visible
 	elif event.is_action_pressed(&"noclip"):
 		run.noclip = not run.noclip
-		run.messages.append("NOCLIP ON (no walls, no damage)" if run.noclip else "NOCLIP OFF")
+		run.messages.append("NOCLIP ON (Space up, Ctrl down, no walls, no damage)" if run.noclip else "NOCLIP OFF")
 	elif event.is_action_pressed(&"camera_toggle"):
 		_set_third_person(not third_person)
 	else:
@@ -909,7 +909,7 @@ func _setup_phantom_camera() -> void:
 	_tp_pivot = Node3D.new()
 	_tp_pivot.name = "CameraPivot"
 	add_child(_tp_pivot)
-	_tp_pivot.global_position = run.player_pos + Vector3(0, tp_height, 0)
+	_tp_pivot.global_position = _view_pos() + Vector3(0, tp_height, 0)
 	_pcam_host = (load(PCAM_HOST_SCRIPT) as GDScript).new()
 	_camera.add_child(_pcam_host)
 	_pcam = (load(PCAM_SCRIPT) as GDScript).new()
@@ -933,7 +933,7 @@ func _update_third_person_camera(jitter: Vector3) -> void:
 	if _pcam != null and is_instance_valid(_pcam) and bool(_pcam.get("_has_follow_spring_arm")):
 		var fwd: Vector3 = _tp_forward()
 		var right: Vector3 = fwd.cross(Vector3.UP).normalized()
-		_tp_pivot.global_position = run.player_pos + Vector3(0, tp_height, 0) + right * tp_shoulder
+		_tp_pivot.global_position = _view_pos() + Vector3(0, tp_height, 0) + right * tp_shoulder
 		_pcam.call("set_third_person_rotation", Vector3(-_tp_pitch, _tp_yaw, 0))
 		# Spring arm without physics: shorten it ourselves when a building is
 		# between the pivot and the camera.
@@ -955,7 +955,7 @@ func _update_third_person_camera(jitter: Vector3) -> void:
 func _update_manual_third_person_camera(jitter: Vector3) -> void:
 	var fwd: Vector3 = _tp_forward()
 	var right: Vector3 = fwd.cross(Vector3.UP).normalized()
-	var pivot: Vector3 = run.player_pos + Vector3(0, tp_height, 0) + right * tp_shoulder
+	var pivot: Vector3 = _view_pos() + Vector3(0, tp_height, 0) + right * tp_shoulder
 	var back: Vector3 = (-fwd * cos(_tp_pitch) + Vector3.UP * sin(_tp_pitch)).normalized()
 	var dist: float = tp_distance
 	for box in _building_boxes:
@@ -972,12 +972,29 @@ func _segment_hits_box(a: Vector3, b: Vector3, box: AABB) -> Variant:
 	return null if hit == null else a.distance_to(hit)
 
 
+## Noclip flight: height above the ground, only visual (the simulation stays
+## on the 2D grid). Space rises, Ctrl descends; noclip off lands you again.
+var _fly: float = 0.0
+const FLY_SPEED: float = 12.0
+const FLY_MAX: float = 120.0
+
+
+func _view_pos() -> Vector3:
+	return run.player_pos + Vector3(0, _fly, 0)
+
+
 func _draw_player_and_camera() -> void:
 	var delta: float = get_process_delta_time()
-	var moved: float = _player.position.distance_to(run.player_pos)
+	if run.noclip:
+		var climb: float = float(Input.is_physical_key_pressed(KEY_SPACE)) - float(Input.is_physical_key_pressed(KEY_CTRL))
+		var speed: float = FLY_SPEED * (3.0 if Input.is_action_pressed(&"sprint") else 1.0)
+		_fly = clampf(_fly + climb * speed * delta, 0.0, FLY_MAX)
+	else:
+		_fly = move_toward(_fly, 0.0, FLY_SPEED * 2.0 * delta)
+	var moved: float = _player.position.distance_to(_view_pos())
 	_walk_speed = lerpf(_walk_speed, clampf(moved / maxf(delta, 0.001) / 6.0, 0.0, 1.0), 0.2)
 	(_player as SoldierModel).animate(_walk_speed, Time.get_ticks_msec() / 1000.0)
-	_player.position = run.player_pos
+	_player.position = _view_pos()
 	_player.basis = Basis.looking_at(run.facing, Vector3.UP)
 	# Stretch along the dash direction while breaking through.
 	if run.dash_time > 0.0:
@@ -999,8 +1016,8 @@ func _draw_player_and_camera() -> void:
 	else:
 		var pitch: float = deg_to_rad(camera_pitch_deg)
 		var offset := Vector3(0, sin(pitch), cos(pitch)) * camera_distance
-		_camera.position = run.player_pos + Vector3(0, 1, 0) + offset + jitter
-		_camera.look_at(run.player_pos + Vector3(0, 1, 0) + jitter * 0.5)
+		_camera.position = _view_pos() + Vector3(0, 1, 0) + offset + jitter
+		_camera.look_at(_view_pos() + Vector3(0, 1, 0) + jitter * 0.5)
 	# Muzzle flash: a short-lived light at the gun.
 	_muzzle.light_energy = maxf(0.0, _muzzle.light_energy - delta * 40.0)
 
