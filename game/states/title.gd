@@ -43,7 +43,13 @@ func _ready() -> void:
 	var gap := Control.new()
 	gap.custom_minimum_size = Vector2(0, 30)
 	box.add_child(gap)
-	var play := _button(box, "DEPLOY", func() -> void: play_requested.emit())
+	var play := _button(box, "DEPLOY", func() -> void:
+		var s := AudioStreamPlayer.new()
+		s.stream = load(Sfx.PACK + String(Sfx.FILES[&"ui_start"]))
+		get_tree().root.add_child(s)
+		s.finished.connect(s.queue_free)
+		s.play()
+		play_requested.emit())
 	_button(box, "FULLSCREEN (F11)", func() -> void:
 		var full: bool = DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if full else DisplayServer.WINDOW_MODE_FULLSCREEN))
@@ -55,6 +61,7 @@ func _ready() -> void:
 		stats.text = "Intel %d · Runs %d · Extractions %d" % [profile.intel, profile.runs, profile.extractions]
 	box.add_child(stats)
 	play.grab_focus()
+	root.add_child(UiSfx.new())
 
 
 func _button(parent: Control, text: String, action: Callable) -> Button:

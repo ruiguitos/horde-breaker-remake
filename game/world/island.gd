@@ -32,6 +32,7 @@ var _audio_cards: bool = false
 var _audio_slam: bool = false
 var _audio_generators: int = 0
 var _audio_scream_cd: float = 0.0
+var _audio_over: bool = false
 
 var _camera: Camera3D
 var _player: Node3D
@@ -89,6 +90,7 @@ func _ready() -> void:
 	add_child(fx)
 	music = Music.new()
 	add_child(music)
+	add_child(Ambience.create(run.map.biome, -14.0 if not showcase else -18.0))
 	if showcase:
 		_player.visible = false
 		sfx.process_mode = Node.PROCESS_MODE_DISABLED
@@ -96,6 +98,7 @@ func _ready() -> void:
 		run.director.trigger_peak(1000000.0)
 		return
 	hud = Hud.new()
+	hud.add_child(UiSfx.new())
 	hud.card_chosen.connect(func(i: int) -> void: run.choose_card(i))
 	hud.resume_requested.connect(func() -> void: paused = false)
 	hud.abandon_requested.connect(_abandon)
@@ -641,7 +644,23 @@ func _play_audio() -> void:
 		target = 1.0
 	music.update_mix(target if not run.is_over() else 0.0, get_process_delta_time())
 	if not run.tracers.is_empty():
-		sfx.play([&"rifle", &"shotgun", &"pistol", &"rifle", &"pistol"][run.weapon_index], -6.0, 0.06, 40)
+		var wid: StringName = run.weapons[run.weapon_index].id
+		var shot: StringName = {&"shotgun": &"shotgun", &"pistol": &"pistol", &"marksman": &"marksman"}.get(wid, &"rifle")
+		sfx.play(shot, -10.0 if shot == &"pistol" or shot == &"marksman" else -6.0, 0.06, 40)
+	# Events announced on the radio also get a sound.
+	for key in run.radio:
+		match key:
+			&"cache":
+				sfx.play(&"cache", -6.0, 0.05)
+			&"survivor_found":
+				sfx.play(&"survivor", -6.0, 0.0)
+			&"low_hp":
+				sfx.play(&"low_hp", -4.0, 0.0)
+	if _audio_slam and run.slam_time <= 0.0:
+		sfx.play(&"slam_hit", 0.0, 0.05)
+	if run.is_over() and not _audio_over:
+		_audio_over = true
+		sfx.play(&"success" if run.objective == IslandRun.Objective.WON else &"game_over", -2.0, 0.0)
 	for d in run.deaths:
 		if d.w > 0.5:
 			sfx.play(&"headshot", -4.0, 0.1, 50)

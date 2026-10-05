@@ -40,6 +40,7 @@ func _ready() -> void:
 	back.pressed.connect(func() -> void: new_run_requested.emit())
 	box.add_child(back)
 	back.grab_focus()
+	add_child(UiSfx.new())
 
 
 func _row(parent: Control, key: String, value: String, color: Color = UiTheme.TEXT) -> void:

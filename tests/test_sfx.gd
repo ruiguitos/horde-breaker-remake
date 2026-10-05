@@ -34,4 +34,17 @@ func _initialize() -> void:
 		print("%s music loop (combat=%s): %.2f s, peak %d" % ["TEST:" if ok else "TEST FAIL:", combat, secs, peak])
 		if not ok:
 			failures += 1
+	# Every recorded sound and ambience loop referenced by the game exists.
+	var missing: PackedStringArray = PackedStringArray()
+	for key in Sfx.FILES:
+		if load(Sfx.PACK + String(Sfx.FILES[key])) == null:
+			missing.append(String(key))
+	for key in Sfx.AMBIENCE:
+		if Sfx.ambience_stream(key) == null:
+			missing.append("ambience " + String(key))
+	if missing.is_empty():
+		print("TEST: %d recorded sounds and %d ambience loops load" % [Sfx.FILES.size(), Sfx.AMBIENCE.size()])
+	else:
+		print("TEST FAIL: missing sounds: " + ", ".join(missing))
+		failures += 1
 	quit(1 if failures > 0 else 0)

@@ -209,11 +209,17 @@ Pack ao fim de 3 min") em vez de impressões.
 
 ## Som
 
-Não há ficheiros de áudio: `audio/sfx.gd` sintetiza os sons em código
-(ruído + ondas + envelope → `AudioStreamWAV`) quando o jogo arranca. Há sons
-para tiros por arma, mortes, headshots, breaker, explosões, dano, XP,
-level-up, gerador e o aviso do golpe do boss. Os volumes estão em
-`world/island.gd::_play_audio`. Ainda não foram afinados a ouvido.
+- **Sons gravados** do pack Ovani (`assets/audio/ovani_sfx_starter_vol1/`):
+  Heavy Pistol, Marksman, explosões, breaker, dano, level-up, gerador,
+  Screamer, golpe do boss (aviso e impacto), caixas, sobrevivente,
+  vitória/derrota, vida baixa e sons de UI (passar o rato/foco e clicar).
+  O mapa evento → ficheiro está em `audio/sfx.gd` (`FILES`); se um ficheiro
+  faltar, o jogo usa o som sintetizado.
+- **Ambiente por bioma** (`audio/ambience.gd`): ondas na praia e nos menus,
+  floresta na selva, vento na vila e no porto, tremor no vulcão.
+- O pack não tem rajadas de espingarda: Assault Rifle, SMG e Shotgun ainda
+  usam os sons sintetizados. Fica no TODO arranjar estes três.
+- Volumes em `world/island.gd::_play_audio`.
 
 **Música adaptativa** (`audio/music.gd`): dois loops sintetizados de 8 s
 (lá menor, 120 BPM), um calmo (drone e acorde) e um de combate (o mesmo

@@ -6,6 +6,41 @@ extends Node
 ## per-sound cooldown stops 50 kills in one frame from making 50 pops.
 
 const MIX_RATE: int = 22050
+const PACK: String = "res://assets/audio/ovani_sfx_starter_vol1/"
+
+## Recorded sounds from the Ovani pack (see assets/LICENSES.md) that replace
+## the synthesised ones. Missing files fall back to synthesis, so the game
+## never breaks if the pack is trimmed.
+const FILES: Dictionary = {
+	&"pistol": "Hollywood/Titan Handgun.wav",
+	&"marksman": "Sci-Fi/Pulse Sniper.wav",
+	&"explosion": "Hollywood/Mega Bomb.wav",
+	&"breaker": "Motions and Impacts/Swoosh Thunder.wav",
+	&"hurt": "Hollywood/Deathpunch.wav",
+	&"level_up": "Jingles & Stingers/Level Up.wav",
+	&"generator": "Jingles & Stingers/Milestone.wav",
+	&"scream": "Horror/It Laughs At You.wav",
+	&"slam_warn": "Hollywood/Earthquake Loop.wav",
+	&"slam_hit": "Motions and Impacts/Impact Axe Fall.wav",
+	&"cache": "Hollywood/Wooden Crate Destruction.wav",
+	&"survivor": "Jingles & Stingers/Area Discovered.wav",
+	&"success": "Jingles & Stingers/Success.wav",
+	&"game_over": "Jingles & Stingers/Game Over.wav",
+	&"low_hp": "Jingles & Stingers/Health Low.wav",
+	&"ui_hover": "UI & Menus/Hover Over.wav",
+	&"ui_select": "UI & Menus/Select.wav",
+	&"ui_start": "UI & Menus/Start.wav",
+}
+
+## Looping ambience per biome (and the menus).
+const AMBIENCE: Dictionary = {
+	&"beach": "Environment/Ocean Loop.wav",
+	&"jungle": "Environment/Rain Forest Loop.wav",
+	&"town": "Environment/Wind Loop.wav",
+	&"port": "Environment/Wind Loop.wav",
+	&"volcano": "Hollywood/Earthquake Loop.wav",
+	&"menu": "Environment/Ocean Loop.wav",
+}
 const POOL_SIZE: int = 16
 
 ## Generated once and shared by every island.
@@ -19,6 +54,7 @@ var _last_played: Dictionary = {}  ## name -> msec
 func _ready() -> void:
 	if _streams.is_empty():
 		_build_all()
+		_load_recorded()
 	for i in POOL_SIZE:
 		var p := AudioStreamPlayer.new()
 		add_child(p)
@@ -39,6 +75,21 @@ func play(sound: StringName, volume_db: float = 0.0, pitch_jitter: float = 0.08,
 	p.volume_db = volume_db
 	p.pitch_scale = 1.0 + randf_range(-pitch_jitter, pitch_jitter)
 	p.play()
+
+
+## Replaces synthesised sounds with recorded ones where the file exists.
+static func _load_recorded() -> void:
+	for key: StringName in FILES:
+		var path: String = PACK + String(FILES[key])
+		if ResourceLoader.exists(path):
+			var s: AudioStream = load(path)
+			if s != null:
+				_streams[key] = s
+
+
+static func ambience_stream(key: StringName) -> AudioStream:
+	var path: String = PACK + String(AMBIENCE.get(key, AMBIENCE[&"menu"]))
+	return load(path) if ResourceLoader.exists(path) else null
 
 
 static func _build_all() -> void:

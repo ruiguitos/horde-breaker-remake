@@ -27,6 +27,9 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 - [ ] Animação dos zombies com Vertex Animation Textures (andar/atacar).
 - [ ] Final da história: 4.ª ilha "Origin" depois de recuperar os 10 ficheiros.
 
+- [ ] Sons de rifle/SMG/shotgun gravados (o pack Ovani não os tem).
+- [ ] Reduzir o pack Ovani aos ficheiros usados (215 MB no repositório).
+
 ## Técnico
 
 - [ ] Medir FPS no PC (RTX 5060 8 GB) com 150 inimigos e preencher `game/README.md`.

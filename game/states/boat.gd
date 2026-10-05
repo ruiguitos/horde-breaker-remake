@@ -185,6 +185,8 @@ func _pick(i: int) -> void:
 			_buttons[k].text = "✔ " + _buttons[k].text
 	_update_land()
 	_refresh_status()
+	add_child(UiSfx.new())
+	add_child(Ambience.create(&"menu", -12.0))
 
 
 func _pick_route(i: int) -> void:

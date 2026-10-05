@@ -79,6 +79,7 @@ func _ready() -> void:
 	box.add_child(start)
 	_rebuild()
 	start.grab_focus()
+	add_child(UiSfx.new())
 
 
 func _rebuild() -> void:
