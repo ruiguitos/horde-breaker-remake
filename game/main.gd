@@ -19,6 +19,7 @@ func _ready() -> void:
 	GameInput.setup()
 	profile = Profile.load_profile()
 	Profile.current = profile
+	GameInput.apply_overrides(profile.key_bindings)
 	profile.apply_volume()
 	GraphicsSettings.apply_all(profile, get_tree())
 	_go(GameFlow.TITLE)

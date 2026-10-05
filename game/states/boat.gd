@@ -17,6 +17,7 @@ var _route_biomes: Array[StringName] = []
 var _route_missions: Array[StringName] = []
 var _map: RouteMap
 var _supplies: ColorRect
+var _briefing: DialogueBox
 
 
 func _ready() -> void:
@@ -187,9 +188,16 @@ func _can_land() -> bool:
 	return _picked and _route_picked
 
 
+## Confirm: Director Hale's briefing (Dialogue Manager), then land.
 func _land_now() -> void:
-	if _can_land():
-		land_requested.emit()
+	if not _can_land() or is_instance_valid(_briefing):
+		return
+	var dialogue: Resource = load(Briefing.RESOURCE) if ResourceLoader.exists(Briefing.RESOURCE) else null
+	if dialogue == null or get_node_or_null("/root/DialogueManager") == null:
+		land_requested.emit()  # addon missing: land straight away
+		return
+	_briefing = DialogueBox.open(self, dialogue, "start", [{"briefing": Briefing.new(context)}])
+	_briefing.finished.connect(func() -> void: land_requested.emit())
 
 
 func _refresh_status() -> void:
@@ -198,7 +206,7 @@ func _refresh_status() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_echo() or not event.is_pressed():
+	if event.is_echo() or not event.is_pressed() or is_instance_valid(_briefing):
 		return
 	for i in 3:
 		if event.is_action_pressed(StringName("card_%d" % (i + 1))):

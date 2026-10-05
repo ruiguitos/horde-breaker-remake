@@ -25,12 +25,11 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 - [ ] Animação melhor que o "balançar" (Vertex Animation Textures, BRAINSTORM §8).
 
 - [ ] Animação dos zombies com Vertex Animation Textures (andar/atacar).
-- [ ] Final da história: 4.ª ilha "Origin" depois de recuperar os 10 ficheiros.
+- [ ] História: ilha "Origin" jogável como extra depois do final (o final já existe como conversa no debrief).
 
 - [ ] Sons de rifle/SMG/shotgun gravados (o pack Ovani não os tem).
-- [ ] Reduzir o pack Ovani aos ficheiros usados (215 MB no repositório).
 
 ## Técnico
 
 - [ ] Medir FPS no PC (RTX 5060 8 GB) com 150 inimigos e preencher `game/README.md`.
-- [ ] Ecrã de título; mais opções (sensibilidade do comando, remapear teclas).
+- [ ] Sensibilidade do stick direito (a do rato e o remapear teclas já existem).

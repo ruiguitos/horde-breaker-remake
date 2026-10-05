@@ -16,7 +16,7 @@ const QUALITY_NAMES: Array[String] = ["Low", "Medium", "High", "Ultra"]
 const QUALITY_INFO: Array[String] = [
 	"No shadows, no bloom, no ambient occlusion. Fastest.",
 	"Sun shadows (2 splits) and bloom.",
-	"Soft 4-split shadows, bloom and ambient occlusion (SSAO).",
+	"Soft 4-split shadows, bloom, ambient occlusion (SSAO) and colour grading.",
 	"High + sharper shadows, indirect light (SSIL) and full detail at distance.",
 ]
 
@@ -90,6 +90,8 @@ static func apply_graphics(profile: Profile, tree: SceneTree) -> void:
 			apply_environment(we.environment)
 	for n in tree.root.find_children("*", "DirectionalLight3D", true, false):
 		apply_sun(n as DirectionalLight3D)
+	for n in tree.root.find_children("*", "Camera3D", true, false):
+		Grading.apply(n as Camera3D)
 
 
 ## Post-processing for the current preset (tonemap is always on).

@@ -1,0 +1,31 @@
+~ start
+Director Hale: Contractor. {{briefing.island_name}}, {{briefing.mission_name}}. {{briefing.mission_text}}
+- Understood. => END
+- What do we know about this island? => intel
+- I want hazard pay. [if not briefing.hazard_pay /] => hazard
+- Any advice? => advice
+
+~ intel
+Director Hale: {{briefing.island_lore}}
+=> choice
+
+~ advice
+Director Hale: {{briefing.advice}}
+=> choice
+
+~ hazard
+Director Hale: Hazard pay. Bold. Twenty-five percent more Intel...
+Director Hale: ...and I tell the island you're coming. Expect a lot more company.
+- Deal.
+	do briefing.take_hazard_pay()
+	Director Hale: Signed. Try to live long enough to spend it.
+- Forget it.
+	Director Hale: Wise. Cheap, but wise.
+=> choice
+
+~ choice
+Director Hale: Anything else?
+- That's all. => END
+- What do we know about this island? => intel
+- I want hazard pay. [if not briefing.hazard_pay /] => hazard
+- Any advice? => advice

@@ -85,6 +85,84 @@ static func _event(binding: Variant) -> InputEvent:
 			return a
 
 
+## Actions the player can rebind (keyboard/mouse slot), with menu names.
+## The first keyboard-or-mouse binding of each action is the "primary" one
+## that a rebind replaces; arrows and gamepad bindings stay as they are.
+const REBINDABLE: Dictionary = {
+	&"move_up": "Move forward", &"move_down": "Move back",
+	&"move_left": "Move left", &"move_right": "Move right",
+	&"breaker": "Breaker (charge)", &"ability": "Class ability",
+	&"sprint": "Sprint", &"camera_toggle": "Camera view",
+	&"weapon_1": "Weapon 1", &"weapon_2": "Weapon 2", &"weapon_3": "Weapon 3",
+	&"pause": "Pause",
+}
+
+
+## True for a keyboard key or a mouse button binding (the remappable kind).
+static func is_kbm(binding: Variant) -> bool:
+	return binding is int or String(binding).begins_with("mouse:")
+
+
+## The default primary keyboard/mouse binding of `action`.
+static func default_binding(action: StringName) -> Variant:
+	for b: Variant in ACTIONS.get(action, []):
+		if is_kbm(b):
+			return b
+	return null
+
+
+## The binding in use: the player's override, else the default.
+static func current_binding(action: StringName, overrides: Dictionary) -> Variant:
+	if overrides.has(String(action)):
+		return _decode(overrides[String(action)])
+	return default_binding(action)
+
+
+## Applies the player's rebinds to the InputMap. Only the primary
+## keyboard/mouse binding changes; secondary ones (arrows) and the gamepad
+## stay as they are.
+static func apply_overrides(overrides: Dictionary) -> void:
+	for action: StringName in REBINDABLE:
+		if not InputMap.has_action(action):
+			continue
+		var secondary: Array = []
+		for b: Variant in ACTIONS.get(action, []):
+			if is_kbm(b) and not same(b, default_binding(action)):
+				secondary.append(b)
+		for e: InputEvent in InputMap.action_get_events(action):
+			var b: Variant = _binding_of(e)
+			if b != null and not secondary.has(b):
+				InputMap.action_erase_event(action, e)
+		var now: Variant = current_binding(action, overrides)
+		if now != null:
+			InputMap.action_add_event(action, _event(now))
+
+
+## InputEvent -> binding (int key or "mouse:N"), or null.
+static func _binding_of(e: InputEvent) -> Variant:
+	if e is InputEventKey:
+		return int((e as InputEventKey).physical_keycode)
+	if e is InputEventMouseButton:
+		return "mouse:%d" % (e as InputEventMouseButton).button_index
+	return null
+
+
+## Bindings mix ints (keys) and strings: compare type first.
+static func same(a: Variant, b: Variant) -> bool:
+	return typeof(a) == typeof(b) and a == b
+
+
+## Profile storage: bindings as strings ("key:87", "mouse:2").
+static func encode(binding: Variant) -> String:
+	return "key:%d" % int(binding) if binding is int else String(binding)
+
+
+static func _decode(text: String) -> Variant:
+	if text.begins_with("key:"):
+		return int(text.substr(4))
+	return text
+
+
 ## Movement vector from keys or the left stick (analog strength kept).
 static func move_vector() -> Vector2:
 	return Input.get_vector(&"move_left", &"move_right", &"move_up", &"move_down", MOVE_DEADZONE)

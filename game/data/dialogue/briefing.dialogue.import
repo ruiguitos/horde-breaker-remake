@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://b23nix7n6blsr"
+path="res://.godot/imported/briefing.dialogue-569723b844a75ebccc50aa77c6adf6ef.tres"
+
+[deps]
+
+source_file="res://game/data/dialogue/briefing.dialogue"
+dest_files=["res://.godot/imported/briefing.dialogue-569723b844a75ebccc50aa77c6adf6ef.tres"]
+
+[params]
+
+defaults=true

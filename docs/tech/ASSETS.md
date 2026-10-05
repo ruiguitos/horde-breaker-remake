@@ -13,11 +13,11 @@ mão no editor). Licenças: `assets/LICENSES.md`.
 | Road Generator | **Usar** | Estradas do cais aos objetivos (`world/island_roads.gd`) |
 | Stylized Nature MegaKit (Quaternius) | **Usar** | Árvores, rochas e vegetação (`world/nature_kit.gd`) |
 | Third Person Controller | **Usar a ideia, não o código** | Câmara de 3.ª pessoa própria (V alterna) |
-| G.U.I.D.E | Usar mais tarde | Remapeamento de teclas e ícones de comandos |
+| G.U.I.D.E | **Usar** | Separador CONTROLS: ícones de teclas/comando e remapeamento |
 | Controller Icons | Usar mais tarde | **Não está no repositório** (falta o push) |
-| Boot Splash Plus | Usar mais tarde (pequeno) | Ecrã de arranque com logótipo |
-| Color Grading | Usar mais tarde | Só Forward+ (não corre na cloud) |
-| Dialogue Manager | Usar mais tarde | Para diálogos com escolhas; o rádio atual chega |
+| Boot Splash Plus | **Usar** | Ecrã de arranque (porto + logótipo + barra) |
+| Color Grading | **Usar** | Cor por bioma em High/Ultra (`world/grading.gd`; só Forward+) |
+| Dialogue Manager | **Usar** | Briefing no barco com escolhas (`data/dialogue/briefing.dialogue`) |
 | GD-Sync | Avaliar | Ver `docs/tech/MULTIPLAYER.md` |
 | Lit | **Não serve** | Só ilumina 2D |
 | HTerrain | **Não usar** | Duplica o Terrain3D |
@@ -89,28 +89,57 @@ As pastas `PlayerCharacter/`, `Map/` e `Arts/` continuam na raiz, porque as
 cenas do asset referem esses caminhos. Podes abrir
 `Map/test_map_scene.tscn` para o experimentar.
 
+### G.U.I.D.E (ícones e remapeamento)
+O `GameInput` continua a ser a fonte das ações (InputMap). O G.U.I.D.E entra
+em duas coisas:
+- **Ícones:** o `GUIDEInputFormatter` desenha a tecla ou o botão do comando
+  (`ui/input_icons.gd`).
+- **Remapear:** o `GUIDEInputDetector` espera pela próxima tecla ou botão do
+  rato.
+
+No separador **CONTROLS** das Settings, cada ação mostra a tecla atual, o
+botão do comando e um **REBIND**; o Esc cancela. Também lá estão a
+sensibilidade do rato e "Reset default keys". Os remapeamentos ficam no
+perfil (`key_bindings`) e mudam só a tecla principal: setas e comando
+mantêm-se.
+
+### Boot Splash Plus
+Está configurado em `project.godot` (secção `application/boot_splash+`):
+porto ao fundo, logótipo Horde Breaker, barra âmbar e 1,6 s. O autoload
+`BootSplashPlus` faz o trabalho em runtime.
+
+O **plugin de editor fica desligado**: na cloud faz rebentar o
+`--import`, e não é preciso para o splash funcionar. Se o ativares no editor
+para mexer nas opções, não faz mal, mas desliga-o antes de fazer push.
+
+### Color Grading
+Cada bioma tem um "look": tons de sombras, médios e altos, mais
+vibrância. Por exemplo, a praia tem sombras azul-esverdeadas e altos
+quentes, e o vulcão é vermelho-laranja. O efeito é um `CompositorEffect` na
+câmara da ilha, ligado nos presets High e Ultra. Só funciona com
+RenderingDevice (Forward+); no modo de compatibilidade não aparece. **Não o
+consegui ver na cloud**, que não tem Vulkan: confirma no editor (F5,
+Graphics: High). Os valores estão em `world/grading.gd` (`LOOKS`).
+
+### Dialogue Manager (briefing no barco)
+Ao confirmar a rota, o Director Hale faz o briefing antes de desembarcar.
+As escolhas são:
+- **Understood:** desembarcas logo.
+- **What do we know about this island?:** lore do bioma.
+- **Any advice?:** dica para a missão.
+- **I want hazard pay:** só na ilha seguinte, +25 % de Intel e +25 % de
+  inimigos.
+
+O texto está em `game/data/dialogue/briefing.dialogue` e edita-se no
+separador *Dialogue* do editor. Os dados e regras estão em
+`game/data/briefing.gd`. A caixa de diálogo (`ui/dialogue_box.gd`) usa o
+estilo da UI do jogo e aceita teclado, comando e as teclas 1–4.
+
 ## Para mais tarde
 
-- **G.U.I.D.E**: sistema de input com contextos e ícones automáticos de
-  teclado e comando. Encaixa quando houver um menu de *remapear teclas*. Por
-  agora o `GameInput` regista as ações em código. Para o ativar:
-  Plugins → G.U.I.D.E. Sem estar ativo, o import mostra erros
-  `Identifier "GUIDE" not declared`, que são inofensivos.
 - **Controller Icons**: não está no repositório. Faz push da pasta
   `addons/controller_icons/` se o quiseres usar; o G.U.I.D.E já traz ícones,
   por isso basta um dos dois.
-- **Boot Splash Plus**: ecrã de arranque com logótipo e barra de progresso.
-  Ativa-se em Plugins e configura-se em Definições do Projeto. É uma
-  alteração pequena para quando houver logótipo final.
-- **Color Grading**: efeitos de `Compositor` (curvas, contraste local). Só
-  funciona em Forward+, por isso não o consigo validar aqui. Para
-  experimentares: no `WorldEnvironment` da ilha, adiciona um `Compositor` e
-  um efeito `ColorGrading` (pasta `Compositor/Color grading/`). Seria uma
-  boa opção para o preset **Ultra**.
-- **Dialogue Manager**: diálogos com ramificações (ficheiros `.dialogue`).
-  As falas do rádio do Director Hale estão em `game/data/story.gd` e chegam
-  para frases soltas. Faz sentido se houver conversas com escolhas (no porto
-  ou no barco).
 - **Godot Asset Placer**: útil para colocar modelos à mão em cenas fixas
   (menus, porto do título). As ilhas são geradas, por isso não ajuda lá.
 

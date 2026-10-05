@@ -49,6 +49,9 @@ gráficos):
 
   Também tem a escala do render 3D (50–100 %: menos píxeis 3D, mais FPS) e o
   anti-aliasing (FXAA, MSAA 2x/4x, TAA).
+- **Controls:** a tecla e o botão do comando de cada ação, com ícones
+  (G.U.I.D.E), **REBIND** para trocar a tecla (Esc cancela), sensibilidade
+  do rato e "Reset default keys".
 - **Audio:** volumes Master, Sound effects e Music, cada um com slider e campo
   editável em percentagem. Os sons vão para os buses SFX e Music.
 
@@ -88,31 +91,12 @@ gráficos):
 - O **diretor** alterna calma → crescer → pico (ver F3). O máximo é de 150
   inimigos vivos.
 
-## HUD tático
+## Briefing no barco
 
-Painéis escuros, títulos condensados e apontamentos âmbar, a combinar com os
-menus. O centro do ecrã fica disponível para o combate.
-
-- **Em baixo**: vida numérica e XP à esquerda; Breaker, habilidade da classe e
-  estamina ao centro; arma e munição à direita. Recargas mostram segundos ou
-  `READY`; correr mostra `SPRINTING` e uma arma vazia mostra `NO AMMO`.
-- **Em cima**: objetivo, progresso e modificador da rota; vida do sobrevivente
-  durante a escolta ou barra do Behemoth com indicação da fase 2. Minimapa à
-  direita, com grelha discreta e barco em forma de losango âmbar.
-- **Avisos**: pouca vida, Grabber, Screamer, perda do sobrevivente e War Cry
-  mantêm-se visíveis. As legendas de Hale aparecem acima da vida. Dano
-  direcional, números de dano, cartas e pausa mantêm o funcionamento anterior.
-- **Controlos**: os atalhos mudam com o último dispositivo usado (teclado ou
-  comando). F3 mostra o diagnóstico, escondido por omissão. Os painéis de
-  combate deixam passar o rato para a mira.
-
-`tests/test_hud.gd` verifica os estados e o encaixe em 960×540, 1152×648 e
-1920×1080. `tools/dev/hud_preview.gd` captura o HUD real, com perfil temporário
-em memória, nos estados `normal`, `danger`, `boss` ou `third_person`:
-
-```bash
-godot --path . --resolution 1152x648 --windowed --script res://tools/dev/hud_preview.gd -- <caminho-absoluto.png> normal
-```
+Depois de escolher a rota, o Director Hale faz o briefing (Dialogue Manager,
+`data/dialogue/briefing.dialogue`). Podes perguntar pela ilha ou pedir
+conselhos, ou aceitar **hazard pay**: +25 % de Intel e +25 % de inimigos, só
+na ilha seguinte.
 
 ## Fluxo da run
 
@@ -150,6 +134,17 @@ arquipélago Halvard, onde uma experiência ("Project TIDE") correu mal.
   Lês as páginas no título ou Armory (botão INTEL ARCHIVE). Juntas contam o que realmente
   aconteceu; são 10, em ordem.
 - O texto está todo em `data/story.gd`: dá para reescrever sem mexer no código.
+
+### Final
+
+Quando vences uma run com os 10 ficheiros de Intel recuperados, o debrief
+abre a conversa final com o Director Hale
+(`data/dialogue/origin.dialogue`). Ele confirma que o arquipélago é um teste
+e pede-te as *core logs*. Escolhes:
+- **Hand over the logs:** final "The Corner Office".
+- **Broadcast the logs:** final "Open Channel".
+
+A escolha fica gravada no perfil, dá +300 Intel e só acontece uma vez.
 
 ## Missões
 

@@ -5,6 +5,7 @@ signal new_run_requested
 
 var context: RunContext
 var profile: Profile
+var _ending: DialogueBox
 
 
 func _ready() -> void:
@@ -41,6 +42,12 @@ func _ready() -> void:
 	box.add_child(back)
 	back.grab_focus()
 	add_child(UiSfx.new())
+	if profile.ending != "":
+		_row(box, "Story ending", OriginEnding.ENDINGS.get(profile.ending, ""), UiTheme.ACCENT)
+	# Story finale: all Intel files recovered and the run won.
+	if OriginEnding.due(profile, context) and ResourceLoader.exists(OriginEnding.RESOURCE) and has_node("/root/DialogueManager"):
+		_ending = DialogueBox.open(self, load(OriginEnding.RESOURCE), "start", [{"origin": OriginEnding.new(profile)}])
+		_ending.finished.connect(_refresh_after_ending.bind(box))
 
 
 func _row(parent: Control, key: String, value: String, color: Color = UiTheme.TEXT) -> void:
@@ -58,7 +65,15 @@ func _row(parent: Control, key: String, value: String, color: Color = UiTheme.TE
 	parent.add_child(row)
 
 
+func _refresh_after_ending(box: VBoxContainer) -> void:
+	profile.save()
+	_row(box, "Story ending", OriginEnding.ENDINGS.get(profile.ending, ""), UiTheme.ACCENT)
+	_row(box, "Ending bonus", "+%d Intel" % OriginEnding.BONUS_INTEL, UiTheme.ACCENT)
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if is_instance_valid(_ending):
+		return
 	var go: bool = (event is InputEventKey and event.pressed and not event.echo
 		and event.physical_keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_R, KEY_SPACE])
 	go = go or (event is InputEventJoypadButton and event.pressed

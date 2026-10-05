@@ -56,6 +56,32 @@ func _test_display_graphics() -> void:
 	Engine.max_fps = 0
 
 
+## Controls tab: rebinding through the G.U.I.D.E detector result updates the
+## InputMap and the profile; reset restores the defaults.
+func _test_controls() -> void:
+	GameInput.setup()
+	_panel.call("_show", "CONTROLS")
+	_check(_panel.find_child("Rebind_breaker", true, false) != null, "Controls tab lists rebindable actions")
+	var key_f: Resource = InputIcons.to_guide(KEY_F)
+	_check(InputIcons.from_guide(key_f) == KEY_F, "G.U.I.D.E key input converts both ways")
+	_panel.call("_start_rebind", &"breaker")
+	_panel.call("_on_detected", &"breaker", key_f)
+	var has_f: bool = false
+	var has_space: bool = false
+	for e in InputMap.action_get_events(&"breaker"):
+		if e is InputEventKey:
+			has_f = has_f or e.physical_keycode == KEY_F
+			has_space = has_space or e.physical_keycode == KEY_SPACE
+	_check(has_f and not has_space and _profile.key_bindings.get("breaker") == "key:%d" % KEY_F,
+		"rebinding Breaker to F replaces Space and is saved")
+	var pad_kept: bool = InputMap.action_get_events(&"breaker").any(func(e: InputEvent) -> bool: return e is InputEventJoypadButton)
+	_check(pad_kept, "gamepad bindings survive a keyboard rebind")
+	var reset: Button = _panel.find_child("ResetKeys", true, false)
+	reset.pressed.emit()
+	var space_back: bool = InputMap.action_get_events(&"breaker").any(func(e: InputEvent) -> bool: return e is InputEventKey and e.physical_keycode == KEY_SPACE)
+	_check(space_back and _profile.key_bindings.is_empty(), "reset restores Space")
+
+
 func _process(_delta: float) -> bool:
 	_frames += 1
 	if _frames == 2:
@@ -90,6 +116,7 @@ func _process(_delta: float) -> bool:
 	var old: Profile = Profile.load_profile(path)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	_check(old.master_volume == 60 and old.sfx_volume == 100, "a v2 profile volume of 6/10 becomes 60%")
+	_test_controls()
 	var v3 := Profile.from_dict({"version": 3, "graphics_high": false})
 	_check(v3.quality == GraphicsSettings.LOW, "a v3 Graphics: Low profile becomes the Low preset")
 	quit(1 if _failures > 0 else 0)

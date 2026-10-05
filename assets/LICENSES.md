@@ -22,7 +22,7 @@ royalty-free comercial). Cada entrada indica a origem e a licença.
 | `addons/dialogue_manager/` | Dialogue Manager 4.1 | Nathan Hoad | MIT (`LICENSE`) |
 | `addons/GD-Sync/` | GD-Sync 1.0.2 (multiplayer na cloud) | GD-Sync | BSD-style para o código; o **serviço** tem termos próprios (contas/planos em gd-sync.com) |
 | `PlayerCharacter/`, `Map/`, `Arts/` | Third Person Controller (cena de exemplo, *plush* do Godot, fontes) | Jeh3no | MIT (`LICENSE` na raiz) |
-| `assets/audio/ovani_sfx_starter_vol1/` | Sound FX Starter Pack Vol. 1 | Ovani Sound | Royalty-free (`Royalty-Free License (Link).pdf`; https://ovanisound.com/policies/terms-of-service) |
+| `assets/audio/ovani_sfx_starter_vol1/` | Sound FX Starter Pack Vol. 1 (só os 21 sons usados; o resto foi retirado, recuperável no histórico) | Ovani Sound | Royalty-free (`Royalty-Free License (Link).pdf`; https://ovanisound.com/policies/terms-of-service) |
 
 Removidos na integração (não servem ao jogo): versões Unity/Unreal da
 biblioteca de animações, a demo do Terrain3D, ficheiros `__MACOSX` e, do
