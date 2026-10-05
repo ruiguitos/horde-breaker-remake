@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b01hr2o64obpw"
-path="res://.godot/imported/Whoosh Gong.wav-a38fc5c59328af459ecdb90ee4a38ecd.sample"
+path="res://.godot/imported/Whoosh Gong.wav-b9adc3fb48970d36865757a86a357176.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Motions and Impacts/Whoosh Gong.wav"
-dest_files=["res://.godot/imported/Whoosh Gong.wav-a38fc5c59328af459ecdb90ee4a38ecd.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Motions and Impacts/Whoosh Gong.wav"
+dest_files=["res://.godot/imported/Whoosh Gong.wav-b9adc3fb48970d36865757a86a357176.sample"]
 
 [params]
 

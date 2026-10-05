@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cmabydtmqh0wb"
-path="res://.godot/imported/Rain Urban Loop.wav-053d4243cc5c6c2ac38745516ec8a39b.sample"
+path="res://.godot/imported/Rain Urban Loop.wav-63e337acee44bf8102081ada066b5b9e.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Environment/Rain Urban Loop.wav"
-dest_files=["res://.godot/imported/Rain Urban Loop.wav-053d4243cc5c6c2ac38745516ec8a39b.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Environment/Rain Urban Loop.wav"
+dest_files=["res://.godot/imported/Rain Urban Loop.wav-63e337acee44bf8102081ada066b5b9e.sample"]
 
 [params]
 

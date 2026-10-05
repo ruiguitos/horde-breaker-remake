@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bopjftt0f74fk"
-path="res://.godot/imported/Loot Gold.wav-c6e8ffaa63fefe3500a32585bf153ed7.sample"
+path="res://.godot/imported/Loot Gold.wav-389e1a929561f9fef76edecf39fb384d.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Medieval/Loot Gold.wav"
-dest_files=["res://.godot/imported/Loot Gold.wav-c6e8ffaa63fefe3500a32585bf153ed7.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Medieval/Loot Gold.wav"
+dest_files=["res://.godot/imported/Loot Gold.wav-389e1a929561f9fef76edecf39fb384d.sample"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://do3vxdsbx6o2b"
-path="res://.godot/imported/Path Blocked.wav-9474aa2c35a0bfe80fefb42e1abfe573.sample"
+path="res://.godot/imported/Path Blocked.wav-5e21d43f847d027ef703896f47380974.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Retro/Path Blocked.wav"
-dest_files=["res://.godot/imported/Path Blocked.wav-9474aa2c35a0bfe80fefb42e1abfe573.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Retro/Path Blocked.wav"
+dest_files=["res://.godot/imported/Path Blocked.wav-5e21d43f847d027ef703896f47380974.sample"]
 
 [params]
 

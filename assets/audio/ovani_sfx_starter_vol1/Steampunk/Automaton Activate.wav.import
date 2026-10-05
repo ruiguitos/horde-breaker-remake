@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://omuhf8fjm75d"
-path="res://.godot/imported/Automaton Activate.wav-03e6944722221ddf3cd6e5dbfbc072fc.sample"
+path="res://.godot/imported/Automaton Activate.wav-157b49481c8ccaafd47bfe898dafe2a9.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Steampunk/Automaton Activate.wav"
-dest_files=["res://.godot/imported/Automaton Activate.wav-03e6944722221ddf3cd6e5dbfbc072fc.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Steampunk/Automaton Activate.wav"
+dest_files=["res://.godot/imported/Automaton Activate.wav-157b49481c8ccaafd47bfe898dafe2a9.sample"]
 
 [params]
 

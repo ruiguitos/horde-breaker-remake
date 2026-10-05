@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://vwuvq2p4egi7"
-path="res://.godot/imported/Mega Bomb.wav-ce4df0ab91a97561c517d194d120e845.sample"
+path="res://.godot/imported/Mega Bomb.wav-c1e84cc08707abab6c5ba6b4414c1e4f.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Hollywood/Mega Bomb.wav"
-dest_files=["res://.godot/imported/Mega Bomb.wav-ce4df0ab91a97561c517d194d120e845.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Hollywood/Mega Bomb.wav"
+dest_files=["res://.godot/imported/Mega Bomb.wav-c1e84cc08707abab6c5ba6b4414c1e4f.sample"]
 
 [params]
 

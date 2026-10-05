@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://qjjjl4k58nxe"
-path="res://.godot/imported/Attack.wav-7a7303647c07638b93cb0acd833c0eb7.sample"
+path="res://.godot/imported/Attack.wav-3d3419bb7eb695e8e7e6aaef069b90af.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Retro/Attack.wav"
-dest_files=["res://.godot/imported/Attack.wav-7a7303647c07638b93cb0acd833c0eb7.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Retro/Attack.wav"
+dest_files=["res://.godot/imported/Attack.wav-3d3419bb7eb695e8e7e6aaef069b90af.sample"]
 
 [params]
 

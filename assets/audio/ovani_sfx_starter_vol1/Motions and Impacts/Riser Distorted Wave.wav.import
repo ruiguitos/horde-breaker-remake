@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dngpcv47t3qwn"
-path="res://.godot/imported/Riser Distorted Wave.wav-5dccebdeb4cfe3266bb4a90596513306.sample"
+path="res://.godot/imported/Riser Distorted Wave.wav-ce82883d4b9f1c1bb7ed504a08ec4e26.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Motions and Impacts/Riser Distorted Wave.wav"
-dest_files=["res://.godot/imported/Riser Distorted Wave.wav-5dccebdeb4cfe3266bb4a90596513306.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Motions and Impacts/Riser Distorted Wave.wav"
+dest_files=["res://.godot/imported/Riser Distorted Wave.wav-ce82883d4b9f1c1bb7ed504a08ec4e26.sample"]
 
 [params]
 

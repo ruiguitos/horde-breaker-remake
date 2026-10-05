@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c6ilkb4nkafug"
-path="res://.godot/imported/Molotov.wav-992f3d45a515165099312fedc8238350.sample"
+path="res://.godot/imported/Molotov.wav-f4d238a7a37c1d8bd10ec5a734ec14d1.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Community Requests/Molotov.wav"
-dest_files=["res://.godot/imported/Molotov.wav-992f3d45a515165099312fedc8238350.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Community Requests/Molotov.wav"
+dest_files=["res://.godot/imported/Molotov.wav-f4d238a7a37c1d8bd10ec5a734ec14d1.sample"]
 
 [params]
 

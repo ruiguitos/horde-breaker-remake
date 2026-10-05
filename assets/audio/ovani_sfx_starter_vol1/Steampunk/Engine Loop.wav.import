@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://duvh3of76nl2x"
-path="res://.godot/imported/Engine Loop.wav-25a565619b4ae1cc97118da7296a5342.sample"
+path="res://.godot/imported/Engine Loop.wav-568f207475fa742e5795cbb0a43b6b68.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Steampunk/Engine Loop.wav"
-dest_files=["res://.godot/imported/Engine Loop.wav-25a565619b4ae1cc97118da7296a5342.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Steampunk/Engine Loop.wav"
+dest_files=["res://.godot/imported/Engine Loop.wav-568f207475fa742e5795cbb0a43b6b68.sample"]
 
 [params]
 

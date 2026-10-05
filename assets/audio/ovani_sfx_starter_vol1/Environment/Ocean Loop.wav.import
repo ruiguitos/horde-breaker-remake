@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://doijhlif8fe8b"
-path="res://.godot/imported/Ocean Loop.wav-613eed85a2ab99c4696bc2170adcec85.sample"
+path="res://.godot/imported/Ocean Loop.wav-9964594ee0650c5cc3bca45d05ee4f48.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Environment/Ocean Loop.wav"
-dest_files=["res://.godot/imported/Ocean Loop.wav-613eed85a2ab99c4696bc2170adcec85.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Environment/Ocean Loop.wav"
+dest_files=["res://.godot/imported/Ocean Loop.wav-9964594ee0650c5cc3bca45d05ee4f48.sample"]
 
 [params]
 

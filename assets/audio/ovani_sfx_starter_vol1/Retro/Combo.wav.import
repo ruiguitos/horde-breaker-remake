@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cftvj2qwlx0ur"
-path="res://.godot/imported/Combo.wav-695e06569acbe6008115576ca2ccb33b.sample"
+path="res://.godot/imported/Combo.wav-818b0c4788f2408d78fbf554a33529ed.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Retro/Combo.wav"
-dest_files=["res://.godot/imported/Combo.wav-695e06569acbe6008115576ca2ccb33b.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Retro/Combo.wav"
+dest_files=["res://.godot/imported/Combo.wav-818b0c4788f2408d78fbf554a33529ed.sample"]
 
 [params]
 

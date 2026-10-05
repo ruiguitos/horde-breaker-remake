@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bwsiwsrs6xd7q"
-path="res://.godot/imported/Mechanism Open Close.wav-a1264d08b384498c44d62d7fead76b72.sample"
+path="res://.godot/imported/Mechanism Open Close.wav-746a55111076f67615c281098f660eee.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Steampunk/Mechanism Open Close.wav"
-dest_files=["res://.godot/imported/Mechanism Open Close.wav-a1264d08b384498c44d62d7fead76b72.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Steampunk/Mechanism Open Close.wav"
+dest_files=["res://.godot/imported/Mechanism Open Close.wav-746a55111076f67615c281098f660eee.sample"]
 
 [params]
 

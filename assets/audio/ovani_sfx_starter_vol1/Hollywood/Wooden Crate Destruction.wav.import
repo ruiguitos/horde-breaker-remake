@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d31rcdywxinsr"
-path="res://.godot/imported/Wooden Crate Destruction.wav-32e89f1417eb1261fcc6ff8cd720e966.sample"
+path="res://.godot/imported/Wooden Crate Destruction.wav-92c2ccba6d9b407ff3d2acb369c9b13e.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Hollywood/Wooden Crate Destruction.wav"
-dest_files=["res://.godot/imported/Wooden Crate Destruction.wav-32e89f1417eb1261fcc6ff8cd720e966.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Hollywood/Wooden Crate Destruction.wav"
+dest_files=["res://.godot/imported/Wooden Crate Destruction.wav-92c2ccba6d9b407ff3d2acb369c9b13e.sample"]
 
 [params]
 

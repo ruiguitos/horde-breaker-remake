@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c8ao6hfen0p4y"
-path="res://.godot/imported/Welcome.wav-70bd74322cd0997645aa67c0da35f335.sample"
+path="res://.godot/imported/Welcome.wav-ba7f8cd0ada2f82c9b79b6ecb44f63bc.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Jingles & Stingers/Welcome.wav"
-dest_files=["res://.godot/imported/Welcome.wav-70bd74322cd0997645aa67c0da35f335.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Jingles & Stingers/Welcome.wav"
+dest_files=["res://.godot/imported/Welcome.wav-ba7f8cd0ada2f82c9b79b6ecb44f63bc.sample"]
 
 [params]
 

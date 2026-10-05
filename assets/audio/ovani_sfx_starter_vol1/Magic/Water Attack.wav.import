@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bffvkas5h1lrs"
-path="res://.godot/imported/Water Attack.wav-273dc035d12930d75de5537b0fc486e2.sample"
+path="res://.godot/imported/Water Attack.wav-906c850f90616bf8e6c5e3908fb8f6ce.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Magic/Water Attack.wav"
-dest_files=["res://.godot/imported/Water Attack.wav-273dc035d12930d75de5537b0fc486e2.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Magic/Water Attack.wav"
+dest_files=["res://.godot/imported/Water Attack.wav-906c850f90616bf8e6c5e3908fb8f6ce.sample"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://qyi51pumhee1"
-path="res://.godot/imported/Health Low.wav-04bece7971233a7537a1d8ceacf2d262.sample"
+path="res://.godot/imported/Health Low.wav-c4c7d2f6f137a783c4ee110fa3763164.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Jingles & Stingers/Health Low.wav"
-dest_files=["res://.godot/imported/Health Low.wav-04bece7971233a7537a1d8ceacf2d262.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Jingles & Stingers/Health Low.wav"
+dest_files=["res://.godot/imported/Health Low.wav-c4c7d2f6f137a783c4ee110fa3763164.sample"]
 
 [params]
 

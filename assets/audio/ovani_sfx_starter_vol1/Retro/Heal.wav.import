@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b5jl4hy7rgfde"
-path="res://.godot/imported/Heal.wav-32a4d3c47d22b168c0ec7b1138303e59.sample"
+path="res://.godot/imported/Heal.wav-5138defc1fa8ee2137d391fabab9e042.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Retro/Heal.wav"
-dest_files=["res://.godot/imported/Heal.wav-32a4d3c47d22b168c0ec7b1138303e59.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Retro/Heal.wav"
+dest_files=["res://.godot/imported/Heal.wav-5138defc1fa8ee2137d391fabab9e042.sample"]
 
 [params]
 

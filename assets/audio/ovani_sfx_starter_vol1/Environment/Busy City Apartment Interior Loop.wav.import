@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b21wx5pj6hjlb"
-path="res://.godot/imported/Busy City Apartment Interior Loop.wav-135a6db0cf9060459108d27aa7502fff.sample"
+path="res://.godot/imported/Busy City Apartment Interior Loop.wav-d93c4cddf6b84423d383451121897056.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Environment/Busy City Apartment Interior Loop.wav"
-dest_files=["res://.godot/imported/Busy City Apartment Interior Loop.wav-135a6db0cf9060459108d27aa7502fff.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Environment/Busy City Apartment Interior Loop.wav"
+dest_files=["res://.godot/imported/Busy City Apartment Interior Loop.wav-d93c4cddf6b84423d383451121897056.sample"]
 
 [params]
 

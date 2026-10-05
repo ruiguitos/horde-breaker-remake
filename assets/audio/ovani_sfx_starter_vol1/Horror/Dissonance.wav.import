@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d4a3pe3q6g7j6"
-path="res://.godot/imported/Dissonance.wav-ea118df043fbfb73fff7aa6c975c869a.sample"
+path="res://.godot/imported/Dissonance.wav-fff9682281134b1bf16f595b2d34a890.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Horror/Dissonance.wav"
-dest_files=["res://.godot/imported/Dissonance.wav-ea118df043fbfb73fff7aa6c975c869a.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Horror/Dissonance.wav"
+dest_files=["res://.godot/imported/Dissonance.wav-fff9682281134b1bf16f595b2d34a890.sample"]
 
 [params]
 

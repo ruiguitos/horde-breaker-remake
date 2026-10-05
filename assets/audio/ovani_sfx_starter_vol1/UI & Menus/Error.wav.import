@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d1ttuvrfa840y"
-path="res://.godot/imported/Error.wav-82c5aa01ef0a128c7e110a22dbeda964.sample"
+path="res://.godot/imported/Error.wav-50f78b5a10f2f1308e0040bcc243d871.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/UI & Menus/Error.wav"
-dest_files=["res://.godot/imported/Error.wav-82c5aa01ef0a128c7e110a22dbeda964.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/UI & Menus/Error.wav"
+dest_files=["res://.godot/imported/Error.wav-50f78b5a10f2f1308e0040bcc243d871.sample"]
 
 [params]
 

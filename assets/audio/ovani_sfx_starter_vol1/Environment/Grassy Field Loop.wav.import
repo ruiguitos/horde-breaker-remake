@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://i8pf7356wwx1"
-path="res://.godot/imported/Grassy Field Loop.wav-c298e326a8a8ff52c51b45d9c05538ca.sample"
+path="res://.godot/imported/Grassy Field Loop.wav-cba4d41c78ca0f204ff48f3a669505d7.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Environment/Grassy Field Loop.wav"
-dest_files=["res://.godot/imported/Grassy Field Loop.wav-c298e326a8a8ff52c51b45d9c05538ca.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Environment/Grassy Field Loop.wav"
+dest_files=["res://.godot/imported/Grassy Field Loop.wav-cba4d41c78ca0f204ff48f3a669505d7.sample"]
 
 [params]
 

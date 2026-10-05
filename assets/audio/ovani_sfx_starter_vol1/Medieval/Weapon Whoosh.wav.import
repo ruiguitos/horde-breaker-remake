@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b1tlyhb4vtc1s"
-path="res://.godot/imported/Weapon Whoosh.wav-ad7828f22ce33cd1d169204612810102.sample"
+path="res://.godot/imported/Weapon Whoosh.wav-4084b6e331cf37598f7b0099b78d7ac3.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Medieval/Weapon Whoosh.wav"
-dest_files=["res://.godot/imported/Weapon Whoosh.wav-ad7828f22ce33cd1d169204612810102.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Medieval/Weapon Whoosh.wav"
+dest_files=["res://.godot/imported/Weapon Whoosh.wav-4084b6e331cf37598f7b0099b78d7ac3.sample"]
 
 [params]
 

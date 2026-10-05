@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bn7rhe451qe8u"
-path="res://.godot/imported/Bow Shoot.wav-ea5ce3b65a8f1fc377ffaf6ec4777200.sample"
+path="res://.godot/imported/Bow Shoot.wav-95575b65ed351ac3a932982755866d81.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Medieval/Bow Shoot.wav"
-dest_files=["res://.godot/imported/Bow Shoot.wav-ea5ce3b65a8f1fc377ffaf6ec4777200.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Medieval/Bow Shoot.wav"
+dest_files=["res://.godot/imported/Bow Shoot.wav-95575b65ed351ac3a932982755866d81.sample"]
 
 [params]
 

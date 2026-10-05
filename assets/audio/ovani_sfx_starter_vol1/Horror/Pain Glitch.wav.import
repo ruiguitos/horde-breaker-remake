@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c4p12mdg23mdh"
-path="res://.godot/imported/Pain Glitch.wav-36fa9be1514bca73cb77aa830322348e.sample"
+path="res://.godot/imported/Pain Glitch.wav-d8d0809ffa3cf5bce9e78ce254dd32e6.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Horror/Pain Glitch.wav"
-dest_files=["res://.godot/imported/Pain Glitch.wav-36fa9be1514bca73cb77aa830322348e.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Horror/Pain Glitch.wav"
+dest_files=["res://.godot/imported/Pain Glitch.wav-d8d0809ffa3cf5bce9e78ce254dd32e6.sample"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dmshtvdirbjsj"
-path="res://.godot/imported/Steampunk Gas Ignite.wav-974fb4897b3531e5f2f5e68a46908103.sample"
+path="res://.godot/imported/Steampunk Gas Ignite.wav-deb79c9db043c753e76220c3d592bc0c.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Steampunk/Steampunk Gas Ignite.wav"
-dest_files=["res://.godot/imported/Steampunk Gas Ignite.wav-974fb4897b3531e5f2f5e68a46908103.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Steampunk/Steampunk Gas Ignite.wav"
+dest_files=["res://.godot/imported/Steampunk Gas Ignite.wav-deb79c9db043c753e76220c3d592bc0c.sample"]
 
 [params]
 

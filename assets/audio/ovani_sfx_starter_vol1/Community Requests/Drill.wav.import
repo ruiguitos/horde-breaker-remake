@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bc6dnl8mdoeiv"
-path="res://.godot/imported/Drill.wav-1221d43e5b9b55fa2bb8e8334edf4b24.sample"
+path="res://.godot/imported/Drill.wav-932e406b929fa2c76412795b18e3af7d.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Community Requests/Drill.wav"
-dest_files=["res://.godot/imported/Drill.wav-1221d43e5b9b55fa2bb8e8334edf4b24.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Community Requests/Drill.wav"
+dest_files=["res://.godot/imported/Drill.wav-932e406b929fa2c76412795b18e3af7d.sample"]
 
 [params]
 

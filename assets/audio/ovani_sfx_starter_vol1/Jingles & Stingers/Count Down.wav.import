@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bi8x87lwg6k7b"
-path="res://.godot/imported/Count Down.wav-72c458b227bf10cc5bdf1f3920edbeac.sample"
+path="res://.godot/imported/Count Down.wav-eb40472e3a36d77ede724dc206a8f218.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Jingles & Stingers/Count Down.wav"
-dest_files=["res://.godot/imported/Count Down.wav-72c458b227bf10cc5bdf1f3920edbeac.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Jingles & Stingers/Count Down.wav"
+dest_files=["res://.godot/imported/Count Down.wav-eb40472e3a36d77ede724dc206a8f218.sample"]
 
 [params]
 

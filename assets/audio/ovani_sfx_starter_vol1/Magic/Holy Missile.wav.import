@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b07t4g74dappk"
-path="res://.godot/imported/Holy Missile.wav-efcbf389833fa5aca5ede5ede5949c82.sample"
+path="res://.godot/imported/Holy Missile.wav-e6bf90363b37d14902529aa028a6466d.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Magic/Holy Missile.wav"
-dest_files=["res://.godot/imported/Holy Missile.wav-efcbf389833fa5aca5ede5ede5949c82.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Magic/Holy Missile.wav"
+dest_files=["res://.godot/imported/Holy Missile.wav-e6bf90363b37d14902529aa028a6466d.sample"]
 
 [params]
 

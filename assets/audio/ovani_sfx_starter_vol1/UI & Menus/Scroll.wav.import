@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bvveo0fmapsqi"
-path="res://.godot/imported/Scroll.wav-abd8351a599e09bd97242e28d0f1bd9d.sample"
+path="res://.godot/imported/Scroll.wav-f0244335270a54ffc179495066617e9c.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/UI & Menus/Scroll.wav"
-dest_files=["res://.godot/imported/Scroll.wav-abd8351a599e09bd97242e28d0f1bd9d.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/UI & Menus/Scroll.wav"
+dest_files=["res://.godot/imported/Scroll.wav-f0244335270a54ffc179495066617e9c.sample"]
 
 [params]
 

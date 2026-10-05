@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dxmmpfdl08jfe"
-path="res://.godot/imported/Dreamscape Loop.wav-99da2ea09cd42538ee36324b126166d6.sample"
+path="res://.godot/imported/Dreamscape Loop.wav-f3a8cc0f811768b95f7fa142876c9b3e.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Environment/Dreamscape Loop.wav"
-dest_files=["res://.godot/imported/Dreamscape Loop.wav-99da2ea09cd42538ee36324b126166d6.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Environment/Dreamscape Loop.wav"
+dest_files=["res://.godot/imported/Dreamscape Loop.wav-f3a8cc0f811768b95f7fa142876c9b3e.sample"]
 
 [params]
 

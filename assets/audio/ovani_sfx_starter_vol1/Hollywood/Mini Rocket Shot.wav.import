@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dym3btxc6ib0i"
-path="res://.godot/imported/Mini Rocket Shot.wav-a3d444accff6784cf6de284a966a4981.sample"
+path="res://.godot/imported/Mini Rocket Shot.wav-f1f72166bf1b2661f0084f44aa13577e.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Hollywood/Mini Rocket Shot.wav"
-dest_files=["res://.godot/imported/Mini Rocket Shot.wav-a3d444accff6784cf6de284a966a4981.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Hollywood/Mini Rocket Shot.wav"
+dest_files=["res://.godot/imported/Mini Rocket Shot.wav-f1f72166bf1b2661f0084f44aa13577e.sample"]
 
 [params]
 

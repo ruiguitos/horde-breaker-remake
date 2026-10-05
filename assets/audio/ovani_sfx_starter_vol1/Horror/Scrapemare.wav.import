@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dmpi1c3jddl7f"
-path="res://.godot/imported/Scrapemare.wav-c438d9f1996e03560a376d28a1190690.sample"
+path="res://.godot/imported/Scrapemare.wav-917c175a8489f78777d00438fa4caa8d.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Horror/Scrapemare.wav"
-dest_files=["res://.godot/imported/Scrapemare.wav-c438d9f1996e03560a376d28a1190690.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Horror/Scrapemare.wav"
+dest_files=["res://.godot/imported/Scrapemare.wav-917c175a8489f78777d00438fa4caa8d.sample"]
 
 [params]
 

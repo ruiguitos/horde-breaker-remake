@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dgtk4sah1t8bc"
-path="res://.godot/imported/Nightmare Loop.wav-0cf9792ebab33d423753bc2ad7eda1d6.sample"
+path="res://.godot/imported/Nightmare Loop.wav-2344d6fa94a97c8221f084568cc079b2.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Environment/Nightmare Loop.wav"
-dest_files=["res://.godot/imported/Nightmare Loop.wav-0cf9792ebab33d423753bc2ad7eda1d6.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Environment/Nightmare Loop.wav"
+dest_files=["res://.godot/imported/Nightmare Loop.wav-2344d6fa94a97c8221f084568cc079b2.sample"]
 
 [params]
 

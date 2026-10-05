@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ctx43v1l3a8a1"
-path="res://.godot/imported/Winged Chaser.wav-458627c13104cfc449b3f90f28d5add5.sample"
+path="res://.godot/imported/Winged Chaser.wav-7f6ead87009a26a6e562f0ed5888256a.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Sci-Fi/Winged Chaser.wav"
-dest_files=["res://.godot/imported/Winged Chaser.wav-458627c13104cfc449b3f90f28d5add5.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Sci-Fi/Winged Chaser.wav"
+dest_files=["res://.godot/imported/Winged Chaser.wav-7f6ead87009a26a6e562f0ed5888256a.sample"]
 
 [params]
 

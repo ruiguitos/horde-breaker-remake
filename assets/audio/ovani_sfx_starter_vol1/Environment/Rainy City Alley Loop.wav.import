@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://be6tsyno300nd"
-path="res://.godot/imported/Rainy City Alley Loop.wav-1f1a944c09d33719a01792b9c0ef8c89.sample"
+path="res://.godot/imported/Rainy City Alley Loop.wav-1327531ff7415d3c75f80d672d9ff0d0.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Environment/Rainy City Alley Loop.wav"
-dest_files=["res://.godot/imported/Rainy City Alley Loop.wav-1f1a944c09d33719a01792b9c0ef8c89.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Environment/Rainy City Alley Loop.wav"
+dest_files=["res://.godot/imported/Rainy City Alley Loop.wav-1327531ff7415d3c75f80d672d9ff0d0.sample"]
 
 [params]
 

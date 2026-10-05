@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cn80hxgik7l6u"
-path="res://.godot/imported/Area Discovered.wav-fe7a211b37f47980e8e6213bf0cbd220.sample"
+path="res://.godot/imported/Area Discovered.wav-ae76850377eff5bf3953178961c1c556.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Jingles & Stingers/Area Discovered.wav"
-dest_files=["res://.godot/imported/Area Discovered.wav-fe7a211b37f47980e8e6213bf0cbd220.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Jingles & Stingers/Area Discovered.wav"
+dest_files=["res://.godot/imported/Area Discovered.wav-ae76850377eff5bf3953178961c1c556.sample"]
 
 [params]
 

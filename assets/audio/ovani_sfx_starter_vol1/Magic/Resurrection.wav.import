@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bqqbcv0rulhpj"
-path="res://.godot/imported/Resurrection.wav-23e2ac4ff806d55f7bd3fe368d438d16.sample"
+path="res://.godot/imported/Resurrection.wav-c339cff405da4ce84fdfd3737522ea5d.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Magic/Resurrection.wav"
-dest_files=["res://.godot/imported/Resurrection.wav-23e2ac4ff806d55f7bd3fe368d438d16.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Magic/Resurrection.wav"
+dest_files=["res://.godot/imported/Resurrection.wav-c339cff405da4ce84fdfd3737522ea5d.sample"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://sy06cffgvwpw"
-path="res://.godot/imported/Whoosh Medieval.wav-0d35a45bb5f892b0f7ecfcd920bbd618.sample"
+path="res://.godot/imported/Whoosh Medieval.wav-954df44ad982cb325c6376f409d3f9f4.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Motions and Impacts/Whoosh Medieval.wav"
-dest_files=["res://.godot/imported/Whoosh Medieval.wav-0d35a45bb5f892b0f7ecfcd920bbd618.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Motions and Impacts/Whoosh Medieval.wav"
+dest_files=["res://.godot/imported/Whoosh Medieval.wav-954df44ad982cb325c6376f409d3f9f4.sample"]
 
 [params]
 

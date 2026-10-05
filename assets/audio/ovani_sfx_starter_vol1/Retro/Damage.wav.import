@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cl1xdi6n4i0sp"
-path="res://.godot/imported/Damage.wav-e530960e415477ef4c1f2daf14f05085.sample"
+path="res://.godot/imported/Damage.wav-d68bdd5cb443fc4ce5d7bff659d8f4cf.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Retro/Damage.wav"
-dest_files=["res://.godot/imported/Damage.wav-e530960e415477ef4c1f2daf14f05085.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Retro/Damage.wav"
+dest_files=["res://.godot/imported/Damage.wav-d68bdd5cb443fc4ce5d7bff659d8f4cf.sample"]
 
 [params]
 

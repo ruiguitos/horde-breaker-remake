@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b24beext0h6hp"
-path="res://.godot/imported/Acid Attack.wav-dde855def9ad64a67c9f0b664cbe180d.sample"
+path="res://.godot/imported/Acid Attack.wav-38455526d46118af3a0c486690a860ba.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Magic/Acid Attack.wav"
-dest_files=["res://.godot/imported/Acid Attack.wav-dde855def9ad64a67c9f0b664cbe180d.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Magic/Acid Attack.wav"
+dest_files=["res://.godot/imported/Acid Attack.wav-38455526d46118af3a0c486690a860ba.sample"]
 
 [params]
 

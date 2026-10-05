@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bxrxydnlvndbq"
-path="res://.godot/imported/Analog Shield Gen Loop.wav-a3a88e7ed7f4207ef1c17d3725fbdebe.sample"
+path="res://.godot/imported/Analog Shield Gen Loop.wav-ab8722cb2c1ddd37eaaf47cddd12aee2.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Sci-Fi/Analog Shield Gen Loop.wav"
-dest_files=["res://.godot/imported/Analog Shield Gen Loop.wav-a3a88e7ed7f4207ef1c17d3725fbdebe.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Sci-Fi/Analog Shield Gen Loop.wav"
+dest_files=["res://.godot/imported/Analog Shield Gen Loop.wav-ab8722cb2c1ddd37eaaf47cddd12aee2.sample"]
 
 [params]
 

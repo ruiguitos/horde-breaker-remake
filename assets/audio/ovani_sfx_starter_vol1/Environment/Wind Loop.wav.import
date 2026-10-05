@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dvhbr5oraeugd"
-path="res://.godot/imported/Wind Loop.wav-a5a187cc51fdf23f087f3d18d55a7013.sample"
+path="res://.godot/imported/Wind Loop.wav-bf9d57a84371797ee6e4df1e6cc1d500.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Environment/Wind Loop.wav"
-dest_files=["res://.godot/imported/Wind Loop.wav-a5a187cc51fdf23f087f3d18d55a7013.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Environment/Wind Loop.wav"
+dest_files=["res://.godot/imported/Wind Loop.wav-bf9d57a84371797ee6e4df1e6cc1d500.sample"]
 
 [params]
 

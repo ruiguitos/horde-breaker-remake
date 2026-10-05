@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://6katg8eo4ot"
-path="res://.godot/imported/Hover Over.wav-8dc577107e5a80b9c45f9db5ef5c7e48.sample"
+path="res://.godot/imported/Hover Over.wav-02a3cfc4713b2722600141da186d08a1.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/UI & Menus/Hover Over.wav"
-dest_files=["res://.godot/imported/Hover Over.wav-8dc577107e5a80b9c45f9db5ef5c7e48.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/UI & Menus/Hover Over.wav"
+dest_files=["res://.godot/imported/Hover Over.wav-02a3cfc4713b2722600141da186d08a1.sample"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://tqakpno6av6t"
-path="res://.godot/imported/Hammer Fall.wav-1e50ebfbf20383a7e1f362d1451a426f.sample"
+path="res://.godot/imported/Hammer Fall.wav-2e539dae2b68d8e3bd62c35cbb5ab1f0.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Community Requests/Hammer Fall.wav"
-dest_files=["res://.godot/imported/Hammer Fall.wav-1e50ebfbf20383a7e1f362d1451a426f.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Community Requests/Hammer Fall.wav"
+dest_files=["res://.godot/imported/Hammer Fall.wav-2e539dae2b68d8e3bd62c35cbb5ab1f0.sample"]
 
 [params]
 

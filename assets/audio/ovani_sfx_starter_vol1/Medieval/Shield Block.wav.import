@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bwrm2whan2iks"
-path="res://.godot/imported/Shield Block.wav-445641e318a00efd965842ba0945ea83.sample"
+path="res://.godot/imported/Shield Block.wav-28eb0ad8f68e60c00245a16f05026a4d.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Medieval/Shield Block.wav"
-dest_files=["res://.godot/imported/Shield Block.wav-445641e318a00efd965842ba0945ea83.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Medieval/Shield Block.wav"
+dest_files=["res://.godot/imported/Shield Block.wav-28eb0ad8f68e60c00245a16f05026a4d.sample"]
 
 [params]
 

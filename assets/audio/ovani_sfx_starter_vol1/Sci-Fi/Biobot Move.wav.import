@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bfraryax2udaj"
-path="res://.godot/imported/Biobot Move.wav-bbff3ec5fc7cd9b32a02071c01f4dcaf.sample"
+path="res://.godot/imported/Biobot Move.wav-d9e0d4cc501a553879391d7ad1d50c9f.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Sci-Fi/Biobot Move.wav"
-dest_files=["res://.godot/imported/Biobot Move.wav-bbff3ec5fc7cd9b32a02071c01f4dcaf.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Sci-Fi/Biobot Move.wav"
+dest_files=["res://.godot/imported/Biobot Move.wav-d9e0d4cc501a553879391d7ad1d50c9f.sample"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://da358v31he6cy"
-path="res://.godot/imported/Outer Space Scanner Loop.wav-23acb1589d3df708cb966e9dbdbe2f4c.sample"
+path="res://.godot/imported/Outer Space Scanner Loop.wav-17f76856616aa53631062295fbe9ce9f.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Sci-Fi/Outer Space Scanner Loop.wav"
-dest_files=["res://.godot/imported/Outer Space Scanner Loop.wav-23acb1589d3df708cb966e9dbdbe2f4c.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Sci-Fi/Outer Space Scanner Loop.wav"
+dest_files=["res://.godot/imported/Outer Space Scanner Loop.wav-17f76856616aa53631062295fbe9ce9f.sample"]
 
 [params]
 

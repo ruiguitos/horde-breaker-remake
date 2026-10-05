@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://du24u2iehiw3w"
-path="res://.godot/imported/Heavy Gun Reload.wav-fae8aad1a24bc37aa1c62049de368ba4.sample"
+path="res://.godot/imported/Heavy Gun Reload.wav-f027e51a1e680ae7a21bcbef8101e922.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Hollywood/Heavy Gun Reload.wav"
-dest_files=["res://.godot/imported/Heavy Gun Reload.wav-fae8aad1a24bc37aa1c62049de368ba4.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Hollywood/Heavy Gun Reload.wav"
+dest_files=["res://.godot/imported/Heavy Gun Reload.wav-f027e51a1e680ae7a21bcbef8101e922.sample"]
 
 [params]
 

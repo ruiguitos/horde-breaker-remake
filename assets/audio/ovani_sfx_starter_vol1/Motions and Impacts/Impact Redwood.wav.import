@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cvwnge746426s"
-path="res://.godot/imported/Impact Redwood.wav-857855e6d0c0d44cfc4e76790c3d561f.sample"
+path="res://.godot/imported/Impact Redwood.wav-17b11990a140251de6c4607e13409626.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Motions and Impacts/Impact Redwood.wav"
-dest_files=["res://.godot/imported/Impact Redwood.wav-857855e6d0c0d44cfc4e76790c3d561f.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Motions and Impacts/Impact Redwood.wav"
+dest_files=["res://.godot/imported/Impact Redwood.wav-17b11990a140251de6c4607e13409626.sample"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cq7pvjm1th7xx"
-path="res://.godot/imported/Jump.wav-9b284a8503e7fffb5679d81396c3196a.sample"
+path="res://.godot/imported/Jump.wav-0a124d674101fd4fdd4688ce32988e7f.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Retro/Jump.wav"
-dest_files=["res://.godot/imported/Jump.wav-9b284a8503e7fffb5679d81396c3196a.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Retro/Jump.wav"
+dest_files=["res://.godot/imported/Jump.wav-0a124d674101fd4fdd4688ce32988e7f.sample"]
 
 [params]
 

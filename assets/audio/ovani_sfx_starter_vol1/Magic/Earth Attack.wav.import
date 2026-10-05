@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cwxsfxsjvvcww"
-path="res://.godot/imported/Earth Attack.wav-e02d2042addb45059de4769883caf8c5.sample"
+path="res://.godot/imported/Earth Attack.wav-41ec1728afc0850e3ac5702a541c716c.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Magic/Earth Attack.wav"
-dest_files=["res://.godot/imported/Earth Attack.wav-e02d2042addb45059de4769883caf8c5.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Magic/Earth Attack.wav"
+dest_files=["res://.godot/imported/Earth Attack.wav-41ec1728afc0850e3ac5702a541c716c.sample"]
 
 [params]
 

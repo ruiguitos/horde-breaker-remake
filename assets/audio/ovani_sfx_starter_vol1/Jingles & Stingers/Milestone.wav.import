@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bllcc7kqqueq4"
-path="res://.godot/imported/Milestone.wav-e2abf0ccee58002142ff4698783988ea.sample"
+path="res://.godot/imported/Milestone.wav-c3e3e5c45187b211ab2b79d2cfd5d12d.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Jingles & Stingers/Milestone.wav"
-dest_files=["res://.godot/imported/Milestone.wav-e2abf0ccee58002142ff4698783988ea.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Jingles & Stingers/Milestone.wav"
+dest_files=["res://.godot/imported/Milestone.wav-c3e3e5c45187b211ab2b79d2cfd5d12d.sample"]
 
 [params]
 

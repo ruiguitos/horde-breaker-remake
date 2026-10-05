@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dryd0g7fbxnhs"
-path="res://.godot/imported/Metal Glass Destruction.wav-76d40c4e7230763c197f1be8d29ebba9.sample"
+path="res://.godot/imported/Metal Glass Destruction.wav-692a8fbd69053b4ad0e5295a7ebd1318.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Hollywood/Metal Glass Destruction.wav"
-dest_files=["res://.godot/imported/Metal Glass Destruction.wav-76d40c4e7230763c197f1be8d29ebba9.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Hollywood/Metal Glass Destruction.wav"
+dest_files=["res://.godot/imported/Metal Glass Destruction.wav-692a8fbd69053b4ad0e5295a7ebd1318.sample"]
 
 [params]
 

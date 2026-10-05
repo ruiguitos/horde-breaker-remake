@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://imgolonvvs0b"
-path="res://.godot/imported/Arrow Hit.wav-7ef41afdc641aba4b3b3056f69dceaf9.sample"
+path="res://.godot/imported/Arrow Hit.wav-8e229711974d2f527b8dbbc5a441cceb.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Medieval/Arrow Hit.wav"
-dest_files=["res://.godot/imported/Arrow Hit.wav-7ef41afdc641aba4b3b3056f69dceaf9.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Medieval/Arrow Hit.wav"
+dest_files=["res://.godot/imported/Arrow Hit.wav-8e229711974d2f527b8dbbc5a441cceb.sample"]
 
 [params]
 

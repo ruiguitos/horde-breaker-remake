@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://be6mlevomdw3b"
-path="res://.godot/imported/Holy Healing.wav-f46d81154f99e80ea4a39cba4b5322ff.sample"
+path="res://.godot/imported/Holy Healing.wav-4e27a07d0b8921d0974138c90fad4852.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Magic/Holy Healing.wav"
-dest_files=["res://.godot/imported/Holy Healing.wav-f46d81154f99e80ea4a39cba4b5322ff.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Magic/Holy Healing.wav"
+dest_files=["res://.godot/imported/Holy Healing.wav-4e27a07d0b8921d0974138c90fad4852.sample"]
 
 [params]
 

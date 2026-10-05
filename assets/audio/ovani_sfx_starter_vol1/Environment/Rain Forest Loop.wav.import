@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b7ytb8achpjpk"
-path="res://.godot/imported/Rain Forest Loop.wav-1c64091bc4334d01cd44b986d14235bb.sample"
+path="res://.godot/imported/Rain Forest Loop.wav-91ecb3f4e371b5de064b7a67aea16bfe.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Environment/Rain Forest Loop.wav"
-dest_files=["res://.godot/imported/Rain Forest Loop.wav-1c64091bc4334d01cd44b986d14235bb.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Environment/Rain Forest Loop.wav"
+dest_files=["res://.godot/imported/Rain Forest Loop.wav-91ecb3f4e371b5de064b7a67aea16bfe.sample"]
 
 [params]
 

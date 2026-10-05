@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://xradkhx5314j"
-path="res://.godot/imported/Slide.wav-4a944fb036f0dcec5534d17f696a2188.sample"
+path="res://.godot/imported/Slide.wav-d21d97f7ec70608d40c9e6a9989895e9.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Retro/Slide.wav"
-dest_files=["res://.godot/imported/Slide.wav-4a944fb036f0dcec5534d17f696a2188.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Retro/Slide.wav"
+dest_files=["res://.godot/imported/Slide.wav-d21d97f7ec70608d40c9e6a9989895e9.sample"]
 
 [params]
 

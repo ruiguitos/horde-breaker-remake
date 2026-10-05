@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://xg23xtpv0co"
-path="res://.godot/imported/Swoosh Pirate Ship.wav-9c9047c0d2d7f69e8b1522d5fd2a8d77.sample"
+path="res://.godot/imported/Swoosh Pirate Ship.wav-053635c669720f8a55a385cd9be7597a.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Motions and Impacts/Swoosh Pirate Ship.wav"
-dest_files=["res://.godot/imported/Swoosh Pirate Ship.wav-9c9047c0d2d7f69e8b1522d5fd2a8d77.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Motions and Impacts/Swoosh Pirate Ship.wav"
+dest_files=["res://.godot/imported/Swoosh Pirate Ship.wav-053635c669720f8a55a385cd9be7597a.sample"]
 
 [params]
 

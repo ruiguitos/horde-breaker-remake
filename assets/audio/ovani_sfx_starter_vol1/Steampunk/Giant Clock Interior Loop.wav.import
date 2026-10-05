@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://hesyqqw5cqr3"
-path="res://.godot/imported/Giant Clock Interior Loop.wav-7941d2789bff8d0e9d80b80cde597a90.sample"
+path="res://.godot/imported/Giant Clock Interior Loop.wav-c2e874a08cd8809a6af3422aca47bc61.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Steampunk/Giant Clock Interior Loop.wav"
-dest_files=["res://.godot/imported/Giant Clock Interior Loop.wav-7941d2789bff8d0e9d80b80cde597a90.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Steampunk/Giant Clock Interior Loop.wav"
+dest_files=["res://.godot/imported/Giant Clock Interior Loop.wav-c2e874a08cd8809a6af3422aca47bc61.sample"]
 
 [params]
 

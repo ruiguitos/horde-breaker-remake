@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dmv20djsqeiow"
-path="res://.godot/imported/Animal Pain.wav-5a79da78c5db5e5e27ec396dfabcfc02.sample"
+path="res://.godot/imported/Animal Pain.wav-9b0b4c5a05270c96476d5f4e05402d8b.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Community Requests/Animal Pain.wav"
-dest_files=["res://.godot/imported/Animal Pain.wav-5a79da78c5db5e5e27ec396dfabcfc02.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Community Requests/Animal Pain.wav"
+dest_files=["res://.godot/imported/Animal Pain.wav-9b0b4c5a05270c96476d5f4e05402d8b.sample"]
 
 [params]
 

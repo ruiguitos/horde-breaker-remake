@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://wh04qe56r24e"
-path="res://.godot/imported/Noise Wave.wav-e6e03609f8f0299ec35ac839f74d58ce.sample"
+path="res://.godot/imported/Noise Wave.wav-8bc57caf2f431235eea6c8b813c48eda.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Horror/Noise Wave.wav"
-dest_files=["res://.godot/imported/Noise Wave.wav-e6e03609f8f0299ec35ac839f74d58ce.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Horror/Noise Wave.wav"
+dest_files=["res://.godot/imported/Noise Wave.wav-8bc57caf2f431235eea6c8b813c48eda.sample"]
 
 [params]
 

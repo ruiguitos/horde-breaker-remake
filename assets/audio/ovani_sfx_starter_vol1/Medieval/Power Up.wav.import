@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ca7o4h71k183n"
-path="res://.godot/imported/Power Up.wav-4189f61febd4070adfd8543c06f99160.sample"
+path="res://.godot/imported/Power Up.wav-29e376b308415453c0e095d7d46a7597.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Medieval/Power Up.wav"
-dest_files=["res://.godot/imported/Power Up.wav-4189f61febd4070adfd8543c06f99160.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Medieval/Power Up.wav"
+dest_files=["res://.godot/imported/Power Up.wav-29e376b308415453c0e095d7d46a7597.sample"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cc80klaqf7d6c"
-path="res://.godot/imported/Charge.wav-a900a1b39c63a4ac891347e112ef02f9.sample"
+path="res://.godot/imported/Charge.wav-a45925bd199ca4e975fc36cd91af3b1f.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Retro/Charge.wav"
-dest_files=["res://.godot/imported/Charge.wav-a900a1b39c63a4ac891347e112ef02f9.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Retro/Charge.wav"
+dest_files=["res://.godot/imported/Charge.wav-a45925bd199ca4e975fc36cd91af3b1f.sample"]
 
 [params]
 

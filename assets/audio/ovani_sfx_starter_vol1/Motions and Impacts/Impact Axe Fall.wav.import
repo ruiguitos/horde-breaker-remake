@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bijqruj3velev"
-path="res://.godot/imported/Impact Axe Fall.wav-8bb992d698b082994a4b25589d937ed2.sample"
+path="res://.godot/imported/Impact Axe Fall.wav-54558069d7334b0612f21917b8a019e1.sample"
 
 [deps]
 
-source_file="res://Sound FX Starter Pack Vol. 1/Motions and Impacts/Impact Axe Fall.wav"
-dest_files=["res://.godot/imported/Impact Axe Fall.wav-8bb992d698b082994a4b25589d937ed2.sample"]
+source_file="res://assets/audio/ovani_sfx_starter_vol1/Motions and Impacts/Impact Axe Fall.wav"
+dest_files=["res://.godot/imported/Impact Axe Fall.wav-54558069d7334b0612f21917b8a019e1.sample"]
 
 [params]
 
