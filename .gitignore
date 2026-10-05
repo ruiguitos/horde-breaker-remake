@@ -9,3 +9,6 @@ export_presets.cfg
 Thumbs.db
 .vscode/
 *.tmp
+
+# GD-Sync API keys. Never commit these.
+addons/GD-Sync/keys.cfg
