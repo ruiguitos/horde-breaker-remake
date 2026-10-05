@@ -353,7 +353,8 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	horde.set_target(player_pos)
 	horde.tick(dt)
 	if invulnerable <= 0.0 and dash_time <= 0.0:
-		hp -= horde.damage_to_player * (0.6 if war_cry_time > 0.0 else 1.0)
+		var melee: float = minf(horde.damage_to_player, GameData.MAX_MELEE_PER_FRAME)
+		hp -= melee * (0.6 if war_cry_time > 0.0 else 1.0)
 	war_cry_time = maxf(0.0, war_cry_time - dt)
 	if player_class == &"medic":
 		hp = minf(max_hp, hp + 1.0 * dt)

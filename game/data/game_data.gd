@@ -124,6 +124,11 @@ const AIM_CONE_DEG: float = 50.0
 const HEADSHOT_CONE_DEG: float = 9.0
 const HEADSHOT_MULTIPLIER: float = 2.5
 
+## Max melee damage taken in one frame: being swarmed is dangerous, but never
+## an instant death without a chance to react (telegraphed boss attacks are
+## not capped).
+const MAX_MELEE_PER_FRAME: float = 25.0
+
 ## Sprint: faster, but the gun stays silent while running.
 const SPRINT_MULTIPLIER: float = 1.6
 const STAMINA_MAX: float = 3.0       ## seconds of sprint
