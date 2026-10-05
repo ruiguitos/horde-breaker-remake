@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3 uid="uid://b0r3r10cionfu"]
+
+[ext_resource type="Script" path="res://game/data/resources/biome_data.gd" id="1_h616x"]
+
+[resource]
+script = ExtResource("1_h616x")
+display_name = "Beach"
+coast = Color(0.78, 0.7, 0.5, 1)
+inland = Color(0.62, 0.6, 0.42, 1)
+building = Color(0.55, 0.42, 0.3, 1)
+foliage = Color(0.3, 0.55, 0.25, 1)
+sky = Color(0.5, 0.7, 0.85, 1)
+palms = true

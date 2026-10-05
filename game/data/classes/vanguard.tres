@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://06s5o6sdkjoc"]
+
+[ext_resource type="Script" path="res://game/data/resources/class_data.gd" id="1_b6ook"]
+
+[resource]
+script = ExtResource("1_b6ook")
+display_name = "Vanguard"
+cost = 150
+ability = "War Cry"
+text = "+40 max HP, breaker cooldown -30%. Ability: War Cry (stun 7 m, -40% damage taken for 5 s)."
+order = 1

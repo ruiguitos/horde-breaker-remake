@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://rusxddmqgoqc"]
+
+[ext_resource type="Script" path="res://game/data/resources/mission_data.gd" id="1_otnbw"]
+
+[resource]
+script = ExtResource("1_otnbw")
+display_name = "Rescue"
+text = "Find the survivor and bring them to the boat alive."
+order = 2

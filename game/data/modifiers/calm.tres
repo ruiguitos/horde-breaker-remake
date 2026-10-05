@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ModifierData" format=3 uid="uid://rtneqelbi5r2"]
+
+[ext_resource type="Script" path="res://game/data/resources/modifier_data.gd" id="1_reu61"]
+
+[resource]
+script = ExtResource("1_reu61")
+title = "Calm Waters"
+description = "No modifier."

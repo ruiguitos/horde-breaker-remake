@@ -309,10 +309,20 @@ Como as transições são cross-fades, não há cortes.
 
 ## Onde mexer nos valores
 
-**Armas, cartas e perks** estão em ficheiros `.tres`, um por item:
-`game/data/weapons/`, `game/data/cards/` e `game/data/perks/`. Cada pasta
-tem um registo **YARD** (`game/data/weapons.tres`, `cards.tres`,
-`perks.tres`).
+O **conteúdo** está em ficheiros `.tres`, um por item, em `game/data/`.
+Cada pasta tem um registo **YARD** com o mesmo nome (por exemplo
+`game/data/enemies.tres`):
+
+| Pasta | O quê |
+|---|---|
+| `weapons/` | Armas: dano, cadência, alcance, munição, preço |
+| `cards/` | Cartas de level-up |
+| `perks/` | Perks do Armory |
+| `enemies/` | Inimigos: vida, velocidade, dano, cor, flags (`order` = `EnemyKind`, não mudar) |
+| `modifiers/` | Modificadores de rota e multiplicador de Intel |
+| `classes/` | Classes: nome, preço, texto da habilidade |
+| `biomes/` | Biomas: cores, nevoeiro, palmeiras, se aparecem como rota |
+| `missions/` | Missões: nome e texto |
 - No editor, o separador **Registry** mostra cada registo como uma folha de
   cálculo: mudas o dano, o custo ou o texto sem tocar em código.
 - Um ficheiro novo na pasta entra sozinho no registo.

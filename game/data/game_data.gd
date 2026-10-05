@@ -1,7 +1,8 @@
 class_name GameData
 extends RefCounted
-## Data definitions for the vertical slice. Values are playtest hypotheses:
-## tweak them here, nothing else hardcodes balance numbers.
+## Game data. Content tables (weapons, cards, perks, enemies, modifiers,
+## classes, biomes, missions) are .tres files in YARD registries under
+## game/data/; global balance numbers and rules stay here as constants.
 
 
 class EnemyType:
@@ -157,35 +158,17 @@ const BOSS_ROCK_RADIUS: float = 2.5
 const BOSS_ROCK_DAMAGE: float = 20.0
 const BOSS_ROCK_COOLDOWN: float = 3.5
 
-## Biomes: look and feel of each island. Islands 1-2 pick one on the boat;
-## the last island is always the volcano.
-const BIOMES: Dictionary = {
-	&"beach": {"name": "Beach", "coast": Color(0.78, 0.7, 0.5), "inland": Color(0.62, 0.6, 0.42),
-		"building": Color(0.55, 0.42, 0.3), "foliage": Color(0.3, 0.55, 0.25), "sky": Color(0.5, 0.7, 0.85),
-		"fog": 0.0, "palms": true},
-	&"town": {"name": "Coastal Town", "coast": Color(0.7, 0.66, 0.5), "inland": Color(0.4, 0.4, 0.38),
-		"building": Color(0.62, 0.55, 0.5), "foliage": Color(0.25, 0.42, 0.22), "sky": Color(0.55, 0.62, 0.7),
-		"fog": 0.0, "palms": false},
-	&"jungle": {"name": "Jungle", "coast": Color(0.6, 0.58, 0.4), "inland": Color(0.2, 0.35, 0.15),
-		"building": Color(0.4, 0.42, 0.36), "foliage": Color(0.12, 0.38, 0.14), "sky": Color(0.3, 0.42, 0.34),
-		"fog": 0.006, "palms": true},
-	&"port": {"name": "Industrial Port", "coast": Color(0.5, 0.5, 0.48), "inland": Color(0.36, 0.36, 0.36),
-		"building": Color(0.7, 0.3, 0.2), "foliage": Color(0.25, 0.4, 0.22), "sky": Color(0.6, 0.62, 0.66),
-		"fog": 0.0, "palms": false},
-	&"volcano": {"name": "Volcano", "coast": Color(0.22, 0.2, 0.2), "inland": Color(0.32, 0.28, 0.26),
-		"building": Color(0.3, 0.27, 0.26), "foliage": Color(0.16, 0.13, 0.12), "sky": Color(0.35, 0.18, 0.14),
-		"fog": 0.0, "palms": false},
-}
-const ISLAND_BIOMES: Array[StringName] = [&"beach", &"town", &"jungle", &"port"]
+## Biomes, missions and classes come from YARD registries (game/data/
+## biomes.tres, missions.tres, classes.tres), exposed in the same shape the
+## game always used: id -> Dictionary.
+static var BIOMES: Dictionary = _load_biomes()
+## Biomes offered on the boat; the last island is always the volcano.
+static var ISLAND_BIOMES: Array[StringName] = _route_biomes()
 const LAVA_PLAYER_DPS: float = 18.0
 const LAVA_ENEMY_DPS: float = 30.0
 
-## Missions (one per island, shown with the route on the boat)
-const MISSIONS: Dictionary = {
-	&"activate": {"name": "Activate 3", "text": "Power up three generators."},
-	&"defend": {"name": "Defend", "text": "Hold the uplink zone for 75 s."},
-	&"rescue": {"name": "Rescue", "text": "Find the survivor and bring them to the boat alive."},
-}
+## Missions (one per island, shown with the route on the boat).
+static var MISSIONS: Dictionary = _load_missions()
 const DEFEND_TIME: float = 75.0
 ## Hazard pay (boat briefing): bonus Intel and extra enemies, one island.
 const HAZARD_INTEL_MULT: float = 1.25
@@ -209,16 +192,9 @@ const BOSS_SLAM_COOLDOWN: float = 5.0
 const BOSS_SUMMON_INTERVAL: float = 9.0
 const BOSS_SUMMON_COUNT: int = 4
 
-## Weapons available from the start; the others are bought in the armory.
-
-## Classes: passive + active ability. The Recruit is free; the others are bought.
-const CLASSES: Array[StringName] = [&"recruit", &"vanguard"]
-const CLASS_INFO: Dictionary = {
-	&"recruit": {"name": "Recruit", "cost": 0, "ability": "Grenade",
-		"text": "Balanced. Ability: Grenade (5 m blast)."},
-	&"vanguard": {"name": "Vanguard", "cost": 150, "ability": "War Cry",
-		"text": "+40 max HP, breaker cooldown -30%. Ability: War Cry (stun 7 m, -40% damage taken for 5 s)."},
-}
+## Classes: passive + active ability (abilities are code in IslandRun).
+static var CLASS_INFO: Dictionary = _load_classes()
+static var CLASSES: Array[StringName] = _class_ids()
 const WAR_CRY_RADIUS: float = 7.0
 const WAR_CRY_TIME: float = 5.0
 const WAR_CRY_COOLDOWN: float = 16.0
@@ -247,22 +223,21 @@ static func xp_for_level(level: int) -> int:
 	return 8 + level * 6 + level * level
 
 
+## Enemy types from game/data/enemies/ (order = EnemyKind). Fresh objects
+## each call.
 static func enemy_types() -> Array[EnemyType]:
-	var walker := EnemyType.new(&"walker", "Walker", 30.0, Vector2(1.8, 2.6), 8.0, 1.0, 1.0, 1.7, Color(0.45, 0.6, 0.35), 1)
-	var runner := EnemyType.new(&"runner", "Runner", 18.0, Vector2(4.6, 5.4), 6.0, 0.7, 0.85, 1.6, Color(0.85, 0.75, 0.25), 1)
-	var brute := EnemyType.new(&"brute", "Brute", 260.0, Vector2(1.6, 1.9), 25.0, 1.6, 1.6, 2.4, Color(0.55, 0.25, 0.25), 6)
-	brute.front_armor = 0.75
-	brute.pushable = false
-	var grabber := EnemyType.new(&"grabber", "Grabber", 70.0, Vector2(2.8, 3.2), 4.0, 0.5, 1.1, 1.9, Color(0.55, 0.35, 0.75), 3)
-	grabber.grabs = true
-	var boss := EnemyType.new(&"behemoth", "Behemoth", 1800.0, Vector2(1.7, 1.7), 35.0, 1.4, 3.0, 4.2, Color(0.3, 0.12, 0.15), 40)
-	boss.front_armor = 0.5
-	boss.pushable = false
-	var bloater := EnemyType.new(&"bloater", "Bloater", 90.0, Vector2(1.3, 1.5), 10.0, 1.2, 1.7, 1.6, Color(0.5, 0.65, 0.2), 3)
-	bloater.explodes = true
-	var screamer := EnemyType.new(&"screamer", "Screamer", 45.0, Vector2(3.0, 3.4), 3.0, 1.0, 0.8, 1.8, Color(0.95, 0.9, 0.55), 4)
-	screamer.keep_away = 11.0
-	return [walker, runner, brute, grabber, boss, bloater, screamer]
+	var list: Array[EnemyType] = []
+	for e: Array in _entries(ENEMY_REGISTRY):
+		var d: EnemyData = e[1]
+		var t := EnemyType.new(e[0], d.display_name, d.hp, Vector2(d.speed_min, d.speed_max), d.damage,
+			d.attack_interval, d.radius_scale, d.height, d.color, d.xp)
+		t.front_armor = d.front_armor
+		t.grabs = d.grabs
+		t.pushable = d.pushable
+		t.keep_away = d.keep_away
+		t.explodes = d.explodes
+		list.append(t)
+	return list
 
 
 ## Weapons, cards and perks live in .tres files (one per entry) listed in
@@ -271,10 +246,16 @@ static func enemy_types() -> Array[EnemyType]:
 const WEAPON_REGISTRY: String = "res://game/data/weapons.tres"
 const CARD_REGISTRY: String = "res://game/data/cards.tres"
 const PERK_REGISTRY: String = "res://game/data/perks.tres"
+const ENEMY_REGISTRY: String = "res://game/data/enemies.tres"
+const MODIFIER_REGISTRY: String = "res://game/data/modifiers.tres"
+const CLASS_REGISTRY: String = "res://game/data/classes.tres"
+const BIOME_REGISTRY: String = "res://game/data/biomes.tres"
+const MISSION_REGISTRY: String = "res://game/data/missions.tres"
 
 static var _weapon_data: Array = []  ## [id, WeaponData] sorted by order
 static var _cards: Array[Card] = []
 static var _perks: Array[Perk] = []
+static var _modifiers: Array[Modifier] = []
 
 
 ## [id, resource] pairs of a registry, sorted by the resources' `order`.
@@ -354,15 +335,14 @@ static func threat_extra_alive(threat: int) -> int:
 	return 25 * (threat - 1)
 
 
-## Island modifiers offered as routes on the boat: harder islands pay more Intel.
+## Island modifiers offered as routes on the boat: harder islands pay more
+## Intel (game/data/modifiers/).
 static func modifiers() -> Array[Modifier]:
-	return [
-		Modifier.new(&"calm", "Calm Waters", "No modifier.", 1.0),
-		Modifier.new(&"swarm", "Swarm", "+40 enemies alive at once.", 1.3),
-		Modifier.new(&"elite", "Elite Pack", "Brutes and Grabbers twice as common.", 1.3),
-		Modifier.new(&"fog", "Sea Fog", "Thick fog: you see enemies late.", 1.2),
-		Modifier.new(&"short", "Supply Shortage", "Special ammo halved; generators refill less.", 1.2),
-	]
+	if _modifiers.is_empty():
+		for e: Array in _entries(MODIFIER_REGISTRY):
+			var d: ModifierData = e[1]
+			_modifiers.append(Modifier.new(e[0], d.title, d.description, d.intel_mult))
+	return _modifiers.duplicate()
 
 
 static func modifier(id: StringName) -> Modifier:
@@ -370,3 +350,43 @@ static func modifier(id: StringName) -> Modifier:
 		if m.id == id:
 			return m
 	return modifiers()[0]
+
+
+static func _load_biomes() -> Dictionary:
+	var out: Dictionary = {}
+	for e: Array in _entries(BIOME_REGISTRY):
+		var d: BiomeData = e[1]
+		out[e[0]] = {"name": d.display_name, "coast": d.coast, "inland": d.inland, "building": d.building,
+			"foliage": d.foliage, "sky": d.sky, "fog": d.fog, "palms": d.palms, "on_route": d.on_route}
+	return out
+
+
+static func _route_biomes() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for id: StringName in BIOMES:
+		if BIOMES[id]["on_route"]:
+			ids.append(id)
+	return ids
+
+
+static func _load_missions() -> Dictionary:
+	var out: Dictionary = {}
+	for e: Array in _entries(MISSION_REGISTRY):
+		var d: MissionData = e[1]
+		out[e[0]] = {"name": d.display_name, "text": d.text}
+	return out
+
+
+static func _load_classes() -> Dictionary:
+	var out: Dictionary = {}
+	for e: Array in _entries(CLASS_REGISTRY):
+		var d: ClassData = e[1]
+		out[e[0]] = {"name": d.display_name, "cost": d.cost, "ability": d.ability, "text": d.text}
+	return out
+
+
+static func _class_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for id: StringName in CLASS_INFO:
+		ids.append(id)
+	return ids

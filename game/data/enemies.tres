@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="Registry" format=3]
+
+[ext_resource type="Script" path="res://addons/yard/registry.gd" id="1_tmjjc"]
+
+[resource]
+script = ExtResource("1_tmjjc")
+_class_restriction = &"EnemyData"
+_scan_directory = "res://game/data/enemies/"
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://b0bva2rehwgfv": &"runner",
+&"uid://b5utkg7r52540": &"grabber",
+&"uid://bipikllb0w625": &"behemoth",
+&"uid://caqx7w6elutb7": &"walker",
+&"uid://ccij8g553do44": &"bloater",
+&"uid://d0e16lminqkv0": &"brute",
+&"uid://dsbmev4kt4trf": &"screamer"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"behemoth": &"uid://bipikllb0w625",
+&"bloater": &"uid://ccij8g553do44",
+&"brute": &"uid://d0e16lminqkv0",
+&"grabber": &"uid://b5utkg7r52540",
+&"runner": &"uid://b0bva2rehwgfv",
+&"screamer": &"uid://dsbmev4kt4trf",
+&"walker": &"uid://caqx7w6elutb7"
+})
+_property_index = Dictionary[StringName, Dictionary]({
+&"pushable": {
+false: {
+&"behemoth": true,
+&"brute": true
+},
+true: {
+&"bloater": true,
+&"grabber": true,
+&"runner": true,
+&"screamer": true,
+&"walker": true
+}
+}
+})

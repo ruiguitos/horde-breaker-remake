@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3 uid="uid://bsgje3dvrck64"]
+
+[ext_resource type="Script" path="res://game/data/resources/biome_data.gd" id="1_qc07n"]
+
+[resource]
+script = ExtResource("1_qc07n")
+display_name = "Coastal Town"
+coast = Color(0.7, 0.66, 0.5, 1)
+inland = Color(0.4, 0.4, 0.38, 1)
+building = Color(0.62, 0.55, 0.5, 1)
+foliage = Color(0.25, 0.42, 0.22, 1)
+sky = Color(0.55, 0.62, 0.7, 1)
+order = 1

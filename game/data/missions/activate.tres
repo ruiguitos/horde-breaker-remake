@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://bw6f5my5mabib"]
+
+[ext_resource type="Script" path="res://game/data/resources/mission_data.gd" id="1_r88cm"]
+
+[resource]
+script = ExtResource("1_r88cm")
+display_name = "Activate 3"
+text = "Power up three generators."

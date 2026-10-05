@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ModifierData" format=3 uid="uid://c4cyyod8ktlms"]
+
+[ext_resource type="Script" path="res://game/data/resources/modifier_data.gd" id="1_b6gkf"]
+
+[resource]
+script = ExtResource("1_b6gkf")
+title = "Elite Pack"
+description = "Brutes and Grabbers twice as common."
+intel_mult = 1.3
+order = 2

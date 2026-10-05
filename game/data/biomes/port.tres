@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3 uid="uid://dj3rbtmn3c6oj"]
+
+[ext_resource type="Script" path="res://game/data/resources/biome_data.gd" id="1_n7l28"]
+
+[resource]
+script = ExtResource("1_n7l28")
+display_name = "Industrial Port"
+coast = Color(0.5, 0.5, 0.48, 1)
+inland = Color(0.36, 0.36, 0.36, 1)
+building = Color(0.7, 0.3, 0.2, 1)
+foliage = Color(0.25, 0.4, 0.22, 1)
+sky = Color(0.6, 0.62, 0.66, 1)
+order = 3

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Registry" format=3]
+
+[ext_resource type="Script" path="res://addons/yard/registry.gd" id="1_u7y4x"]
+
+[resource]
+script = ExtResource("1_u7y4x")
+_class_restriction = &"ClassData"
+_scan_directory = "res://game/data/classes/"
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://06s5o6sdkjoc": &"vanguard",
+&"uid://dkp6gynrccsy6": &"recruit"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"recruit": &"uid://dkp6gynrccsy6",
+&"vanguard": &"uid://06s5o6sdkjoc"
+})
+_property_index = Dictionary[StringName, Dictionary]({
+&"cost": {
+0: {
+&"recruit": true
+},
+150: {
+&"vanguard": true
+}
+}
+})

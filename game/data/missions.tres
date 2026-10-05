@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Registry" format=3]
+
+[ext_resource type="Script" path="res://addons/yard/registry.gd" id="1_b3tet"]
+
+[resource]
+script = ExtResource("1_b3tet")
+_class_restriction = &"MissionData"
+_scan_directory = "res://game/data/missions/"
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://bw6f5my5mabib": &"activate",
+&"uid://cyhxl6e4hyajv": &"defend",
+&"uid://rusxddmqgoqc": &"rescue"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"activate": &"uid://bw6f5my5mabib",
+&"defend": &"uid://cyhxl6e4hyajv",
+&"rescue": &"uid://rusxddmqgoqc"
+})

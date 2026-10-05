@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ClassData" format=3 uid="uid://dkp6gynrccsy6"]
+
+[ext_resource type="Script" path="res://game/data/resources/class_data.gd" id="1_faf72"]
+
+[resource]
+script = ExtResource("1_faf72")
+display_name = "Recruit"
+ability = "Grenade"
+text = "Balanced. Ability: Grenade (5 m blast)."

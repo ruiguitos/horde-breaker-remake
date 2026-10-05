@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Registry" format=3]
+
+[ext_resource type="Script" path="res://addons/yard/registry.gd" id="1_u563v"]
+
+[resource]
+script = ExtResource("1_u563v")
+_class_restriction = &"ModifierData"
+_scan_directory = "res://game/data/modifiers/"
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://c178jmke84utx": &"fog",
+&"uid://c4cyyod8ktlms": &"elite",
+&"uid://cr0oyix3wru3d": &"short",
+&"uid://glgrivgerqtd": &"swarm",
+&"uid://rtneqelbi5r2": &"calm"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"calm": &"uid://rtneqelbi5r2",
+&"elite": &"uid://c4cyyod8ktlms",
+&"fog": &"uid://c178jmke84utx",
+&"short": &"uid://cr0oyix3wru3d",
+&"swarm": &"uid://glgrivgerqtd"
+})

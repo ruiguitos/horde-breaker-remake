@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="Registry" format=3]
+
+[ext_resource type="Script" path="res://addons/yard/registry.gd" id="1_8kqb8"]
+
+[resource]
+script = ExtResource("1_8kqb8")
+_class_restriction = &"BiomeData"
+_scan_directory = "res://game/data/biomes/"
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://b0r3r10cionfu": &"beach",
+&"uid://bmn6kbrwmyha": &"jungle",
+&"uid://bsgje3dvrck64": &"town",
+&"uid://dig0ioduipb8s": &"volcano",
+&"uid://dj3rbtmn3c6oj": &"port"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"beach": &"uid://b0r3r10cionfu",
+&"jungle": &"uid://bmn6kbrwmyha",
+&"port": &"uid://dj3rbtmn3c6oj",
+&"town": &"uid://bsgje3dvrck64",
+&"volcano": &"uid://dig0ioduipb8s"
+})
+_property_index = Dictionary[StringName, Dictionary]({
+&"on_route": {
+false: {
+&"volcano": true
+},
+true: {
+&"beach": true,
+&"jungle": true,
+&"port": true,
+&"town": true
+}
+}
+})

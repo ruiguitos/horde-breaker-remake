@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ModifierData" format=3 uid="uid://c178jmke84utx"]
+
+[ext_resource type="Script" path="res://game/data/resources/modifier_data.gd" id="1_5l4qb"]
+
+[resource]
+script = ExtResource("1_5l4qb")
+title = "Sea Fog"
+description = "Thick fog: you see enemies late."
+intel_mult = 1.2
+order = 3

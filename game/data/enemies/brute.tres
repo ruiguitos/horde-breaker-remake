@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://d0e16lminqkv0"]
+
+[ext_resource type="Script" path="res://game/data/resources/enemy_data.gd" id="1_6jh5q"]
+
+[resource]
+script = ExtResource("1_6jh5q")
+display_name = "Brute"
+hp = 260.0
+speed_min = 1.6
+speed_max = 1.9
+damage = 25.0
+attack_interval = 1.6
+radius_scale = 1.6
+height = 2.4
+color = Color(0.55, 0.25, 0.25, 1)
+xp = 6
+front_armor = 0.75
+pushable = false
+order = 2

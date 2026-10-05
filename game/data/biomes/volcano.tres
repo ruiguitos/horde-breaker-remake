@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3 uid="uid://dig0ioduipb8s"]
+
+[ext_resource type="Script" path="res://game/data/resources/biome_data.gd" id="1_pxqak"]
+
+[resource]
+script = ExtResource("1_pxqak")
+display_name = "Volcano"
+coast = Color(0.22, 0.2, 0.2, 1)
+inland = Color(0.32, 0.28, 0.26, 1)
+building = Color(0.3, 0.27, 0.26, 1)
+foliage = Color(0.16, 0.13, 0.12, 1)
+sky = Color(0.35, 0.18, 0.14, 1)
+on_route = false
+order = 4

@@ -72,7 +72,86 @@ func _initialize() -> void:
 		d.order = i
 		p.append(d)
 	_build("perks", &"PerkData", PERKS, p, [&"cost"])
+	_build_world_data()
 	quit(0)
+
+
+## Second migration: enemies, modifiers, classes, biomes and missions, read
+## from the GameData tables as they were before moving to .tres. Skipped
+## once a registry exists (GameData then reads the registries instead).
+func _build_world_data() -> void:
+	if not ResourceLoader.exists("res://game/data/enemies.tres"):
+		var rows: Array = []
+		var res: Array[Resource] = []
+		var types: Array = GameData.enemy_types()
+		for i in types.size():
+			var t: Object = types[i]
+			var d := EnemyData.new()
+			for prop in ["hp", "speed_min", "speed_max", "damage", "attack_interval", "radius_scale", "height", "color", "xp", "front_armor", "grabs", "pushable", "keep_away", "explodes"]:
+				d.set(prop, t.get(prop))
+			d.display_name = t.get("display_name")
+			d.order = i
+			rows.append([t.get("id")])
+			res.append(d)
+		_build("enemies", &"EnemyData", rows, res, [&"pushable"])
+	if not ResourceLoader.exists("res://game/data/modifiers.tres"):
+		var rows: Array = []
+		var res: Array[Resource] = []
+		var mods: Array = GameData.modifiers()
+		for i in mods.size():
+			var d := ModifierData.new()
+			d.title = mods[i].title
+			d.description = mods[i].description
+			d.intel_mult = mods[i].intel_mult
+			d.order = i
+			rows.append([mods[i].id])
+			res.append(d)
+		_build("modifiers", &"ModifierData", rows, res, [])
+	if not ResourceLoader.exists("res://game/data/classes.tres"):
+		var rows: Array = []
+		var res: Array[Resource] = []
+		var i: int = 0
+		for id: StringName in GameData.CLASS_INFO:
+			var info: Dictionary = GameData.CLASS_INFO[id]
+			var d := ClassData.new()
+			d.display_name = info["name"]
+			d.cost = info["cost"]
+			d.ability = info["ability"]
+			d.text = info["text"]
+			d.order = i
+			i += 1
+			rows.append([id])
+			res.append(d)
+		_build("classes", &"ClassData", rows, res, [&"cost"])
+	if not ResourceLoader.exists("res://game/data/biomes.tres"):
+		var rows: Array = []
+		var res: Array[Resource] = []
+		var i: int = 0
+		for id: StringName in GameData.BIOMES:
+			var b: Dictionary = GameData.BIOMES[id]
+			var d := BiomeData.new()
+			d.display_name = b["name"]
+			for prop in ["coast", "inland", "building", "foliage", "sky", "fog", "palms"]:
+				d.set(prop, b[prop])
+			d.on_route = GameData.ISLAND_BIOMES.has(id)
+			d.order = i
+			i += 1
+			rows.append([id])
+			res.append(d)
+		_build("biomes", &"BiomeData", rows, res, [&"on_route"])
+	if not ResourceLoader.exists("res://game/data/missions.tres"):
+		var rows: Array = []
+		var res: Array[Resource] = []
+		var i: int = 0
+		for id: StringName in GameData.MISSIONS:
+			var d := MissionData.new()
+			d.display_name = GameData.MISSIONS[id]["name"]
+			d.text = GameData.MISSIONS[id]["text"]
+			d.order = i
+			i += 1
+			rows.append([id])
+			res.append(d)
+		_build("missions", &"MissionData", rows, res, [])
 
 
 ## Saves each resource as game/data/<kind>/<id>.tres (if missing) and the

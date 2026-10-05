@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3 uid="uid://bmn6kbrwmyha"]
+
+[ext_resource type="Script" path="res://game/data/resources/biome_data.gd" id="1_qvmcg"]
+
+[resource]
+script = ExtResource("1_qvmcg")
+display_name = "Jungle"
+coast = Color(0.6, 0.58, 0.4, 1)
+inland = Color(0.2, 0.35, 0.15, 1)
+building = Color(0.4, 0.42, 0.36, 1)
+foliage = Color(0.12, 0.38, 0.14, 1)
+sky = Color(0.3, 0.42, 0.34, 1)
+fog = 0.006
+palms = true
+order = 2
