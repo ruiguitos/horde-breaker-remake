@@ -30,6 +30,8 @@ var _audio_generators: int = 0
 var _camera: Camera3D
 var _player: Node3D
 var _enemy_mm := MultiMesh.new()
+var _head_mm := MultiMesh.new()
+var _arm_mm := MultiMesh.new()
 var _orb_mm := MultiMesh.new()
 var _debris_mm := MultiMesh.new()
 var _tracer_mesh := ImmediateMesh.new()
@@ -186,6 +188,11 @@ func _build_world() -> void:
 	add_child(_player)
 
 	_setup_multimesh(_enemy_mm, _capsule(0.35, 1.7), true)
+	# Heads and arms: separate MultiMeshes that follow the body transform.
+	_setup_multimesh(_head_mm, _sphere(0.24), true)
+	var arm := BoxMesh.new()
+	arm.size = Vector3(0.13, 0.13, 0.65)
+	_setup_multimesh(_arm_mm, arm, true)
 	_setup_multimesh(_orb_mm, _sphere(0.18), false, Color(0.3, 0.9, 1.0), true)
 	_setup_multimesh(_grenade_mm, _sphere(0.22), false, Color(0.15, 0.3, 0.1))
 	var warn := TorusMesh.new()
@@ -437,6 +444,8 @@ func _draw_enemies() -> void:
 	var h: Horde = run.horde
 	var now: float = Time.get_ticks_msec() * 0.001
 	_enemy_mm.instance_count = h.count
+	_head_mm.instance_count = h.count
+	_arm_mm.instance_count = h.count * 2
 	for i in h.count:
 		var t: GameData.EnemyType = h.types[h.kinds[i]]
 		var v: Vector3 = h.velocities[i]
@@ -452,16 +461,30 @@ func _draw_enemies() -> void:
 		if h.stun[i] > 0.0:
 			roll = sin(now * 25.0 + i) * 0.3
 			lean = -0.25
-		var basis := Basis(Vector3.UP, yaw) * Basis(Vector3.RIGHT, lean) * Basis(Vector3.FORWARD, roll)
-		basis = basis.scaled(Vector3(t.radius_scale, sy, t.radius_scale))
+		var rot := Basis(Vector3.UP, yaw) * Basis(Vector3.RIGHT, lean) * Basis(Vector3.FORWARD, roll)
+		var sx: float = t.radius_scale
 		var bob: float = absf(sin(phase)) * 0.12 * walk
-		_enemy_mm.set_instance_transform(i, Transform3D(basis, h.positions[i] + Vector3(0, t.height * 0.5 + bob, 0)))
+		var center: Vector3 = h.positions[i] + Vector3(0, t.height * 0.5 + bob, 0)
+		_enemy_mm.set_instance_transform(i, Transform3D(rot.scaled(Vector3(sx, sy, sx)), center))
+		# Local +Z is the walking direction (yaw = atan2(v.x, v.z)).
+		var head_pos: Vector3 = center + rot * Vector3(0, t.height * 0.5 + 0.08 * sx, 0.06 * sx)
+		_head_mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * sx), head_pos))
+		var swing: float = sin(phase) * 0.25 * walk
+		for side in 2:
+			var sign: float = -1.0 if side == 0 else 1.0
+			var arm_rot: Basis = rot * Basis(Vector3.RIGHT, -0.15 + swing * sign)
+			var arm_pos: Vector3 = center + rot * Vector3(0.3 * sign * sx, t.height * 0.28, 0.3 * sx)
+			_arm_mm.set_instance_transform(i * 2 + side, Transform3D(arm_rot.scaled(Vector3.ONE * sx), arm_pos))
 		var c: Color = t.color
 		if h.flash[i] > 0.0:
 			c = Color.WHITE
 		elif h.stun[i] > 0.0:
 			c = c.lightened(0.35)
 		_enemy_mm.set_instance_color(i, c)
+		_arm_mm.set_instance_color(i * 2, c)
+		_arm_mm.set_instance_color(i * 2 + 1, c)
+		# Heads are paler so they read as the target for headshots.
+		_head_mm.set_instance_color(i, c if h.flash[i] > 0.0 else c.lerp(Color(0.85, 0.8, 0.7), 0.45))
 
 
 func _draw_grenades() -> void:
