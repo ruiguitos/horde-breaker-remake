@@ -687,6 +687,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		run.cycle_weapon()
 	elif event.is_action_pressed(&"debug"):
 		hud.debug_visible = not hud.debug_visible
+	elif event.is_action_pressed(&"noclip"):
+		run.noclip = not run.noclip
+		run.messages.append("NOCLIP ON (no walls, no damage)" if run.noclip else "NOCLIP OFF")
 	elif event.is_action_pressed(&"camera_toggle"):
 		_set_third_person(not third_person)
 	else:

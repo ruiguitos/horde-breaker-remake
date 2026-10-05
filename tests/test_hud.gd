@@ -134,4 +134,6 @@ func _test_layout(extent: Vector2i) -> void:
 		for j in range(i + 1, panels.size()):
 			separated = separated and not panels[i].get_global_rect().intersects(panels[j].get_global_rect())
 	_check(contained and separated, "status, abilities and weapon fit without overlap at %dx%d" % [extent.x, extent.y])
-	_check(_hud._alerts.get_global_rect().end.y <= _hud._abilities_panel.get_global_rect().position.y - 8, "simultaneous warnings leave abilities clear at %dx%d" % [extent.x, extent.y])
+	# The 8 px gap shrinks with the HUD size setting (panels are scaled).
+	var gap: float = 8.0 * _hud._field.scale.y
+	_check(_hud._alerts.get_global_rect().end.y <= _hud._abilities_panel.get_global_rect().position.y - gap + 0.01, "simultaneous warnings leave abilities clear at %dx%d" % [extent.x, extent.y])

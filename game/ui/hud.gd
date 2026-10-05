@@ -693,7 +693,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func apply_hud_scale() -> void:
 	if _field == null or not is_inside_tree():
 		return
-	var percent: int = profile.hud_scale if profile != null else 100
+	var percent: int = profile.hud_scale if profile != null else 60
 	var s: float = clampf(percent / 100.0, 0.5, 1.0)
 	var view: Vector2 = get_viewport().get_visible_rect().size
 	_field.scale = Vector2(s, s)

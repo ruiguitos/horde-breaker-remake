@@ -3,7 +3,11 @@ extends RefCounted
 ## Builds the grey-box "Dawn Beach" island as a wall grid: the sea is blocked
 ## cells around an irregular coastline, buildings are blocked rectangles.
 
+## Island grid size in metres (cells). Change this one number for bigger
+## maps: coast, objectives and prop counts scale with it (see K).
 const SIZE: int = 160
+## Scale relative to the original 160 m island.
+const K: float = SIZE / 160.0
 
 var field: FlowField
 var boat: Vector3
@@ -39,13 +43,13 @@ static func build(rng_seed: int = 7, biome: StringName = &"beach") -> IslandMap:
 			var dx: float = x + 0.5 - c
 			var dz: float = z + 0.5 - c
 			var ang: float = atan2(dz, dx)
-			var radius: float = 70.0 + 5.0 * sin(ang * 3.0 + phase_a) + 3.0 * sin(ang * 7.0 + phase_b)
+			var radius: float = K * (70.0 + 5.0 * sin(ang * 3.0 + phase_a) + 3.0 * sin(ang * 7.0 + phase_b))
 			if dx * dx + dz * dz > radius * radius or x == 0 or z == 0 or x == SIZE - 1 or z == SIZE - 1:
 				f.blocked[z * SIZE + x] = 1
-	map.boat = Vector3(c, 0.0, c + 58.0)
+	map.boat = Vector3(c, 0.0, c + 58.0 * K)
 	map.player_start = map.boat + Vector3(0, 0, -5)
 	# Generator sites move a little per island so routes differ.
-	map.generators = [Vector3(c - 38, 0, c - 20), Vector3(c + 40, 0, c - 28), Vector3(c + 2, 0, c - 52)]
+	map.generators = [Vector3(c - 38 * K, 0, c - 20 * K), Vector3(c + 40 * K, 0, c - 28 * K), Vector3(c + 2 * K, 0, c - 52 * K)]
 	for i in map.generators.size():
 		map.generators[i] += Vector3(rng.randf_range(-8, 8), 0, rng.randf_range(-8, 8))
 		map.generators[i] = Vector3(floorf(map.generators[i].x) + 0.5, 0, floorf(map.generators[i].z) + 0.5)
@@ -59,11 +63,11 @@ static func build(rng_seed: int = 7, biome: StringName = &"beach") -> IslandMap:
 		&"port":
 			_container_rows(map, rng, keep_free)
 		&"jungle":
-			_scatter_buildings(map, rng, keep_free, 12, Vector2i(3, 6), 0.4)
+			_scatter_buildings(map, rng, keep_free, int(12 * K * K), Vector2i(3, 6), 0.4)
 		&"beach":
-			_scatter_buildings(map, rng, keep_free, 18, Vector2i(3, 5), 0.15)
+			_scatter_buildings(map, rng, keep_free, int(18 * K * K), Vector2i(3, 5), 0.15)
 		_:
-			_scatter_buildings(map, rng, keep_free, 45, Vector2i(3, 12), 0.3)
+			_scatter_buildings(map, rng, keep_free, int(45 * K * K), Vector2i(3, 12), 0.3)
 	# Caches: free spots away from the boat and generators.
 	attempts = 0
 	while map.caches.size() < 4 and attempts < 2000:
@@ -81,10 +85,11 @@ static func build(rng_seed: int = 7, biome: StringName = &"beach") -> IslandMap:
 	# so they add cover without ever sealing a corridor.
 	var props: int = 0
 	attempts = 0
-	var prop_target: int = {&"town": 40, &"port": 30, &"jungle": 520, &"beach": 220}.get(biome, 160)
+	# Props per area: the count grows with the island surface (K squared).
+	var prop_target: int = int({&"town": 40, &"port": 30, &"jungle": 520, &"beach": 220}.get(biome, 160) * K * K)
 	var spacing: int = 1 if biome == &"jungle" else 2
 	var tree_ratio: float = {&"beach": 0.5, &"port": 0.2, &"volcano": 0.5}.get(biome, 0.75)
-	while props < prop_target and attempts < 8000:
+	while props < prop_target and attempts < int(8000 * K * K):
 		attempts += 1
 		var cell := Vector2i(rng.randi_range(2, SIZE - 3), rng.randi_range(2, SIZE - 3))
 		var near_goal: bool = false
@@ -126,7 +131,7 @@ static func _scatter_buildings(map: IslandMap, rng: RandomNumberGenerator, keep_
 		count: int, size_range: Vector2i, thin_chance: float) -> void:
 	var placed: int = 0
 	var attempts: int = 0
-	while placed < count and attempts < 3000:
+	while placed < count and attempts < maxi(3000, count * 70):
 		attempts += 1
 		var w: int = rng.randi_range(size_range.x, size_range.y)
 		var h: int = rng.randi_range(size_range.x, size_range.y)

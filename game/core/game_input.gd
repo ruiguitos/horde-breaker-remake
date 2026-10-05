@@ -22,6 +22,8 @@ static var ACTIONS: Dictionary = {
 	&"abandon": [KEY_Q],
 	&"confirm": [KEY_ENTER, KEY_KP_ENTER, KEY_R, "joy:%d" % JOY_BUTTON_A, "joy:%d" % JOY_BUTTON_START],
 	&"debug": [KEY_F3],
+	## Debug: walk through everything, take no damage (mouse side buttons).
+	&"noclip": ["mouse:%d" % MOUSE_BUTTON_XBUTTON1, "mouse:%d" % MOUSE_BUTTON_XBUTTON2],
 	&"camera_toggle": [KEY_V, "joy:%d" % JOY_BUTTON_BACK],
 	&"card_1": [KEY_1, "joy:%d" % JOY_BUTTON_X],
 	&"card_2": [KEY_2, "joy:%d" % JOY_BUTTON_Y],

@@ -31,6 +31,8 @@ var breaker_cd: float = 0.0
 var dash_time: float = 0.0
 var dash_dir: Vector3 = Vector3.ZERO
 var invulnerable: float = 0.0
+## Debug noclip (Mouse 4/5): move through walls and sea, faster, no damage.
+var noclip: bool = false
 var player_class: StringName = &"recruit"
 var hazard_pay: bool = false  ## boat briefing deal (see RunContext)
 var war_cry_time: float = 0.0  ## > 0 while War Cry reduces damage taken
@@ -424,6 +426,8 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	var to_spawn: int = director.update(dt, horde.count, horde.damage_to_player, near)
 	for k in to_spawn:
 		_spawn_enemy()
+	if noclip:
+		hp = maxf(hp, _hp_at_step_start)  # no damage while testing
 	damage_taken += maxf(0.0, _hp_at_step_start - hp)
 	_low_hp_cd -= dt
 	if hp < max_hp * 0.3 and _low_hp_cd <= 0.0 and hp > 0.0:
@@ -449,6 +453,14 @@ func _update_stamina(dt: float, wants_sprint: bool) -> void:
 
 func _update_player(dt: float, move: Vector2, breaker: bool) -> void:
 	breaker_cd = maxf(0.0, breaker_cd - dt)
+	if noclip:
+		horde.grabbed_by = -1
+		if move.length_squared() > 1.0:
+			move = move.normalized()
+		var fly: Vector2 = move * GameData.PLAYER_SPEED * (6.0 if sprinting else 3.0) * dt
+		player_pos.x = clampf(player_pos.x + fly.x, 0.5, field.width - 0.5)
+		player_pos.z = clampf(player_pos.z + fly.y, 0.5, field.height - 0.5)
+		return
 	var grabbed: bool = horde.grabbed_by != -1
 	if breaker and breaker_cd <= 0.0 and dash_time <= 0.0:
 		_start_breaker(move)

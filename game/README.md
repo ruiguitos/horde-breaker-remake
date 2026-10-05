@@ -126,6 +126,37 @@ em memória, nos estados `normal`, `danger`, `boss` ou `third_person`:
 godot --path . --resolution 1152x648 --windowed --script res://tools/dev/hud_preview.gd -- <caminho-absoluto.png> normal
 ```
 
+## Mapas (ilhas)
+
+Cada ilha é gerada a partir de uma *seed*, sem cenas feitas à mão.
+
+| Ficheiro | O que faz |
+|---|---|
+| `world/island_map.gd` | **Geração do mapa**: costa, cais, geradores, caches, edifícios por bioma, árvores, rochas, lava. `SIZE` é o tamanho |
+| `horde/flow_field.gd` | Grelha de navegação (células livres/bloqueadas) e caminhos da horda |
+| `world/island_run.gd` | Regras: onde o jogador começa, missões, spawns (usa o mapa) |
+| `world/island.gd` | Constrói o mundo 3D a partir do mapa (edifícios, props, mar, luz, câmara) |
+| `world/island_terrain.gd` | Chão com Terrain3D (costa em declive, cores) |
+| `world/island_roads.gd` | Estradas com o Road Generator e candeeiros |
+| `world/nature_kit.gd` | Árvores, rochas e vegetação da Quaternius por bioma |
+| `world/director.gd` | Quantos inimigos aparecem e quando |
+| `ui/minimap.gd` | Minimapa |
+| `data/biomes/*.tres` | Cores, nevoeiro e palmeiras de cada bioma (YARD) |
+
+**Mapas grandes:** em `world/island_map.gd`, muda `const SIZE: int = 160`
+para, por exemplo, `320`.
+- Crescem com o tamanho: a costa, a posição do cais e dos geradores, e o
+  número de edifícios, árvores e rochas (proporcional à área). A densidade
+  mantém-se.
+- Medido na cloud, a 320 m a geração passa de ~80 ms para ~0,4 s, a maior
+  parte nas estradas. Para mapas maiores, gerar numa thread durante o
+  barco evita a pausa.
+- O número de inimigos vivos não muda (`MAX_ALIVE` em `game_data.gd`). Num
+  mapa maior parecem menos: sobe-o se quiseres a mesma pressão.
+
+**Noclip (teste):** **Mouse 4 / Mouse 5** liga/desliga. Atravessas paredes e
+mar, andas 3× mais depressa (6× a correr) e não levas dano.
+
 ## Fluxo da run
 
 **Título** → **Armory** (gastar Intel, equipar perks, escolher Threat) → barco (1 de 3: cura, munição ou carta) → ilha → ilha limpa → barco → … →

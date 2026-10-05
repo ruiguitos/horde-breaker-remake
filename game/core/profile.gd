@@ -39,7 +39,7 @@ var render_scale: int = 100  ## 3D resolution in percent of the window
 var antialias: int = GraphicsSettings.AA_FXAA
 var third_person: bool = true  ## island camera: over-the-shoulder (V toggles top-down)
 var mouse_sensitivity: int = 50  ## percent
-var hud_scale: int = 100  ## HUD size in percent (60..100)
+var hud_scale: int = 60  ## HUD size in percent (60..100)
 ## Rebound keys: action -> "key:N" / "mouse:N" (see GameInput.REBINDABLE).
 var key_bindings: Dictionary = {}
 
@@ -78,7 +78,7 @@ static func from_dict(d: Dictionary) -> Profile:
 	if res.size() == 2 and res[0].is_valid_int() and res[1].is_valid_int():
 		p.resolution = Vector2i(maxi(640, int(res[0])), maxi(360, int(res[1])))
 	p.vsync = bool(d.get("vsync", true))
-	p.hud_scale = clampi(int(d.get("hud_scale", 100)), 60, 100)
+	p.hud_scale = clampi(int(d.get("hud_scale", 60)), 60, 100)
 	p.third_person = bool(d.get("third_person", true))
 	var kb: Variant = d.get("key_bindings", {})
 	if kb is Dictionary:
