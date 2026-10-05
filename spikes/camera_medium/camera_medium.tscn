@@ -1,0 +1,96 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://spikes/camera_medium/camera_medium.gd" id="1_main"]
+[ext_resource type="Script" path="res://spikes/camera_medium/camera_rig.gd" id="2_rig"]
+
+[sub_resource type="BoxShape3D" id="floor_shape"]
+size = Vector3(120, 1, 120)
+
+[sub_resource type="BoxMesh" id="floor_mesh"]
+size = Vector3(120, 1, 120)
+
+[sub_resource type="StandardMaterial3D" id="floor_mat"]
+albedo_color = Color(0.3, 0.32, 0.28, 1)
+uv1_triplanar = true
+
+[sub_resource type="CapsuleShape3D" id="player_shape"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="CapsuleMesh" id="player_mesh"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="player_mat"]
+albedo_color = Color(0.2, 0.45, 0.9, 1)
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 3
+
+[node name="CameraMedium" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 10, 0)
+shadow_enabled = true
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("floor_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("floor_mesh")
+surface_material_override/0 = SubResource("floor_mat")
+
+[node name="Obstacles" type="Node3D" parent="."]
+
+[node name="Zombies" type="Node3D" parent="."]
+
+[node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Player"]
+shape = SubResource("player_shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="Player"]
+mesh = SubResource("player_mesh")
+surface_material_override/0 = SubResource("player_mat")
+
+[node name="CameraRig" type="Node3D" parent="." node_paths=PackedStringArray("target")]
+script = ExtResource("2_rig")
+target = NodePath("../Player")
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig"]
+current = true
+
+[node name="Overlay" type="CanvasLayer" parent="."]
+
+[node name="Info" type="Label" parent="Overlay"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 700.0
+offset_bottom = 140.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+
+[node name="Reticle" type="Label" parent="Overlay"]
+offset_right = 20.0
+offset_bottom = 24.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.25, 0.25, 1)
+theme_override_font_sizes/font_size = 22
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
