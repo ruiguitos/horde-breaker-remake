@@ -28,7 +28,11 @@ func _process(_delta: float) -> bool:
 	_frames += 1
 	match _step:
 		0:
-			_check(_main.get("state") == 0, "the run starts on the boat")
+			_check(_main.get("state") == 3, "the game opens in the armory")
+			_current().call("_start")
+			_step = 10
+		10:
+			_check(_main.get("state") == 0, "starting a run goes to the boat")
 			_current().call("_pick", 0)
 			_current().emit_signal("land_requested")
 			_step = 1
@@ -57,5 +61,8 @@ func _process(_delta: float) -> bool:
 				_current().call("_finish")
 			if _frames == 10:
 				_check(_main.get("state") == 2, "death ends the run in the debrief")
+				_current().emit_signal("new_run_requested")
+			if _frames == 14:
+				_check(_main.get("state") == 3, "the debrief returns to the armory")
 				quit(1 if _failures > 0 else 0)
 	return false

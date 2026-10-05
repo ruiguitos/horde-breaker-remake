@@ -26,6 +26,7 @@ Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 | Mover | WASD / setas | stick esquerdo |
 | Orientar (o auto-fire dispara para onde olhas) | rato | stick direito |
 | Breaker (investida) | Espaço ou botão direito | A ou RB |
+| Granada (lança para o rato) | G ou botão do meio | LB |
 | Trocar arma | 1 / 2 / 3 | D-pad ← ↑ → |
 | Escolher carta | 1 / 2 / 3 ou clique | X / Y / B |
 | Continuar no fim da ilha | Enter / R | A / Start |
@@ -59,14 +60,26 @@ Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 
 ## Fluxo da run
 
-Barco (1 de 3: cura, munição ou carta) → ilha → ilha limpa → barco → … →
-3.ª ilha limpa ou morte → debrief, com o Intel total → nova run. Cada ilha é
+**Armory** (gastar Intel, equipar perks, escolher Threat) → barco (1 de 3: cura, munição ou carta) → ilha → ilha limpa → barco → … →
+3.ª ilha limpa ou morte → debrief → Armory. Extrair (ganhar a 3.ª ilha)
+multiplica o Intel da run por 1,5. Cada ilha é
 mais dura: o HP dos inimigos sobe 30 % e há mais especiais. A vida, o nível,
 as cartas e a munição passam de ilha para ilha (`core/run_context.gd`).
 
 O perfil grava-se em `user://profile.json`. No Windows fica em
 `%APPDATA%\Godot\app_userdata\Horde Breaker Remake\`. Apagar o ficheiro
 recomeça o perfil.
+
+## Meta: Intel, perks e Threat
+
+- **Perks** compram-se uma vez com Intel e equipam-se em slots: começas com
+  1 slot, o 2.º custa 100 e o 3.º 250. São 5 perks: Thick Skin, Pack Rat,
+  Head Hunter, Battering Ram e Demolitions. São bónus pequenos, para dar
+  opções e não poder bruto.
+- **Threat 1–3**: cada nível dá +20 % de HP aos inimigos, mais 25 vivos e
+  +25 % de Intel. Extrair no Threat mais alto desbloqueia o seguinte.
+- **Granada**: cai onde está o rato (até 14 m), rebenta após 0,8 s (5 m,
+  90 de dano) e tem 12 s de cooldown. O anel vermelho mostra a área.
 
 ## Feedback visual (sem animações nem assets)
 
@@ -93,7 +106,7 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 | `main.gd` | Máquina de estados da run: barco → ilha → debrief. |
 | `core/run_context.gd` | O que passa de ilha para ilha. |
 | `core/profile.gd` | Perfil gravado (Intel, runs), JSON versionado. |
-| `states/boat.gd`, `states/debrief.gd` | Ecrãs do barco e do fim da run. |
+| `states/armory.gd`, `states/boat.gd`, `states/debrief.gd` | Ecrãs entre runs, entre ilhas e do fim da run. |
 | `world/island_run.gd` | **Todas as regras**, sem nós: jogador, auto-fire, breaker, cartas, missão. Testável em headless. |
 | `world/island.gd` | Input, render (MultiMesh), câmara média e efeitos. |
 | `world/island_map.gd` | Gera a ilha (costa irregular, edifícios, geradores, barco). |

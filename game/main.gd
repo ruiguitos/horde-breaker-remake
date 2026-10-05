@@ -1,11 +1,11 @@
 extends Node
 ## Root of the game: a small run state machine.
-##   BOAT -> ISLAND -> (cleared and more islands) BOAT
-##                  -> (last island cleared, or death) DEBRIEF -> BOAT (new run)
+##   ARMORY -> BOAT -> ISLAND -> (cleared and more islands) BOAT
+##                  -> (last island cleared, or death) DEBRIEF -> ARMORY
 ## Each state is a scene that is freed when the state changes; RunContext is
 ## the only thing that crosses states.
 
-enum State { BOAT, ISLAND, DEBRIEF }
+enum State { BOAT, ISLAND, DEBRIEF, ARMORY }
 
 const ISLAND_SCENE: String = "res://game/world/island.tscn"
 
@@ -17,11 +17,13 @@ var _current: Node
 
 func _ready() -> void:
 	profile = Profile.load_profile()
-	_new_run()
+	_go(State.ARMORY)
 
 
 func _new_run() -> void:
 	context = RunContext.new()
+	context.threat = profile.threat
+	context.apply_perks(profile.equipped_perks)
 	_go(State.BOAT)
 
 
@@ -48,8 +50,14 @@ func _go(next: State) -> void:
 			debrief.set_script(load("res://game/states/debrief.gd"))
 			debrief.set("context", context)
 			debrief.set("profile", profile)
-			debrief.connect("new_run_requested", _new_run, CONNECT_DEFERRED)
+			debrief.connect("new_run_requested", _go.bind(State.ARMORY), CONNECT_DEFERRED)
 			_current = debrief
+		State.ARMORY:
+			var armory := Control.new()
+			armory.set_script(load("res://game/states/armory.gd"))
+			armory.set("profile", profile)
+			armory.connect("start_requested", _new_run, CONNECT_DEFERRED)
+			_current = armory
 	add_child(_current)
 
 
@@ -59,4 +67,7 @@ func _on_island_finished(won: bool) -> void:
 		_go(State.BOAT)
 	else:
 		context.won = won
+		if won:
+			# Extracting multiplies everything earned in the run.
+			context.intel = int(context.intel * GameData.EXTRACTION_INTEL_MULTIPLIER)
 		_go(State.DEBRIEF)

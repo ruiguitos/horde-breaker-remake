@@ -10,6 +10,7 @@ var debug_visible: bool = true
 var _hp_bar: ProgressBar
 var _xp_bar: ProgressBar
 var _breaker_bar: ProgressBar
+var _grenade_bar: ProgressBar
 var _info: Label
 var _objective: Label
 var _marker: Label
@@ -45,6 +46,7 @@ func _init() -> void:
 	_hp_bar = _bar(bars, "HP", Color(0.85, 0.2, 0.2))
 	_xp_bar = _bar(bars, "XP", Color(0.3, 0.8, 1.0))
 	_breaker_bar = _bar(bars, "Breaker", Color(1.0, 0.75, 0.2))
+	_grenade_bar = _bar(bars, "Grenade", Color(0.5, 0.85, 0.3))
 	_info = Label.new()
 	bars.add_child(_info)
 
@@ -78,7 +80,7 @@ func _init() -> void:
 	var help := Label.new()
 	help.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	help.position = Vector2(16, -40)
-	help.text = "WASD move · mouse aims (auto-fire) · Space/RMB breaker · 1-3 weapons · Esc pause · F3 debug"
+	help.text = "WASD move · mouse aims (auto-fire) · Space/RMB breaker · G/MMB grenade · 1-3 weapons · Esc pause · F3 debug"
 	help.modulate = Color(1, 1, 1, 0.7)
 	root.add_child(help)
 
@@ -154,13 +156,15 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 		_damage_flash.color.a = clampf(_damage_flash.color.a + (_last_hp - run.hp) * 0.02, 0.0, 0.35)
 	_last_hp = run.hp
 	_damage_flash.color.a = maxf(0.0, _damage_flash.color.a - get_process_delta_time() * 1.5)
-	_hp_bar.max_value = GameData.PLAYER_MAX_HP
+	_hp_bar.max_value = run.max_hp
 	_hp_bar.value = run.hp
 	_xp_bar.max_value = run.xp_needed()
 	_xp_bar.value = run.xp
 	var total: float = run.breaker_cooldown_total()
 	_breaker_bar.max_value = total
 	_breaker_bar.value = total - run.breaker_cd
+	_grenade_bar.max_value = run.grenade_cooldown_total()
+	_grenade_bar.value = run.grenade_cooldown_total() - run.grenade_cd
 	var w: GameData.Weapon = run.weapons[run.weapon_index]
 	var ammo_text: String = "∞" if w.max_ammo < 0 else str(run.ammo[run.weapon_index])
 	_info.text = "Level %d   Kills %d   Headshots %d\n[%d] %s  %s" % [

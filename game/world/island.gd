@@ -42,6 +42,9 @@ var _last_hp: float = -1.0
 var _was_dashing: bool = false
 var _muzzle: OmniLight3D
 var _hitstop: float = 0.0
+var _grenade_held: bool = false
+var _grenade_mm := MultiMesh.new()
+var _grenade_ring_mm := MultiMesh.new()
 var _sim_ms: float = 0.0
 
 
@@ -163,6 +166,11 @@ func _build_world() -> void:
 
 	_setup_multimesh(_enemy_mm, _capsule(0.35, 1.7), true)
 	_setup_multimesh(_orb_mm, _sphere(0.18), false, Color(0.3, 0.9, 1.0), true)
+	_setup_multimesh(_grenade_mm, _sphere(0.22), false, Color(0.15, 0.3, 0.1))
+	var warn := TorusMesh.new()
+	warn.inner_radius = 0.92
+	warn.outer_radius = 1.0
+	_setup_multimesh(_grenade_ring_mm, warn, false, Color(1, 0.25, 0.1), true)
 	var chunk := BoxMesh.new()
 	chunk.size = Vector3(0.25, 0.25, 0.25)
 	_setup_multimesh(_debris_mm, chunk, true)
@@ -243,10 +251,14 @@ func _unhandled_input(event: InputEvent) -> void:
 			run.switch_weapon(key - KEY_1)
 		elif key == KEY_SPACE:
 			_breaker_held = true
+		elif key == KEY_G:
+			_grenade_held = true
 		elif key == KEY_F3:
 			hud.debug_visible = not hud.debug_visible
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 		_breaker_held = true
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_MIDDLE:
+		_grenade_held = true
 	elif event is InputEventJoypadButton and event.pressed:
 		if run.is_over() and event.button_index in [JOY_BUTTON_START, JOY_BUTTON_A]:
 			_finish()
@@ -256,6 +268,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			run.choose_card([JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_B].find(event.button_index))
 		elif event.button_index in [JOY_BUTTON_A, JOY_BUTTON_RIGHT_SHOULDER]:
 			_breaker_held = true
+		elif event.button_index == JOY_BUTTON_LEFT_SHOULDER:
+			_grenade_held = true
 		elif event.button_index == JOY_BUTTON_DPAD_LEFT:
 			run.switch_weapon(0)
 		elif event.button_index == JOY_BUTTON_DPAD_UP:
@@ -295,6 +309,10 @@ func _physics_process(delta: float) -> void:
 		aim = Vector3(stick.x, 0, stick.y)
 	var t0: int = Time.get_ticks_usec()
 	run.step(delta, move, aim, _breaker_held)
+	if _grenade_held:
+		# Without a mouse (gamepad) throw 8 m ahead.
+		run.throw_grenade(aim if aim.length() > 1.0 else run.facing * 8.0)
+		_grenade_held = false
 	_sim_ms = lerpf(_sim_ms, (Time.get_ticks_usec() - t0) / 1000.0, 0.05)
 	_breaker_held = false
 
@@ -317,6 +335,7 @@ func _process(delta: float) -> void:
 	_draw_player_and_camera()
 	_draw_enemies()
 	_draw_orbs()
+	_draw_grenades()
 	_draw_effects(delta)
 	_draw_mission()
 	var label: String = ""
@@ -380,6 +399,20 @@ func _draw_enemies() -> void:
 		elif h.stun[i] > 0.0:
 			c = c.lightened(0.35)
 		_enemy_mm.set_instance_color(i, c)
+
+
+func _draw_grenades() -> void:
+	var n: int = run.grenades.size()
+	_grenade_mm.instance_count = n
+	_grenade_ring_mm.instance_count = n
+	var radius: float = GameData.GRENADE_RADIUS + (1.0 if run.has_perk(&"demolitions") else 0.0)
+	for i in n:
+		var p: Vector3 = run.grenades[i]
+		# Small arc: the grenade drops onto the target as the fuse runs out.
+		var t: float = 1.0 - run.grenade_fuses[i] / GameData.GRENADE_FUSE
+		var height: float = 0.25 + 2.0 * (1.0 - t) * t * 4.0 * 0.5
+		_grenade_mm.set_instance_transform(i, Transform3D(Basis(), p + Vector3(0, height, 0)))
+		_grenade_ring_mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * radius), p + Vector3(0, 0.06, 0)))
 
 
 func _draw_orbs() -> void:

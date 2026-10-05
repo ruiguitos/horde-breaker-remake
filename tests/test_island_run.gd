@@ -16,6 +16,9 @@ func _initialize() -> void:
 	_test_mission_flow()
 	_test_bot_survives_a_while()
 	_test_profile_roundtrip()
+	_test_grenade()
+	_test_perks_and_threat()
+	_test_meta_shop()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -154,3 +157,48 @@ func _test_profile_roundtrip() -> void:
 	var q: Profile = Profile.load_profile(path)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	_check(q.intel == 42 and q.runs == 1 and q.extractions == 1 and q.best_kills == 300, "profile saves and loads Intel and stats")
+
+
+func _test_grenade() -> void:
+	var run := IslandRun.new(7)
+	run.director.max_alive = 0
+	var target: Vector3 = run.player_pos + Vector3(0, 0, 8)
+	for k in 6:
+		run.horde.add(target + Vector3(randf_range(-1.5, 1.5), 0, randf_range(-1.5, 1.5)), GameData.EnemyKind.WALKER, run.rng)
+	# Face away so only the grenade can kill them.
+	var thrown: bool = run.throw_grenade(Vector3(0, 0, 8))
+	var again: bool = run.throw_grenade(Vector3(0, 0, 8))
+	for t in 60:
+		run.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)
+	_check(thrown and not again and run.kills == 6, "grenade kills the group; cooldown blocks a 2nd throw (kills %d)" % run.kills)
+
+
+func _test_perks_and_threat() -> void:
+	var ctx := RunContext.new(9)
+	ctx.threat = 3
+	var perks: Array[StringName] = [&"thick_skin", &"pack_rat"]
+	ctx.apply_perks(perks)
+	var run := IslandRun.new(ctx.island_seed())
+	run.load_context(ctx)
+	_check(run.max_hp == 130.0 and run.hp == 130.0, "Thick Skin gives 130 max HP")
+	_check(run.ammo[1] == 60 and run.ammo[2] == 90, "Pack Rat gives +50% special ammo")
+	_check(is_equal_approx(run.horde.hp_scale, 1.4) and run.director.max_alive == 200, "Threat 3: enemy HP x1.4 and 200 alive")
+
+
+func _test_meta_shop() -> void:
+	var p := Profile.new()
+	p.intel = 120
+	var perk: GameData.Perk = GameData.perks()[0]
+	var bought: bool = p.buy_perk(perk)
+	var equipped: bool = p.toggle_equip(perk.id)
+	var second: GameData.Perk = GameData.perks()[1]
+	p.buy_perk(second)
+	var no_slot: bool = p.toggle_equip(second.id)
+	var slot: bool = p.buy_slot()
+	_check(bought and equipped and not no_slot and not slot and p.intel == 40,
+		"buying perks costs Intel and equipping respects slots")
+	var ctx := RunContext.new(1)
+	ctx.won = true
+	ctx.threat = 1
+	p.record_run(ctx)
+	_check(p.max_threat == 2, "extracting on the highest Threat unlocks the next")

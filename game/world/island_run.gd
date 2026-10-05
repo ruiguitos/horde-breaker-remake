@@ -16,7 +16,14 @@ var rng := RandomNumberGenerator.new()
 # Player
 var player_pos: Vector3
 var facing: Vector3 = Vector3(0, 0, -1)
+var max_hp: float = GameData.PLAYER_MAX_HP
 var hp: float = GameData.PLAYER_MAX_HP
+var perks: Array[StringName] = []
+var threat: int = 1
+var grenade_cd: float = 0.0
+## Grenades in flight/fuse: position of impact and remaining fuse time.
+var grenades: PackedVector3Array = PackedVector3Array()
+var grenade_fuses: PackedFloat32Array = PackedFloat32Array()
 var level: int = 1
 var xp: int = 0
 var breaker_cd: float = 0.0
@@ -79,6 +86,9 @@ func _init(rng_seed: int = 7) -> void:
 
 ## Loads the run state carried from previous islands and scales difficulty.
 func load_context(ctx: RunContext) -> void:
+	perks = ctx.perks.duplicate()
+	threat = ctx.threat
+	max_hp = ctx.max_hp
 	hp = ctx.hp
 	level = ctx.level
 	xp = ctx.xp
@@ -89,7 +99,12 @@ func load_context(ctx: RunContext) -> void:
 	_kills_at_start = kills
 	headshots = ctx.headshots
 	time_alive = ctx.time_alive
-	horde.hp_scale = 1.0 + 0.3 * ctx.island_index
+	horde.hp_scale = (1.0 + 0.3 * ctx.island_index) * GameData.threat_hp(threat)
+	director.max_alive = GameData.MAX_ALIVE + GameData.threat_extra_alive(threat)
+	if ctx.ammo.size() != ammo.size() and has_perk(&"pack_rat"):
+		for w in weapons.size():
+			if weapons[w].max_ammo > 0:
+				ammo[w] = max_ammo(w)
 	# A head start makes the director spawn more specials on later islands.
 	director.elapsed = 120.0 * ctx.island_index
 
@@ -97,7 +112,7 @@ func load_context(ctx: RunContext) -> void:
 ## Writes the run state back when the island ends.
 func save_to_context(ctx: RunContext) -> void:
 	ctx.intel += intel_earned()
-	ctx.hp = maxf(hp, 1.0)
+	ctx.hp = clampf(hp, 1.0, max_hp)
 	ctx.level = level
 	ctx.xp = xp
 	ctx.card_stacks = card_stacks.duplicate()
@@ -105,6 +120,60 @@ func save_to_context(ctx: RunContext) -> void:
 	ctx.kills = kills
 	ctx.headshots = headshots
 	ctx.time_alive = time_alive
+
+
+func max_ammo(w: int) -> int:
+	var m: int = weapons[w].max_ammo
+	return m * 3 / 2 if m > 0 and has_perk(&"pack_rat") else m
+
+
+func has_perk(id: StringName) -> bool:
+	return perks.has(id)
+
+
+func grenade_cooldown_total() -> float:
+	return GameData.GRENADE_COOLDOWN * (0.65 if has_perk(&"demolitions") else 1.0)
+
+
+## Throws a grenade towards `aim` (vector from the player; its length is the
+## throw distance, clamped to the grenade range).
+func throw_grenade(aim: Vector3) -> bool:
+	if grenade_cd > 0.0 or is_paused():
+		return false
+	var flat := Vector3(aim.x, 0, aim.z)
+	if flat.length_squared() < 0.01:
+		flat = facing * 6.0
+	flat = flat.limit_length(GameData.GRENADE_RANGE)
+	# Stop the throw at the first wall cell along the way.
+	var target: Vector3 = player_pos
+	var n: int = ceili(flat.length() / 0.5)
+	for k in range(1, n + 1):
+		var p: Vector3 = player_pos + flat * (float(k) / n)
+		if field.is_blocked(floori(p.x), floori(p.z)):
+			break
+		target = p
+	grenades.append(target)
+	grenade_fuses.append(GameData.GRENADE_FUSE)
+	grenade_cd = grenade_cooldown_total()
+	return true
+
+
+func _update_grenades(dt: float) -> void:
+	grenade_cd = maxf(0.0, grenade_cd - dt)
+	var radius: float = GameData.GRENADE_RADIUS + (1.0 if has_perk(&"demolitions") else 0.0)
+	var i: int = grenades.size() - 1
+	while i >= 0:
+		grenade_fuses[i] -= dt
+		if grenade_fuses[i] <= 0.0:
+			var p: Vector3 = grenades[i]
+			explosions.append(p)
+			for j in horde.query_radius(p, radius):
+				_damage(j, GameData.GRENADE_DAMAGE, p, false, true)
+				horde.stun[j] = maxf(horde.stun[j], 0.6)
+				horde.knock_back(j, p, 2.0)
+			grenades.remove_at(i)
+			grenade_fuses.remove_at(i)
+		i -= 1
 
 
 func is_paused() -> bool:
@@ -132,7 +201,8 @@ func intel_earned() -> int:
 	for p in generator_progress:
 		if p >= GameData.GENERATOR_HOLD_SECONDS:
 			done += 1
-	return (kills - _kills_at_start) / 5 + done * 15 + (40 if objective == Objective.WON else 0)
+	var base: int = (kills - _kills_at_start) / 5 + done * 15 + (40 if objective == Objective.WON else 0)
+	return int(base * GameData.threat_intel(threat))
 
 
 func switch_weapon(i: int) -> void:
@@ -165,6 +235,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool) -> void:
 		hp -= horde.damage_to_player
 	invulnerable = maxf(0.0, invulnerable - dt)
 	_auto_fire(dt)
+	_update_grenades(dt)
 	_flush_dead()
 	_update_orbs(dt)
 	_update_mission(dt)
@@ -184,7 +255,7 @@ func _update_player(dt: float, move: Vector2, breaker: bool) -> void:
 		_start_breaker(move)
 	if dash_time > 0.0:
 		dash_time -= dt
-		var speed: float = GameData.BREAKER_DISTANCE / GameData.BREAKER_DURATION
+		var speed: float = GameData.BREAKER_DISTANCE * (1.4 if has_perk(&"long_breaker") else 1.0) / GameData.BREAKER_DURATION
 		player_pos = Horde.move_against_walls(field, player_pos, dash_dir.x * speed * dt, dash_dir.z * speed * dt, GameData.PLAYER_RADIUS)
 		# Shove everything along the path out of the way.
 		var radius: float = GameData.BREAKER_RADIUS * (2.0 if stacks(&"shockwave") > 0 else 1.0)
@@ -282,7 +353,7 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 	to.y = 0.0
 	var dir: Vector3 = to.normalized()
 	# Headshot when the target sits where the player is facing.
-	var headshot: bool = facing.dot(dir) >= cos(deg_to_rad(GameData.HEADSHOT_CONE_DEG))
+	var headshot: bool = facing.dot(dir) >= cos(deg_to_rad(15.0 if has_perk(&"head_hunter") else GameData.HEADSHOT_CONE_DEG))
 	var dmg: float = w.damage * (1.0 + 0.25 * stacks(&"hollow_points"))
 	for p in w.pellets:
 		var pellet_dir: Vector3 = dir
@@ -330,7 +401,7 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 		orbs.append(p)
 		orb_values.append(t.xp)
 		if headshot and stacks(&"vampire") > 0:
-			hp = minf(GameData.PLAYER_MAX_HP, hp + 2.0 * stacks(&"vampire"))
+			hp = minf(max_hp, hp + 2.0 * stacks(&"vampire"))
 		if headshot and stacks(&"explosive_heads") > 0:
 			explosions.append(p)
 			for j in horde.query_radius(p, 3.0):
@@ -402,7 +473,7 @@ func _update_mission(dt: float) -> void:
 						messages.append("Generator online")
 						for w in weapons.size():
 							if weapons[w].max_ammo > 0:
-								ammo[w] = mini(weapons[w].max_ammo, ammo[w] + weapons[w].max_ammo / 2)
+								ammo[w] = mini(max_ammo(w), ammo[w] + max_ammo(w) / 2)
 			if all_done:
 				objective = Objective.RETURN_TO_BOAT
 				director.trigger_peak(25.0)

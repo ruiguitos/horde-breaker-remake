@@ -17,6 +17,21 @@ var headshots: int = 0
 var time_alive: float = 0.0
 var intel: int = 0
 var won: bool = false
+var threat: int = 1
+var perks: Array[StringName] = []
+var max_hp: float = GameData.PLAYER_MAX_HP
+
+
+## Applies the equipped perks that change starting values.
+func apply_perks(p_perks: Array[StringName]) -> void:
+	perks = p_perks.duplicate()
+	if perks.has(&"thick_skin"):
+		max_hp += 30.0
+	hp = max_hp
+
+
+func has_perk(id: StringName) -> bool:
+	return perks.has(id)
 
 
 func _init(p_seed: int = 0) -> void:

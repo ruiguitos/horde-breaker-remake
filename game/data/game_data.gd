@@ -77,6 +77,19 @@ class Card:
 		max_stacks = p_max
 
 
+class Perk:
+	var id: StringName
+	var title: String
+	var description: String
+	var cost: int
+
+	func _init(p_id: StringName, p_title: String, p_desc: String, p_cost: int) -> void:
+		id = p_id
+		title = p_title
+		description = p_desc
+		cost = p_cost
+
+
 enum EnemyKind { WALKER, RUNNER, BRUTE, GRABBER }
 
 ## Player
@@ -95,6 +108,18 @@ const AIM_CONE_DEG: float = 50.0
 ## Targets this close to the facing direction get headshots.
 const HEADSHOT_CONE_DEG: float = 9.0
 const HEADSHOT_MULTIPLIER: float = 2.5
+
+## Grenade (Recruit active ability)
+const GRENADE_COOLDOWN: float = 12.0
+const GRENADE_RANGE: float = 14.0
+const GRENADE_FUSE: float = 0.8
+const GRENADE_RADIUS: float = 5.0
+const GRENADE_DAMAGE: float = 90.0
+
+## Meta progression
+const SLOT_COSTS: Array[int] = [0, 100, 250]  ## cost of the 1st, 2nd, 3rd perk slot
+const MAX_THREAT: int = 3
+const EXTRACTION_INTEL_MULTIPLIER: float = 1.5
 
 ## Horde
 const MAX_ALIVE: int = 150
@@ -143,3 +168,26 @@ static func cards() -> Array[Card]:
 		Card.new(&"fast_hands", "Fast Hands", "+20% fire rate.", 3),
 		Card.new(&"magnet", "XP Magnet", "Pickup radius x2.", 1),
 	]
+
+
+static func perks() -> Array[Perk]:
+	return [
+		Perk.new(&"thick_skin", "Thick Skin", "+30 max HP.", 40),
+		Perk.new(&"pack_rat", "Pack Rat", "+50% Shotgun and Heavy Pistol ammo.", 40),
+		Perk.new(&"head_hunter", "Head Hunter", "Wider headshot cone (9° -> 15°).", 60),
+		Perk.new(&"long_breaker", "Battering Ram", "Breaker goes 40% further.", 50),
+		Perk.new(&"demolitions", "Demolitions", "Grenade cooldown -35%, radius +1 m.", 50),
+	]
+
+
+## Threat level rules: enemy HP and Intel multipliers, extra enemies alive.
+static func threat_hp(threat: int) -> float:
+	return 1.0 + 0.2 * (threat - 1)
+
+
+static func threat_intel(threat: int) -> float:
+	return 1.0 + 0.25 * (threat - 1)
+
+
+static func threat_extra_alive(threat: int) -> int:
+	return 25 * (threat - 1)

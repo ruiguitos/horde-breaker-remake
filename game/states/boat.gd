@@ -66,7 +66,7 @@ func _ready() -> void:
 
 func _make_options() -> void:
 	_options.append({"title": "Field Repairs", "text": "Heal 50 HP.",
-		"apply": func() -> void: context.hp = minf(GameData.PLAYER_MAX_HP, context.hp + 50.0)})
+		"apply": func() -> void: context.hp = minf(context.max_hp, context.hp + 50.0)})
 	_options.append({"title": "Ammo Crate", "text": "Refill Shotgun and Heavy Pistol ammo.",
 		"apply": func() -> void: context.ammo = PackedInt32Array()})  # empty = full ammo on landing
 	var pool: Array[GameData.Card] = []
@@ -95,7 +95,7 @@ func _pick(i: int) -> void:
 
 func _refresh_status() -> void:
 	_status.text = "HP %d/%d · Level %d · Kills %d · Intel this run %d" % [
-		int(context.hp), int(GameData.PLAYER_MAX_HP), context.level, context.kills, context.intel]
+		int(context.hp), int(context.max_hp), context.level, context.kills, context.intel]
 
 
 func _unhandled_input(event: InputEvent) -> void:

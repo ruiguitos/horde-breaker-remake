@@ -13,8 +13,7 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 ## Gameplay
 
 - [ ] Escolha de rota entre ilhas (grafo com modificadores).
-- [ ] Gastar Intel: perks em slots desbloqueáveis.
-- [ ] Granada (habilidade ativa do Recruit).
+- [ ] Mais desbloqueios com Intel: armas e cartas no pool, classes.
 - [ ] Boss na última ilha (Volcano).
 - [ ] Caches/desvios opcionais na ilha.
 

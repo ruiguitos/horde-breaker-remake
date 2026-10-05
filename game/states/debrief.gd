@@ -21,7 +21,7 @@ func _ready() -> void:
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 22)
 	var islands: int = context.island_index + (1 if context.won else 0)
-	label.text = "%s\n\nIslands cleared: %d / %d\nTime %d s · Kills %d · Headshots %d · Level %d\n\nIntel earned: %d\nTotal Intel: %d   (runs %d, extractions %d, best kills %d)\n\nEnter / A: new run" % [
+	label.text = "%s\n\nIslands cleared: %d / %d\nTime %d s · Kills %d · Headshots %d · Level %d\n\nIntel earned: %d\nTotal Intel: %d   (runs %d, extractions %d, best kills %d)\n\nEnter / A: armory" % [
 		"EXTRACTED — RUN COMPLETE!" if context.won else "MISSION FAILED",
 		islands, RunContext.ISLAND_COUNT, int(context.time_alive), context.kills, context.headshots,
 		context.level, context.intel, profile.intel, profile.runs, profile.extractions, profile.best_kills]

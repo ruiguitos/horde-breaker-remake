@@ -30,6 +30,9 @@ func _process(_delta: float) -> bool:
 		print("saved ", _out)
 		quit(0)
 		return false
+	if main.get("state") == 3 and _frames > 3:
+		current.call("_start")
+		return false
 	if main.get("state") == 0 and _frames > 3:
 		current.call("_pick", 0)
 		current.emit_signal("land_requested")
