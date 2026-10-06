@@ -1,5 +1,5 @@
 extends Camera3D
-## Free flight to look at the island (F6 on out/real_island.tscn):
+## Free flight to look at the island (F6 on out/real_island.scn):
 ## WASD move, Q/E down/up, hold right mouse to look, Shift fast, wheel = speed.
 ## Also adds the colour grading (Color Grading addon; needs Forward+).
 

@@ -1,5 +1,5 @@
 extends SceneTree
-## Builds out/real_island.tscn from real data (run fetch_data.py first):
+## Builds out/real_island.scn from real data (run fetch_data.py first):
 ##   - relief: elevation tiles (about 25-30 m real resolution) smoothed with
 ##     a cubic resize, plus fine noise for rock detail;
 ##   - coast: the exact OpenStreetMap coastline; cliffs where it meets the
@@ -485,8 +485,11 @@ func _build_scene() -> void:
 	_place_world()
 	var packed := PackedScene.new()
 	packed.pack(_root)
-	var err: int = ResourceSaver.save(packed, OUT + "real_island.tscn")
-	_lap("saved %s (%s)" % [OUT + "real_island.tscn", error_string(err)])
+	# Binary, not text: the 196k vegetation transforms make a 21 MB .tscn that
+	# takes 1.6 s just to parse; the .scn loads in about 40 ms.
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(OUT + "real_island.tscn"))  # older builds
+	var err: int = ResourceSaver.save(packed, OUT + "real_island.scn", ResourceSaver.FLAG_COMPRESS)
+	_lap("saved %s (%s)" % [OUT + "real_island.scn", error_string(err)])
 
 
 ## Terrain3D textures from the Poly Haven maps: colour + displacement (height

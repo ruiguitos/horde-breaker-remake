@@ -13,7 +13,7 @@ spikes. Para voltar atrás chega reverter o commit e apagar esta pasta.
      pontes, edifícios, farol, cais, praias;
    - **4 texturas CC0 do Poly Haven** (1k): erva com rocha, falésia, costa e
      gravilha dos caminhos.
-2. `build.gd` constrói `out/real_island.tscn` (também fora do git):
+2. `build.gd` constrói `out/real_island.scn` (também fora do git):
    - relevo real suavizado (redimensionamento cúbico), com ruído fino para
      dar textura à rocha;
    - a costa exata do OSM, com falésias onde encontra o mar e declives suaves
@@ -37,7 +37,7 @@ godot --headless --path . --script res://spikes/real_island/build.gd
 godot --path . --resolution 1920x1080 --script res://spikes/real_island/view.gd
 ```
 
-Para passear: abre `spikes/real_island/out/real_island.tscn` no editor e
+Para passear: abre `spikes/real_island/out/real_island.scn` no editor e
 carrega em **F6**. Controlos: **WASD** para andar, **Q/E** para descer e
 subir, **botão direito** para olhar, **Shift** para ir mais depressa e
 **roda do rato** para mudar a velocidade.

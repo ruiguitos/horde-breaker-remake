@@ -1,5 +1,5 @@
 extends SceneTree
-## Pictures and frame times of out/real_island.tscn (needs a GPU):
+## Pictures and frame times of out/real_island.scn (needs a GPU):
 ##   godot --path . --resolution 1280x720 --script res://spikes/real_island/view.gd
 ## Saves out/shots/*.png from a few viewpoints, then flies a slow circle for
 ## 300 frames and prints the mean and 95th-percentile frame time.
@@ -19,7 +19,7 @@ var _ready_at: int = 0  ## waits for the boot splash (Boot Splash Plus) to fade
 func _initialize() -> void:
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)  # measure, not wait for the monitor
 	var t0: int = Time.get_ticks_msec()
-	_scene = (load(DIR + "out/real_island.tscn") as PackedScene).instantiate()
+	_scene = (load(DIR + "out/real_island.scn") as PackedScene).instantiate()
 	root.add_child(_scene)
 	print("scene loaded in %d ms" % (Time.get_ticks_msec() - t0))
 	_cam = _scene.get_node("FlyCamera")

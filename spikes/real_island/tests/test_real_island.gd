@@ -1,11 +1,11 @@
 extends SceneTree
-## The built island (out/real_island.tscn) loads and has its parts: terrain
+## The built island (out/real_island.scn) loads and has its parts: terrain
 ## with saved regions, buildings, a lighthouse, vegetation chunks with
 ## instances, a camera. Skips (exit 0) when the data or the build is missing:
 ## both stay out of git (see README).
 ## Run: godot --headless --path . --script res://spikes/real_island/tests/test_real_island.gd
 
-const SCENE: String = "res://spikes/real_island/out/real_island.tscn"
+const SCENE: String = "res://spikes/real_island/out/real_island.scn"
 
 var _failures: int = 0
 
