@@ -2,8 +2,10 @@ extends SceneTree
 ## Renders pictures of a scene for review without a GPU (software OpenGL):
 ##   xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 \
 ##     --resolution 1280x720 --script res://tools/dev/screenshot.gd -- <scene.tscn> <out_dir>
-## Writes top.png (orthographic, whole island) and four oblique views
-## (view_n/e/s/w.png). Lighting is a plain sun and sky colour.
+## Writes top.png (orthographic, whole island), four oblique views
+## (view_n/e/s/w.png) and a close view of every Choke_* and Arena_* marker
+## (close_<marker>.png, from 16 m south and 9 m up: about the game camera).
+## Lighting is a plain sun and sky colour.
 
 var _scene: Node3D
 var _cam: Camera3D
@@ -44,6 +46,12 @@ func _initialize() -> void:
 		["view_e", c + Vector3(_size * 0.95, _size * 0.55, 0), c, false],
 		["view_w", c + Vector3(-_size * 0.95, _size * 0.55, 0), c, false],
 	]
+	var markers: Node = _scene.get_node_or_null("Markers")
+	if markers != null:
+		for m in markers.get_children():
+			if m is Node3D and (m.name.begins_with("Choke_") or m.name.begins_with("Arena_")):
+				var p: Vector3 = (m as Node3D).position
+				_shots.append(["close_" + String(m.name), p + Vector3(0, 9, 16), p + Vector3(0, 1, 0), false])
 	var terrain: Node = _scene.get_node_or_null("Terrain3D")
 	if terrain != null:
 		terrain.call("set_camera", _cam)

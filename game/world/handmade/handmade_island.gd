@@ -7,6 +7,8 @@ extends Node3D
 ##   Buildings/     -> every child blocks the cells under its footprint
 ##   Rocks/         -> same as buildings (single rocks block one cell)
 ##   Trees/         -> every child blocks only the cell of its trunk
+##   Bridges/       -> every child is a deck mesh: the cells under it become
+##                     walkable ground at the deck's top, even over water
 ##   Decor/         -> never blocks (grass, flowers, roads, lights, water)
 ##   Markers/       -> Boat (required), PlayerStart, Generator*, Cache*
 ## The island covers x, z in [0, size): keep everything inside that square.
@@ -51,6 +53,9 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 			for o: Vector2i in [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]:
 				h += _vertex_height(regions, x + o.x, z + o.y)
 			heights[z * size + x] = h * 0.25 if not regions.is_empty() else NO_TERRAIN
+	var deck := PackedByteArray()
+	deck.resize(size * size)
+	_lay_bridges(heights, deck)
 	for z in size:
 		for x in size:
 			var i: int = z * size + x
@@ -60,11 +65,17 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 				for o: Vector2i in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:
 					var nx: int = x + o.x
 					var nz: int = z + o.y
-					if nx >= 0 and nz >= 0 and nx < size and nz < size and absf(heights[nz * size + nx] - h) > max_step:
+					if nx < 0 or nz < 0 or nx >= size or nz >= size:
+						continue
+					var hn: float = heights[nz * size + nx]
+					if deck[i] != 0 and deck[nz * size + nx] == 0 and hn < h:
+						continue  # a bridge has rails: the drop beside it is not a cliff for the deck
+					if absf(hn - h) > max_step:
 						blocked = true
 						break
 			if blocked:
 				f.blocked[i] = 1
+	_raise_beside_decks(heights, deck, f)
 	map.heights = heights
 	# Objects.
 	for node in _children_of("Buildings") + _children_of("Rocks"):
@@ -209,6 +220,51 @@ func _vertex_height(regions: Dictionary, x: int, z: int) -> float:
 		if px >= 0 and pz >= 0 and px < rs and pz < rs:
 			return img.get_pixel(px, pz).r
 	return sea_level - 10.0
+
+
+## Bridges/: every cell whose centre lies under a deck gets the height of the
+## deck's top surface there (decks may slope from bank to bank) and is marked
+## in `deck`. A deck is a MeshInstance3D; its children (rails) are ignored.
+func _lay_bridges(heights: PackedFloat32Array, deck: PackedByteArray) -> void:
+	for node in _children_of("Bridges"):
+		if not node is MeshInstance3D or (node as MeshInstance3D).mesh == null:
+			continue
+		var box: AABB = (node as MeshInstance3D).mesh.get_aabb()
+		var xf: Transform3D = _local(node)
+		var inv: Transform3D = xf.affine_inverse()
+		# The top face as a plane: a point on it and its normal.
+		var top: Vector3 = xf * Vector3(0.0, box.end.y, 0.0)
+		var up: Vector3 = xf.basis.y.normalized()
+		var r: Rect2i = _footprint(node)
+		for z in range(r.position.y, r.end.y):
+			for x in range(r.position.x, r.end.x):
+				# Where the vertical line through the cell centre meets the top.
+				var p := Vector3(x + 0.5, 0.0, z + 0.5)
+				p.y = top.y - (up.x * (p.x - top.x) + up.z * (p.z - top.z)) / up.y
+				var c: Vector3 = inv * p
+				if c.x < box.position.x or c.x > box.end.x or c.z < box.position.z or c.z > box.end.z:
+					continue
+				var i: int = z * size + x
+				heights[i] = p.y
+				deck[i] = 1
+
+
+## Blocked cells beside a deck (the water past the rails) take the deck's
+## height: ground_y() blends neighbouring cells, so a unit walking near the
+## rail would otherwise sink towards the riverbed. They stay blocked.
+func _raise_beside_decks(heights: PackedFloat32Array, deck: PackedByteArray, f: FlowField) -> void:
+	var raised: PackedFloat32Array = heights.duplicate()
+	for z in range(1, size - 1):
+		for x in range(1, size - 1):
+			var i: int = z * size + x
+			if deck[i] != 0 or f.blocked[i] == 0:
+				continue
+			for o: Vector2i in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:
+				var n: int = (z + o.y) * size + x + o.x
+				if deck[n] != 0 and heights[n] > raised[i]:
+					raised[i] = heights[n]
+	for i in heights.size():
+		heights[i] = raised[i]
 
 
 func _children_of(group: String) -> Array[Node3D]:

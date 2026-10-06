@@ -174,12 +174,31 @@ onde estão (não mudam o jogo).
 | Ilha | Gargalos (rota curta) | Rota longa | Arenas |
 |---|---|---|---|
 | `beach_01` | Ponte estreita sobre o riacho; brecha nas dunas a este; rampa sul do farol | Vau largo a oeste pela aldeia; contornar as dunas pelo norte; rampa este do farol | Encruzilhada; praça da aldeia |
-| `town_01` | Ponte do meio sobre o canal; portão da frente do pátio murado; escadas da igreja; becos de 3 m entre casas | Pontes laterais; portão de trás do pátio; rampa norte da igreja | Praça sul; mercado a norte |
+| `town_01` | Ponte do meio sobre o canal; portão da frente do pátio murado; escadas da igreja; becos de 3 m entre casas | Pontes laterais; portão de trás do pátio; rampa sudoeste da igreja | Praça sul; mercado a norte |
 | `jungle_01` | Ponte de corda sobre o rio; rampa sul do templo | Vaus a oeste e a este; rampa oeste do templo | Clareira sul; topo do templo |
 | `port_01` | Ponte basculante sobre a doca; brechas entre armazéns; corredores estreitos dos contentores | Contornar a doca; contornar os armazéns; avenida central | Cais sul; cruzamento central |
 
 O script verifica as duas rotas: fecha cada gargalo à vez e confirma que o
-barco e todos os geradores continuam acessíveis.
+barco, os geradores e as caches continuam acessíveis.
+
+O script também faz uma **auditoria**: nenhum objeto na água, num rio, numa
+estrada, numa ponte, numa praça ou numa falésia; nenhum edifício em chão
+irregular ou a menos de 10 m da costa; nenhuma estrada na água ou numa
+falésia. A colocação e a auditoria usam a mesma regra (`_spot_problem`), por
+isso o que o script põe passa sempre. Se houver um problema, o script acaba
+com código 1.
+
+**Estradas:** são malhas próprias (`Decor/Roads`), com bordas nítidas e
+coladas ao terreno: asfalto com passeios e risco ao centro na cidade,
+asfalto no porto, terra batida na praia e na selva. As curvas são
+arredondadas e as estradas passam a direito sobre as pontes. Onde duas se
+juntam, a mais recente pára 1 m dentro da outra; não se usa união de
+polígonos porque as ruas da cidade formam quarteirões (buracos) e o Godot não
+triangula polígonos com buracos.
+
+**Pontes:** o rio passa por baixo (água a sério). O tabuleiro está no grupo
+`Bridges/`: as células por baixo dele andam-se à altura do tabuleiro, que
+sobe ou desce de uma margem à outra.
 
 Foram construídas por `tools/dev/build_islands.gd`, que esculpe o Terrain3D e
 coloca tudo a partir de um desenho escrito por bioma. Depois disso são cenas
@@ -226,6 +245,7 @@ só visual. A câmara de 3.ª pessoa encurta para não entrar nas colinas.
 | `Buildings/` | Cada filho bloqueia as células por baixo da sua caixa (vista de cima) |
 | `Rocks/` | Igual aos edifícios |
 | `Trees/` | Cada filho bloqueia só a célula do tronco (a copa não conta) |
+| `Bridges/` | Cada filho é o tabuleiro de uma ponte (`MeshInstance3D`): as células por baixo andam-se à altura do tabuleiro, mesmo sobre água; os filhos (guardas) são decoração |
 | `Decor/` | Nunca bloqueia: relva, flores, estradas, luzes, água de pré-visualização |
 | `Markers/` | `Boat` (obrigatório), `PlayerStart`, `Generator1..3`, `Cache1..` (nós `Marker3D`) |
 
@@ -273,8 +293,9 @@ grava `<cena>_grid.png` ao lado da cena, que é a grelha vista de cima:
 | Ciano | Caches |
 
 **Fotografias para revisão (Claude na cloud):** `tools/dev/screenshot.gd`
-renderiza a cena por software (sem GPU) e grava uma vista de cima e quatro
-vistas oblíquas. É assim que o Claude vê as tuas ilhas: faz push e pede-lhe
+renderiza a cena por software (sem GPU) e grava uma vista de cima, quatro
+vistas oblíquas e uma vista de perto de cada marcador `Choke_*` e `Arena_*`
+(mais ou menos a câmara do jogo). É assim que o Claude vê as tuas ilhas: faz push e pede-lhe
 para as rever.
 
 O modelo foi criado por `tools/dev/make_handmade_template.gd`; o teste está

@@ -12,13 +12,30 @@ const OUT: String = "res://game/world/handmade/islands/"
 const KIT: String = "res://assets/models/nature_megakit/"
 const N: int = 256  ## island size = one Terrain3D region (256 m)
 const C: float = N * 0.5
+## Clearances per object kind, in metres (see _spot_problem).
+const COAST_CLEAR: Dictionary = {"building": 10.0, "rock": 8.0, "tree": 8.0, "cover": 3.0}
+const RIVER_CLEAR: Dictionary = {"building": 3.5, "rock": 3.5, "tree": 3.5, "cover": 1.5}
+const ROAD_CLEAR: Dictionary = {"building": 0.5, "rock": 1.0, "tree": 1.5, "cover": 0.8}
+const MAX_SLOPE: Dictionary = {"rock": 0.4, "tree": 0.5, "cover": 0.6}
+## Road meshes: height above the terrain (asphalt over sidewalks, so the
+## asphalt always shows where they overlap), sidewalk width, bridge decks.
+const ROAD_LIFT: float = 0.06
+const WALK_LIFT: float = 0.03
+const SIDEWALK: float = 1.8
+const DECK_THICKNESS: float = 0.3
+## Longest straight cut of a rounded corner (metres from the corner).
+const MAX_CORNER_CUT: float = 6.0
+## Radius of the openings in ridges, and of the area closed at each choke
+## point by the route check (larger, so a closed choke really is closed).
+const GAP_RADIUS: float = 6.5
+const CHOKE_CLOSE_RADIUS: float = 7.5
 
 ## Current layout (filled by the _design_* functions).
 var biome: StringName
 var coast_r0: float = 100.0
 var coast_waves: Array = []        ## [amplitude, frequency, phase]
 var hills: Array = []              ## [Vector2 centre, radius, height]
-var plateaus: Array = []           ## [Vector2 centre, radius, height, ramp angles (rad, Array)]
+var plateaus: Array = []           ## [Vector2 centre, radius, height, ramp angles (rad, Array), ramp length (optional, 26 m)]
 var rivers: Array = []             ## [PackedVector2Array, width]: carved below the sea (blocks)
 var crossings: Array = []          ## [Vector2 centre, radius, "bridge" | "ford"]: land across a river
 var ridges: Array = []             ## [PackedVector2Array, width, height, gaps (Array[Vector2])]
@@ -37,6 +54,8 @@ var _pending: Array = []
 var _terrain: Node3D
 var _root: HandmadeIsland
 var _frames: int = 0
+var _failed: bool = false          ## any island with problems: exit code 1
+var _cover_spots: Array = []       ## [model, Vector2]: every tuft placed (the audit reads it)
 
 
 func _initialize() -> void:
@@ -48,10 +67,11 @@ func _initialize() -> void:
 
 func _start_next() -> void:
 	if _pending.is_empty():
-		quit(0)
+		quit(1 if _failed else 0)
 		return
 	_reset(StringName(_pending.pop_front()))
 	call("_design_" + String(biome))
+	_prepare_paths()
 	_sculpt()
 	_root = HandmadeIsland.new()
 	_root.name = String(biome).capitalize() + "Island"
@@ -125,17 +145,17 @@ func _design_beach() -> void:
 	plateaus = [[Vector2(128, 50), 20.0, 7.0, [PI * 0.5, 0.0]]]
 	rivers = [[_line([Vector2(0, 150), Vector2(60, 142), Vector2(100, 152), Vector2(150, 146), Vector2(200, 156), Vector2(256, 150)]), 10.0]]
 	crossings = [[Vector2(128, 148.7), 3.0, "bridge"], [Vector2(55, 143.2), 8.0, "ford"]]
-	ridges = [[_line([Vector2(178, 70), Vector2(197, 95), Vector2(210, 125), Vector2(214, 152)]), 6.0, 3.5, [Vector2(197, 95)]]]
+	ridges = [[_line([Vector2(182, 80), Vector2(197, 95), Vector2(210, 125), Vector2(214, 152)]), 6.0, 3.5, [Vector2(197, 95)]]]
 	paths = [
-		[_line([Vector2(128, 226), Vector2(128, 170), Vector2(128, 149), Vector2(128, 113)]), 6.0],
+		[_line([Vector2(128, 218), Vector2(128, 170), Vector2(128, 149), Vector2(128, 113)]), 6.0],
 		[_line([Vector2(128, 192), Vector2(88, 178), Vector2(55, 160), Vector2(55, 143), Vector2(55, 117)]), 5.0],
 		[_line([Vector2(70, 117), Vector2(100, 112), Vector2(128, 113)]), 5.0],
-		[_line([Vector2(128, 100), Vector2(128, 78)]), 5.0],
-		[_line([Vector2(146, 113), Vector2(175, 100), Vector2(197, 95), Vector2(206, 88)]), 5.0],
-		[_line([Vector2(148, 50), Vector2(176, 54), Vector2(194, 66), Vector2(206, 88)]), 4.0],
+		[_line([Vector2(128, 100), Vector2(128, 68)]), 5.0],
+		[_line([Vector2(146, 113), Vector2(175, 103), Vector2(190, 99), Vector2(197, 95), Vector2(204, 91), Vector2(206, 88)]), 5.0],
+		[_line([Vector2(148, 50), Vector2(168, 54), Vector2(180, 62), Vector2(188, 70), Vector2(198, 80), Vector2(206, 88)]), 4.0],
 	]
 	plazas = [Rect2(Vector2(110, 100), Vector2(36, 26)), Rect2(Vector2(40, 104), Vector2(30, 26))]
-	for p in [Vector2(36, 92), Vector2(48, 92), Vector2(60, 92), Vector2(74, 104), Vector2(74, 116), Vector2(26, 108)]:
+	for p in [Vector2(48, 92), Vector2(60, 92), Vector2(72, 92), Vector2(74, 104), Vector2(76, 121), Vector2(84, 96)]:
 		buildings.append([Rect2(p, Vector2(7, 6)), 3.2, Color(0.72, 0.6, 0.45), "hut"])
 	buildings.append([Rect2(Vector2(118, 36), Vector2(7, 7)), 10.0, Color(0.9, 0.9, 0.85), "tower"])
 	forests = [
@@ -151,38 +171,40 @@ func _design_beach() -> void:
 ## Old Town. A canal splits the old quarter (north) from the harbour side.
 ##   Short routes: the narrow middle bridge, the yard's front gate, the
 ##   church's west steps. Long routes: the side bridges, the yard's back
-##   gate, the church's north ramp. Houses packed with 3 m alleys.
+##   gate, the church's south-west ramp. Houses packed with 3 m alleys.
 ##   Arenas: the south square, the north market.
 func _design_town() -> void:
 	markers = {
-		"Generator1": Vector2(41, 103), "Generator2": Vector2(220, 160), "Generator3": Vector2(128, 60),
+		"Generator1": Vector2(49, 99), "Generator2": Vector2(220, 160), "Generator3": Vector2(128, 60),
 		"Cache1": Vector2(150, 179), "Cache2": Vector2(70, 140), "Cache3": Vector2(186, 100), "Cache4": Vector2(96, 100),
-		"Choke_MiddleBridge": Vector2(128, 118), "Choke_YardGate": Vector2(54, 103), "Choke_ChurchSteps": Vector2(190, 152),
+		"Choke_MiddleBridge": Vector2(128, 118), "Choke_YardGate": Vector2(62, 99), "Choke_ChurchSteps": Vector2(204, 152),
 		"Arena_Square": Vector2(128, 179), "Arena_Market": Vector2(128, 61),
 	}
 	coast_r0 = 108.0
 	coast_waves = [[5.0, 2, 1.1], [3.0, 5, 0.3]]
 	palette["grass"] = Color(0.45, 0.55, 0.33)
-	plateaus = [[Vector2(212, 152), 16.0, 5.0, [PI, -PI * 0.5]]]
+	plateaus = [[Vector2(220, 152), 14.0, 5.0, [PI, PI * 2.0 / 3.0], 14.0]]
 	rivers = [[_line([Vector2(0, 122), Vector2(80, 116), Vector2(176, 120), Vector2(256, 116)]), 10.0]]
 	crossings = [[Vector2(128, 118), 3.0, "bridge"], [Vector2(70, 116.8), 4.5, "bridge"], [Vector2(186, 119.5), 4.5, "bridge"]]
 	paths = [
-		[_line([Vector2(128, 228), Vector2(128, 44)]), 10.0],
+		[_line([Vector2(128, 225), Vector2(128, 44)]), 10.0],
 		[_line([Vector2(70, 200), Vector2(70, 60)]), 8.0],
 		[_line([Vector2(186, 200), Vector2(186, 60)]), 8.0],
 		[_line([Vector2(40, 84), Vector2(216, 84)]), 8.0],
-		[_line([Vector2(40, 160), Vector2(196, 160)]), 8.0],
+		[_line([Vector2(40, 160), Vector2(190, 160)]), 8.0],
 		[_line([Vector2(70, 196), Vector2(186, 196)]), 8.0],
-		[_line([Vector2(186, 152), Vector2(196, 152)]), 6.0],
+		[_line([Vector2(186, 152), Vector2(210, 152)]), 6.0],
+		[_line([Vector2(186, 196), Vector2(198, 186), Vector2(206, 176), Vector2(213, 165)]), 6.0],
 	]
-	plazas = [Rect2(Vector2(100, 168), Vector2(56, 22)), Rect2(Vector2(96, 48), Vector2(64, 26)), Rect2(Vector2(28, 92), Vector2(26, 22))]
+	plazas = [Rect2(Vector2(100, 168), Vector2(56, 22)), Rect2(Vector2(96, 48), Vector2(64, 26)), Rect2(Vector2(36, 90), Vector2(26, 18))]
 	# Walled yard (generator 1): front gate east, back gate north.
-	_wall(Vector2(28, 92), Vector2(38, 92))
-	_wall(Vector2(44, 92), Vector2(54, 92))
-	_wall(Vector2(28, 114), Vector2(54, 114))
-	_wall(Vector2(54, 92), Vector2(54, 100))
-	_wall(Vector2(54, 106), Vector2(54, 114))
-	buildings.append([Rect2(Vector2(206, 138), Vector2(10, 12)), 9.0, Color(0.8, 0.78, 0.72), "church"])
+	_wall(Vector2(36, 90), Vector2(46, 90))
+	_wall(Vector2(52, 90), Vector2(62, 90))
+	_wall(Vector2(36, 108), Vector2(62, 108))
+	_wall(Vector2(36, 90), Vector2(36, 108))
+	_wall(Vector2(62, 90), Vector2(62, 96))
+	_wall(Vector2(62, 102), Vector2(62, 108))
+	buildings.append([Rect2(Vector2(214, 140), Vector2(10, 12)), 9.0, Color(0.8, 0.78, 0.72), "church"])
 	var colors: Array = [Color(0.85, 0.8, 0.65), Color(0.75, 0.55, 0.45), Color(0.6, 0.7, 0.75), Color(0.85, 0.85, 0.82), Color(0.7, 0.62, 0.5)]
 	_fill_houses(Rect2(Vector2(30, 40), Vector2(196, 180)), colors)
 	forests = [
@@ -200,7 +222,7 @@ func _design_town() -> void:
 func _design_jungle() -> void:
 	markers = {
 		"Generator1": Vector2(50, 87), "Generator2": Vector2(210, 111), "Generator3": Vector2(154, 56),
-		"Cache1": Vector2(114, 162), "Cache2": Vector2(86, 196), "Cache3": Vector2(75, 62), "Cache4": Vector2(196, 196),
+		"Cache1": Vector2(114, 162), "Cache2": Vector2(86, 196), "Cache3": Vector2(82, 56), "Cache4": Vector2(196, 196),
 		"Choke_RopeBridge": Vector2(128, 126), "Choke_TempleSouthRamp": Vector2(152, 92),
 		"Arena_Clearing": Vector2(114, 162), "Arena_Temple": Vector2(154, 56),
 	}
@@ -208,19 +230,19 @@ func _design_jungle() -> void:
 	coast_waves = [[10.0, 2, 0.8], [6.0, 4, 2.1], [3.0, 7, 0.5]]
 	palette["grass"] = Color(0.28, 0.45, 0.22)
 	palette["dirt"] = Color(0.42, 0.33, 0.22)
-	hills = [[Vector2(75, 62), 20.0, 8.0], [Vector2(196, 196), 18.0, 6.0], [Vector2(62, 188), 14.0, 4.0]]
+	hills = [[Vector2(82, 56), 18.0, 7.0], [Vector2(196, 196), 18.0, 6.0], [Vector2(62, 188), 14.0, 4.0]]
 	plateaus = [[Vector2(152, 58), 22.0, 6.0, [PI, PI * 0.5]]]
 	rivers = [[_line([Vector2(0, 108), Vector2(55, 117), Vector2(100, 112), Vector2(128, 126), Vector2(170, 138), Vector2(205, 146), Vector2(256, 160)]), 12.0]]
 	crossings = [[Vector2(128, 126), 2.5, "bridge"], [Vector2(55, 117), 7.0, "ford"], [Vector2(205, 146), 7.0, "ford"]]
 	paths = [
-		[_line([Vector2(128, 222), Vector2(120, 186), Vector2(126, 160), Vector2(128, 126), Vector2(134, 104), Vector2(152, 92)]), 5.0],
+		[_line([Vector2(128, 214), Vector2(120, 186), Vector2(126, 160), Vector2(128, 126), Vector2(134, 104), Vector2(152, 92), Vector2(152, 78)]), 5.0],
 		[_line([Vector2(120, 186), Vector2(84, 166), Vector2(56, 140), Vector2(55, 117), Vector2(50, 88)]), 5.0],
 		[_line([Vector2(126, 160), Vector2(172, 166), Vector2(205, 160), Vector2(205, 146), Vector2(210, 112)]), 5.0],
-		[_line([Vector2(50, 88), Vector2(90, 60), Vector2(124, 58)]), 4.0],
+		[_line([Vector2(50, 88), Vector2(90, 60), Vector2(134, 58)]), 4.0],
 		[_line([Vector2(210, 112), Vector2(196, 90), Vector2(166, 86)]), 4.0],
 	]
 	plazas = [Rect2(Vector2(98, 150), Vector2(32, 24)), Rect2(Vector2(38, 76), Vector2(24, 22)), Rect2(Vector2(198, 100), Vector2(24, 22))]
-	for r in [[Rect2(Vector2(140, 44), Vector2(6, 6)), 4.0], [Rect2(Vector2(162, 48), Vector2(5, 9)), 3.0], [Rect2(Vector2(146, 70), Vector2(10, 4)), 2.5], [Rect2(Vector2(166, 66), Vector2(4, 4)), 3.5]]:
+	for r in [[Rect2(Vector2(136, 48), Vector2(6, 6)), 4.0], [Rect2(Vector2(155, 63), Vector2(5, 9)), 3.0], [Rect2(Vector2(138, 66), Vector2(10, 4)), 2.5], [Rect2(Vector2(166, 66), Vector2(4, 4)), 3.5]]:
 		buildings.append([r[0], r[1], Color(0.5, 0.52, 0.45), "ruin"])
 	var trees: Array = ["CommonTree_1", "CommonTree_2", "CommonTree_4", "CommonTree_5", "Pine_1", "Pine_3"]
 	forests = [
@@ -241,7 +263,7 @@ func _design_port() -> void:
 	markers = {
 		"Generator1": Vector2(50, 124), "Generator2": Vector2(214, 124), "Generator3": Vector2(96, 44),
 		"Cache1": Vector2(62, 196), "Cache2": Vector2(166, 86), "Cache3": Vector2(176, 200), "Cache4": Vector2(128, 124),
-		"Choke_SwingBridge": Vector2(70, 162), "Choke_WarehouseGap": Vector2(77, 63),
+		"Choke_SwingBridge": Vector2(70, 162), "Choke_WarehouseGap": Vector2(84, 74),
 		"Arena_Quay": Vector2(170, 196), "Arena_Crossing": Vector2(128, 142),
 	}
 	coast_r0 = 108.0
@@ -251,18 +273,18 @@ func _design_port() -> void:
 	rivers = [[_line([Vector2(0, 162), Vector2(104, 162)]), 14.0]]
 	crossings = [[Vector2(70, 162), 2.5, "bridge"]]
 	paths = [
-		[_line([Vector2(128, 230), Vector2(128, 40)]), 10.0],
+		[_line([Vector2(128, 226), Vector2(128, 40)]), 10.0],
 		[_line([Vector2(40, 104), Vector2(216, 104)]), 8.0],
 		[_line([Vector2(40, 142), Vector2(216, 142)]), 8.0],
 		[_line([Vector2(70, 142), Vector2(70, 190), Vector2(122, 196)]), 5.0],
 	]
-	for x in [44, 80, 146, 182]:
-		buildings.append([Rect2(Vector2(x, 54), Vector2(30, 18)), 9.0, Color(0.55, 0.5, 0.45), "warehouse"])
+	for x in [56, 86, 144, 174]:
+		buildings.append([Rect2(Vector2(x, 66), Vector2(26, 16)), 9.0, Color(0.55, 0.5, 0.45), "warehouse"])
 	var paints: Array = [Color(0.75, 0.25, 0.15), Color(0.2, 0.4, 0.7), Color(0.85, 0.6, 0.15), Color(0.25, 0.55, 0.3)]
 	_containers(Rect2(Vector2(36, 110), Vector2(184, 28)), paints)
 	_containers(Rect2(Vector2(136, 150), Vector2(80, 16)), paints)
-	for x in [40, 88]:
-		buildings.append([Rect2(Vector2(x, 176), Vector2(14, 10)), 5.0, Color(0.6, 0.58, 0.55), "shed"])
+	for x in [52, 88]:
+		buildings.append([Rect2(Vector2(x, 173), Vector2(12, 10)), 5.0, Color(0.6, 0.58, 0.55), "shed"])
 	forests = [[Vector2(36, 128), 10.0, 6, ["CommonTree_2"], 6.0, 6.0], [Vector2(222, 140), 10.0, 6, ["CommonTree_4"], 6.0, 6.0]]
 	rock_count = 6
 	cover = [["Grass_Common_Short", 300, 0.4], ["Pebble_Square_2", 300, 0.3]]
@@ -292,12 +314,11 @@ func _fill_houses(area: Rect2, colors: Array) -> void:
 
 
 func _lot_free(r: Rect2) -> bool:
-	for corner in [r.position, r.end, Vector2(r.position.x, r.end.y), Vector2(r.end.x, r.position.y), r.get_center()]:
-		if _inland(corner.x, corner.y) < 10.0 or _path_distance(corner) < 1.5:
+	# Every cell of the lot, not just its corners: a wavy coast can cut in
+	# between them. +1.5 m for the roof overhang (the grid footprint).
+	for p in _points_in(r):
+		if _inland(p.x, p.y) < COAST_CLEAR["building"] + 1.5 or _path_distance(p) < 1.5 or _river_distance(p) < 5.0:
 			return false
-		for rv in rivers:
-			if _line_distance(corner, rv[0]) < rv[1] * 0.5 + 5.0:
-				return false
 	for path in paths:
 		var pts: PackedVector2Array = path[0]
 		for i in pts.size() - 1:
@@ -336,6 +357,80 @@ func _containers(area: Rect2, paints: Array) -> void:
 				buildings.append([r, 2.6 * _rng.randi_range(1, 3), paints[_rng.randi() % paints.size()], "containers"])
 			x += 12.0 + (3.5 if _rng.randf() < 0.35 else 0.5)
 		z += 9.5
+
+
+## The paths as they are drawn: straight over each bridge (in line with the
+## deck) and with rounded corners. Runs once after the design and before
+## sculpting, so the terrain, the paint, the clearances and the road meshes
+## all follow the same lines.
+func _prepare_paths() -> void:
+	for path in paths:
+		var pts: PackedVector2Array = path[0]
+		for ci in crossings.size():
+			if crossings[ci][2] == "bridge":
+				pts = _through_bridge(pts, ci, path[1])
+		path[0] = _rounded(pts, path[1])
+
+
+## `pts` with a straight run over bridge `ci` when the path crosses it: the
+## crossing centre plus a point on each side, far enough that the rounded
+## corners start beyond the deck.
+func _through_bridge(pts: PackedVector2Array, ci: int, width: float) -> PackedVector2Array:
+	var c: Vector2 = crossings[ci][0]
+	for i in pts.size() - 1:
+		var q: Vector2 = Geometry2D.get_closest_point_to_segment(c, pts[i], pts[i + 1])
+		if q.distance_to(c) > 2.0:
+			continue
+		var across: Vector2 = _river_dir(c).orthogonal()
+		if across.dot(pts[i + 1] - pts[i]) < 0.0:
+			across = -across
+		var k: float = _deck_half_length(c) + 2.0 + minf(width * 1.5, MAX_CORNER_CUT)
+		# Points closer to the bridge than k are replaced by the straight run.
+		var out := PackedVector2Array()
+		for j in i + 1:
+			if pts[j].distance_to(c) > k:
+				out.append(pts[j])
+		out.append_array([c - across * k, c, c + across * k])
+		for j in range(i + 1, pts.size()):
+			if pts[j].distance_to(c) > k:
+				out.append(pts[j])
+		return out
+	return pts
+
+
+## Corners replaced by short curves (quadratic Bézier from the corner's
+## neighbours), at most MAX_CORNER_CUT or 45 % of a segment from the corner.
+func _rounded(pts: PackedVector2Array, width: float) -> PackedVector2Array:
+	if pts.size() < 3:
+		return pts
+	var out := PackedVector2Array([pts[0]])
+	for i in range(1, pts.size() - 1):
+		var a: Vector2 = pts[i - 1]
+		var b: Vector2 = pts[i]
+		var c: Vector2 = pts[i + 1]
+		var turn: float = absf((b - a).angle_to(c - b))
+		if turn < 0.05:
+			out.append(b)
+			continue
+		var t: float = minf(minf(width * 1.5, MAX_CORNER_CUT), 0.45 * minf(a.distance_to(b), b.distance_to(c)))
+		var p1: Vector2 = b + (a - b).normalized() * t
+		var p2: Vector2 = b + (c - b).normalized() * t
+		var steps: int = maxi(3, ceili(turn / deg_to_rad(12.0)))
+		for k in steps + 1:
+			var f: float = float(k) / steps
+			out.append(p1.lerp(b, f).lerp(b.lerp(p2, f), f))
+	out.append(pts[pts.size() - 1])
+	return out
+
+
+## Points along `pts` at most `step` metres apart (the corners kept).
+func _resample(pts: PackedVector2Array, step: float) -> PackedVector2Array:
+	var out := PackedVector2Array([pts[0]])
+	for i in pts.size() - 1:
+		var n: int = maxi(1, ceili(pts[i].distance_to(pts[i + 1]) / step))
+		for k in range(1, n + 1):
+			out.append(pts[i].lerp(pts[i + 1], float(k) / n))
+	return out
 
 
 # ---------------------------------------------------------------- terrain
@@ -386,36 +481,45 @@ func _sculpt() -> void:
 			for hill in hills:
 				var d: float = Vector2(x, z).distance_to(hill[0])
 				h += hill[2] * exp(-d * d / (hill[1] * hill[1] * 0.5)) * smoothstep(0.0, 10.0, t)
-			for pl in plateaus:
-				h = maxf(h, _plateau(pl, Vector2(x, z), h))
+			if t > 1.0:  # a plateau at the shore ends in a sea cliff
+				for pl in plateaus:
+					h = maxf(h, _plateau(pl, Vector2(x, z), h))
 			h += _ridge_height(Vector2(x, z)) * smoothstep(0.0, 6.0, t)
 			_h[z * N + x] = h
-	# Paths: smooth the ground along them (a road never has bumps).
+	# Paths: smooth the ground along them (a road never has bumps). Reads an
+	# unchanged copy, so the result does not depend on the scan order.
+	var src: PackedFloat32Array = _h.duplicate()
 	for z in N:
 		for x in N:
 			var pd: float = _path_distance(Vector2(x, z))
-			if pd < 2.0 and _h[z * N + x] > 0.0:
-				_h[z * N + x] = lerpf(_h[z * N + x], _smoothed(x, z, 3), clampf(1.0 - pd / 2.0, 0.0, 1.0))
-	# Building plots and plazas: flat at their mean height, blended at the rim.
+			if pd < 2.0 and src[z * N + x] > 0.0:
+				_h[z * N + x] = lerpf(src[z * N + x], _smoothed(src, x, z, 3), clampf(1.0 - pd / 2.0, 0.0, 1.0))
+	# Plazas, then building plots (so a plot on a plaza stays exactly flat):
+	# flat at their mean height, blended into the ground around them. Plazas
+	# get a wide rim: one on a hillside would otherwise end in a steep bank.
 	var flats: Array = []
+	for r: Rect2 in plazas:
+		flats.append([r, 7.0])
 	for b in buildings:
-		flats.append(b[0])
-	flats.append_array(plazas)
-	for r: Rect2 in flats:
+		flats.append([b[0], 3.0])
+	for f in flats:
+		var r: Rect2 = f[0]
+		var rim: float = f[1]
 		var mean: float = _mean_height(r)
-		var grown: Rect2 = r.grow(3.0)
+		var grown: Rect2 = r.grow(rim)
 		for z in range(maxi(0, int(grown.position.y)), mini(N, int(grown.end.y) + 1)):
 			for x in range(maxi(0, int(grown.position.x)), mini(N, int(grown.end.x) + 1)):
 				if _inland(x, z) < 4.0:
 					continue  # plots never push land into the sea
-				var out: float = _rect_distance(r, Vector2(x, z))
-				var k: float = clampf(1.0 - out / 3.0, 0.0, 1.0)
+				var k: float = 1.0 - smoothstep(0.0, rim, _rect_distance(r, Vector2(x, z)))
 				_h[z * N + x] = lerpf(_h[z * N + x], mean, k)
-	# Rivers last: they cut through everything except the crossings.
+	# Rivers last: they cut through everything except the fords. Bridges
+	# span the water (their deck is the walkable ground, see _place_bridges).
 	for z in N:
 		for x in N:
 			var p := Vector2(x, z)
-			if _crossing_at(p) != -1:
+			var ci: int = _crossing_at(p)
+			if ci != -1 and crossings[ci][2] == "ford":
 				_h[z * N + x] = maxf(_h[z * N + x], 0.4)
 				continue
 			for rv in rivers:
@@ -435,9 +539,15 @@ func _plateau(pl: Array, p: Vector2, under: float) -> float:
 		return top
 	var dir: Vector2 = (p - centre).normalized()
 	var ramps: Array = pl[3] if pl[3] is Array else [pl[3]]
+	var run: float = pl[4] if pl.size() > 4 else 26.0
 	for ang in ramps:
-		if dir.dot(Vector2.from_angle(ang)) > 0.95 and d < r + 26.0:
-			return lerpf(top, under, smoothstep(r, r + 26.0, d))  # ramp, about 1:4
+		var dot: float = dir.dot(Vector2.from_angle(ang))
+		if dot > 0.93 and d < r + run:
+			# Ramp (26 m: about 1:4). Its sides blend over a few degrees: near
+			# the foot that is a gentle bank (no wall across the roads beside
+			# it), near the top it is still a cliff.
+			var ramp: float = lerpf(top, under, smoothstep(r, r + run, d))
+			return lerpf(under, ramp, smoothstep(0.93, 0.97, dot))
 	if d < r + 1.2:
 		return lerpf(top, under, (d - r) / 1.2)  # cliff
 	return -INF
@@ -487,21 +597,21 @@ func _ridge_height(p: Vector2) -> float:
 			continue
 		var gap: bool = false
 		for g: Vector2 in rd[3]:
-			if p.distance_to(g) < 5.0:
+			if p.distance_to(g) < GAP_RADIUS:
 				gap = true
 		if not gap:
 			out = maxf(out, rd[2] if d <= 0.0 else lerpf(rd[2], 0.0, d / 1.2))
 	return out
 
 
-func _smoothed(x: int, z: int, k: int) -> float:
+func _smoothed(src: PackedFloat32Array, x: int, z: int, k: int) -> float:
 	var s: float = 0.0
 	var n: int = 0
 	for dz in range(-k, k + 1):
 		for dx in range(-k, k + 1):
 			var xx: int = clampi(x + dx, 0, N - 1)
 			var zz: int = clampi(z + dz, 0, N - 1)
-			s += _h[zz * N + xx]
+			s += src[zz * N + xx]
 			n += 1
 	return s / n
 
@@ -555,12 +665,14 @@ func _colour(x: int, z: int) -> Color:
 	if _slope(x, z) > 0.6:
 		c = palette["cliff"]
 	var ci: int = _crossing_at(Vector2(x, z))
-	if ci != -1:
+	if ci != -1 and crossings[ci][2] == "ford":
 		c = palette["dirt"]
 	var pd: float = _path_distance(Vector2(x, z))
 	if pd < 0.0:
 		c = palette["paved"] if biome in [&"town", &"port"] else palette["dirt"]
-	elif pd < 1.5:
+	elif biome == &"town" and pd < SIDEWALK:
+		c = palette["paved"]
+	elif biome in [&"beach", &"jungle"] and pd < 1.5:
 		c = c.lerp(palette["dirt"], 0.5)
 	return c.darkened(_rng.randf() * 0.05)
 
@@ -587,13 +699,14 @@ func _build_scene() -> void:
 	DirAccess.make_dir_recursive_absolute(dir)
 	data.call("save_directory", dir)
 	_terrain.set("data_directory", dir)
-	for group in ["Buildings", "Trees", "Rocks", "Decor", "Markers"]:
+	for group in ["Buildings", "Trees", "Rocks", "Bridges", "Decor", "Markers"]:
 		var n := Node3D.new()
 		n.name = group
 		_root.add_child(n)
 		n.owner = _root
 	_place_sea()
 	_place_bridges()
+	_place_roads()
 	_place_buildings()
 	var taken: Array[Vector2] = []
 	for m: String in markers:
@@ -618,57 +731,45 @@ func _build_scene() -> void:
 	for b in map.field.blocked:
 		open += 1 if b == 0 else 0
 	print("%s: %s, walkable %d, buildings %d, trees %d, problems %s" % [name, error_string(err), open, map.buildings.size(), map.trees.size(), problems])
+	_failed = _failed or err != OK or not problems.is_empty()
 	_check_routes(map)
 	_audit()
 
 
-## Objects in odd places: in water, on roads or bridges, in squares, on
-## cliffs, or buildings on uneven ground (one side floats, the other sinks).
-## Prints every offender; the goal is zero.
+## Objects in odd places: in water or rivers, on roads or bridges, in
+## squares, on cliffs, or buildings on uneven ground (one side floats, the
+## other sinks). Uses the same rules as placement (_spot_problem) on what is
+## really in the scene: footprints as the grid sees them, tree trunks, and
+## every tuft of ground cover. Prints every offender; the goal is zero.
 func _audit() -> void:
 	var issues: Dictionary = {}
 	for group in ["Buildings", "Rocks", "Trees"]:
-		for node in _root.get_node(group).get_children():
-			var cells: Array[Vector2i] = []
+		for node: Node3D in _root.get_node(group).get_children():
+			var pts: PackedVector2Array
+			var kind: String = {"Buildings": "building", "Rocks": "rock", "Trees": "tree"}[group]
 			if group == "Trees":
-				cells.append(Vector2i(floori(node.position.x), floori(node.position.z)))
+				var p := Vector2(node.position.x, node.position.z)
+				pts = _points_in(Rect2(p - Vector2.ONE * 0.6, Vector2.ONE * 1.2))
 			else:
-				var r: Rect2i = _root._footprint(node)
-				for z in range(r.position.y, r.end.y):
-					for x in range(r.position.x, r.end.x):
-						cells.append(Vector2i(x, z))
-			var lo: float = INF
-			var hi: float = -INF
-			var why: Array[String] = []
-			for c in cells:
-				var p := Vector2(c.x + 0.5, c.y + 0.5)
-				var h: float = height_at(p.x, p.y)
-				lo = minf(lo, h)
-				hi = maxf(hi, h)
-				var road: float = _path_distance(p)
-				if h < 0.15 and not "water" in why:
-					why.append("water")
-				if road < (0.0 if group == "Buildings" else 1.0) and not "road" in why:
-					why.append("road")
-				if _crossing_at(p) != -1 and not "bridge" in why:
-					why.append("bridge")
-				if group != "Buildings" and _slope(c.x, c.y) > 0.5 and not "cliff" in why:
-					why.append("cliff")
-				if group != "Buildings":
-					for r: Rect2 in plazas:
-						if r.has_point(p) and biome != &"port" and not "square" in why:
-							why.append("square")
-			if group == "Buildings" and hi - lo > 0.8:
-				why.append("uneven ground %.1f m" % (hi - lo))
-			for w in why:
-				var key: String = w.get_slice(" ", 0)
-				if not issues.has(key):
-					issues[key] = []
-				issues[key].append("%s (%d, %d)" % [node.name, int(node.position.x), int(node.position.z)])
+				pts = _footprint_points(node)
+			_note(issues, _spot_problem(pts, kind), "%s (%d, %d)" % [node.name, int(node.position.x), int(node.position.z)])
+	# MultiMesh transforms are not kept without a GPU: read the spots placed.
+	for spot in _cover_spots:
+		_note(issues, _cover_problem(spot[1]), "%s (%d, %d)" % [spot[0], int(spot[1].x), int(spot[1].y)])
+	_audit_roads(issues)
+	_failed = _failed or not issues.is_empty()
 	if issues.is_empty():
 		print("  audit: no objects in odd places")
 	for k: String in issues:
 		print("  audit %s: %d -> %s" % [k, issues[k].size(), ", ".join(issues[k].slice(0, 6))])
+
+
+func _note(issues: Dictionary, why: String, what: String) -> void:
+	if why == "":
+		return
+	if not issues.has(why):
+		issues[why] = []
+	issues[why].append(what)
 
 
 ## Every goal must stay reachable when any one choke point is closed:
@@ -676,15 +777,17 @@ func _audit() -> void:
 func _check_routes(map: IslandMap) -> void:
 	var goals: Array[Vector3] = [map.boat]
 	goals.append_array(map.generators)
+	goals.append_array(map.caches)
 	for m: String in markers:
 		if not m.begins_with("Choke_"):
 			continue
 		var f := FlowField.new(map.field.width, map.field.height)
 		f.blocked = map.field.blocked.duplicate()
 		var c: Vector2 = markers[m]
-		for z in range(int(c.y) - 6, int(c.y) + 7):
-			for x in range(int(c.x) - 6, int(c.x) + 7):
-				if x >= 0 and z >= 0 and x < N and z < N and Vector2(x, z).distance_to(c) <= 6.0:
+		var k: int = ceili(CHOKE_CLOSE_RADIUS)
+		for z in range(int(c.y) - k, int(c.y) + k + 1):
+			for x in range(int(c.x) - k, int(c.x) + k + 1):
+				if x >= 0 and z >= 0 and x < N and z < N and Vector2(x, z).distance_to(c) <= CHOKE_CLOSE_RADIUS:
 					f.blocked[z * N + x] = 1
 		f.compute_now(f.world_to_cell(map.player_start))
 		var cut: Array[String] = []
@@ -692,6 +795,7 @@ func _check_routes(map: IslandMap) -> void:
 			if f.distance_at(g) >= FlowField.UNREACHABLE:
 				cut.append("(%d, %d)" % [int(g.x), int(g.z)])
 		print("  %s closed: %s" % [m, "every goal still reachable" if cut.is_empty() else "CUT OFF " + ", ".join(cut)])
+		_failed = _failed or not cut.is_empty()
 
 
 func _add(n: Node, group: String) -> void:
@@ -713,24 +817,225 @@ func _place_sea() -> void:
 	_add(sea, "Decor")
 
 
-## Wooden decks over the bridge crossings (decoration: the crossing itself is
-## land on the grid).
+## Wooden bridges over the rivers: a deck from bank to bank (sloping when
+## the banks differ in height) with a rail on each side. The deck is the
+## walkable ground there: HandmadeIsland reads the Bridges group.
 func _place_bridges() -> void:
 	var n: int = 0
 	for cr in crossings:
 		if cr[2] != "bridge":
 			continue
-		var along: Vector2 = _river_dir(cr[0])
+		var c: Vector2 = cr[0]
+		var along: Vector2 = _river_dir(c)
+		var across := Vector2(-along.y, along.x)
+		var half: float = _deck_half_length(c)
+		var ha: float = height_at(c.x - across.x * half, c.y - across.y * half)
+		var hb: float = height_at(c.x + across.x * half, c.y + across.y * half)
 		n += 1
 		var deck := MeshInstance3D.new()
 		deck.name = "Bridge_%d" % n
+		var span := Vector3(across.x * half * 2.0, hb - ha, across.y * half * 2.0)  # bank to bank
 		var bm := BoxMesh.new()
-		bm.size = Vector3(cr[1] * 2.0, 0.3, 22.0)  # across the river (local Z)
+		bm.size = Vector3(cr[1] * 2.0, DECK_THICKNESS, span.length())  # local X along the river, Z across
 		deck.mesh = bm
 		deck.material_override = _mat(Color(0.45, 0.32, 0.2))
-		deck.position = Vector3(cr[0].x, 0.45, cr[0].y)
-		deck.rotation.y = -along.angle()
-		_add(deck, "Decor")
+		var x_axis := Vector3(along.x, 0.0, along.y)
+		var z_axis: Vector3 = span.normalized()
+		deck.basis = Basis(x_axis, z_axis.cross(x_axis), z_axis)
+		# Top surface level with the ground at both ends (5 cm above it).
+		deck.position = Vector3(c.x, (ha + hb) * 0.5 + 0.05, c.y) - deck.basis.y * DECK_THICKNESS * 0.5
+		_add(deck, "Bridges")
+		for side in [-1.0, 1.0]:
+			var rail := MeshInstance3D.new()
+			rail.name = "Rail_%s" % ("L" if side < 0.0 else "R")
+			var rm := BoxMesh.new()
+			rm.size = Vector3(0.15, 0.9, span.length())
+			rail.mesh = rm
+			rail.material_override = _mat(Color(0.35, 0.24, 0.15))
+			rail.position = Vector3(side * (cr[1] - 0.1), DECK_THICKNESS * 0.5 + 0.45, 0.0)
+			deck.add_child(rail)
+			rail.owner = _root
+
+
+## Half the length of the bridge at crossing `c`: the river, its 3 m banks and
+## 1 m on solid ground at each end.
+func _deck_half_length(c: Vector2) -> float:
+	return _river_width(c) * 0.5 + 4.0
+
+
+func _river_width(c: Vector2) -> float:
+	var best: float = INF
+	var width: float = 0.0
+	for rv in rivers:
+		var d: float = _line_distance(c, rv[0])
+		if d < best:
+			best = d
+			width = rv[1]
+	return width
+
+
+## True when `p` is on a bridge deck (the strip the deck covers).
+func _on_bridge(p: Vector2, margin: float = 0.0) -> bool:
+	for cr in crossings:
+		if cr[2] != "bridge":
+			continue
+		var along: Vector2 = _river_dir(cr[0])
+		var d: Vector2 = p - cr[0]
+		if absf(d.dot(along)) <= cr[1] + margin and absf(d.dot(along.orthogonal())) <= _deck_half_length(cr[0]) + margin:
+			return true
+	return false
+
+
+## Road surfaces: a ribbon mesh along every path, draped on the terrain at
+## the path's width with sharp edges (the terrain paint is only 1 m per
+## pixel). Town streets get sidewalks and the town and port main roads a
+## dashed centre line; beach and jungle get dirt tracks. Where two roads
+## meet, the later one stops just inside the earlier one, and asphalt sits
+## above the sidewalks, so no two surfaces fight at the same height.
+## Decoration only (Decor/Roads): the grid ignores it.
+func _place_roads() -> void:
+	var town: bool = biome == &"town"
+	var urban: bool = biome in [&"town", &"port"]
+	var road := SurfaceTool.new()
+	var walk := SurfaceTool.new()
+	var line := SurfaceTool.new()
+	for st: SurfaceTool in [road, walk, line]:
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in paths.size():
+		var w: float = paths[i][1]
+		var pts: PackedVector2Array = _resample(paths[i][0], 1.0)
+		var stagger: float = 0.002 * i  # later roads a hair lower: the earlier one shows on top
+		_ribbon(road, pts, -w * 0.5, w * 0.5, ROAD_LIFT - stagger, func(p: Vector2) -> bool: return _road_hidden(p, i, -1.0, true), func(p: Vector2) -> float: return _bridge_taper(p, w))
+		if town:
+			for side in [-1.0, 1.0]:
+				var inner: float = side * (w * 0.5 - 0.2)  # tucked 0.2 m under the asphalt
+				var outer: float = side * (w * 0.5 + SIDEWALK)
+				_ribbon(walk, pts, minf(inner, outer), maxf(inner, outer), WALK_LIFT - stagger, func(p: Vector2) -> bool: return _on_bridge(p, 4.0) or _steep(p) or _road_hidden(p, i, 0.0, false))
+		if urban and w >= 8.0:
+			# Dashes: 2 m painted, 3 m gap; none across junctions.
+			var dash := PackedVector2Array()
+			for k in pts.size():
+				if k % 5 < 3:
+					dash.append(pts[k])
+				elif dash.size() > 1:
+					_ribbon(line, dash, -0.1, 0.1, ROAD_LIFT + 0.01, func(p: Vector2) -> bool: return _road_hidden(p, i, 1.0, false))
+					dash.clear()
+				else:
+					dash.clear()
+	var looks: Dictionary = {
+		&"beach": Color(0.68, 0.58, 0.4), &"jungle": Color(0.37, 0.28, 0.18),
+		&"town": Color(0.25, 0.25, 0.27), &"port": Color(0.33, 0.33, 0.34),
+	}
+	_add_roads_mesh(road, "Surface", looks.get(biome, palette["dirt"]))
+	_add_roads_mesh(walk, "Sidewalks", Color(0.62, 0.6, 0.56))
+	_add_roads_mesh(line, "Markings", Color(0.92, 0.9, 0.82))
+
+
+## Adds a strip along `pts` between the side offsets `left` and `right`
+## (metres from the centre line, negative = left), draped on the terrain
+## `lift` above it, one vertex per metre along and across (so it follows the
+## ground). Samples where `hidden` returns true for the strip's middle are
+## left out: the strip breaks there. `taper` (optional) scales the offsets
+## at each sample (a wide street narrowing onto a bridge).
+func _ribbon(st: SurfaceTool, pts: PackedVector2Array, left: float, right: float, lift: float, hidden: Callable, taper: Callable = Callable()) -> void:
+	var cols: int = maxi(1, ceili(right - left))
+	var prev := PackedVector3Array()
+	for k in pts.size():
+		var t: Vector2 = (pts[mini(k + 1, pts.size() - 1)] - pts[maxi(k - 1, 0)]).normalized()
+		var n := Vector2(-t.y, t.x)
+		if hidden.call(pts[k] + n * (left + right) * 0.5):
+			prev.clear()
+			continue
+		var f: float = taper.call(pts[k]) if taper.is_valid() else 1.0
+		var row := PackedVector3Array()
+		for j in cols + 1:
+			var q: Vector2 = pts[k] + n * lerpf(left, right, float(j) / cols) * f
+			row.append(Vector3(q.x, height_at(q.x, q.y) + lift, q.y))
+		if not prev.is_empty():
+			for j in cols:
+				# Clockwise seen from above: Godot's front faces.
+				for v: Vector3 in [prev[j], row[j + 1], prev[j + 1], prev[j], row[j], row[j + 1]]:
+					st.set_normal(_ground_normal(v.x, v.z))
+					st.add_vertex(v)
+		prev = row
+
+
+## Whether a road piece of path `i` at `p` is left out: on a bridge (the deck
+## is the road there), in the water, or inside another road. `own` = true
+## only checks the roads drawn before path `i` (a road stops 1 m inside the
+## one it joins); otherwise every other road, grown by `grow` metres.
+func _road_hidden(p: Vector2, i: int, grow: float, own: bool) -> bool:
+	if _on_bridge(p) or height_at(p.x, p.y) < 0.2:
+		return true
+	for j in paths.size():
+		if j == i or (own and j > i):
+			continue
+		if _line_distance(p, paths[j][0]) < paths[j][1] * 0.5 + (-1.0 if own else grow):
+			return true
+	return false
+
+
+## True on a cliff or a ramp's side bank: a sidewalk there would climb it.
+func _steep(p: Vector2) -> bool:
+	return _slope(clampi(floori(p.x), 0, N - 1), clampi(floori(p.y), 0, N - 1)) > 0.45
+
+
+## Width factor for a road `w` metres wide at `p`: it narrows to the deck's
+## width over the last 4 m before a narrower bridge.
+func _bridge_taper(p: Vector2, w: float) -> float:
+	var f: float = 1.0
+	for cr in crossings:
+		var deck_w: float = cr[1] * 2.0
+		if cr[2] != "bridge" or w <= deck_w:
+			continue
+		var along: Vector2 = _river_dir(cr[0])
+		var d: Vector2 = p - cr[0]
+		if absf(d.dot(along)) > w:
+			continue
+		var beyond: float = absf(d.dot(along.orthogonal())) - _deck_half_length(cr[0])
+		f = minf(f, lerpf(deck_w / w, 1.0, clampf(beyond / 4.0, 0.0, 1.0)))
+	return f
+
+
+func _ground_normal(x: float, z: float) -> Vector3:
+	return Vector3(height_at(x - 0.5, z) - height_at(x + 0.5, z), 1.0, height_at(x, z - 0.5) - height_at(x, z + 0.5)).normalized()
+
+
+func _add_roads_mesh(st: SurfaceTool, name: String, colour: Color) -> void:
+	var mesh: ArrayMesh = st.commit()
+	if mesh.get_surface_count() == 0:
+		return
+	if not _root.has_node("Decor/Roads"):
+		var group := Node3D.new()
+		group.name = "Roads"
+		_add(group, "Decor")
+	var inst := MeshInstance3D.new()
+	inst.name = name
+	inst.mesh = mesh
+	inst.material_override = _mat(colour)
+	inst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_root.get_node("Decor/Roads").add_child(inst)
+	inst.owner = _root
+
+
+## Roads the player would notice are wrong: running through water (away
+## from bridges and fords) or over a cliff. Samples the centre and both
+## edges every metre.
+func _audit_roads(issues: Dictionary) -> void:
+	for i in paths.size():
+		var w: float = paths[i][1]
+		var pts: PackedVector2Array = _resample(paths[i][0], 1.0)
+		for k in pts.size():
+			var t: Vector2 = (pts[mini(k + 1, pts.size() - 1)] - pts[maxi(k - 1, 0)]).normalized()
+			for off in [-w * 0.5, 0.0, w * 0.5]:
+				var p: Vector2 = pts[k] + Vector2(-t.y, t.x) * off
+				if _on_bridge(p, w * 0.5 + 0.5) or _crossing_at(p) != -1:
+					continue  # bridges and fords; a road wider than its bridge narrows there
+				var c := Vector2i(clampi(floori(p.x), 0, N - 1), clampi(floori(p.y), 0, N - 1))
+				var why: String = "road in water" if height_at(p.x, p.y) < 0.15 else ("road on cliff" if _slope(c.x, c.y) > 0.6 else "")
+				if why != "":
+					_note(issues, why, "path %d (%d, %d)" % [i, int(p.x), int(p.y)])
+					break
 
 
 func _mat(c: Color) -> StandardMaterial3D:
@@ -798,20 +1103,76 @@ func _place_buildings() -> void:
 			spire.owner = _root
 
 
-## Free spot for a tree or rock: on land, flat enough, off paths, plazas,
-## building plots and markers, at least `spacing` from `taken`.
-func _free(p: Vector2, taken: Array[Vector2], spacing: float) -> bool:
+## Why an object of `kind` ("building", "rock", "tree", "cover") standing on
+## the ground points `pts` would look wrong, or "" when the spot is fine. The placement
+## functions and _audit() both use it, so a placed object always passes the
+## audit. Buildings may stand on squares and need flat ground (one side would
+## float, the other sink); everything else needs a gentle slope.
+func _spot_problem(pts: PackedVector2Array, kind: String) -> String:
+	var lo: float = INF
+	var hi: float = -INF
+	for p in pts:
+		var c := Vector2i(clampi(floori(p.x), 0, N - 1), clampi(floori(p.y), 0, N - 1))
+		var h: float = height_at(p.x, p.y)
+		lo = minf(lo, h)
+		hi = maxf(hi, h)
+		if h < 0.15:
+			return "water"
+		if _inland(p.x, p.y) < COAST_CLEAR[kind]:
+			return "coast"
+		if _river_distance(p) < RIVER_CLEAR[kind]:
+			return "river"
+		if _crossing_at(p) != -1:
+			return "bridge"
+		if _path_distance(p) < ROAD_CLEAR[kind]:
+			return "road"
+		if kind != "building":
+			if _in_plaza(p) and not (kind == "tree" and biome == &"port"):
+				return "square"
+			if _slope(c.x, c.y) > MAX_SLOPE[kind]:
+				return "cliff"
+	if kind == "building" and hi - lo > 0.8:
+		return "uneven"
+	if kind == "rock" and hi - lo > 0.6:
+		return "cliff"
+	return ""
+
+
+## Metres from `p` to the nearest river bank (negative in the water).
+func _river_distance(p: Vector2) -> float:
+	var best: float = INF
+	for rv in rivers:
+		best = minf(best, _line_distance(p, rv[0]) - rv[1] * 0.5)
+	return best
+
+
+func _in_plaza(p: Vector2) -> bool:
+	for r: Rect2 in plazas:
+		if r.has_point(p):
+			return true
+	return false
+
+
+## Cell centres inside `r` (at least its centre), as ground sample points.
+func _points_in(r: Rect2) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for z in range(floori(r.position.y), ceili(r.end.y)):
+		for x in range(floori(r.position.x), ceili(r.end.x)):
+			if x >= 0 and z >= 0 and x < N and z < N and r.has_point(Vector2(x + 0.5, z + 0.5)):
+				out.append(Vector2(x + 0.5, z + 0.5))
+	if out.is_empty():
+		out.append(r.get_center())
+	return out
+
+
+## Free spot for a tree or rock of radius `radius`: a clean spot (see
+## _spot_problem), off building plots and markers, at least `spacing` from
+## `taken`.
+func _free(p: Vector2, kind: String, radius: float, taken: Array[Vector2], spacing: float) -> bool:
 	if p.x < 4 or p.y < 4 or p.x > N - 5 or p.y > N - 5:
 		return false
-	if _inland(p.x, p.y) < 8.0 or _slope(int(p.x), int(p.y)) > 0.5 or height_at(p.x, p.y) < 0.2:
-		return false
-	if _path_distance(p) < 2.5:
-		return false
-	for r: Rect2 in plazas:
-		if r.grow(1.0).has_point(p) and biome not in [&"port", &"town"]:
-			return false
 	for b in buildings:
-		if (b[0] as Rect2).grow(3.0).has_point(p):
+		if (b[0] as Rect2).grow(radius + 2.0).has_point(p):
 			return false
 	for m: String in markers:
 		if p.distance_to(markers[m]) < 7.0:
@@ -819,7 +1180,8 @@ func _free(p: Vector2, taken: Array[Vector2], spacing: float) -> bool:
 	for q in taken:
 		if p.distance_squared_to(q) < spacing * spacing:
 			return false
-	return true
+	var r := Rect2(p - Vector2.ONE * radius, Vector2.ONE * radius * 2.0)
+	return _spot_problem(_points_in(r), kind) == ""
 
 
 func _place_trees(taken: Array[Vector2]) -> void:
@@ -830,7 +1192,8 @@ func _place_trees(taken: Array[Vector2]) -> void:
 		while placed < f[2] and tries < f[2] * 40:
 			tries += 1
 			var p: Vector2 = f[0] + Vector2.from_angle(_rng.randf() * TAU) * sqrt(_rng.randf()) * f[1]
-			if not _free(p, taken, f[4]):
+			p = Vector2(floorf(p.x) + 0.5, floorf(p.y) + 0.5)  # trunk on a cell centre (it blocks that cell)
+			if not _free(p, "tree", 0.6, taken, f[4]):
 				continue
 			var model: String = f[3][_rng.randi() % f[3].size()]
 			var tree: Node3D = (load(KIT + model + ".gltf") as PackedScene).instantiate()
@@ -839,7 +1202,7 @@ func _place_trees(taken: Array[Vector2]) -> void:
 			var target: float = f[5] * _rng.randf_range(0.8, 1.2)
 			tree.scale = Vector3.ONE * _model_scale(tree, target)
 			tree.rotation.y = _rng.randf() * TAU
-			tree.position = Vector3(floorf(p.x) + 0.5, height_at(p.x, p.y) - 0.1, floorf(p.y) + 0.5)
+			tree.position = Vector3(p.x, _lowest(p, 0.6) - 0.1, p.y)
 			_add(tree, "Trees")
 			taken.append(p)
 			placed += 1
@@ -851,20 +1214,31 @@ func _place_rocks(taken: Array[Vector2]) -> void:
 	while n < rock_count and tries < 4000:
 		tries += 1
 		var p := Vector2(_rng.randf_range(10, N - 10), _rng.randf_range(10, N - 10))
-		if not _free(p, taken, 10.0):
+		if not _free(p, "rock", 1.5, taken, 10.0):
 			continue
 		var rock: Node3D = (load(KIT + "Rock_Medium_%d.gltf" % _rng.randi_range(1, 3)) as PackedScene).instantiate()
-		n += 1
-		rock.name = "Rock_%02d" % n
 		rock.scale = Vector3.ONE * _model_scale(rock, _rng.randf_range(1.2, 2.0))
 		rock.rotation.y = _rng.randf() * TAU
-		rock.position = Vector3(p.x, height_at(p.x, p.y) - 0.2, p.y)
+		rock.position = Vector3(p.x, 0.0, p.y)
 		_add(rock, "Rocks")
+		# Check the real footprint (what the grid and the audit see), not a guess.
+		var cells: PackedVector2Array = _footprint_points(rock)
+		if _spot_problem(cells, "rock") != "":
+			rock.get_parent().remove_child(rock)
+			rock.free()
+			continue
+		var lo: float = INF
+		for c in cells:
+			lo = minf(lo, height_at(c.x, c.y))
+		rock.position.y = lo - 0.2  # sunk to its lowest corner: never floats
+		n += 1
+		rock.name = "Rock_%02d" % n
 		taken.append(p)
 
 
 ## Ground cover: one MultiMesh per model (cheap, never blocks).
 func _place_cover() -> void:
+	_cover_spots.clear()
 	for c in cover:
 		var m: Mesh = NatureKit.mesh(c[0])
 		if m == null:
@@ -877,18 +1251,14 @@ func _place_cover() -> void:
 		while xf.size() < c[1] and tries < c[1] * 10:
 			tries += 1
 			var p := Vector2(_rng.randf_range(4, N - 4), _rng.randf_range(4, N - 4))
-			if _inland(p.x, p.y) < 3.0 or _path_distance(p) < 0.5 or height_at(p.x, p.y) < 0.1:
-				continue
-			var blocked: bool = false
+			var blocked: bool = _cover_problem(p) != ""
 			for b in buildings:
 				if (b[0] as Rect2).grow(0.5).has_point(p):
 					blocked = true
 					break
-			for r: Rect2 in plazas:
-				if r.has_point(p) and biome in [&"town", &"port"]:
-					blocked = true
 			if blocked:
 				continue
+			_cover_spots.append([c[0], p])
 			var s: float = NatureKit.scale_for(m, c[2]) * _rng.randf_range(0.7, 1.3)
 			xf.append(Transform3D(Basis(Vector3.UP, _rng.randf() * TAU).scaled(Vector3.ONE * s), Vector3(p.x, height_at(p.x, p.y) - 0.05, p.y)))
 		mm.instance_count = xf.size()
@@ -898,6 +1268,30 @@ func _place_cover() -> void:
 		inst.name = "Cover_" + String(c[0])
 		inst.multimesh = mm
 		_add(inst, "Decor")
+
+
+## Why a tuft of ground cover at `p` would look wrong, or "".
+func _cover_problem(p: Vector2) -> String:
+	return _spot_problem(PackedVector2Array([p]), "cover")
+
+
+## Centres of the cells under `node` as the grid sees them
+## (HandmadeIsland._footprint).
+func _footprint_points(node: Node3D) -> PackedVector2Array:
+	var r: Rect2i = _root._footprint(node)
+	var out := PackedVector2Array()
+	for z in range(r.position.y, r.end.y):
+		for x in range(r.position.x, r.end.x):
+			out.append(Vector2(x + 0.5, z + 0.5))
+	return out
+
+
+## Lowest ground within `radius` of `p` (a base sunk to it never floats).
+func _lowest(p: Vector2, radius: float) -> float:
+	var lo: float = height_at(p.x, p.y)
+	for o: Vector2 in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]:
+		lo = minf(lo, height_at(p.x + o.x * radius, p.y + o.y * radius))
+	return lo
 
 
 func _model_scale(n: Node3D, target: float) -> float:

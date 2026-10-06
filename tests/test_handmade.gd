@@ -1,7 +1,9 @@
 extends SceneTree
 ## Hand-made islands: the template scene converts to a grid where the sea
 ## and cliffs block, gentle hills stay walkable, objects block their
-## footprint (trees only the trunk) and markers become the goals.
+## footprint (trees only the trunk) and markers become the goals. The four
+## route islands convert without problems, walk over their bridges (water
+## under the deck) and have road meshes.
 ## Run: godot --headless --path . --script res://tests/test_handmade.gd
 
 var _failures: int = 0
@@ -54,7 +56,33 @@ func _scene_checks() -> void:
 	_check(HandmadeIsland.pick(&"volcano", 1) == null, "no hand-made island for a biome -> generated")
 
 
+func _route_island_checks() -> void:
+	for biome in ["beach", "town", "jungle", "port"]:
+		var island: HandmadeIsland = (load(HandmadeIsland.ISLANDS_DIR + biome + "_01.tscn") as PackedScene).instantiate()
+		var problems: Array[String] = []
+		var map: IslandMap = island.build_map(problems)
+		_check(problems.is_empty(), "%s_01 has no problems %s" % [biome, problems])
+		var decks: Array[Node] = island.get_node("Bridges").get_children()
+		var ok: bool = true
+		for deck: Node3D in decks:
+			# Deck centre: walkable at the deck's height; 3 m beside it (along
+			# the river, past the rails) is water.
+			var c: Vector3 = deck.position
+			var side: Vector3 = c + deck.basis.x.normalized() * ((deck as MeshInstance3D).mesh.get_aabb().size.x * 0.5 + 3.0)
+			var cell: Vector2i = map.field.world_to_cell(c)
+			ok = ok and not map.field.is_blocked(cell.x, cell.y) and map.ground_y(c) > 0.2
+			ok = ok and map.field.is_blocked(map.field.world_to_cell(side).x, map.field.world_to_cell(side).y)
+			# Near the rail a unit stays on the deck (no sinking towards the water).
+			var rail: Vector3 = c + deck.basis.x.normalized() * ((deck as MeshInstance3D).mesh.get_aabb().size.x * 0.5 - 0.3)
+			ok = ok and absf(map.ground_y(rail) - map.ground_y(c)) < 0.2
+		var bridges: int = {"beach": 1, "town": 3, "jungle": 1, "port": 1}[biome]
+		_check(decks.size() == bridges and ok, "%s_01: %d bridge(s), walkable decks over water" % [biome, decks.size()])
+		_check(island.get_node_or_null("Decor/Roads/Surface") != null, "%s_01 has road meshes" % biome)
+		island.free()
+
+
 func _run_checks() -> void:
+	_route_island_checks()
 	var problems: Array[String] = []
 	var map: IslandMap = _island.build_map(problems)
 	var f: FlowField = map.field
