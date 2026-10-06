@@ -7,8 +7,13 @@ extends SceneTree
 ## The scenes are then ordinary editor scenes: open and tweak them by hand
 ## (re-running this script overwrites them).
 ## Run: godot --headless --path . --script res://tools/dev/build_islands.gd [-- beach town ...]
+## Experiment: add --roadgen to build the roads with the Road Generator
+## addon instead; the result goes to game/world/handmade/trials/<biome>_roadgen.tscn
+## (not used by the run).
 
 const OUT: String = "res://game/world/handmade/islands/"
+const TRIALS: String = "res://game/world/handmade/trials/"
+const RG: String = "res://addons/road-generator/nodes/"
 const KIT: String = "res://assets/models/nature_megakit/"
 const N: int = 256  ## island size = one Terrain3D region (256 m)
 const C: float = N * 0.5
@@ -55,12 +60,15 @@ var _terrain: Node3D
 var _root: HandmadeIsland
 var _frames: int = 0
 var _failed: bool = false          ## any island with problems: exit code 1
+var _roadgen: bool = false         ## --roadgen: Road Generator roads (experiment)
 var _cover_spots: Array = []       ## [model, Vector2]: every tuft placed (the audit reads it)
 
 
 func _initialize() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
-	_pending = Array(args) if not args.is_empty() else ["beach", "town", "jungle", "port"]
+	_roadgen = args.has("--roadgen")
+	var names: Array = Array(args).filter(func(a: String) -> bool: return not a.begins_with("--"))
+	_pending = names if not names.is_empty() else ["beach", "town", "jungle", "port"]
 	DirAccess.make_dir_recursive_absolute(OUT)
 	_start_next()
 
@@ -680,7 +688,9 @@ func _colour(x: int, z: int) -> Color:
 # ---------------------------------------------------------------- scene
 
 func _build_scene() -> void:
-	var name: String = "%s_01" % biome
+	var name: String = ("%s_roadgen" if _roadgen else "%s_01") % biome
+	var out: String = TRIALS if _roadgen else OUT
+	DirAccess.make_dir_recursive_absolute(out)
 	var height := Image.create_empty(N, N, false, Image.FORMAT_RF)
 	var color := Image.create_empty(N, N, false, Image.FORMAT_RGBA8)
 	for z in N:
@@ -693,7 +703,7 @@ func _build_scene() -> void:
 	_terrain.set("assets", load("res://game/world/handmade/ground_assets.res"))
 	var data: Object = _terrain.get("data")
 	data.call("import_images", [height, null, color], Vector3.ZERO, 0.0, 1.0)
-	var dir: String = OUT + name + "_data"
+	var dir: String = out + name + "_data"
 	for f in DirAccess.get_files_at(dir) if DirAccess.dir_exists_absolute(dir) else PackedStringArray():
 		DirAccess.remove_absolute(dir.path_join(f))
 	DirAccess.make_dir_recursive_absolute(dir)
@@ -723,10 +733,10 @@ func _build_scene() -> void:
 		_add(mk, "Markers")
 	var packed := PackedScene.new()
 	packed.pack(_root)
-	var err := ResourceSaver.save(packed, OUT + name + ".tscn")
+	var err := ResourceSaver.save(packed, out + name + ".tscn")
 	var problems: Array[String] = []
 	var map: IslandMap = _root.build_map(problems)
-	HandmadeIsland.grid_image(map).save_png(OUT + name + "_grid.png")
+	HandmadeIsland.grid_image(map).save_png(out + name + "_grid.png")
 	var open: int = 0
 	for b in map.field.blocked:
 		open += 1 if b == 0 else 0
@@ -905,13 +915,14 @@ func _place_roads() -> void:
 		var w: float = paths[i][1]
 		var pts: PackedVector2Array = _resample(paths[i][0], 1.0)
 		var stagger: float = 0.002 * i  # later roads a hair lower: the earlier one shows on top
-		_ribbon(road, pts, -w * 0.5, w * 0.5, ROAD_LIFT - stagger, func(p: Vector2) -> bool: return _road_hidden(p, i, -1.0, true), func(p: Vector2) -> float: return _bridge_taper(p, w))
+		if not _roadgen:
+			_ribbon(road, pts, -w * 0.5, w * 0.5, ROAD_LIFT - stagger, func(p: Vector2) -> bool: return _road_hidden(p, i, -1.0, true), func(p: Vector2) -> float: return _bridge_taper(p, w))
 		if town:
 			for side in [-1.0, 1.0]:
 				var inner: float = side * (w * 0.5 - 0.2)  # tucked 0.2 m under the asphalt
 				var outer: float = side * (w * 0.5 + SIDEWALK)
 				_ribbon(walk, pts, minf(inner, outer), maxf(inner, outer), WALK_LIFT - stagger, func(p: Vector2) -> bool: return _on_bridge(p, 4.0) or _steep(p) or _road_hidden(p, i, 0.0, false))
-		if urban and w >= 8.0:
+		if urban and w >= 8.0 and not _roadgen:
 			# Dashes: 2 m painted, 3 m gap; none across junctions.
 			var dash := PackedVector2Array()
 			for k in pts.size():
@@ -929,6 +940,141 @@ func _place_roads() -> void:
 	_add_roads_mesh(road, "Surface", looks.get(biome, palette["dirt"]))
 	_add_roads_mesh(walk, "Sidewalks", Color(0.62, 0.6, 0.56))
 	_add_roads_mesh(line, "Markings", Color(0.92, 0.9, 0.82))
+	if _roadgen:
+		_place_roadgen()
+
+
+## Experiment (--roadgen): the roads with the Road Generator addon. Every
+## path is cut where it meets another; each junction becomes a
+## RoadIntersection and each piece between junctions a chain of RoadPoints
+## (one every ~8 m, at the terrain height). Bridges also cut the chains: the
+## deck is the road there. The addon draws asphalt, lanes and shoulders.
+func _place_roadgen() -> void:
+	var manager := Node3D.new()
+	manager.set_script(load(RG + "road_manager.gd"))
+	manager.name = "RoadNetwork"
+	_add(manager, "Decor")
+	var container := Node3D.new()
+	container.set_script(load(RG + "road_container.gd"))
+	container.name = "Streets"
+	container.set("flatten_terrain", false)  # the builder already shaped the ground
+	manager.add_child(container)
+	container.owner = _root
+	# Junctions: a path end on another path (T) or two paths crossing (X).
+	var junctions: Array = []  # [Vector2 centre, radius]
+	for i in paths.size():
+		var pts: PackedVector2Array = paths[i][0]
+		for j in paths.size():
+			if j == i:
+				continue
+			var other: PackedVector2Array = paths[j][0]
+			for end: Vector2 in [pts[0], pts[pts.size() - 1]]:
+				var q: Vector2 = _closest_on(end, other)
+				if end.distance_to(q) < paths[j][1] * 0.5 + 0.5:
+					_merge_junction(junctions, q, maxf(paths[i][1], paths[j][1]))
+			if j > i:
+				for a in pts.size() - 1:
+					for b in other.size() - 1:
+						var x: Variant = Geometry2D.segment_intersects_segment(pts[a], pts[a + 1], other[b], other[b + 1])
+						if x != null:
+							_merge_junction(junctions, x, maxf(paths[i][1], paths[j][1]))
+	var nodes: Array[Node3D] = []
+	for k in junctions.size():
+		var c: Vector2 = junctions[k][0]
+		var ix := Node3D.new()
+		ix.set_script(load(RG + "road_intersection.gd"))
+		ix.name = "Junction_%02d" % k
+		ix.position = Vector3(c.x, height_at(c.x, c.y) + 0.08, c.y)
+		container.add_child(ix)
+		ix.owner = _root
+		nodes.append(ix)
+	# Chains: runs of samples off junctions, bridges and water.
+	var n: int = 0
+	for i in paths.size():
+		var w: float = paths[i][1]
+		var pts: PackedVector2Array = _resample(paths[i][0], 1.0)
+		var run := PackedVector2Array()
+		var start_j: int = -1
+		for k in pts.size() + 1:
+			var p: Vector2 = pts[mini(k, pts.size() - 1)]
+			var j: int = _junction_at(junctions, p)
+			var stop: bool = k == pts.size() or j != -1 or _on_bridge(p) or height_at(p.x, p.y) < 0.2
+			if not stop:
+				if run.is_empty():
+					start_j = _junction_at(junctions, pts[maxi(k - 1, 0)], 1.5)
+				run.append(p)
+				continue
+			if run.size() >= 3:
+				n += 1
+				_roadgen_chain(container, run, w, "Road_%02d" % n,
+					nodes[start_j] if start_j != -1 else null, nodes[j] if j != -1 else null)
+			run = PackedVector2Array()
+
+
+## RoadPoints along `run` (one every ~8 m), connected in order, the ends
+## joined to the junctions `from` / `to` when given.
+func _roadgen_chain(container: Node3D, run: PackedVector2Array, w: float, name: String, from: Node3D, to: Node3D) -> void:
+	var count: int = maxi(2, ceili(run.size() / 8.0) + 1)
+	var rps: Array[Node3D] = []
+	var shoulder: float = 0.8
+	for k in count:
+		var idx: int = roundi(float(k) / (count - 1) * (run.size() - 1))
+		var p: Vector2 = run[idx]
+		var a: Vector2 = run[maxi(idx - 1, 0)]
+		var b: Vector2 = run[mini(idx + 1, run.size() - 1)]
+		var dir := Vector3(b.x - a.x, 0.0, b.y - a.y).normalized()
+		var rp := Node3D.new()
+		rp.set_script(load(RG + "road_point.gd"))
+		rp.name = "%s_%02d" % [name, k]
+		rp.set("auto_lanes", false)
+		var dirs: Array[int] = [2, 1]  # one lane each way (REVERSE, FORWARD)
+		var types: Array[int] = [5, 5]  # TWO_WAY: white edge line, yellow centre
+		rp.set("traffic_dir", dirs)
+		rp.set("lanes", types)
+		rp.set("lane_width", (w - shoulder * 2.0) * 0.5)
+		rp.set("shoulder_width_l", shoulder)
+		rp.set("shoulder_width_r", shoulder)
+		rp.set("gutter_profile", Vector2(0.4, -0.12))
+		rp.transform = Transform3D(Basis.looking_at(-dir, Vector3.UP), Vector3(p.x, height_at(p.x, p.y) + 0.08, p.y))
+		var span: float = run.size() / float(count - 1) * 0.4
+		rp.set("prior_mag", span)
+		rp.set("next_mag", span)
+		container.add_child(rp)
+		rp.owner = _root
+		rps.append(rp)
+	for k in rps.size() - 1:
+		rps[k].call("connect_roadpoint", 0, rps[k + 1], 1)  # NEXT -> PRIOR
+	if from != null:
+		from.call("add_branch", rps[0])
+	if to != null:
+		to.call("add_branch", rps[rps.size() - 1])
+
+
+func _closest_on(p: Vector2, pts: PackedVector2Array) -> Vector2:
+	var best: Vector2 = pts[0]
+	for i in pts.size() - 1:
+		var q: Vector2 = Geometry2D.get_closest_point_to_segment(p, pts[i], pts[i + 1])
+		if q.distance_to(p) < best.distance_to(p):
+			best = q
+	return best
+
+
+## Adds a junction at `c` (radius from the widest road meeting there), or
+## merges it with one less than 4 m away.
+func _merge_junction(junctions: Array, c: Vector2, width: float) -> void:
+	for jn in junctions:
+		if (jn[0] as Vector2).distance_to(c) < 4.0:
+			jn[1] = maxf(jn[1], width * 0.5 + 2.0)
+			return
+	junctions.append([c, width * 0.5 + 2.0])
+
+
+## Index of the junction whose area covers `p` (grown by `grow`), or -1.
+func _junction_at(junctions: Array, p: Vector2, grow: float = 0.0) -> int:
+	for k in junctions.size():
+		if p.distance_to(junctions[k][0]) < junctions[k][1] + grow:
+			return k
+	return -1
 
 
 ## Adds a strip along `pts` between the side offsets `left` and `right`

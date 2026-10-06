@@ -79,6 +79,23 @@ as linhas `TEST FAIL` e a auditoria, não o código de saída.
    código de saída 1 com problemas, vistas de perto nos marcadores
    (`screenshot.gd`), teste das quatro ilhas e das pontes (`test_handmade`).
 
+## Experiência: Road Generator nas ilhas feitas à mão
+
+`build_islands.gd -- town --roadgen` constrói a cidade com as estradas do
+Road Generator em vez das fitas e grava em
+`game/world/handmade/trials/town_roadgen.tscn` (fora da rota: abre-a no
+editor ou joga com F6 em `island.tscn`, campo **Handmade Scene**). Cada
+caminho é cortado nos cruzamentos (`RoadIntersection`) e nas pontes; os
+troços são cadeias de `RoadPoint` a cada ~8 m.
+
+Comparação (fotografias de perto):
+- **Melhor:** faixas pintadas, lancis, cruzamentos com cantos curvos.
+- **Pior:** a estrada não segue o relevo (curva rígida entre pontos): na
+  rampa da igreja o terreno atravessa o asfalto. Resolve-se achatando o
+  Terrain3D por baixo da estrada (o addon tem um conector), o que obriga a
+  desenhar as estradas antes de esculpir. Pára antes das pontes e não
+  estreita para elas. Só faz asfalto (a terra batida continua em fita).
+
 ## Tarefas pendentes
 
 - Árvores ainda podem ter a copa sobre uma estrada ou um telhado (a regra

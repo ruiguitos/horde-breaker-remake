@@ -12,3 +12,6 @@ extends Resource
 @export var palms: bool = false
 @export var on_route: bool = true  ## offered on the boat (the volcano is always the last island)
 @export var order: int = 0
+## Colour grading of the biome (Color Grading addon: create a ColorGrading
+## here and tune it with the colour wheels in the inspector). Empty = none.
+@export var grading: CompositorEffect

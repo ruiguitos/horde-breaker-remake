@@ -357,7 +357,8 @@ static func _load_biomes() -> Dictionary:
 	for e: Array in _entries(BIOME_REGISTRY):
 		var d: BiomeData = e[1]
 		out[e[0]] = {"name": d.display_name, "coast": d.coast, "inland": d.inland, "building": d.building,
-			"foliage": d.foliage, "sky": d.sky, "fog": d.fog, "palms": d.palms, "on_route": d.on_route}
+			"foliage": d.foliage, "sky": d.sky, "fog": d.fog, "palms": d.palms, "on_route": d.on_route,
+			"grading": d.grading}
 	return out
 
 

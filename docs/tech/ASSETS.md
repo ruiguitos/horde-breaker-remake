@@ -10,7 +10,7 @@ mão no editor). Licenças: `assets/LICENSES.md`.
 |---|---|---|
 | Terrain3D | **Usar** | Chão das ilhas (`world/island_terrain.gd`) |
 | Sky3D | **Usar** | Céu e hora do dia |
-| Road Generator | **Usar** | Estradas do cais aos objetivos (`world/island_roads.gd`) |
+| Road Generator | **Usar** | Estradas do cais aos objetivos nas ilhas geradas (`world/island_roads.gd`); experiência nas feitas à mão (`build_islands.gd --roadgen`) |
 | Stylized Nature MegaKit (Quaternius) | **Usar** | Árvores, rochas e vegetação (`world/nature_kit.gd`) |
 | Third Person Controller | **Usar a ideia, não o código** | Câmara de 3.ª pessoa própria (V alterna) |
 | Phantom Camera | **Usar** | Câmara de 3.ª pessoa (Third Person + amortecimento), enquadrada acima do HUD |
@@ -119,9 +119,14 @@ Cada bioma tem um "look": tons de sombras, médios e altos, mais
 vibrância. Por exemplo, a praia tem sombras azul-esverdeadas e altos
 quentes, e o vulcão é vermelho-laranja. O efeito é um `CompositorEffect` na
 câmara da ilha, ligado nos presets High e Ultra. Só funciona com
-RenderingDevice (Forward+); no modo de compatibilidade não aparece. **Não o
-consegui ver na cloud**, que não tem Vulkan: confirma no editor (F5,
-Graphics: High). Os valores estão em `world/grading.gd` (`LOOKS`).
+RenderingDevice (Forward+); no modo de compatibilidade não aparece.
+
+Os valores estão nos dados de cada bioma (`game/data/biomes/<bioma>.tres`,
+campo **Grading**): abre o ficheiro e afina as rodas de cor no inspetor.
+Os primeiros valores eram tão fracos (tinta de 0,03 a 0,15) que mudavam
+menos de 1 % da imagem e não se notavam; agora mudam 2 a 4 %. Para medir:
+`tools/dev/grading_compare.gd` renderiza uma ilha com o efeito ligado e
+desligado e imprime a diferença (abaixo de ~0,01 ninguém nota).
 
 ### Dialogue Manager (briefing no barco)
 Ao confirmar a rota, o Director Hale faz o briefing antes de desembarcar.

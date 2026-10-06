@@ -1,6 +1,16 @@
 [gd_resource type="Resource" script_class="BiomeData" format=3 uid="uid://b0r3r10cionfu"]
 
 [ext_resource type="Script" path="res://game/data/resources/biome_data.gd" id="1_h616x"]
+[ext_resource type="Script" uid="uid://cpqa8r4ahkbfy" path="res://Compositor/Color grading/ColorGrading.gd" id="2_grade"]
+
+[sub_resource type="CompositorEffect" id="CompositorEffect_grade"]
+resource_local_to_scene = false
+resource_name = ""
+enabled = true
+script = ExtResource("2_grade")
+shadows = Vector4(0.55, 0.35, 1.1, 0.95)
+midtones = Vector4(0.12, 0.12, 1.15, 1.0)
+highlights = Vector4(0.2, 0.25, 1.05, 1.03)
 
 [resource]
 script = ExtResource("1_h616x")
@@ -11,3 +21,4 @@ building = Color(0.55, 0.42, 0.3, 1)
 foliage = Color(0.3, 0.55, 0.25, 1)
 sky = Color(0.5, 0.7, 0.85, 1)
 palms = true
+grading = SubResource("CompositorEffect_grade")
