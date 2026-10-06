@@ -846,578 +846,578 @@ transform_format = 1
 instance_count = 200
 mesh = SubResource("ArrayMesh_3yuc2")
 
-[node name="TownIsland" type="Node3D" unique_id=2115907757]
+[node name="TownIsland" type="Node3D" unique_id=1958781997]
 script = ExtResource("1_3agyx")
 size = 256
 biome = &"town"
 
-[node name="Terrain3D" type="Terrain3D" parent="." unique_id=1854756268]
+[node name="Terrain3D" type="Terrain3D" parent="." unique_id=1711018427]
 data_directory = "res://game/world/handmade/islands/town_01_data"
 material = SubResource("Terrain3DMaterial_674s2")
 assets = ExtResource("2_f67gq")
 top_level = true
 metadata/_edit_lock_ = true
 
-[node name="Buildings" type="Node3D" parent="." unique_id=1913253677]
+[node name="Buildings" type="Node3D" parent="." unique_id=1025935716]
 
-[node name="Wall_01" type="Node3D" parent="Buildings" unique_id=1861038260]
+[node name="Wall_01" type="Node3D" parent="Buildings" unique_id=1514949919]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 0.6903394, 92)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/Wall_01" unique_id=527945919]
+[node name="Body" type="MeshInstance3D" parent="Buildings/Wall_01" unique_id=1507445448]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 material_override = SubResource("StandardMaterial3D_j8lux")
 mesh = SubResource("BoxMesh_b6oy2")
 
-[node name="Wall_02" type="Node3D" parent="Buildings" unique_id=460357100]
+[node name="Wall_02" type="Node3D" parent="Buildings" unique_id=1883688730]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49, 0.6903394, 92)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/Wall_02" unique_id=1792892724]
+[node name="Body" type="MeshInstance3D" parent="Buildings/Wall_02" unique_id=1155577970]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 material_override = SubResource("StandardMaterial3D_cvnlt")
 mesh = SubResource("BoxMesh_xj038")
 
-[node name="Wall_03" type="Node3D" parent="Buildings" unique_id=1765351746]
+[node name="Wall_03" type="Node3D" parent="Buildings" unique_id=64068073]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41, -2, 114)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/Wall_03" unique_id=1748518528]
+[node name="Body" type="MeshInstance3D" parent="Buildings/Wall_03" unique_id=1386682324]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 material_override = SubResource("StandardMaterial3D_bea76")
 mesh = SubResource("BoxMesh_bqodx")
 
-[node name="Wall_04" type="Node3D" parent="Buildings" unique_id=1840598036]
+[node name="Wall_04" type="Node3D" parent="Buildings" unique_id=1177971015]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 0.6903394, 96)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/Wall_04" unique_id=847824134]
+[node name="Body" type="MeshInstance3D" parent="Buildings/Wall_04" unique_id=1472488750]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 material_override = SubResource("StandardMaterial3D_amh7c")
 mesh = SubResource("BoxMesh_k0qm2")
 
-[node name="Wall_05" type="Node3D" parent="Buildings" unique_id=201614061]
+[node name="Wall_05" type="Node3D" parent="Buildings" unique_id=690480486]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 0.6255343, 110)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/Wall_05" unique_id=1621246854]
+[node name="Body" type="MeshInstance3D" parent="Buildings/Wall_05" unique_id=79279602]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 material_override = SubResource("StandardMaterial3D_2ycmh")
 mesh = SubResource("BoxMesh_787c8")
 
-[node name="Church_01" type="Node3D" parent="Buildings" unique_id=1102220665]
+[node name="Church_01" type="Node3D" parent="Buildings" unique_id=2018260884]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 211, 5, 144)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/Church_01" unique_id=893338366]
+[node name="Body" type="MeshInstance3D" parent="Buildings/Church_01" unique_id=250474580]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
 material_override = SubResource("StandardMaterial3D_5b31p")
 mesh = SubResource("BoxMesh_gq1wv")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/Church_01" unique_id=837966001]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/Church_01" unique_id=2066063657]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.8, 0)
 material_override = SubResource("StandardMaterial3D_blu4f")
 mesh = SubResource("PrismMesh_1d8fh")
 
-[node name="Spire" type="MeshInstance3D" parent="Buildings/Church_01" unique_id=202241764]
+[node name="Spire" type="MeshInstance3D" parent="Buildings/Church_01" unique_id=2003299465]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
 material_override = SubResource("StandardMaterial3D_w42bc")
 mesh = SubResource("CylinderMesh_pva63")
 
-[node name="House_01" type="Node3D" parent="Buildings" unique_id=468729433]
+[node name="House_01" type="Node3D" parent="Buildings" unique_id=1787628932]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82.18143, 1.0154626, 57.191208)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_01" unique_id=1730081582]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_01" unique_id=1463068975]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8327463, 0)
 material_override = SubResource("StandardMaterial3D_oqvvs")
 mesh = SubResource("BoxMesh_qrtay")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_01" unique_id=1752992067]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_01" unique_id=695725851]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.0654926, 0)
 material_override = SubResource("StandardMaterial3D_s784t")
 mesh = SubResource("PrismMesh_gbm6f")
 
-[node name="House_02" type="Node3D" parent="Buildings" unique_id=355256957]
+[node name="House_02" type="Node3D" parent="Buildings" unique_id=880661635]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 169.85248, 0.79537714, 57.211452)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_02" unique_id=1607134494]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_02" unique_id=1256317741]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.385659, 0)
 material_override = SubResource("StandardMaterial3D_v1hal")
 mesh = SubResource("BoxMesh_8ysqs")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_02" unique_id=815722233]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_02" unique_id=1661994977]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.171318, 0)
 material_override = SubResource("StandardMaterial3D_x15q2")
 mesh = SubResource("PrismMesh_aynqy")
 
-[node name="House_03" type="Node3D" parent="Buildings" unique_id=1919140571]
+[node name="House_03" type="Node3D" parent="Buildings" unique_id=1232877637]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.391407, 0.77205265, 70.9072)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_03" unique_id=1603060105]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_03" unique_id=1535817305]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.360119, 0)
 material_override = SubResource("StandardMaterial3D_4x448")
 mesh = SubResource("BoxMesh_bytnn")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_03" unique_id=285249197]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_03" unique_id=742433028]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.120238, 0)
 material_override = SubResource("StandardMaterial3D_4itns")
 mesh = SubResource("PrismMesh_khoko")
 
-[node name="House_04" type="Node3D" parent="Buildings" unique_id=295595989]
+[node name="House_04" type="Node3D" parent="Buildings" unique_id=793203140]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82.67021, 0.9530712, 70.26102)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_04" unique_id=1223028793]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_04" unique_id=1821198231]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.311144, 0)
 material_override = SubResource("StandardMaterial3D_kk5k0")
 mesh = SubResource("BoxMesh_m5i58")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_04" unique_id=1889926786]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_04" unique_id=320970912]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.0222883, 0)
 material_override = SubResource("StandardMaterial3D_lj7nv")
 mesh = SubResource("PrismMesh_vqkij")
 
-[node name="House_05" type="Node3D" parent="Buildings" unique_id=1559445612]
+[node name="House_05" type="Node3D" parent="Buildings" unique_id=2133336153]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 171.64989, 1.0901394, 70.6006)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_05" unique_id=140920300]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_05" unique_id=2118771714]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9004529, 0)
 material_override = SubResource("StandardMaterial3D_xnhbm")
 mesh = SubResource("BoxMesh_ynkm7")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_05" unique_id=928647597]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_05" unique_id=1052255117]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.200906, 0)
 material_override = SubResource("StandardMaterial3D_fhoqn")
 mesh = SubResource("PrismMesh_hoqdx")
 
-[node name="House_06" type="Node3D" parent="Buildings" unique_id=1826521960]
+[node name="House_06" type="Node3D" parent="Buildings" unique_id=1304329267]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 196.37473, 0.68627536, 70.82606)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_06" unique_id=764829903]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_06" unique_id=443734708]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8328896, 0)
 material_override = SubResource("StandardMaterial3D_5rmo7")
 mesh = SubResource("BoxMesh_v11tf")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_06" unique_id=1991537667]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_06" unique_id=581106298]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.065779, 0)
 material_override = SubResource("StandardMaterial3D_xsjrv")
 mesh = SubResource("PrismMesh_mw7qy")
 
-[node name="House_07" type="Node3D" parent="Buildings" unique_id=1974522105]
+[node name="House_07" type="Node3D" parent="Buildings" unique_id=1785504098]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82.873436, 0.8966801, 96.11211)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_07" unique_id=1258837419]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_07" unique_id=1017025254]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0936737, 0)
 material_override = SubResource("StandardMaterial3D_78o01")
 mesh = SubResource("BoxMesh_yeis0")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_07" unique_id=821805204]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_07" unique_id=1915495625]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5873475, 0)
 material_override = SubResource("StandardMaterial3D_ojw4b")
 mesh = SubResource("PrismMesh_4usk8")
 
-[node name="House_08" type="Node3D" parent="Buildings" unique_id=1711607466]
+[node name="House_08" type="Node3D" parent="Buildings" unique_id=1813199596]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 107.14582, 1.0840553, 95.62711)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_08" unique_id=2018673352]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_08" unique_id=985816178]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7061393, 0)
 material_override = SubResource("StandardMaterial3D_7hs1v")
 mesh = SubResource("BoxMesh_dkk3l")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_08" unique_id=1612458678]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_08" unique_id=636784592]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8122787, 0)
 material_override = SubResource("StandardMaterial3D_q40si")
 mesh = SubResource("PrismMesh_4ismf")
 
-[node name="House_09" type="Node3D" parent="Buildings" unique_id=557698207]
+[node name="House_09" type="Node3D" parent="Buildings" unique_id=158549921]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 138.91933, 0.84262055, 96.37256)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_09" unique_id=31147444]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_09" unique_id=667107375]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8505576, 0)
 material_override = SubResource("StandardMaterial3D_rmkgf")
 mesh = SubResource("BoxMesh_0mecj")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_09" unique_id=1969944598]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_09" unique_id=1095224553]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.101115, 0)
 material_override = SubResource("StandardMaterial3D_j0jls")
 mesh = SubResource("PrismMesh_fbijl")
 
-[node name="House_10" type="Node3D" parent="Buildings" unique_id=1977513516]
+[node name="House_10" type="Node3D" parent="Buildings" unique_id=1867226821]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 150.32341, 0.8844239, 95.76037)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_10" unique_id=2034050221]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_10" unique_id=169939789]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3712702, 0)
 material_override = SubResource("StandardMaterial3D_qa5id")
 mesh = SubResource("BoxMesh_3posd")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_10" unique_id=385693947]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_10" unique_id=918423254]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.14254, 0)
 material_override = SubResource("StandardMaterial3D_lgwhp")
 mesh = SubResource("PrismMesh_j85qe")
 
-[node name="House_11" type="Node3D" parent="Buildings" unique_id=303562403]
+[node name="House_11" type="Node3D" parent="Buildings" unique_id=1840880436]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 161.8529, 0.8055698, 96.58207)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_11" unique_id=2061766024]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_11" unique_id=120806422]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9118059, 0)
 material_override = SubResource("StandardMaterial3D_1fves")
 mesh = SubResource("BoxMesh_dxtio")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_11" unique_id=1546074590]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_11" unique_id=16488281]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.223612, 0)
 material_override = SubResource("StandardMaterial3D_6xxxv")
 mesh = SubResource("PrismMesh_g60yf")
 
-[node name="House_12" type="Node3D" parent="Buildings" unique_id=1962649023]
+[node name="House_12" type="Node3D" parent="Buildings" unique_id=1251189374]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 174.07867, 0.9337635, 96.37036)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_12" unique_id=590834107]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_12" unique_id=1347130986]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4063358, 0)
 material_override = SubResource("StandardMaterial3D_hfa4j")
 mesh = SubResource("BoxMesh_xe3dp")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_12" unique_id=1156451259]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_12" unique_id=1607529358]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.212671, 0)
 material_override = SubResource("StandardMaterial3D_xmevx")
 mesh = SubResource("PrismMesh_ttyka")
 
-[node name="House_13" type="Node3D" parent="Buildings" unique_id=1122638531]
+[node name="House_13" type="Node3D" parent="Buildings" unique_id=952516113]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 197.99101, 0.8866435, 95.62667)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_13" unique_id=1687318184]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_13" unique_id=2037882575]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2651904, 0)
 material_override = SubResource("StandardMaterial3D_pp7uj")
 mesh = SubResource("BoxMesh_ni7la")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_13" unique_id=1988445793]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_13" unique_id=1594851874]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.930381, 0)
 material_override = SubResource("StandardMaterial3D_sxu17")
 mesh = SubResource("PrismMesh_eqlvf")
 
-[node name="House_14" type="Node3D" parent="Buildings" unique_id=107034455]
+[node name="House_14" type="Node3D" parent="Buildings" unique_id=382496208]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 210.13078, 0.63891655, 96.61892)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_14" unique_id=1001925347]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_14" unique_id=1289095533]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5920966, 0)
 material_override = SubResource("StandardMaterial3D_7q502")
 mesh = SubResource("BoxMesh_5v1hr")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_14" unique_id=1532406037]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_14" unique_id=1682908733]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.584193, 0)
 material_override = SubResource("StandardMaterial3D_mgwr3")
 mesh = SubResource("PrismMesh_s8xfu")
 
-[node name="House_15" type="Node3D" parent="Buildings" unique_id=297903160]
+[node name="House_15" type="Node3D" parent="Buildings" unique_id=345466461]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.34664, 0.6771764, 134.60443)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_15" unique_id=1305393458]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_15" unique_id=1152719040]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6601017, 0)
 material_override = SubResource("StandardMaterial3D_5svp2")
 mesh = SubResource("BoxMesh_aqpbc")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_15" unique_id=722300296]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_15" unique_id=1336046793]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.7202034, 0)
 material_override = SubResource("StandardMaterial3D_uvkhw")
 mesh = SubResource("PrismMesh_wot83")
 
-[node name="House_16" type="Node3D" parent="Buildings" unique_id=1504675479]
+[node name="House_16" type="Node3D" parent="Buildings" unique_id=1017179918]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.96332, 1.159749, 134.5527)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_16" unique_id=1064675336]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_16" unique_id=31787458]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6524498, 0)
 material_override = SubResource("StandardMaterial3D_yqioy")
 mesh = SubResource("BoxMesh_b7vjf")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_16" unique_id=2096894953]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_16" unique_id=1704097005]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.7049, 0)
 material_override = SubResource("StandardMaterial3D_gqi5p")
 mesh = SubResource("PrismMesh_jrlev")
 
-[node name="House_17" type="Node3D" parent="Buildings" unique_id=569467577]
+[node name="House_17" type="Node3D" parent="Buildings" unique_id=1082928290]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84.52023, 0.77034473, 134.86522)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_17" unique_id=24438705]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_17" unique_id=1040356417]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3691134, 0)
 material_override = SubResource("StandardMaterial3D_7sjx7")
 mesh = SubResource("BoxMesh_ewvry")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_17" unique_id=596157322]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_17" unique_id=237181649]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.138227, 0)
 material_override = SubResource("StandardMaterial3D_8e2kr")
 mesh = SubResource("PrismMesh_h61ay")
 
-[node name="House_18" type="Node3D" parent="Buildings" unique_id=89058293]
+[node name="House_18" type="Node3D" parent="Buildings" unique_id=147829844]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 96.882866, 0.8830087, 135.02588)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_18" unique_id=656867305]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_18" unique_id=2035584817]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3926861, 0)
 material_override = SubResource("StandardMaterial3D_tnwj3")
 mesh = SubResource("BoxMesh_nmyyf")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_18" unique_id=1386143402]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_18" unique_id=241270047]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.185372, 0)
 material_override = SubResource("StandardMaterial3D_3or4t")
 mesh = SubResource("PrismMesh_6bht3")
 
-[node name="House_19" type="Node3D" parent="Buildings" unique_id=2036189788]
+[node name="House_19" type="Node3D" parent="Buildings" unique_id=424057015]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 109.12068, 1.0499625, 134.78954)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_19" unique_id=179620426]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_19" unique_id=1086625709]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2246325, 0)
 material_override = SubResource("StandardMaterial3D_ouk31")
 mesh = SubResource("BoxMesh_q5ae5")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_19" unique_id=422276750]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_19" unique_id=215915001]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.849265, 0)
 material_override = SubResource("StandardMaterial3D_kfsx6")
 mesh = SubResource("PrismMesh_6k8lt")
 
-[node name="House_20" type="Node3D" parent="Buildings" unique_id=1402051748]
+[node name="House_20" type="Node3D" parent="Buildings" unique_id=1886976378]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 141.91313, 1.024328, 135.65356)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_20" unique_id=2102424202]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_20" unique_id=1777425705]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3816464, 0)
 material_override = SubResource("StandardMaterial3D_h4m3n")
 mesh = SubResource("BoxMesh_ra3bn")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_20" unique_id=766395747]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_20" unique_id=771588634]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.163293, 0)
 material_override = SubResource("StandardMaterial3D_foev5")
 mesh = SubResource("PrismMesh_qqifh")
 
-[node name="House_21" type="Node3D" parent="Buildings" unique_id=159179872]
+[node name="House_21" type="Node3D" parent="Buildings" unique_id=1937821099]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 154.4652, 1.1161095, 134.76085)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_21" unique_id=210044020]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_21" unique_id=1966860588]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8587332, 0)
 material_override = SubResource("StandardMaterial3D_un8ut")
 mesh = SubResource("BoxMesh_tveph")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_21" unique_id=1278208759]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_21" unique_id=1712597651]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.1174664, 0)
 material_override = SubResource("StandardMaterial3D_ho8ac")
 mesh = SubResource("PrismMesh_6s7nm")
 
-[node name="House_22" type="Node3D" parent="Buildings" unique_id=827773738]
+[node name="House_22" type="Node3D" parent="Buildings" unique_id=1354581279]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 167.17236, 0.94384027, 135.01991)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_22" unique_id=1515818195]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_22" unique_id=1535574350]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4982483, 0)
 material_override = SubResource("StandardMaterial3D_bf8mp")
 mesh = SubResource("BoxMesh_jhtmn")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_22" unique_id=470893521]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_22" unique_id=1078164156]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.396497, 0)
 material_override = SubResource("StandardMaterial3D_5a1bk")
 mesh = SubResource("PrismMesh_ai4yk")
 
-[node name="House_23" type="Node3D" parent="Buildings" unique_id=559741112]
+[node name="House_23" type="Node3D" parent="Buildings" unique_id=1766145057]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.729885, 0.5626941, 148.01903)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_23" unique_id=1678417957]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_23" unique_id=1260641851]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4395416, 0)
 material_override = SubResource("StandardMaterial3D_s36ku")
 mesh = SubResource("BoxMesh_4o8iu")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_23" unique_id=1093547896]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_23" unique_id=865629268]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.2790833, 0)
 material_override = SubResource("StandardMaterial3D_jfyci")
 mesh = SubResource("PrismMesh_ofl8w")
 
-[node name="House_24" type="Node3D" parent="Buildings" unique_id=1457441301]
+[node name="House_24" type="Node3D" parent="Buildings" unique_id=1706430526]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.652603, 0.8428715, 148.74771)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_24" unique_id=1979152824]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_24" unique_id=1854708360]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5918765, 0)
 material_override = SubResource("StandardMaterial3D_omaq6")
 mesh = SubResource("BoxMesh_7jl1p")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_24" unique_id=1468395374]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_24" unique_id=1406958759]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.583753, 0)
 material_override = SubResource("StandardMaterial3D_ic8xr")
 mesh = SubResource("PrismMesh_nrgmh")
 
-[node name="House_25" type="Node3D" parent="Buildings" unique_id=543350711]
+[node name="House_25" type="Node3D" parent="Buildings" unique_id=1229270340]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.90246, 1.0903598, 148.40596)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_25" unique_id=911192311]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_25" unique_id=19482313]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7808695, 0)
 material_override = SubResource("StandardMaterial3D_nqk53")
 mesh = SubResource("BoxMesh_b4cxl")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_25" unique_id=1271310875]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_25" unique_id=1032958261]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.961739, 0)
 material_override = SubResource("StandardMaterial3D_3s1km")
 mesh = SubResource("PrismMesh_lbutn")
 
-[node name="House_26" type="Node3D" parent="Buildings" unique_id=13459750]
+[node name="House_26" type="Node3D" parent="Buildings" unique_id=1238279506]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84.260704, 0.93311554, 147.5797)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_26" unique_id=10993359]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_26" unique_id=623196200]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.304025, 0)
 material_override = SubResource("StandardMaterial3D_5fotd")
 mesh = SubResource("BoxMesh_0tcio")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_26" unique_id=1289308631]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_26" unique_id=1185165344]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.00805, 0)
 material_override = SubResource("StandardMaterial3D_srxxy")
 mesh = SubResource("PrismMesh_y4m46")
 
-[node name="House_27" type="Node3D" parent="Buildings" unique_id=1543437629]
+[node name="House_27" type="Node3D" parent="Buildings" unique_id=1482905790]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 96.91511, 0.9884788, 147.51314)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_27" unique_id=717739305]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_27" unique_id=2011171291]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.570768, 0)
 material_override = SubResource("StandardMaterial3D_x3k3d")
 mesh = SubResource("BoxMesh_0rsxs")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_27" unique_id=35636300]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_27" unique_id=783681645]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.541536, 0)
 material_override = SubResource("StandardMaterial3D_bp1pt")
 mesh = SubResource("PrismMesh_780cb")
 
-[node name="House_28" type="Node3D" parent="Buildings" unique_id=1827466534]
+[node name="House_28" type="Node3D" parent="Buildings" unique_id=2097475285]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 109.30237, 1.1207426, 148.20483)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_28" unique_id=1370172775]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_28" unique_id=847513086]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7420495, 0)
 material_override = SubResource("StandardMaterial3D_4y63i")
 mesh = SubResource("BoxMesh_bgabq")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_28" unique_id=1000521554]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_28" unique_id=986867343]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.884099, 0)
 material_override = SubResource("StandardMaterial3D_tv1t6")
 mesh = SubResource("PrismMesh_s3ytf")
 
-[node name="House_29" type="Node3D" parent="Buildings" unique_id=1844223053]
+[node name="House_29" type="Node3D" parent="Buildings" unique_id=1239668361]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 141.49474, 0.87955636, 148.8001)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_29" unique_id=246719632]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_29" unique_id=1145102177]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3229125, 0)
 material_override = SubResource("StandardMaterial3D_vdomm")
 mesh = SubResource("BoxMesh_52cc8")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_29" unique_id=1645986721]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_29" unique_id=1902717438]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.045825, 0)
 material_override = SubResource("StandardMaterial3D_3ge1o")
 mesh = SubResource("PrismMesh_6pesm")
 
-[node name="House_30" type="Node3D" parent="Buildings" unique_id=39153906]
+[node name="House_30" type="Node3D" parent="Buildings" unique_id=2011154095]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 153.1348, 0.86550945, 148.16913)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_30" unique_id=1258550171]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_30" unique_id=221095086]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6498075, 0)
 material_override = SubResource("StandardMaterial3D_4wj0a")
 mesh = SubResource("BoxMesh_hmv4f")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_30" unique_id=1869199255]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_30" unique_id=866631886]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.699615, 0)
 material_override = SubResource("StandardMaterial3D_g1dg5")
 mesh = SubResource("PrismMesh_xr2n3")
 
-[node name="House_31" type="Node3D" parent="Buildings" unique_id=240148725]
+[node name="House_31" type="Node3D" parent="Buildings" unique_id=343119355]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 164.79684, 0.82301223, 148.4226)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_31" unique_id=721467756]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_31" unique_id=164128771]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.250293, 0)
 material_override = SubResource("StandardMaterial3D_r5s6o")
 mesh = SubResource("BoxMesh_1qnot")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_31" unique_id=1340095807]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_31" unique_id=1939053211]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.900586, 0)
 material_override = SubResource("StandardMaterial3D_nwu2t")
 mesh = SubResource("PrismMesh_c4lp3")
 
-[node name="House_32" type="Node3D" parent="Buildings" unique_id=2081119688]
+[node name="House_32" type="Node3D" parent="Buildings" unique_id=650705691]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.33957, 0.5847931, 174.93912)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_32" unique_id=1493262970]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_32" unique_id=2044363416]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0912135, 0)
 material_override = SubResource("StandardMaterial3D_mstmy")
 mesh = SubResource("BoxMesh_x37nq")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_32" unique_id=80806254]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_32" unique_id=33846825]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.582427, 0)
 material_override = SubResource("StandardMaterial3D_cvn6k")
 mesh = SubResource("PrismMesh_urmdd")
 
-[node name="House_33" type="Node3D" parent="Buildings" unique_id=1850887703]
+[node name="House_33" type="Node3D" parent="Buildings" unique_id=344305834]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 81.07412, 0.9393786, 173.91853)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_33" unique_id=1678784280]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_33" unique_id=1969182506]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1987016, 0)
 material_override = SubResource("StandardMaterial3D_5kgwy")
 mesh = SubResource("BoxMesh_2r67u")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_33" unique_id=1788228361]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_33" unique_id=1198135039]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.7974033, 0)
 material_override = SubResource("StandardMaterial3D_h5i62")
 mesh = SubResource("PrismMesh_5l40k")
 
-[node name="House_34" type="Node3D" parent="Buildings" unique_id=547616621]
+[node name="House_34" type="Node3D" parent="Buildings" unique_id=2133566025]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 166.94875, 0.89278245, 174.18565)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_34" unique_id=1293400234]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_34" unique_id=1234709383]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1669176, 0)
 material_override = SubResource("StandardMaterial3D_ogiqy")
 mesh = SubResource("BoxMesh_7gw2y")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_34" unique_id=1580327309]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_34" unique_id=125170482]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.733835, 0)
 material_override = SubResource("StandardMaterial3D_7nvy8")
 mesh = SubResource("PrismMesh_bprwp")
 
-[node name="House_35" type="Node3D" parent="Buildings" unique_id=1285744089]
+[node name="House_35" type="Node3D" parent="Buildings" unique_id=1935656778]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.05998, 0.9075367, 186.58987)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_35" unique_id=1723739557]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_35" unique_id=930105247]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3859124, 0)
 material_override = SubResource("StandardMaterial3D_mfhhq")
 mesh = SubResource("BoxMesh_bl8pn")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_35" unique_id=1120128311]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_35" unique_id=1579345332]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.171824, 0)
 material_override = SubResource("StandardMaterial3D_u02ea")
 mesh = SubResource("PrismMesh_r7eqt")
 
-[node name="House_36" type="Node3D" parent="Buildings" unique_id=1336186890]
+[node name="House_36" type="Node3D" parent="Buildings" unique_id=85486326]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 107.16971, 0.6215035, 212.75372)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_36" unique_id=1820599735]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_36" unique_id=682908120]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2829812, 0)
 material_override = SubResource("StandardMaterial3D_wktbq")
 mesh = SubResource("BoxMesh_yydrw")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_36" unique_id=826513271]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_36" unique_id=189070671]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.9659624, 0)
 material_override = SubResource("StandardMaterial3D_qfh0a")
 mesh = SubResource("PrismMesh_bb86o")
 
-[node name="House_37" type="Node3D" parent="Buildings" unique_id=2057546683]
+[node name="House_37" type="Node3D" parent="Buildings" unique_id=487029474]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 139.6608, 0.774503, 213.71735)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_37" unique_id=349642896]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_37" unique_id=486589214]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7382414, 0)
 material_override = SubResource("StandardMaterial3D_3xv61")
 mesh = SubResource("BoxMesh_5p2og")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_37" unique_id=2019890710]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_37" unique_id=1644638382]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.876483, 0)
 material_override = SubResource("StandardMaterial3D_yum2k")
 mesh = SubResource("PrismMesh_ss7gj")
 
-[node name="House_38" type="Node3D" parent="Buildings" unique_id=1817140109]
+[node name="House_38" type="Node3D" parent="Buildings" unique_id=1210722423]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 151.89551, 0.5949508, 213.61273)
 
-[node name="Body" type="MeshInstance3D" parent="Buildings/House_38" unique_id=1752146669]
+[node name="Body" type="MeshInstance3D" parent="Buildings/House_38" unique_id=1017572282]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7994485, 0)
 material_override = SubResource("StandardMaterial3D_0srt2")
 mesh = SubResource("BoxMesh_nbn21")
 
-[node name="Roof" type="MeshInstance3D" parent="Buildings/House_38" unique_id=828958699]
+[node name="Roof" type="MeshInstance3D" parent="Buildings/House_38" unique_id=1584455515]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.998897, 0)
 material_override = SubResource("StandardMaterial3D_lhf07")
 mesh = SubResource("PrismMesh_l4iww")
 
-[node name="Trees" type="Node3D" parent="." unique_id=1078019236]
+[node name="Trees" type="Node3D" parent="." unique_id=1170227935]
 
 [node name="Tree_001" type="Node3D" parent="Trees" unique_id=1804112924 instance=ExtResource("3_an5lw")]
 transform = Transform3D(-0.63270503, 0, -0.23863913, 0, 0.6762132, 0, 0.23863913, 0, -0.63270503, 29.5, 0.32726905, 155.5)
 
-[node name="Tree_002" type="Node3D" parent="Trees" unique_id=680338418 instance=ExtResource("3_an5lw")]
+[node name="Tree_002" type="Node3D" parent="Trees" unique_id=631364135 instance=ExtResource("3_an5lw")]
 transform = Transform3D(-0.3611363, 0, -0.7763249, 0, 0.8562125, 0, 0.7763249, 0, -0.3611363, 26.5, 0.28852025, 148.5)
 
 [node name="Tree_003" type="Node3D" parent="Trees" unique_id=1222790025 instance=ExtResource("4_rek5p")]
@@ -1429,22 +1429,22 @@ transform = Transform3D(-0.7880944, 0, 0.13360664, 0, 0.7993394, 0, -0.13360664,
 [node name="Tree_005" type="Node3D" parent="Trees" unique_id=1202307070 instance=ExtResource("6_bqw8q")]
 transform = Transform3D(-0.5087071, 0, 0.72103894, 0, 0.8824285, 0, -0.72103894, 0, -0.5087071, 168.5, 0.33448565, 41.5)
 
-[node name="Tree_006" type="Node3D" parent="Trees" unique_id=318144060 instance=ExtResource("5_62gcl")]
+[node name="Tree_006" type="Node3D" parent="Trees" unique_id=846993595 instance=ExtResource("5_62gcl")]
 transform = Transform3D(0.9090935, 0, -0.5983805, 0, 1.0883521, 0, 0.5983805, 0, 0.9090935, 157.5, 0.4766042, 45.5)
 
-[node name="Tree_007" type="Node3D" parent="Trees" unique_id=460240536 instance=ExtResource("5_62gcl")]
+[node name="Tree_007" type="Node3D" parent="Trees" unique_id=1472779285 instance=ExtResource("5_62gcl")]
 transform = Transform3D(-0.34604293, 0, -0.84527934, 0, 0.91336894, 0, 0.84527934, 0, -0.34604293, 161.5, 0.7825996, 50.5)
 
-[node name="Tree_008" type="Node3D" parent="Trees" unique_id=1210595408 instance=ExtResource("5_62gcl")]
+[node name="Tree_008" type="Node3D" parent="Trees" unique_id=1900504446 instance=ExtResource("5_62gcl")]
 transform = Transform3D(-0.11704596, 0, 0.8918174, 0, 0.8994654, 0, -0.8918174, 0, -0.11704596, 179.5, 0.3974141, 47.5)
 
-[node name="Tree_009" type="Node3D" parent="Trees" unique_id=1784641293 instance=ExtResource("6_bqw8q")]
+[node name="Tree_009" type="Node3D" parent="Trees" unique_id=274119080 instance=ExtResource("6_bqw8q")]
 transform = Transform3D(-1.0413991, 0, -0.15322521, 0, 1.0526111, 0, 0.15322521, 0, -1.0413991, 174.5, 0.3204016, 42.5)
 
-[node name="Tree_010" type="Node3D" parent="Trees" unique_id=1813506987 instance=ExtResource("5_62gcl")]
+[node name="Tree_010" type="Node3D" parent="Trees" unique_id=1235266102 instance=ExtResource("5_62gcl")]
 transform = Transform3D(-0.9839868, 0, -0.04234089, 0, 0.9848974, 0, 0.04234089, 0, -0.9839868, 161.5, 0.31724644, 39.5)
 
-[node name="Rocks" type="Node3D" parent="." unique_id=2113552924]
+[node name="Rocks" type="Node3D" parent="." unique_id=1633890625]
 
 [node name="Rock_01" type="Node3D" parent="Rocks" unique_id=2096496993 instance=ExtResource("7_u45hn")]
 transform = Transform3D(0.007753271, 0, 0.6215393, 0, 0.62158763, 0, -0.6215393, 0, 0.007753271, 101.434555, 0.58491, 45.636765)
@@ -1452,103 +1452,103 @@ transform = Transform3D(0.007753271, 0, 0.6215393, 0, 0.62158763, 0, -0.6215393,
 [node name="Rock_02" type="Node3D" parent="Rocks" unique_id=341877195 instance=ExtResource("8_kdqpk")]
 transform = Transform3D(-0.47716618, 0, -0.8260296, 0, 0.9539457, 0, 0.8260296, 0, -0.47716618, 148.4746, 0.8694518, 55.936382)
 
-[node name="Rock_03" type="Node3D" parent="Rocks" unique_id=745838444 instance=ExtResource("7_u45hn")]
+[node name="Rock_03" type="Node3D" parent="Rocks" unique_id=1916320488 instance=ExtResource("7_u45hn")]
 transform = Transform3D(0.6110298, 0, 0.3689836, 0, 0.7137971, 0, -0.3689836, 0, 0.6110298, 46.304695, 0.5697448, 166.99779)
 
-[node name="Rock_04" type="Node3D" parent="Rocks" unique_id=1138202781 instance=ExtResource("8_kdqpk")]
+[node name="Rock_04" type="Node3D" parent="Rocks" unique_id=1861548435 instance=ExtResource("8_kdqpk")]
 transform = Transform3D(-0.78057176, 0, 0.49705282, 0, 0.9253938, 0, -0.49705282, 0, -0.78057176, 200.03249, 0.59366393, 108.28892)
 
 [node name="Rock_05" type="Node3D" parent="Rocks" unique_id=1283432621 instance=ExtResource("9_cotqt")]
 transform = Transform3D(-0.4288793, 0, -0.75604683, 0, 0.8692205, 0, 0.75604683, 0, -0.4288793, 158.42783, 0.8694518, 67.72595)
 
-[node name="Rock_06" type="Node3D" parent="Rocks" unique_id=163567713 instance=ExtResource("7_u45hn")]
+[node name="Rock_06" type="Node3D" parent="Rocks" unique_id=2129542498 instance=ExtResource("7_u45hn")]
 transform = Transform3D(-0.18779686, 0, 0.4905031, 0, 0.5252247, 0, -0.4905031, 0, -0.18779686, 84.02713, 0.48029733, 46.668274)
 
-[node name="Decor" type="Node3D" parent="." unique_id=2082972525]
+[node name="Decor" type="Node3D" parent="." unique_id=2095129452]
 
-[node name="SeaPreview" type="MeshInstance3D" parent="Decor" unique_id=1059368870]
+[node name="SeaPreview" type="MeshInstance3D" parent="Decor" unique_id=2111694008]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, -0.3, 128)
 material_override = SubResource("StandardMaterial3D_ix6v2")
 mesh = SubResource("PlaneMesh_td72m")
 
-[node name="Bridge_1" type="MeshInstance3D" parent="Decor" unique_id=2042631738]
+[node name="Bridge_1" type="MeshInstance3D" parent="Decor" unique_id=445558742]
 transform = Transform3D(0.99913305, 0, -0.041630547, 0, 1, 0, 0.041630547, 0, 0.99913305, 128, 0.45, 118)
 material_override = SubResource("StandardMaterial3D_nap2s")
 mesh = SubResource("BoxMesh_70eha")
 
-[node name="Bridge_2" type="MeshInstance3D" parent="Decor" unique_id=1260264897]
+[node name="Bridge_2" type="MeshInstance3D" parent="Decor" unique_id=1724640972]
 transform = Transform3D(0.9971993, 0, 0.07478995, 0, 1, 0, -0.07478995, 0, 0.9971993, 70, 0.45, 116.8)
 material_override = SubResource("StandardMaterial3D_bmc8v")
 mesh = SubResource("BoxMesh_smpgc")
 
-[node name="Bridge_3" type="MeshInstance3D" parent="Decor" unique_id=238237663]
+[node name="Bridge_3" type="MeshInstance3D" parent="Decor" unique_id=1256232126]
 transform = Transform3D(0.99875236, 0, 0.049937617, 0, 1, 0, -0.049937617, 0, 0.99875236, 186, 0.45, 119.5)
 material_override = SubResource("StandardMaterial3D_xdhyv")
 mesh = SubResource("BoxMesh_5p1wc")
 
-[node name="Cover_Grass_Common_Short" type="MultiMeshInstance3D" parent="Decor" unique_id=55688436]
+[node name="Cover_Grass_Common_Short" type="MultiMeshInstance3D" parent="Decor" unique_id=1975755583]
 multimesh = SubResource("MultiMesh_nol65")
 
-[node name="Cover_Clover_1" type="MultiMeshInstance3D" parent="Decor" unique_id=1704280386]
+[node name="Cover_Clover_1" type="MultiMeshInstance3D" parent="Decor" unique_id=1213543591]
 multimesh = SubResource("MultiMesh_snmpm")
 
-[node name="Cover_Flower_3_Group" type="MultiMeshInstance3D" parent="Decor" unique_id=878770013]
+[node name="Cover_Flower_3_Group" type="MultiMeshInstance3D" parent="Decor" unique_id=1210746311]
 multimesh = SubResource("MultiMesh_tdjfx")
 
-[node name="Markers" type="Node3D" parent="." unique_id=1582144156]
+[node name="Markers" type="Node3D" parent="." unique_id=1869096475]
 
-[node name="Generator1" type="Marker3D" parent="Markers" unique_id=308900042]
+[node name="Generator1" type="Marker3D" parent="Markers" unique_id=1062990878]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41, 0.6903394, 103)
 gizmo_extents = 3.0
 
-[node name="Generator2" type="Marker3D" parent="Markers" unique_id=1915371167]
+[node name="Generator2" type="Marker3D" parent="Markers" unique_id=1292090792]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 220, 5, 160)
 gizmo_extents = 3.0
 
-[node name="Generator3" type="Marker3D" parent="Markers" unique_id=484482312]
+[node name="Generator3" type="Marker3D" parent="Markers" unique_id=2007877699]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 1.0694518, 60)
 gizmo_extents = 3.0
 
-[node name="Cache1" type="Marker3D" parent="Markers" unique_id=2011056551]
+[node name="Cache1" type="Marker3D" parent="Markers" unique_id=56284255]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 150, 0.8995704, 179)
 gizmo_extents = 3.0
 
-[node name="Cache2" type="Marker3D" parent="Markers" unique_id=701967150]
+[node name="Cache2" type="Marker3D" parent="Markers" unique_id=1319557930]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, 0.92448556, 140)
 gizmo_extents = 3.0
 
-[node name="Cache3" type="Marker3D" parent="Markers" unique_id=1104444788]
+[node name="Cache3" type="Marker3D" parent="Markers" unique_id=1757754420]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 186, 0.91299915, 100)
 gizmo_extents = 3.0
 
-[node name="Cache4" type="Marker3D" parent="Markers" unique_id=187066377]
+[node name="Cache4" type="Marker3D" parent="Markers" unique_id=1721310924]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 96, 1.0751448, 100)
 gizmo_extents = 3.0
 
-[node name="Choke_MiddleBridge" type="Marker3D" parent="Markers" unique_id=289015217]
+[node name="Choke_MiddleBridge" type="Marker3D" parent="Markers" unique_id=81211065]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 0.90453684, 118)
 gizmo_extents = 3.0
 
-[node name="Choke_YardGate" type="Marker3D" parent="Markers" unique_id=1713089827]
+[node name="Choke_YardGate" type="Marker3D" parent="Markers" unique_id=1204025597]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 0.6903394, 103)
 gizmo_extents = 3.0
 
-[node name="Choke_ChurchSteps" type="Marker3D" parent="Markers" unique_id=749086453]
+[node name="Choke_ChurchSteps" type="Marker3D" parent="Markers" unique_id=1645115093]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 190, 4.3332276, 152)
 gizmo_extents = 3.0
 
-[node name="Arena_Square" type="Marker3D" parent="Markers" unique_id=1539969838]
+[node name="Arena_Square" type="Marker3D" parent="Markers" unique_id=791501076]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 0.8995704, 179)
 gizmo_extents = 3.0
 
-[node name="Arena_Market" type="Marker3D" parent="Markers" unique_id=2086792679]
+[node name="Arena_Market" type="Marker3D" parent="Markers" unique_id=1469864004]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 1.0694518, 61)
 gizmo_extents = 3.0
 
-[node name="Boat" type="Marker3D" parent="Markers" unique_id=1152274378]
+[node name="Boat" type="Marker3D" parent="Markers" unique_id=450919712]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 0.46156672, 224.40997)
 gizmo_extents = 3.0
 
-[node name="PlayerStart" type="Marker3D" parent="Markers" unique_id=924464101]
+[node name="PlayerStart" type="Marker3D" parent="Markers" unique_id=11488581]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 0.7237976, 217.40997)
 gizmo_extents = 3.0

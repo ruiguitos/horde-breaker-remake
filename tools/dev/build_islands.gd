@@ -619,6 +619,56 @@ func _build_scene() -> void:
 		open += 1 if b == 0 else 0
 	print("%s: %s, walkable %d, buildings %d, trees %d, problems %s" % [name, error_string(err), open, map.buildings.size(), map.trees.size(), problems])
 	_check_routes(map)
+	_audit()
+
+
+## Objects in odd places: in water, on roads or bridges, in squares, on
+## cliffs, or buildings on uneven ground (one side floats, the other sinks).
+## Prints every offender; the goal is zero.
+func _audit() -> void:
+	var issues: Dictionary = {}
+	for group in ["Buildings", "Rocks", "Trees"]:
+		for node in _root.get_node(group).get_children():
+			var cells: Array[Vector2i] = []
+			if group == "Trees":
+				cells.append(Vector2i(floori(node.position.x), floori(node.position.z)))
+			else:
+				var r: Rect2i = _root._footprint(node)
+				for z in range(r.position.y, r.end.y):
+					for x in range(r.position.x, r.end.x):
+						cells.append(Vector2i(x, z))
+			var lo: float = INF
+			var hi: float = -INF
+			var why: Array[String] = []
+			for c in cells:
+				var p := Vector2(c.x + 0.5, c.y + 0.5)
+				var h: float = height_at(p.x, p.y)
+				lo = minf(lo, h)
+				hi = maxf(hi, h)
+				var road: float = _path_distance(p)
+				if h < 0.15 and not "water" in why:
+					why.append("water")
+				if road < (0.0 if group == "Buildings" else 1.0) and not "road" in why:
+					why.append("road")
+				if _crossing_at(p) != -1 and not "bridge" in why:
+					why.append("bridge")
+				if group != "Buildings" and _slope(c.x, c.y) > 0.5 and not "cliff" in why:
+					why.append("cliff")
+				if group != "Buildings":
+					for r: Rect2 in plazas:
+						if r.has_point(p) and biome != &"port" and not "square" in why:
+							why.append("square")
+			if group == "Buildings" and hi - lo > 0.8:
+				why.append("uneven ground %.1f m" % (hi - lo))
+			for w in why:
+				var key: String = w.get_slice(" ", 0)
+				if not issues.has(key):
+					issues[key] = []
+				issues[key].append("%s (%d, %d)" % [node.name, int(node.position.x), int(node.position.z)])
+	if issues.is_empty():
+		print("  audit: no objects in odd places")
+	for k: String in issues:
+		print("  audit %s: %d -> %s" % [k, issues[k].size(), ", ".join(issues[k].slice(0, 6))])
 
 
 ## Every goal must stay reachable when any one choke point is closed:
