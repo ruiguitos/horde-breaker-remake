@@ -17,11 +17,11 @@ extends SceneTree
 ## Prints the time of every stage, the grid and its problems (exit code 1
 ## when there are any).
 ## Run: python tools/real_island/fetch_data.py <place>
-##      godot --headless --path . --script res://tools/real_island/build.gd -- <place>
-## (place: berlenga, hashima; default berlenga)
+##      godot --headless --path . --script res://tools/real_island/build.gd -- <place> [--out-dir <res://dir/>] [--kits houses,paths]
+## (place: berlenga, hashima; default berlenga). --out-dir writes a test
+## build somewhere else than the game's islands (e.g. a gitignored folder).
 
 const DIR: String = "res://tools/real_island/"
-const ISLANDS: String = "res://game/world/handmade/islands/"
 const TEX: String = "res://assets/textures/polyhaven/"
 const KIT: String = "res://assets/models/nature_megakit/"
 const DEM_STEP: int = 8  ## metres between elevation samples before the cubic resize
@@ -53,6 +53,10 @@ const PLACES: Dictionary = {
 		"landing": "beach",
 		"generators": [["landuse", ""], ["lighthouse", ""], ["fort", ""]],
 		"caches": 6, "cache_walk": 1200,
+		# Detail kits (village_houses.gd, village_paths.gd) only inside this
+		# rectangle (island metres): the landing, the road up and the
+		# Bairro dos Pescadores. A test before the whole island.
+		"detail_area": Rect2(830, 560, 260, 230),
 		"scatter": [["Grass_Wispy_Short", 110000, 0.35, 6.0, 140.0, "land"], ["Grass_Common_Short", 55000, 0.3, 6.0, 120.0, "land"],
 			["Grass_Wispy_Tall", 14000, 0.7, 6.0, 220.0, "land"], ["Bush_Common", 600, 0.9, 10.0, 400.0, "land"],
 			["Rock_Medium_1", 450, 2.0, 2.0, 1500.0, "cliff_top"], ["Rock_Medium_2", 350, 1.5, 2.0, 1500.0, "cliff_top"]],
@@ -99,8 +103,8 @@ var _beach := PackedByteArray()
 var _path_d := PackedFloat32Array() ## metres from the nearest path edge (capped)
 var _rings: Array[PackedVector2Array] = []
 var _beaches: Array[PackedVector2Array] = []
-var _paths: Array = []              ## [PackedVector2Array, width, kind, bridge]
-var _houses: Array = []             ## [PackedVector2Array, height, kind, roof:shape, name]
+var _paths: Array = []              ## [PackedVector2Array, width, kind, bridge, all tags + osm_id]
+var _houses: Array = []             ## [PackedVector2Array, height, kind, roof:shape, name, all tags + osm_id]
 var _piers: Array[PackedVector2Array] = []
 var _lighthouses: Array[Vector2] = []
 var _light_heights: Array[float] = []  ## metres, one per lighthouse
@@ -110,6 +114,10 @@ var _named: Dictionary = {}         ## OSM name -> centre
 var _green: Array[PackedVector2Array] = []  ## grass and scrub areas
 var _walls: Array[PackedVector2Array] = []  ## sea walls (retaining walls)
 var _rng := RandomNumberGenerator.new()
+var ISLANDS: String = "res://game/world/handmade/islands/"  ## where the island is saved (--out-dir)
+var _house_kit: RefCounted  ## village_houses.gd, when the place has a detail_area
+var _path_kit: RefCounted   ## village_paths.gd, idem
+var _materials: Dictionary = {}  ## texture role -> material (_role_material)
 var _root: HandmadeIsland
 var _terrain: Node3D
 var _clock: int = 0
@@ -118,6 +126,10 @@ var _clock: int = 0
 func _initialize() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	var key: String = args[0] if not args.is_empty() else "berlenga"
+	var o: int = args.find("--out-dir")
+	if o >= 0 and o + 1 < args.size():
+		ISLANDS = args[o + 1].trim_suffix("/") + "/"
+		DirAccess.make_dir_recursive_absolute(ISLANDS)
 	if not PLACES.has(key):
 		print("Unknown place %s (known: %s)" % [key, ", ".join(PLACES.keys())])
 		quit(1)
@@ -227,14 +239,16 @@ func _read_osm() -> void:
 				height = float(tags["building:levels"]) * 3.0 + 0.5
 			if tags.has("height"):
 				height = float(String(tags["height"]).to_float())
-			_houses.append([pts, height, kind, tags.get("roof:shape", ""), tags.get("name", "")])
+			tags["osm_id"] = e["id"]
+			_houses.append([pts, height, kind, tags.get("roof:shape", ""), tags.get("name", ""), tags])
 		elif tags.get("man_made") == "pier":
 			_piers.append(pts)
 		elif tags.get("landuse") == "residential" and tags.has("name"):
 			_village = _centroid(pts)  # Bairro dos Pescadores
 		elif tags.has("highway"):
 			var kind: String = tags["highway"]
-			_paths.append([pts, WIDTHS.get(kind, 2.0), kind, tags.get("bridge") == "yes"])
+			tags["osm_id"] = e["id"]
+			_paths.append([pts, WIDTHS.get(kind, 2.0), kind, tags.get("bridge") == "yes", tags])
 	# Coastline ways joined end to end into closed rings (one per island).
 	var used: Array[bool] = []
 	used.resize(coast.size())
@@ -696,6 +710,16 @@ func _build_scene() -> bool:
 		n.name = group
 		_root.add_child(n)
 		n.owner = _root
+	if P.has("detail_area"):
+		# Loaded at run time: plain scripts, no class_name to register.
+		# --kits houses (or paths, or none) builds only those, for testing one.
+		var args: PackedStringArray = OS.get_cmdline_user_args()
+		var k: int = args.find("--kits")
+		var kits: String = args[k + 1] if k >= 0 and k + 1 < args.size() else "houses,paths"
+		if "houses" in kits:
+			_house_kit = load(DIR + "village_houses.gd").new(self)
+		if "paths" in kits:
+			_path_kit = load(DIR + "village_paths.gd").new(self)
 	_place_paths()
 	_place_bridges()
 	_place_buildings()
@@ -911,6 +935,45 @@ func _mat(c: Color, rough: float = 0.9) -> StandardMaterial3D:
 	return m
 
 
+## A material from the place's texture with that role in fetch_data.py
+## (plaster, roof, stone...): colour, normal and roughness maps, tinted,
+## one picture every `metres`. Projected from the sides in world space
+## (triplanar) unless `uv` is true: then the mesh's own UVs, in metres
+## (UV 1 = 1 m). Null when the place has no texture with that role.
+func _role_material(role: String, metres: float, tint: Color = Color.WHITE, uv: bool = false) -> StandardMaterial3D:
+	var key: String = "%s/%s/%s/%s" % [role, metres, tint.to_html(), uv]
+	if _materials.has(key):
+		return _materials[key]
+	var m: StandardMaterial3D = null
+	for asset: String in meta["textures"]:
+		if meta["textures"][asset] != role:
+			continue
+		m = _mat(tint, 1.0)
+		m.albedo_texture = _cached_texture(asset, "diffuse.jpg")
+		m.normal_enabled = true
+		m.normal_texture = _cached_texture(asset, "nor_gl.jpg")
+		m.roughness_texture = _cached_texture(asset, "rough.jpg")
+		m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_GREEN
+		if uv:
+			m.uv1_scale = Vector3.ONE / metres
+		else:
+			m.uv1_triplanar = true
+			m.uv1_world_triplanar = true
+			m.uv1_scale = Vector3.ONE / metres
+	_materials[key] = m
+	return m
+
+
+## One map of a texture as a compressed resource in TEX, made once per build.
+func _cached_texture(asset: String, file: String) -> Texture2D:
+	var name: String = "%s_%s" % [asset, file.get_basename()]
+	if _materials.has(name):
+		return _materials[name]
+	var t: Texture2D = _texture(_tex(asset, file), name)
+	_materials[name] = t
+	return t
+
+
 func _add(n: Node, group: String) -> void:
 	_root.get_node(group).add_child(n)
 	n.owner = _root
@@ -938,10 +1001,14 @@ func _place_paths() -> void:
 	for path in _paths:
 		if path[3]:
 			continue
+		if _path_kit != null and _path_kit.place(path):
+			continue  # inside the detail area: the kit's steps, kerbs, road
 		if path[2] == "steps":
 			_ribbon(stone, path[0], path[1], 0.06)
 		elif path[2] == "service":
 			_ribbon(road, path[0], path[1], 0.05)
+	if _path_kit != null:
+		_path_kit.finish()
 	for item in [[stone, "Steps", Color(0.62, 0.6, 0.56)], [road, "Road", Color(0.58, 0.56, 0.52)]]:
 		var mesh: ArrayMesh = (item[0] as SurfaceTool).commit()
 		if mesh.get_surface_count() == 0:
@@ -1050,6 +1117,8 @@ func _place_buildings() -> void:
 		if P.get("special", {}).get(_houses[k][4], "") == "conveyor":
 			_conveyor(pts, hi, k)
 			continue
+		if _house_kit != null and _house_kit.place(k, pts, lo, hi):
+			continue  # inside the detail area: the kit's house
 		var c: Vector2 = _centroid(pts)
 		var base: float = lo - 0.5
 		var eaves: float = hi + float(_houses[k][1])
@@ -1109,6 +1178,8 @@ func _place_buildings() -> void:
 		_add(inst, "Buildings")
 		if flat and String(_houses[k][4]).ends_with("号棟") and float(_houses[k][1]) >= 12.0:
 			_balconies(balconies, pts, hi, eaves)
+	if _house_kit != null:
+		_house_kit.finish()
 	var gallery: ArrayMesh = balconies.commit()
 	if gallery.get_surface_count() > 0:
 		# Decoration, not part of the buildings: the grid blocks what a building
