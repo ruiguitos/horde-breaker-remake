@@ -38,6 +38,12 @@ godot --headless --path . --script res://tools/real_island/build.gd -- hashima
 
    Acaba com código 1 se a ilha tiver problemas.
 
+Opções para testar sem mexer na ilha do jogo:
+- `--out-dir res://tools/real_island/test_out/<nome>` grava numa pasta de
+  teste, fora do git. O construtor recusa qualquer outra pasta.
+- `--kits houses`, `--kits paths` ou `--kits none` constrói só uma parte dos
+  kits de detalhe (ver abaixo).
+
 Correr outra vez **substitui** a ilha. Para mudar alguma coisa à mão, faz-o
 depois de a construir, ou muda o script.
 
@@ -99,6 +105,43 @@ depois de a construir, ou muda o script.
     são só decoração.
   - **Tapete transportador (ベルトコンベアー):** passadeira a 5 m de altura
     sobre pilares. Só os pilares bloqueiam.
+- **Kits de detalhe (Berlenga, só numa parte da ilha):** feitos em paralelo
+  por dois subagentes Claude e revistos pelo Codex, como teste antes de
+  passar à ilha toda. Aplicam-se dentro do retângulo `detail_area` do
+  preset, com o desembarque, a estrada a subir e o Bairro dos Pescadores.
+  Fora dele fica o estilo antigo. Cada kit é um ficheiro próprio, para os
+  dois poderem trabalhar sem mexer no mesmo código.
+  - **`village_houses.gd`, casas:**
+    - paredes caiadas com barra pintada, azul ou ocre, e embasamento de
+      pedra; beiral a cerca de 3,1 m;
+    - telhado de duas águas nas plantas alongadas e de quatro águas nas
+      compactas, com telha que segue cada água, cumeeira, beiral saliente e
+      chaminé;
+    - porta virada para o caminho mais próximo e janelas com moldura e
+      peitoril, só nas paredes livres;
+    - cores escolhidas a partir do id do OSM, por isso são sempre as mesmas.
+
+    O corpo da casa fica em `Buildings/` e bloqueia só a planta. Tudo o que
+    sai dela (beirais, molduras, degraus da porta) fica em `Decor/`.
+  - **`village_paths.gd`, caminhos:**
+    - degraus a sério, com cobertor e espelho de 15 a 18 cm, que seguem o
+      perfil escavado;
+    - corrimão onde o OSM diz `handrail=yes`;
+    - a estrada de betão com juntas a cada 3,5 m e bordas gastas;
+    - lancis só onde o terreno cai ao lado;
+    - pedras soltas nos trilhos de terra.
+
+    É tudo decoração: o jogador e a horda andam no terreno. Nas curvas
+    apertadas da escadaria do desembarque, os degraus que o chão cobre
+    deixam-se de fora e o próprio chão serve de patamar.
+  - **Verificação:** a grelha fica igual célula a célula a uma construção
+    sem kits, e o percurso também (229, 417, 704 e 1028 m).
+  - **Limites:**
+    - não se usa o `step_count` do OSM: os 63 degraus de `441503017` dariam
+      espelhos de 4 cm no relevo escavado;
+    - fica uma peça de degrau solta junto à segunda curva da escadaria do
+      desembarque;
+    - as portas e janelas são painéis sobre a parede, sem recorte.
 - **Praças:** os passeios com `area=yes` no OSM (o percurso turístico de
   Hashima) são pavimento por inteiro, e não um caminho ao longo do contorno.
 - **Gargalos e arenas** (`chokes`, `arenas` no preset): são marcadores

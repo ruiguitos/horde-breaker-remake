@@ -187,6 +187,10 @@ A rota Beach sorteia por seed entre a `beach_01` e
 `islands/beach_berlenga.scn`. A Berlenga é a ilha real, com 1,5 km, feita a
 partir de dados abertos: relevo, a costa e os caminhos do OpenStreetMap e
 texturas do Poly Haven.
+- **Bairro dos Pescadores (teste):** à volta do desembarque e do bairro, as
+  casas são caiadas com barras azuis ou ocre, telha, portas e janelas, e os
+  caminhos têm degraus a sério e a estrada de betão. O resto da ilha ainda
+  tem o estilo antigo (ver `tools/real_island/README.md`).
 - **Missão:**
   - desembarcas na praia do Carreiro do Mosteiro;
   - os geradores estão no Bairro dos Pescadores, junto ao farol e no ilhéu do

@@ -115,6 +115,8 @@ var _green: Array[PackedVector2Array] = []  ## grass and scrub areas
 var _walls: Array[PackedVector2Array] = []  ## sea walls (retaining walls)
 var _rng := RandomNumberGenerator.new()
 var ISLANDS: String = "res://game/world/handmade/islands/"  ## where the island is saved (--out-dir)
+const TEST_OUT: String = "res://tools/real_island/test_out/"  ## the only place --out-dir may write
+var _kits: PackedStringArray = ["houses", "paths"]  ## --kits
 var _house_kit: RefCounted  ## village_houses.gd, when the place has a detail_area
 var _path_kit: RefCounted   ## village_paths.gd, idem
 var _materials: Dictionary = {}  ## texture role -> material (_role_material)
@@ -125,11 +127,36 @@ var _clock: int = 0
 
 func _initialize() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
-	var key: String = args[0] if not args.is_empty() else "berlenga"
-	var o: int = args.find("--out-dir")
-	if o >= 0 and o + 1 < args.size():
-		ISLANDS = args[o + 1].trim_suffix("/") + "/"
-		DirAccess.make_dir_recursive_absolute(ISLANDS)
+	var key: String = "berlenga"
+	# Every option checked before anything is written (found by Codex): a
+	# test build must never land on the game's islands by mistake.
+	var i: int = 0
+	while i < args.size():
+		var arg: String = args[i]
+		var value: String = args[i + 1] if i + 1 < args.size() else ""
+		if arg == "--out-dir":
+			var dir: String = value.simplify_path().trim_suffix("/") + "/"
+			if not dir.begins_with(TEST_OUT) or dir == TEST_OUT or ".." in value:
+				print("--out-dir must be a folder inside %s (got '%s')" % [TEST_OUT, value])
+				quit(1)
+				return
+			ISLANDS = dir
+			i += 2
+		elif arg == "--kits":
+			_kits = value.split(",", false)
+			for kit in _kits:
+				if kit not in ["houses", "paths", "none"]:
+					print("--kits takes houses, paths or none, comma-separated (got '%s')" % value)
+					quit(1)
+					return
+			i += 2
+		elif arg.begins_with("--"):
+			print("Unknown option ", arg)
+			quit(1)
+			return
+		else:
+			key = arg
+			i += 1
 	if not PLACES.has(key):
 		print("Unknown place %s (known: %s)" % [key, ", ".join(PLACES.keys())])
 		quit(1)
@@ -137,6 +164,8 @@ func _initialize() -> void:
 	P = PLACES[key]
 	NAME = P["out"]
 	DATA = DIR + "data/" + key + "/"
+	if ISLANDS.begins_with(TEST_OUT):
+		DirAccess.make_dir_recursive_absolute(ISLANDS)
 	if not FileAccess.file_exists(DATA + "meta.json"):
 		print("No data: run  python tools/real_island/fetch_data.py %s  first." % key)
 		quit(1)
@@ -239,7 +268,8 @@ func _read_osm() -> void:
 				height = float(tags["building:levels"]) * 3.0 + 0.5
 			if tags.has("height"):
 				height = float(String(tags["height"]).to_float())
-			tags["osm_id"] = e["id"]
+			tags = tags.duplicate()
+			tags["osm_id"] = int(e["id"])
 			_houses.append([pts, height, kind, tags.get("roof:shape", ""), tags.get("name", ""), tags])
 		elif tags.get("man_made") == "pier":
 			_piers.append(pts)
@@ -247,7 +277,8 @@ func _read_osm() -> void:
 			_village = _centroid(pts)  # Bairro dos Pescadores
 		elif tags.has("highway"):
 			var kind: String = tags["highway"]
-			tags["osm_id"] = e["id"]
+			tags = tags.duplicate()
+			tags["osm_id"] = int(e["id"])
 			_paths.append([pts, WIDTHS.get(kind, 2.0), kind, tags.get("bridge") == "yes", tags])
 	# Coastline ways joined end to end into closed rings (one per island).
 	var used: Array[bool] = []
@@ -713,12 +744,9 @@ func _build_scene() -> bool:
 	if P.has("detail_area"):
 		# Loaded at run time: plain scripts, no class_name to register.
 		# --kits houses (or paths, or none) builds only those, for testing one.
-		var args: PackedStringArray = OS.get_cmdline_user_args()
-		var k: int = args.find("--kits")
-		var kits: String = args[k + 1] if k >= 0 and k + 1 < args.size() else "houses,paths"
-		if "houses" in kits:
+		if "houses" in _kits:
 			_house_kit = load(DIR + "village_houses.gd").new(self)
-		if "paths" in kits:
+		if "paths" in _kits:
 			_path_kit = load(DIR + "village_paths.gd").new(self)
 	_place_paths()
 	_place_bridges()
@@ -899,13 +927,15 @@ func _tex(asset: String, file: String) -> Image:
 	return img
 
 
-func _texture(img: Image, name: String) -> Texture2D:
+func _texture(img: Image, name: String, normal: bool = false) -> Texture2D:
 	img.convert(Image.FORMAT_RGBA8)
-	img.generate_mipmaps()
+	img.generate_mipmaps(normal)  # normal maps: mipmaps renormalized
 	if img.compress(Image.COMPRESS_S3TC, Image.COMPRESS_SOURCE_GENERIC) != OK:
 		print("  %s: not compressed (stays RGBA8)" % name)
 	var path: String = TEX + name + ".res"
-	ResourceSaver.save(ImageTexture.create_from_image(img), path)
+	var err: int = ResourceSaver.save(ImageTexture.create_from_image(img), path)
+	if err != OK:
+		print("  PROBLEM: could not save %s (%s)" % [path, error_string(err)])
 	return load(path)
 
 
@@ -941,7 +971,8 @@ func _mat(c: Color, rough: float = 0.9) -> StandardMaterial3D:
 ## (triplanar) unless `uv` is true: then the mesh's own UVs, in metres
 ## (UV 1 = 1 m). Null when the place has no texture with that role.
 func _role_material(role: String, metres: float, tint: Color = Color.WHITE, uv: bool = false) -> StandardMaterial3D:
-	var key: String = "%s/%s/%s/%s" % [role, metres, tint.to_html(), uv]
+	assert(metres > 0.0)
+	var key: String = "mat/%s/%s/%s/%s" % [role, metres, tint, uv]
 	if _materials.has(key):
 		return _materials[key]
 	var m: StandardMaterial3D = null
@@ -966,10 +997,10 @@ func _role_material(role: String, metres: float, tint: Color = Color.WHITE, uv: 
 
 ## One map of a texture as a compressed resource in TEX, made once per build.
 func _cached_texture(asset: String, file: String) -> Texture2D:
-	var name: String = "%s_%s" % [asset, file.get_basename()]
+	var name: String = "%s_%s" % [asset, file.get_basename()]  # also the .res file name
 	if _materials.has(name):
 		return _materials[name]
-	var t: Texture2D = _texture(_tex(asset, file), name)
+	var t: Texture2D = _texture(_tex(asset, file), name, file.begins_with("nor"))
 	_materials[name] = t
 	return t
 
