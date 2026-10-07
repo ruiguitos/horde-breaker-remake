@@ -32,6 +32,7 @@ const MARGIN: int = 24  ## metres of sea kept around the main island
 const PATH_SLOPE: float = 0.55
 const SHOULDER: float = 2.0  ## metres beside a path carved with it
 const BLEND: float = 4.0  ## metres over which a carved path meets the natural ground
+const LIGHTHOUSE_HEIGHT: float = 22.0  ## a lighthouse mapped as a point, without a height
 const WIDTHS: Dictionary = {"footway": 2.0, "path": 1.6, "steps": 2.2, "track": 3.0, "service": 4.0, "pedestrian": 3.0}
 
 ## What differs between places. Scatter rows: [Quaternius model, count,
@@ -65,10 +66,17 @@ const PLACES: Dictionary = {
 		"landing": "pier", "parapet": true,
 		"generators": [["named", "第二坑捲"], ["named", "65号棟"], ["named", "四坑上家"]],  # pit 2 (mine), block 65, pit 4
 		"caches": 4, "cache_walk": 600,
+		# Level design read from the real layout with Codex (island metres).
+		# No choke at the pier: closing any 4 m disc 9-30 m from the landing
+		# leaves the boat reachable (272 tried), so the landing has two ways.
+		"chokes": {"FiftySteps": Vector2(254, 149), "WestSteps": Vector2(225, 156), "BlockAlleys": Vector2(210, 180),
+			"MineSteps": Vector2(197, 286)},
+		"arenas": {"NorthEast": Vector2(330, 95), "EastTerrace": Vector2(310, 255), "South": Vector2(65, 400)},
 		"scatter": [["Grass_Wispy_Short", 7000, 0.35, 3.0, 120.0, "green"], ["Grass_Common_Short", 3000, 0.3, 3.0, 100.0, "green"],
 			["Grass_Wispy_Tall", 1500, 0.7, 3.0, 160.0, "green"], ["Fern_1", 400, 0.8, 4.0, 200.0, "green"],
 			["Plant_1", 300, 0.6, 3.0, 160.0, "green"],
-			["Rock_Medium_1", 160, 0.9, 3.0, 400.0, "rubble"], ["Rock_Medium_2", 140, 0.7, 3.0, 400.0, "rubble"]],
+			# Fallen concrete: angular blocks rather than round rocks.
+			["Pebble_Square_4", 160, 0.8, 3.0, 400.0, "rubble"], ["Pebble_Square_5", 140, 0.6, 3.0, 400.0, "rubble"]],
 	},
 }
 
@@ -89,9 +97,11 @@ var _path_d := PackedFloat32Array() ## metres from the nearest path edge (capped
 var _rings: Array[PackedVector2Array] = []
 var _beaches: Array[PackedVector2Array] = []
 var _paths: Array = []              ## [PackedVector2Array, width, kind, bridge]
-var _houses: Array = []             ## [PackedVector2Array, height, kind]
+var _houses: Array = []             ## [PackedVector2Array, height, kind, roof:shape, name]
 var _piers: Array[PackedVector2Array] = []
 var _lighthouses: Array[Vector2] = []
+var _light_heights: Array[float] = []  ## metres, one per lighthouse
+var _plazas: Array[PackedVector2Array] = []  ## paved squares (highway + area=yes)
 var _village := Vector2(-1, -1)     ## centre of the named residential area
 var _named: Dictionary = {}         ## OSM name -> centre
 var _green: Array[PackedVector2Array] = []  ## grass and scrub areas
@@ -185,6 +195,7 @@ func _read_osm() -> void:
 		if e["type"] == "node":
 			if tags.get("man_made") == "lighthouse":
 				_lighthouses.append(to_local(e["lat"], e["lon"]))
+				_light_heights.append(String(tags["height"]).to_float() if tags.has("height") else LIGHTHOUSE_HEIGHT)
 			if tags.has("name"):
 				_named[tags["name"]] = to_local(e["lat"], e["lon"])
 			continue
@@ -201,6 +212,11 @@ func _read_osm() -> void:
 			coast.append([e["nodes"], pts])
 		elif tags.get("natural") == "beach" and pts.size() > 3:
 			_beaches.append(pts)
+		elif tags.get("man_made") == "lighthouse":  # a lighthouse building: one tower, its real height
+			_lighthouses.append(_centroid(pts))
+			_light_heights.append(String(tags.get("height", "18")).to_float())
+		elif tags.has("highway") and tags.get("area") == "yes" and pts.size() > 3:
+			_plazas.append(pts)  # a paved square, not a line to walk along its edge
 		elif tags.has("building"):
 			var kind: String = tags["building"]
 			var height: float = {"shed": 3.0, "kiosk": 3.0, "service": 3.5, "retail": 4.5}.get(kind, float(P["house_height"]))
@@ -208,11 +224,7 @@ func _read_osm() -> void:
 				height = float(tags["building:levels"]) * 3.0 + 0.5
 			if tags.has("height"):
 				height = float(String(tags["height"]).to_float())
-			_houses.append([pts, height, kind])
-			if tags.get("man_made") == "lighthouse":
-				_lighthouses.append(_centroid(pts))
-		elif tags.get("man_made") == "lighthouse":
-			_lighthouses.append(_centroid(pts))
+			_houses.append([pts, height, kind, tags.get("roof:shape", ""), tags.get("name", "")])
 		elif tags.get("man_made") == "pier":
 			_piers.append(pts)
 		elif tags.get("landuse") == "residential" and tags.has("name"):
@@ -280,6 +292,8 @@ func _crop() -> void:
 		_named[k] -= o
 	for i in _green.size():
 		_green[i] = _moved(_green[i], o)
+	for i in _plazas.size():
+		_plazas[i] = _moved(_plazas[i], o)
 	for i in _walls.size():
 		_walls[i] = _moved(_walls[i], o)
 	_paths = _paths.filter(func(p: Array) -> bool: return square.encloses(_bounds(p[0])))
@@ -316,22 +330,28 @@ func _centroid(pts: PackedVector2Array) -> Vector2:
 
 # ---------------------------------------------------------------- terrain
 
-## Even-odd fill of `rings` into a vertex mask (scanline per row).
+## Union of `rings` as a vertex mask: each ring filled on its own (even-odd
+## scanline per row), then added. Filling all rings together with even-odd
+## would cut a hole where two overlap, e.g. the margins around two
+## neighbouring buildings (found by Codex).
 func _fill(rings: Array[PackedVector2Array]) -> PackedByteArray:
 	var mask := PackedByteArray()
 	mask.resize(N * N)
-	for z in N:
-		var xs: Array[float] = []
-		for ring in rings:
+	for ring in rings:
+		if ring.size() < 3:
+			continue
+		var box: Rect2 = _bounds(ring)
+		for z in range(maxi(0, floori(box.position.y)), mini(N, ceili(box.end.y) + 1)):
+			var xs: Array[float] = []
 			for i in ring.size():
 				var a: Vector2 = ring[i]
 				var b: Vector2 = ring[(i + 1) % ring.size()]  # closes open rings too
 				if (a.y <= z) != (b.y <= z):
 					xs.append(a.x + (z - a.y) / (b.y - a.y) * (b.x - a.x))
-		xs.sort()
-		for k in range(0, xs.size() - 1, 2):
-			for x in range(maxi(0, ceili(xs[k])), mini(N, floori(xs[k + 1]) + 1)):
-				mask[z * N + x] = 1
+			xs.sort()
+			for k in range(0, xs.size() - 1, 2):
+				for x in range(maxi(0, ceili(xs[k])), mini(N, floori(xs[k + 1]) + 1)):
+					mask[z * N + x] = 1
 	return mask
 
 
@@ -468,7 +488,14 @@ func _relief() -> void:
 func _carve_paths() -> void:
 	_path_d.resize(N * N)
 	_path_d.fill(99.0)
-	for path in _paths:
+	# Squares (Hashima's tour walkway): their outline counts as a path of no
+	# width (distances outside), their inside as paved; filled after the loop.
+	var lines: Array = _paths.duplicate()
+	for plaza in _plazas:
+		var ring: PackedVector2Array = plaza.duplicate()
+		ring.append(plaza[0])
+		lines.append([ring, 0.0, "square", false])
+	for path in lines:
 		if path[3]:
 			continue  # bridges are decks above the ground
 		var pts: PackedVector2Array = path[0]
@@ -486,6 +513,10 @@ func _carve_paths() -> void:
 					var k: int = z * N + x
 					if d < _path_d[k]:
 						_path_d[k] = d
+	var paved: PackedByteArray = _fill(_plazas)
+	for i in N * N:
+		if paved[i] == 1:
+			_path_d[i] = -1.0
 	# Corridor heights: smoothed natural ground, never under the sea. Beach
 	# sand above the water joins the corridor as it is: where a path ends at a
 	# beach closed in by cliffs, path and sand meet in a ramp.
@@ -634,13 +665,14 @@ func _build_scene() -> bool:
 	mat.call("set_shader_param", "enable_macro_variation", true)
 	var data: Object = _terrain.get("data")
 	data.call("import_images", [height_img, control_img, color_img], Vector3.ZERO, 0.0, 1.0)
-	var dir: String = ISLANDS + NAME + "_data"
-	for f in DirAccess.get_files_at(dir) if DirAccess.dir_exists_absolute(dir) else PackedStringArray():
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(dir.path_join(f)))
-	DirAccess.make_dir_recursive_absolute(dir)
-	data.call("save_directory", dir)
-	_terrain.set("data_directory", dir)
-	_lap("terrain: heights, textures per vertex, saved")
+	# Staged first: the island's terrain is only replaced once the new
+	# island passes its checks (found by Codex).
+	var stage: String = ISLANDS + NAME + "_data_build"
+	_clear_dir(stage)
+	DirAccess.make_dir_recursive_absolute(stage)
+	data.call("save_directory", stage)
+	_terrain.set("data_directory", stage)
+	_lap("terrain: heights, textures per vertex, staged")
 	for group in ["Buildings", "Rocks", "Bridges", "Decor", "Markers"]:
 		var n := Node3D.new()
 		n.name = group
@@ -657,16 +689,36 @@ func _build_scene() -> bool:
 	var problems: Array[String] = []
 	var first: IslandMap = _root.build_map(problems)
 	_lap("grid (%d x %d)" % [N, N])
-	_place_markers(first)
+	if not _place_markers(first):
+		print("  PROBLEM: no landing; the island was not saved")
+		_clear_dir(stage)
+		return false
 	_lap("markers")
-	var packed := PackedScene.new()
-	packed.pack(_root)
-	# Binary: the copies of grass and rocks make a text scene far too big and slow.
-	var err: int = ResourceSaver.save(packed, ISLANDS + NAME + ".scn", ResourceSaver.FLAG_COMPRESS)
-	_lap("saved %s (%s)" % [ISLANDS + NAME + ".scn", error_string(err)])
+	# Check the finished island before saving anything of it: a failed build
+	# must not replace a good island (found by Codex).
 	problems.clear()
 	var map: IslandMap = _root.build_map(problems)
-	HandmadeIsland.grid_image(map).save_png(ISLANDS + NAME + "_grid.png")
+	var err: int = OK
+	if problems.is_empty():
+		var final: String = ISLANDS + NAME + "_data"
+		_clear_dir(final)
+		DirAccess.make_dir_recursive_absolute(final)
+		for f in DirAccess.get_files_at(stage):
+			DirAccess.rename_absolute(ProjectSettings.globalize_path(stage.path_join(f)), ProjectSettings.globalize_path(final.path_join(f)))
+		_clear_dir(stage)
+		_terrain.set("data_directory", final)
+		var assets: Resource = _terrain.get("assets")
+		ResourceSaver.save(assets, ISLANDS + NAME + "_ground.res")
+		assets.take_over_path(ISLANDS + NAME + "_ground.res")
+		var packed := PackedScene.new()
+		packed.pack(_root)
+		# Binary: the copies of grass and rocks make a text scene far too big and slow.
+		err = ResourceSaver.save(packed, ISLANDS + NAME + ".scn", ResourceSaver.FLAG_COMPRESS)
+		_lap("saved %s (%s)" % [ISLANDS + NAME + ".scn", error_string(err)])
+		HandmadeIsland.grid_image(map).save_png(ISLANDS + NAME + "_grid.png")
+	else:
+		print("  not saved: the island has problems (below)")
+		_clear_dir(stage)
 	var open: int = 0
 	for b in map.field.blocked:
 		open += 1 if b == 0 else 0
@@ -686,12 +738,44 @@ func _build_scene() -> bool:
 	print("  Activate route on the grid (landing > generators 1, 2, 3 > boat), metres per leg: %s" % ", ".join(legs))
 	for k in map.generators.size():
 		print("  Generator%d at (%d, %d)" % [k + 1, int(map.generators[k].x), int(map.generators[k].z)])
+	_check_chokes(map)
 	_debug_picture(map)
 	for p in problems:
 		print("  PROBLEM: ", p)
 	if problems.is_empty() and err == OK:
 		print("  no problems")
 	return problems.is_empty() and err == OK
+
+
+## Choke points (PLACES "chokes"): close each one in turn (a 4 m disc) and
+## say whether the boat, generators and caches can still be reached, as
+## tools/dev/build_islands.gd does for the hand-made islands. A cut is
+## reported, not an error: on a real island some passages are the only way.
+func _check_chokes(map: IslandMap) -> void:
+	var goals: Array[Vector3] = [map.boat]
+	goals.append_array(map.generators)
+	goals.append_array(map.caches)
+	var chokes: Dictionary = P.get("chokes", {})
+	for name: String in chokes:
+		var c: Vector2 = chokes[name]
+		# A disc over the start or a goal would "cut" it without proving
+		# anything about the routes (found by Codex): move the marker.
+		var on: Array = goals.filter(func(g: Vector3) -> bool: return Vector2(g.x, g.z).distance_to(c) <= 5.0)
+		if Vector2(map.player_start.x, map.player_start.z).distance_to(c) <= 5.0 or not on.is_empty():
+			print("  Choke_%s: placed on the start or a goal, move it" % name)
+			continue
+		var f := FlowField.new(N, N)
+		f.blocked = map.field.blocked.duplicate()
+		for z in range(int(c.y) - 4, int(c.y) + 5):
+			for x in range(int(c.x) - 4, int(c.x) + 5):
+				if x >= 0 and z >= 0 and x < N and z < N and Vector2(x + 0.5, z + 0.5).distance_to(c) <= 4.0:
+					f.blocked[z * N + x] = 1
+		f.compute_now(f.world_to_cell(map.player_start))
+		var cut: PackedStringArray = []
+		for g in goals:
+			if f.distance_at(g) >= FlowField.UNREACHABLE:
+				cut.append("(%d, %d)" % [int(g.x), int(g.z)])
+		print("  Choke_%s closed: %s" % [name, "every goal still reachable" if cut.is_empty() else "CUT OFF " + ", ".join(cut)])
 
 
 ## data/reach.png (not in git): where the paths are and what the grid can
@@ -721,7 +805,7 @@ func _debug_picture(map: IslandMap) -> void:
 ## compressed (DXT5) into assets/textures/polyhaven/.
 func _ground_assets() -> Resource:
 	DirAccess.make_dir_recursive_absolute(TEX)
-	var assets: Object = ClassDB.instantiate(&"Terrain3DAssets")
+	var assets: Resource = ClassDB.instantiate(&"Terrain3DAssets")
 	var names: Array = (meta["textures"] as Dictionary).keys()
 	var scales: Dictionary = {"ground": 0.12, "cliff": 0.08, "shore": 0.15, "path": 0.3}
 	var order: Array = ["ground", "cliff", "shore", "path"]
@@ -740,13 +824,33 @@ func _ground_assets() -> Resource:
 		ta.set("uv_scale", scales[order[id]])
 		ta.set("detiling_rotation", 0.3)
 		assets.call("set_texture", id, ta)
-	var path: String = ISLANDS + NAME + "_ground.res"
-	ResourceSaver.save(assets, path)
-	return load(path)
+	return assets  # saved next to the island only when the build succeeds
 
 
+## Deletes the files in `dir` and the folder itself (if they exist).
+func _clear_dir(dir: String) -> void:
+	if not DirAccess.dir_exists_absolute(dir):
+		return
+	for f in DirAccess.get_files_at(dir):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(dir.path_join(f)))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(dir))
+
+
+## One map of a downloaded texture. Poly Haven does not have every map for
+## every texture (or has it only as .jpg): the other extension is tried,
+## then a plain grey stands in (mid height, mid roughness).
 func _tex(asset: String, file: String) -> Image:
-	var img: Image = Image.load_from_file(ProjectSettings.globalize_path(DATA + "textures/%s_%s" % [asset, file]))
+	var path: String = ProjectSettings.globalize_path(DATA + "textures/%s_%s" % [asset, file])
+	var other: String = path.get_basename() + (".jpg" if path.ends_with(".png") else ".png")
+	var img: Image
+	if FileAccess.file_exists(path):
+		img = Image.load_from_file(path)
+	elif FileAccess.file_exists(other):
+		img = Image.load_from_file(other)
+	else:
+		print("  %s_%s missing: plain grey instead" % [asset, file])
+		img = Image.create_empty(1024, 1024, false, Image.FORMAT_RGBA8)
+		img.fill(Color(0.5, 0.5, 0.5))
 	img.convert(Image.FORMAT_RGBA8)
 	if img.get_width() != 1024:
 		img.resize(1024, 1024)
@@ -909,8 +1013,12 @@ func _place_buildings() -> void:
 		wall_mat.uv1_triplanar = true
 		wall_mat.uv1_scale = Vector3.ONE / 3.0  # one picture (a floor with its window) every 3 m
 	var roof_mat: StandardMaterial3D = _mat(P["roof_color"], 0.85)
-	var flat: bool = P["roof"] == "flat"
+	var balconies := SurfaceTool.new()
+	balconies.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for k in _houses.size():
+		# OSM roof:shape wins over the place's style (Hashima's pit 4 is gabled).
+		var shape: String = _houses[k][3]
+		var flat: bool = shape == "flat" or (shape == "" and P["roof"] == "flat")
 		var pts: PackedVector2Array = _houses[k][0]
 		if pts.size() > 1 and pts[0].distance_to(pts[pts.size() - 1]) < 0.01:
 			pts = pts.slice(0, pts.size() - 1)
@@ -928,14 +1036,13 @@ func _place_buildings() -> void:
 		var roof := SurfaceTool.new()
 		walls.begin(Mesh.PRIMITIVE_TRIANGLES)
 		roof.begin(Mesh.PRIMITIVE_TRIANGLES)
+		var turn: float = _turn(pts)
 		var shortest: float = INF
 		for i in pts.size():
 			var a: Vector2 = pts[i] - c
 			var e: Vector2 = pts[(i + 1) % pts.size()] - c
 			shortest = minf(shortest, a.distance_to(e))
-			var out := Vector3((e - a).y, 0, -(e - a).x).normalized()
-			if out.dot(Vector3(a.x, 0, a.y)) < 0.0:
-				out = -out
+			var out: Vector3 = _outward(a, e, turn)
 			_tri(walls, Vector3(a.x, base, a.y), Vector3(e.x, base, e.y), Vector3(e.x, eaves, e.y), out)
 			_tri(walls, Vector3(a.x, base, a.y), Vector3(e.x, eaves, e.y), Vector3(a.x, eaves, a.y), out)
 		if flat:
@@ -953,11 +1060,14 @@ func _place_buildings() -> void:
 			for i in pts.size():
 				var a: Vector2 = pts[i] - c
 				var e: Vector2 = pts[(i + 1) % pts.size()] - c
-				var out := Vector3((e - a).y, 0, -(e - a).x).normalized()
-				if out.dot(Vector3(a.x, 0, a.y)) < 0.0:
-					out = -out
+				var out: Vector3 = _outward(a, e, turn)
 				_tri(walls, Vector3(a.x, eaves, a.y), Vector3(e.x, eaves, e.y), Vector3(e.x, eaves + 0.8, e.y), out)
 				_tri(walls, Vector3(a.x, eaves, a.y), Vector3(e.x, eaves + 0.8, e.y), Vector3(a.x, eaves + 0.8, a.y), out)
+		elif shape in ["gabled", "pitched"]:
+			var local := PackedVector2Array()
+			for p in pts:
+				local.append(p - c)
+			_gable(roof, local, eaves, turn)
 		else:
 			var ridge := Vector3(0, eaves + clampf(shortest * 0.35, 1.0, 2.5), 0)
 			for i in pts.size():
@@ -976,21 +1086,127 @@ func _place_buildings() -> void:
 		inst.mesh = mesh
 		inst.position = Vector3(c.x, 0, c.y)
 		_add(inst, "Buildings")
+		if flat and String(_houses[k][4]).ends_with("号棟") and float(_houses[k][1]) >= 12.0:
+			_balconies(balconies, pts, hi, eaves)
+	var gallery: ArrayMesh = balconies.commit()
+	if gallery.get_surface_count() > 0:
+		# Decoration, not part of the buildings: the grid blocks what a building
+		# covers from above, and balconies over an alley would close it.
+		var inst := MeshInstance3D.new()
+		inst.name = "Balconies"
+		inst.mesh = gallery
+		inst.material_override = _mat(Color(0.62, 0.61, 0.58), 0.9)
+		_add(inst, "Decor")
 	for k in _lighthouses.size():
-		_lighthouse(_lighthouses[k], k)
+		_lighthouse(_lighthouses[k], k, _light_heights[k])
 	for k in _piers.size():
 		_pier(_piers[k], k)
 
 
-func _lighthouse(p: Vector2, k: int) -> void:
+## A gabled roof: the ridge runs along the longest wall, through the middle
+## of the plan; every point of the eaves rises to the ridge point level with
+## it. Long walls get a slope, short ones a vertical gable. Before, OSM
+## "gabled" fell back to a pyramid (found by Codex).
+func _gable(st: SurfaceTool, pts: PackedVector2Array, eaves: float, turn: float) -> void:
+	var u := Vector2.RIGHT
+	var longest: float = 0.0
+	for i in pts.size():
+		var d: Vector2 = pts[(i + 1) % pts.size()] - pts[i]
+		if d.length() > longest:
+			longest = d.length()
+			u = d.normalized()
+	var v := Vector2(-u.y, u.x)
+	var vmin: float = INF
+	var vmax: float = -INF
+	for p in pts:
+		vmin = minf(vmin, p.dot(v))
+		vmax = maxf(vmax, p.dot(v))
+	var vmid: float = (vmin + vmax) * 0.5
+	var top: float = eaves + clampf((vmax - vmin) * 0.3, 1.0, 4.0)
+	for i in pts.size():
+		var p: Vector2 = pts[i]
+		var q: Vector2 = pts[(i + 1) % pts.size()]
+		var rp2: Vector2 = u * p.dot(u) + v * vmid
+		var rq2: Vector2 = u * q.dot(u) + v * vmid
+		var a := Vector3(p.x, eaves, p.y)
+		var b := Vector3(q.x, eaves, q.y)
+		var rp := Vector3(rp2.x, top, rp2.y)
+		var rq := Vector3(rq2.x, top, rq2.y)
+		var n: Vector3 = (b - a).cross(rp - a).normalized()
+		if n.dot(_outward(p, q, turn)) + n.y < 0.0:
+			n = -n  # slopes face up and out, gables out
+		if rp2.distance_to(rq2) < 0.05:
+			_tri(st, a, b, rp, n)  # gable end
+		else:
+			_tri(st, a, b, rq, n)
+			_tri(st, a, rq, rp, n)
+
+
+## Which way a footprint winds: +1 or -1 (sign of its area, closing edge
+## included). With it the outside of every wall is known, also in L- and
+## U-shaped plans, where "away from the centre" points the wrong way.
+func _turn(pts: PackedVector2Array) -> float:
+	var a: float = 0.0
+	for i in pts.size():
+		var p: Vector2 = pts[i]
+		var q: Vector2 = pts[(i + 1) % pts.size()]
+		a += p.x * q.y - q.x * p.y
+	return 1.0 if a >= 0.0 else -1.0
+
+
+## Outward normal of the wall from a to e (see _turn).
+func _outward(a: Vector2, e: Vector2, turn: float) -> Vector3:
+	var d: Vector2 = (e - a).normalized()
+	return Vector3(d.y, 0, -d.x) * turn
+
+
+## Hashima's flats ("<n>号棟"): an open gallery (a concrete slab 1 m deep
+## with a 0.9 m parapet) along each long side, one per floor (3 m). The
+## blocks had them on the outside: they are what makes them read as housing.
+func _balconies(st: SurfaceTool, pts: PackedVector2Array, ground: float, eaves: float) -> void:
+	var turn: float = _turn(pts)
+	for i in pts.size():
+		var a: Vector2 = pts[i]
+		var e: Vector2 = pts[(i + 1) % pts.size()]
+		if a.distance_to(e) < 8.0:
+			continue
+		var d: Vector2 = (e - a).normalized()
+		var out2 := Vector2(d.y, -d.x) * turn
+		# Ends trimmed by the gallery's depth: at an inner corner the two
+		# galleries would otherwise overlap and flicker (found by Codex).
+		var a0: Vector2 = a + d * 1.0
+		var e0: Vector2 = e - d * 1.0
+		var a1: Vector2 = a0 + out2
+		var e1: Vector2 = e0 + out2
+		var out := Vector3(out2.x, 0, out2.y)
+		var y: float = ground + 3.0
+		while y < eaves - 1.0:
+			var p: Array[Vector3] = [Vector3(a0.x, y, a0.y), Vector3(e0.x, y, e0.y), Vector3(e1.x, y, e1.y), Vector3(a1.x, y, a1.y)]
+			_tri(st, p[0], p[1], p[2], Vector3.UP)  # slab top
+			_tri(st, p[0], p[2], p[3], Vector3.UP)
+			var down := Vector3(0, -0.15, 0)
+			_tri(st, p[0] + down, p[2] + down, p[1] + down, Vector3.DOWN)
+			_tri(st, p[0] + down, p[3] + down, p[2] + down, Vector3.DOWN)
+			var up := Vector3(0, 0.9, 0)
+			_tri(st, p[3] + down, p[2] + down, p[2] + up, out)  # parapet
+			_tri(st, p[3] + down, p[2] + up, p[3] + up, out)
+			_tri(st, p[3] + up, p[2] + up, p[2], -out)
+			_tri(st, p[3] + up, p[2], p[3], -out)
+			y += 3.0
+
+
+## A lighthouse `height` metres tall (OSM height, or LIGHTHOUSE_HEIGHT for a
+## point): a square tower, the lantern room and a red cap.
+func _lighthouse(p: Vector2, k: int, height: float) -> void:
 	var node := Node3D.new()
 	node.name = "Lighthouse_%d" % k
 	node.position = Vector3(p.x, height_at(p.x, p.y) - 0.5, p.y)
 	_add(node, "Buildings")
+	var s: float = height / 22.2  # the parts below are for a 22.2 m lighthouse
 	var parts: Array = [
-		[BoxMesh.new(), Vector3(4.5, 18.0, 4.5), Vector3(0, 9.0, 0), Color(0.95, 0.94, 0.9)],
-		[CylinderMesh.new(), Vector3(2.0, 3.0, 2.0), Vector3(0, 19.5, 0), Color(0.15, 0.17, 0.2)],
-		[CylinderMesh.new(), Vector3(2.4, 1.2, 2.4), Vector3(0, 21.6, 0), Color(0.7, 0.15, 0.12)],
+		[BoxMesh.new(), Vector3(4.5, 18.0, 4.5) * s, Vector3(0, 9.0, 0) * s, Color(0.95, 0.94, 0.9)],
+		[CylinderMesh.new(), Vector3(2.0, 3.0, 2.0) * s, Vector3(0, 19.5, 0) * s, Color(0.15, 0.17, 0.2)],
+		[CylinderMesh.new(), Vector3(2.4, 1.2, 2.4) * s, Vector3(0, 21.6, 0) * s, Color(0.7, 0.15, 0.12)],
 	]
 	for part in parts:
 		var mi := MeshInstance3D.new()
@@ -1045,7 +1261,7 @@ func _place_nature() -> void:
 		var mesh: Mesh = _kit_mesh(spec[0])
 		if mesh == null:
 			continue
-		var rock: bool = String(spec[0]).begins_with("Rock")
+		var rock: bool = spec[5] in ["cliff_top", "rubble"]  # these block (Rocks/)
 		var target: float = spec[2]
 		var tries: int = 0
 		var made: int = 0
@@ -1184,7 +1400,7 @@ func _place_sea() -> void:
 ## the boat on the beach, the generators at real landmarks, the caches as far
 ## from everything as possible. Every spot is walkable, clear around and
 ## reachable from the landing.
-func _place_markers(map: IslandMap) -> void:
+func _place_markers(map: IslandMap) -> bool:
 	var f: FlowField = map.field
 	f.max_distance = 0
 	# The island's walkable heart: everything reachable from the lighthouse,
@@ -1216,6 +1432,8 @@ func _place_markers(map: IslandMap) -> void:
 			if d < best and _t[i] >= 2.0 and _t[i] <= 8.0 and _h[i] > 0.2 and heart[i] < FlowField.UNREACHABLE and _clear(f, Vector2i(x, z)):
 				best = d
 				landing = Vector2i(x, z)
+	if landing.x < 0:
+		return false  # no dry shore cell connected to the island near the beach or pier
 	print("  landing at (%d, %d) %s, %.1f m high" % [landing.x, landing.y, "on the sand" if best < 100.0 else "on the shore", _h[landing.y * N + landing.x]])
 	var seaward := Vector2(_t[landing.y * N + landing.x - 1] - _t[landing.y * N + landing.x + 1],
 		_t[(landing.y - 1) * N + landing.x] - _t[(landing.y + 1) * N + landing.x]).normalized()
@@ -1256,6 +1474,14 @@ func _place_markers(map: IslandMap) -> void:
 		var c: Vector2 = _farthest(f, reach, goals, walk / 10, walk, 12.0 if walk > 800 else 4.0)
 		_marker("Cache%d" % (k + 1), Vector3(c.x + 0.5, 0, c.y + 0.5))
 		goals.append(c)
+	# Choke points and arenas: markers for the level design (they do not
+	# change the game; screenshot.gd takes a close view of each).
+	for kind: String in ["chokes", "arenas"]:
+		var spots: Dictionary = P.get(kind, {})
+		for name: String in spots:
+			var p: Vector2 = spots[name]
+			_marker(("Choke_" if kind == "chokes" else "Arena_") + name, Vector3(p.x, 0, p.y))
+	return true
 
 
 ## The open, walkable cell furthest from the coast.

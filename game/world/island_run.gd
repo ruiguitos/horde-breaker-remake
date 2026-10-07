@@ -666,10 +666,13 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 ## the area around the player, so enemies left behind outside it would stand
 ## still. They are removed (no XP) and the director spawns new ones nearby.
 func _recycle_far(dt: float) -> void:
-	if field.max_distance <= 0 or field.is_computing:
+	if field.max_distance <= 0:
 		return
+	# Count down every tick; once due, wait only for a finished field (while
+	# the player runs a recompute is almost always under way, and counting
+	# only between them stretched 1 s to about 8 s: found by Codex).
 	_recycle_cd -= dt
-	if _recycle_cd > 0.0:
+	if _recycle_cd > 0.0 or field.is_computing:
 		return
 	_recycle_cd = 1.0
 	var far2: float = GameData.SPAWN_MAX_DIST * GameData.SPAWN_MAX_DIST

@@ -285,7 +285,7 @@ só visual. A câmara de 3.ª pessoa encurta para não entrar nas colinas.
 | Nó | O que faz na grelha |
 |---|---|
 | `Terrain3D` | Abaixo do mar (-0,3 m) é mar; degrau maior que 0,9 m por metro (cerca de 42°) é falésia: bloqueia |
-| `Buildings/` | Cada filho bloqueia as células por baixo da sua caixa (vista de cima) |
+| `Buildings/` | Cada filho bloqueia as células por baixo da sua forma real, vista de cima: os triângulos do modelo projetados no chão. Um prédio rodado ou em L deixa livres as vielas e os pátios à volta. Objetos sem forma visível de cima bloqueiam a caixa inteira |
 | `Rocks/` | Igual aos edifícios. Um nó `Scatter` (muitas cópias de uma rocha) bloqueia por baixo de cada cópia |
 | `Trees/` | Cada filho bloqueia só a célula do tronco (a copa não conta) |
 | `Bridges/` | Cada filho é o tabuleiro de uma ponte (`MeshInstance3D`): as células por baixo andam-se à altura do tabuleiro, mesmo sobre água; os filhos (guardas) são decoração |

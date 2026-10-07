@@ -37,6 +37,8 @@ const ISLANDS_DIR: String = "res://game/world/handmade/islands/"
 const GROUND_MARGIN: float = 0.15
 const NO_TERRAIN: float = 0.0  ## height used when there is no Terrain3D
 
+var _objects := PackedByteArray()  ## cells already in map.wall_cells (build_map)
+
 
 ## Converts the scene into the grid map the simulation uses. Problems found
 ## (missing boat, unreachable goals...) are appended to `problems`.
@@ -94,6 +96,8 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	_raise_beside_decks(heights, deck, deck_cells, f)
 	map.heights = heights
 	# Objects. A Scatter (many copies of one rock) blocks under every copy.
+	_objects = PackedByteArray()
+	_objects.resize(size * size)
 	for node in _children_of("Rocks"):
 		if node is Scatter:
 			var scatter := node as Scatter
@@ -109,7 +113,7 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 		if rect.size == Vector2i.ZERO:
 			problems.append("%s has no mesh: it blocks nothing." % node.name)
 			continue
-		f.set_blocked_rect(rect.position.x, rect.position.y, rect.end.x - 1, rect.end.y - 1)
+		_block_shape(node, rect, f, map)
 		map.buildings.append(rect)
 	for node in _children_of("Trees"):
 		var tp: Vector3 = _local(node).origin
@@ -196,8 +200,11 @@ static func grid_image(map: IslandMap) -> Image:
 			if f.blocked[i] != 0:
 				c = Color(0.1, 0.3, 0.8) if h < 0.0 else Color(0.25, 0.2, 0.15)
 			img.set_pixel(x, z, c)
-	for r in map.buildings:
-		img.fill_rect(r, Color(0.6, 0.6, 0.6))
+	if not map.handmade:
+		for r in map.buildings:
+			img.fill_rect(r, Color(0.6, 0.6, 0.6))
+	for i in map.wall_cells:
+		img.set_pixel(i % f.width, i / f.width, Color(0.6, 0.6, 0.6))
 	for t in map.trees:
 		img.set_pixelv(t, Color(0.05, 0.45, 0.1))
 	for p: Vector3 in map.generators:
@@ -324,6 +331,12 @@ func _children_of(group: String) -> Array[Node3D]:
 ## Cells covered by the meshes under `node` (world AABB on XZ), clamped to
 ## the island. A thin object still covers at least the cell it stands on.
 func _footprint(node: Node3D) -> Rect2i:
+	var box: AABB = _box_of(node)
+	return Rect2i() if box.size == Vector3.ZERO else _rect_of(box)
+
+
+## The box around the meshes under `node`, in island space (empty if none).
+func _box_of(node: Node3D) -> AABB:
 	var box := AABB()
 	var first: bool = true
 	var meshes: Array[Node] = [node]
@@ -337,9 +350,75 @@ func _footprint(node: Node3D) -> Rect2i:
 			continue
 		box = b if first else box.merge(b)
 		first = false
-	if first:
-		return Rect2i()
-	return _rect_of(box)
+	return box
+
+
+## Boxes (island space, real heights) of the buildings and single rocks: the
+## island scene shortens the third-person camera when it would pass through
+## one. A 27 m block needs its 27 m, not a fixed height.
+func object_boxes() -> Array[AABB]:
+	var out: Array[AABB] = []
+	for node in _children_of("Buildings") + _children_of("Rocks"):
+		if node is Scatter:
+			continue
+		var box: AABB = _box_of(node)
+		if box.size != Vector3.ZERO:
+			out.append(box)
+	return out
+
+
+## Blocks the cells whose centre lies under the object's real shape seen
+## from above (its mesh triangles projected on the ground), not the whole
+## box around it: a rotated or L-shaped building leaves the alleys and yards
+## beside it open. Objects without a mesh shape (or too thin to cover a cell
+## centre) block their box, as before. Each mesh is judged on its own (a
+## thin railing beside a thick wall still blocks). Blocked cells go to
+## map.wall_cells once each (the minimap draws them), also over cliffs.
+func _block_shape(node: Node3D, rect: Rect2i, f: FlowField, map: IslandMap) -> void:
+	var meshes: Array[Node] = [node]
+	meshes.append_array(node.find_children("*", "MeshInstance3D", true, false))
+	var any_mesh: bool = false
+	for m in meshes:
+		if not m is MeshInstance3D or (m as MeshInstance3D).mesh == null:
+			continue
+		any_mesh = true
+		var mi := m as MeshInstance3D
+		var xf: Transform3D = _local(mi)
+		var faces: PackedVector3Array = mi.mesh.get_faces()
+		var covered: int = 0
+		for k in range(0, faces.size() - 2, 3):
+			var a3: Vector3 = xf * faces[k]
+			var b3: Vector3 = xf * faces[k + 1]
+			var c3: Vector3 = xf * faces[k + 2]
+			var a := Vector2(a3.x, a3.z)
+			var b := Vector2(b3.x, b3.z)
+			var c := Vector2(c3.x, c3.z)
+			if absf((b - a).cross(c - a)) < 1e-6:
+				continue  # edge-on from above (a wall): its roof or floor gives the shape
+			var lo: Vector2 = a.min(b).min(c)
+			var hi: Vector2 = a.max(b).max(c)
+			for z in range(maxi(floori(lo.y), 0), mini(ceili(hi.y), size)):
+				for x in range(maxi(floori(lo.x), 0), mini(ceili(hi.x), size)):
+					if Geometry2D.point_is_inside_triangle(Vector2(x + 0.5, z + 0.5), a, b, c):
+						covered += 1
+						_mark_object(z * size + x, f, map)
+		if covered == 0:  # too thin to cover a cell centre: its box
+			_block_rect(_rect_of(xf * mi.mesh.get_aabb()), f, map)
+	if not any_mesh:
+		_block_rect(rect, f, map)
+
+
+func _block_rect(r: Rect2i, f: FlowField, map: IslandMap) -> void:
+	for z in range(r.position.y, r.end.y):
+		for x in range(r.position.x, r.end.x):
+			_mark_object(z * size + x, f, map)
+
+
+func _mark_object(i: int, f: FlowField, map: IslandMap) -> void:
+	f.blocked[i] = 1
+	if _objects[i] == 0:
+		_objects[i] = 1
+		map.wall_cells.append(i)
 
 
 ## Cells under a box (island space, seen from above), clamped to the island.

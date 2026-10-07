@@ -27,6 +27,7 @@ func _init() -> void:
 
 func set_run(r: IslandRun) -> void:
 	run = r
+	_origin = Vector2.ZERO  # a minimap reused after a big island must not keep its window
 	# Bake the terrain once: sea, walkable ground, walls/buildings.
 	var f: FlowField = r.field
 	_step = maxi(1, ceili(maxf(f.width, f.height) / float(BAKE_MAX)))
@@ -35,10 +36,13 @@ func set_run(r: IslandRun) -> void:
 	var h: int = ceili(f.height / float(_step))
 	var walls := PackedByteArray()
 	walls.resize(f.width * f.height)
-	for b in r.map.buildings:
-		for z in range(b.position.y, b.end.y):
-			for x in range(b.position.x, b.end.x):
-				walls[z * f.width + x] = 1
+	if not r.map.handmade:
+		for b in r.map.buildings:
+			for z in range(b.position.y, b.end.y):
+				for x in range(b.position.x, b.end.x):
+					walls[z * f.width + x] = 1
+	for i in r.map.wall_cells:  # hand-made islands: the real shapes, alleys open
+		walls[i] = 1
 	for c in r.map.trees + r.map.rocks:
 		walls[c.y * f.width + c.x] = 2
 	var sea := Color("111e1e")

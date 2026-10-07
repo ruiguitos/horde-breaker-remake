@@ -17,6 +17,9 @@ var player_start: Vector3
 var generators: Array[Vector3] = []
 ## Wall rectangles (x0, z0, w, h) in cells, for rendering buildings.
 var buildings: Array[Rect2i] = []
+## Hand-made islands: the cells their buildings and rocks really block
+## (z * width + x); the rectangles above are only the boxes around them.
+var wall_cells: PackedInt32Array = PackedInt32Array()
 ## Single-cell blocking props (cells), rendered as trees and rocks.
 var trees: Array[Vector2i] = []
 var rocks: Array[Vector2i] = []

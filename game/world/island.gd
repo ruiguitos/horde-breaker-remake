@@ -395,15 +395,13 @@ func _build_generated_world() -> void:
 
 
 ## Hand-made islands: the scene already holds terrain, models and decor.
-## Only the camera boxes are taken from the grid (buildings and rocks).
+## Only the camera boxes come from it (buildings and rocks, real heights).
 func _use_handmade_world() -> void:
 	_terrain = _handmade.get_node_or_null("Terrain3D")
 	var preview: Node3D = _handmade.get_node_or_null("Decor/SeaPreview")
 	if preview != null:
 		preview.visible = false  # the game draws its own animated sea
-	for r in run.map.buildings:
-		var base: float = run.map.ground_y(Vector3(r.get_center().x, 0, r.get_center().y))
-		_building_boxes.append(AABB(Vector3(r.position.x, base, r.position.y), Vector3(r.size.x, 6.0, r.size.y)))
+	_building_boxes.append_array(_handmade.object_boxes())
 
 
 ## Terrain3D ground (sloping sea floor, colour-mapped land). False when the

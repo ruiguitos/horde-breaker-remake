@@ -118,10 +118,10 @@ com aprovação do utilizador.
 
 ## Tarefas pendentes
 
-- Picos de simulação com 100 a 150 inimigos: até 76 ms na `port_01` e 117 ms
-  em Hashima (bot do soak). A média fica em 2 a 3 ms. Falta medir onde está o
-  tempo; suspeitas: cadeias de explosões de Bloaters ou a separação entre
-  inimigos.
+- Picos de simulação: numa medição apareceram passos de 76 ms na `port_01` e
+  de 117 ms em Hashima. Ao repetir, o pior passo foi de 6,7 e 8,5 ms. Pode
+  ter sido carga da máquina naquele momento; voltar a medir se aparecerem
+  quebras no jogo.
 
 - Berlenga: falta um ecrã de créditos com "© OpenStreetMap contributors"
   (obrigatório pela ODbL quando o jogo for distribuído).

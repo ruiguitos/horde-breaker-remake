@@ -76,6 +76,22 @@ depois de a construir, ou muda o script.
   - **Hashima:** betão com telhado plano e platibanda. A fachada é uma
     textura do Poly Haven com uma janela desenhada a cada 3 m, mais ou menos
     um andar. Os 66 edifícios têm a altura do OSM; o Bloco 65 tem 27 m.
+- **Mais detalhe dos edifícios em Hashima:** acrescentado na revisão com o
+  Codex.
+  - Os blocos de habitação (`号棟`) têm galerias abertas a cada andar, como
+    as reais. Ficam em `Decor/` para não fecharem as vielas na grelha.
+  - O `roof:shape` do OSM sobrepõe-se ao estilo do sítio: o Poço 4 tem
+    telhado inclinado.
+  - O farol é uma só torre, com os 10 m do OSM.
+  - A orientação das paredes vem do sentido do polígono, para que as plantas
+    em L e em U fiquem com as paredes viradas para fora.
+- **Praças:** os passeios com `area=yes` no OSM (o percurso turístico de
+  Hashima) são pavimento por inteiro, e não um caminho ao longo do contorno.
+- **Gargalos e arenas** (`chokes`, `arenas` no preset): são marcadores
+  `Choke_*` e `Arena_*`, com as posições que o Codex leu na disposição real.
+  O construtor fecha cada gargalo à vez e diz se algum objetivo fica
+  inacessível. Em Hashima só o cais corta o caminho para o barco: é o funil
+  do desembarque.
 - **Paredão:** em Hashima há um muro de 1,7 m ao longo do paredão do OSM.
   É só decoração, porque o desnível atrás dele já bloqueia.
 - **Espalhados:** cada sítio tem a sua lista em `PLACES`.
@@ -107,15 +123,11 @@ Ambiente: Windows 11, Godot 4.7.2, AMD Ryzen 5 5600, NVIDIA RTX 5060.
 | Construir a ilha (headless) | cerca de 18 s | cerca de 5 s |
 | Grelha | 1466 m, 2,1 M células | 495 m, 245 mil células |
 | Converter para a grelha (`build_map`) | 0,75 a 1,2 s | cerca de 0,1 s |
-| Células transitáveis / alcançáveis do desembarque | 760 mil / 726 mil | 36,7 mil / 34,6 mil |
-| Rota Activate pela grelha (troços) | cerca de 2,4 km: 233 + 426 + 699 + 1028 m | cerca de 1,1 km: 141 + 522 + 159 + 238 m |
-| Passo da simulação (bot) | 1,1 a 1,3 ms em média, pior 8 ms | 2,5 a 2,7 ms em média (até 150 vivos), pior 117 ms |
-| Frame em jogo a 1920 × 1080 (Ultra, horda a chegar) | 4,6 a 6,2 ms | 5,4 a 6,9 ms |
-| Bot invencível, Threat 2 | Activate 6 min, Defend 4,5 min, Rescue 3,5 min | Activate 3 min, Defend 3 min, Rescue 2 min |
-
-Os picos de simulação (o pior passo) também aparecem na `port_01` feita à
-mão, até 76 ms, com 100 a 150 inimigos. Não vêm destas ilhas; estão nas
-tarefas pendentes.
+| Células transitáveis / alcançáveis do desembarque | 761 mil / 727 mil | 50,9 mil / 50,9 mil (36,7 mil / 34,6 mil quando os edifícios bloqueavam a caixa) |
+| Rota Activate pela grelha (troços) | cerca de 2,4 km: 229 + 417 + 704 + 1028 m | cerca de 0,9 km: 135 + 393 + 159 + 227 m |
+| Passo da simulação (bot) | 1,1 a 1,3 ms em média, pior 8 ms | 1,6 a 1,8 ms em média (até 150 vivos), pior 8,5 ms |
+| Frame em jogo a 1920 × 1080 (Ultra, horda a chegar) | 4,6 a 6,2 ms | 3,4 a 4,3 ms |
+| Bot invencível, Threat 2 | Activate 6 min, Defend 4,5 min, Rescue 3,5 min | Activate 2,5 min, Defend 2,5 min, Rescue 1,5 min |
 
 ## Limites
 
