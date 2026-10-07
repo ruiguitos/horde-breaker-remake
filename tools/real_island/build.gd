@@ -62,6 +62,9 @@ const PLACES: Dictionary = {
 		"horde_radius": 0,  # 0.5 km: the whole island
 		# Reclaimed land behind a sea wall, with the old rock in the middle.
 		"land_min": 5.0, "detail": 0.4, "tint": Color(0.92, 0.92, 0.9),
+		"terrace": [17.0, 0.4],  # rock above 17 m; lower land flattened to 40 %
+		# OSM features with their own model instead of a building box.
+		"special": {"端島神社": "shrine", "ベルトコンベアー": "conveyor"},
 		"roof": "flat", "walls": Color(0.78, 0.77, 0.73), "roof_color": Color(0.38, 0.38, 0.37), "house_height": 9.0,
 		"landing": "pier", "parapet": true,
 		"generators": [["named", "第二坑捲"], ["named", "65号棟"], ["named", "四坑上家"]],  # pit 2 (mine), block 65, pit 4
@@ -477,6 +480,21 @@ func _relief() -> void:
 		else:
 			# Sea floor: a rocky shelf getting deeper offshore.
 			_h[i] = -1.5 - minf(-t * 0.35, 20.0) + detail * 1.5
+	# Two levels (Hashima, with Codex): the reclaimed land below `terrace[0]`
+	# metres is flattened (its height above land_min scaled by terrace[1]); the
+	# old rock above it keeps its height. In between, 2 m of steep ground: a
+	# rock face the grid cannot climb, crossed only where a path or stair is
+	# carved (_carve_paths runs after this).
+	var terrace: Array = P.get("terrace", [])
+	if not terrace.is_empty():
+		var cut: float = terrace[0]
+		var low: float = P["land_min"]
+		for i in N * N:
+			var h: float = _h[i]
+			if _t[i] <= CLIFF or h <= low:
+				continue
+			var flat: float = low + (h - low) * float(terrace[1])
+			_h[i] = lerpf(flat, h + 2.0, smoothstep(cut - 1.0, cut + 1.0, h))
 
 
 ## Paths become walkable ramps. Every cell within SHOULDER of a path (not a
@@ -1029,6 +1047,9 @@ func _place_buildings() -> void:
 		for p in pts:
 			lo = minf(lo, height_at(p.x, p.y))
 			hi = maxf(hi, height_at(p.x, p.y))
+		if P.get("special", {}).get(_houses[k][4], "") == "conveyor":
+			_conveyor(pts, hi, k)
+			continue
 		var c: Vector2 = _centroid(pts)
 		var base: float = lo - 0.5
 		var eaves: float = hi + float(_houses[k][1])
@@ -1097,10 +1118,106 @@ func _place_buildings() -> void:
 		inst.mesh = gallery
 		inst.material_override = _mat(Color(0.62, 0.61, 0.58), 0.9)
 		_add(inst, "Decor")
+	for name: String in P.get("special", {}):
+		if P["special"][name] == "shrine" and _named.has(name):
+			_shrine(_named[name])
 	for k in _lighthouses.size():
 		_lighthouse(_lighthouses[k], k, _light_heights[k])
 	for k in _piers.size():
 		_pier(_piers[k], k)
+
+
+## A box mesh instance (size, centre in island space, colour, turned `yaw`
+## around Y) added to `group`.
+func _box(group: String, name: String, size: Vector3, centre: Vector3, color: Color, yaw: float = 0.0) -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	mi.name = name
+	var bm := BoxMesh.new()
+	bm.size = size
+	mi.mesh = bm
+	mi.material_override = _mat(color, 0.8)
+	mi.transform = Transform3D(Basis(Vector3.UP, yaw), centre)
+	_add(mi, group)
+	return mi
+
+
+## A small Shinto shrine at the OSM point (Hashima's 端島神社, with Codex):
+## a wooden hall with a gabled roof on a stone base, and a torii gate in
+## front. The hall and each torii pillar block (Buildings/); the torii
+## beams are decoration, so the gate stays open.
+func _shrine(p: Vector2) -> void:
+	# The OSM point touches block 1's footprint: move to the nearest spot
+	# with 3 m clear of every building (and the shrine's own 8 m).
+	var taken: PackedByteArray = _fill(_grown_houses(3.0))
+	var best := p
+	var bd: float = INF
+	for z in range(int(p.y) - 30, int(p.y) + 31):
+		for x in range(int(p.x) - 30, int(p.x) + 31):
+			var free: bool = true
+			for o: Vector2i in [Vector2i(0, 0), Vector2i(4, 0), Vector2i(-4, 0), Vector2i(0, 4), Vector2i(0, -4), Vector2i(5, 5), Vector2i(-5, -5)]:
+				var q := Vector2i(x, z) + o
+				if q.x < 0 or q.y < 0 or q.x >= N or q.y >= N or taken[q.y * N + q.x] == 1 or _slope(q.y * N + q.x) > 0.4:
+					free = false
+					break
+			if free and p.distance_to(Vector2(x, z)) < bd:
+				bd = p.distance_to(Vector2(x, z))
+				best = Vector2(x + 0.5, z + 0.5)
+	p = best
+	var y: float = height_at(p.x, p.y)
+	var yaw: float = PI * 0.25  # facing the sea to the south-east
+	var fwd := Vector3(sin(yaw), 0, cos(yaw))
+	var side := Vector3(cos(yaw), 0, -sin(yaw))
+	var c := Vector3(p.x, y, p.y)
+	_box("Buildings", "ShrineBase", Vector3(4.5, 0.8, 5.5), c + Vector3(0, 0.1, 0), Color(0.5, 0.49, 0.46), yaw)
+	var hall := _box("Buildings", "ShrineHall", Vector3(3.2, 2.6, 4.0), c + Vector3(0, 1.8, 0), Color(0.36, 0.24, 0.17), yaw)
+	var roof := SurfaceTool.new()
+	roof.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var plan := PackedVector2Array([Vector2(-2.1, -2.6), Vector2(2.1, -2.6), Vector2(2.1, 2.6), Vector2(-2.1, 2.6)])
+	_gable(roof, plan, 1.3, _turn(plan))  # hall-local: eaves 1.3 m above its centre
+	var rm := MeshInstance3D.new()
+	rm.name = "Roof"
+	rm.mesh = roof.commit()
+	rm.material_override = _mat(Color(0.22, 0.22, 0.24), 0.7)
+	hall.add_child(rm)
+	rm.owner = _root
+	var gate: Vector3 = c + fwd * 7.0
+	gate.y = height_at(gate.x, gate.z)
+	var red := Color(0.55, 0.2, 0.15)
+	for s: float in [-1.4, 1.4]:
+		var post: Vector3 = gate + side * s
+		_box("Buildings", "ToriiPillar", Vector3(0.35, 3.6, 0.35), post + Vector3(0, 1.8, 0), red, yaw)
+	_box("Decor", "ToriiTop", Vector3(4.2, 0.3, 0.45), gate + Vector3(0, 3.75, 0), red, yaw)
+	_box("Decor", "ToriiTie", Vector3(3.4, 0.2, 0.25), gate + Vector3(0, 3.1, 0), red, yaw)
+
+
+## Hashima's conveyor belt (ベルトコンベアー): an open belt on a frame 5 m
+## up along the footprint's long side, on posts every 4 m. Only the posts
+## block (Buildings/); the belt is decoration, so units walk under it.
+func _conveyor(pts: PackedVector2Array, ground: float, k: int) -> void:
+	var u := Vector2.RIGHT
+	var longest: float = 0.0
+	for i in pts.size():
+		var d: Vector2 = pts[(i + 1) % pts.size()] - pts[i]
+		if d.length() > longest:
+			longest = d.length()
+			u = d.normalized()
+	var umin: float = INF
+	var umax: float = -INF
+	for p in pts:
+		umin = minf(umin, p.dot(u))
+		umax = maxf(umax, p.dot(u))
+	var c: Vector2 = _centroid(pts)
+	var mid: Vector2 = c + u * ((umin + umax) * 0.5 - c.dot(u))
+	var length: float = umax - umin
+	var yaw: float = atan2(u.x, u.y)
+	var belt_y: float = ground + 5.0
+	_box("Decor", "Conveyor_%d" % k, Vector3(1.6, 0.5, length), Vector3(mid.x, belt_y, mid.y), Color(0.3, 0.27, 0.24), yaw)
+	_box("Decor", "ConveyorRoof_%d" % k, Vector3(2.2, 0.15, length), Vector3(mid.x, belt_y + 1.6, mid.y), Color(0.42, 0.3, 0.22), yaw)
+	var n: int = maxi(2, int(length / 4.0) + 1)
+	for j in n:
+		var q: Vector2 = mid + u * lerpf(-length * 0.5 + 0.5, length * 0.5 - 0.5, float(j) / (n - 1))
+		var gy: float = height_at(q.x, q.y)
+		_box("Buildings", "ConveyorPost_%d_%d" % [k, j], Vector3(0.5, belt_y - gy, 0.5), Vector3(q.x, (belt_y + gy) * 0.5, q.y), Color(0.35, 0.3, 0.26), yaw)
 
 
 ## A gabled roof: the ridge runs along the longest wall, through the middle

@@ -85,6 +85,20 @@ depois de a construir, ou muda o script.
   - O farol é uma só torre, com os 10 m do OSM.
   - A orientação das paredes vem do sentido do polígono, para que as plantas
     em L e em U fiquem com as paredes viradas para fora.
+- **Dois níveis em Hashima:** feito na terceira ronda, com o Codex.
+  - O aterro abaixo de 17 m fica mais plano e o rochedo acima mantém a
+    altura.
+  - Entre os dois há uma faixa íngreme que a grelha não sobe. Só se
+    atravessa pelas escadas e caminhos escavados, que são gargalos a sério.
+  - Custo: o troço entre o Bloco 65 e o Poço 4 passou de 159 m para 647 m,
+    porque a faixa a leste do rochedo é estreita.
+- **Marcos de Hashima:**
+  - **Santuário (端島神社):** salão de madeira com telhado de duas águas e um
+    torii. Fica na clareira livre mais próxima do ponto do OSM, que está
+    encostado ao Bloco 1. Bloqueiam o salão e os pilares; as vigas do torii
+    são só decoração.
+  - **Tapete transportador (ベルトコンベアー):** passadeira a 5 m de altura
+    sobre pilares. Só os pilares bloqueiam.
 - **Praças:** os passeios com `area=yes` no OSM (o percurso turístico de
   Hashima) são pavimento por inteiro, e não um caminho ao longo do contorno.
 - **Gargalos e arenas** (`chokes`, `arenas` no preset): são marcadores
