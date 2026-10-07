@@ -1,28 +1,27 @@
 extends SceneTree
-## Builds the playable Berlenga Grande (game/world/handmade/islands/
-## beach_berlenga.scn) from real data downloaded by fetch_data.py:
+## Builds a playable island (game/world/handmade/islands/<biome>_<place>.scn)
+## from the real data fetch_data.py downloaded for a place (PLACES below):
 ##   - relief: elevation tiles (about 25-30 m real resolution) smoothed with
-##     a cubic resize, plus fine noise for rock detail;
-##   - coast: the exact OpenStreetMap coastline; cliffs where it meets the
-##     sea, gentle slopes on mapped beaches;
-##   - paths, steps and the service road carved into ramps no steeper than
-##     PATH_SLOPE, so the grid can walk every one of them (the real ground is
-##     known only every 25-30 m: the stairs down to the fort are steeper);
+##     a cubic resize, plus noise for rock detail (little on concrete);
+##   - coast: the exact OpenStreetMap coastline; cliffs (or a sea wall)
+##     where it meets the sea, gentle slopes on mapped beaches;
+##   - paths, steps and roads carved into ramps no steeper than PATH_SLOPE,
+##     so the grid can walk every one of them (the real ground is known only
+##     every 25-30 m);
 ##   - bridges (decks the grid walks on), buildings from their real
-##     footprints, the lighthouse, the fort's pier;
-##   - rocks along the cliff tops (they block), scrub (decoration);
-##   - markers: the boat on the Carreiro do Mosteiro beach, generators at the
-##     lighthouse, at the fort and far inland, caches spread out.
-## The scene is a normal HandmadeIsland: the game picks it for Beach routes.
+##     footprints and heights in the place's style, lighthouse, piers;
+##   - scatter (rocks or rubble that block, grass and scrub that do not);
+##   - markers: the boat at the landing, generators at real landmarks,
+##     caches spread out.
+## The scene is a normal HandmadeIsland: the game picks it for its biome.
 ## Prints the time of every stage, the grid and its problems (exit code 1
 ## when there are any).
-## Run: python tools/real_island/fetch_data.py
-##      godot --headless --path . --script res://tools/real_island/build.gd
+## Run: python tools/real_island/fetch_data.py <place>
+##      godot --headless --path . --script res://tools/real_island/build.gd -- <place>
+## (place: berlenga, hashima; default berlenga)
 
 const DIR: String = "res://tools/real_island/"
-const DATA: String = DIR + "data/"
 const ISLANDS: String = "res://game/world/handmade/islands/"
-const NAME: String = "beach_berlenga"
 const TEX: String = "res://assets/textures/polyhaven/"
 const KIT: String = "res://assets/models/nature_megakit/"
 const DEM_STEP: int = 8  ## metres between elevation samples before the cubic resize
@@ -33,11 +32,49 @@ const MARGIN: int = 24  ## metres of sea kept around the main island
 const PATH_SLOPE: float = 0.55
 const SHOULDER: float = 2.0  ## metres beside a path carved with it
 const BLEND: float = 4.0  ## metres over which a carved path meets the natural ground
-## See HandmadeIsland.horde_radius. Enemies spawn 28-45 m away; 120 steps
-## (cells, along the grid) is 85-120 m.
-const HORDE_RADIUS: int = 120
 const WIDTHS: Dictionary = {"footway": 2.0, "path": 1.6, "steps": 2.2, "track": 3.0, "service": 4.0, "pedestrian": 3.0}
 
+## What differs between places. Scatter rows: [Quaternius model, count,
+## height m, min metres from the coast, drawn up to m, where]; where = land
+## (anywhere gentle), cliff_top (rocks along the cliffs), green (inside the
+## OSM grass and scrub areas) or rubble (beside buildings). Rock models
+## block (Rocks/), the rest is decoration. Generators: [kind, name]; kind =
+## named (an OSM feature with that name), landuse (the named residential
+## area), lighthouse or fort (the islet the last bridge reaches).
+const PLACES: Dictionary = {
+	"berlenga": {
+		"out": "beach_berlenga", "biome": &"beach",
+		# See HandmadeIsland.horde_radius. Enemies spawn 28-45 m away; 120
+		# steps (cells, along the grid) is 85-120 m.
+		"horde_radius": 120,
+		"land_min": 2.0, "detail": 3.0, "tint": Color(0.88, 0.98, 0.84),
+		"roof": "hip", "walls": Color(0.93, 0.92, 0.88), "roof_color": Color(0.72, 0.34, 0.22), "house_height": 5.5,
+		"landing": "beach",
+		"generators": [["landuse", ""], ["lighthouse", ""], ["fort", ""]],
+		"caches": 6, "cache_walk": 1200,
+		"scatter": [["Grass_Wispy_Short", 110000, 0.35, 6.0, 140.0, "land"], ["Grass_Common_Short", 55000, 0.3, 6.0, 120.0, "land"],
+			["Grass_Wispy_Tall", 14000, 0.7, 6.0, 220.0, "land"], ["Bush_Common", 600, 0.9, 10.0, 400.0, "land"],
+			["Rock_Medium_1", 450, 2.0, 2.0, 1500.0, "cliff_top"], ["Rock_Medium_2", 350, 1.5, 2.0, 1500.0, "cliff_top"]],
+	},
+	"hashima": {
+		"out": "port_hashima", "biome": &"port",
+		"horde_radius": 0,  # 0.5 km: the whole island
+		# Reclaimed land behind a sea wall, with the old rock in the middle.
+		"land_min": 5.0, "detail": 0.4, "tint": Color(0.92, 0.92, 0.9),
+		"roof": "flat", "walls": Color(0.78, 0.77, 0.73), "roof_color": Color(0.38, 0.38, 0.37), "house_height": 9.0,
+		"landing": "pier", "parapet": true,
+		"generators": [["named", "第二坑捲"], ["named", "65号棟"], ["named", "四坑上家"]],  # pit 2 (mine), block 65, pit 4
+		"caches": 4, "cache_walk": 600,
+		"scatter": [["Grass_Wispy_Short", 7000, 0.35, 3.0, 120.0, "green"], ["Grass_Common_Short", 3000, 0.3, 3.0, 100.0, "green"],
+			["Grass_Wispy_Tall", 1500, 0.7, 3.0, 160.0, "green"], ["Fern_1", 400, 0.8, 4.0, 200.0, "green"],
+			["Plant_1", 300, 0.6, 3.0, 160.0, "green"],
+			["Rock_Medium_1", 160, 0.9, 3.0, 400.0, "rubble"], ["Rock_Medium_2", 140, 0.7, 3.0, 400.0, "rubble"]],
+	},
+}
+
+var P: Dictionary  ## this place's settings (PLACES)
+var DATA: String
+var NAME: String
 var meta: Dictionary
 var N: int  ## side of the island square, metres (cells)
 var lat0: float
@@ -55,7 +92,10 @@ var _paths: Array = []              ## [PackedVector2Array, width, kind, bridge]
 var _houses: Array = []             ## [PackedVector2Array, height, kind]
 var _piers: Array[PackedVector2Array] = []
 var _lighthouses: Array[Vector2] = []
-var _village := Vector2(-1, -1)     ## centre of the fishermen's quarter
+var _village := Vector2(-1, -1)     ## centre of the named residential area
+var _named: Dictionary = {}         ## OSM name -> centre
+var _green: Array[PackedVector2Array] = []  ## grass and scrub areas
+var _walls: Array[PackedVector2Array] = []  ## sea walls (retaining walls)
 var _rng := RandomNumberGenerator.new()
 var _root: HandmadeIsland
 var _terrain: Node3D
@@ -63,8 +103,17 @@ var _clock: int = 0
 
 
 func _initialize() -> void:
+	var args: PackedStringArray = OS.get_cmdline_user_args()
+	var key: String = args[0] if not args.is_empty() else "berlenga"
+	if not PLACES.has(key):
+		print("Unknown place %s (known: %s)" % [key, ", ".join(PLACES.keys())])
+		quit(1)
+		return
+	P = PLACES[key]
+	NAME = P["out"]
+	DATA = DIR + "data/" + key + "/"
 	if not FileAccess.file_exists(DATA + "meta.json"):
-		print("No data: run  python tools/real_island/fetch_data.py  first.")
+		print("No data: run  python tools/real_island/fetch_data.py %s  first." % key)
 		quit(1)
 		return
 	meta = JSON.parse_string(FileAccess.get_file_as_string(DATA + "meta.json"))
@@ -86,10 +135,10 @@ func _initialize() -> void:
 	_carve_paths()
 	_lap("paths carved")
 	_root = HandmadeIsland.new()
-	_root.name = "BerlengaIsland"
+	_root.name = String(meta["key"]).capitalize() + "Island"
 	_root.size = N
-	_root.biome = &"beach"
-	_root.horde_radius = HORDE_RADIUS
+	_root.biome = P["biome"]
+	_root.horde_radius = P["horde_radius"]
 	root.add_child(_root)
 	_terrain = ClassDB.instantiate(&"Terrain3D")
 	_terrain.name = "Terrain3D"
@@ -136,17 +185,25 @@ func _read_osm() -> void:
 		if e["type"] == "node":
 			if tags.get("man_made") == "lighthouse":
 				_lighthouses.append(to_local(e["lat"], e["lon"]))
+			if tags.has("name"):
+				_named[tags["name"]] = to_local(e["lat"], e["lon"])
 			continue
 		var pts: PackedVector2Array = _geom(e)
 		if pts.size() < 2:
 			continue
-		if tags.get("natural") == "coastline":
+		if tags.has("name") and tags.get("natural") != "coastline":
+			_named[tags["name"]] = _centroid(pts)
+		if tags.get("natural") in ["grassland", "scrub", "wood", "heath"] and pts.size() > 3:
+			_green.append(pts)
+		elif tags.get("barrier") == "retaining_wall" or tags.get("man_made") == "breakwater":
+			_walls.append(pts)
+		elif tags.get("natural") == "coastline":
 			coast.append([e["nodes"], pts])
 		elif tags.get("natural") == "beach" and pts.size() > 3:
 			_beaches.append(pts)
 		elif tags.has("building"):
 			var kind: String = tags["building"]
-			var height: float = {"shed": 3.0, "kiosk": 3.0, "service": 3.5, "retail": 4.5}.get(kind, 5.5)
+			var height: float = {"shed": 3.0, "kiosk": 3.0, "service": 3.5, "retail": 4.5}.get(kind, float(P["house_height"]))
 			if tags.has("building:levels"):
 				height = float(tags["building:levels"]) * 3.0 + 0.5
 			if tags.has("height"):
@@ -219,6 +276,12 @@ func _crop() -> void:
 	for i in _lighthouses.size():
 		_lighthouses[i] -= o
 	_village -= o
+	for k: String in _named:
+		_named[k] -= o
+	for i in _green.size():
+		_green[i] = _moved(_green[i], o)
+	for i in _walls.size():
+		_walls[i] = _moved(_walls[i], o)
 	_paths = _paths.filter(func(p: Array) -> bool: return square.encloses(_bounds(p[0])))
 	_houses = _houses.filter(func(b: Array) -> bool: return square.encloses(_bounds(b[0])))
 
@@ -383,9 +446,10 @@ func _relief() -> void:
 	_h.resize(N * N)
 	for i in N * N:
 		var t: float = _t[i]
-		var detail: float = (n1[i] / 255.0 - 0.5) * 3.0 + (n2[i] / 255.0 - 0.5) * 0.5
+		var amp: float = P["detail"]
+		var detail: float = (n1[i] / 255.0 - 0.5) * amp + (n2[i] / 255.0 - 0.5) * amp / 6.0
 		if t > 0.0:
-			var top: float = maxf(raw[i], 2.0) + detail * smoothstep(CLIFF, CLIFF + 20.0, t)
+			var top: float = maxf(raw[i], P["land_min"]) + detail * smoothstep(CLIFF, CLIFF + 20.0, t)
 			if _beach[i] == 1:
 				_h[i] = minf(top, -0.6 + t * 0.3)  # beach: dry sand from 2 m off the water, 3 m high at 12 m
 			else:
@@ -507,8 +571,10 @@ func _slope(i: int) -> float:
 
 func _build_scene() -> bool:
 	_clock = Time.get_ticks_msec()
-	# Terrain3D wants one more vertex than cells on each side (cell corners).
-	var V: int = N + 1
+	# One more vertex than cells on each side (cell corners), padded to whole
+	# Terrain3D regions with the sea floor at the edge: a region's unimported
+	# part would sit at 0 m, a flat strip above the water.
+	var V: int = ceili((N + 1) / 512.0) * 512
 	var hv := PackedFloat32Array()
 	hv.resize(V * V)
 	var control := PackedFloat32Array()
@@ -550,9 +616,10 @@ func _build_scene() -> bool:
 			var b: int = clampi(roundi(clampf(blend, 0.0, 1.0) * 255.0), 0, 255)
 			control[v] = Terrain3DUtil.as_float(Terrain3DUtil.enc_base(base) | Terrain3DUtil.enc_overlay(over) | Terrain3DUtil.enc_blend(b))
 			var light: float = 0.88 + tints[i] / 255.0 * 0.12  # slight light/dark variation
-			color[v * 4] = int(light * 225.0)
-			color[v * 4 + 1] = int(light * 250.0)  # a little greener: the scrub in spring
-			color[v * 4 + 2] = int(light * 215.0)
+			var hue: Color = P["tint"]  # Berlenga: a little greener, the scrub in spring
+			color[v * 4] = int(light * 255.0 * hue.r)
+			color[v * 4 + 1] = int(light * 255.0 * hue.g)
+			color[v * 4 + 2] = int(light * 255.0 * hue.b)
 			color[v * 4 + 3] = 255
 	var height_img := Image.create_from_data(V, V, false, Image.FORMAT_RF, hv.to_byte_array())
 	var control_img := Image.create_from_data(V, V, false, Image.FORMAT_RF, control.to_byte_array())
@@ -584,6 +651,7 @@ func _build_scene() -> bool:
 	_place_buildings()
 	_lap("paths, bridges, %d buildings, lighthouse, pier" % _houses.size())
 	_place_nature()
+	_place_walls()
 	_place_sea()
 	_lap("scrub and rocks")
 	var problems: Array[String] = []
@@ -693,6 +761,25 @@ func _texture(img: Image, name: String) -> Texture2D:
 	var path: String = TEX + name + ".res"
 	ResourceSaver.save(ImageTexture.create_from_image(img), path)
 	return load(path)
+
+
+## The place's facade texture (role "facade" in fetch_data.py) with a window
+## drawn in, or null. One picture covers 3 x 3 m of wall (one floor, one
+## window), see _place_buildings.
+func _facade_texture() -> Texture2D:
+	for asset: String in meta["textures"]:
+		if meta["textures"][asset] != "facade":
+			continue
+		var img: Image = _tex(asset, "diffuse.jpg")
+		var s: int = img.get_width()
+		var frame := Rect2i(int(s * 0.27), int(s * 0.22), int(s * 0.46), int(s * 0.5))
+		img.fill_rect(frame, Color(0.3, 0.3, 0.29))  # concrete frame
+		var glass: Rect2i = frame.grow(-int(s * 0.03))
+		img.fill_rect(glass, Color(0.07, 0.08, 0.09))  # dark, broken glass
+		img.fill_rect(Rect2i(glass.position.x, glass.get_center().y, glass.size.x, int(s * 0.012)), Color(0.22, 0.22, 0.21))
+		img.fill_rect(Rect2i(glass.get_center().x, glass.position.y, int(s * 0.012), glass.size.y), Color(0.22, 0.22, 0.21))
+		return _texture(img, asset + "_window")
+	return null
 
 
 func _mat(c: Color, rough: float = 0.9) -> StandardMaterial3D:
@@ -809,12 +896,20 @@ func _place_bridges() -> void:
 				rail.owner = _root
 
 
-## Buildings from their real footprints, one node each (the grid blocks
-## their footprint): whitewashed walls from below the lowest ground up to the
-## eaves and a tiled hip roof (a fan to the centre).
+## Buildings from their real footprints and heights, one node each (the grid
+## blocks their footprint): walls from below the lowest ground up to the
+## eaves, and the place's roof: "hip" (tiled, a fan to the centre) or "flat"
+## (concrete slab inside a low parapet). Walls take the place's facade
+## texture when it has one, projected from the sides (triplanar).
 func _place_buildings() -> void:
-	var wall_mat: StandardMaterial3D = _mat(Color(0.93, 0.92, 0.88), 0.85)
-	var roof_mat: StandardMaterial3D = _mat(Color(0.72, 0.34, 0.22), 0.85)
+	var wall_mat: StandardMaterial3D = _mat(P["walls"], 0.85)
+	var facade: Texture2D = _facade_texture()
+	if facade != null:
+		wall_mat.albedo_texture = facade
+		wall_mat.uv1_triplanar = true
+		wall_mat.uv1_scale = Vector3.ONE / 3.0  # one picture (a floor with its window) every 3 m
+	var roof_mat: StandardMaterial3D = _mat(P["roof_color"], 0.85)
+	var flat: bool = P["roof"] == "flat"
 	for k in _houses.size():
 		var pts: PackedVector2Array = _houses[k][0]
 		if pts.size() > 1 and pts[0].distance_to(pts[pts.size() - 1]) < 0.01:
@@ -843,14 +938,35 @@ func _place_buildings() -> void:
 				out = -out
 			_tri(walls, Vector3(a.x, base, a.y), Vector3(e.x, base, e.y), Vector3(e.x, eaves, e.y), out)
 			_tri(walls, Vector3(a.x, base, a.y), Vector3(e.x, eaves, e.y), Vector3(a.x, eaves, a.y), out)
-		var ridge := Vector3(0, eaves + clampf(shortest * 0.35, 1.0, 2.5), 0)
-		for i in pts.size():
-			var a := Vector3(pts[i].x - c.x, eaves, pts[i].y - c.y)
-			var e := Vector3(pts[(i + 1) % pts.size()].x - c.x, eaves, pts[(i + 1) % pts.size()].y - c.y)
-			var n: Vector3 = (e - a).cross(ridge - a).normalized()
-			if n.y < 0.0:
-				n = -n
-			_tri(roof, a, e, ridge, n)
+		if flat:
+			# Slab: triangulated footprint (concave plans too), and a 0.8 m
+			# parapet that hides it from the street.
+			var local := PackedVector2Array()
+			for p in pts:
+				local.append(p - c)
+			var idx: PackedInt32Array = Geometry2D.triangulate_polygon(local)
+			for k3 in range(0, idx.size(), 3):
+				var q: Array[Vector3] = []
+				for j in 3:
+					q.append(Vector3(local[idx[k3 + j]].x, eaves - 0.1, local[idx[k3 + j]].y))
+				_tri(roof, q[0], q[1], q[2], Vector3.UP)
+			for i in pts.size():
+				var a: Vector2 = pts[i] - c
+				var e: Vector2 = pts[(i + 1) % pts.size()] - c
+				var out := Vector3((e - a).y, 0, -(e - a).x).normalized()
+				if out.dot(Vector3(a.x, 0, a.y)) < 0.0:
+					out = -out
+				_tri(walls, Vector3(a.x, eaves, a.y), Vector3(e.x, eaves, e.y), Vector3(e.x, eaves + 0.8, e.y), out)
+				_tri(walls, Vector3(a.x, eaves, a.y), Vector3(e.x, eaves + 0.8, e.y), Vector3(a.x, eaves + 0.8, a.y), out)
+		else:
+			var ridge := Vector3(0, eaves + clampf(shortest * 0.35, 1.0, 2.5), 0)
+			for i in pts.size():
+				var a := Vector3(pts[i].x - c.x, eaves, pts[i].y - c.y)
+				var e := Vector3(pts[(i + 1) % pts.size()].x - c.x, eaves, pts[(i + 1) % pts.size()].y - c.y)
+				var n: Vector3 = (e - a).cross(ridge - a).normalized()
+				if n.y < 0.0:
+					n = -n
+				_tri(roof, a, e, ridge, n)
 		var mesh: ArrayMesh = walls.commit()
 		roof.commit(mesh)
 		mesh.surface_set_material(0, wall_mat)
@@ -916,21 +1032,16 @@ func _kit_mesh(model: String) -> Mesh:
 	return m
 
 
-## Low scrub on the plateau (Decor) and rocks on the cliff tops (Rocks: they
-## block), as Scatter nodes in 128 m chunks that are drawn only near the
-## camera: drawing every tuft of the island every frame costs far too much.
+## The place's scatter (PLACES "scatter"): grass and scrub (Decor) and rocks
+## or rubble (Rocks: they block), as Scatter nodes in 128 m chunks that are
+## drawn only near the camera: drawing every tuft of the island every frame
+## costs far too much.
 func _place_nature() -> void:
-	var rings: Array[PackedVector2Array] = []
-	for b in _houses:
-		var grown: Array[PackedVector2Array] = Geometry2D.offset_polygon(b[0], 2.0)
-		rings.append(grown[0] if not grown.is_empty() else b[0])
-	var near_house: PackedByteArray = _fill(rings)
-	# [model, count, height m, min metres from the coast, drawn up to m]
-	var specs: Array = [["Grass_Wispy_Short", 110000, 0.35, 6.0, 140.0], ["Grass_Common_Short", 55000, 0.3, 6.0, 120.0],
-		["Grass_Wispy_Tall", 14000, 0.7, 6.0, 220.0], ["Bush_Common", 600, 0.9, 10.0, 400.0],
-		["Rock_Medium_1", 450, 2.0, 2.0, 1500.0], ["Rock_Medium_2", 350, 1.5, 2.0, 1500.0]]
+	var near_house: PackedByteArray = _fill(_grown_houses(2.0))
+	var around_house: PackedByteArray = _fill(_grown_houses(5.0))
+	var green: PackedByteArray = _fill(_green)
 	var near_light: Array[Vector2] = _lighthouses.duplicate()
-	for spec in specs:
+	for spec: Array in P["scatter"]:
 		var mesh: Mesh = _kit_mesh(spec[0])
 		if mesh == null:
 			continue
@@ -945,16 +1056,25 @@ func _place_nature() -> void:
 			var z: int = _rng.randi_range(2, N - 3)
 			var i: int = z * N + x
 			var t: float = _t[i]
-			if t < spec[3] or near_house[i] == 1 or _beach[i] == 1:
+			if t < spec[3] or _beach[i] == 1:
 				continue
 			if _path_d[i] < (SHOULDER + BLEND + 1.0 if rock else 0.6):
 				continue  # rocks keep paths and their ramps clear
-			if rock and (t > 25.0 or _slope(i) < 0.25):
-				continue  # rocks along the cliff tops
-			if not rock and _slope(i) > 0.55:
-				continue
-			if rock and near_light.any(func(l: Vector2) -> bool: return l.distance_to(Vector2(x, z)) < 30.0):
-				continue
+			match spec[5]:
+				"cliff_top":  # along the cliffs, away from buildings and the lighthouse
+					if near_house[i] == 1 or t > 25.0 or _slope(i) < 0.25:
+						continue
+					if near_light.any(func(l: Vector2) -> bool: return l.distance_to(Vector2(x, z)) < 30.0):
+						continue
+				"rubble":  # fallen concrete at the foot of the buildings
+					if near_house[i] == 1 or around_house[i] == 0 or _slope(i) > 0.4:
+						continue
+				"green":
+					if green[i] == 0 or near_house[i] == 1 or _slope(i) > 0.55:
+						continue
+				_:
+					if near_house[i] == 1 or _slope(i) > 0.55:
+						continue
 			var p := Vector2(x + _rng.randf(), z + _rng.randf())
 			var s: float = target / maxf(mesh.get_aabb().size.y, 0.01) * _rng.randf_range(0.6, 1.4)
 			var y: float = height_at(p.x, p.y) - (0.4 * s if rock else 0.05)
@@ -992,6 +1112,57 @@ func _place_nature() -> void:
 			group.free()  # never added to the scene
 
 
+## Building footprints grown by `metres` (for "near a building" masks).
+func _grown_houses(metres: float) -> Array[PackedVector2Array]:
+	var rings: Array[PackedVector2Array] = []
+	for b in _houses:
+		var grown: Array[PackedVector2Array] = Geometry2D.offset_polygon(b[0], metres)
+		rings.append(grown[0] if not grown.is_empty() else b[0])
+	return rings
+
+
+## Sea walls (OSM retaining walls and breakwaters): a 1.2 m concrete parapet
+## along the top of the wall. Decoration: the drop behind it already blocks.
+func _place_walls() -> void:
+	if not P.get("parapet", false) or _walls.is_empty():
+		return
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for wall in _walls:
+		for i in wall.size() - 1:
+			var a: Vector2 = wall[i]
+			var b: Vector2 = wall[i + 1]
+			var n: int = maxi(1, ceili(a.distance_to(b) / 2.0))
+			for k in n:
+				var p: Vector2 = a.lerp(b, float(k) / n)
+				var q: Vector2 = a.lerp(b, float(k + 1) / n)
+				# The wall's top: the highest ground within 2 m (the line runs
+				# along the edge, half way down the drop).
+				var hp: float = _top_near(p)
+				var hq: float = _top_near(q)
+				var side := Vector3(-(q - p).y, 0, (q - p).x).normalized() * 0.2
+				var p0 := Vector3(p.x, hp - 0.5, p.y)
+				var q0 := Vector3(q.x, hq - 0.5, q.y)
+				for s: Vector3 in [side, -side]:
+					_tri(st, p0 + s, q0 + s, q0 + s + Vector3(0, 1.7, 0), s.normalized())
+					_tri(st, p0 + s, q0 + s + Vector3(0, 1.7, 0), p0 + s + Vector3(0, 1.7, 0), s.normalized())
+				_tri(st, p0 + side + Vector3(0, 1.7, 0), q0 + side + Vector3(0, 1.7, 0), q0 - side + Vector3(0, 1.7, 0), Vector3.UP)
+				_tri(st, p0 + side + Vector3(0, 1.7, 0), q0 - side + Vector3(0, 1.7, 0), p0 - side + Vector3(0, 1.7, 0), Vector3.UP)
+	var inst := MeshInstance3D.new()
+	inst.name = "SeaWall"
+	inst.mesh = st.commit()
+	inst.material_override = _mat(Color(0.6, 0.59, 0.56))
+	_add(inst, "Decor")
+
+
+func _top_near(p: Vector2) -> float:
+	var top: float = -INF
+	for dz in range(-2, 3):
+		for dx in range(-2, 3):
+			top = maxf(top, height_at(p.x + dx, p.y + dz))
+	return top
+
+
 ## A flat sea for the editor only (the game draws its own animated sea).
 func _place_sea() -> void:
 	var sea := MeshInstance3D.new()
@@ -1016,18 +1187,22 @@ func _place_sea() -> void:
 func _place_markers(map: IslandMap) -> void:
 	var f: FlowField = map.field
 	f.max_distance = 0
-	# The island's walkable heart: everything reachable from the lighthouse.
-	var light: Vector2 = _lighthouses[0] if not _lighthouses.is_empty() else Vector2(N * 0.5, N * 0.5)
+	# The island's walkable heart: everything reachable from the lighthouse,
+	# or from the most inland open spot.
+	var light: Vector2 = _lighthouses[0] if not _lighthouses.is_empty() else _most_inland(f)
 	f.compute_now(_nearest_clear(f, Vector2i(light), 40))
 	var heart: PackedInt32Array = f.dist.duplicate()
 	# Landing: the shore cell (2-8 m from the water, dry, connected to the
-	# heart) nearest the middle of the biggest beach, the Carreiro do Mosteiro
-	# (its sand is closed in by cliffs: the nearest connected shore is the
-	# harbour). The boat lies out to sea from there.
+	# heart) nearest the middle of the biggest beach (Berlenga: the Carreiro
+	# do Mosteiro, sand first) or of the pier (Hashima: the Dolphin Pier,
+	# where the tour boats tie up). The boat lies out to sea from there.
 	var beach := PackedVector2Array([Vector2(N * 0.5, N * 0.5)])
-	for b in _beaches:
-		if beach.size() < 3 or absf(_area(b)) > absf(_area(beach)):
+	var source: Array[PackedVector2Array] = _beaches if P["landing"] == "beach" else _piers
+	for b in source:
+		if beach.size() < 2 or absf(_area(b)) > absf(_area(beach)) or P["landing"] == "pier":
 			beach = b
+			if P["landing"] == "pier":
+				break
 	var mid: Vector2 = _centroid(beach)
 	var landing := Vector2i(-1, -1)
 	var best: float = INF
@@ -1041,7 +1216,7 @@ func _place_markers(map: IslandMap) -> void:
 			if d < best and _t[i] >= 2.0 and _t[i] <= 8.0 and _h[i] > 0.2 and heart[i] < FlowField.UNREACHABLE and _clear(f, Vector2i(x, z)):
 				best = d
 				landing = Vector2i(x, z)
-	print("  landing at (%d, %d) %s, %.1f m high" % [landing.x, landing.y, "on the beach" if best < 100.0 else "beside the beach", _h[landing.y * N + landing.x]])
+	print("  landing at (%d, %d) %s, %.1f m high" % [landing.x, landing.y, "on the sand" if best < 100.0 else "on the shore", _h[landing.y * N + landing.x]])
 	var seaward := Vector2(_t[landing.y * N + landing.x - 1] - _t[landing.y * N + landing.x + 1],
 		_t[(landing.y - 1) * N + landing.x] - _t[(landing.y + 1) * N + landing.x]).normalized()
 	var boat := Vector3(landing.x + 0.5, 0, landing.y + 0.5)
@@ -1051,24 +1226,49 @@ func _place_markers(map: IslandMap) -> void:
 	f.compute_now(start)
 	var reach: PackedInt32Array = f.dist.duplicate()
 	var goals: Array[Vector2] = [Vector2(landing)]
-	# Generators at three real places: 1 the fishermen's quarter (Bairro dos
-	# Pescadores), 2 beside the lighthouse, 3 the fort's islet (at the end of
-	# the Caminho do Forte steps and bridges). The caches go to the far ends
-	# of the island: optional detours.
-	var fort: Vector2 = _fort_islet()
-	var village: Vector2 = _village if _village.x >= 0.0 else light
-	var gens: Array[Vector2] = [
-		_reachable_near(f, reach, village, 8.0, 40.0),
-		_reachable_near(f, reach, light, 10.0, 40.0),
-		_reachable_near(f, reach, fort, 0.0, 60.0),
-	]
-	for k in gens.size():
-		_marker("Generator%d" % (k + 1), Vector3(gens[k].x + 0.5, 0, gens[k].y + 0.5))
-		goals.append(gens[k])
-	for k in 6:
-		var c: Vector2 = _farthest(f, reach, goals, 120, 1200, 12.0)
+	# Generators at three real places (PLACES "generators"). Berlenga: the
+	# fishermen's quarter (Bairro dos Pescadores), the lighthouse, the fort's
+	# islet at the end of the Caminho do Forte. Hashima: pit 2 (the mine),
+	# block 65 (the biggest flats), pit 4. The caches go to the far ends of the
+	# island: optional detours.
+	for k in P["generators"].size():
+		var spec: Array = P["generators"][k]
+		var near: Vector2 = light
+		var r_min: float = 8.0
+		match spec[0]:
+			"landuse":
+				near = _village if _village.x >= 0.0 else light
+			"lighthouse":
+				r_min = 10.0
+			"fort":
+				near = _fort_islet()
+				r_min = 0.0
+			"named":
+				if _named.has(spec[1]):
+					near = _named[spec[1]]
+				else:
+					print("  WARNING: no OSM feature named %s" % spec[1])
+		var g: Vector2 = _reachable_near(f, reach, near, r_min, 60.0)
+		_marker("Generator%d" % (k + 1), Vector3(g.x + 0.5, 0, g.y + 0.5))
+		goals.append(g)
+	var walk: int = P["cache_walk"]
+	for k in P["caches"]:
+		var c: Vector2 = _farthest(f, reach, goals, walk / 10, walk, 12.0 if walk > 800 else 4.0)
 		_marker("Cache%d" % (k + 1), Vector3(c.x + 0.5, 0, c.y + 0.5))
 		goals.append(c)
+
+
+## The open, walkable cell furthest from the coast.
+func _most_inland(f: FlowField) -> Vector2:
+	var best := Vector2(N * 0.5, N * 0.5)
+	var bt: float = -1.0
+	for z in range(4, N - 4, 2):
+		for x in range(4, N - 4, 2):
+			var t: float = _t[z * N + x]
+			if t > bt and _clear(f, Vector2i(x, z)):
+				bt = t
+				best = Vector2(x, z)
+	return best
 
 
 func _marker(name: String, p: Vector3, out: Vector3 = Vector3.ZERO) -> void:

@@ -199,6 +199,18 @@ texturas do Poly Haven.
 - **Licença:** os dados do mapa têm licença ODbL, "© OpenStreetMap
   contributors" (ver `assets/LICENSES.md`).
 
+### Hashima (ilha real)
+
+A rota Industrial Port sorteia por seed entre a `port_01` e
+`islands/port_hashima.scn`. É Hashima (Gunkanjima), a ilha mineira
+abandonada do Japão, com 0,5 km.
+- **A ilha:** os 66 edifícios de betão com a altura real, o paredão e o
+  rochedo central.
+- **Desembarque:** no cais Dolphin.
+- **Geradores:** no poço 2 da mina, no Bloco 65 (o maior prédio) e no poço 4.
+- **Construção:** foi feita pela mesma ferramenta da Berlenga
+  (`tools/real_island/`, sítio `hashima`).
+
 **Mapas grandes:** com 2 milhões de células, recalcular os caminhos da
 horda para a ilha toda demora 0,5 s. Por isso:
 - **`horde_radius`:** este campo do `HandmadeIsland` (120 na Berlenga)

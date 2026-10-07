@@ -140,9 +140,30 @@ func _berlenga_checks() -> void:
 	island.queue_free()
 
 
+## Hashima (tools/real_island/build.gd -- hashima): the real mining island,
+## dense concrete blocks. Converts without problems, its 66 real buildings
+## block, Port routes can pick it.
+func _hashima_checks() -> void:
+	var path: String = HandmadeIsland.ISLANDS_DIR + "port_hashima.scn"
+	var island: HandmadeIsland = (load(path) as PackedScene).instantiate()
+	root.add_child(island)
+	var problems: Array[String] = []
+	var map: IslandMap = island.build_map(problems)
+	_check(problems.is_empty() and map.generators.size() == 3 and map.caches.size() >= 4, "port_hashima has no problems, 3 generators, %d caches %s" % [map.caches.size(), problems])
+	_check(map.buildings.size() >= 60 and map.biome == &"port", "%d buildings on a port island" % map.buildings.size())
+	var picked: Array[String] = []
+	for s in 8:
+		var scene: PackedScene = HandmadeIsland.pick(&"port", s)
+		if not picked.has(scene.resource_path):
+			picked.append(scene.resource_path)
+	_check(picked.has(path) and picked.size() == 2, "Port routes pick port_01 or Hashima %s" % [picked])
+	island.queue_free()
+
+
 func _run_checks() -> void:
 	_route_island_checks()
 	_berlenga_checks()
+	_hashima_checks()
 	var problems: Array[String] = []
 	var map: IslandMap = _island.build_map(problems)
 	var f: FlowField = map.field

@@ -111,7 +111,17 @@ como, as medições e os limites. Para caber no jogo foi preciso mudar:
 - **as rochas:** os nós `Scatter` em `Rocks/` bloqueiam;
 - **o barco:** fica ancorado na direção do marcador.
 
+A mesma ferramenta faz Hashima (`islands/port_hashima.scn`, rota Port):
+prédios de betão com janelas, paredão, entulho e erva só nas zonas verdes.
+As próximas ilhas reais (selva, cidade, vulcão) fazem-se uma de cada vez,
+com aprovação do utilizador.
+
 ## Tarefas pendentes
+
+- Picos de simulação com 100 a 150 inimigos: até 76 ms na `port_01` e 117 ms
+  em Hashima (bot do soak). A média fica em 2 a 3 ms. Falta medir onde está o
+  tempo; suspeitas: cadeias de explosões de Bloaters ou a separação entre
+  inimigos.
 
 - Berlenga: falta um ecrã de créditos com "© OpenStreetMap contributors"
   (obrigatório pela ODbL quando o jogo for distribuído).
