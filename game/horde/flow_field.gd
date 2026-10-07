@@ -9,7 +9,12 @@ extends RefCounted
 ## Recomputing can be time-sliced: request_target() starts a new BFS into a
 ## back buffer, step(budget) expands at most `budget` cells, and when the BFS
 ## finishes the buffers swap. Agents keep using the old field meanwhile, so a
-## recompute never causes a frame spike.
+## recompute never causes a frame spike. A new target waits for the running
+## BFS to finish: restarting on every cell the player crosses meant a large
+## field never finished while the player kept moving.
+##
+## Big maps set max_distance: the BFS stops that many cells from the target,
+## so its cost depends on the area around the player, not on the island.
 
 const UNREACHABLE: int = 0x3fffffff
 
@@ -25,6 +30,8 @@ var blocked: PackedByteArray
 var dist: PackedInt32Array
 var target_cell: Vector2i = Vector2i(-1, -1)
 var is_computing: bool = false
+## Cells further than this from the target stay UNREACHABLE (0 = no limit).
+var max_distance: int = 0
 
 var _pending_dist: PackedInt32Array
 var _pending_target: Vector2i = Vector2i(-1, -1)
@@ -75,11 +82,11 @@ func cell_center(c: Vector2i) -> Vector3:
 	return Vector3((c.x + 0.5) * cell_size, 0.0, (c.y + 0.5) * cell_size)
 
 
-## Starts a (time-sliced) recompute unless the target is already current/pending.
+## Starts a (time-sliced) recompute unless the target is current or a
+## recompute is running (the caller asks again every tick, so the newest
+## target starts as soon as the running one finishes).
 func request_target(cell: Vector2i) -> void:
-	if is_computing and cell == _pending_target:
-		return
-	if not is_computing and cell == target_cell:
+	if is_computing or cell == target_cell:
 		return
 	_start(cell)
 
@@ -117,11 +124,15 @@ func step(budget: int) -> bool:
 	var q: PackedInt32Array = _queue
 	var head: int = _q_head
 	var tail: int = _q_tail
+	var limit: int = max_distance if max_distance > 0 else UNREACHABLE
 	while head < tail and processed < budget:
 		var idx: int = q[head]
 		head += 1
 		processed += 1
 		var nd: int = pd[idx] + 1
+		if nd > limit:
+			head = tail  # BFS order: every cell still queued is as far or further
+			break
 		var x: int = idx % w
 		var z: int = idx / w
 		# Unrolled and inlined 4-neighbour expansion: function calls and loops

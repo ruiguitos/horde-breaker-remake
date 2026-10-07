@@ -11,6 +11,8 @@ const K: float = SIZE / 160.0
 
 var field: FlowField
 var boat: Vector3
+## Direction from the landing point out to the moored boat (flat, unit).
+var boat_dir: Vector3 = Vector3(0, 0, 1)
 var player_start: Vector3
 var generators: Array[Vector3] = []
 ## Wall rectangles (x0, z0, w, h) in cells, for rendering buildings.

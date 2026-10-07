@@ -169,11 +169,13 @@ func _build_world() -> void:
 	var f: FlowField = run.field
 	var sea := MeshInstance3D.new()
 	var sea_mesh := PlaneMesh.new()
-	sea_mesh.size = Vector2(600, 600)
+	var sea_side: float = maxf(600.0, maxf(f.width, f.height) * 2.5)  # big islands need a bigger sea
+	sea_mesh.size = Vector2(sea_side, sea_side)
 	sea.mesh = sea_mesh
 	sea.position = Vector3(f.width * 0.5, -0.3, f.height * 0.5)
-	sea_mesh.subdivide_width = 120
-	sea_mesh.subdivide_depth = 120
+	var sea_rows: int = clampi(int(sea_side / 5.0), 120, 400)  # vertices every 5-9 m for the waves
+	sea_mesh.subdivide_width = sea_rows
+	sea_mesh.subdivide_depth = sea_rows
 	sea.material_override = Visuals.sea_material()
 	add_child(sea)
 
@@ -229,7 +231,8 @@ func _build_world() -> void:
 	var hull := BoxMesh.new()
 	hull.size = Vector3(4, 1.2, 8)
 	boat.mesh = hull
-	boat.position = run.map.boat + Vector3(0, 0.3, 3)
+	boat.position = run.map.boat + run.map.boat_dir * 3.0 + Vector3(0, 0.3, 0)
+	boat.rotation.y = atan2(run.map.boat_dir.x, run.map.boat_dir.z)
 	boat.material_override = _mat(Color(0.45, 0.3, 0.18))
 	add_child(boat)
 	_boat_ring = _ring(run.map.boat, GameData.BOAT_RADIUS, Color(0.3, 1, 0.4))

@@ -1,7 +1,10 @@
 # Assets e addons de terceiros
 
 Só entram assets com licença que permita usá-los num jogo (CC0, MIT, OFL ou
-royalty-free comercial). Cada entrada indica a origem e a licença.
+royalty-free comercial). Cada entrada indica a origem e a licença. Exceção
+aceite pelo utilizador: os dados do OpenStreetMap (ODbL) da Berlenga. Quando o
+jogo tiver ecrã de créditos, este tem de mostrar "© OpenStreetMap
+contributors".
 
 | Caminho | O quê | Autor / origem | Licença |
 |---|---|---|---|
@@ -23,6 +26,9 @@ royalty-free comercial). Cada entrada indica a origem e a licença.
 | `addons/dialogue_manager/` | Dialogue Manager 4.1 | Nathan Hoad | MIT (`LICENSE`) |
 | `addons/GD-Sync/` | GD-Sync 1.0.2 (multiplayer na cloud) | GD-Sync | BSD-style para o código; o **serviço** tem termos próprios (contas/planos em gd-sync.com) |
 | `PlayerCharacter/`, `Map/`, `Arts/` | Third Person Controller (cena de exemplo, *plush* do Godot, fontes) | Jeh3no | MIT (`LICENSE` na raiz) |
+| `assets/textures/polyhaven/` | Texturas do chão da Berlenga (aerial_grass_rock, rock_face_03, coast_sand_rocks_02, rocky_trail), empacotadas e comprimidas por `tools/real_island/build.gd` | Poly Haven (polyhaven.com) | CC0 |
+| `game/world/handmade/islands/beach_berlenga*` | Costa, caminhos, pontes, edifícios, farol e praia da Berlenga Grande | © OpenStreetMap contributors | **ODbL 1.0** (aceite pelo utilizador a 2026-10-07; atribuição obrigatória, e quem partilhar a base de dados derivada tem de a partilhar com a mesma licença) |
+| `game/world/handmade/islands/beach_berlenga_data/` | Relevo da Berlenga | AWS Terrain Tiles (Mapzen; fontes SRTM, EU-DEM e outras) | Dados abertos com atribuição às fontes |
 | `assets/audio/ovani_sfx_starter_vol1/` | Sound FX Starter Pack Vol. 1 (só os 21 sons usados; o resto foi retirado, recuperável no histórico) | Ovani Sound | Royalty-free (`Royalty-Free License (Link).pdf`; https://ovanisound.com/policies/terms-of-service) |
 
 Removidos na integração (não servem ao jogo): versões Unity/Unreal da

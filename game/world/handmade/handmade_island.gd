@@ -23,12 +23,16 @@ extends Node3D
 @export var max_step: float = 0.9
 ## Biome look (sky, fog, ambience, minimap colours): see GameData.BIOMES.
 @export var biome: StringName = &"beach"
+## Big islands: the horde's paths are computed only this many metres around
+## the player (0 = the whole island). Enemies left further behind are
+## replaced by new ones near the player.
+@export var horde_radius: int = 0
 ## Writes a top-down picture of the converted grid next to this scene and
 ## prints a report: what blocks, what is unreachable from the boat.
 @export_tool_button("Check map", "Search") var check_button: Callable = check_map
 
-## Islands used by the run: <biome>_<anything>.tscn (beach_01.tscn,
-## town_harbour.tscn...). One is picked per island; none = generated island.
+## Islands used by the run: <biome>_<anything>.tscn or .scn (beach_01.tscn,
+## beach_berlenga.scn...). One is picked per island; none = generated island.
 const ISLANDS_DIR: String = "res://game/world/handmade/islands/"
 const GROUND_MARGIN: float = 0.15
 const NO_TERRAIN: float = 0.0  ## height used when there is no Terrain3D
@@ -45,40 +49,62 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	# Ground: height per cell (centre), sea and cliffs.
 	var heights := PackedFloat32Array()
 	heights.resize(size * size)
-	var regions: Dictionary = _load_regions(problems)
-	for z in size:
-		for x in size:
-			# Cell centre = mean of its four corner vertices (1 m spacing).
-			var h: float = 0.0
-			for o: Vector2i in [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]:
-				h += _vertex_height(regions, x + o.x, z + o.y)
-			heights[z * size + x] = h * 0.25 if not regions.is_empty() else NO_TERRAIN
+	heights.fill(NO_TERRAIN)
+	# Plain loops over packed arrays, no function calls or small arrays per
+	# cell: a 1.5 km island has over 2 million cells.
+	var verts: PackedFloat32Array = _vertex_heights(problems)
+	if not verts.is_empty():
+		var row: int = size + 1
+		for z in size:
+			var r0: int = z * row
+			var r1: int = r0 + row
+			var out: int = z * size
+			for x in size:
+				# Cell centre = mean of its four corner vertices (1 m spacing).
+				heights[out + x] = (verts[r0 + x] + verts[r0 + x + 1] + verts[r1 + x] + verts[r1 + x + 1]) * 0.25
 	var deck := PackedByteArray()
 	deck.resize(size * size)
-	_lay_bridges(heights, deck)
+	var deck_cells: PackedInt32Array = _lay_bridges(heights, deck)
+	var low: float = sea_level + GROUND_MARGIN
+	var blocked: PackedByteArray = f.blocked
 	for z in size:
 		for x in size:
 			var i: int = z * size + x
 			var h: float = heights[i]
-			var blocked: bool = h < sea_level + GROUND_MARGIN or x == 0 or z == 0 or x == size - 1 or z == size - 1
-			if not blocked:
-				for o: Vector2i in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:
-					var nx: int = x + o.x
-					var nz: int = z + o.y
-					if nx < 0 or nz < 0 or nx >= size or nz >= size:
-						continue
-					var hn: float = heights[nz * size + nx]
-					if deck[i] != 0 and deck[nz * size + nx] == 0 and hn < h:
-						continue  # a bridge has rails: the drop beside it is not a cliff for the deck
-					if absf(hn - h) > max_step:
-						blocked = true
-						break
-			if blocked:
-				f.blocked[i] = 1
-	_raise_beside_decks(heights, deck, f)
+			if h < low or x == 0 or z == 0 or x == size - 1 or z == size - 1:
+				blocked[i] = 1
+				continue
+			# A step steeper than max_step to any neighbour is a cliff. A bridge
+			# has rails: a drop beside the deck is not a cliff for the deck.
+			var on_deck: bool = deck[i] != 0
+			var hn: float = heights[i + 1]
+			var steep: bool = absf(hn - h) > max_step and not (on_deck and deck[i + 1] == 0 and hn < h)
+			if not steep:
+				hn = heights[i - 1]
+				steep = absf(hn - h) > max_step and not (on_deck and deck[i - 1] == 0 and hn < h)
+			if not steep:
+				hn = heights[i + size]
+				steep = absf(hn - h) > max_step and not (on_deck and deck[i + size] == 0 and hn < h)
+			if not steep:
+				hn = heights[i - size]
+				steep = absf(hn - h) > max_step and not (on_deck and deck[i - size] == 0 and hn < h)
+			if steep:
+				blocked[i] = 1
+	f.blocked = blocked
+	_raise_beside_decks(heights, deck, deck_cells, f)
 	map.heights = heights
-	# Objects.
+	# Objects. A Scatter (many copies of one rock) blocks under every copy.
+	for node in _children_of("Rocks"):
+		if node is Scatter:
+			var scatter := node as Scatter
+			var box: AABB = scatter.mesh.get_aabb() if scatter.mesh != null else AABB()
+			for k in scatter.count():
+				var rect: Rect2i = _rect_of(_local(scatter) * scatter.instance_transform(k) * box)
+				f.set_blocked_rect(rect.position.x, rect.position.y, rect.end.x - 1, rect.end.y - 1)
+				map.rocks.append(rect.get_center())
 	for node in _children_of("Buildings") + _children_of("Rocks"):
+		if node is Scatter:
+			continue
 		var rect: Rect2i = _footprint(node)
 		if rect.size == Vector2i.ZERO:
 			problems.append("%s has no mesh: it blocks nothing." % node.name)
@@ -98,6 +124,11 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 		map.boat = Vector3(size * 0.5, 0, size - 10.5)
 	else:
 		map.boat = _flat(_local(boat).origin)
+		# The boat is moored along the marker's +Z (rotate the marker to aim it at the sea).
+		var out: Vector3 = _local(boat).basis.z
+		out.y = 0.0
+		if out.length_squared() > 0.01:
+			map.boat_dir = out.normalized()
 	var start: Node3D = get_node_or_null("Markers/PlayerStart")
 	map.player_start = _flat(_local(start).origin) if start != null else map.boat + Vector3(0, 0, -5)
 	for node in _children_of("Markers"):
@@ -117,6 +148,7 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 			for p: Vector3 in list[1]:
 				if f.distance_at(p) >= FlowField.UNREACHABLE:
 					problems.append("%s at (%d, %d) cannot be reached from the start." % [list[0], int(p.x), int(p.z)])
+	f.max_distance = horde_radius  # after the check above, which needs the whole island
 	return map
 
 
@@ -124,7 +156,7 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 static func pick(biome_id: StringName, seed_value: int) -> PackedScene:
 	var found: PackedStringArray = []
 	for file in ResourceLoader.list_directory(ISLANDS_DIR) if DirAccess.dir_exists_absolute(ISLANDS_DIR) else PackedStringArray():
-		if file.ends_with(".tscn") and file.begins_with(String(biome_id) + "_"):
+		if (file.ends_with(".tscn") or file.ends_with(".scn")) and file.begins_with(String(biome_id) + "_"):
 			found.append(ISLANDS_DIR + file)
 	if found.is_empty():
 		return null
@@ -176,6 +208,25 @@ static func grid_image(map: IslandMap) -> Image:
 	return img
 
 
+## Terrain heights at every vertex of the island, (size + 1)^2 values, row
+## by row; far below the sea where no region covers it (unsculpted = open
+## sea). Empty without a Terrain3D. The regions are copied into one image
+## (native code) instead of being looked up vertex by vertex.
+func _vertex_heights(problems: Array[String]) -> PackedFloat32Array:
+	var regions: Dictionary = _load_regions(problems)
+	if regions.is_empty():
+		return PackedFloat32Array()
+	var all := Image.create_empty(size + 1, size + 1, false, Image.FORMAT_RF)
+	all.fill(Color(sea_level - 10.0, 0, 0))
+	for loc: Vector2i in regions:
+		var img: Image = regions[loc]
+		if img.get_format() != Image.FORMAT_RF:
+			img.convert(Image.FORMAT_RF)
+		var rs: int = img.get_width()
+		all.blit_rect(img, Rect2i(0, 0, rs, rs), loc * rs)
+	return all.get_data().to_float32_array()
+
+
 ## Terrain3D region files (terrain3d_00_00.res, terrain3d-01_00.res...) of the
 ## Terrain3D node's data directory: Vector2i location -> height Image. Read
 ## straight from disk, so it works before the node has loaded its data.
@@ -209,23 +260,12 @@ static func _loc(part: String) -> int:
 	return int(part.substr(1)) * (-1 if part.begins_with("-") else 1)
 
 
-## Height of the terrain vertex (x, z); far below the sea when no region
-## covers it (unsculpted area = open sea).
-func _vertex_height(regions: Dictionary, x: int, z: int) -> float:
-	for loc: Vector2i in regions:
-		var img: Image = regions[loc]
-		var rs: int = img.get_width()
-		var px: int = x - loc.x * rs
-		var pz: int = z - loc.y * rs
-		if px >= 0 and pz >= 0 and px < rs and pz < rs:
-			return img.get_pixel(px, pz).r
-	return sea_level - 10.0
-
-
 ## Bridges/: every cell whose centre lies under a deck gets the height of the
 ## deck's top surface there (decks may slope from bank to bank) and is marked
 ## in `deck`. A deck is a MeshInstance3D; its children (rails) are ignored.
-func _lay_bridges(heights: PackedFloat32Array, deck: PackedByteArray) -> void:
+## Returns the deck cells.
+func _lay_bridges(heights: PackedFloat32Array, deck: PackedByteArray) -> PackedInt32Array:
+	var cells := PackedInt32Array()
 	for node in _children_of("Bridges"):
 		if not node is MeshInstance3D or (node as MeshInstance3D).mesh == null:
 			continue
@@ -246,25 +286,29 @@ func _lay_bridges(heights: PackedFloat32Array, deck: PackedByteArray) -> void:
 					continue
 				var i: int = z * size + x
 				heights[i] = p.y
+				if deck[i] == 0:
+					cells.append(i)
 				deck[i] = 1
+	return cells
 
 
 ## Blocked cells beside a deck (the water past the rails) take the deck's
 ## height: ground_y() blends neighbouring cells, so a unit walking near the
 ## rail would otherwise sink towards the riverbed. They stay blocked.
-func _raise_beside_decks(heights: PackedFloat32Array, deck: PackedByteArray, f: FlowField) -> void:
-	var raised: PackedFloat32Array = heights.duplicate()
-	for z in range(1, size - 1):
-		for x in range(1, size - 1):
-			var i: int = z * size + x
-			if deck[i] != 0 or f.blocked[i] == 0:
+func _raise_beside_decks(heights: PackedFloat32Array, deck: PackedByteArray, deck_cells: PackedInt32Array, f: FlowField) -> void:
+	var raised := {}  # cell -> height: decided from the original heights only
+	for i in deck_cells:
+		for n: int in [i + 1, i - 1, i + size, i - size]:
+			var x: int = n % size
+			var z: int = n / size
+			if n < 0 or x == 0 or z == 0 or x >= size - 1 or z >= size - 1:
 				continue
-			for o: Vector2i in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:
-				var n: int = (z + o.y) * size + x + o.x
-				if deck[n] != 0 and heights[n] > raised[i]:
-					raised[i] = heights[n]
-	for i in heights.size():
-		heights[i] = raised[i]
+			if deck[n] != 0 or f.blocked[n] == 0:
+				continue
+			if heights[i] > maxf(heights[n], raised.get(n, -INF)):
+				raised[n] = heights[i]
+	for n: int in raised:
+		heights[n] = raised[n]
 
 
 func _children_of(group: String) -> Array[Node3D]:
@@ -295,6 +339,12 @@ func _footprint(node: Node3D) -> Rect2i:
 		first = false
 	if first:
 		return Rect2i()
+	return _rect_of(box)
+
+
+## Cells under a box (island space, seen from above), clamped to the island.
+## Edges that cover less than a quarter of a cell leave that cell free.
+func _rect_of(box: AABB) -> Rect2i:
 	var x0: int = clampi(floori(box.position.x + 0.25), 0, size - 1)
 	var z0: int = clampi(floori(box.position.z + 0.25), 0, size - 1)
 	var x1: int = clampi(ceili(box.end.x - 0.25), x0 + 1, size)

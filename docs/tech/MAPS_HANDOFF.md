@@ -96,8 +96,26 @@ Comparação (fotografias de perto):
   desenhar as estradas antes de esculpir. Pára antes das pontes e não
   estreita para elas. Só faz asfalto (a terra batida continua em fita).
 
+## Ilha real: Berlenga Grande
+
+`islands/beach_berlenga.scn` é a Berlenga Grande, com 1,5 km, feita a partir
+de dados abertos por `tools/real_island/build.gd`. O README dessa pasta tem o
+como, as medições e os limites. Para caber no jogo foi preciso mudar:
+- **o campo de fluxo:** tem um raio máximo (`horde_radius`), e um novo alvo
+  espera que o cálculo em curso acabe;
+- **os inimigos deixados para trás:** são substituídos por outros perto do
+  jogador;
+- **o minimapa:** acompanha o jogador;
+- **a conversão para a grelha:** passou a ser feita sem ciclos lentos e leva
+  cerca de 1 s para 2 milhões de células;
+- **as rochas:** os nós `Scatter` em `Rocks/` bloqueiam;
+- **o barco:** fica ancorado na direção do marcador.
+
 ## Tarefas pendentes
 
+- Berlenga: falta um ecrã de créditos com "© OpenStreetMap contributors"
+  (obrigatório pela ODbL quando o jogo for distribuído).
+- Berlenga: o farol é uma caixa simples e o forte não tem modelo.
 - Árvores ainda podem ter a copa sobre uma estrada ou um telhado (a regra
   só olha para o tronco).
 - As falésias do terreno têm resolução de 1 m: de perto, as paredes das
@@ -109,4 +127,5 @@ Ver `CLAUDE.md`:
 - documentação e comunicação em português de Portugal; código em inglês;
 - GDScript tipado;
 - não editar `docs/DECISIONS.md`;
-- só assets com licença livre.
+- só assets com licença livre, mais os dados do OpenStreetMap (ODbL, aceite
+  pelo utilizador).

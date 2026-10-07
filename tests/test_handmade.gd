@@ -81,8 +81,68 @@ func _route_island_checks() -> void:
 		island.free()
 
 
+## Berlenga Grande (tools/real_island/build.gd): a real 1.5 km island. It
+## converts without problems in a few seconds, its horde works around the
+## player only (horde_radius) and enemies left far behind are replaced.
+func _berlenga_checks() -> void:
+	var path: String = HandmadeIsland.ISLANDS_DIR + "beach_berlenga.scn"
+	var island: HandmadeIsland = (load(path) as PackedScene).instantiate()
+	root.add_child(island)
+	var problems: Array[String] = []
+	var t0: int = Time.get_ticks_msec()
+	var map: IslandMap = island.build_map(problems)
+	var ms: int = Time.get_ticks_msec() - t0
+	var f: FlowField = map.field
+	_check(problems.is_empty(), "beach_berlenga has no problems %s" % [problems])
+	_check(f.width > 1000 and map.generators.size() == 3 and map.caches.size() >= 5, "%d m island, 3 generators, %d caches" % [f.width, map.caches.size()])
+	_check(ms < 8000, "grid of %d cells converted in %d ms" % [f.width * f.height, ms])
+	_check(f.max_distance == island.horde_radius and island.horde_radius > 0, "horde paths limited to %d m around the player" % f.max_distance)
+	var decks: int = 0
+	var walkable: int = 0
+	for deck: Node3D in island.get_node("Bridges").get_children():
+		decks += 1
+		var c: Vector2i = f.world_to_cell(deck.position)
+		walkable += 0 if f.is_blocked(c.x, c.y) else 1
+	_check(decks >= 4 and walkable == decks, "%d bridge decks, %d walkable in the middle" % [decks, walkable])
+	var picked: Array[String] = []
+	for s in 8:
+		var scene: PackedScene = HandmadeIsland.pick(&"beach", s)
+		if not picked.has(scene.resource_path):
+			picked.append(scene.resource_path)
+	_check(picked.has(path) and picked.size() == 2, "Beach routes pick beach_01 or Berlenga %s" % [picked])
+	# The horde on the big map: the field around the player finishes while
+	# they walk, enemies spawn and reach them, a straggler far away goes.
+	var run := IslandRun.new(7, map.biome, map)
+	run.director.trigger_peak(30.0)
+	var finished: int = 0
+	var t1: int = Time.get_ticks_usec()
+	for i in 600:
+		var was: bool = f.is_computing
+		run.step(1.0 / 60.0, Vector2(0, -1) if i < 300 else Vector2.ZERO, Vector3(0, 0, -1), false)
+		finished += 1 if was and not f.is_computing else 0
+	var step_ms: float = (Time.get_ticks_usec() - t1) / 600000.0
+	_check(finished >= 10 and run.horde.count > 10, "big map: field finished %d times in 10 s, %d enemies, %.2f ms per step" % [finished, run.horde.count, step_ms])
+	var far: Vector3 = run.player_pos + Vector3(0, 0, 0)
+	for p in [Vector3(400, 0, 0), Vector3(-400, 0, 0), Vector3(0, 0, 400), Vector3(0, 0, -400)]:
+		var q: Vector3 = run.player_pos + p
+		var c: Vector2i = f.world_to_cell(q)
+		if not f.is_blocked(c.x, c.y):
+			far = q
+			break
+	var before: int = run.horde.count
+	run.horde.add(far, GameData.EnemyKind.WALKER, RandomNumberGenerator.new())
+	for i in 90:
+		run.step(1.0 / 60.0, Vector2.ZERO, Vector3(0, 0, -1), false)
+	var left: bool = true
+	for i in run.horde.count:
+		left = left and run.horde.positions[i].distance_to(far) > 1.0
+	_check(far != run.player_pos and left, "a straggler 400 m away is replaced (%d -> %d enemies)" % [before, run.horde.count])
+	island.queue_free()
+
+
 func _run_checks() -> void:
 	_route_island_checks()
+	_berlenga_checks()
 	var problems: Array[String] = []
 	var map: IslandMap = _island.build_map(problems)
 	var f: FlowField = map.field

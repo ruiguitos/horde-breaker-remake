@@ -181,6 +181,37 @@ onde estão (não mudam o jogo).
 O script verifica as duas rotas: fecha cada gargalo à vez e confirma que o
 barco, os geradores e as caches continuam acessíveis.
 
+### Berlenga Grande (ilha real)
+
+A rota Beach sorteia por seed entre a `beach_01` e
+`islands/beach_berlenga.scn`. A Berlenga é a ilha real, com 1,5 km, feita a
+partir de dados abertos: relevo, a costa e os caminhos do OpenStreetMap e
+texturas do Poly Haven.
+- **Missão:**
+  - desembarcas na praia do Carreiro do Mosteiro;
+  - os geradores estão no Bairro dos Pescadores, junto ao farol e no ilhéu do
+    forte, ao fim do Caminho do Forte, com degraus e pontes;
+  - há 6 caixas nas pontas da ilha.
+- **Duração:** a rota completa tem cerca de 2,4 km e o bot leva 6 minutos.
+- **Como foi construída:** por `tools/real_island/build.gd`; o como e o
+  porquê estão no `README.md` dessa pasta. Para a testar já, arrasta-a para
+  **Handmade Scene** em `world/island.tscn` e carrega em **F6**.
+- **Licença:** os dados do mapa têm licença ODbL, "© OpenStreetMap
+  contributors" (ver `assets/LICENSES.md`).
+
+**Mapas grandes:** com 2 milhões de células, recalcular os caminhos da
+horda para a ilha toda demora 0,5 s. Por isso:
+- **`horde_radius`:** este campo do `HandmadeIsland` (120 na Berlenga)
+  limita o cálculo a uma zona à volta do jogador;
+- **inimigos deixados para trás:** os que ficam fora dessa zona e a mais de
+  45 m são retirados, e o diretor faz aparecer outros perto de ti;
+- **minimapa:** mostra uma janela de 320 m que acompanha o jogador. Os
+  objetivos fora da janela ficam encostados à borda, a indicar a direção.
+
+Em todas as ilhas, quando o jogador muda de célula, o cálculo em curso acaba
+antes de começar o seguinte. Antes recomeçava do zero, por isso enquanto o
+jogador corria nunca chegava a acabar.
+
 O script também faz uma **auditoria**: nenhum objeto na água, num rio, numa
 estrada, numa ponte, numa praça ou numa falésia; nenhum edifício em chão
 irregular ou a menos de 10 m da costa; nenhuma estrada na água ou numa
@@ -221,7 +252,7 @@ só visual. A câmara de 3.ª pessoa encurta para não entrar nas colinas.
   tua cena para **Handmade Scene** no inspetor. Depois carrega em **F6**.
   Lembra-te de limpar o campo antes de fazer push.
 - **Na run:** grava a cena em `game/world/handmade/islands/` com o nome
-  `<bioma>_<qualquer coisa>.tscn` (por exemplo `beach_01.tscn`; biomas:
+  `<bioma>_<qualquer coisa>.tscn` ou `.scn` (por exemplo `beach_01.tscn`; biomas:
   `beach`, `town`, `jungle`, `port`). Quando a rota calhar nesse bioma, a
   ilha usada é a tua em vez da gerada. Se houver várias do mesmo bioma, é
   escolhida uma por seed.
@@ -243,11 +274,11 @@ só visual. A câmara de 3.ª pessoa encurta para não entrar nas colinas.
 |---|---|
 | `Terrain3D` | Abaixo do mar (-0,3 m) é mar; degrau maior que 0,9 m por metro (cerca de 42°) é falésia: bloqueia |
 | `Buildings/` | Cada filho bloqueia as células por baixo da sua caixa (vista de cima) |
-| `Rocks/` | Igual aos edifícios |
+| `Rocks/` | Igual aos edifícios. Um nó `Scatter` (muitas cópias de uma rocha) bloqueia por baixo de cada cópia |
 | `Trees/` | Cada filho bloqueia só a célula do tronco (a copa não conta) |
 | `Bridges/` | Cada filho é o tabuleiro de uma ponte (`MeshInstance3D`): as células por baixo andam-se à altura do tabuleiro, mesmo sobre água; os filhos (guardas) são decoração |
 | `Decor/` | Nunca bloqueia: relva, flores, estradas, luzes, água de pré-visualização |
-| `Markers/` | `Boat` (obrigatório), `PlayerStart`, `Generator1..3`, `Cache1..` (nós `Marker3D`) |
+| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..` (nós `Marker3D`) |
 
 A ilha ocupa o quadrado de 0 a `size` metros em X e Z (160 por omissão;
 muda no inspetor do nó raiz). Mantém tudo lá dentro.

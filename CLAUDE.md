@@ -62,7 +62,8 @@ Testes: `extends SceneTree`, lógica em `_initialize()`, imprimem `TEST: ...` ou
 - **Não editar `docs/DECISIONS.md`.** Propor decisões numa secção
   "Decisões propostas" do teu próprio documento; o utilizador decide.
 - **Assets externos só com licença livre** (CC0, MIT, OFL ou royalty-free
-  comercial) e registados em `assets/LICENSES.md`. Addons em `addons/`,
+  comercial) e registados em `assets/LICENSES.md`. Exceção aceite pelo
+  utilizador: dados do OpenStreetMap (ODbL), com atribuição. Addons em `addons/`,
   assets do jogo em `assets/`. O jogo tem de continuar a funcionar sem GPU
   (testes headless).
 - Spikes ficam em `spikes/<nome>/` e não dependem uns dos outros nem de `game/`.

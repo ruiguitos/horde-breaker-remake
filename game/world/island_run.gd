@@ -54,6 +54,7 @@ var all_cards: Array[GameData.Card] = GameData.cards()
 var card_stacks: Dictionary = {}  ## StringName -> int
 var card_choices: Array[GameData.Card] = []
 var _pending_levels: int = 0
+var _recycle_cd: float = 0.0
 
 # Pickups
 var orbs: PackedVector3Array = PackedVector3Array()
@@ -124,6 +125,8 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMa
 	map = custom_map if custom_map != null else IslandMap.build(rng_seed, biome)
 	field = map.field
 	horde = Horde.new(field)
+	if field.max_distance > 0:
+		horde.field_budget = 4000  # big island: a fresher field around the player (~1 ms more per step)
 	director = Director.new(rng_seed)
 	player_pos = map.player_start
 	field.compute_now(field.world_to_cell(player_pos))
@@ -420,6 +423,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	_update_grenades(dt)
 	_update_screamers(dt)
 	_flush_dead()
+	_recycle_far(dt)
 	_update_orbs(dt)
 	_update_mission(dt)
 	_update_caches(dt)
@@ -656,6 +660,25 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 			explosions.append(p)
 			for j in horde.query_radius(p, 3.0):
 				_damage(j, 30.0, p, false, true)
+
+
+## Big islands (field.max_distance set): the horde's flow field only covers
+## the area around the player, so enemies left behind outside it would stand
+## still. They are removed (no XP) and the director spawns new ones nearby.
+func _recycle_far(dt: float) -> void:
+	if field.max_distance <= 0 or field.is_computing:
+		return
+	_recycle_cd -= dt
+	if _recycle_cd > 0.0:
+		return
+	_recycle_cd = 1.0
+	var far2: float = GameData.SPAWN_MAX_DIST * GameData.SPAWN_MAX_DIST
+	for i in range(horde.count - 1, -1, -1):
+		if horde.kinds[i] == GameData.EnemyKind.BOSS:
+			continue
+		var p: Vector3 = horde.positions[i]
+		if field.distance_at(p) >= FlowField.UNREACHABLE and p.distance_squared_to(player_pos) > far2:
+			horde.remove(i)
 
 
 func _flush_dead() -> void:

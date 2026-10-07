@@ -36,6 +36,7 @@ var steering: float = 10.0
 
 var _head: PackedInt32Array = PackedInt32Array()
 var _next: PackedInt32Array = PackedInt32Array()
+var _hashed: PackedInt32Array = PackedInt32Array()  ## cells written by the last rebuild_hash
 var _hash_dirty: bool = true
 var _stamp: PackedInt32Array = PackedInt32Array()
 var _query_id: int = 0
@@ -44,6 +45,7 @@ var _query_id: int = 0
 func _init(flow_field: FlowField) -> void:
 	field = flow_field
 	_head.resize(field.width * field.height)
+	_head.fill(-1)
 
 
 func add(pos: Vector3, kind: int, rng: RandomNumberGenerator) -> int:
@@ -99,7 +101,11 @@ func set_target(p: Vector3) -> void:
 
 
 func rebuild_hash() -> void:
-	_head.fill(-1)
+	# Clear only the cells used last time: filling the whole grid every tick
+	# costs milliseconds on a 1.5 km island.
+	for cell in _hashed:
+		_head[cell] = -1
+	_hashed.resize(count)
 	var w: int = field.width
 	var cs: float = field.cell_size
 	for i in count:
@@ -107,6 +113,7 @@ func rebuild_hash() -> void:
 		var cell: int = floori(p.z / cs) * w + floori(p.x / cs)
 		_next[i] = _head[cell]
 		_head[cell] = i
+		_hashed[i] = cell
 	_hash_dirty = false
 
 

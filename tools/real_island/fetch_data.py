@@ -1,6 +1,6 @@
 """Downloads the real-world data for the real_island spike into data/.
 
-    python spikes/real_island/fetch_data.py [place]
+    python tools/real_island/fetch_data.py [place]
 
 Places are presets below (default: berlenga). Downloads, once:
   - elevation tiles (AWS Terrain Tiles, "terrarium" PNG, zoom 15, about 3.7 m
@@ -9,8 +9,8 @@ Places are presets below (default: berlenga). Downloads, once:
     buildings, lighthouse, pier, beaches;
   - four CC0 ground textures from Poly Haven (1k: colour, normal, roughness,
     displacement).
-data/ is ignored by git: OSM data is ODbL (attribution and share-alike), so
-nothing from it goes into the repository until the user decides.
+data/ is ignored by git: only the island built from it (build.gd) is kept.
+OSM data is ODbL: "(c) OpenStreetMap contributors" (see assets/LICENSES.md).
 Only the Python standard library is used.
 """
 
