@@ -13,6 +13,7 @@ var state: GameFlow = GameFlow.BOAT
 var context: RunContext
 var profile: Profile
 var _current: Node
+var _test_scene: PackedScene  ## TEST ISLAND: the island being tested, no run around it
 
 
 func _ready() -> void:
@@ -42,6 +43,21 @@ func _new_run() -> void:
 	_go(GameFlow.BOAT)
 
 
+## TEST ISLAND (development builds): one hand-made island with the chosen
+## mission, straight from the title, with the profile's class, perks and
+## weapons. Its biome comes from the file name (beach_berlenga -> beach).
+func _test_island(path: String, mission: StringName) -> void:
+	context = RunContext.new()
+	context.threat = profile.threat
+	context.apply_class(profile.selected_class)
+	context.apply_perks(profile.equipped_perks)
+	context.weapons.append_array(profile.unlocked_weapons)
+	context.biome = StringName(path.get_file().get_slice("_", 0))
+	context.mission = mission
+	_test_scene = load(path)
+	_go(GameFlow.ISLAND)
+
+
 func _go(next: GameFlow) -> void:
 	if _current != null:
 		_current.queue_free()
@@ -57,6 +73,8 @@ func _go(next: GameFlow) -> void:
 			var island: Node = (load(ISLAND_SCENE) as PackedScene).instantiate()
 			island.set("context", context)
 			island.set("profile", profile)
+			if _test_scene != null:
+				island.set("handmade_scene", _test_scene)
 			island.connect("finished", _on_island_finished, CONNECT_DEFERRED)
 			_current = island
 		GameFlow.DEBRIEF:
@@ -74,6 +92,7 @@ func _go(next: GameFlow) -> void:
 			title.set_script(load("res://game/states/title.gd"))
 			title.set("profile", profile)
 			title.connect("play_requested", _go.bind(GameFlow.ARMORY), CONNECT_DEFERRED)
+			title.connect("test_island_requested", _test_island, CONNECT_DEFERRED)
 			_current = title
 		GameFlow.ARMORY:
 			var armory := Control.new()
@@ -104,6 +123,10 @@ func _write_telemetry() -> void:
 
 
 func _on_island_finished(won: bool) -> void:
+	if _test_scene != null:
+		_test_scene = null  # a test: back to the title, nothing recorded
+		_go(GameFlow.TITLE)
+		return
 	if won and not context.is_last_island():
 		context.island_index += 1
 		_go(GameFlow.BOAT)

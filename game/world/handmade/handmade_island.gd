@@ -158,14 +158,21 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 
 ## A hand-made island for this biome (stable per seed), or null.
 static func pick(biome_id: StringName, seed_value: int) -> PackedScene:
-	var found: PackedStringArray = []
-	for file in ResourceLoader.list_directory(ISLANDS_DIR) if DirAccess.dir_exists_absolute(ISLANDS_DIR) else PackedStringArray():
-		if (file.ends_with(".tscn") or file.ends_with(".scn")) and file.begins_with(String(biome_id) + "_"):
-			found.append(ISLANDS_DIR + file)
+	var found: PackedStringArray = island_paths(biome_id)
 	if found.is_empty():
 		return null
-	found.sort()
 	return load(found[absi(seed_value) % found.size()]) as PackedScene
+
+
+## Paths of the islands in ISLANDS_DIR, sorted; only that biome's when
+## `biome_id` is given (the file name starts with "<biome>_").
+static func island_paths(biome_id: StringName = &"") -> PackedStringArray:
+	var found: PackedStringArray = []
+	for file in ResourceLoader.list_directory(ISLANDS_DIR) if DirAccess.dir_exists_absolute(ISLANDS_DIR) else PackedStringArray():
+		if (file.ends_with(".tscn") or file.ends_with(".scn")) and (biome_id == &"" or file.begins_with(String(biome_id) + "_")):
+			found.append(ISLANDS_DIR + file)
+	found.sort()
+	return found
 
 
 ## Editor button: report + grid picture (<scene>_grid.png).

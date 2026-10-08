@@ -19,6 +19,16 @@ O Intel ganho fica gravado no perfil, mesmo quando se morre.
 
 Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 
+**Testar uma ilha:** no ecrã inicial há um botão **TEST ISLAND**, que só
+aparece nas versões de desenvolvimento (o editor e as exportações de debug).
+- Escolhes a missão e uma das ilhas de `world/handmade/islands/` (a
+  Berlenga, a Hashima...) e entras logo nela, sem rota nem sorteio.
+- O bioma vem do nome do ficheiro: `beach_berlenga` é Beach.
+- No fim voltas ao ecrã inicial, e o teste não conta como viagem no perfil.
+
+Sem ele, só se chega a uma ilha por sorte. O barco oferece 2 rotas ao
+acaso e, dentro da rota, a ilha sai pela seed.
+
 ## Controlos
 
 | Ação | Teclado/rato | Comando |
@@ -198,8 +208,9 @@ texturas do Poly Haven.
   - há 6 caixas nas pontas da ilha.
 - **Duração:** a rota completa tem cerca de 2,4 km e o bot leva 6 minutos.
 - **Como foi construída:** por `tools/real_island/build.gd`; o como e o
-  porquê estão no `README.md` dessa pasta. Para a testar já, arrasta-a para
-  **Handmade Scene** em `world/island.tscn` e carrega em **F6**.
+  porquê estão no `README.md` dessa pasta. Para a testar já: **TEST ISLAND**
+  no ecrã inicial, ou arrasta-a para **Handmade Scene** em
+  `world/island.tscn` e carrega em **F6**.
 - **Licença:** os dados do mapa têm licença ODbL, "© OpenStreetMap
   contributors" (ver `assets/LICENSES.md`).
 

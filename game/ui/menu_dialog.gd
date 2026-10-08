@@ -97,6 +97,31 @@ static func controls(parent: Node) -> MenuDialog:
 	return dialog
 
 
+## Development builds (Title > TEST ISLAND): every hand-made island and a
+## mission, to play one straight away. `on_pick` gets the island's path and
+## the mission id.
+static func test_island(parent: Node, on_pick: Callable) -> MenuDialog:
+	var dialog := MenuDialog.new()
+	parent.add_child(dialog)
+	dialog.content.add_child(UiTheme.title("TEST ISLAND", 36))
+	dialog.content.add_child(UiTheme.label("Development builds only: one island, no run around it.", 16, UiTheme.MUTED))
+	var mission := OptionButton.new()
+	mission.name = "Mission"
+	for id: StringName in GameData.MISSIONS:
+		mission.add_item("MISSION: " + String(GameData.MISSIONS[id]["name"]).to_upper())
+		mission.set_item_metadata(mission.item_count - 1, id)
+	dialog.content.add_child(mission)
+	var list := _scroll(dialog.content, 300)
+	for path in HandmadeIsland.island_paths():
+		var b := UiTheme.button(list, path.get_file().get_basename().to_upper(), func() -> void:
+			var id: StringName = mission.get_item_metadata(mission.selected)
+			dialog.close()
+			on_pick.call(path, id))
+		b.name = "Island_" + path.get_file().get_basename()
+	UiTheme.button(dialog.content, "BACK", dialog.close, true)
+	return dialog
+
+
 static func _scroll(parent: Control, height: float) -> VBoxContainer:
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size.y = height

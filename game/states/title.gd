@@ -2,6 +2,8 @@ extends Node
 ## Illustrated harbor with native, focusable controls.
 
 signal play_requested
+## TEST ISLAND (development builds): play this island with this mission.
+signal test_island_requested(path: String, mission: StringName)
 
 var profile: Profile
 var _root: Control
@@ -47,10 +49,10 @@ func _ready() -> void:
 	arrow.offset_right = -12
 	arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	deploy.add_child(arrow)
-	for item in [
-		["SETTINGS", _settings],
-		["INTEL ARCHIVE", _archive],
-		["QUIT", func() -> void: get_tree().quit()]]:
+	var items: Array = [["SETTINGS", _settings], ["INTEL ARCHIVE", _archive], ["QUIT", func() -> void: get_tree().quit()]]
+	if OS.is_debug_build():  # the editor and debug exports; never a release
+		items.push_front(["TEST ISLAND", _test_island])
+	for item in items:
 		var b := UiTheme.button(box, item[0], item[1])
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var gap := Control.new()
@@ -84,6 +86,12 @@ func _deploy() -> void:
 func _settings() -> void:
 	if not is_instance_valid(_dialog):
 		_dialog = MenuDialog.settings(_root, profile)
+
+
+func _test_island() -> void:
+	if not is_instance_valid(_dialog):
+		_dialog = MenuDialog.test_island(_root, func(path: String, mission: StringName) -> void:
+			test_island_requested.emit(path, mission))
 
 
 func _archive() -> void:
