@@ -9,10 +9,14 @@ extends RefCounted
 ## - a clay tile roof with UVs along each slope: gabled on elongated plans,
 ##   hipped on compact ones, a lean-to on sheds and service buildings (OSM
 ##   roof:shape / roof:direction / roof:height win when mapped). Gable
-##   triangles are wall, not roof;
+##   triangles are wall, not roof. L- and U-shaped plans are split into
+##   rectangular wings, each with its own roof, meeting in valleys;
 ## - a door on the wall nearest a path (not one touching another house) and
 ##   windows with painted surrounds and sills on the free outward walls;
-##   colours chosen per house from its OSM id, so every build is the same.
+##   colours chosen per house from its OSM id, so every build is the same
+##   (one paint for a lighthouse keepers' compound);
+## - buildings on the fort's islet: bare stone and a flat roof behind a
+##   parapet, like the fort around them.
 ##
 ## Grid: the grid blocks what a Buildings/ mesh covers from above. The house
 ## body (vertical walls + the roof inside the footprint) is one node per house
@@ -38,7 +42,13 @@ const STYLES: Dictionary = {
 		"door": Vector2(1.0, 1.9), "window": Vector2(0.5, 0.5), "side_windows": false, "chimney": false},
 	"kiosk": {"eaves": 2.5, "min_wall": 2.2, "roof": "hip", "pitch": 0.45, "eave": 0.3, "verge": 0.3,
 		"door": Vector2(0.8, 1.95), "window": Vector2(1.0, 0.8), "side_windows": false, "chimney": false},
+	# Buildings inside the fort (Forte de Sao Joao Baptista): bare stone, a
+	# flat roof behind a parapet, small windows.
+	"fort": {"eaves": 4.0, "min_wall": 3.0, "roof": "flat", "pitch": 0.0, "eave": 0.0, "verge": 0.0, "parapet": 0.9,
+		"door": Vector2(1.3, 2.3), "window": Vector2(0.7, 0.9), "side_windows": true, "chimney": false},
 }
+const WING_PITCH: float = 0.45  ## wings of a lean-to style (service, shed): a gable needs a real pitch
+const COMPOUND_RADIUS: float = 45.0  ## houses this close to a lighthouse share one paint (the keepers' compound)
 
 ## Painted surrounds, bands and corner strips: Portuguese blues and ochre.
 const PAINTS: Array[Color] = [Color(0.1, 0.28, 0.58), Color(0.24, 0.47, 0.72), Color(0.86, 0.64, 0.18), Color(0.12, 0.3, 0.55)]
@@ -53,6 +63,9 @@ var b: SceneTree  ## the builder (build.gd): height_at, _add, _role_material...
 var _decor: Dictionary = {}  ## material -> Surf, shared by every house (Decor/VillageHouseDetail)
 var _plain: Dictionary = {}  ## colour -> plain material
 var _built: int = 0
+var _wings_built: int = 0
+var _fort_ring := PackedVector2Array()  ## coast ring of the fort's islet (empty: no fort)
+var _fort_ready: bool = false
 
 
 ## One mesh surface being written: a SurfaceTool, its material and the
@@ -96,12 +109,16 @@ class Surf:
 ## The roof's height over any plan point: walls rise to it, so gable ends
 ## and lean-to sides are wall up to the roof line.
 class Roof:
-	var shape: String = "hip"  ## gable, hip, skillion, flat, fan
+	var shape: String = "hip"  ## gable, hip, skillion, flat, fan, wings
 	var eaves: float
 	var rise: float
 	var ra: Vector2  ## gable: a ridge point; skillion: a point of the low eaves
 	var rd: Vector2  ## direction of that line
 	var span: float  ## gable: half width; skillion: width
+	var parapet: float = 0.45  ## flat: parapet above the slab
+	## wings (L- and U-shaped plans): one [plan, Roof, cut edges, turn] per
+	## rectangular wing; a point takes the highest roof of the wings it is in.
+	var parts: Array = []
 
 	func height(p: Vector2) -> float:
 		match shape:
@@ -110,8 +127,21 @@ class Roof:
 			"skillion":
 				return eaves + rise * absf((p - ra).cross(rd)) / span
 			"flat":
-				return eaves + 0.45  # parapet
+				return eaves + parapet
+			"wings":
+				var best: float = -INF
+				for w: Array in parts:
+					var pl: PackedVector2Array = w[0]
+					if Geometry2D.is_point_in_polygon(p, pl) or ring_dist(p, pl) < 0.03:
+						best = maxf(best, (w[1] as Roof).height(p))
+				return best if best > -INF else eaves
 		return eaves
+
+	static func ring_dist(p: Vector2, ring: PackedVector2Array) -> float:
+		var best: float = INF
+		for i in ring.size():
+			best = minf(best, p.distance_to(Geometry2D.get_closest_point_to_segment(p, ring[i], ring[(i + 1) % ring.size()])))
+		return best
 
 
 func _init(builder: SceneTree) -> void:
@@ -135,7 +165,8 @@ func place(k: int, pts: PackedVector2Array, lo: float, hi: float) -> bool:
 			return false
 	var tags: Dictionary = b._houses[k][5]
 	var kind: String = b._houses[k][2]
-	var style: Dictionary = STYLES.get(kind, STYLES["dwelling"])
+	var fort: bool = _on_fort_islet(c)
+	var style: Dictionary = STYLES["fort"] if fort else STYLES.get(kind, STYLES["dwelling"])
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(tags.get("osm_id", k))
 	var turn: float = b._turn(plan)
@@ -167,17 +198,51 @@ func place(k: int, pts: PackedVector2Array, lo: float, hi: float) -> bool:
 	var roof_m: Material = _role("roof", ROOF_METRES, ROOFS[rng.randi() % ROOFS.size()], true)
 	if kind in ["shed", "service"]:
 		band_m = _role("plaster", PLASTER_METRES, Color(1.0, 1.0, 0.97), false)  # a grey band, no colours
+	var compound: int = _compound(c)
+	if compound >= 0:
+		# The lighthouse keepers' houses were built and kept by one service:
+		# one paint for the whole compound (drawn after the house's own draws,
+		# so every other colour stays as it was).
+		var crng := RandomNumberGenerator.new()
+		crng.seed = 4513 + compound
+		paint = PAINTS[crng.randi() % PAINTS.size()]
+		door_paint = DOORS[crng.randi() % DOORS.size()]
+		if kind not in ["shed", "service"]:
+			band_m = _role("plaster", PLASTER_METRES, paint * BAND_GAIN, false)
+	if fort:
+		# Bare masonry like the fort's walls: no whitewash, no painted band;
+		# stone surrounds and a darker plinth.
+		wall_m = _role("stone", 2.0, Color(1.3, 1.34, 1.36), false)  # cooler: the picture is warm
+		band_m = wall_m
+		stone_m = _role("stone", STONE_METRES, Color(0.95, 0.92, 0.88), false)
+		paint = Color(0.8, 0.78, 0.72)
+		door_paint = DOORS[1]
 
 	var walls := Surf.new(wall_m, o, false)
 	var band := Surf.new(band_m, o, false)
 	var stone := Surf.new(stone_m, o, false)
 	var roof_s := Surf.new(roof_m, o, true)
-	var roof: Roof = _roof(plan, tags, style, shape, eaves)
-	_walls(plan, turn, roof, lo - 0.5, ref, walls, band, stone)
-	_roof_faces(plan, turn, roof, style, rng, roof_s, walls, roof_m, wall_m)
+	var roof: Roof = null
+	if shape == "wings":
+		roof = _wing_roofs(plan, tags, style, eaves)
+		if roof == null:
+			shape = "flat"  # the plan would not split into wings: flat, as before
+	if roof == null:
+		roof = _roof(plan, tags, style, shape, eaves)
+	# The fort's terrace: a plain lime-mortar grey, not the wall's stone.
+	var slab: Surf = Surf.new(_colour(Color(0.42, 0.41, 0.39), 0.95), o, false) if fort else null
+	_walls(plan, turn, roof, lo - 0.5, ref, walls, band, stone, slab)
+	if roof.shape == "wings":
+		_wing_faces(roof, style, rng, roof_s, walls, roof_m, wall_m)
+	else:
+		_roof_faces(plan, turn, roof, style, rng, roof_s, walls, roof_m, wall_m, [], true)
+	if roof.shape == "flat" and fort:
+		_coping(plan, turn, roof)
 
 	var mesh := ArrayMesh.new()
-	for s: Surf in [walls, band, stone, roof_s]:
+	for s: Surf in [walls, band, stone, roof_s, slab]:
+		if s == null:
+			continue
 		if s.empty:
 			continue
 		if s.uv:
@@ -191,7 +256,8 @@ func place(k: int, pts: PackedVector2Array, lo: float, hi: float) -> bool:
 	b._add(inst, "Buildings")
 
 	# Openings and painted details, outside the walls: decoration.
-	_corner_strips(plan, turn, roof, ref, shared, band_m)
+	if not fort:
+		_corner_strips(plan, turn, roof, ref, shared, band_m)
 	for i in plan.size():
 		if shared[i]:
 			continue
@@ -215,7 +281,7 @@ func finish() -> void:
 		inst.name = "VillageHouseDetail"
 		inst.mesh = mesh
 		b._add(inst, "Decor")
-	print("  village houses: %d built by the kit, %d decoration surfaces" % [_built, mesh.get_surface_count()])
+	print("  village houses: %d built by the kit (%d split into wings), %d decoration surfaces" % [_built, _wings_built, mesh.get_surface_count()])
 
 
 # ---------------------------------------------------------------- plan
@@ -259,9 +325,10 @@ func _is_convex(plan: PackedVector2Array) -> bool:
 	return true
 
 
-## gable, hip, skillion, flat or fan (a pyramid over a convex plan that is
-## not a quad). OSM roof:shape wins; otherwise gabled when the plan is
-## elongated (1.35 : 1 or more), hipped when compact.
+## gable, hip, skillion, flat, fan (a pyramid over a convex plan that is
+## not a quad) or wings (a concave plan: L, U... split into rectangular
+## wings, see _wing_roofs). OSM roof:shape wins; otherwise gabled when the
+## plan is elongated (1.35 : 1 or more), hipped when compact.
 func _shape(plan: PackedVector2Array, tags: Dictionary, style: Dictionary) -> String:
 	var s: String = {"gabled": "gable", "pitched": "gable", "saltbox": "gable", "gambrel": "gable", "mansard": "hip",
 		"hipped": "hip", "half-hipped": "hip", "pyramidal": "hip", "side_hipped": "hip",
@@ -271,7 +338,7 @@ func _shape(plan: PackedVector2Array, tags: Dictionary, style: Dictionary) -> St
 	if plan.size() != 4 or not _is_convex(plan):
 		if s == "flat":
 			return s
-		return "fan" if _is_convex(plan) else "flat"
+		return "fan" if _is_convex(plan) else "wings"
 	if s == "auto":
 		var l0: float = plan[0].distance_to(plan[1]) + plan[2].distance_to(plan[3])
 		var l1: float = plan[1].distance_to(plan[2]) + plan[3].distance_to(plan[0])
@@ -394,6 +461,7 @@ func _roof(plan: PackedVector2Array, tags: Dictionary, style: Dictionary, shape:
 			r.span = minf(r.span, c.distance_to(Geometry2D.get_closest_point_to_segment(c, plan[i], plan[(i + 1) % plan.size()])))
 	r.span = maxf(r.span, 0.5)
 	r.rise = pitch * r.span
+	r.parapet = float(style.get("parapet", 0.45))
 	if tags.has("roof:height"):
 		r.rise = maxf(0.2, String(tags["roof:height"]).to_float())
 	return r
@@ -404,7 +472,8 @@ func _roof(plan: PackedVector2Array, tags: Dictionary, style: Dictionary, shape:
 ## 0.3 m above it (more on the downhill side, where the floor stays level),
 ## the painted band 0.55 m above that, whitewash to the top. Vertices sit
 ## exactly on the footprint: seen from above the walls cover nothing.
-func _walls(plan: PackedVector2Array, turn: float, roof: Roof, base: float, ref: float, walls: Surf, band: Surf, stone: Surf) -> void:
+func _walls(plan: PackedVector2Array, turn: float, roof: Roof, base: float, ref: float, walls: Surf, band: Surf, stone: Surf,
+		slab: Surf = null) -> void:
 	for i in plan.size():
 		var a: Vector2 = plan[i]
 		var e: Vector2 = plan[(i + 1) % plan.size()]
@@ -415,7 +484,9 @@ func _walls(plan: PackedVector2Array, turn: float, roof: Roof, base: float, ref:
 			ts.append(float(j) / steps)
 		if roof.shape == "gable" and (i == 0 or i == 2):
 			ts.append(0.5)  # the gable's top
-			ts.sort()
+		elif roof.shape == "wings":
+			ts.append_array(_wing_breaks(roof, a, e))
+		ts.sort()
 		var prev: Array = []
 		var ga: float = b.height_at(a.x, a.y)
 		var ge: float = b.height_at(e.x, e.y)
@@ -438,10 +509,12 @@ func _walls(plan: PackedVector2Array, turn: float, roof: Roof, base: float, ref:
 			var a: Vector2 = plan[i]
 			var e: Vector2 = plan[(i + 1) % plan.size()]
 			var out: Vector3 = b._outward(a, e, turn)
-			walls.quad(Vector3(a.x, roof.eaves, a.y), Vector3(e.x, roof.eaves, e.y), Vector3(e.x, roof.eaves + 0.45, e.y), Vector3(a.x, roof.eaves + 0.45, a.y), -out)
+			var top: float = roof.eaves + roof.parapet
+			walls.quad(Vector3(a.x, roof.eaves, a.y), Vector3(e.x, roof.eaves, e.y), Vector3(e.x, top, e.y), Vector3(a.x, top, a.y), -out)
 		var idx: PackedInt32Array = Geometry2D.triangulate_polygon(plan)
+		var s: Surf = walls if slab == null else slab
 		for t in range(0, idx.size(), 3):
-			walls.tri(Vector3(plan[idx[t]].x, roof.eaves, plan[idx[t]].y), Vector3(plan[idx[t + 1]].x, roof.eaves, plan[idx[t + 1]].y),
+			s.tri(Vector3(plan[idx[t]].x, roof.eaves, plan[idx[t]].y), Vector3(plan[idx[t + 1]].x, roof.eaves, plan[idx[t + 1]].y),
 				Vector3(plan[idx[t + 2]].x, roof.eaves, plan[idx[t + 2]].y), Vector3.UP)
 
 
@@ -459,13 +532,258 @@ func _levels(p: Vector2, roof: Roof, base: float, ref: float, line: float) -> Ar
 	return [p, base, s, t, top]
 
 
+# ---------------------------------------------------------------- wings
+
+## A concave plan (L, U, T...) as rectangular wings, each with its own tiled
+## roof, as Portuguese houses are built: the plan is cut at its inner
+## corners, always along the shortest cut that extends a wall (so a narrow
+## wing joins the main range across its width), until every piece is convex.
+## A wing whose end is a cut gets a gable roof running into the wing it
+## joins; the other wings keep the usual gable or hip. Every roof face stays
+## inside its wing, so the house still blocks exactly its footprint. Null
+## when the plan does not split cleanly (it then gets the flat roof).
+func _wing_roofs(plan: PackedVector2Array, tags: Dictionary, style: Dictionary, eaves: float) -> Roof:
+	var pieces: Array = [plan]
+	var turn: float = b._turn(plan)
+	var i: int = 0
+	var cuts_made: int = 0
+	while i < pieces.size():
+		var poly: PackedVector2Array = pieces[i]
+		var cut: Array = _best_cut(poly, turn)
+		if cut.is_empty():
+			if not _is_convex(poly):
+				return null
+			i += 1
+			continue
+		cuts_made += 1
+		if cuts_made > 8:
+			return null
+		pieces[i] = cut[0]
+		pieces.append(cut[1])
+	var wstyle: Dictionary = style.duplicate()
+	if wstyle["roof"] == "skillion":
+		wstyle["pitch"] = WING_PITCH
+	var roof := Roof.new()
+	roof.shape = "wings"
+	roof.eaves = eaves
+	for piece: PackedVector2Array in pieces:
+		var pl: PackedVector2Array = _simplify(piece)
+		if pl.size() < 3 or not _is_convex(pl):
+			return null
+		var cuts: Array[bool] = _cut_edges(pl, plan)
+		var shape: String = "fan"
+		if pl.size() == 4:
+			var ci: int = cuts.find(true)
+			if ci >= 0:
+				# The cut end becomes gable end 0: the ridge runs into the
+				# neighbouring wing.
+				pl = PackedVector2Array([pl[ci], pl[(ci + 1) % 4], pl[(ci + 2) % 4], pl[(ci + 3) % 4]])
+				shape = "gable"
+			else:
+				shape = {"gabled": "gable", "pitched": "gable", "hipped": "hip"}.get(tags.get("roof:shape", ""), "")
+				if shape == "":
+					var l0: float = pl[0].distance_to(pl[1]) + pl[2].distance_to(pl[3])
+					var l1: float = pl[1].distance_to(pl[2]) + pl[3].distance_to(pl[0])
+					shape = "gable" if maxf(l0, l1) >= 1.35 * minf(l0, l1) else "hip"
+				pl = _orient(pl, {}, false)
+			cuts = _cut_edges(pl, plan)
+		# No OSM roof:height here: every wing keeps the same pitch, so the
+		# narrower wing's roof dives under the wider one's (see _wing_join).
+		roof.parts.append([pl, _roof(pl, {}, wstyle, shape, eaves), cuts, b._turn(pl)])
+	_wings_built += 1
+	return roof
+
+
+## The shortest cut of a concave piece: from an inner (reflex) corner along
+## one of its walls, to the far side. [piece a, piece b], or [] when the
+## piece is convex or no cut leaves two real rooms (4 m2 or more).
+func _best_cut(poly: PackedVector2Array, turn: float) -> Array:
+	var n: int = poly.size()
+	var best: Array = []
+	var best_len: float = INF
+	for j in n:
+		var pv: Vector2 = poly[(j + n - 1) % n]
+		var v: Vector2 = poly[j]
+		var nx: Vector2 = poly[(j + 1) % n]
+		if (v - pv).cross(nx - v) * turn > -1e-3:
+			continue  # an outer corner (or a straight one)
+		for dir: Vector2 in [(v - pv).normalized(), (v - nx).normalized()]:
+			var hit := Vector2.ZERO
+			var hk: int = -1
+			var hd: float = INF
+			for k in n:
+				if k == j or k == (j + n - 1) % n:
+					continue  # the corner's own walls
+				var x: Variant = Geometry2D.segment_intersects_segment(v + dir * 0.01, v + dir * 10000.0, poly[k], poly[(k + 1) % n])
+				if x != null and v.distance_to(x) < hd:
+					hd = v.distance_to(x)
+					hit = x
+					hk = k
+			if hk < 0 or hd >= best_len:
+				continue
+			var halves: Array = _split(poly, j, hk, hit)
+			var ok: bool = true
+			for h: PackedVector2Array in halves:
+				ok = ok and h.size() >= 3 and absf(_shoelace(h)) >= 4.0
+			if ok:
+				best = halves
+				best_len = hd
+	return best
+
+
+## The piece split by the cut from corner j to point h on edge k.
+func _split(poly: PackedVector2Array, j: int, k: int, h: Vector2) -> Array:
+	var n: int = poly.size()
+	var a := PackedVector2Array([poly[j]])
+	var idx: int = (j + 1) % n
+	while true:
+		a.append(poly[idx])
+		if idx == k:
+			break
+		idx = (idx + 1) % n
+	a.append(h)
+	var c := PackedVector2Array([h])
+	idx = (k + 1) % n
+	while true:
+		c.append(poly[idx])
+		if idx == j:
+			break
+		idx = (idx + 1) % n
+	return [_simplify(a), _simplify(c)]
+
+
+func _shoelace(pl: PackedVector2Array) -> float:
+	var s: float = 0.0
+	for i in pl.size():
+		s += pl[i].cross(pl[(i + 1) % pl.size()])
+	return s * 0.5
+
+
+## Which edges of a wing lie inside the house (cuts), not on the footprint.
+## An edge partly on the footprint (the main range a wing joins) is not a cut.
+func _cut_edges(pl: PackedVector2Array, outline: PackedVector2Array) -> Array[bool]:
+	var out: Array[bool] = []
+	for i in pl.size():
+		var inner: int = 0
+		for s in 7:
+			var q: Vector2 = pl[i].lerp(pl[(i + 1) % pl.size()], (s + 0.5) / 7.0)
+			if Roof.ring_dist(q, outline) > 0.03:
+				inner += 1
+		out.append(inner >= 6)
+	return out
+
+
+## Where the roof line over the wall a-e bends: the wings' corners and
+## gable tops on it, as fractions of the wall.
+func _wing_breaks(roof: Roof, a: Vector2, e: Vector2) -> Array[float]:
+	var ts: Array[float] = []
+	var l2: float = a.distance_squared_to(e)
+	for w: Array in roof.parts:
+		var pl: PackedVector2Array = w[0]
+		var r: Roof = w[1]
+		var pts: Array[Vector2] = []
+		for q in pl:
+			pts.append(q)
+		if r.shape == "gable":
+			pts.append((pl[0] + pl[1]) * 0.5)
+			pts.append((pl[2] + pl[3]) * 0.5)
+		for q in pts:
+			if q.distance_to(Geometry2D.get_closest_point_to_segment(q, a, e)) < 0.03:
+				var t: float = (q - a).dot(e - a) / l2
+				if t > 0.001 and t < 0.999:
+					ts.append(t)
+	return ts
+
+
+## Every wing's roof (the biggest wing gets the chimney) and the joints.
+func _wing_faces(roof: Roof, style: Dictionary, rng: RandomNumberGenerator, roof_s: Surf, walls: Surf,
+		roof_m: Material, wall_m: Material) -> void:
+	var biggest: int = 0
+	for wi in roof.parts.size():
+		if absf(_shoelace(roof.parts[wi][0])) > absf(_shoelace(roof.parts[biggest][0])):
+			biggest = wi
+	for wi in roof.parts.size():
+		var w: Array = roof.parts[wi]
+		_roof_faces(w[0], w[3], w[1], style, rng, roof_s, walls, roof_m, wall_m, w[2], wi == biggest)
+		if (w[1] as Roof).shape != "gable":
+			continue
+		for c: int in [0, 2]:
+			if w[2][c]:
+				_wing_join(roof, wi, c, roof_s, walls, roof_m)
+
+
+## The joint at cut end c of wing wi. When the neighbouring wing's roof
+## rises from this line (the cut is along its eaves) and is wide enough, the
+## gable roof runs on into it by its own half width: past that it is under
+## the neighbour's slope, so the two meet in a valley, as real roofs do. The
+## extension lies inside the neighbour, inside the footprint. Otherwise a
+## gable wall closes the end above the neighbour's roof.
+func _wing_join(roof: Roof, wi: int, c: int, roof_s: Surf, walls: Surf, roof_m: Material) -> void:
+	var w: Array = roof.parts[wi]
+	var pl: PackedVector2Array = w[0]
+	var r: Roof = w[1]
+	var a: Vector2 = pl[c]
+	var e: Vector2 = pl[(c + 1) % 4]
+	var m: Vector2 = (a + e) * 0.5
+	var o3: Vector3 = b._outward(a, e, w[3])
+	var d := Vector2(o3.x, o3.z)  # into the neighbour
+	var length: float = r.span + 0.1
+	var ok: bool = false
+	for wj in roof.parts.size():
+		var npl: PackedVector2Array = roof.parts[wj][0]
+		if wj == wi or not Geometry2D.is_point_in_polygon(m + d * 0.3, npl):
+			continue
+		var nr: Roof = roof.parts[wj][1]
+		ok = absf(nr.height(m + d * 0.02) - roof.eaves) < 0.1 and nr.height(m + d * length) >= roof.eaves + r.rise - 0.02
+		for q: Vector2 in [a + d * length, e + d * length, m + d * length]:
+			ok = ok and (Geometry2D.is_point_in_polygon(q, npl) or Roof.ring_dist(q, npl) < 0.03)
+	var v3 := func(p: Vector2) -> Vector3: return Vector3(p.x, r.height(p), p.y)
+	if ok:
+		var a2: Vector2 = a + d * length
+		var e2: Vector2 = e + d * length
+		var m2: Vector2 = m + d * length
+		_tile_face(roof_s, [v3.call(a), v3.call(m), v3.call(m2), v3.call(a2)])
+		_tile_face(roof_s, [v3.call(m), v3.call(e), v3.call(e2), v3.call(m2)])
+		_ridge_cap(_decor_surf(roof_m, true), v3.call(m), v3.call(m2))
+		return
+	for t: Array in [[0.0, 0.5], [0.5, 1.0]]:
+		var p: Vector2 = a.lerp(e, t[0])
+		var q: Vector2 = a.lerp(e, t[1])
+		var y0: float = roof.eaves - 0.3
+		walls.quad(Vector3(p.x, y0, p.y), Vector3(q.x, y0, q.y), v3.call(q), v3.call(p), o3)
+
+
+## Tiles on a plane roof face (corners in order), UVs as in _roof_faces.
+func _tile_face(s: Surf, pin: Array) -> void:
+	var nrm := Vector3.ZERO
+	for j in pin.size():
+		var a: Vector3 = pin[j]
+		var e: Vector3 = pin[(j + 1) % pin.size()]
+		nrm += Vector3((a.y - e.y) * (a.z + e.z), (a.z - e.z) * (a.x + e.x), (a.x - e.x) * (a.y + e.y))
+	nrm = nrm.normalized()
+	if nrm.y < 0.0:
+		nrm = -nrm
+	if nrm.y < 0.05:
+		return
+	var hd: Vector3 = Vector3.UP.cross(nrm)
+	hd = hd.normalized() if hd.length() > 0.01 else Vector3.RIGHT
+	var dd: Vector3 = nrm.cross(hd)
+	if dd.y > 0.0:
+		dd = -dd
+	var uv := func(p: Vector3) -> Vector2: return Vector2(p.dot(hd), p.dot(dd))
+	for j in range(1, pin.size() - 1):
+		s.tri(pin[0], pin[j], pin[j + 1], nrm, uv.call(pin[0]), uv.call(pin[j]), uv.call(pin[j + 1]))
+
+
 # ---------------------------------------------------------------- roof
 
 ## The roof faces over the footprint go into the house (roof_s); the
 ## overhangs past the walls, their undersides, the edge boards, ridge tiles
-## and the chimney into the shared decoration.
+## and the chimney into the shared decoration. `cuts` marks the edges of a
+## wing that lie inside the house (no overhang there); `chimney` false skips
+## the chimney (the other wings of the house).
 func _roof_faces(plan: PackedVector2Array, turn: float, roof: Roof, style: Dictionary, rng: RandomNumberGenerator,
-		roof_s: Surf, walls: Surf, roof_m: Material, wall_m: Material) -> void:
+		roof_s: Surf, walls: Surf, roof_m: Material, wall_m: Material, cuts: Array, chimney: bool) -> void:
 	if roof.shape == "flat":
 		return
 	var n: int = plan.size()
@@ -474,6 +792,8 @@ func _roof_faces(plan: PackedVector2Array, turn: float, roof: Roof, style: Dicti
 	for i in n:
 		var verge: bool = roof.shape in ["gable", "skillion"] and (i == 0 or i == 2)
 		off.append(float(style["verge"]) if verge else float(style["eave"]))
+		if i < cuts.size() and cuts[i]:
+			off[i] = 0.0
 	var outs: Array[Vector2] = []
 	for i in n:
 		var o3: Vector3 = b._outward(plan[i], plan[(i + 1) % n], turn)
@@ -578,7 +898,7 @@ func _roof_faces(plan: PackedVector2Array, turn: float, roof: Roof, style: Dicti
 				caps[key] = [a, e]
 	for key: String in caps:
 		_ridge_cap(over, caps[key][0], caps[key][1])
-	if bool(style["chimney"]):
+	if bool(style["chimney"]) and chimney:
 		var r0: Vector2 = p2[ridge[0]] if not ridge.is_empty() else p2[p2.size() - 1]
 		var r1: Vector2 = p2[ridge[1]] if not ridge.is_empty() else p2[p2.size() - 1]
 		var t: float = [0.2, 0.8][rng.randi() % 2]
@@ -587,7 +907,11 @@ func _roof_faces(plan: PackedVector2Array, turn: float, roof: Roof, style: Dicti
 		var cp: Vector2 = r0.lerp(r1, t) + side
 		if roof.shape == "hip" and r0.distance_to(r1) > 0.1:
 			cp = r0.lerp(r1, 0.5) + side
-		_chimney(cp, top, along, wall_m)
+		var clear: bool = true
+		for lp: Vector2 in b._lighthouses:
+			clear = clear and lp.distance_to(cp) > 5.0  # not through the lighthouse tower
+		if clear:
+			_chimney(cp, top, along, wall_m)
 
 
 func _apex(c: Vector2, top: float, p2: PackedVector2Array, ys: PackedFloat32Array, ext: PackedVector2Array, on: Array,
@@ -781,6 +1105,42 @@ func _door(p: Vector2, d: Vector2, out: Vector2, y0: float, w: float, h: float, 
 	_box(frame, fc + up * (h + fw) * 0.5, t3 * (w * 0.5 + fw), up * fw * 0.5, fz)
 	var step: Surf = _decor_surf(_role("stone", STONE_METRES, Color(0.85, 0.83, 0.8), false), false)
 	_box(step, Vector3(p.x, y0 - 0.3, p.y) + n3 * 0.2, t3 * (w * 0.5 + 0.2), up * 0.3, n3 * 0.2)
+
+
+# ---------------------------------------------------------------- places
+
+## True when `c` is on the fort's islet (the place has a fort generator).
+func _on_fort_islet(c: Vector2) -> bool:
+	if not _fort_ready:
+		_fort_ready = true
+		if b.P["generators"].any(func(g: Array) -> bool: return g[0] == "fort"):
+			var islet: Vector2 = b._fort_islet()
+			for ring: PackedVector2Array in b._rings:
+				if b._centroid(ring).distance_to(islet) < 1.0:
+					_fort_ring = ring
+	return _fort_ring.size() > 2 and Geometry2D.is_point_in_polygon(c, _fort_ring)
+
+
+## The lighthouse whose keepers' compound `c` belongs to, or -1.
+func _compound(c: Vector2) -> int:
+	for i in b._lighthouses.size():
+		if (b._lighthouses[i] as Vector2).distance_to(c) < COMPOUND_RADIUS:
+			return i
+	return -1
+
+
+## A stone coping on the parapet: it gives the thin wall its thickness
+## (half of it outside the footprint: decoration).
+func _coping(plan: PackedVector2Array, turn: float, roof: Roof) -> void:
+	var s: Surf = _decor_surf(_role("stone", STONE_METRES, Color(1.5, 1.47, 1.4), false), false)
+	var y: float = roof.eaves + roof.parapet + 0.05
+	for i in plan.size():
+		var a: Vector2 = plan[i]
+		var e: Vector2 = plan[(i + 1) % plan.size()]
+		var d: Vector2 = (e - a).normalized()
+		var o3: Vector3 = b._outward(a, e, turn)
+		var m: Vector2 = (a + e) * 0.5
+		_box(s, Vector3(m.x, y, m.y), Vector3(d.x, 0, d.y) * (a.distance_to(e) * 0.5 + 0.2), Vector3(0, 0.07, 0), o3 * 0.2, true)
 
 
 # ---------------------------------------------------------------- helpers

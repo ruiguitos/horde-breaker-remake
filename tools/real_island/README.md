@@ -105,12 +105,12 @@ depois de a construir, ou muda o script.
     são só decoração.
   - **Tapete transportador (ベルトコンベアー):** passadeira a 5 m de altura
     sobre pilares. Só os pilares bloqueiam.
-- **Kits de detalhe (Berlenga, só numa parte da ilha):** feitos em paralelo
-  por dois subagentes Claude e revistos pelo Codex, como teste antes de
-  passar à ilha toda. Aplicam-se dentro do retângulo `detail_area` do
-  preset, com o desembarque, a estrada a subir e o Bairro dos Pescadores.
-  Fora dele fica o estilo antigo. Cada kit é um ficheiro próprio, para os
-  dois poderem trabalhar sem mexer no mesmo código.
+- **Kits de detalhe (Berlenga):** feitos em paralelo por subagentes Claude
+  e revistos pelo Codex. Cada kit é um ficheiro próprio, para os subagentes
+  poderem trabalhar sem mexer no mesmo código.
+  - **Primeira ronda:** só no retângulo `detail_area` do desembarque e do
+    Bairro dos Pescadores, como teste.
+  - **Segunda ronda:** a ilha toda, mais o farol e o forte.
   - **`village_houses.gd`, casas:**
     - paredes caiadas com barra pintada, azul ou ocre, e embasamento de
       pedra; beiral a cerca de 3,1 m;
@@ -119,7 +119,11 @@ depois de a construir, ou muda o script.
       chaminé;
     - porta virada para o caminho mais próximo e janelas com moldura e
       peitoril, só nas paredes livres;
-    - cores escolhidas a partir do id do OSM, por isso são sempre as mesmas.
+    - cores escolhidas a partir do id do OSM, por isso são sempre as mesmas;
+    - plantas em L e em U divididas em alas, cada uma com o seu telhado de
+      duas águas, que se encontram numa calha;
+    - casas dos faroleiros com a mesma pintura; o edifício do ilhéu do forte
+      em pedra, com telhado plano atrás de uma platibanda.
 
     O corpo da casa fica em `Buildings/` e bloqueia só a planta. Tudo o que
     sai dela (beirais, molduras, degraus da porta) fica em `Decor/`.
@@ -131,16 +135,40 @@ depois de a construir, ou muda o script.
     - lancis só onde o terreno cai ao lado;
     - pedras soltas nos trilhos de terra.
 
-    É tudo decoração: o jogador e a horda andam no terreno. Nas curvas
-    apertadas da escadaria do desembarque, os degraus que o chão cobre
-    deixam-se de fora e o próprio chão serve de patamar.
-  - **Verificação:** a grelha fica igual célula a célula a uma construção
-    sem kits, e o percurso também (229, 417, 704 e 1028 m).
+    É tudo decoração: o jogador e a horda andam no terreno.
+    - **Curvas apertadas** (mais de 2 rad): não têm degraus, e o chão
+      escavado serve de patamar.
+    - **Lanços soltos:** os de menos de 1,2 m deixam-se de fora.
+    - **Pontes:** os caminhos acabam onde começa o tabuleiro de uma ponte.
+  - **`landmarks.gd`, farol e forte:**
+    - **Farol:** torre quadrada caiada com 29 m (a altura do OSM), que
+      estreita de 4,6 para 3,9 m. Tem cunhais de pedra, janelas estreitas,
+      varanda com gradeamento e lanterna com cúpula vermelha. Fica dentro da
+      ala norte da casa dos faroleiros.
+    - **Forte de São João Baptista:** é aproximado, porque o OSM não tem a
+      planta. As muralhas seguem a costa do ilhéu 2,5 m para dentro, em 9
+      faces, com talude, adarve, parapeito com 21 canhoneiras e guaritas
+      nos cantos. A porta, de 3,6 m, fica alinhada com a última ponte.
+    - **Bloqueio:** só bloqueiam as faixas das muralhas; a porta e o pátio
+      ficam abertos.
+    - **Gerador 3:** fica no pátio, por isso o troço até ele passa pela
+      porta (mais 28 m).
+  - **Espalhados e espaço reservado:** um kit pode reservar uma área (as
+    muralhas, o pátio), e o construtor tira de lá as rochas e a erva. Cada
+    tentativa de colocação sorteia sempre os mesmos números, aceite ou não.
+    Assim, reservar uma área não muda de sítio as rochas no resto da ilha.
+  - **Verificação** (`check_kits.gd`, contra uma construção com
+    `--kits none`):
+    - os caminhos não mudam nenhuma célula;
+    - as casas só abrem as 78 células do pátio da casa em U do farol, que o
+      telhado antigo, em leque, tapava por engano;
+    - o forte bloqueia as faixas das muralhas;
+    - o percurso passa a ter 229, 414, 737 e 1056 m.
   - **Limites:**
     - não se usa o `step_count` do OSM: os 63 degraus de `441503017` dariam
       espelhos de 4 cm no relevo escavado;
-    - fica uma peça de degrau solta junto à segunda curva da escadaria do
-      desembarque;
+    - nas escadas mais íngremes os lanços parecem escadotes;
+    - a pedra do forte é clara e lisa, e puxa ligeiramente para o rosa;
     - as portas e janelas são painéis sobre a parede, sem recorte.
 - **Praças:** os passeios com `area=yes` no OSM (o percurso turístico de
   Hashima) são pavimento por inteiro, e não um caminho ao longo do contorno.
@@ -181,7 +209,7 @@ Ambiente: Windows 11, Godot 4.7.2, AMD Ryzen 5 5600, NVIDIA RTX 5060.
 | Grelha | 1466 m, 2,1 M células | 495 m, 245 mil células |
 | Converter para a grelha (`build_map`) | 0,75 a 1,2 s | cerca de 0,1 s |
 | Células transitáveis / alcançáveis do desembarque | 761 mil / 727 mil | 50,9 mil / 50,9 mil (36,7 mil / 34,6 mil quando os edifícios bloqueavam a caixa) |
-| Rota Activate pela grelha (troços) | cerca de 2,4 km: 229 + 417 + 704 + 1028 m | cerca de 0,9 km: 135 + 393 + 159 + 227 m |
+| Rota Activate pela grelha (troços) | cerca de 2,4 km: 229 + 414 + 737 + 1056 m | cerca de 1,3 km: 142 + 642 + 281 + 221 m |
 | Passo da simulação (bot) | 1,1 a 1,3 ms em média, pior 8 ms | 1,6 a 1,8 ms em média (até 150 vivos), pior 8,5 ms |
 | Frame em jogo a 1920 × 1080 (Ultra, horda a chegar) | 4,6 a 6,2 ms | 3,4 a 4,3 ms |
 | Bot invencível, Threat 2 | Activate 6 min, Defend 4,5 min, Rescue 3,5 min | Activate 2,5 min, Defend 2,5 min, Rescue 1,5 min |
@@ -192,8 +220,7 @@ Ambiente: Windows 11, Godot 4.7.2, AMD Ryzen 5 5600, NVIDIA RTX 5060.
   1 a 2 m dariam outro resultado.
 - **Berlenga:**
   - a altura dos edifícios é estimada, porque o OSM quase não a tem;
-  - o farol é uma caixa e um cilindro;
-  - o forte não está mapeado como edifício: o gerador marca o sítio.
+  - o forte é uma aproximação: segue a costa do ilhéu, não uma planta real.
 - **Hashima:**
   - os prédios são caixas com janelas pintadas, sem varandas nem interiores;
   - as ruas estreitas entre prédios dependem do traçado do OSM.

@@ -1192,7 +1192,7 @@ func _place_buildings() -> void:
 			var local := PackedVector2Array()
 			for p in pts:
 				local.append(p - c)
-			_gable(roof, local, eaves, turn)
+			_gable(roof, local, eaves, turn, walls)
 		else:
 			var ridge := Vector3(0, eaves + clampf(shortest * 0.35, 1.0, 2.5), 0)
 			for i in pts.size():
@@ -1283,7 +1283,7 @@ func _shrine(p: Vector2) -> void:
 	var roof := SurfaceTool.new()
 	roof.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var plan := PackedVector2Array([Vector2(-2.1, -2.6), Vector2(2.1, -2.6), Vector2(2.1, 2.6), Vector2(-2.1, 2.6)])
-	_gable(roof, plan, 1.3, _turn(plan))  # hall-local: eaves 1.3 m above its centre
+	_gable(roof, plan, 1.3, _turn(plan), roof)  # one mesh, gable ends too; hall-local: eaves 1.3 m above its centre
 	var rm := MeshInstance3D.new()
 	rm.name = "Roof"
 	rm.mesh = roof.commit()
@@ -1334,7 +1334,9 @@ func _conveyor(pts: PackedVector2Array, ground: float, k: int) -> void:
 ## of the plan; every point of the eaves rises to the ridge point level with
 ## it. Long walls get a slope, short ones a vertical gable. Before, OSM
 ## "gabled" fell back to a pyramid (found by Codex).
-func _gable(st: SurfaceTool, pts: PackedVector2Array, eaves: float, turn: float) -> void:
+## Gabled roof over a plan: slopes into `st`, the triangular gable ends into
+## `walls` (they are wall, not roof: found by Codex).
+func _gable(st: SurfaceTool, pts: PackedVector2Array, eaves: float, turn: float, walls: SurfaceTool) -> void:
 	var u := Vector2.RIGHT
 	var longest: float = 0.0
 	for i in pts.size():
@@ -1363,7 +1365,7 @@ func _gable(st: SurfaceTool, pts: PackedVector2Array, eaves: float, turn: float)
 		if n.dot(_outward(p, q, turn)) + n.y < 0.0:
 			n = -n  # slopes face up and out, gables out
 		if rp2.distance_to(rq2) < 0.05:
-			_tri(st, a, b, rp, n)  # gable end
+			_tri(walls, a, b, rp, n)  # gable end
 		else:
 			_tri(st, a, b, rq, n)
 			_tri(st, a, rq, rp, n)
@@ -1480,8 +1482,13 @@ func _kit_mesh(model: String) -> Mesh:
 ## drawn only near the camera: drawing every tuft of the island every frame
 ## costs far too much.
 func _place_nature() -> void:
-	var near_house: PackedByteArray = _fill(_grown_houses(2.0))
-	var around_house: PackedByteArray = _fill(_grown_houses(5.0))
+	var near_house: PackedByteArray = _fill(_grown_houses(2.0, false))
+	var around_house: PackedByteArray = _fill(_grown_houses(5.0, false))
+	# Kits' footprints (fort walls, courtyard): checked last and counted as
+	# placed, and every try draws the same random numbers, accepted or not.
+	# So reserving a shape removes only what would land on it and moves
+	# nothing elsewhere on the island (found by the landmarks subagent).
+	var reserved: PackedByteArray = _fill(_grown(_reserved, 1.0))
 	var green: PackedByteArray = _fill(_green)
 	var near_light: Array[Vector2] = _lighthouses.duplicate()
 	for spec: Array in P["scatter"]:
@@ -1497,6 +1504,10 @@ func _place_nature() -> void:
 			tries += 1
 			var x: int = _rng.randi_range(2, N - 3)
 			var z: int = _rng.randi_range(2, N - 3)
+			var jx: float = _rng.randf()
+			var jz: float = _rng.randf()
+			var size: float = _rng.randf_range(0.6, 1.4)
+			var yaw: float = _rng.randf() * TAU
 			var i: int = z * N + x
 			var t: float = _t[i]
 			if t < spec[3] or _beach[i] == 1:
@@ -1518,8 +1529,11 @@ func _place_nature() -> void:
 				_:
 					if near_house[i] == 1 or _slope(i) > 0.55:
 						continue
-			var p := Vector2(x + _rng.randf(), z + _rng.randf())
-			var s: float = target / maxf(mesh.get_aabb().size.y, 0.01) * _rng.randf_range(0.6, 1.4)
+			if reserved[i] == 1:
+				made += 1
+				continue
+			var p := Vector2(x + jx, z + jz)
+			var s: float = target / maxf(mesh.get_aabb().size.y, 0.01) * size
 			var y: float = height_at(p.x, p.y) - (0.4 * s if rock else 0.05)
 			var key := Vector2i(floori(p.x / 128.0), floori(p.y / 128.0))
 			if not chunks.has(key):
@@ -1528,7 +1542,7 @@ func _place_nature() -> void:
 			var o := Vector2(key.x * 128.0 + 64.0, key.y * 128.0 + 64.0)
 			# Packed arrays are copied when read from a Dictionary: write it back.
 			var arr: PackedFloat32Array = chunks[key]
-			arr.append_array([p.x - o.x, y, p.y - o.y, _rng.randf() * TAU, s])
+			arr.append_array([p.x - o.x, y, p.y - o.y, yaw, s])
 			chunks[key] = arr
 			made += 1
 		var group := Node3D.new()  # grass: one folder per model in Decor/
@@ -1555,13 +1569,20 @@ func _place_nature() -> void:
 			group.free()  # never added to the scene
 
 
-## Building footprints (and kits' reserved shapes) grown by `metres` (for
-## "near a building" masks).
-func _grown_houses(metres: float) -> Array[PackedVector2Array]:
-	var rings: Array[PackedVector2Array] = []
-	var shapes: Array[PackedVector2Array] = _reserved.duplicate()
+## Building footprints (and kits' reserved shapes unless `reserved` is
+## false) grown by `metres` (for "near a building" masks).
+func _grown_houses(metres: float, reserved: bool = true) -> Array[PackedVector2Array]:
+	var shapes: Array[PackedVector2Array] = []
+	if reserved:
+		shapes.append_array(_reserved)
 	for b in _houses:
 		shapes.append(b[0])
+	return _grown(shapes, metres)
+
+
+## Shapes grown by `metres`.
+func _grown(shapes: Array[PackedVector2Array], metres: float) -> Array[PackedVector2Array]:
+	var rings: Array[PackedVector2Array] = []
 	for pts in shapes:
 		var grown: Array[PackedVector2Array] = Geometry2D.offset_polygon(pts, metres)
 		rings.append(grown[0] if not grown.is_empty() else pts)
@@ -1689,8 +1710,10 @@ func _place_markers(map: IslandMap) -> bool:
 				near = _village if _village.x >= 0.0 else light
 			"lighthouse":
 				r_min = 10.0
-			"fort":
+			"fort":  # in the fort's courtyard when landmarks.gd built one
 				near = _fort_islet()
+				if _landmark_kit != null and _landmark_kit.courtyard.x >= 0.0:
+					near = _landmark_kit.courtyard
 				r_min = 0.0
 			"named":
 				if _named.has(spec[1]):

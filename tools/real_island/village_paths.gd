@@ -14,6 +14,11 @@ extends RefCounted
 ##   flat stretches (or corners) become landings. Risers are 15-18 cm, or the
 ##   OSM step_count when it fits the carved height. Concrete steps get low
 ##   stone kerbs; handrail=yes gets a steel rail on the open (lower) side.
+##   Hairpins (corners sharper than HAIRPIN) are landings on the carved
+##   ground; treads the ground covers, and runs shorter than MIN_RUN left
+##   between such gaps, are left out, so no loose piece sticks out.
+## - A way that meets a bridge stops where the bridge deck begins (the
+##   builder's decks reach 2 m onto each bank).
 ## - Concrete / paved ways (the 700 m service road, the village footways):
 ##   a slab draped on the ground, UVs in metres along the way, transverse
 ##   joints, worn uneven edges that crumble into the ground, and short kerbs
@@ -33,6 +38,8 @@ const TREAD_LIFT: float = 0.05  ## treads sit this much above the carved ramp
 const SINK: float = 0.25       ## vertical faces reach this far under the ground
 const BURIED: float = 0.3      ## a tread the ground covers by more is left out (hairpins)
 const MAX_TURN: float = 2.3    ## radians; sharper corners are mitred as if this sharp
+const HAIRPIN: float = 2.0     ## radians; sharper stair corners are landings on the ground
+const MIN_RUN: float = 1.2     ## metres; a shorter run of treads between landings is left out
 
 var b: SceneTree  ## the builder (build.gd): height_at, _add, _role_material, P...
 var _concrete := SurfaceTool.new()  ## slabs and concrete treads (UVs, vertex colours)
@@ -42,11 +49,13 @@ var _used: Dictionary = {}          ## SurfaceTool -> true once it has triangles
 var _noise := FastNoiseLite.new()
 var _rng := RandomNumberGenerator.new()
 var _area: Rect2
+var _decks: Array = []  ## bridge decks: [start, direction, length, half width]
 # The way being built (_prepare).
 var _pts := PackedVector2Array()
 var _cum := PackedFloat32Array()     ## metres along the way at each point
 var _zone := PackedFloat32Array()    ## half length of each point's corner zone
 var _miter := PackedVector2Array()   ## each corner's offset to its "a" side edge
+var _turn := PackedFloat32Array()    ## each corner's real turn (radians, not capped)
 var _half: float = 1.0
 var _built: int = 0
 
@@ -75,6 +84,16 @@ func place(path: Array) -> bool:
 	_prepare(raw, w * 0.5)
 	if _pts.size() < 2:
 		return false
+	# A bridge deck reaches 2 m onto each bank (build.gd _place_bridges): the
+	# way stops where the deck begins instead of running on under it.
+	var cut: Vector2 = _deck_cuts()
+	if cut != Vector2.ZERO:
+		var full: float = _cum[_cum.size() - 1]
+		if full - cut.x - cut.y < 0.5:
+			_built += 1
+			print("  paths kit: %d %s %.1f m: all under bridge decks, nothing built" % [int(tags["osm_id"]), kind, full])
+			return true
+		_prepare(_sub(cut.x, full - cut.y), w * 0.5)
 	_rng.seed = int(tags["osm_id"])
 	var what: String
 	if kind == "steps":
@@ -84,6 +103,8 @@ func place(path: Array) -> bool:
 	else:
 		what = _trail()
 	_built += 1
+	if cut != Vector2.ZERO:
+		what += ", ends cut %.1f / %.1f m for bridge decks" % [cut.x, cut.y]
 	print("  paths kit: %d %s (%s) %.1f m: %s" % [int(tags["osm_id"]), kind, surface if surface != "" else "-", _cum[_cum.size() - 1], what])
 	return true
 
@@ -120,6 +141,62 @@ func _commit(st: SurfaceTool, name: String, mat: Material, tangents: bool) -> vo
 
 # ---------------------------------------------------------------- the way
 
+## Metres to cut at the (start, end) of the way being built where it runs
+## under a bridge deck: up to where no cross-section touches a deck.
+func _deck_cuts() -> Vector2:
+	if _decks.is_empty():
+		for q: Array in b._paths:
+			if not q[3]:
+				continue
+			var bp: PackedVector2Array = q[0]
+			for i in bp.size() - 1:
+				# The same deck as build.gd _place_bridges: 2 m past each end.
+				var dir: Vector2 = (bp[i + 1] - bp[i]).normalized()
+				_decks.append([bp[i] - dir * 2.0, dir, bp[i].distance_to(bp[i + 1]) + 4.0, (float(q[1]) + 0.6) * 0.5])
+		if _decks.is_empty():
+			_decks.append([Vector2(-1e6, -1e6), Vector2.RIGHT, 0.0, 0.0])  # none: a far dummy
+	var length: float = _cum[_cum.size() - 1]
+	var out := Vector2.ZERO
+	for e in 2:
+		# The whole end cross-section, not only its centre: an edge of the way
+		# can reach under a deck while the centre does not (found by Codex).
+		var end: PackedVector2Array = _frame(0.0 if e == 0 else length)
+		if not (_on_deck(end[0], 0.2) or _on_deck(end[1], 0.2) or _on_deck(end[2], 0.2)):
+			continue
+		var d: float = 0.0
+		while d < length:
+			var fr: PackedVector2Array = _frame(d if e == 0 else length - d)
+			if not (_on_deck(fr[0], 0.1) or _on_deck(fr[1], 0.1) or _on_deck(fr[2], 0.1)):
+				break
+			d += 0.1
+		out[e] = d
+	return out
+
+
+func _on_deck(p: Vector2, margin: float) -> bool:
+	for dk: Array in _decks:
+		var v: Vector2 = p - (dk[0] as Vector2)
+		var along: float = v.dot(dk[1])
+		if along > -margin and along < float(dk[2]) + margin and absf(v.cross(dk[1])) < float(dk[3]) + margin:
+			return true
+	return false
+
+
+## The way between `d0` and `d1` metres along it.
+func _sub(d0: float, d1: float) -> PackedVector2Array:
+	var out := PackedVector2Array([_point(d0)])
+	for j in _pts.size():
+		if _cum[j] > d0 + 0.05 and _cum[j] < d1 - 0.05:
+			out.append(_pts[j])
+	out.append(_point(d1))
+	return out
+
+
+func _point(d: float) -> Vector2:
+	var i: int = clampi(_cum.bsearch(d) - 1, 0, _pts.size() - 2)
+	return _pts[i] + (_pts[i + 1] - _pts[i]).normalized() * (d - _cum[i])
+
+
 func _enters(pts: PackedVector2Array) -> bool:
 	for i in pts.size() - 1:
 		var n: int = maxi(1, ceili(pts[i].distance_to(pts[i + 1])))
@@ -146,10 +223,13 @@ func _prepare(raw: PackedVector2Array, half: float) -> void:
 	_zone.resize(n)
 	_miter = PackedVector2Array()
 	_miter.resize(n)
+	_turn = PackedFloat32Array()
+	_turn.resize(n)
 	for j in range(1, n - 1):
 		var t0: Vector2 = (_pts[j] - _pts[j - 1]).normalized()
 		var t1: Vector2 = (_pts[j + 1] - _pts[j]).normalized()
-		var turn: float = minf(acos(clampf(t0.dot(t1), -1.0, 1.0)), MAX_TURN)
+		_turn[j] = acos(clampf(t0.dot(t1), -1.0, 1.0))
+		var turn: float = minf(_turn[j], MAX_TURN)
 		if turn < 0.02:
 			continue
 		var bis: Vector2 = (Vector2(-t0.y, t0.x) + Vector2(-t1.y, t1.x)).normalized()
@@ -262,48 +342,75 @@ func _steps(tags: Dictionary, concrete: bool) -> String:
 	# too (up to PATH_SLOPE per metre), and the grid walks that ground: a
 	# level tread would be half buried. Treads stay level along the way but
 	# lean across like the ground (smoothed over neighbours, capped).
-	var stations: Array[PackedFloat32Array] = []
-	var frames: Array = []
 	var tilts := PackedFloat32Array()
+	var gapped := PackedByteArray()  # 1: the tread lies inside a hairpin landing
 	for t in levels.size():
 		var at := PackedFloat32Array([bounds[t]])
 		at.append_array(_corner_stations(bounds[t], bounds[t + 1]))
 		at.append(bounds[t + 1])
-		var frs: Array[PackedVector2Array] = []
 		var tilt: float = 0.0
 		for d in at:
 			var fr: PackedVector2Array = _frame(d)
-			frs.append(fr)
 			tilt += (_g(fr[1]) - _g(fr[2])) * 0.5 / at.size()
-		stations.append(at)
-		frames.append(frs)
 		tilts.append(clampf(tilt, -0.6, 0.6))
+		gapped.append(1 if _pieces(bounds[t], bounds[t + 1]).is_empty() else 0)
+	# Smoothed over the neighbours, but not with a landing's tread: at a
+	# hairpin the ground leans with both legs at once.
 	var smooth := tilts.duplicate()
 	for t in tilts.size():
-		smooth[t] = (tilts[maxi(t - 1, 0)] + 2.0 * tilts[t] + tilts[mini(t + 1, tilts.size() - 1)]) * 0.25
+		var a: float = tilts[t - 1] if t > 0 and gapped[t - 1] == 0 else tilts[t]
+		var c: float = tilts[t + 1] if t + 1 < tilts.size() and gapped[t + 1] == 0 else tilts[t]
+		smooth[t] = (a + 2.0 * tilts[t] + c) * 0.25
+	# The pieces to draw: each tread minus the hairpin landings, left out
+	# where the ground covers it (the other leg of a hairpin, found by Codex).
 	var cross: float = 0.0  # ground above a drawn tread, worst case
 	var skipped: int = 0  # treads left out: the ground covers them
 	var lean: float = 0.0
 	var flights: int = 0
+	var drawn: Array = []  # [d0, d1, tread]
 	for t in levels.size():
+		if t > 0 and (t == 1 or bounds[t] - bounds[t - 1] > 1.0):
+			flights += 1  # a riser after a landing (or the first) starts a flight
+		var lv := Vector2(levels[t] + TREAD_LIFT, smooth[t])
+		for piece: Vector2 in _pieces(bounds[t], bounds[t + 1]):
+			var over: float = 0.0
+			for d: float in _stations(piece.x, piece.y):
+				var fr: PackedVector2Array = _frame(d)
+				for f: float in [-1.0, -0.5, 0.5, 1.0]:
+					over = maxf(over, _g(_at(fr, f)) - (lv.x + lv.y * f))
+			if over > BURIED:
+				skipped += 1
+				continue
+			cross = maxf(cross, over)
+			drawn.append([piece.x, piece.y, t])
+	# A run of treads shorter than MIN_RUN between two landings (or covered
+	# treads) is a loose piece sticking out of the ground: left out.
+	var keep: Array = []
+	var shorts: int = 0
+	var i: int = 0
+	while i < drawn.size():
+		var j: int = i + 1
+		while j < drawn.size() and absf(float(drawn[j][0]) - float(drawn[j - 1][1])) < 0.001:
+			j += 1
+		var d0: float = drawn[i][0]
+		var d1: float = drawn[j - 1][1]
+		if d1 - d0 < MIN_RUN and d0 > 0.001 and d1 < length - 0.001:
+			shorts += j - i
+		else:
+			keep.append_array(drawn.slice(i, j))
+		i = j
+	for piece: Array in keep:
+		var t: int = piece[2]
 		# (height at the centre, rise per unit of f), a little above the
 		# ground like the slabs, so a long landing is not hidden by it.
 		var lv := Vector2(levels[t] + TREAD_LIFT, smooth[t])
-		var prev: Vector2 = Vector2(levels[t - 1] + TREAD_LIFT, smooth[t - 1]) if t > 0 else lv
-		var next: Vector2 = Vector2(levels[t + 1] + TREAD_LIFT, smooth[t + 1]) if t + 1 < levels.size() else lv
-		if t > 0 and (t == 1 or bounds[t] - bounds[t - 1] > 1.0):
-			flights += 1  # a riser after a landing (or the first) starts a flight
-		var at: PackedFloat32Array = stations[t]
-		var frs: Array[PackedVector2Array] = frames[t]
+		var prev: Vector2 = Vector2(levels[t - 1] + TREAD_LIFT, smooth[t - 1]) if t > 0 and absf(float(piece[0]) - bounds[t]) < 0.001 else lv
+		var next: Vector2 = Vector2(levels[t + 1] + TREAD_LIFT, smooth[t + 1]) if t + 1 < levels.size() and absf(float(piece[1]) - bounds[t + 1]) < 0.001 else lv
 		lean = maxf(lean, absf(lv.y))
-		var over: float = 0.0
-		for fr in frs:
-			for f: float in [-1.0, -0.5, 0.5, 1.0]:
-				over = maxf(over, _g(_at(fr, f)) - (lv.x + lv.y * f))
-		if over > BURIED:
-			skipped += 1
-			continue  # a hairpin: the stair stops and the ground is the landing (found by Codex)
-		cross = maxf(cross, over)
+		var at: PackedFloat32Array = _stations(piece[0], piece[1])
+		var frs: Array[PackedVector2Array] = []
+		for d in at:
+			frs.append(_frame(d))
 		var tone: float = _rng.randf_range(0.84, 1.0)
 		var col := Color(tone, tone, tone * 0.98) if concrete else Color(tone, tone * 0.97, tone * 0.93)
 		_block(st, at, frs, -inner, inner, lv, prev, next, col)
@@ -314,9 +421,46 @@ func _steps(tags: Dictionary, concrete: bool) -> String:
 				_block(_stone, at, frs, minf(side, side * inner), maxf(side, side * inner), lv + up, prev + up, next + up, kc)
 	var rail: String = ""
 	if tags.get("handrail") == "yes":
-		rail = _handrail(risers, levels, smooth)
-	return "%d steps (riser %.1f cm) in %d flights, centre %.0f cm off the ground at most, lean up to %.0f cm, ground up to %.0f cm over a tread, %d treads left to the ground%s%s%s" % [
-		risers.size(), riser * 100.0, flights, worst * 100.0, lean * 100.0, maxf(cross, 0.0) * 100.0, skipped, ", stone kerbs" if concrete else "", rail, note]
+		rail = _handrail(keep, risers, levels, smooth)
+	return "%d steps (riser %.1f cm) in %d flights, centre %.0f cm off the ground at most, lean up to %.0f cm, ground up to %.0f cm over a tread, %d hairpin landings, %d pieces left to the ground, %d loose pieces left out%s%s%s" % [
+		risers.size(), riser * 100.0, flights, worst * 100.0, lean * 100.0, maxf(cross, 0.0) * 100.0, _landings().size(), skipped, shorts, ", stone kerbs" if concrete else "", rail, note]
+
+
+## Hairpin landings: (start, end) metres along the way around each corner
+## sharper than HAIRPIN. Treads there would fan around a capped mitre and
+## cross the other leg; the carved ground is the landing.
+func _landings() -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	for j in range(1, _pts.size() - 1):
+		if _turn[j] >= HAIRPIN:
+			var g: float = clampf(_half * tan(minf(_turn[j], 2.8) * 0.5), _half + 0.3, 4.0)
+			out.append(Vector2(_cum[j] - g, _cum[j] + g))
+	return out
+
+
+## (d0, d1) minus the hairpin landings: the parts at least 5 cm long.
+func _pieces(d0: float, d1: float) -> Array[Vector2]:
+	var out: Array[Vector2] = [Vector2(d0, d1)]
+	for gap in _landings():
+		var next: Array[Vector2] = []
+		for p in out:
+			if gap.y <= p.x or gap.x >= p.y:
+				next.append(p)
+				continue
+			if gap.x - p.x >= 0.05:
+				next.append(Vector2(p.x, gap.x))
+			if p.y - gap.y >= 0.05:
+				next.append(Vector2(gap.y, p.y))
+		out = next
+	return out
+
+
+## The cross-sections of a piece: its ends and the corner stations inside.
+func _stations(d0: float, d1: float) -> PackedFloat32Array:
+	var at := PackedFloat32Array([d0])
+	at.append_array(_corner_stations(d0, d1))
+	at.append(d1)
+	return at
 
 
 ## A solid along the stations `at` (frames `frs`) between fractions f0 and
@@ -368,8 +512,9 @@ func _bottom(p: Vector2, top: float, neighbour: float) -> float:
 	return minf(minf(top, neighbour) - 0.05, _g(p) - SINK)
 
 
-## Steel posts every 2 m (and at corners) on the open side, two rails.
-func _handrail(risers: PackedFloat32Array, levels: PackedFloat32Array, tilts: PackedFloat32Array) -> String:
+## Steel posts every 2 m (and at corners) on the open side, two rails,
+## along the `drawn` pieces ([d0, d1, tread]).
+func _handrail(drawn: Array, risers: PackedFloat32Array, levels: PackedFloat32Array, tilts: PackedFloat32Array) -> String:
 	var length: float = _cum[_cum.size() - 1]
 	var drop: float = 0.0  # > 0: the a side is lower
 	var d: float = 0.5
@@ -379,29 +524,45 @@ func _handrail(risers: PackedFloat32Array, levels: PackedFloat32Array, tilts: Pa
 		drop += _g(fr[2] - out) - _g(fr[1] + out)
 		d += 1.0
 	var side: float = 1.0 if drop > 0.0 else -1.0
-	var stops := PackedFloat32Array([0.25])
-	var n: int = maxi(1, ceili((length - 0.5) / 2.0))
-	for k in range(1, n):
-		stops.append(0.25 + (length - 0.5) * k / n)
-	for j in range(1, _pts.size() - 1):
-		if _zone[j] > 0.0:
-			stops.append(_cum[j])
-	stops.append(length - 0.25)
-	stops.sort()
-	var tops: Array[Vector3] = []
-	for s in stops:
-		var f: float = side * (1.0 - 0.12 / _half)
-		var p: Vector2 = _at(_frame(s), f)
-		var t: int = risers.bsearch(s, false)
-		var y: float = levels[t] + TREAD_LIFT + tilts[t] * f + 0.95
-		var top := Vector3(p.x, y, p.y)
-		tops.append(top)
-		_beam(_metal, top - Vector3(0.025, 0, 0), top + Vector3(0.025, 0, 0), 0.05, 1.1, Color.WHITE)
-	for k in tops.size() - 1:
-		for drop_y: float in [0.0, 0.45]:
-			var down := Vector3(0, drop_y, 0)
-			_beam(_metal, tops[k] - down, tops[k + 1] - down, 0.045, 0.045, Color.WHITE)
-	return ", handrail (%d posts, %s side)" % [tops.size(), "a" if side > 0.0 else "b"]
+	var f: float = side * (1.0 - 0.12 / _half)
+	# One rail per run of drawn treads (runs less than 1 m apart join):
+	# hairpin landings and covered treads are the ground, with no rail.
+	var runs: Array[Vector2] = []
+	for piece: Array in drawn:
+		if not runs.is_empty() and float(piece[0]) - runs[runs.size() - 1].y < 1.0:
+			runs[runs.size() - 1].y = piece[1]
+		else:
+			runs.append(Vector2(piece[0], piece[1]))
+	var posts: int = 0
+	for run in runs:
+		var r0: float = run.x + 0.15
+		var r1: float = run.y - 0.15
+		if r1 - r0 < 0.5:
+			continue
+		var stops := PackedFloat32Array([r0, r1])
+		var n: int = ceili((r1 - r0) / 2.0)
+		for k in range(1, n):
+			stops.append(r0 + (r1 - r0) * k / n)
+		for j in range(1, _pts.size() - 1):
+			if _zone[j] > 0.0 and _cum[j] > r0 + 0.3 and _cum[j] < r1 - 0.3:
+				stops.append(_cum[j])
+		stops.sort()
+		var tops: Array[Vector3] = []
+		for s in stops:
+			var p: Vector2 = _at(_frame(s), f)
+			var t: int = risers.bsearch(s, false)
+			# On the tread, or 95 cm over the ground where a covered tread is.
+			var tread: float = levels[t] + TREAD_LIFT + tilts[t] * f
+			var top := Vector3(p.x, maxf(tread, _g(p)) + 0.95, p.y)
+			tops.append(top)
+			var h: float = top.y - minf(tread, _g(p)) + 0.15
+			_beam(_metal, top - Vector3(0.025, 0, 0), top + Vector3(0.025, 0, 0), 0.05, h, Color.WHITE)
+		for k in tops.size() - 1:
+			for drop_y: float in [0.0, 0.45]:
+				var down := Vector3(0, drop_y, 0)
+				_beam(_metal, tops[k] - down, tops[k + 1] - down, 0.045, 0.045, Color.WHITE)
+		posts += tops.size()
+	return ", handrail (%d posts in %d runs, %s side)" % [posts, runs.size(), "a" if side > 0.0 else "b"]
 
 
 # ---------------------------------------------------------------- slabs
@@ -461,6 +622,8 @@ func _slab(joint: float) -> String:
 	var seed_y: float = float(_rng.randi_range(0, 1000))
 	var prev: Array = []
 	var kerb_m: float = 0.0
+	# Where two slabs overlap (junctions) each sits a few mm apart: no flicker.
+	var bias: float = 0.004 * (_built % 4)
 	for i in stations.size():
 		var s: Vector2 = stations[i]
 		var fr: PackedVector2Array = frs[i]
@@ -495,7 +658,7 @@ func _slab(joint: float) -> String:
 				col = col * 0.95
 			if s.y > 0.0 and not lip:
 				col = Color(col.r * 0.6, col.g * 0.6, col.b * 0.6)
-			row.append([p, _g(p) + lift, Vector2(across * _half, s.x), col])
+			row.append([p, _g(p) + lift + bias, Vector2(across * _half, s.x), col])
 		if not prev.is_empty():
 			for c in row.size() - 1:
 				var q: Array = [prev[c], prev[c + 1], row[c + 1], row[c]]
