@@ -27,6 +27,7 @@ const KIT: String = "res://assets/models/nature_megakit/"
 const DEM_STEP: int = 8  ## metres between elevation samples before the cubic resize
 const CLIFF: float = 4.0  ## width of the drop from the cliff top to the sea, metres
 const MARGIN: int = 24  ## metres of sea kept around the main island
+const SEA: float = -0.3  ## HandmadeIsland.sea_level
 ## Steepest carved path, m per m. The grid blocks above 0.9, and a cell's
 ## height is the mean of its four corners, so the edges of a ramp need room.
 const PATH_SLOPE: float = 0.55
@@ -39,7 +40,8 @@ const WIDTHS: Dictionary = {"footway": 2.0, "path": 1.6, "steps": 2.2, "track": 
 ## height m, min metres from the coast, drawn up to m, where]; where = land
 ## (anywhere gentle), cliff_top (rocks along the cliffs), green (inside the
 ## OSM grass and scrub areas) or rubble (beside buildings). Rock models
-## block (Rocks/), the rest is decoration. Generators: [kind, name]; kind =
+## block (Rocks/), the rest is decoration. outcrop = small groups of rocks on
+## gentle ground far from the coast (see _outcrops). Generators: [kind, name]; kind =
 ## named (an OSM feature with that name), landuse (the named residential
 ## area), lighthouse or fort (the islet the last bridge reaches).
 const PLACES: Dictionary = {
@@ -49,6 +51,9 @@ const PLACES: Dictionary = {
 		# steps (cells, along the grid) is 85-120 m.
 		"horde_radius": 120,
 		"land_min": 2.0, "detail": 3.0, "tint": Color(0.88, 0.98, 0.84),
+		# Cliffs from 4 to 16 m wide, from the real ground behind them (see
+		# _cliff_widths); 4 m everywhere when absent.
+		"cliff_width": [4.0, 16.0],
 		"roof": "hip", "walls": Color(0.93, 0.92, 0.88), "roof_color": Color(0.72, 0.34, 0.22), "house_height": 5.5,
 		"landing": "beach",
 		"generators": [["landuse", ""], ["lighthouse", ""], ["fort", ""]],
@@ -59,7 +64,10 @@ const PLACES: Dictionary = {
 		"detail_area": Rect2(0, 0, 4096, 4096),
 		"scatter": [["Grass_Wispy_Short", 110000, 0.35, 6.0, 140.0, "land"], ["Grass_Common_Short", 55000, 0.3, 6.0, 120.0, "land"],
 			["Grass_Wispy_Tall", 14000, 0.7, 6.0, 220.0, "land"], ["Bush_Common", 600, 0.9, 10.0, 400.0, "land"],
-			["Rock_Medium_1", 450, 2.0, 2.0, 1500.0, "cliff_top"], ["Rock_Medium_2", 350, 1.5, 2.0, 1500.0, "cliff_top"]],
+			["Rock_Medium_1", 450, 2.0, 2.0, 1500.0, "cliff_top"], ["Rock_Medium_2", 350, 1.5, 2.0, 1500.0, "cliff_top"],
+			# Last, so the rows above keep their copies: granite outcrops on
+			# the plateau (Codex's design), small and partly buried.
+			["Rock_Medium_1", 160, 0.9, 25.0, 1500.0, "outcrop"], ["Rock_Medium_2", 120, 0.6, 25.0, 1500.0, "outcrop"]],
 	},
 	"hashima": {
 		"out": "port_hashima", "biome": &"port",
@@ -495,6 +503,7 @@ func _relief() -> void:
 			var lat: float = lat0 - (j * DEM_STEP - _off.y) / mz
 			var lon: float = lon0 + (i * DEM_STEP - _off.x) / mx
 			dem.set_pixel(i, j, Color(_elevation(lat, lon), 0, 0))
+	var coarse_dem: Image = dem.duplicate()
 	dem.resize(dn * DEM_STEP, dn * DEM_STEP, Image.INTERPOLATE_CUBIC)
 	var raw := PackedFloat32Array()
 	raw.resize(N * N)
@@ -513,17 +522,19 @@ func _relief() -> void:
 	fine.frequency = 0.25
 	var n1: PackedByteArray = coarse.get_image(N, N, false, false, false).get_data()
 	var n2: PackedByteArray = fine.get_image(N, N, false, false, false).get_data()
+	var widths: PackedFloat32Array = _cliff_widths(coarse_dem)
 	_h.resize(N * N)
 	for i in N * N:
 		var t: float = _t[i]
 		var amp: float = P["detail"]
 		var detail: float = (n1[i] / 255.0 - 0.5) * amp + (n2[i] / 255.0 - 0.5) * amp / 6.0
 		if t > 0.0:
-			var top: float = maxf(raw[i], P["land_min"]) + detail * smoothstep(CLIFF, CLIFF + 20.0, t)
+			var cliff: float = widths[i] if not widths.is_empty() else CLIFF
+			var top: float = maxf(raw[i], P["land_min"]) + detail * smoothstep(cliff, cliff + 20.0, t)
 			if _beach[i] == 1:
 				_h[i] = minf(top, -0.6 + t * 0.3)  # beach: dry sand from 2 m off the water, 3 m high at 12 m
 			else:
-				_h[i] = lerpf(-1.5, top, smoothstep(0.0, CLIFF, t))  # cliff
+				_h[i] = lerpf(-1.5, top, smoothstep(0.0, cliff, t))  # cliff
 		else:
 			# Sea floor: a rocky shelf getting deeper offshore.
 			_h[i] = -1.5 - minf(-t * 0.35, 20.0) + detail * 1.5
@@ -542,6 +553,124 @@ func _relief() -> void:
 				continue
 			var flat: float = low + (h - low) * float(terrace[1])
 			_h[i] = lerpf(flat, h + 2.0, smoothstep(cut - 1.0, cut + 1.0, h))
+
+
+## Width of the cliff (the drop from the land to the sea) per cell, when the
+## place has "cliff_width" [min, max]; empty otherwise. Codex's design:
+## wider where the land behind is high, narrower where it is steep, with a
+## slow variation along the coast:
+##   w = clamp(6 + 0.12 H - 6 smoothstep(0.25, 1.2, g) + 2 n, min, max)
+## H = mean height of the land within 32 m, g = its slope, n = noise. Worked
+## out on the coarse elevation grid (one sample every DEM_STEP m), smoothed,
+## then resized to 1 m. Kept at CLIFF (the old 4 m) within 8 m of every path
+## and bridge (their ramps and decks were made for it), blending to the new
+## width over the next 12 m, and on the islets (the fort's).
+func _cliff_widths(coarse: Image) -> PackedFloat32Array:
+	if not P.has("cliff_width"):
+		return PackedFloat32Array()
+	var lo: float = P["cliff_width"][0]
+	var hi: float = P["cliff_width"][1]
+	var dn: int = coarse.get_width()
+	var r: int = ceili(32.0 / DEM_STEP)
+	var land_h := PackedFloat32Array()
+	land_h.resize(dn * dn)
+	var land := PackedByteArray()
+	land.resize(dn * dn)
+	for j in dn:
+		for i in dn:
+			var x: int = mini(i * DEM_STEP, N - 1)
+			var z: int = mini(j * DEM_STEP, N - 1)
+			land[j * dn + i] = 1 if _t[z * N + x] > 0.0 else 0
+			land_h[j * dn + i] = coarse.get_pixel(i, j).r
+	var mean := PackedFloat32Array()
+	mean.resize(dn * dn)
+	for j in dn:
+		for i in dn:
+			var s: float = 0.0
+			var c: int = 0
+			for dj in range(-r, r + 1):
+				for di in range(-r, r + 1):
+					var ii: int = i + di
+					var jj: int = j + dj
+					if di * di + dj * dj > r * r or ii < 0 or jj < 0 or ii >= dn or jj >= dn or land[jj * dn + ii] == 0:
+						continue  # a disc of 32 m (found by Codex: a square reached 45 m)
+					s += land_h[jj * dn + ii]
+					c += 1
+			mean[j * dn + i] = maxf(s / c, P["land_min"]) if c > 0 else P["land_min"]
+	var noise := FastNoiseLite.new()
+	noise.seed = 13
+	noise.frequency = 0.01
+	var w_img := Image.create_empty(dn, dn, false, Image.FORMAT_RF)
+	for j in dn:
+		for i in dn:
+			var gx: float = (mean[j * dn + mini(i + 1, dn - 1)] - mean[j * dn + maxi(i - 1, 0)]) / (2.0 * DEM_STEP)
+			var gz: float = (mean[mini(j + 1, dn - 1) * dn + i] - mean[maxi(j - 1, 0) * dn + i]) / (2.0 * DEM_STEP)
+			var g: float = Vector2(gx, gz).length()
+			var n: float = noise.get_noise_2d(i * DEM_STEP, j * DEM_STEP)
+			w_img.set_pixel(i, j, Color(clampf(6.0 + 0.12 * mean[j * dn + i] - 6.0 * smoothstep(0.25, 1.2, g) + 2.0 * n, lo, hi), 0, 0))
+	# Smoothed along the coast (a small blur on the coarse grid), then 1 m.
+	w_img.resize(dn / 2, dn / 2, Image.INTERPOLATE_BILINEAR)
+	w_img.resize(dn * DEM_STEP, dn * DEM_STEP, Image.INTERPOLATE_CUBIC)
+	var guard: PackedFloat32Array = _guard_distance(20.0)
+	# The beaches too: their sand joins the path corridors on its own (found
+	# by Codex), so the cliffs beside them stay as they were.
+	var sand := PackedFloat32Array()
+	sand.resize(N * N)
+	for i in N * N:
+		sand[i] = 0.0 if _beach[i] == 1 else 1e6
+	_chamfer(sand)
+	for i in N * N:
+		guard[i] = minf(guard[i], sand[i])
+	var main_ring: Array[PackedVector2Array] = [_rings[_main_ring()]]
+	var main: PackedByteArray = _fill(main_ring)
+	var out := PackedFloat32Array()
+	out.resize(N * N)
+	var wd: PackedByteArray = w_img.get_data()
+	var ww: int = w_img.get_width()
+	for z in N:
+		for x in N:
+			var i: int = z * N + x
+			var w: float = clampf(wd.decode_float((z * ww + x) * 4), lo, hi)
+			w = lerpf(CLIFF, w, smoothstep(8.0, 20.0, guard[i]))
+			out[i] = w if main[i] == 1 else CLIFF
+	return out
+
+
+## Metres from every path and bridge (bridges 2 m longer at each end, as
+## their decks), up to `reach` (beyond: reach).
+func _guard_distance(reach: float) -> PackedFloat32Array:
+	var d := PackedFloat32Array()
+	d.resize(N * N)
+	d.fill(reach)
+	for path in _paths:
+		var pts: PackedVector2Array = path[0]
+		var half: float = path[1] * 0.5
+		for i in pts.size() - 1:
+			var a: Vector2 = pts[i]
+			var b: Vector2 = pts[i + 1]
+			if path[3]:
+				var dir: Vector2 = (b - a).normalized()
+				a -= dir * 2.0
+				b += dir * 2.0
+			var pad: float = half + reach
+			var lo: Vector2i = Vector2i(floori(minf(a.x, b.x) - pad), floori(minf(a.y, b.y) - pad)).clamp(Vector2i.ZERO, Vector2i(N - 1, N - 1))
+			var hi: Vector2i = Vector2i(ceili(maxf(a.x, b.x) + pad), ceili(maxf(a.y, b.y) + pad)).clamp(Vector2i.ZERO, Vector2i(N - 1, N - 1))
+			for z in range(lo.y, hi.y + 1):
+				for x in range(lo.x, hi.x + 1):
+					var p := Vector2(x, z)
+					var dd: float = maxf(p.distance_to(Geometry2D.get_closest_point_to_segment(p, a, b)) - half, 0.0)
+					if dd < d[z * N + x]:
+						d[z * N + x] = dd
+	return d
+
+
+## Index of the biggest coast ring (the main island).
+func _main_ring() -> int:
+	var best: int = 0
+	for k in _rings.size():
+		if absf(_area(_rings[k])) > absf(_area(_rings[best])):
+			best = k
+	return best
 
 
 ## Paths become walkable ramps. Every cell within SHOULDER of a path (not a
@@ -712,7 +841,14 @@ func _build_scene() -> bool:
 			var b: int = clampi(roundi(clampf(blend, 0.0, 1.0) * 255.0), 0, 255)
 			control[v] = Terrain3DUtil.as_float(Terrain3DUtil.enc_base(base) | Terrain3DUtil.enc_overlay(over) | Terrain3DUtil.enc_blend(b))
 			var light: float = 0.88 + tints[i] / 255.0 * 0.12  # slight light/dark variation
-			var hue: Color = P["tint"]  # Berlenga: a little greener, the scrub in spring
+			# The place's tint (Berlenga: a little greener, the scrub in spring)
+			# only on vegetation: bare rock keeps its own colour.
+			var rock: float = 1.0 if base == 1 else (clampf(blend, 0.0, 1.0) if over == 1 else 0.0)
+			var hue: Color = (P["tint"] as Color).lerp(Color.WHITE, rock)
+			# Wet band: rock and shore darker in the last 2 m above the water
+			# (Codex's design).
+			var wet: float = (1.0 - smoothstep(SEA + 0.3, SEA + 2.0, _h[i])) * (1.0 if base == 2 else rock)
+			light *= lerpf(1.0, 0.65, wet)
 			color[v * 4] = int(light * 255.0 * hue.r)
 			color[v * 4 + 1] = int(light * 255.0 * hue.g)
 			color[v * 4 + 2] = int(light * 255.0 * hue.b)
@@ -1489,13 +1625,18 @@ func _place_nature() -> void:
 	# So reserving a shape removes only what would land on it and moves
 	# nothing elsewhere on the island (found by the landmarks subagent).
 	var reserved: PackedByteArray = _fill(_grown(_reserved, 1.0))
+	var outcrops: PackedByteArray = _outcrops(around_house)
+	var outcrop_cells := PackedInt32Array()  # drawn from directly: the discs are tiny
+	for i in N * N:
+		if outcrops[i] == 1:
+			outcrop_cells.append(i)
 	var green: PackedByteArray = _fill(_green)
 	var near_light: Array[Vector2] = _lighthouses.duplicate()
 	for spec: Array in P["scatter"]:
 		var mesh: Mesh = _kit_mesh(spec[0])
 		if mesh == null:
 			continue
-		var rock: bool = spec[5] in ["cliff_top", "rubble"]  # these block (Rocks/)
+		var rock: bool = spec[5] in ["cliff_top", "rubble", "outcrop"]  # these block (Rocks/)
 		var target: float = spec[2]
 		var tries: int = 0
 		var made: int = 0
@@ -1504,6 +1645,12 @@ func _place_nature() -> void:
 			tries += 1
 			var x: int = _rng.randi_range(2, N - 3)
 			var z: int = _rng.randi_range(2, N - 3)
+			if spec[5] == "outcrop":
+				if outcrop_cells.is_empty():
+					break
+				var oc: int = outcrop_cells[_rng.randi() % outcrop_cells.size()]
+				x = oc % N
+				z = oc / N
 			var jx: float = _rng.randf()
 			var jz: float = _rng.randf()
 			var size: float = _rng.randf_range(0.6, 1.4)
@@ -1525,6 +1672,9 @@ func _place_nature() -> void:
 						continue
 				"green":
 					if green[i] == 0 or near_house[i] == 1 or _slope(i) > 0.55:
+						continue
+				"outcrop":
+					if outcrops[i] == 0:
 						continue
 				_:
 					if near_house[i] == 1 or _slope(i) > 0.55:
@@ -1567,6 +1717,41 @@ func _place_nature() -> void:
 				inst.owner = _root
 		if rock:
 			group.free()  # never added to the scene
+
+
+## Cells of the outcrops: 40 discs of 2 to 4 m on gentle ground (slope under
+## 0.35) more than 25 m from the coast, away from paths, beaches, buildings
+## (`around_house`) and 30 m from where the generators go (the village, the
+## lighthouses, the fort's islet). Its own random numbers: the other
+## scatter rows do not move.
+func _outcrops(around_house: PackedByteArray) -> PackedByteArray:
+	var mask := PackedByteArray()
+	mask.resize(N * N)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 31
+	var keep_out: Array[Vector2] = _lighthouses.duplicate()
+	if _village.x >= 0.0:
+		keep_out.append(_village)
+	keep_out.append(_fort_islet())
+	var made: int = 0
+	var tries: int = 0
+	while made < 40 and tries < 20000:
+		tries += 1
+		var c := Vector2i(rng.randi_range(8, N - 9), rng.randi_range(8, N - 9))
+		var r: float = rng.randf_range(2.0, 4.0)
+		var i: int = c.y * N + c.x
+		if _t[i] < 25.0 or _slope(i) > 0.35 or around_house[i] == 1 or _path_d[i] < 10.0:
+			continue
+		if keep_out.any(func(p: Vector2) -> bool: return p.distance_to(Vector2(c)) < 30.0):
+			continue
+		# Every cell of the disc checked, not only the centre (found by Codex).
+		for z in range(c.y - 4, c.y + 5):
+			for x in range(c.x - 4, c.x + 5):
+				var k: int = z * N + x
+				if Vector2(x, z).distance_to(Vector2(c)) <= r and _path_d[k] > SHOULDER + BLEND + 1.0 						and _slope(k) <= 0.35 and around_house[k] == 0 and _t[k] > 20.0:
+					mask[k] = 1
+		made += 1
+	return mask
 
 
 ## Building footprints (and kits' reserved shapes unless `reserved` is

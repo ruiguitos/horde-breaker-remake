@@ -60,8 +60,21 @@ depois de a construir, ou muda o script.
   - em Hashima o chão fica a pelo menos 5 m, porque é terreno conquistado ao
     mar atrás de um paredão.
 
-  Onde a terra encontra o mar há falésias, ou paredão, de 4 m de largura; na
-  areia, uma praia suave.
+  Onde a terra encontra o mar há falésias, ou paredão; na areia, uma praia
+  suave.
+  - **Largura das falésias:** em Hashima é sempre de 4 m. Na Berlenga varia
+    entre 4 e 16 m, conforme o desenho do Codex: é mais larga onde a terra
+    atrás é alta e mais estreita onde é íngreme, e varia lentamente ao longo
+    da costa. Fica nos 4 m antigos junto a caminhos, pontes, praias e
+    ilhéus, porque as rampas, os tabuleiros e o desembarque foram feitos
+    para essa largura.
+  - **Cor:** a rocha nua não leva o tom verde da vegetação, e escurece nos
+    últimos 2 m acima da água, como rocha molhada.
+  - **Textura:** experimentou-se a `seaside_rock` e foi posta de parte,
+    porque é quase preta e o granito da Berlenga é claro e rosado.
+  - **Afloramentos:** 40 grupos de rochas pequenas, meio enterradas, no
+    planalto. Ficam longe da costa, dos caminhos, das casas e dos sítios dos
+    geradores, e bloqueiam.
 - **Caminhos escavados:** é a parte mais importante. Com dados de 30 m, os
   degraus para o forte e a estrada da praia na Berlenga ficavam mais
   íngremes do que a grelha aceita (0,9 m por metro), e meia ilha ficava
@@ -208,7 +221,7 @@ Ambiente: Windows 11, Godot 4.7.2, AMD Ryzen 5 5600, NVIDIA RTX 5060.
 | Construir a ilha (headless) | cerca de 18 s | cerca de 5 s |
 | Grelha | 1466 m, 2,1 M células | 495 m, 245 mil células |
 | Converter para a grelha (`build_map`) | 0,75 a 1,2 s | cerca de 0,1 s |
-| Células transitáveis / alcançáveis do desembarque | 761 mil / 727 mil | 50,9 mil / 50,9 mil (36,7 mil / 34,6 mil quando os edifícios bloqueavam a caixa) |
+| Células transitáveis / alcançáveis do desembarque | 744 mil / 709 mil (761 mil / 727 mil com falésias de 4 m) | 50,9 mil / 50,9 mil (36,7 mil / 34,6 mil quando os edifícios bloqueavam a caixa) |
 | Rota Activate pela grelha (troços) | cerca de 2,4 km: 229 + 414 + 737 + 1056 m | cerca de 1,3 km: 142 + 642 + 281 + 221 m |
 | Passo da simulação (bot) | 1,1 a 1,3 ms em média, pior 8 ms | 1,6 a 1,8 ms em média (até 150 vivos), pior 8,5 ms |
 | Frame em jogo a 1920 × 1080 (Ultra, horda a chegar) | 4,6 a 6,2 ms | 3,4 a 4,3 ms |
