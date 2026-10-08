@@ -17,7 +17,7 @@ extends SceneTree
 ## Prints the time of every stage, the grid and its problems (exit code 1
 ## when there are any).
 ## Run: python tools/real_island/fetch_data.py <place>
-##      godot --headless --path . --script res://tools/real_island/build.gd -- <place> [--out-dir <res://dir/>] [--kits houses,paths]
+##      godot --headless --path . --script res://tools/real_island/build.gd -- <place> [--out-dir <res://dir/>] [--kits houses,paths,landmarks]
 ## (place: berlenga, hashima; default berlenga). --out-dir writes a test
 ## build somewhere else than the game's islands (e.g. a gitignored folder).
 
@@ -53,10 +53,10 @@ const PLACES: Dictionary = {
 		"landing": "beach",
 		"generators": [["landuse", ""], ["lighthouse", ""], ["fort", ""]],
 		"caches": 6, "cache_walk": 1200,
-		# Detail kits (village_houses.gd, village_paths.gd) only inside this
-		# rectangle (island metres): the landing, the road up and the
-		# Bairro dos Pescadores. A test before the whole island.
-		"detail_area": Rect2(830, 560, 260, 230),
+		# Detail kits (village_houses.gd, village_paths.gd, landmarks.gd)
+		# inside this rectangle (island metres). The first test covered only
+		# the landing and the Bairro dos Pescadores: Rect2(830, 560, 260, 230).
+		"detail_area": Rect2(0, 0, 4096, 4096),
 		"scatter": [["Grass_Wispy_Short", 110000, 0.35, 6.0, 140.0, "land"], ["Grass_Common_Short", 55000, 0.3, 6.0, 120.0, "land"],
 			["Grass_Wispy_Tall", 14000, 0.7, 6.0, 220.0, "land"], ["Bush_Common", 600, 0.9, 10.0, 400.0, "land"],
 			["Rock_Medium_1", 450, 2.0, 2.0, 1500.0, "cliff_top"], ["Rock_Medium_2", 350, 1.5, 2.0, 1500.0, "cliff_top"]],
@@ -116,9 +116,11 @@ var _walls: Array[PackedVector2Array] = []  ## sea walls (retaining walls)
 var _rng := RandomNumberGenerator.new()
 var ISLANDS: String = "res://game/world/handmade/islands/"  ## where the island is saved (--out-dir)
 const TEST_OUT: String = "res://tools/real_island/test_out/"  ## the only place --out-dir may write
-var _kits: PackedStringArray = ["houses", "paths"]  ## --kits
+var _kits: PackedStringArray = ["houses", "paths", "landmarks"]  ## --kits
 var _house_kit: RefCounted  ## village_houses.gd, when the place has a detail_area
 var _path_kit: RefCounted   ## village_paths.gd, idem
+var _landmark_kit: RefCounted  ## landmarks.gd (lighthouse, fort), idem
+var _reserved: Array[PackedVector2Array] = []  ## footprints kits add (fort walls...): no scatter there
 var _materials: Dictionary = {}  ## texture role -> material (_role_material)
 var _root: HandmadeIsland
 var _terrain: Node3D
@@ -145,8 +147,8 @@ func _initialize() -> void:
 		elif arg == "--kits":
 			_kits = value.split(",", false)
 			for kit in _kits:
-				if kit not in ["houses", "paths", "none"]:
-					print("--kits takes houses, paths or none, comma-separated (got '%s')" % value)
+				if kit not in ["houses", "paths", "landmarks", "none"]:
+					print("--kits takes houses, paths, landmarks or none, comma-separated (got '%s')" % value)
 					quit(1)
 					return
 			i += 2
@@ -748,6 +750,8 @@ func _build_scene() -> bool:
 			_house_kit = load(DIR + "village_houses.gd").new(self)
 		if "paths" in _kits:
 			_path_kit = load(DIR + "village_paths.gd").new(self)
+		if "landmarks" in _kits:
+			_landmark_kit = load(DIR + "landmarks.gd").new(self)
 	_place_paths()
 	_place_bridges()
 	_place_buildings()
@@ -1224,7 +1228,11 @@ func _place_buildings() -> void:
 		if P["special"][name] == "shrine" and _named.has(name):
 			_shrine(_named[name])
 	for k in _lighthouses.size():
+		if _landmark_kit != null and _landmark_kit.lighthouse(_lighthouses[k], k, _light_heights[k]):
+			continue
 		_lighthouse(_lighthouses[k], k, _light_heights[k])
+	if _landmark_kit != null and P["generators"].any(func(g: Array) -> bool: return g[0] == "fort"):
+		_landmark_kit.fort(_fort_islet())
 	for k in _piers.size():
 		_pier(_piers[k], k)
 
@@ -1547,12 +1555,16 @@ func _place_nature() -> void:
 			group.free()  # never added to the scene
 
 
-## Building footprints grown by `metres` (for "near a building" masks).
+## Building footprints (and kits' reserved shapes) grown by `metres` (for
+## "near a building" masks).
 func _grown_houses(metres: float) -> Array[PackedVector2Array]:
 	var rings: Array[PackedVector2Array] = []
+	var shapes: Array[PackedVector2Array] = _reserved.duplicate()
 	for b in _houses:
-		var grown: Array[PackedVector2Array] = Geometry2D.offset_polygon(b[0], metres)
-		rings.append(grown[0] if not grown.is_empty() else b[0])
+		shapes.append(b[0])
+	for pts in shapes:
+		var grown: Array[PackedVector2Array] = Geometry2D.offset_polygon(pts, metres)
+		rings.append(grown[0] if not grown.is_empty() else pts)
 	return rings
 
 
