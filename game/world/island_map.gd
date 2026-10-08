@@ -23,6 +23,11 @@ var wall_cells: PackedInt32Array = PackedInt32Array()
 ## Single-cell blocking props (cells), rendered as trees and rocks.
 var trees: Array[Vector2i] = []
 var rocks: Array[Vector2i] = []
+## Expedition parts (see HandmadeIsland markers): the way on to the next
+## part, the survivor to rescue, the zone to defend. x < 0 = none.
+var exit := Vector3(-1, 0, -1)
+var rescue_target := Vector3(-1, 0, -1)
+var defend_zone := Vector3(-1, 0, -1)
 ## Optional supply caches (detours with a reward).
 var caches: Array[Vector3] = []
 ## Biome id: beach, town, jungle, port or volcano (see GameData.BIOMES).

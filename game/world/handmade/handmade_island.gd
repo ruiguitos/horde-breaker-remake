@@ -10,7 +10,9 @@ extends Node3D
 ##   Bridges/       -> every child is a deck mesh: the cells under it become
 ##                     walkable ground at the deck's top, even over water
 ##   Decor/         -> never blocks (grass, flowers, roads, lights, water)
-##   Markers/       -> Boat (required), PlayerStart, Generator*, Cache*
+##   Markers/       -> Boat (required), PlayerStart, Generator*, Cache*,
+##                     and for expedition parts: Exit (the way on to the
+##                     next part), RescueTarget, DefendZone
 ## The island covers x, z in [0, size): keep everything inside that square.
 ## How to build one: game/README.md, "Ilhas feitas à mão".
 
@@ -27,6 +29,13 @@ extends Node3D
 ## the player (0 = the whole island). Enemies left further behind are
 ## replaced by new ones near the player.
 @export var horde_radius: int = 0
+## A part of a bigger island (expeditions, e.g. the Berlenga): only the
+## cells inside this polygon (island metres) are walkable; the rest of the
+## island stays visible. Empty = the whole island.
+@export var play_area: PackedVector2Array = PackedVector2Array()
+## The mission this scene is made for (activate, rescue, defend, holdout...);
+## empty = any. Only "activate" (or empty) needs the generator markers.
+@export var mission: StringName = &""
 ## Writes a top-down picture of the converted grid next to this scene and
 ## prints a report: what blocks, what is unreachable from the boat.
 @export_tool_button("Check map", "Search") var check_button: Callable = check_map
@@ -121,6 +130,8 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 		if _inside(cell):
 			f.blocked[cell.y * size + cell.x] = 1
 			map.trees.append(cell)
+	if not play_area.is_empty():
+		_block_outside(f)
 	# Markers.
 	var boat: Node3D = get_node_or_null("Markers/Boat")
 	if boat == null:
@@ -140,7 +151,11 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 			map.generators.append(_flat(_local(node).origin))
 		elif node.name.begins_with("Cache"):
 			map.caches.append(_flat(_local(node).origin))
-	if map.generators.size() != GameData.GENERATOR_COUNT:
+	for spot: Array in [["Exit", "exit"], ["RescueTarget", "rescue_target"], ["DefendZone", "defend_zone"]]:
+		var node: Node3D = get_node_or_null("Markers/" + spot[0])
+		if node != null:
+			map.set(spot[1], _flat(_local(node).origin))
+	if mission in [&"", &"activate"] and map.generators.size() != GameData.GENERATOR_COUNT:
 		problems.append("Markers: %d generators found, the Activate mission needs %d." % [map.generators.size(), GameData.GENERATOR_COUNT])
 	# Reachability from the player start (the horde and the player walk the grid).
 	var start_cell: Vector2i = f.world_to_cell(map.player_start)
@@ -148,12 +163,43 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 		problems.append("PlayerStart is on a blocked cell (sea, cliff or object).")
 	else:
 		f.compute_now(start_cell)
-		for list: Array in [["Boat", [map.boat]], ["Generator", map.generators], ["Cache", map.caches]]:
+		var spots: Array[Vector3] = []
+		for p: Vector3 in [map.exit, map.rescue_target, map.defend_zone]:
+			if p.x >= 0.0:
+				spots.append(p)
+		for list: Array in [["Boat", [map.boat]], ["Generator", map.generators], ["Cache", map.caches], ["Exit/RescueTarget/DefendZone", spots]]:
 			for p: Vector3 in list[1]:
 				if f.distance_at(p) >= FlowField.UNREACHABLE:
 					problems.append("%s at (%d, %d) cannot be reached from the start." % [list[0], int(p.x), int(p.z)])
 	f.max_distance = horde_radius  # after the check above, which needs the whole island
 	return map
+
+
+## Blocks every cell whose centre is outside play_area (scanline fill: two
+## million cells on a 1.5 km island, one row at a time).
+func _block_outside(f: FlowField) -> void:
+	var n: int = play_area.size()
+	for z in size:
+		var y: float = z + 0.5
+		var xs: Array[float] = []
+		for i in n:
+			var a: Vector2 = play_area[i]
+			var b: Vector2 = play_area[(i + 1) % n]
+			if (a.y <= y) != (b.y <= y):
+				xs.append(a.x + (y - a.y) / (b.y - a.y) * (b.x - a.x))
+		xs.sort()
+		var row: int = z * size
+		var x: int = 0
+		var k: int = 0
+		while x < size:
+			# Inside between xs[k] and xs[k + 1] (even-odd rule).
+			var inside: bool = false
+			while k < xs.size() and xs[k] <= x + 0.5:
+				k += 1
+			inside = k % 2 == 1
+			if not inside:
+				f.blocked[row + x] = 1
+			x += 1
 
 
 ## A hand-made island for this biome (stable per seed), or null.
