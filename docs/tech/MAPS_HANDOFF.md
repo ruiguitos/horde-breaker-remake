@@ -98,8 +98,9 @@ Comparação (fotografias de perto):
 
 ## Ilha real: Berlenga Grande
 
-`islands/beach_berlenga.scn` é a Berlenga Grande, com 1,5 km, feita a partir
-de dados abertos por `tools/real_island/build.gd`. O README dessa pasta tem o
+A Berlenga Grande, com 1,5 km, é feita a partir de dados abertos por
+`tools/real_island/build.gd`. Desde 2026-10-09 é a Expedição Berlenga, em 4
+partes (`expeditions/berlenga/`, ver `docs/design/BERLENGA_EXPEDITION.md`). O README dessa pasta tem o
 como, as medições e os limites. Para caber no jogo foi preciso mudar:
 - **o campo de fluxo:** tem um raio máximo (`horde_radius`), e um novo alvo
   espera que o cálculo em curso acabe;

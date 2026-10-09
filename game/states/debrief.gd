@@ -22,7 +22,7 @@ func _ready() -> void:
 	heading.add_theme_color_override("font_color", Color(0.4, 0.95, 0.5) if context.won else UiTheme.DANGER)
 	box.add_child(heading)
 	var islands: int = context.island_index + (1 if context.won else 0)
-	_row(box, "Islands cleared", "%d / %d" % [islands, RunContext.ISLAND_COUNT])
+	_row(box, "Parts cleared" if context.is_expedition() else "Islands cleared", "%d / %d" % [islands, context.island_count()])
 	_row(box, "Time", "%d:%02d" % [int(context.time_alive) / 60, int(context.time_alive) % 60])
 	_row(box, "Kills  ·  Headshots", "%d  ·  %d" % [context.kills, context.headshots])
 	_row(box, "Level reached", str(context.level))

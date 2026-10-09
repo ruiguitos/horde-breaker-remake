@@ -169,7 +169,14 @@ const LAVA_ENEMY_DPS: float = 30.0
 
 ## Missions (one per island, shown with the route on the boat).
 static var MISSIONS: Dictionary = _load_missions()
+## Missions the boat offers on archipelago routes (not the expedition-only
+## holdout).
+static var ROUTE_MISSIONS: Array[StringName] = _route_missions()
 const DEFEND_TIME: float = 75.0
+## Holdout (the Berlenga's final, in the fort): hold the courtyard a bit
+## longer than a Defend, then the rescue boat needs this long to dock.
+const HOLDOUT_TIME: float = 90.0
+const BOAT_ARRIVAL_TIME: float = 20.0
 ## Hazard pay (boat briefing): bonus Intel and extra enemies, one island.
 const HAZARD_INTEL_MULT: float = 1.25
 const HAZARD_ALIVE_MULT: float = 1.25
@@ -374,8 +381,16 @@ static func _load_missions() -> Dictionary:
 	var out: Dictionary = {}
 	for e: Array in _entries(MISSION_REGISTRY):
 		var d: MissionData = e[1]
-		out[e[0]] = {"name": d.display_name, "text": d.text}
+		out[e[0]] = {"name": d.display_name, "text": d.text, "on_route": d.on_route}
 	return out
+
+
+static func _route_missions() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for id: StringName in MISSIONS:
+		if MISSIONS[id]["on_route"]:
+			ids.append(id)
+	return ids
 
 
 static func _load_classes() -> Dictionary:

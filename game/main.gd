@@ -2,10 +2,13 @@ extends Node
 ## Root of the game: a small run state machine.
 ##   TITLE -> ARMORY -> BOAT -> ISLAND -> (cleared and more islands) BOAT
 ##                  -> (last island cleared, or death) DEBRIEF -> ARMORY
+## An expedition (one real island in parts, on foot) has no boat:
+##   ARMORY -> ISLAND (part 1) -> (cleared and more parts) CAMP -> ISLAND
+##          -> (last part cleared, or death) DEBRIEF
 ## Each state is a scene that is freed when the state changes; RunContext is
 ## the only thing that crosses states.
 
-enum GameFlow { BOAT, ISLAND, DEBRIEF, ARMORY, TITLE }
+enum GameFlow { BOAT, ISLAND, DEBRIEF, ARMORY, TITLE, CAMP }
 
 const ISLAND_SCENE: String = "res://game/world/island.tscn"
 
@@ -34,25 +37,40 @@ func _unhandled_input(event: InputEvent) -> void:
 		profile.save()
 
 
-func _new_run() -> void:
-	context = RunContext.new()
-	context.threat = profile.threat
-	context.apply_class(profile.selected_class)
-	context.apply_perks(profile.equipped_perks)
-	context.weapons.append_array(profile.unlocked_weapons)
-	_go(GameFlow.BOAT)
+## Starts a run from the Armory: the archipelago (`expedition` = &"") goes
+## to the boat; an expedition lands straight on its first part.
+func _new_run(expedition: StringName = &"") -> void:
+	context = _fresh_context()
+	if expedition != &"" and context.start_expedition(expedition):
+		_go(GameFlow.ISLAND)
+	else:
+		_go(GameFlow.BOAT)
+
+
+## A run context with the profile's threat, class, perks and weapons.
+func _fresh_context() -> RunContext:
+	var ctx := RunContext.new()
+	ctx.threat = profile.threat
+	ctx.apply_class(profile.selected_class)
+	ctx.apply_perks(profile.equipped_perks)
+	ctx.weapons.append_array(profile.unlocked_weapons)
+	return ctx
 
 
 ## TEST ISLAND (development builds): one hand-made island with the chosen
 ## mission, straight from the title, with the profile's class, perks and
 ## weapons. Its biome comes from the file name (beach_berlenga -> beach).
+## An expedition part plays as that part (its biome, mission and place in
+## the expedition); the whole expedition island takes the expedition biome.
 func _test_island(path: String, mission: StringName) -> void:
-	context = RunContext.new()
-	context.threat = profile.threat
-	context.apply_class(profile.selected_class)
-	context.apply_perks(profile.equipped_perks)
-	context.weapons.append_array(profile.unlocked_weapons)
-	context.biome = StringName(path.get_file().get_slice("_", 0))
+	context = _fresh_context()
+	var where: Dictionary = Expeditions.locate(path)
+	if where.is_empty():
+		context.biome = StringName(path.get_file().get_slice("_", 0))
+	elif int(where["index"]) >= 0:
+		context.start_expedition(where["expedition"], int(where["index"]))
+	else:
+		context.biome = Expeditions.biome(where["expedition"])
 	context.mission = mission
 	_test_scene = load(path)
 	_go(GameFlow.ISLAND)
@@ -75,6 +93,11 @@ func _go(next: GameFlow) -> void:
 			island.set("profile", profile)
 			if _test_scene != null:
 				island.set("handmade_scene", _test_scene)
+			elif context.is_expedition():
+				var part_scene := load(context.part_scene()) as PackedScene
+				if part_scene == null:
+					push_error("Expedition part scene missing: %s" % context.part_scene())
+				island.set("handmade_scene", part_scene)
 			island.connect("finished", _on_island_finished, CONNECT_DEFERRED)
 			_current = island
 		GameFlow.DEBRIEF:
@@ -94,6 +117,12 @@ func _go(next: GameFlow) -> void:
 			title.connect("play_requested", _go.bind(GameFlow.ARMORY), CONNECT_DEFERRED)
 			title.connect("test_island_requested", _test_island, CONNECT_DEFERRED)
 			_current = title
+		GameFlow.CAMP:
+			var camp := Control.new()
+			camp.set_script(load("res://game/states/camp.gd"))
+			camp.set("context", context)
+			camp.connect("land_requested", _go.bind(GameFlow.ISLAND), CONNECT_DEFERRED)
+			_current = camp
 		GameFlow.ARMORY:
 			var armory := Control.new()
 			armory.set_script(load("res://game/states/armory.gd"))
@@ -116,6 +145,7 @@ func _write_telemetry() -> void:
 		return
 	f.store_string(JSON.stringify({
 		"version": 1, "won": context.won, "threat": context.threat,
+		"expedition": String(context.expedition),
 		"class": String(context.player_class),
 		"perks": context.perks.map(func(x: StringName) -> String: return String(x)),
 		"intel": context.intel, "total_seconds": snappedf(context.time_alive, 0.1),
@@ -128,8 +158,8 @@ func _on_island_finished(won: bool) -> void:
 		_go(GameFlow.TITLE)
 		return
 	if won and not context.is_last_island():
-		context.island_index += 1
-		_go(GameFlow.BOAT)
+		context.advance()
+		_go(GameFlow.CAMP if context.is_expedition() else GameFlow.BOAT)
 	else:
 		context.won = won
 		if won:

@@ -22,8 +22,12 @@ Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 **Testar uma ilha:** no ecrã inicial há um botão **TEST ISLAND**, que só
 aparece nas versões de desenvolvimento (o editor e as exportações de debug).
 - Escolhes a missão e uma das ilhas de `world/handmade/islands/` (a
-  Berlenga, a Hashima...) e entras logo nela, sem rota nem sorteio.
-- O bioma vem do nome do ficheiro: `beach_berlenga` é Beach.
+  Hashima, a `beach_01`...) e entras logo nela, sem rota nem sorteio.
+- O bioma vem do nome do ficheiro: `port_hashima` é Industrial Port.
+- Quando as cenas da Expedição Berlenga existem, a lista mostra também a
+  ilha inteira (`BERLENGA / WHOLE ISLAND`, com a missão escolhida) e cada
+  parte (`BERLENGA 1 / CARREIRO DO MOSTEIRO (RESCUE)`...). Uma parte joga
+  sempre a sua própria missão e conta como essa parte (a 4.ª é a última).
 - No fim voltas ao ecrã inicial, e o teste não conta como viagem no perfil.
 
 Sem ele, só se chega a uma ilha por sorte. O barco oferece 2 rotas ao
@@ -193,24 +197,30 @@ barco, os geradores e as caches continuam acessíveis.
 
 ### Berlenga Grande (ilha real)
 
-A rota Beach sorteia por seed entre a `beach_01` e
-`islands/beach_berlenga.scn`. A Berlenga é a ilha real, com 1,5 km, feita a
-partir de dados abertos: relevo, a costa e os caminhos do OpenStreetMap e
-texturas do Poly Haven.
-- **Bairro dos Pescadores (teste):** à volta do desembarque e do bairro, as
-  casas são caiadas com barras azuis ou ocre, telha, portas e janelas, e os
-  caminhos têm degraus a sério e a estrada de betão. O resto da ilha ainda
-  tem o estilo antigo (ver `tools/real_island/README.md`).
-- **Missão:**
-  - desembarcas na praia do Carreiro do Mosteiro;
-  - os geradores estão no Bairro dos Pescadores, junto ao farol e no ilhéu do
-    forte, ao fim do Caminho do Forte, com degraus e pontes;
-  - há 6 caixas nas pontas da ilha.
-- **Duração:** a rota completa tem cerca de 2,4 km e o bot leva 6 minutos.
-- **Como foi construída:** por `tools/real_island/build.gd`; o como e o
-  porquê estão no `README.md` dessa pasta. Para a testar já: **TEST ISLAND**
-  no ecrã inicial, ou arrasta-a para **Handmade Scene** em
-  `world/island.tscn` e carrega em **F6**.
+A Berlenga é a ilha real, com 1,5 km, feita a partir de dados abertos:
+relevo, a costa e os caminhos do OpenStreetMap e texturas do Poly Haven.
+Já não sai no sorteio da rota Beach.
+- **Expedição Berlenga:** é uma viagem própria, que se escolhe no Armory.
+  São 4 partes seguidas, ligadas a pé: Rescue, Activate, Defend e o final
+  no forte. Ver "Berlenga Expedition" mais abaixo e
+  `docs/design/BERLENGA_EXPEDITION.md`.
+- **Cenas:** estão em `world/handmade/expeditions/berlenga/`:
+  - `base.scn`, a ilha sem marcadores;
+  - `whole.scn`, a ilha inteira, só para o TEST ISLAND;
+  - `part_1.scn` a `part_4.scn`.
+
+  Herdam todas da `base.scn` e partilham a pasta de terreno `terrain/`.
+- **Duração:** o bot faz as 4 partes em cerca de 8 minutos de jogo (69,
+  97, 145 e 162 s).
+- **A ilha:**
+  - as casas são caiadas, com barras azuis ou ocre e telha;
+  - os degraus e a estrada de betão são a sério;
+  - o farol tem 29 m;
+  - o forte de São João Baptista é aproximado;
+  - as falésias variam de largura conforme o terreno.
+
+  O como e o porquê estão em `tools/real_island/README.md`.
+- **Para testar uma parte:** **TEST ISLAND** no ecrã inicial.
 - **Licença:** os dados do mapa têm licença ODbL, "© OpenStreetMap
   contributors" (ver `assets/LICENSES.md`).
 
@@ -361,11 +371,22 @@ em `tests/test_handmade.gd`.
 
 ## Fluxo da run
 
-**Título** → **Armory** (gastar Intel, equipar perks, escolher Threat) → barco (1 de 3: cura, munição ou carta) → ilha → ilha limpa → barco → … →
-3.ª ilha limpa ou morte → debrief → Armory. Extrair (ganhar a 3.ª ilha)
-multiplica o Intel da run por 1,5. Cada ilha é
-mais dura: o HP dos inimigos sobe 30 % e há mais especiais. A vida, o nível,
-as cartas e a munição passam de ilha para ilha (`core/run_context.gd`).
+**Título** → **Armory** (gastar Intel, equipar perks, escolher Threat) →
+**START RUN**, que pergunta qual das viagens:
+
+- **Archipelago:** barco (1 de 3: cura, munição ou carta) → ilha → ilha
+  limpa → barco → … → 3.ª ilha limpa ou morte → debrief → Armory.
+- **Berlenga Expedition** (`docs/design/BERLENGA_EXPEDITION.md`): a ilha
+  real em 4 partes, a pé, sem barco nem escolha de rota. Começa logo na
+  parte 1 → parte limpa → **acampamento** → parte seguinte → … → 4.ª parte
+  limpa ou morte → debrief. O acampamento (`states/camp.gd`) dá o mesmo
+  "escolhe 1 de 3" do barco e mostra a parte seguinte e o seu objetivo.
+  O botão fica desligado enquanto as cenas das partes não existirem.
+
+Extrair (ganhar a última ilha ou parte) multiplica o Intel da run por 1,5.
+Cada ilha (ou parte) é mais dura: o HP dos inimigos sobe 30 % e há mais
+especiais. A vida, o nível, as cartas e a munição passam de ilha para ilha
+(`core/run_context.gd`).
 
 O perfil grava-se em `user://profile.json`. No Windows fica em
 `%APPDATA%\Godot\app_userdata\Horde Breaker Remake\`. Apagar o ficheiro
@@ -576,15 +597,16 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 
 | Ficheiro | O quê |
 |---|---|
-| `main.gd` | Máquina de estados da run: barco → ilha → debrief. |
-| `core/run_context.gd` | O que passa de ilha para ilha. |
+| `main.gd` | Máquina de estados da run: barco (ou acampamento) → ilha → debrief. |
+| `core/run_context.gd` | O que passa de ilha para ilha; a expedição e a parte em jogo. |
+| `data/expeditions.gd` | Expedições: as partes (nome, cena, missão) por ordem. |
 | `core/game_input.gd` | Ações de input (InputMap): teclas e botões do comando por ação. |
 | `core/profile.gd` | Perfil gravado (Intel, runs), JSON versionado. |
 | `states/title.gd` | Título com porto ilustrado e botões nativos. |
 | `ui/ui_theme.gd` | Tema partilhado por menus e HUD (painéis, botões, cores). |
 | `ui/menu_dialog.gd` | Foco e input modal; arquivo e controlos. |
 | `ui/route_map.gd`, `ui/route_preview.gd` | Mapa decorativo e miniaturas das rotas. |
-| `states/armory.gd`, `states/boat.gd`, `states/debrief.gd` | Ecrãs entre runs, entre ilhas e do fim da run. |
+| `states/armory.gd`, `states/boat.gd`, `states/camp.gd`, `states/debrief.gd` | Ecrãs entre runs, entre ilhas, entre partes de uma expedição e do fim da run. O `camp.gd` herda do `boat.gd`: os mantimentos ficam num só sítio. |
 | `world/island_run.gd` | **Todas as regras**, sem nós: jogador, auto-fire, breaker, cartas, missão. Testável em headless. |
 | `world/island.gd` | Input, render (MultiMesh), câmara média e efeitos. |
 | `world/island_map.gd` | Gera a ilha (costa irregular, edifícios, geradores, barco). |

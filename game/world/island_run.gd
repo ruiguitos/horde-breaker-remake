@@ -67,9 +67,20 @@ var generator_started: Array[bool] = []
 ## The last island ends with a boss fight before the return to the boat.
 var has_boss: bool = false
 var mission: StringName = &"activate"
-## Defend / rescue site: the generator spot farthest from the boat.
+## Defend / rescue / holdout site: the map's RescueTarget / DefendZone
+## marker when it has one, else the generator spot farthest from the boat.
 var site: Vector3 = Vector3.ZERO
 var defend_time: float = 0.0
+## Holdout (final of an expedition): seconds until the rescue boat reaches
+## the pier, counting down once the zone is held (-1 = not called yet).
+var boat_eta: float = -1.0
+## Expedition parts: the next part's name, for "Head to <name>" (empty =
+## "Leave along the path"). load_context fills it; the scene may too.
+var exit_label: String = ""
+## Expedition parts: the walkable polygon (island metres) of this part, from
+## HandmadeIsland.play_area (set by the Island scene). Empty = whole island.
+## Only the minimap uses it: the grid already blocks the cells outside.
+var play_area: PackedVector2Array = PackedVector2Array()
 var _defend_peak_cd: float = 0.0
 var survivor_pos: Vector3 = Vector3.ZERO
 var survivor_hp: float = GameData.SURVIVOR_HP
@@ -98,6 +109,11 @@ var _summon_cd: float = GameData.BOSS_SUMMON_INTERVAL
 var kills: int = 0
 var headshots: int = 0
 var time_alive: float = 0.0
+## Spawn statistics (tests, F3): enemies the director asked for, how many
+## needed the ring fallback and how many found no spot at all.
+var spawn_requests: int = 0
+var spawn_fallbacks: int = 0
+var spawn_failures: int = 0
 
 # Render events, consumed (cleared) by the scene every frame.
 var tracers: Array[PackedVector3Array] = []
@@ -145,13 +161,16 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMa
 func load_context(ctx: RunContext) -> void:
 	perks = ctx.perks.duplicate()
 	set_mission(ctx.mission)
+	exit_label = next_part_name(ctx)
 	radio.append(StringName("land_" + String(mission)))
-	if ctx.is_last_island():
+	# The last island has the Behemoth; the expedition's holdout is itself
+	# the finale (hold the fort, then the boat), so it has none.
+	has_boss = ctx.is_last_island() and mission != &"holdout"
+	if has_boss:
 		radio.append(&"land_boss")
 	player_class = ctx.player_class
 	for w in weapons.size():
 		weapon_unlocked[w] = ctx.weapons.has(weapons[w].id)
-	has_boss = ctx.is_last_island()
 	threat = ctx.threat
 	max_hp = ctx.max_hp
 	hp = ctx.hp
@@ -183,6 +202,17 @@ func load_context(ctx: RunContext) -> void:
 			ammo[w] = max_ammo(w) if ctx.ammo.size() != ammo.size() else mini(ammo[w], max_ammo(w))
 	# A head start makes the director spawn more specials on later islands.
 	director.elapsed = 120.0 * ctx.island_index
+
+
+## Expedition runs: the name of the part after the current one ("" when the
+## run is not an expedition or this is its last part). In an expedition
+## island_index is the part being played (RunContext.expedition_parts).
+static func next_part_name(ctx: RunContext) -> String:
+	var parts: Variant = ctx.get(&"expedition_parts")
+	if not parts is Array:
+		return ""
+	var next: int = ctx.island_index + 1
+	return String(parts[next].get("name", "")) if next < parts.size() else ""
 
 
 ## Writes the run state back when the island ends.
@@ -314,20 +344,74 @@ func _update_grenades(dt: float) -> void:
 
 func set_mission(id: StringName) -> void:
 	mission = id
-	var best: float = -1.0
-	for g in map.generators:
-		var d: float = g.distance_to(map.boat)
-		if d > best:
-			best = d
-			site = g
+	var marker: Vector3 = map.rescue_target if mission == &"rescue" else map.defend_zone
+	if mission in [&"rescue", &"defend", &"holdout"] and marker.x >= 0.0:
+		site = marker
+	elif not map.generators.is_empty():
+		var best: float = -1.0
+		for g in map.generators:
+			var d: float = g.distance_to(map.boat)
+			if d > best:
+				best = d
+				site = g
+	else:
+		site = map.exit if has_exit() else map.boat
 	survivor_pos = site
+
+
+## Expedition parts: true when the map has an Exit marker (the way on to the
+## next part), so the extraction is there, on foot, not at the boat. The
+## holdout (the final) always ends on the rescue boat.
+func has_exit() -> bool:
+	return map.exit.x >= 0.0 and mission != &"holdout"
+
+
+## Where the island ends: the Exit on expedition parts, else the boat (the
+## holdout's rescue boat docks at the Boat marker, the fort pier).
+func extraction_point() -> Vector3:
+	return map.exit if has_exit() else map.boat
+
+
+## Short name of the extraction point (HUD marker).
+func extraction_name() -> String:
+	if has_exit():
+		return exit_label if exit_label != "" else "Exit"
+	return "Pier" if mission == &"holdout" else "Boat"
+
+
+## Seconds the zone must be held (Defend, or the expedition's final holdout).
+func hold_time() -> float:
+	return GameData.HOLDOUT_TIME if mission == &"holdout" else GameData.DEFEND_TIME
+
+
+## True when the boat model belongs in the world now. Parts 2-3 keep the
+## Boat marker inland at their entry only because build_map needs one: there
+## the hull would sit on land, so it is hidden. The holdout's boat shows once
+## it has been called (it sails in from the sea).
+func shows_boat() -> bool:
+	if mission == &"holdout":
+		return boat_eta >= 0.0
+	if map.exit.x < 0.0 or map.heights.is_empty():
+		return true
+	for d: float in [3.0, 6.0, 9.0]:
+		var p: Vector3 = map.boat + map.boat_dir * d
+		if p.x < 0.0 or p.z < 0.0 or p.x >= field.width or p.z >= field.height or map.ground_y(p) <= 0.0:
+			return true  # water under the hull: the landing boat stays as scenery
+	return false
+
+
+## 0 while the holdout boat is far out at sea (or not called), 1 once docked.
+func boat_arrival() -> float:
+	if boat_eta < 0.0:
+		return 0.0
+	return 1.0 - boat_eta / GameData.BOAT_ARRIVAL_TIME
 
 
 ## True once the island's main task is done (the boss / boat come next).
 func _main_task_done() -> bool:
 	match mission:
-		&"defend":
-			return defend_time >= GameData.DEFEND_TIME
+		&"defend", &"holdout":
+			return defend_time >= hold_time()
 		&"rescue":
 			return survivor_found or survivor_lost
 	for p in generator_progress:
@@ -363,8 +447,8 @@ func intel_earned() -> int:
 			done += 1
 	var base: int = (kills - _kills_at_start) / 5 + (40 if objective == Objective.WON else 0)
 	match mission:
-		&"defend":
-			base += 45 if defend_time >= GameData.DEFEND_TIME else int(defend_time / GameData.DEFEND_TIME * 30.0)
+		&"defend", &"holdout":
+			base += 45 if defend_time >= hold_time() else int(defend_time / hold_time() * 30.0)
 		&"rescue":
 			base += 40 if survivor_found and not survivor_lost and objective == Objective.WON else 0
 		_:
@@ -741,7 +825,7 @@ func _update_mission(dt: float) -> void:
 	match objective:
 		Objective.GENERATORS:
 			match mission:
-				&"defend":
+				&"defend", &"holdout":
 					_update_defend(dt)
 				&"rescue":
 					_update_rescue(dt)
@@ -753,11 +837,10 @@ func _update_mission(dt: float) -> void:
 				messages.append("Something huge is coming... Kill the Behemoth!")
 				radio.append(&"boss")
 			elif _main_task_done():
-				objective = Objective.RETURN_TO_BOAT
+				_start_extraction()
 				director.trigger_peak(25.0)
-				messages.append("Objective complete. Get back to the boat!")
 				if mission != &"rescue":
-					radio.append(&"objective_done")
+					radio.append(&"objective_done_on_foot" if has_exit() else &"objective_done")
 		Objective.BOSS:
 			_update_rescue(dt)
 			var b: int = boss_index()
@@ -766,26 +849,49 @@ func _update_mission(dt: float) -> void:
 				rocks.clear()
 				rock_times.clear()
 				rock_origins.clear()
-				objective = Objective.RETURN_TO_BOAT
 				slam_time = 0.0
 				director.trigger_peak(20.0)
-				messages.append("Behemoth down! Get back to the boat!")
+				messages.append("Behemoth down!")
+				_start_extraction()
 				radio.append(&"boss_down")
 				lore_found += 1
 			else:
 				_update_boss(dt, b)
 		Objective.RETURN_TO_BOAT:
 			_update_rescue(dt)
-			# A rescued survivor must make it to the boat too.
-			var survivor_ok: bool = mission != &"rescue" or survivor_lost or survivor_pos.distance_to(map.boat) <= GameData.BOAT_RADIUS + 2.0
-			if player_pos.distance_to(map.boat) <= GameData.BOAT_RADIUS and survivor_ok:
+			if boat_eta > 0.0:
+				boat_eta = maxf(0.0, boat_eta - dt)
+				if boat_eta == 0.0:
+					messages.append("The boat is at the pier. Get on board!")
+				return  # the holdout's boat is still out at sea
+			# A rescued survivor must make it out too.
+			var out: Vector3 = extraction_point()
+			var survivor_ok: bool = mission != &"rescue" or survivor_lost or survivor_pos.distance_to(out) <= GameData.BOAT_RADIUS + 2.0
+			if player_pos.distance_to(out) <= GameData.BOAT_RADIUS and survivor_ok:
 				objective = Objective.WON
+
+
+## The main task (and the boss) is done: head for the extraction point. The
+## holdout calls the rescue boat, which needs BOAT_ARRIVAL_TIME to dock.
+func _start_extraction() -> void:
+	objective = Objective.RETURN_TO_BOAT
+	if mission == &"holdout":
+		boat_eta = GameData.BOAT_ARRIVAL_TIME
+		messages.append("The rescue boat is coming! Make for the pier!")
+	elif has_exit():
+		messages.append("Objective complete. %s!" % _exit_order())
+	else:
+		messages.append("Objective complete. Get back to the boat!")
+
+
+func _exit_order() -> String:
+	return "Head to " + exit_label if exit_label != "" else "Leave along the path"
 
 
 func _update_defend(dt: float) -> void:
 	if player_pos.distance_to(site) <= GameData.DEFEND_RADIUS:
 		if defend_time == 0.0:
-			messages.append("Uplink started: hold the zone!")
+			messages.append("Hold the courtyard until the boat is called!" if mission == &"holdout" else "Uplink started: hold the zone!")
 		defend_time += dt
 		_defend_peak_cd -= dt
 		if _defend_peak_cd <= 0.0:
@@ -800,7 +906,7 @@ func _update_rescue(dt: float) -> void:
 	if not survivor_found:
 		if player_pos.distance_to(survivor_pos) <= GameData.SURVIVOR_FIND_RADIUS:
 			survivor_found = true
-			messages.append("Survivor found! Escort them to the boat.")
+			messages.append("Survivor found! Escort them %s." % ("out along the path" if has_exit() else "to the boat"))
 			radio.append(&"survivor_found")
 		return
 	var to: Vector3 = player_pos - survivor_pos
@@ -922,8 +1028,11 @@ func _spawn_boss() -> void:
 		var i: int = horde.add(p, GameData.EnemyKind.BOSS, rng)
 		boss_max_hp = horde.hp[i]
 		return
-	# Fallback: right at a generator (always free).
-	var j: int = horde.add(map.generators[0], GameData.EnemyKind.BOSS, rng)
+	# Fallback (narrow places, expedition parts without generators): the
+	# first free, reachable spot on rings around the player; at worst on the
+	# player, the one cell known to be walkable.
+	var spot: Vector3 = _ring_spot(player_pos, [12.0, 18.0, 26.0, 8.0, 5.0])
+	var j: int = horde.add(spot if spot != Vector3.INF else player_pos, GameData.EnemyKind.BOSS, rng)
 	boss_max_hp = horde.hp[j]
 
 
@@ -973,29 +1082,62 @@ func _update_boss(dt: float, b: int) -> void:
 		_summon_cd = GameData.BOSS_SUMMON_INTERVAL
 		if boss_enraged:
 			var bpos: Vector3 = bp + Vector3(0, 0, 3.5)
-			if not Horde.overlaps_wall(field, bpos.x, bpos.z, Horde.RADIUS + 0.05):
+			if can_spawn_at(bpos):
 				horde.add(bpos, GameData.EnemyKind.BRUTE, rng)
 		for k in GameData.BOSS_SUMMON_COUNT:
 			var p: Vector3 = bp + Vector3(cos(k * 1.05), 0, sin(k * 1.05)) * 3.0
-			if not Horde.overlaps_wall(field, p.x, p.z, Horde.RADIUS + 0.05):
+			# Free and reachable: a summon behind a wall (in a closed yard, or
+			# outside an expedition part's play area) would never reach the fight.
+			if can_spawn_at(p):
 				horde.add(p, GameData.EnemyKind.RUNNER, rng)
+
+
+## True when an enemy can appear at `p`: inside the grid, clear of walls
+## (the sea, cliffs and the cells outside an expedition part's play area are
+## all blocked) and connected to the player by the horde's flow field.
+func can_spawn_at(p: Vector3) -> bool:
+	if p.x < 1 or p.z < 1 or p.x > field.width - 1 or p.z > field.height - 1:
+		return false
+	if Horde.overlaps_wall(field, p.x, p.z, Horde.RADIUS + 0.05):
+		return false
+	return field.distance_at(p) < FlowField.UNREACHABLE
+
+
+## The first spot that can_spawn_at() on rings of these radii around
+## `center` (36 directions each, every ring from its own random angle, so a
+## narrow path missed on one ring is found on the next); INF when none.
+func _ring_spot(center: Vector3, radii: Array) -> Vector3:
+	for r: float in radii:
+		var start: float = rng.randf() * TAU
+		for k in 36:
+			var ang: float = start + k * TAU / 36.0
+			var p: Vector3 = center + Vector3(cos(ang), 0, sin(ang)) * r
+			if can_spawn_at(p):
+				return p
+	return Vector3.INF
 
 
 func _spawn_enemy() -> void:
 	if horde.count >= GameData.MAX_ALIVE:
 		return
+	spawn_requests += 1
 	for attempt in 12:
 		var ang: float = rng.randf() * TAU
 		var dist: float = rng.randf_range(GameData.SPAWN_MIN_DIST, GameData.SPAWN_MAX_DIST)
 		var p: Vector3 = player_pos + Vector3(cos(ang), 0, sin(ang)) * dist
-		if p.x < 1 or p.z < 1 or p.x > field.width - 1 or p.z > field.height - 1:
-			continue
-		if Horde.overlaps_wall(field, p.x, p.z, Horde.RADIUS + 0.05):
-			continue
-		if field.distance_at(p) >= FlowField.UNREACHABLE:
-			continue
-		horde.add(p, director.pick_kind(), rng)
+		if can_spawn_at(p):
+			horde.add(p, director.pick_kind(), rng)
+			return
+	# Near the edge of a play area, on a narrow path or a pier most of the
+	# ring is blocked and 12 random tries can all miss: scan rings (out to
+	# 60 m) so the pressure keeps up there too.
+	spawn_fallbacks += 1
+	var mid: float = (GameData.SPAWN_MIN_DIST + GameData.SPAWN_MAX_DIST) * 0.5
+	var spot: Vector3 = _ring_spot(player_pos, [mid, GameData.SPAWN_MIN_DIST, GameData.SPAWN_MAX_DIST, 52.0, 60.0])
+	if spot == Vector3.INF:
+		spawn_failures += 1
 		return
+	horde.add(spot, director.pick_kind(), rng)
 
 
 ## Objective text for the HUD.
@@ -1004,6 +1146,8 @@ func objective_text() -> String:
 		Objective.GENERATORS:
 			if mission == &"defend":
 				return "Hold the uplink zone (%d / %d s)" % [int(defend_time), int(GameData.DEFEND_TIME)]
+			if mission == &"holdout":
+				return "Hold the fort courtyard (%d / %d s)" % [int(defend_time), int(hold_time())]
 			if mission == &"rescue":
 				return "Find the survivor"
 			var done: int = 0
@@ -1014,8 +1158,17 @@ func objective_text() -> String:
 		Objective.BOSS:
 			return "Kill the Behemoth!"
 		Objective.RETURN_TO_BOAT:
+			if boat_eta > 0.0:
+				return "The boat is coming (%d s): make for the pier!" % ceili(boat_eta)
+			if mission == &"holdout":
+				return "Board the rescue boat!"
+			var where: String = "to the boat"
+			if has_exit():
+				where = "to " + exit_label if exit_label != "" else "out along the path"
 			if mission == &"rescue" and survivor_found and not survivor_lost:
-				return "Escort the survivor to the boat! (HP %d)" % int(survivor_hp)
+				return "Escort the survivor %s! (HP %d)" % [where, int(survivor_hp)]
+			if has_exit():
+				return _exit_order() + "!"
 			return "Return to the boat!"
 		Objective.WON:
 			return "Extracted!"

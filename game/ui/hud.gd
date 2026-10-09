@@ -513,8 +513,15 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_end_panel.visible = run.is_over()
 	if run.is_over():
 		var won: bool = run.objective == IslandRun.Objective.WON
-		_end_label.text = "%s\n\nKills %d · Headshots %d · Level %d\nIntel from this island: %d\n\nEnter / A: continue" % [
-			"ISLAND CLEARED!" if won else "YOU DIED", run.kills, run.headshots, run.level, run.intel_earned()]
+		_end_label.text = "%s\n\nKills %d · Headshots %d · Level %d\nIntel earned here: %d\n\nEnter / A: continue" % [
+			_cleared_text(run) if won else "YOU DIED", run.kills, run.headshots, run.level, run.intel_earned()]
+
+
+## End panel title for a win: the fort's extraction, an expedition part, or an island.
+func _cleared_text(run: IslandRun) -> String:
+	if run.mission == &"holdout":
+		return "EXTRACTED!"
+	return "PART CLEARED!" if run.has_exit() else "ISLAND CLEARED!"
 
 
 func _update_objective(run: IslandRun, island_text: String) -> void:
@@ -525,6 +532,9 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 				&"defend":
 					_objective.text = "DEFEND THE UPLINK"
 					detail += " / %d OF %d s" % [int(run.defend_time), int(GameData.DEFEND_TIME)]
+				&"holdout":
+					_objective.text = "HOLD THE FORT"
+					detail += " / %d OF %d s" % [int(run.defend_time), int(run.hold_time())]
 				&"rescue":
 					_objective.text = "LOCATE THE SURVIVOR"
 				_:
@@ -537,7 +547,16 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 		IslandRun.Objective.BOSS:
 			_objective.text = "ELIMINATE THE BEHEMOTH"
 		IslandRun.Objective.RETURN_TO_BOAT:
-			_objective.text = "EXTRACT THE SURVIVOR" if run.mission == &"rescue" and run.survivor_found and not run.survivor_lost else "RETURN TO THE BOAT"
+			if run.mission == &"rescue" and run.survivor_found and not run.survivor_lost:
+				_objective.text = "EXTRACT THE SURVIVOR"
+			elif run.mission == &"holdout":
+				_objective.text = "BOAT INBOUND" if run.boat_eta > 0.0 else "BOARD THE BOAT"
+				if run.boat_eta > 0.0:
+					detail += " / DOCKING IN %d s" % ceili(run.boat_eta)
+			elif run.has_exit():
+				_objective.text = ("HEAD TO " + run.exit_label).to_upper() if run.exit_label != "" else "LEAVE ALONG THE PATH"
+			else:
+				_objective.text = "RETURN TO THE BOAT"
 		IslandRun.Objective.WON:
 			_objective.text = "EXTRACTION COMPLETE"
 		IslandRun.Objective.LOST:
@@ -628,6 +647,9 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	if run.objective == IslandRun.Objective.GENERATORS and run.mission == &"defend":
 		goal = run.site
 		goal_name = "Uplink"
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"holdout":
+		goal = run.site
+		goal_name = "Courtyard"
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"rescue":
 		goal = run.survivor_pos
 		goal_name = "Survivor"
@@ -644,8 +666,8 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 		goal = run.horde.positions[run.boss_index()]
 		goal_name = "Behemoth"
 	elif run.objective == IslandRun.Objective.RETURN_TO_BOAT:
-		goal = run.map.boat
-		goal_name = "Boat"
+		goal = run.extraction_point()
+		goal_name = run.extraction_name()
 	if goal == Vector3.INF or camera == null:
 		_marker.visible = false
 		return

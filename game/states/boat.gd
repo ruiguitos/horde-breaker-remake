@@ -1,5 +1,6 @@
 extends Control
 ## Supply choice followed by two routes; existing rewards and RNG order retained.
+## The expedition camp (camp.gd) extends this script: same supplies, no routes.
 
 signal land_requested
 
@@ -92,7 +93,7 @@ func _make_routes() -> void:
 	var b: int = (a + _rng.randi_range(1, mods.size() - 1)) % mods.size()
 	_routes = [mods[a], mods[b]]
 	var biomes: Array[StringName] = GameData.ISLAND_BIOMES.duplicate()
-	var missions: Array = GameData.MISSIONS.keys()
+	var missions: Array = GameData.ROUTE_MISSIONS  # not the expedition-only holdout
 	for i in 2:
 		_route_missions.append(missions[_rng.randi_range(0, missions.size() - 1)])
 		if context.is_last_island():
@@ -118,15 +119,16 @@ func _make_options() -> void:
 			"apply": func() -> void: context.card_stacks[card.id] = context.card_stacks.get(card.id, 0) + 1})
 
 
-func _show_supplies() -> void:
+func _show_supplies(kicker: String = "SALVAGE & CO. / QUARTERMASTER",
+		blurb: String = "One allowance per landing. Generosity has a budget.") -> void:
 	_supplies = ColorRect.new()
 	_supplies.color = Color(0, 0, 0, 0.8)
 	_supplies.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(_supplies)
 	var box := UiTheme.centered_panel(_supplies, 780)
-	box.add_child(UiTheme.label("SALVAGE & CO. / QUARTERMASTER", 16, UiTheme.MUTED, true))
+	box.add_child(UiTheme.label(kicker, 16, UiTheme.MUTED, true))
 	box.add_child(UiTheme.title("01 / CHOOSE YOUR SUPPLY", 32))
-	box.add_child(UiTheme.label("One allowance per landing. Generosity has a budget.", 16, UiTheme.MUTED))
+	box.add_child(UiTheme.label(blurb, 16, UiTheme.MUTED))
 	var row := HBoxContainer.new()
 	box.add_child(row)
 	for i in _options.size():
@@ -158,8 +160,13 @@ func _pick(i: int) -> void:
 		if k == i:
 			_buttons[k].theme_type_variation = &"SelectedButton"
 	_supplies.hide()
-	_route_buttons[0].grab_focus()
+	_focus_after_supply()
 	_update_land()
+
+
+## After the supply: the routes come next (the camp has none).
+func _focus_after_supply() -> void:
+	_route_buttons[0].grab_focus()
 
 
 func _pick_route(i: int) -> void:

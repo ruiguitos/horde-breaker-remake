@@ -73,6 +73,9 @@ var _laser_mat: StandardMaterial3D
 var _generators: Array[MeshInstance3D] = []
 var _generator_rings: Array[MeshInstance3D] = []
 var _boat_ring: MeshInstance3D
+var _boat: MeshInstance3D
+## Expedition parts: a post with a ring at the Exit (the path to the next part).
+var _exit_post: MeshInstance3D
 var _defend_ring: MeshInstance3D
 var _survivor: MeshInstance3D
 var _caches: Array[MeshInstance3D] = []
@@ -119,6 +122,8 @@ func _ready() -> void:
 		for p in problems:
 			push_warning("Hand-made island %s: %s" % [scene.resource_path, p])
 	run = IslandRun.new(island_seed, biome, custom)
+	if _handmade != null:
+		run.play_area = _handmade.play_area
 	if context != null:
 		run.load_context(context)
 	_build_world()
@@ -209,9 +214,10 @@ func _build_world() -> void:
 			gen.visible = false
 			_generator_rings[-1].visible = false
 	# Defend: an antenna in the middle of a big ring. Rescue: the survivor.
+	var holds: bool = run.mission == &"defend" or run.mission == &"holdout"
 	_defend_ring = _ring(run.site, GameData.DEFEND_RADIUS, Color(0.3, 0.8, 1.0))
-	_defend_ring.visible = run.mission == &"defend"
-	if run.mission == &"defend":
+	_defend_ring.visible = holds
+	if holds:
 		var mast := MeshInstance3D.new()
 		var mm := CylinderMesh.new()
 		mm.top_radius = 0.08
@@ -231,12 +237,25 @@ func _build_world() -> void:
 	var hull := BoxMesh.new()
 	hull.size = Vector3(4, 1.2, 8)
 	boat.mesh = hull
-	boat.position = run.map.boat + run.map.boat_dir * 3.0 + Vector3(0, 0.3, 0)
+	boat.position = _boat_spot()
 	boat.rotation.y = atan2(run.map.boat_dir.x, run.map.boat_dir.z)
 	boat.material_override = _mat(Color(0.45, 0.3, 0.18))
+	boat.visible = run.shows_boat()
 	add_child(boat)
-	_boat_ring = _ring(run.map.boat, GameData.BOAT_RADIUS, Color(0.3, 1, 0.4))
+	_boat = boat
+	# The extraction ring: at the Exit on expedition parts, else at the boat.
+	_boat_ring = _ring(run.extraction_point(), GameData.BOAT_RADIUS, Color(0.3, 1, 0.4))
 	_boat_ring.visible = false
+	if run.has_exit():
+		_exit_post = MeshInstance3D.new()
+		var pm := CylinderMesh.new()
+		pm.top_radius = 0.12
+		pm.bottom_radius = 0.18
+		pm.height = 3.0
+		_exit_post.mesh = pm
+		_exit_post.position = _on_ground(run.map.exit) + Vector3(0, 1.5, 0)
+		_exit_post.material_override = _mat(Color(0.3, 1, 0.4))
+		add_child(_exit_post)
 	_slam_ring = _ring(Vector3.ZERO, GameData.BOSS_SLAM_RADIUS, Color(1, 0.2, 0.1))
 	_slam_ring.visible = false
 
@@ -825,7 +844,10 @@ func _process(delta: float) -> void:
 		return
 	var label: String = ""
 	if context != null:
-		label = "Island %d/%d" % [context.island_index + 1, RunContext.ISLAND_COUNT]
+		if context.is_expedition():
+			label = "%s %d/%d" % [context.part_name(), context.island_index + 1, context.island_count()]
+		else:
+			label = "Island %d/%d" % [context.island_index + 1, RunContext.ISLAND_COUNT]
 		if context.modifier != &"calm":
 			label += " [%s]" % GameData.modifier(context.modifier).title
 	hud.refresh(run, _camera, _sim_ms, paused, label)
@@ -1328,11 +1350,22 @@ func _fade_occluders(delta: float) -> void:
 		m.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED if m.albedo_color.a >= 0.999 else BaseMaterial3D.TRANSPARENCY_ALPHA
 
 
+## Where the boat model floats: moored 3 m out from the Boat marker; the
+## holdout's rescue boat starts 90 m out to sea and glides in as it arrives.
+func _boat_spot() -> Vector3:
+	var out: float = 3.0
+	if run.mission == &"holdout":
+		var t: float = run.boat_arrival()
+		out = lerpf(90.0, 3.0, 1.0 - (1.0 - t) * (1.0 - t))  # eases into the pier
+	var p: Vector3 = run.map.boat + run.map.boat_dir * out
+	return Vector3(p.x, 0.3 + sin(Time.get_ticks_msec() * 0.0015) * 0.08, p.z)
+
+
 func _draw_mission() -> void:
 	if run.mission == &"rescue":
 		_survivor.visible = not run.survivor_lost
 		_survivor.position = _on_ground(run.survivor_pos) + Vector3(0, 0.85 + (0.0 if run.survivor_found else absf(sin(Time.get_ticks_msec() * 0.006)) * 0.3), 0)
-	if run.mission == &"defend":
+	if run.mission == &"defend" or run.mission == &"holdout":
 		var m2: StandardMaterial3D = _defend_ring.material_override
 		var inside: bool = run.player_pos.distance_to(run.site) <= GameData.DEFEND_RADIUS
 		m2.albedo_color = Color(0.3, 1.0, 0.5) if inside else Color(0.3, 0.8, 1.0)
@@ -1345,7 +1378,11 @@ func _draw_mission() -> void:
 			_generator_rings[g].visible = false
 		elif p > 0.0:
 			m.albedo_color = Color(0.7, 0.2, 0.15).lerp(Color(1, 0.85, 0.2), p)
-	_boat_ring.visible = run.objective == IslandRun.Objective.RETURN_TO_BOAT
+	_boat_ring.visible = run.objective == IslandRun.Objective.RETURN_TO_BOAT and run.boat_eta <= 0.0
+	if run.mission == &"holdout":
+		# The rescue boat sails in from the sea to the pier once called.
+		_boat.visible = run.shows_boat()
+		_boat.position = _boat_spot()
 	for c in _caches.size():
 		var opened: bool = run.cache_progress[c] >= GameData.CACHE_OPEN_TIME
 		var m: StandardMaterial3D = _caches[c].material_override

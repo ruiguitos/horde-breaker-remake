@@ -20,6 +20,10 @@ const RADIO: Dictionary = {
 		"One of our surveyors is still alive. Probably. Bring them back, they owe us a report.",
 		"Survivor signal detected. Retrieval is billable, so let's do it right.",
 	],
+	&"land_holdout": [
+		"The fort's yours until the boat gets there. Hold the courtyard, then get on board.",
+		"Rescue boat is on its way. Keep the courtyard clear. And the pier. Especially the pier.",
+	],
 	&"land_boss": [
 		"Thermal readings on the volcano are... large. Do the job, then leave before it notices.",
 	],
@@ -31,6 +35,10 @@ const RADIO: Dictionary = {
 	&"objective_done": [
 		"Objective complete. Get to the boat, the meter's running.",
 		"Good work. Now leave, quickly, with all your limbs.",
+	],
+	&"objective_done_on_foot": [
+		"Objective complete. Follow the path out, the next stretch won't clear itself.",
+		"Done here. Keep moving along the trail, no sightseeing.",
 	],
 	&"survivor_found": [
 		"Survivor located. Keep them breathing, the paperwork for the other outcome is awful.",

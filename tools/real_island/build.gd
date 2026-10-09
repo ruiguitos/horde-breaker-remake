@@ -14,12 +14,19 @@ extends SceneTree
 ##   - markers: the boat at the landing, generators at real landmarks,
 ##     caches spread out.
 ## The scene is a normal HandmadeIsland: the game picks it for its biome.
+## A place with "parts" (the Berlenga expedition) is written instead to
+## game/world/handmade/expeditions/<place>/: the shared island (base.scn,
+## no markers), the whole island (whole.scn) and one scene per part
+## (part_1.scn...), all on one Terrain3D data folder (terrain/). whole.scn
+## and the parts are scenes inherited from base.scn: they store only their
+## markers, play area and boundary walls (see _save_inherited).
 ## Prints the time of every stage, the grid and its problems (exit code 1
 ## when there are any).
 ## Run: python tools/real_island/fetch_data.py <place>
 ##      godot --headless --path . --script res://tools/real_island/build.gd -- <place> [--out-dir <res://dir/>] [--kits houses,paths,landmarks]
 ## (place: berlenga, hashima; default berlenga). --out-dir writes a test
-## build somewhere else than the game's islands (e.g. a gitignored folder).
+## build somewhere else than the game's islands (e.g. a gitignored folder),
+## with the same files.
 
 const DIR: String = "res://tools/real_island/"
 const TEX: String = "res://assets/textures/polyhaven/"
@@ -68,6 +75,36 @@ const PLACES: Dictionary = {
 			# Last, so the rows above keep their copies: granite outcrops on
 			# the plateau (Codex's design), small and partly buried.
 			["Rock_Medium_1", 160, 0.9, 25.0, 1500.0, "outcrop"], ["Rock_Medium_2", 120, 0.6, 25.0, 1500.0, "outcrop"]],
+		# The fort's pier (OSM man_made=pier) is a walkable deck in Bridges/,
+		# level with the foot of the fort's steps: the final boards there.
+		"pier_deck": true,
+		# Expedition (docs/design/BERLENGA_EXPEDITION.md): the island played
+		# in four parts, in order, on foot. Codex's polygons (island metres);
+		# exit = [point near the crossing, OSM way of the path that crosses]:
+		# the next part's entry. Part 1 starts at the landing, part 4 ends
+		# on the pier. horde_radius -1 = measured (0 when the part is small).
+		"expedition": "berlenga",
+		"parts": [
+			{"mission": &"rescue", "horde_radius": 120,
+				"polygon": [Vector2(650, 0), Vector2(1466, 0), Vector2(1466, 1466), Vector2(880, 1466), Vector2(880, 800), Vector2(865, 630), Vector2(800, 540), Vector2(650, 400)],
+				"exit": [Vector2(835, 589), 441503021],
+				"rescue": Vector2(1011, 720), "caches": [Vector2(1059, 768), Vector2(909, 560)]},
+			{"mission": &"activate", "horde_radius": 120,
+				"polygon": [Vector2(0, 0), Vector2(650, 0), Vector2(650, 400), Vector2(800, 540), Vector2(865, 630), Vector2(880, 800), Vector2(523, 800), Vector2(0, 800)],
+				"exit": [Vector2(521, 800), 233892909],
+				"generators": [Vector2(710, 633), Vector2(675, 674), Vector2(745, 665)], "caches": [Vector2(621, 642)]},
+			{"mission": &"defend", "horde_radius": -1,
+				"polygon": [Vector2(0, 800), Vector2(523, 800), Vector2(523, 850), Vector2(500, 880), Vector2(500, 1466), Vector2(0, 1466)],
+				"exit": [Vector2(523, 822), 38298331],
+				"defend": Vector2(431, 983), "caches": [Vector2(301, 1052)]},
+			{"mission": &"holdout", "horde_radius": -1,
+				"polygon": [Vector2(523, 800), Vector2(880, 800), Vector2(880, 1466), Vector2(500, 1466), Vector2(500, 880), Vector2(523, 850)],
+				"exit": "pier",
+				"defend": Vector2(637, 1045), "caches": [Vector2(536, 835)]},
+		],
+		# Crossings between parts that stay shut, [point, OSM way]: the
+		# Caminho do Forte between parts 2 and 4.
+		"closed": [[Vector2(559, 800), 233892907]],
 	},
 	"hashima": {
 		"out": "port_hashima", "biome": &"port",
@@ -124,6 +161,22 @@ var _walls: Array[PackedVector2Array] = []  ## sea walls (retaining walls)
 var _rng := RandomNumberGenerator.new()
 var ISLANDS: String = "res://game/world/handmade/islands/"  ## where the island is saved (--out-dir)
 const TEST_OUT: String = "res://tools/real_island/test_out/"  ## the only place --out-dir may write
+const EXPEDITIONS: String = "res://game/world/handmade/expeditions/"  ## places with "parts" (_paths_for)
+## Where this build writes (_paths_for): the folder, the scene the game plays
+## (whole island), the Terrain3D data folder, its textures, the grid picture
+## and, for expeditions, the shared scene the others inherit from.
+var OUT: String
+var SCENE: String
+var TERRAIN: String
+var GROUND: String
+var GRID: String
+var BASE: String
+var _custom_out: bool = false  ## --out-dir given
+var _fail_part: int = 0  ## --fail-part <n>: force part n to fail after it is written (tests the restore)
+var _crossings: Array = []  ## expedition: [point, direction from part k into k + 1, portal polygon] per crossing
+var _kit_meshes: Dictionary = {}  ## model -> Mesh (_kit_mesh_cached)
+var _whole_markers: Array[Node] = []  ## expedition: the whole island's markers, kept off _root while the parts are built
+var _pier_top: float = 0.0  ## height of the walkable pier deck (pier_deck), for the boat marker
 var _kits: PackedStringArray = ["houses", "paths", "landmarks"]  ## --kits
 var _house_kit: RefCounted  ## village_houses.gd, when the place has a detail_area
 var _path_kit: RefCounted   ## village_paths.gd, idem
@@ -151,6 +204,12 @@ func _initialize() -> void:
 				quit(1)
 				return
 			ISLANDS = dir
+			_custom_out = true
+			i += 2
+		elif arg == "--fail-part":
+			# Test of the atomic save: this part fails its read-back check after
+			# being written, so the build must put the previous files back.
+			_fail_part = int(value)
 			i += 2
 		elif arg == "--kits":
 			_kits = value.split(",", false)
@@ -174,8 +233,9 @@ func _initialize() -> void:
 	P = PLACES[key]
 	NAME = P["out"]
 	DATA = DIR + "data/" + key + "/"
-	if ISLANDS.begins_with(TEST_OUT):
-		DirAccess.make_dir_recursive_absolute(ISLANDS)
+	_paths_for()
+	if ISLANDS.begins_with(TEST_OUT) or P.has("expedition"):
+		DirAccess.make_dir_recursive_absolute(OUT)
 	if not FileAccess.file_exists(DATA + "meta.json"):
 		print("No data: run  python tools/real_island/fetch_data.py %s  first." % key)
 		quit(1)
@@ -220,6 +280,28 @@ func _process(_delta: float) -> bool:
 	_terrain = null
 	quit(0 if ok else 1)
 	return true
+
+
+## Output files. A plain island: islands/<biome>_<place>.scn with its
+## _data/ folder, _ground.res and _grid.png. An expedition: its own folder
+## (EXPEDITIONS/<place>/, out of the islands the routes pick from) with
+## base.scn, whole.scn, part_<n>.scn, terrain/, ground.res and *_grid.png.
+## --out-dir keeps the same names inside the test folder.
+func _paths_for() -> void:
+	if P.has("expedition"):
+		OUT = ISLANDS if _custom_out else EXPEDITIONS + String(P["expedition"]) + "/"
+		SCENE = OUT + "whole.scn"
+		TERRAIN = OUT + "terrain"
+		GROUND = OUT + "ground.res"
+		GRID = OUT + "whole_grid.png"
+		BASE = OUT + "base.scn"
+	else:
+		OUT = ISLANDS
+		SCENE = ISLANDS + NAME + ".scn"
+		TERRAIN = ISLANDS + NAME + "_data"
+		GROUND = ISLANDS + NAME + "_ground.res"
+		GRID = ISLANDS + NAME + "_grid.png"
+		BASE = ""
 
 
 func _lap(what: String) -> void:
@@ -868,7 +950,9 @@ func _build_scene() -> bool:
 	data.call("import_images", [height_img, control_img, color_img], Vector3.ZERO, 0.0, 1.0)
 	# Staged first: the island's terrain is only replaced once the new
 	# island passes its checks (found by Codex).
-	var stage: String = ISLANDS + NAME + "_data_build"
+	# An expedition stages its terrain outside its folder: the folder is
+	# replaced as a whole (_publish_expedition).
+	var stage: String = (OUT.trim_suffix("/") + "_terrain_build") if P.has("parts") else TERRAIN + "_build"
 	_clear_dir(stage)
 	DirAccess.make_dir_recursive_absolute(stage)
 	data.call("save_directory", stage)
@@ -908,27 +992,56 @@ func _build_scene() -> bool:
 	# must not replace a good island (found by Codex).
 	problems.clear()
 	var map: IslandMap = _root.build_map(problems)
+	_island_report(map)
+	# Expedition parts: built and checked in memory too, before anything is saved.
+	var parts: Array = []
+	if problems.is_empty() and P.has("parts"):
+		parts = _build_parts(map)
+		_lap("expedition parts")
 	var err: int = OK
-	if problems.is_empty():
-		var final: String = ISLANDS + NAME + "_data"
-		_clear_dir(final)
-		DirAccess.make_dir_recursive_absolute(final)
+	var parts_ok: bool = parts.all(func(part: Dictionary) -> bool: return part["problems"].is_empty())
+	if P.has("parts"):
+		# All or nothing: the expedition's folder is only replaced when the
+		# whole island and every part passed, and comes back as it was when
+		# anything fails while writing or reading back (found by Codex).
+		if problems.is_empty() and parts_ok:
+			err = _publish_expedition(stage, parts, map)
+		else:
+			print("  nothing saved: the island or a part has problems")
+			_clear_dir(stage)
+	elif problems.is_empty():
+		_clear_dir(TERRAIN)
+		DirAccess.make_dir_recursive_absolute(TERRAIN)
 		for f in DirAccess.get_files_at(stage):
-			DirAccess.rename_absolute(ProjectSettings.globalize_path(stage.path_join(f)), ProjectSettings.globalize_path(final.path_join(f)))
+			DirAccess.rename_absolute(ProjectSettings.globalize_path(stage.path_join(f)), ProjectSettings.globalize_path(TERRAIN.path_join(f)))
 		_clear_dir(stage)
-		_terrain.set("data_directory", final)
+		_terrain.set("data_directory", TERRAIN)
 		var assets: Resource = _terrain.get("assets")
-		ResourceSaver.save(assets, ISLANDS + NAME + "_ground.res")
-		assets.take_over_path(ISLANDS + NAME + "_ground.res")
+		ResourceSaver.save(assets, GROUND)
+		assets.take_over_path(GROUND)
 		var packed := PackedScene.new()
 		packed.pack(_root)
 		# Binary: the copies of grass and rocks make a text scene far too big and slow.
-		err = ResourceSaver.save(packed, ISLANDS + NAME + ".scn", ResourceSaver.FLAG_COMPRESS)
-		_lap("saved %s (%s)" % [ISLANDS + NAME + ".scn", error_string(err)])
-		HandmadeIsland.grid_image(map).save_png(ISLANDS + NAME + "_grid.png")
+		err = ResourceSaver.save(packed, SCENE, ResourceSaver.FLAG_COMPRESS)
+		_lap("saved %s (%s)" % [SCENE, error_string(err)])
+		HandmadeIsland.grid_image(map).save_png(GRID)
 	else:
 		print("  not saved: the island has problems (below)")
 		_clear_dir(stage)
+	for p in problems:
+		print("  PROBLEM: ", p)
+	if problems.is_empty() and err == OK and parts_ok:
+		print("  no problems")
+	elif not parts_ok:
+		print("  PROBLEM: some expedition parts have problems (above)")
+	elif err != OK:
+		print("  PROBLEM: saving failed (%s)" % error_string(err))
+	return problems.is_empty() and err == OK and parts_ok
+
+
+## The whole island's numbers: cells, the Activate route, choke points, and
+## data/reach.png.
+func _island_report(map: IslandMap) -> void:
 	var open: int = 0
 	for b in map.field.blocked:
 		open += 1 if b == 0 else 0
@@ -949,12 +1062,7 @@ func _build_scene() -> bool:
 	for k in map.generators.size():
 		print("  Generator%d at (%d, %d)" % [k + 1, int(map.generators[k].x), int(map.generators[k].z)])
 	_check_chokes(map)
-	_debug_picture(map)
-	for p in problems:
-		print("  PROBLEM: ", p)
-	if problems.is_empty() and err == OK:
-		print("  no problems")
-	return problems.is_empty() and err == OK
+	_debug_picture(map, DATA + "reach.png")
 
 
 ## Choke points (PLACES "chokes"): close each one in turn (a 4 m disc) and
@@ -991,7 +1099,9 @@ func _check_chokes(map: IslandMap) -> void:
 ## data/reach.png (not in git): where the paths are and what the grid can
 ## reach from the landing. Black sea, dark red cliffs, grey ground out of
 ## reach, green reachable, yellow paths (cliffs on a path are red).
-func _debug_picture(map: IslandMap) -> void:
+## Expedition parts (data/reach_part_<n>.png) add `marks`, [point, colour]
+## pairs: the boundary walls and rocks, the markers.
+func _debug_picture(map: IslandMap, file: String, marks: Array = []) -> void:
 	var f: FlowField = map.field
 	f.max_distance = 0
 	f.compute_now(f.world_to_cell(map.player_start))
@@ -1007,7 +1117,11 @@ func _debug_picture(map: IslandMap) -> void:
 			if _path_d[i] < 0.0:
 				c = Color(1, 0.1, 0.1) if f.blocked[i] != 0 else (Color(1, 0.9, 0.2) if f.dist[i] < FlowField.UNREACHABLE else Color(0.75, 0.6, 0.2))
 			img.set_pixel(x, z, c)
-	img.save_png(DATA + "reach.png")
+	for m: Array in marks:
+		var p: Vector2 = m[0]
+		if p.x >= 0.0 and p.y >= 0.0 and p.x < N and p.y < N:
+			img.set_pixel(int(p.x), int(p.y), m[1])
+	img.save_png(file)
 
 
 ## Terrain3D textures from the Poly Haven maps: colour + displacement (height
@@ -1589,20 +1703,45 @@ func _lighthouse(p: Vector2, k: int, height: float) -> void:
 		mi.owner = _root
 
 
-## The pier at the fort: over the water, so decoration (not walkable).
+## The pier at the fort: a 4 m wide stone block along each side of its OSM
+## outline. Decoration, unless the place has "pier_deck": then every block
+## is a deck in Bridges/ (the grid walks it, also over the water) whose top
+## is just above the highest dry ground of the outline, where the fort's
+## steps come down (Berlenga: 0.6 m), so the steps lead onto it.
 func _pier(pts: PackedVector2Array, k: int) -> void:
+	var deck: bool = P.get("pier_deck", false)
+	var top: float = 1.55  # the decoration's old top
+	if deck:
+		var land: float = 0.6
+		for p in pts:
+			var h: float = height_at(p.x, p.y)
+			if h > SEA + 0.3:
+				land = maxf(land, h)
+		top = land + 0.1
+		_pier_top = top
 	for i in pts.size() - 1:
 		var a: Vector2 = pts[i]
 		var b: Vector2 = pts[i + 1]
 		var mi := MeshInstance3D.new()
 		mi.name = "Pier_%d_%d" % [k, i]
 		var bm := BoxMesh.new()
-		bm.size = Vector3(4.0, 2.5, a.distance_to(b) + 2.0)
+		# A deck reaches down to the sea floor (4 m): no gap under it.
+		var tall: float = top + 4.0 if deck else 2.5
+		bm.size = Vector3(4.0, tall, a.distance_to(b) + 2.0)
 		mi.mesh = bm
 		mi.material_override = _mat(Color(0.6, 0.58, 0.54))
 		var dir := Vector3(b.x - a.x, 0, b.y - a.y).normalized()
-		mi.transform = Transform3D(Basis.looking_at(dir, Vector3.UP), Vector3((a.x + b.x) * 0.5, 0.3, (a.y + b.y) * 0.5))
-		_add(mi, "Decor")
+		mi.transform = Transform3D(Basis.looking_at(dir, Vector3.UP), Vector3((a.x + b.x) * 0.5, top - tall * 0.5, (a.y + b.y) * 0.5))
+		_add(mi, "Bridges" if deck else "Decor")
+	if deck:
+		print("  pier %d: walkable deck, %d blocks, top %.2f m" % [k, pts.size() - 1, top])
+
+
+## _kit_mesh, loaded once per build.
+func _kit_mesh_cached(model: String) -> Mesh:
+	if not _kit_meshes.has(model):
+		_kit_meshes[model] = _kit_mesh(model)
+	return _kit_meshes[model]
 
 
 func _kit_mesh(model: String) -> Mesh:
@@ -1956,20 +2095,21 @@ func _clear(f: FlowField, c: Vector2i, r: int = 2) -> bool:
 	return true
 
 
-func _nearest_clear(f: FlowField, c: Vector2i, r: int) -> Vector2i:
+func _nearest_clear(f: FlowField, c: Vector2i, r: int, clear: int = 2) -> Vector2i:
 	var best := c
 	var bd: float = INF
 	for z in range(c.y - r, c.y + r + 1):
 		for x in range(c.x - r, c.x + r + 1):
 			var d: float = Vector2(c).distance_to(Vector2(x, z))
-			if d < bd and _clear(f, Vector2i(x, z)):
+			if d < bd and _clear(f, Vector2i(x, z), clear):
 				bd = d
 				best = Vector2i(x, z)
 	return best
 
 
-## Clear, reachable cell nearest to `p`, between r_min and r_max metres away.
-func _reachable_near(f: FlowField, reach: PackedInt32Array, p: Vector2, r_min: float, r_max: float) -> Vector2:
+## Clear (every cell within `clear` metres walkable), reachable cell nearest
+## to `p`, between r_min and r_max metres away.
+func _reachable_near(f: FlowField, reach: PackedInt32Array, p: Vector2, r_min: float, r_max: float, clear: int = 4) -> Vector2:
 	var best := p
 	var bd: float = INF
 	for z in range(int(p.y - r_max), int(p.y + r_max) + 1):
@@ -1979,7 +2119,7 @@ func _reachable_near(f: FlowField, reach: PackedInt32Array, p: Vector2, r_min: f
 			var d: float = p.distance_to(Vector2(x, z))
 			if d < r_min or d > r_max or d >= bd or reach[z * N + x] >= FlowField.UNREACHABLE:
 				continue
-			if _clear(f, Vector2i(x, z), 4):
+			if _clear(f, Vector2i(x, z), clear):
 				bd = d
 				best = Vector2(x, z)
 	if bd == INF:
@@ -2037,3 +2177,884 @@ func _dist_to_ring(p: Vector2, ring: PackedVector2Array) -> float:
 	for i in ring.size() - 1:
 		d = minf(d, p.distance_to(Geometry2D.get_closest_point_to_segment(p, ring[i], ring[i + 1])))
 	return d
+
+
+# ---------------------------------------------------------------- expedition parts
+
+const PORTAL_WIDTH: float = 12.0  ## the strip two parts share at a crossing: metres across the path...
+const PORTAL_DEPTH: float = 12.0  ## ...and how far it reaches into each part along the path
+## Reachable cells under which a part plays without horde_radius (the
+## horde's field covers the whole part, as on Hashima: 51 thousand cells).
+const SMALL_PART: int = 60000
+const WALL_TINT := Color(1.75, 1.72, 1.66)  ## landmarks.gd STONE_TINT: the "stone" picture as warm grey granite
+## Flat stones of the dry-stone walls (about 0.4 m, laid at 1.3-1.7 x) and
+## the boulders of the rock bands (about 3 m, laid at 0.4-0.8 x).
+const WALL_STONES: Array[String] = ["Pebble_Square_1", "Pebble_Square_2", "Pebble_Square_3", "Pebble_Square_4", "Pebble_Square_5", "Pebble_Square_6"]
+const BAND_ROCKS: Array[String] = ["Rock_Medium_1", "Rock_Medium_2", "Rock_Medium_3"]
+const TYPE_INSTANTIATED: int = 0x7FFFFFFF  ## SceneState: a node that comes from the base scene
+const FLAG_ID_IS_PATH: int = 1 << 30  ## SceneState: a parent given as a path (node_paths)
+const NAME_MASK: int = (1 << 18) - 1  ## SceneState: the name index (the bits above hold the node's index)
+
+
+func _poly(spec: Dictionary) -> PackedVector2Array:
+	return PackedVector2Array(spec["polygon"])
+
+
+## Shoelace area of an open polygon (the last point joins the first).
+func _area_open(pts: PackedVector2Array) -> float:
+	var a: float = 0.0
+	for i in pts.size():
+		var p: Vector2 = pts[i]
+		var q: Vector2 = pts[(i + 1) % pts.size()]
+		a += p.x * q.y - q.x * p.y
+	return a * 0.5
+
+
+func _cell3(c: Vector2) -> Vector3:
+	return Vector3(floorf(c.x) + 0.5, 0, floorf(c.y) + 0.5)
+
+
+## Builds the parts (PLACES "parts") on _root in memory, one after the
+## other, and checks each; nothing is saved here. Returns one Dictionary per
+## part (see _build_part). The whole island's markers wait in _whole_markers.
+func _build_parts(whole: IslandMap) -> Array:
+	var parts: Array = P["parts"]
+	_crossings.clear()
+	for k in parts.size() - 1:
+		var ex: Array = parts[k]["exit"]
+		var c: Array = _crossing(_poly(parts[k]), ex[0], ex[1])
+		if c.is_empty() or (c[0] as Vector2).distance_to(ex[0]) > 15.0:
+			# No crossing found: the given point, heading for the next part.
+			print("  WARNING: way %d does not cross part %d's outline near (%d, %d)" % [ex[1], k + 1, int(ex[0].x), int(ex[0].y)])
+			c = [ex[0], (_centroid(_poly(parts[k + 1])) - ex[0]).normalized()]
+		# Only over the two parts it joins: a rectangle near a corner of the
+		# outlines (part 3's, at (523, 800)) would reach into a third part.
+		var pair: PackedVector2Array = _biggest(Geometry2D.merge_polygons(_poly(parts[k]), _poly(parts[k + 1])))
+		_crossings.append([c[0], c[1], _biggest(Geometry2D.intersect_polygons(_portal(c[0], c[1]), pair))])
+	# Two portals into the same part (part 3: in at (521, 800), out at
+	# (523, 822)) may overlap there: that ground stays only in the part they
+	# share, else parts 2 and 4 would share cells (found by Codex).
+	var raw: Array = _crossings.map(func(cr: Array) -> PackedVector2Array: return cr[2])
+	for k in _crossings.size() - 1:
+		for both: PackedVector2Array in Geometry2D.intersect_polygons(raw[k], raw[k + 1]):
+			for j: int in [k, k + 1]:
+				_crossings[j][2] = _biggest(Geometry2D.clip_polygons(_crossings[j][2], both))
+	for k in _crossings.size():
+		var cr: Array = _crossings[k]
+		print("  crossing part %d > %d at (%.1f, %.1f), path heading (%.2f, %.2f): portal %.0f m2 (at most %d x %d m)"
+			% [k + 1, k + 2, cr[0].x, cr[0].y, cr[1].x, cr[1].y, absf(_area_open(cr[2])), int(PORTAL_WIDTH), int(PORTAL_DEPTH * 2.0)])
+	var markers: Node = _root.get_node("Markers")
+	_whole_markers.clear()
+	for m in markers.get_children():
+		markers.remove_child(m)
+		_whole_markers.append(m)
+	var out: Array = []
+	for k in parts.size():
+		out.append(_build_part(k, whole))
+	_root.play_area = PackedVector2Array()
+	_root.mission = &""
+	_root.horde_radius = P["horde_radius"]
+	_check_overlaps(out)
+	return out
+
+
+## The largest polygon of a Geometry2D result (empty when none).
+func _biggest(polys: Array[PackedVector2Array]) -> PackedVector2Array:
+	var best := PackedVector2Array()
+	for poly in polys:
+		if absf(_area_open(poly)) > absf(_area_open(best)):
+			best = poly
+	return best
+
+
+## No cell may be walkable in two parts that are not consecutive, and two
+## consecutive parts share only cells of their portal. Problems go to the
+## later part of each pair (it is then not saved, nor is anything else).
+func _check_overlaps(parts: Array) -> void:
+	var walk: Array[PackedByteArray] = []
+	for part: Dictionary in parts:
+		walk.append(part["blocked"])
+	var n: int = walk.size()
+	var gates: Array[PackedVector2Array] = []
+	for cr: Array in _crossings:
+		gates.append(Geometry2D.offset_polygon(cr[2], 0.5)[0])
+	var shared: Dictionary = {}  # "a,b" -> [count, first cell, cells outside the portal]
+	for i in N * N:
+		var mask: int = 0
+		for k in n:
+			if walk[k][i] == 0:
+				mask |= 1 << k
+		if mask & (mask - 1) == 0:
+			continue  # one part or none
+		for a in n:
+			for b in range(a + 1, n):
+				if mask & (1 << a) == 0 or mask & (1 << b) == 0:
+					continue
+				var key: String = "%d,%d" % [a, b]
+				if not shared.has(key):
+					shared[key] = [0, Vector2i(i % N, i / N), 0]
+				shared[key][0] += 1
+				if b == a + 1 and not Geometry2D.is_point_in_polygon(Vector2(i % N + 0.5, i / N + 0.5), gates[a]):
+					shared[key][2] += 1
+	for key: String in shared:
+		var ab: PackedStringArray = key.split(",")
+		var a: int = int(ab[0])
+		var b: int = int(ab[1])
+		var s: Array = shared[key]
+		var why: String = ""
+		if b != a + 1:
+			why = "%d cells walkable in both part %d and part %d, e.g. (%d, %d)" % [s[0], a + 1, b + 1, s[1].x, s[1].y]
+		elif s[2] > 0:
+			why = "%d cells walkable in parts %d and %d outside their portal" % [s[2], a + 1, b + 1]
+		if why != "":
+			parts[b]["problems"].append(why)
+			print("  PROBLEM: ", why)
+		print("  parts %d and %d share %d walkable cells%s" % [a + 1, b + 1, s[0], " (their portal)" if b == a + 1 and s[2] == 0 else ""])
+
+
+## Where the OSM way `way_id` crosses the polygon's outline, nearest to
+## `near`: [point, the way's direction there pointing out of the polygon],
+## or [] when it does not cross.
+func _crossing(poly: PackedVector2Array, near: Vector2, way_id: int) -> Array:
+	var best: Array = []
+	var bd: float = INF
+	for path: Array in _paths:
+		if int(path[4].get("osm_id", -1)) != way_id:
+			continue
+		var pts: PackedVector2Array = path[0]
+		for i in pts.size() - 1:
+			for j in poly.size():
+				var hit: Variant = Geometry2D.segment_intersects_segment(pts[i], pts[i + 1], poly[j], poly[(j + 1) % poly.size()])
+				if hit == null or (hit as Vector2).distance_to(near) >= bd:
+					continue
+				bd = (hit as Vector2).distance_to(near)
+				var d: Vector2 = (pts[i + 1] - pts[i]).normalized()
+				if Geometry2D.is_point_in_polygon(hit + d, poly):
+					d = -d
+				best = [hit, d]
+	return best
+
+
+## The strip both parts share at a crossing: PORTAL_WIDTH across the path,
+## PORTAL_DEPTH along it into each part, so the way through is walkable from
+## both sides (the Exit of one part and the start of the next lie in it).
+func _portal(c: Vector2, d: Vector2) -> PackedVector2Array:
+	var side := Vector2(-d.y, d.x) * PORTAL_WIDTH * 0.5
+	var a: Vector2 = c - d * PORTAL_DEPTH
+	var e: Vector2 = c + d * PORTAL_DEPTH
+	return PackedVector2Array([a - side, e - side, e + side, a + side])
+
+
+## Part k's play_area: its polygon joined with the portals at its entry and exit.
+func _play_area(k: int) -> PackedVector2Array:
+	var area: PackedVector2Array = _poly(P["parts"][k])
+	for j: int in [k - 1, k]:
+		if j < 0 or j >= _crossings.size():
+			continue
+		var best := area
+		var ba: float = 0.0
+		for piece: PackedVector2Array in Geometry2D.merge_polygons(area, _crossings[j][2]):
+			if absf(_area_open(piece)) > ba:
+				ba = absf(_area_open(piece))
+				best = piece
+		area = best
+	return area
+
+
+## One part on _root: its play area, mission and markers, the boundary
+## dressing, then the checks (build_map's problems, closed crossings) and
+## its numbers. Its nodes are taken off _root again at the end. Returns
+## {name, area, mission, horde_radius, markers, decor, problems, grid}.
+func _build_part(k: int, whole: IslandMap) -> Dictionary:
+	var spec: Dictionary = P["parts"][k]
+	var name: String = "part_%d" % (k + 1)
+	var poly: PackedVector2Array = _poly(spec)
+	var area: PackedVector2Array = _play_area(k)
+	var last: bool = not spec["exit"] is Array
+	_root.play_area = area
+	_root.mission = spec["mission"]
+	_root.horde_radius = 0
+	var ignored: Array[String] = []
+	var f: FlowField = _root.build_map(ignored).field  # no markers yet: its problems do not count
+	f.max_distance = 0
+	# Entry: part 1 lands on the beach like the whole island; the others start
+	# 8 m into the part along the path that came in. Every marker sits on a
+	# reachable cell with 4 m clear around it (the pier boat: 1 m, the deck is
+	# narrow).
+	var start: Vector2i
+	if k == 0:
+		start = f.world_to_cell(whole.player_start)
+	else:
+		var cr: Array = _crossings[k - 1]
+		start = _nearest_clear(f, Vector2i(((cr[0] as Vector2) + cr[1] * 8.0).floor()), 12, 4)
+	f.compute_now(start)
+	var reach: PackedInt32Array = f.dist.duplicate()
+	_marker("PlayerStart", _cell3(Vector2(start)))
+	if k == 0:
+		_marker("Boat", whole.boat, whole.boat_dir)
+	elif not last:
+		# The game hides this boat (the way back is on foot); IslandMap needs one.
+		var cr: Array = _crossings[k - 1]
+		var b: Vector2 = _reachable_near(f, reach, (cr[0] as Vector2) + cr[1] * 3.0, 0.0, 10.0)
+		_marker("Boat", _cell3(b), Vector3(-cr[1].x, 0, -cr[1].y))
+	if last:
+		# The rescue boat at the end of the fort's pier.
+		var b: Vector2 = _reachable_near(f, reach, _pier_end(), 0.0, 12.0, 1)
+		_marker("Boat", _cell3(b), _seaward(Vector2i(b)))
+		var mk: Node3D = _root.get_node("Markers/Boat")
+		mk.position.y = maxf(mk.position.y, _pier_top)  # on the deck, not the sea floor
+	else:
+		var cr: Array = _crossings[k]
+		_marker("Exit", _cell3(_reachable_near(f, reach, (cr[0] as Vector2) + cr[1] * 4.0, 0.0, 10.0)))
+	if spec.has("rescue"):
+		_marker("RescueTarget", _cell3(_reachable_near(f, reach, spec["rescue"], 0.0, 30.0)))
+	var gens: Array = spec.get("generators", [])
+	for g in gens.size():
+		_marker("Generator%d" % (g + 1), _cell3(_reachable_near(f, reach, gens[g], 0.0, 30.0)))
+	if spec.has("defend"):
+		_marker("DefendZone", _cell3(_reachable_near(f, reach, spec["defend"], 0.0, 30.0)))
+	var caches: Array = spec.get("caches", [])
+	for c in caches.size():
+		_marker("Cache%d" % (c + 1), _cell3(_reachable_near(f, reach, caches[c], 0.0, 30.0)))
+	var dressing: Array = _boundary(k, poly, f, reach, whole.field)
+	var boundary: Node3D = dressing[0]
+	_add(boundary, "Decor")
+	for n in boundary.find_children("*", "", true, false):
+		n.owner = _root
+	# The checks, on the part as it will be saved.
+	var problems: Array[String] = []
+	var map: IslandMap = _root.build_map(problems)
+	var mf: FlowField = map.field
+	mf.max_distance = 0
+	var t0: int = Time.get_ticks_usec()
+	mf.compute_now(start)
+	var bfs_ms: float = (Time.get_ticks_usec() - t0) / 1000.0
+	var open: int = 0
+	for b in mf.blocked:
+		open += 1 if b == 0 else 0
+	var reached: int = 0
+	for d in mf.dist:
+		reached += 1 if d < FlowField.UNREACHABLE else 0
+	var closed_txt: PackedStringArray = []
+	for c: Array in P.get("closed", []):
+		var cross: Array = _crossing(poly, c[0], c[1])
+		if cross.is_empty() or (cross[0] as Vector2).distance_to(c[0]) > 20.0:
+			continue  # not on this part's outline
+		for portal: Array in _crossings:
+			if Geometry2D.is_point_in_polygon(cross[0], Geometry2D.offset_polygon(portal[2], 4.0)[0]):
+				problems.append("a portal opens the closed crossing at (%d, %d)" % [int(c[0].x), int(c[0].y)])
+		var far: Vector3 = _cell3((cross[0] as Vector2) + cross[1] * 8.0)
+		var shut: bool = mf.distance_at(far) >= FlowField.UNREACHABLE
+		if not shut:
+			problems.append("the closed crossing at (%d, %d) can be walked through" % [int(c[0].x), int(c[0].y)])
+		closed_txt.append("(%d, %d) %s" % [int(c[0].x), int(c[0].y), "closed" if shut else "OPEN"])
+	var hr: int = spec["horde_radius"]
+	if hr < 0:
+		hr = 0 if reached <= SMALL_PART else int(P["horde_radius"])
+	var route: Array = _route(map)
+	print("%s (%s): walkable %d cells inside the play area, %d reachable from the start (full horde field %.0f ms) -> horde_radius %d"
+		% [name, spec["mission"], open, reached, bfs_ms, hr])
+	print("  route %s: %s = %d m" % [" > ".join(route[0]), " + ".join(route[1]), route[2]])
+	if not closed_txt.is_empty():
+		print("  closed crossings: ", ", ".join(closed_txt))
+	print("  boundary: ", dressing[1])
+	var marks: Array = dressing[2]
+	for m: Node3D in _root.get_node("Markers").get_children():
+		for dz in range(-1, 2):
+			for dx in range(-1, 2):
+				marks.append([Vector2(m.position.x + dx, m.position.z + dz), Color.RED])
+	_debug_picture(map, DATA + "reach_%s.png" % name, marks)
+	for p in problems:
+		print("  PROBLEM: ", p)
+	var grid: Image = HandmadeIsland.grid_image(map)
+	# Off _root again: the next part, base.scn and whole.scn must not have them.
+	var nodes: Array[Node] = []
+	var markers: Node = _root.get_node("Markers")
+	for m in markers.get_children():
+		markers.remove_child(m)
+		nodes.append(m)
+	_root.get_node("Decor").remove_child(boundary)
+	var decor: Array[Node] = [boundary]
+	return {"name": name, "area": area, "mission": spec["mission"], "horde_radius": hr, "markers": nodes,
+		"decor": decor, "problems": problems, "grid": grid, "blocked": mf.blocked}
+
+
+## The mission's walk on the grid: start > generators (nearest first) >
+## rescue target or defence zone > Exit (the last part: the boat on the
+## pier). Returns [labels, metres per leg as text, total metres].
+func _route(map: IslandMap) -> Array:
+	var f: FlowField = map.field
+	var labels: PackedStringArray = ["start"]
+	var legs: PackedStringArray = []
+	var total: int = 0
+	var cur: Vector3 = map.player_start
+	var gens: Array[Vector3] = []
+	gens.assign(map.generators)
+	var stops: Array = []  # [label, point]
+	while not gens.is_empty():
+		f.compute_now(f.world_to_cell(cur))
+		var best: int = 0
+		for g in gens.size():
+			if f.distance_at(gens[g]) < f.distance_at(gens[best]):
+				best = g
+		stops.append(["Generator", gens[best]])
+		cur = gens[best]
+		gens.remove_at(best)
+	if map.rescue_target.x >= 0.0:
+		stops.append(["RescueTarget", map.rescue_target])
+	if map.defend_zone.x >= 0.0:
+		stops.append(["DefendZone", map.defend_zone])
+	stops.append(["Exit", map.exit] if map.exit.x >= 0.0 else ["Boat", map.boat])
+	cur = map.player_start
+	for s: Array in stops:
+		f.compute_now(f.world_to_cell(s[1]))
+		var d: int = f.distance_at(cur)
+		labels.append(s[0])
+		legs.append(str(d) if d < FlowField.UNREACHABLE else "unreachable")
+		total += d if d < FlowField.UNREACHABLE else 0
+		cur = s[1]
+	return [labels, legs, total]
+
+
+## The pier's point over the deepest water (the rescue boat's mooring).
+func _pier_end() -> Vector2:
+	var best := Vector2(N * 0.5, N * 0.5)
+	var low: float = INF
+	for pier in _piers:
+		for p in pier:
+			if height_at(p.x, p.y) < low:
+				low = height_at(p.x, p.y)
+				best = p
+	return best
+
+
+## Out to sea from cell `c` (towards lower coast distance), for the boat's +Z.
+func _seaward(c: Vector2i) -> Vector3:
+	var i: int = c.y * N + c.x
+	var s := Vector2(_t[i - 1] - _t[i + 1], _t[i - N] - _t[i + N]).normalized()
+	return Vector3(s.x, 0, s.y)
+
+
+## Natural limits of a part: where its polygon crosses open land (the cell
+## 1.5 m inside is reached from the start and the ground 2.5 m outside is
+## open on the whole island), dry-stone walls and bands of granite boulders
+## just outside the polygon. Decoration: the play area already blocks.
+## Never across a portal (the path's way through stays open, like a gap in a
+## field wall). Each run closes gaps of up to 3 m, goes on 3 m into the
+## cliff or rock it meets, and starts and ends with boulders; a closed
+## crossing gets boulders over the path (a rockfall), not a wall. The same
+## random numbers every build. Returns [Node3D "Boundary", summary, marks
+## for the reach picture].
+func _boundary(k: int, poly: PackedVector2Array, f: FlowField, reach: PackedInt32Array, whole: FlowField) -> Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 900 + k
+	var gates: Array[PackedVector2Array] = []
+	for j: int in [k - 1, k]:
+		if j >= 0 and j < _crossings.size():
+			gates.append(Geometry2D.offset_polygon(_crossings[j][2], 2.0)[0])
+	var closed: Array[Vector2] = []
+	for c: Array in P.get("closed", []):
+		closed.append(c[0])
+	# Samples every metre round the outline: point, outward normal, open?
+	var pos := PackedVector2Array()
+	var nor := PackedVector2Array()
+	var open: Array[bool] = []
+	var gate: Array[bool] = []
+	var n: int = poly.size()
+	for i in n:
+		var a: Vector2 = poly[i]
+		var e: Vector2 = poly[(i + 1) % n]
+		var length: float = a.distance_to(e)
+		if length < 1.0:
+			continue
+		var t: Vector2 = (e - a) / length
+		var out := Vector2(-t.y, t.x)
+		if Geometry2D.is_point_in_polygon((a + e) * 0.5 + out * 0.5, poly):
+			out = -out
+		for s in int(length):
+			var p: Vector2 = a + t * (s + 0.5)
+			var in_gate: bool = gates.any(func(g: PackedVector2Array) -> bool: return Geometry2D.is_point_in_polygon(p, g))
+			var inside := Vector2i((p - out * 1.5).floor())
+			var outside := Vector2i((p + out * 2.5).floor())
+			var reached: bool = inside.x > 0 and inside.y > 0 and inside.x < N - 1 and inside.y < N - 1 \
+				and reach[inside.y * N + inside.x] < FlowField.UNREACHABLE
+			pos.append(p)
+			nor.append(out)
+			gate.append(in_gate)
+			open.append(not in_gate and reached and not whole.is_blocked(outside.x, outside.y))
+	var count: int = pos.size()
+	var mark: Array[bool] = open.duplicate()
+	for i in count:
+		if open[i] or gate[i]:
+			continue
+		var before: bool = false
+		var after: bool = false
+		for d in range(1, 4):
+			before = before or open[(i - d + count) % count]
+			after = after or open[(i + d) % count]
+		mark[i] = before and after
+	for i in count:
+		if not open[i]:
+			continue
+		for dir: int in [-1, 1]:
+			if open[(i + dir + count) % count]:
+				continue
+			for d in range(1, 4):
+				var j: int = (i + dir * d + count) % count
+				if gate[j]:
+					break
+				mark[j] = true
+	# Runs of marked samples, starting the walk on an unmarked one.
+	var s0: int = mark.find(false)
+	var runs: Array[PackedInt32Array] = []
+	var run := PackedInt32Array()
+	for m in count:
+		var i: int = (maxi(s0, 0) + m) % count
+		if mark[i]:
+			run.append(i)
+		elif not run.is_empty():
+			runs.append(run)
+			run = PackedInt32Array()
+	if not run.is_empty():
+		runs.append(run)
+	var stones: Dictionary = {}  # model -> PackedFloat32Array (x, y, z, yaw, size in island space)
+	var rocks: Dictionary = {}
+	var core := SurfaceTool.new()
+	core.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var marks: Array = []
+	var tally: Dictionary = {"nudged": 0, "dropped": 0}  # copies moved out / left out: they would stand on walkable cells
+	var wall_m: int = 0
+	var rock_m: int = 0
+	for r in runs:
+		var length: int = r.size()
+		var walls: Array[bool] = []
+		walls.resize(length)
+		walls.fill(false)
+		if length >= 10:  # boulders 3-5 m at each end, walls and bands between
+			var m: int = rng.randi_range(3, 5)
+			var e: int = length - rng.randi_range(3, 5)
+			var is_wall: bool = true
+			while m < e:
+				var piece: int = rng.randi_range(10, 28) if is_wall else rng.randi_range(4, 9)
+				for q in range(m, mini(m + piece, e)):
+					walls[q] = is_wall
+				m += piece
+				is_wall = not is_wall
+		for q in length:
+			if closed.any(func(c: Vector2) -> bool: return c.distance_to(pos[r[q]]) < 8.0):
+				walls[q] = false
+		var q0: int = 0
+		while q0 < length:
+			var q1: int = q0
+			while q1 < length and walls[q1] == walls[q0]:
+				q1 += 1
+			var pts := PackedVector2Array()
+			var nrm := PackedVector2Array()
+			for q in range(q0, q1):
+				pts.append(pos[r[q]])
+				nrm.append(nor[r[q]])
+				marks.append([pos[r[q]] + nor[r[q]], Color.MAGENTA if walls[q0] else Color.WHITE])
+			if walls[q0]:
+				_wall(pts, nrm, rng, stones, core, f, tally)
+				wall_m += pts.size()
+			else:
+				_rock_band(pts, nrm, rng, rocks, f, tally)
+				rock_m += pts.size()
+			q0 = q1
+	var node := Node3D.new()
+	node.name = "Boundary"
+	var stone: Material = _role_material("stone", 1.8, WALL_TINT)
+	if stone == null:
+		stone = _mat(Color(0.62, 0.6, 0.56))
+	var mesh: ArrayMesh = core.commit()
+	if mesh.get_surface_count() > 0:
+		var inst := MeshInstance3D.new()
+		inst.name = "WallCore"
+		inst.mesh = mesh
+		inst.material_override = stone
+		node.add_child(inst)
+	var n_stones: int = 0
+	var n_rocks: int = 0
+	for kind: Array in [[stones, "Wall_", stone], [rocks, "Band_", null]]:
+		var models: Dictionary = kind[0]
+		for model: String in models:
+			var arr: PackedFloat32Array = models[model]
+			var centre := Vector3.ZERO
+			for c in arr.size() / 5:
+				centre += Vector3(arr[c * 5], arr[c * 5 + 1], arr[c * 5 + 2])
+			centre /= maxi(arr.size() / 5, 1)
+			for c in arr.size() / 5:  # relative to the node
+				arr[c * 5] -= centre.x
+				arr[c * 5 + 1] -= centre.y
+				arr[c * 5 + 2] -= centre.z
+			var sc := Scatter.new()
+			sc.name = String(kind[1]) + model
+			sc.position = centre
+			sc.mesh = _kit_mesh_cached(model)
+			sc.data = arr
+			if kind[2] != null:
+				sc.material_override = kind[2]
+			node.add_child(sc)
+			if kind[1] == "Wall_":
+				n_stones += arr.size() / 5
+			else:
+				n_rocks += arr.size() / 5
+	var summary: String = "%d m along open land in %d runs: %d m of dry-stone wall (%d stones), %d m of boulders (%d rocks); %d boulders moved out, %d copies left out (over walkable cells)" 		% [wall_m + rock_m, runs.size(), wall_m, n_stones, rock_m, n_rocks, tally["nudged"], tally["dropped"]]
+	return [node, summary, marks]
+
+
+## A dry-stone wall along `pts` (one per metre), 0.6-1.2 m outside the
+## outline (`nrm`: outward), gently winding: a battered core in the "stone" material, and
+## 4-6 courses of flat stones laid on it, staggered, the top course broken.
+func _wall(pts: PackedVector2Array, nrm: PackedVector2Array, rng: RandomNumberGenerator, stones: Dictionary, core: SurfaceTool, f: FlowField, tally: Dictionary) -> void:
+	var m: int = pts.size()
+	var phase: float = rng.randf() * TAU
+	var courses: int = rng.randi_range(4, 6)
+	var line := PackedVector2Array()
+	var ground := PackedFloat32Array()
+	for q in m:
+		var c: Vector2 = pts[q] + nrm[q] * (0.9 + 0.3 * sin(q * 0.15 + phase))
+		line.append(c)
+		ground.append(minf(height_at(c.x - nrm[q].x * 0.4, c.y - nrm[q].y * 0.4), height_at(c.x + nrm[q].x * 0.4, c.y + nrm[q].y * 0.4)))
+	var h: float = courses * 0.2 - 0.12
+	for q in m - 1:
+		var lo: Array[Vector3] = []
+		var hi: Array[Vector3] = []
+		for side: float in [-1.0, 1.0]:
+			for j: int in [q, q + 1]:
+				var b: Vector2 = line[j] + nrm[j] * side * 0.32
+				var t: Vector2 = line[j] + nrm[j] * side * 0.22
+				lo.append(Vector3(b.x, ground[j] - 0.4, b.y))
+				hi.append(Vector3(t.x, ground[j] + h, t.y))
+		var foot := PackedVector2Array([Vector2(lo[0].x, lo[0].z), Vector2(lo[1].x, lo[1].z), Vector2(lo[3].x, lo[3].z), Vector2(lo[2].x, lo[2].z)])
+		if _covers_walkable(f, foot):
+			tally["dropped"] += 1
+			continue
+		for s in 2:  # the two faces (lo/hi 0-1 inner side, 2-3 outer side)
+			var face_n := Vector3(nrm[q].x * (2 * s - 1), 0.15, nrm[q].y * (2 * s - 1)).normalized()
+			_tri(core, lo[s * 2], lo[s * 2 + 1], hi[s * 2 + 1], face_n)
+			_tri(core, lo[s * 2], hi[s * 2 + 1], hi[s * 2], face_n)
+		_tri(core, hi[0], hi[1], hi[3], Vector3.UP)
+		_tri(core, hi[0], hi[3], hi[2], Vector3.UP)
+		for end: int in ([0] if q == 0 else []) + ([1] if q == m - 2 else []):  # the wall's ends
+			var along := Vector3(line[q + 1].x - line[q].x, 0, line[q + 1].y - line[q].y).normalized() * (2 * end - 1)
+			_tri(core, lo[end], lo[2 + end], hi[2 + end], along)
+			_tri(core, lo[end], hi[2 + end], hi[end], along)
+	for q in m:
+		var t: Vector2 = (line[mini(q + 1, m - 1)] - line[maxi(q - 1, 0)]).normalized()
+		if t == Vector2.ZERO:
+			t = Vector2(-nrm[q].y, nrm[q].x)
+		var yaw: float = atan2(-t.y, t.x)
+		for c in courses:
+			for s in 2:
+				var along: float = s * 0.5 + (c % 2) * 0.25 + rng.randf_range(-0.05, 0.05)
+				var size: float = rng.randf_range(1.3, 1.7)
+				var model: String = WALL_STONES[rng.randi() % WALL_STONES.size()]
+				var skip: bool = (c == courses - 1 and rng.randf() < 0.25) or (q == m - 1 and along > 0.3)
+				if skip:
+					continue
+				var p: Vector2 = line[q] + t * along + nrm[q] * rng.randf_range(-0.04, 0.04)
+				var at := Vector3(p.x, ground[q] - 0.1 + c * 0.2 + rng.randf() * 0.03, p.y)
+				var turn: float = yaw + rng.randf_range(-0.2, 0.2)
+				if not _off_walkable(f, _kit_mesh_cached(model).get_aabb(), at, turn, size):
+					tally["dropped"] += 1
+					continue
+				var arr: PackedFloat32Array = stones.get(model, PackedFloat32Array())
+				arr.append_array([at.x, at.y, at.z, turn, size])
+				stones[model] = arr
+
+
+## A band of granite boulders along `pts`, outside the outline: touching or
+## overlapping (one every 1.2-2 m, 1.4-2.8 m wide), partly buried, and most
+## with a smaller one further out, so the band reads as a barrier and not
+## as stones one could walk between. Starts 1.5 m before the section and
+## ends 1.5 m after it, over the ends of the walls beside it.
+func _rock_band(pts: PackedVector2Array, nrm: PackedVector2Array, rng: RandomNumberGenerator, rocks: Dictionary, f: FlowField, tally: Dictionary) -> void:
+	var m: int = pts.size()
+	var q: float = -1.5 + rng.randf() * 0.5
+	while q < m + 1.5:
+		var i: int = clampi(int(q), 0, m - 1)
+		var t: Vector2 = (pts[mini(i + 1, m - 1)] - pts[maxi(i - 1, 0)]).normalized()
+		if t == Vector2.ZERO:
+			t = Vector2(-nrm[i].y, nrm[i].x)
+		var s: float = rng.randf_range(0.45, 0.85)
+		var at: Vector2 = pts[i] + t * (q - i)
+		for second in 2:
+			if second == 1:
+				if rng.randf() < 0.3:
+					break
+				s *= rng.randf_range(0.5, 0.75)
+			var off: float = 0.4 + 1.5 * s + rng.randf_range(-0.2, 0.3) + (1.6 if second == 1 else 0.0)
+			var c: Vector2 = at + nrm[i] * off + t * rng.randf_range(-0.3, 0.3)
+			var model: String = BAND_ROCKS[rng.randi() % BAND_ROCKS.size()]
+			var yaw: float = rng.randf() * TAU
+			# Its box seen from above, after turning and scaling, must not cover a
+			# walkable cell (the play area, the portals): pushed out up to 3 m,
+			# else left out (found by Codex).
+			var placed: bool = false
+			for nudge in 7:
+				var cc: Vector2 = c + nrm[i] * (nudge * 0.5)
+				var g: float = minf(height_at(cc.x, cc.y), minf(height_at(cc.x - nrm[i].x, cc.y - nrm[i].y), height_at(cc.x + nrm[i].x, cc.y + nrm[i].y)))
+				var pos := Vector3(cc.x, g - 0.65 * s, cc.y)
+				if _off_walkable(f, _kit_mesh_cached(model).get_aabb(), pos, yaw, s):
+					var arr: PackedFloat32Array = rocks.get(model, PackedFloat32Array())
+					arr.append_array([pos.x, pos.y, pos.z, yaw, s])
+					rocks[model] = arr
+					tally["nudged"] += 1 if nudge > 0 else 0
+					placed = true
+					break
+			if not placed:
+				tally["dropped"] += 1
+		q += 0.8 + 1.6 * s * rng.randf_range(0.45, 0.65)
+
+
+## True when no walkable cell of the part (cell centre) lies under the box
+## `box` of a copy at `p`, turned `yaw` and scaled `s` (as Scatter draws it),
+## seen from above.
+func _off_walkable(f: FlowField, box: AABB, p: Vector3, yaw: float, s: float) -> bool:
+	var b: AABB = Transform3D(Basis(Vector3.UP, yaw).scaled(Vector3.ONE * s), p) * box
+	for z in range(floori(b.position.z - 0.5), ceili(b.end.z) + 1):
+		for x in range(floori(b.position.x - 0.5), ceili(b.end.x) + 1):
+			var cx: float = x + 0.5
+			var cz: float = z + 0.5
+			if cx >= b.position.x and cx <= b.end.x and cz >= b.position.z and cz <= b.end.z and not f.is_blocked(x, z):
+				return false
+	return true
+
+
+## True when a walkable cell centre lies inside `poly` (seen from above).
+func _covers_walkable(f: FlowField, poly: PackedVector2Array) -> bool:
+	var r := Rect2(poly[0], Vector2.ZERO)
+	for p in poly:
+		r = r.expand(p)
+	for z in range(floori(r.position.y), ceili(r.end.y) + 1):
+		for x in range(floori(r.position.x), ceili(r.end.x) + 1):
+			if not f.is_blocked(x, z) and Geometry2D.is_point_in_polygon(Vector2(x + 0.5, z + 0.5), poly):
+				return true
+	return false
+
+
+## Publishes the expedition, all or nothing. The folder in place moves
+## aside (<folder>.previous), a new one is written (terrain, ground.res,
+## base.scn, whole.scn, the parts) and every scene is read back from disk and
+## checked. Only when everything passed is the old folder deleted; on any
+## error the new folder is deleted and the old one moved back. Files of the
+## old folder the build does not make (the editor's .import of the grid
+## pictures) are kept.
+func _publish_expedition(stage: String, parts: Array, map: IslandMap) -> int:
+	var old: String = OUT.trim_suffix("/") + ".previous"
+	_remove_tree(old)  # left by a build that crashed half way
+	var had_old: bool = DirAccess.dir_exists_absolute(OUT)
+	var err: int = OK
+	if had_old:
+		err = DirAccess.rename_absolute(ProjectSettings.globalize_path(OUT), ProjectSettings.globalize_path(old))
+		if err != OK:
+			print("  PROBLEM: could not move %s aside (%s): nothing saved" % [OUT, error_string(err)])
+			_clear_dir(stage)
+			return err
+	err = DirAccess.make_dir_recursive_absolute(OUT)
+	if err == OK:
+		err = DirAccess.rename_absolute(ProjectSettings.globalize_path(stage), ProjectSettings.globalize_path(TERRAIN))
+		if err != OK:
+			print("  PROBLEM: could not move the terrain into %s (%s)" % [TERRAIN, error_string(err)])
+	if err == OK:
+		_terrain.set("data_directory", TERRAIN)
+		var assets: Resource = _terrain.get("assets")
+		err = ResourceSaver.save(assets, GROUND)
+		assets.take_over_path(GROUND)
+	if err == OK:
+		err = _save_expedition(parts)
+	if err == OK:
+		err = HandmadeIsland.grid_image(map).save_png(GRID)
+	if err != OK:
+		print("  PROBLEM: the expedition failed while saving (%s): %s put back as it was" % [error_string(err), OUT])
+		_remove_tree(OUT)
+		_clear_dir(stage)
+		if had_old:
+			DirAccess.rename_absolute(ProjectSettings.globalize_path(old), ProjectSettings.globalize_path(OUT))
+		return err
+	if had_old:
+		for f in DirAccess.get_files_at(old):
+			if f.ends_with(".import") and FileAccess.file_exists(OUT + f.trim_suffix(".import")):
+				DirAccess.copy_absolute(old.path_join(f), OUT + f)
+		_remove_tree(old)
+	print("  published %s" % OUT)
+	return OK
+
+
+## Deletes `dir` with everything in it; only expedition folders (game or test).
+func _remove_tree(dir: String) -> void:
+	dir = dir.trim_suffix("/")
+	if not DirAccess.dir_exists_absolute(dir):
+		return
+	if not (dir.begins_with(EXPEDITIONS) or dir.begins_with(TEST_OUT)) or dir + "/" in [EXPEDITIONS, TEST_OUT]:
+		print("  WARNING: refusing to delete %s" % dir)
+		return
+	for sub in DirAccess.get_directories_at(dir):
+		_remove_tree(dir.path_join(sub))
+	_clear_dir(dir)
+
+
+## Saves base.scn (the island without markers, the big file), whole.scn and
+## the parts as scenes inherited from base.scn. Each is read back from disk
+## and checked with build_map; the first error stops it.
+func _save_expedition(parts: Array) -> int:
+	var base := PackedScene.new()
+	var err: int = base.pack(_root)  # Markers is empty: the markers live in the inherited scenes
+	if err == OK:
+		err = ResourceSaver.save(base, BASE, ResourceSaver.FLAG_COMPRESS)
+	base.take_over_path(BASE)
+	_lap("saved %s (%s), %s" % [BASE, error_string(err), _size(BASE)])
+	if err != OK:
+		return err
+	err = _save_inherited(base, SCENE, {}, _whole_markers, [])
+	for part: Dictionary in parts:
+		if err != OK:
+			break
+		var path: String = OUT + String(part["name"]) + ".scn"
+		var props: Dictionary = {"play_area": part["area"], "mission": part["mission"], "horde_radius": part["horde_radius"]}
+		err = _save_inherited(base, path, props, part["markers"], part["decor"])
+		if err == OK:
+			err = (part["grid"] as Image).save_png(OUT + String(part["name"]) + "_grid.png")
+	_lap("saved whole.scn and the parts")
+	return err
+
+
+## A scene inherited from `base` that only stores its differences: these
+## root properties, and new nodes under the base's Markers/ and Decor/.
+## Godot makes inherited scenes in the editor only (New Inherited Scene), so
+## the scene's data is written here as the editor would: the new nodes are
+## packed on their own, then the root and the group nodes are turned into
+## references to the base's (_inherited). Read back and checked.
+func _save_inherited(base: PackedScene, path: String, props: Dictionary, markers: Array[Node], decor: Array[Node]) -> int:
+	var tree := Node3D.new()
+	tree.name = _root.name
+	for group: String in ["Markers", "Decor"]:
+		var g := Node3D.new()
+		g.name = group
+		tree.add_child(g)
+		g.owner = tree
+		for n: Node in (markers if group == "Markers" else decor):
+			if n.get_parent() != null:
+				n.get_parent().remove_child(n)
+			g.add_child(n)
+			n.owner = tree
+			for c in n.find_children("*", "", true, false):
+				c.owner = tree
+	var diff := PackedScene.new()
+	var err: int = diff.pack(tree)
+	tree.free()
+	var packed: PackedScene = _inherited(base, diff, props, markers.size()) if err == OK else null
+	if packed == null:
+		print("  PROBLEM: %s: could not make the inherited scene, not saved" % path)
+		return FAILED
+	err = ResourceSaver.save(packed, path, ResourceSaver.FLAG_COMPRESS)
+	if err != OK:
+		print("  PROBLEM: saving %s failed (%s)" % [path, error_string(err)])
+		return err
+	var loaded: PackedScene = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE) as PackedScene
+	var back: HandmadeIsland = loaded.instantiate() as HandmadeIsland if loaded != null else null
+	if back == null:
+		print("  PROBLEM: %s does not load back as a HandmadeIsland" % path)
+		return FAILED
+	var problems: Array[String] = []
+	var map: IslandMap = back.build_map(problems)
+	if _fail_part > 0 and path.ends_with("part_%d.scn" % _fail_part):
+		problems.append("forced failure (--fail-part %d)" % _fail_part)
+	print("  saved %s (%s), %s; read back: %d markers, mission '%s', %d generators, %s"
+		% [path, error_string(err), _size(path), back.get_node("Markers").get_child_count(), back.mission, map.generators.size(),
+			"no problems" if problems.is_empty() else "PROBLEMS %s" % [problems]])
+	back.free()
+	return OK if problems.is_empty() else FAILED
+
+
+## `diff` (a root with the groups Markers/Decor holding new nodes) as a
+## scene inherited from `base`: the root becomes the base's root with
+## `props` set, the group nodes become paths into the base, the new nodes
+## keep their data. The same layout Godot gives an inherited .tscn
+## ([node name=... instance=ExtResource(base)], parent="Markers"...).
+## This writes PackedScene's internal data (_bundled, version 3, Godot 4.7):
+## anything unexpected in it returns null, and the build saves nothing.
+func _inherited(base: PackedScene, diff: PackedScene, props: Dictionary, n_markers: int) -> PackedScene:
+	var b: Dictionary = diff.get("_bundled")
+	var keys: Array = b.keys()
+	keys.sort()
+	var expected: Array = ["conn_count", "conns", "editable_instances", "id_paths", "names", "node_count", "node_ids", "node_paths", "nodes", "variants", "version"]
+	if keys != expected or int(b["version"]) != 3 or int(b["conn_count"]) != 0 or not (b["node_paths"] as Array).is_empty():
+		print("  PROBLEM: PackedScene data not as expected (version %s, keys %s): update _inherited for this Godot" % [b.get("version"), keys])
+		return null
+	var names: PackedStringArray = b["names"]
+	var variants: Array = b["variants"]
+	var nodes: PackedInt32Array = b["nodes"]
+	# Per node: parent, owner, type, name, instance, then property count,
+	# (name, value) pairs, group count, groups.
+	var list: Array = []
+	var i: int = 0
+	while i + 6 < nodes.size():
+		var pc: int = nodes[i + 5]
+		if i + 6 + pc * 2 >= nodes.size():
+			break
+		var end: int = i + 7 + pc * 2 + nodes[i + 6 + pc * 2]
+		var parent: int = nodes[i]
+		# Plain nodes only: the root has no parent, the others a parent read
+		# before them; no instanced scenes.
+		var plain: bool = (parent == -1) == list.is_empty() and parent < list.size() and nodes[i + 4] == -1
+		if not plain or end > nodes.size():
+			break
+		list.append([parent, nodes[i + 1], nodes[i + 2], nodes[i + 3], nodes[i + 4], nodes.slice(i + 5, end)])
+		i = end
+	if i != nodes.size() or list.size() != int(b["node_count"]) or (b["node_ids"] as PackedInt32Array).size() != list.size():
+		print("  PROBLEM: PackedScene node data not as expected (%d of %d nodes read): update _inherited for this Godot" % [list.size(), b["node_count"]])
+		return null
+	var out := PackedInt32Array([-1, -1, TYPE_INSTANTIATED, list[0][3], -1, props.size()])
+	for key: String in props:
+		names.append(key)
+		variants.append(props[key])
+		out.append_array([names.size() - 1, variants.size() - 1])
+	out.append(0)  # groups
+	var paths: Array[NodePath] = []
+	var index: Dictionary = {0: 0}
+	var count: int = 1
+	for j in range(1, list.size()):
+		var nd: Array = list[j]
+		if nd[0] == 0:  # Markers/Decor: the base's own node
+			paths.append(NodePath("./" + names[nd[3] & NAME_MASK]))
+			index[j] = FLAG_ID_IS_PATH | (paths.size() - 1)
+			continue
+		index[j] = count
+		count += 1
+		out.append_array([index[nd[0]], 0, nd[2], nd[3], nd[4]])
+		out.append_array(nd[5])
+	variants.append(base)
+	var ids := PackedInt32Array()
+	ids.resize(count)
+	ids.fill(0)
+	var id_paths: Array = []
+	for p in paths:
+		id_paths.append(PackedInt32Array())
+	b["names"] = names
+	b["variants"] = variants
+	b["node_count"] = count
+	b["nodes"] = out
+	b["node_ids"] = ids
+	b["node_paths"] = paths
+	b["id_paths"] = id_paths
+	b["editable_instances"] = []
+	b["base_scene"] = variants.size() - 1
+	var packed := PackedScene.new()
+	packed.set("_bundled", b)
+	# In memory first: the base's nodes plus exactly the new markers.
+	var probe: Node = packed.instantiate()
+	var ok: bool = probe != null and probe.get_node_or_null("Terrain3D") != null and probe.get_node_or_null("Markers") != null
+	ok = ok and probe.get_node("Markers").get_child_count() == n_markers
+	if probe != null:
+		probe.free()
+	if not ok:
+		print("  PROBLEM: the inherited scene does not instantiate as expected: update _inherited for this Godot")
+		return null
+	return packed
+
+
+func _size(path: String) -> String:
+	var bytes: int = FileAccess.get_file_as_bytes(path).size()
+	return "%.2f MB" % (bytes / 1048576.0) if bytes > 1048576 else "%d KB" % (bytes / 1024)

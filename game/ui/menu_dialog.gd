@@ -97,6 +97,33 @@ static func controls(parent: Node) -> MenuDialog:
 	return dialog
 
 
+## Armory > START RUN: the archipelago run or an expedition. `on_pick` gets
+## &"" (archipelago) or the expedition id. An expedition whose part scenes
+## are not built yet is shown disabled.
+static func run_choice(parent: Node, on_pick: Callable) -> MenuDialog:
+	var dialog := MenuDialog.new()
+	parent.add_child(dialog)
+	dialog.content.add_child(UiTheme.title("CHOOSE YOUR RUN", 36))
+	var runs: Array = [[&"", "ARCHIPELAGO", "By boat: two routes at every landing, %d islands, the volcano last." % RunContext.ISLAND_COUNT]]
+	for id: StringName in Expeditions.INFO:
+		runs.append([id, Expeditions.display_name(id).to_upper(), String(Expeditions.INFO[id]["text"])])
+	for run: Array in runs:
+		var id: StringName = run[0]
+		var playable: bool = id == &"" or Expeditions.available(id)
+		var text: String = "%s\n%s" % [run[1], run[2] if playable else "Not built yet: its part scenes are missing."]
+		var pick := func() -> void:
+			dialog.close()
+			on_pick.call(id)
+		var b := UiTheme.button(dialog.content, text, pick, id == &"")
+		b.name = "Run_" + (String(id) if id != &"" else "archipelago")
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.custom_minimum_size.y = 96
+		b.disabled = not playable
+	UiTheme.button(dialog.content, "BACK", dialog.close)
+	return dialog
+
+
 ## Development builds (Title > TEST ISLAND): every hand-made island and a
 ## mission, to play one straight away. `on_pick` gets the island's path and
 ## the mission id.
@@ -118,6 +145,14 @@ static func test_island(parent: Node, on_pick: Callable) -> MenuDialog:
 			dialog.close()
 			on_pick.call(path, id))
 		b.name = "Island_" + path.get_file().get_basename()
+	# Expedition scenes (when built): the whole island takes the mission
+	# above; a part always plays its own mission.
+	for entry: Dictionary in Expeditions.test_entries():
+		var b := UiTheme.button(list, String(entry["label"]), func() -> void:
+			var id: StringName = entry["mission"] if entry["mission"] != &"" else mission.get_item_metadata(mission.selected)
+			dialog.close()
+			on_pick.call(String(entry["path"]), id))
+		b.name = "Expedition_" + String(entry["id"])
 	UiTheme.button(dialog.content, "BACK", dialog.close, true)
 	return dialog
 

@@ -1,7 +1,8 @@
 extends Control
 ## Native equipment screen; progression remains owned by Profile.
 
-signal start_requested
+## `expedition`: &"" = the archipelago run, else an Expeditions.ALL id.
+signal start_requested(expedition: StringName)
 signal back_requested
 
 var profile: Profile
@@ -245,11 +246,16 @@ func _act(changed: bool) -> void:
 		_rebuild()
 
 
+## START RUN: asks which run (archipelago or an expedition) first.
 func _start() -> void:
 	if is_instance_valid(_dialog):
 		return
+	_dialog = MenuDialog.run_choice(self, _start_run)
+
+
+func _start_run(expedition: StringName) -> void:
 	profile.save()
-	start_requested.emit()
+	start_requested.emit(expedition)
 
 
 func _unhandled_input(event: InputEvent) -> void:

@@ -25,7 +25,9 @@ func _settle() -> void:
 
 func _run_tests() -> void:
 	var all: PackedStringArray = HandmadeIsland.island_paths()
-	_check(all.has(HandmadeIsland.ISLANDS_DIR + "beach_berlenga.scn") and all.has(HandmadeIsland.ISLANDS_DIR + "port_hashima.scn"), "the list has the real islands")
+	# The Berlenga is an expedition now (Expeditions.test_entries), not an island.
+	_check(all.has(HandmadeIsland.ISLANDS_DIR + "port_hashima.scn") and not Array(all).any(func(p: String) -> bool: return "berlenga" in p), "the list has Hashima, not the Berlenga")
+	_check(Expeditions.test_entries().size() == 5, "the Berlenga's whole island and 4 parts are listed (%d)" % Expeditions.test_entries().size())
 	var port: PackedStringArray = HandmadeIsland.island_paths(&"port")
 	_check(port.size() >= 2 and Array(port).all(func(p: String) -> bool: return p.get_file().begins_with("port_")), "a biome lists only its islands")
 	# The picker: choosing a mission, then an island, hands both over.
@@ -41,6 +43,11 @@ func _run_tests() -> void:
 		if mission.get_item_metadata(i) == &"defend":
 			defend = i
 	mission.select(defend)
+	# Expedition scenes are listed only once built (tests/test_expedition.gd
+	# covers them with stand-ins).
+	var entries: Array[Dictionary] = Expeditions.test_entries()
+	var listed: Array = dialog.find_children("Expedition_*", "Button", true, false)
+	_check(listed.size() == entries.size() and entries.all(func(e: Dictionary) -> bool: return dialog.find_child("Expedition_" + String(e["id"]), true, false) != null), "one button per built expedition scene (%d)" % entries.size())
 	var button: Button = dialog.find_child("Island_beach_01", true, false)
 	_check(button != null, "one button per island")
 	button.pressed.emit()

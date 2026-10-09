@@ -3,7 +3,9 @@ extends Control
 ## Small top-down map drawn with _draw(): island shape (cached texture),
 ## objectives, enemies near the player and the player's facing. Islands wider
 ## than VIEW_M scroll with the player; goals outside the window are pinned to
-## its edge, so they still show the way.
+## its edge, so they still show the way. On an expedition part the land
+## outside the play area is drawn darker (blocked, but not sea) and the Exit
+## shows as a green chevron.
 
 const SIZE_PX: float = 170.0
 ## Metres shown across the minimap on big islands (smaller ones show whole).
@@ -48,17 +50,48 @@ func set_run(r: IslandRun) -> void:
 	var sea := Color("111e1e")
 	var ground := Color("354839")
 	var wall := Color("777e68")
+	var outside := Color("232b24")  ## land beyond an expedition part's play area
+	var part: bool = not r.play_area.is_empty() and not r.map.heights.is_empty()
 	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
 	for pz in h:
+		var z: int = mini(pz * _step, f.height - 1)
+		var spans: PackedFloat32Array = _row_spans(r.play_area, z + 0.5) if part else PackedFloat32Array()
 		for px in w:
-			var i: int = mini(pz * _step, f.height - 1) * f.width + mini(px * _step, f.width - 1)
+			var x: int = mini(px * _step, f.width - 1)
+			var i: int = z * f.width + x
 			var c: Color = sea
-			if walls[i] == 1:
+			if part and not _inside(spans, x + 0.5):
+				# Outside the part: land (above the sea) is darkened, sea stays sea.
+				if r.map.heights[i] > 0.0:
+					c = outside.lerp(wall, 0.25) if walls[i] == 1 else outside
+			elif walls[i] == 1:
 				c = wall
 			elif f.blocked[i] == 0 or walls[i] == 2:
 				c = ground
 			img.set_pixel(px, pz, c)
 	_texture = ImageTexture.create_from_image(img)
+
+
+## Sorted x where row `y` crosses the polygon's edges (even-odd rule, as
+## HandmadeIsland._block_outside).
+static func _row_spans(poly: PackedVector2Array, y: float) -> PackedFloat32Array:
+	var xs := PackedFloat32Array()
+	var n: int = poly.size()
+	for k in n:
+		var a: Vector2 = poly[k]
+		var b: Vector2 = poly[(k + 1) % n]
+		if (a.y <= y) != (b.y <= y):
+			xs.append(a.x + (y - a.y) / (b.y - a.y) * (b.x - a.x))
+	xs.sort()
+	return xs
+
+
+static func _inside(xs: PackedFloat32Array, x: float) -> bool:
+	var crossed: int = 0
+	for v in xs:
+		if v <= x:
+			crossed += 1
+	return crossed % 2 == 1
 
 
 func _process(_delta: float) -> void:
@@ -91,7 +124,7 @@ func _draw() -> void:
 		draw_circle(ep, 4.0 if boss else 1.5, UiTheme.DANGER)
 		if boss:
 			draw_arc(ep, 6.0, 0, TAU, 20, UiTheme.DANGER, 1.0, true)
-	if run.mission == &"defend":
+	if run.mission == &"defend" or run.mission == &"holdout":
 		draw_circle(_px(run.site), 5.0, Color(0.3, 0.8, 1.0))
 	elif run.mission == &"rescue" and not run.survivor_lost:
 		draw_circle(_px(run.survivor_pos), 4.0, Color(1.0, 0.55, 0.1))
@@ -103,8 +136,14 @@ func _draw() -> void:
 	for c in run.map.caches.size():
 		if run.cache_progress[c] < GameData.CACHE_OPEN_TIME:
 			draw_rect(Rect2(_px(run.map.caches[c]) - Vector2(2.5, 2.5), Vector2(5, 5)), Color(0.4, 0.95, 1.0))
-	var boat_point: Vector2 = _px(run.map.boat)
-	draw_colored_polygon(PackedVector2Array([boat_point + Vector2(0, -4), boat_point + Vector2(4, 0), boat_point + Vector2(0, 4), boat_point + Vector2(-4, 0)]), UiTheme.ACCENT)
+	if run.has_exit():
+		# The Exit: a green chevron pointing up (the way on).
+		var e: Vector2 = _px(run.map.exit)
+		draw_colored_polygon(PackedVector2Array([e + Vector2(0, -5), e + Vector2(5, 3), e + Vector2(0, 0.5), e + Vector2(-5, 3)]), UiTheme.SUCCESS)
+	if run.shows_boat() or run.mission == &"holdout":
+		# The holdout's pier shows before the boat comes: it is where to go.
+		var boat_point: Vector2 = _px(run.map.boat)
+		draw_colored_polygon(PackedVector2Array([boat_point + Vector2(0, -4), boat_point + Vector2(4, 0), boat_point + Vector2(0, 4), boat_point + Vector2(-4, 0)]), UiTheme.ACCENT)
 	# Player: a white triangle pointing where they face.
 	var pp: Vector2 = _px(run.player_pos)
 	var fwd := Vector2(run.facing.x, run.facing.z).normalized() * 6.0

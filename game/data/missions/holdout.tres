@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://dodo2x6r60i0p"]
+
+[ext_resource type="Script" path="res://game/data/resources/mission_data.gd" id="1_o8gip"]
+
+[resource]
+script = ExtResource("1_o8gip")
+display_name = "Holdout"
+text = "Hold the fort's courtyard, then board the rescue boat at the pier."
+on_route = false
+order = 3

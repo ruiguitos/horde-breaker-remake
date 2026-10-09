@@ -36,6 +36,13 @@ var player_class: StringName = &"recruit"
 var hazard_pay: bool = false
 ## Telemetry: one Dictionary per island played (see IslandRun.save_to_context).
 var island_log: Array[Dictionary] = []
+## Expedition being played (Expeditions.ALL id); &"" = the archipelago run
+## (boat, routes, 3 islands, volcano). In an expedition island_index is the
+## index of the part being played, so seeds, difficulty and telemetry work
+## the same way in both runs.
+var expedition: StringName = &""
+## The expedition's parts (name, scene, mission), copied when it starts.
+var expedition_parts: Array = []
 
 
 ## Sets the class; call before apply_perks (both change max HP).
@@ -67,5 +74,60 @@ func island_seed() -> int:
 	return rng_seed + island_index * 7919
 
 
+## Islands (or expedition parts) in this run.
+func island_count() -> int:
+	return expedition_parts.size() if is_expedition() else ISLAND_COUNT
+
+
 func is_last_island() -> bool:
-	return island_index >= ISLAND_COUNT - 1
+	return island_index >= island_count() - 1
+
+
+func is_expedition() -> bool:
+	return expedition != &""
+
+
+## Starts expedition `id` at part `index`: biome and mission come from the
+## part. Returns false (context unchanged) for an unknown id or index.
+func start_expedition(id: StringName, index: int = 0) -> bool:
+	var list: Array = Expeditions.parts(id)
+	if index < 0 or index >= list.size():
+		return false
+	expedition = id
+	expedition_parts = list.duplicate(true)
+	island_index = index
+	_apply_part()
+	return true
+
+
+## Moves on to the next island (archipelago) or part (expedition).
+func advance() -> void:
+	island_index += 1
+	if is_expedition():
+		_apply_part()
+
+
+## The part being played (empty outside an expedition).
+func part() -> Dictionary:
+	if not is_expedition() or island_index < 0 or island_index >= expedition_parts.size():
+		return {}
+	return expedition_parts[island_index]
+
+
+## Name of the part being played ("Carreiro do Mosteiro"); "" outside one.
+func part_name() -> String:
+	return String(part().get("name", ""))
+
+
+## Scene of the part being played; "" outside an expedition.
+func part_scene() -> String:
+	return String(part().get("scene", ""))
+
+
+func _apply_part() -> void:
+	var p: Dictionary = part()
+	if p.is_empty():
+		return
+	biome = Expeditions.biome(expedition)
+	mission = p["mission"]
+	modifier = &"calm"  # no route choice on foot

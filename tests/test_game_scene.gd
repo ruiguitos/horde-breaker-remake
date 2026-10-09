@@ -33,7 +33,10 @@ func _process(_delta: float) -> bool:
 			_step = 9
 		9:
 			_check(_main.get("state") == 3, "deploy opens the armory")
-			_current().call("_start")
+			_current().call("_start")  # START RUN asks which run
+			var archipelago: Button = _current().find_child("Run_archipelago", true, false)
+			_check(archipelago != null, "START RUN offers the archipelago run")
+			archipelago.pressed.emit()
 			_step = 10
 		10:
 			_check(_main.get("state") == 0, "starting a run goes to the boat")

@@ -6,7 +6,7 @@ em `build.gd` diz como construir.
 
 | Sítio | Ilha no jogo | Rota |
 |---|---|---|
-| `berlenga`: Berlenga Grande (Portugal) | `islands/beach_berlenga.scn`, 1,5 km | Beach |
+| `berlenga`: Berlenga Grande (Portugal) | `expeditions/berlenga/` (inteira + 4 partes), 1,5 km | Expedição Berlenga (fora do sorteio Beach) |
 | `hashima`: Hashima ou Gunkanjima (Japão) | `islands/port_hashima.scn`, 0,5 km | Industrial Port |
 
 Começou como spike (`spikes/real_island`, retirado; ver o histórico do git)
@@ -37,6 +37,9 @@ godot --headless --path . --script res://tools/real_island/build.gd -- hashima
      alcançável, amarelo são caminhos e vermelho são caminhos bloqueados.
 
    Acaba com código 1 se a ilha tiver problemas.
+
+   A Berlenga é uma expedição (`parts` no preset) e grava noutra pasta,
+   `game/world/handmade/expeditions/berlenga/` (ver "Expedição Berlenga").
 
 Opções para testar sem mexer na ilha do jogo:
 - `--out-dir res://tools/real_island/test_out/<nome>` grava numa pasta de
@@ -212,13 +215,89 @@ depois de a construir, ou muda o script.
       (四坑上家).
   - **Caixas:** nas pontas da ilha, o mais longe possível de tudo.
 
+## Expedição Berlenga
+
+A ilha joga-se em quatro partes seguidas, a pé
+(`docs/design/BERLENGA_EXPEDITION.md`). O preset tem os polígonos do Codex,
+a saída de cada parte (um ponto e o caminho do OSM que atravessa a
+fronteira) e os objetivos. O construtor grava, na pasta da expedição:
+
+| Ficheiro | O que é |
+|---|---|
+| `base.scn` (4,6 MB) | a ilha toda sem marcadores: terreno, casas, rochas, erva |
+| `whole.scn` (< 1 KB) | a ilha inteira com os marcadores de sempre (TEST ISLAND) |
+| `part_1.scn` … `part_4.scn` (70 a 210 KB) | uma cena por parte |
+| `terrain/`, `ground.res` | o terreno, uma só vez para as cinco cenas |
+| `*_grid.png` | a grelha de cada cena |
+
+- **Cenas herdadas:** `whole.scn` e as partes herdam de `base.scn` e só
+  guardam as diferenças. O Godot só cria cenas herdadas no editor, por isso
+  o construtor escreve os dados da cena como o editor faria
+  (`_save_inherited`, `_inherited`). Cada ficheiro é lido de novo do disco e
+  verificado com o `build_map`. Porquê uma base sem marcadores: uma cena
+  herdada não pode apagar nós da base, e cada parte tem marcadores
+  diferentes.
+- **Gravação tudo-ou-nada:** tudo é construído e verificado em memória.
+  Depois, a pasta antiga passa para `<pasta>.previous` e a nova é escrita
+  e relida do disco. Se alguma coisa falhar, a pasta antiga volta para o
+  seu lugar tal como estava. `--fail-part <n>` força uma falha na parte n,
+  para testar isto.
+- **Formato:** os dados internos do `PackedScene` (versão 3, Godot 4.7) são
+  verificados antes de escrever. Se forem diferentes do esperado, a
+  construção falha e não grava nada.
+- **Área jogável:** o polígono da parte mais um **portal** em cada
+  passagem: uma faixa de 12 m de largura ao longo do caminho, que entra
+  12 m em cada parte.
+  - O portal fica recortado às duas partes que liga.
+  - Onde dois portais se sobrepõem na parte 3, essa zona só pertence à
+    parte 3.
+  - Assim, duas partes não seguidas nunca partilham células, e o construtor
+    verifica-o.
+  - A `Exit` fica no portal, 4 m para lá da fronteira; o início da parte
+    seguinte fica 8 m para dentro dela.
+- **Passagem fechada:** o Caminho do Forte (559, 800), entre as partes 2 e
+  4, fica de fora de todos os portais. O construtor confirma que o outro
+  lado não se alcança.
+- **Cais do forte:** os blocos do cais estão em `Bridges/`, com o topo a
+  0,7 m, logo acima do pé das escadas do forte. Na parte 4 o barco de
+  resgate fica na ponta do cais, com o +Z virado para o mar.
+- **Limites naturais:** onde a fronteira atravessa terreno aberto (por
+  dentro alcançável, por fora chão livre na ilha inteira), há muros de pedra
+  solta e faixas de penedos, um pouco por fora do polígono. Ficam em
+  `Decor/Boundary` e são só decoração, porque a `play_area` já bloqueia.
+  - **Muros:** núcleo com a textura "stone" e fiadas de pedras chatas
+    (`Pebble_Square_*`).
+  - **Penedos:** `Rock_Medium_*`, encostados uns aos outros.
+  - Cada troço começa e acaba em penedos e entra 3 m na falésia. Nunca
+    tapa um portal. Na passagem fechada há penedos por cima do caminho.
+  - Vista de cima, a caixa de cada penedo ou pedra (já rodada e à escala)
+    não pode tapar uma célula transitável. Se tapar, o penedo é empurrado
+    para fora até 3 m; se ainda tapar, fica de fora. Por parte, são 17 a
+    30 penedos empurrados e 1 a 6 peças deixadas de fora.
+- **Horda:** as partes 1 a 3 mantêm `horde_radius` 120. A parte 4 tem
+  42 mil células alcançáveis, abaixo das 60 mil (a Hashima tem 51 mil), e
+  fica com 0.
+- **Imagens:** `data/berlenga/reach_part_<n>.png` mostra o que se alcança.
+  Os limites aparecem a magenta (muro) e a branco (penedos), e os
+  marcadores a vermelho.
+
+| Parte | Missão | Transitáveis / alcançáveis | Percurso na grelha | Limites |
+|---|---|---|---|---|
+| 1 | rescue | 253 mil / 238 mil | 229 + 307 = 536 m | 114 m |
+| 2 | activate | 276 mil / 256 mil | 155 + 67 + 76 + 285 = 583 m | 939 m |
+| 3 | defend | 171 mil / 171 mil | 262 + 254 = 516 m | 719 m |
+| 4 | holdout | 44 mil / 43 mil | 363 + 48 = 411 m (até ao barco) | 685 m |
+
+`tests/test_handmade.gd -- --berlenga-dir res://tools/real_island/test_out/<nome>/`
+verifica uma construção de teste.
+
 ## Medições
 
 Ambiente: Windows 11, Godot 4.7.2, AMD Ryzen 5 5600, NVIDIA RTX 5060.
 
 | O quê | Berlenga | Hashima |
 |---|---|---|
-| Construir a ilha (headless) | cerca de 18 s | cerca de 5 s |
+| Construir a ilha (headless) | cerca de 45 s: 18 s a ilha, 20 s as 4 partes (verificadas), 6 s a gravar e reler | cerca de 5 s |
 | Grelha | 1466 m, 2,1 M células | 495 m, 245 mil células |
 | Converter para a grelha (`build_map`) | 0,75 a 1,2 s | cerca de 0,1 s |
 | Células transitáveis / alcançáveis do desembarque | 744 mil / 709 mil (761 mil / 727 mil com falésias de 4 m) | 50,9 mil / 50,9 mil (36,7 mil / 34,6 mil quando os edifícios bloqueavam a caixa) |
