@@ -41,6 +41,84 @@ SettingsPanel herda o comportamento modal e conserva os três volumes em
 percentagem (Master, Sound effects e Music), com slider e campo editável.
 A integração preserva o céu Sky3D e o áudio gravado existentes.
 
+## Redesenho de outubro de 2026 (escolhido pelo utilizador)
+
+A 2026-10-10 o utilizador escolheu, a partir das maquetes da tela "Horde
+Breaker UI Proposals", as 7 propostas abaixo. O utilizador regista-as em
+`docs/DECISIONS.md` se as quiser fechar.
+
+1. **Paleta B, "Atlântico e azulejo":**
+
+   | Papel | Cor |
+   |---|---|
+   | Fundo basalto | `#0D1216` |
+   | Painel | `#0F2830` |
+   | Painel elevado | `#143540` |
+   | Linhas | `#2A5662` |
+   | Texto cal | `#ECE6D3` |
+   | Texto secundário | `#9AB0B2` |
+   | Âmbar, só para ações e foco | `#F2B23A` |
+   | Perigo | `#E8705A` |
+   | Objetivos e informação | `#6FA6E6` |
+   | Sucesso | `#7FC8B8` |
+
+   - Fontes OFL incluídas no jogo: Barlow Condensed nos títulos, Barlow no
+     corpo, IBM Plex Mono nos números e nas teclas.
+   - Os estados distinguem-se pela forma e não só pela cor:
+     - **foco** são cantoneiras à volta, tipo mira;
+     - **escolhido** leva um visto;
+     - **indisponível** é tracejado, com cadeado ou com o motivo escrito.
+2. **Título:**
+   - as estatísticas e as ajudas ficam numa barra no fundo da arte, sem
+     sobreposição;
+   - novo botão QUICK REDEPLOY, que repete a última corrida;
+   - o TEST ISLAND fica discreto;
+   - o lema deixa de sair do ecrã.
+3. **Barco num só ecrã, sem janela por cima:**
+   - rotas e mantimentos lado a lado;
+   - a missão fica escrita no cartão da rota, com os modificadores e o
+     hazard pay;
+   - os mantimentos sem efeito ficam desativados, com o motivo;
+   - o botão diz o destino ("DEPLOY TO JUNGLE").
+   - O acampamento da expedição usa o mesmo esquema.
+4. **Cartas de nível:**
+   - cada carta tem categoria (cor e forma), ícone, nome, efeito, rank em
+     pips, etiqueta NEW/UPGRADE e a sinergia com outras cartas;
+   - escolhe-se com o foco e confirma-se com A/Enter, deixando de usar 1–3,
+     que também trocam de arma;
+   - os botões só respondem 0,4 s depois de as cartas abrirem;
+   - a build atual aparece em baixo;
+   - há REROLL. A quantidade de rerolls é uma proposta por decidir.
+   - O baralho tem de crescer muito ("mais e mais cartas"). Fica para uma
+     proposta de design própria.
+5. **HUD sem fundos escuros:**
+   - texto com sombra diretamente sobre o jogo;
+   - o marcador do gerador e os outros marcadores do mundo mantêm a sua
+     pastilha;
+   - letra maior (a vida a 22 px);
+   - o minimapa fica como está, só sem o fundo escuro, com a legenda certa
+     para os marcadores que já desenha;
+   - habilidades com o tempo de recarga em anel e as teclas reais;
+   - slots de arma com munição;
+   - seta na borda do ecrã para inimigos fora da vista.
+6. **Pausa com a build**, tal como a confirmação de abandono, **sem painel
+   escuro**:
+   - o jogo desfocado fica visível;
+   - o texto leva sombra;
+   - os botões e as caixas ficam translúcidos.
+
+   Outros pormenores:
+   - mostra as armas, as cartas com rank e o Intel guardado e em risco;
+   - ABANDON RUN abre uma confirmação: KEEP FIGHTING fica com o foco e é
+     preciso segurar 1 s para abandonar;
+   - o Q deixa de abandonar.
+7. **Debrief:**
+   - resumo por ilha e decomposição do Intel;
+   - mostra o que já se pode comprar na armaria;
+   - os números sobem a contar;
+   - os botões só respondem 0,6 s depois de o ecrã abrir;
+   - BACK TO ARMORY e QUICK REDEPLOY.
+
 ## Verificação e capturas
 
 - tests/test_menus.gd: compras, limite de slots, foco modal, fecho/gravação,

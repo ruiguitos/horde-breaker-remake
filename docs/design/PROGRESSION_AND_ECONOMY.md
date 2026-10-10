@@ -169,6 +169,79 @@ Regras:
 7. Limite de **6 cartas de comportamento** diferentes por run, para o ecrã
    e a cabeça do jogador continuarem legíveis. Stats não contam.
 
+### 1.6 Expansão de cartas e reroll (proposta de 2026-10-10)
+
+O utilizador aprovou o novo ecrã de cartas com REROLL e pediu "mais e mais
+cartas" (ver `MENUS.md`, "Redesenho de outubro de 2026"). Esta proposta foi
+feita pelo Codex, lendo o código. Os valores são hipóteses para playtest e
+quem decide é o utilizador.
+
+**Hoje:**
+- Há 12 cartas e 22 ranks em `game/data/cards.tres`.
+- As cartas não têm categorias, etiquetas nem restrição de classe.
+- O sorteio é uniforme entre as cartas que ainda não estão no rank máximo.
+- Os stacks passam de uma ilha para a seguinte.
+- O mantimento "Card:" dá uma carta elegível ao acaso.
+
+**Categorias.** A cor vai sempre acompanhada de uma forma e de texto, e o
+âmbar fica reservado para ações e foco.
+
+| Categoria | Papel | Cor / forma |
+|---|---|---|
+| Breaker | Abrir caminho | Azul `#6FA6E6` / chevron |
+| Firearms | Transformar os disparos | Cal `#ECE6D3` / quadrado |
+| Survival | Recuperar e reposicionar | Verde `#7FC8B8` / escudo |
+| Class Ability | Identidade da classe | Lilás `#B7A6D8` / hexágono |
+| Island / Mission | Explorar e extrair | Turquesa `#71BBC4` / losango |
+
+**Primeira expansão: +24 cartas, 36 no total.** † = precisa de um sistema
+novo.
+
+| Nome | Categoria | Efeito por rank | Rank máximo |
+|---|---|---|---:|
+| Aftershock | Breaker | +0,5 s de atordoamento | 2 |
+| Crowd Splitter | Breaker | +0,8 m de empurrão | 2 |
+| Breach Shot | Breaker | No fim do breaker, dispara uma vez | 1 |
+| Scorched Path † | Breaker | Rasto de fogo de 3 s, 10 de dano/s | 1 |
+| Piercing Rounds | Firearms | +1 alvo atravessado | 2 |
+| Fifth Round | Firearms | Cada 5.º tiro explode (2 m, 30 de dano) | 1 |
+| Steady Aim | Firearms | Parado: +25% de cadência | 1 |
+| Suppressing Fire | Firearms | Cada 4.º tiro atordoa 0,4 s | 1 |
+| Point Blank | Firearms | +20% de dano a 4 m ou menos | 2 |
+| Finish the Job | Firearms | +30% de dano a alvos abaixo de 30% de HP | 2 |
+| Field Dressing | Survival | Cada orbe cura 1 HP | 1 |
+| Catch Your Breath | Survival | Sem inimigos a 6 m: cura 2 HP/s | 1 |
+| Second Breath | Survival | Abate por headshot: +0,2 s de estamina | 2 |
+| Thick Hide | Survival | +15 HP máximos | 2 |
+| Light Boots | Survival | +8% de velocidade | 2 |
+| Last Stand † | Survival | Um golpe mortal deixa-te com 1 HP, uma vez por ilha | 1 |
+| Wide Blast | Class (Recruit) | +0,75 m de raio da granada | 2 |
+| Concussion | Class (Recruit) | A granada atordoa mais 0,5 s | 2 |
+| Rally | Class (Vanguard) | O War Cry cura 8 HP | 2 |
+| Intimidation | Class (Vanguard) | O War Cry empurra mais 1 m | 2 |
+| Trail Rations | Island | Abrir uma cache cura mais 10 HP | 2 |
+| Salvage Route | Island | Uma cache repõe 20% da munição especial | 1 |
+| Evacuation Drill | Island | Na extração: +50% de recuperação de estamina | 1 |
+| Objective Rush | Island | Concluir o objetivo deixa o breaker pronto | 1 |
+
+**Regras de sorteio e reroll:**
+- Cada oferta garante uma carta nova e uma melhoria, quando existirem.
+- A terceira carta é ponderada: nova ×1, melhoria ×1,5, etiqueta em comum
+  com a build ×1,25.
+- As cartas são filtradas pela classe (o Grenadier só para o Recruit).
+- Por agora não há raridades nem banish.
+- Começas com 2 rerolls e ganhas 1 por cada ilha concluída que não seja a
+  última. A reserva máxima é 3.
+- O "Card:" dos mantimentos passa a mostrar a carta com o mesmo aspeto e
+  também se pode trocar com um reroll.
+
+**Ordem de implementação:**
+1. Dados das cartas: categoria, ícone, etiquetas e classe.
+2. Efeitos.
+3. Sorteio e rerolls num `card_offers.gd` novo, com testes.
+4. Ecrã das cartas.
+5. Por último, as cartas †.
+
 ## 2. Economia da run
 
 ### 2.1 Cortar o Scrap ou manter uma moeda?
@@ -322,6 +395,11 @@ desbloqueio que torne o jogo mais fácil sem escolha.
 7. **P7 — Classes**: Recruit, Vanguard (ex-Renegade), Field Medic; ativa +
    passiva + loadout; perks em 1–3 slots.
 8. **P8 — Dificuldade** em Threat 1–5 desbloqueados por extração.
+9. **P9 — Expansão de cartas e reroll** (§1.6):
+   - 24 cartas novas, 36 no total, em 5 categorias;
+   - cada oferta garante uma carta nova e uma melhoria;
+   - 2 rerolls no início e +1 por ilha, com reserva máxima de 3.
+   - Substitui a P4 se for aceite.
 
 ### Perguntas para o utilizador
 

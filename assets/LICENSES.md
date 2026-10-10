@@ -30,6 +30,8 @@ contributors".
 | `game/world/handmade/islands/beach_berlenga*`, `port_hashima*` | Costa, caminhos, pontes, edifícios (plantas e alturas), paredões, farol e cais da Berlenga Grande e de Hashima | © OpenStreetMap contributors | **ODbL 1.0** (aceite pelo utilizador a 2026-10-07; atribuição obrigatória, e quem partilhar a base de dados derivada tem de a partilhar com a mesma licença) |
 | `game/world/handmade/islands/*_berlenga_data/`, `port_hashima_data/` | Relevo | AWS Terrain Tiles (Mapzen; fontes SRTM, EU-DEM e outras) | Dados abertos com atribuição às fontes |
 | `assets/audio/ovani_sfx_starter_vol1/` | Sound FX Starter Pack Vol. 1 (só os 21 sons usados; o resto foi retirado, recuperável no histórico) | Ovani Sound | Royalty-free (`Royalty-Free License (Link).pdf`; https://ovanisound.com/policies/terms-of-service) |
+| `assets/fonts/barlow_condensed/`, `assets/fonts/barlow/` | Barlow Condensed (SemiBold, Bold, ExtraBold) e Barlow (Regular, Medium, SemiBold): títulos e corpo dos menus e do HUD | The Barlow Project Authors (Jeremy Tribby), via github.com/google/fonts | OFL 1.1 (`OFL.txt` em cada pasta) |
+| `assets/fonts/ibm_plex_mono/` | IBM Plex Mono (Regular, SemiBold): números e teclas | IBM Corp., via github.com/google/fonts | OFL 1.1 (`OFL.txt`) |
 
 Removidos na integração (não servem ao jogo): versões Unity/Unreal da
 biblioteca de animações, a demo do Terrain3D, ficheiros `__MACOSX` e, do
