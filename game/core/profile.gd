@@ -4,7 +4,7 @@ extends RefCounted
 ## user:// (on Windows: %APPDATA%/Godot/app_userdata/Horde Breaker Remake).
 
 const PATH: String = "user://profile.json"
-const VERSION: int = 4
+const VERSION: int = 5
 
 var intel: int = 0
 var runs: int = 0
@@ -42,6 +42,14 @@ var mouse_sensitivity: int = 50  ## percent
 var hud_scale: int = 100  ## HUD size in percent (60..100); new profiles start at 100
 ## Rebound keys: action -> "key:N" / "mouse:N" (see GameInput.REBINDABLE).
 var key_bindings: Dictionary = {}
+## The last run started, for QUICK REDEPLOY: {"class", "perks", "threat",
+## "expedition"} as JSON-friendly values ("" expedition = the archipelago).
+## Empty until the first run.
+var last_run: Dictionary = {}
+## Intel files already seen in the archive (the title shows "N NEW").
+var lore_read: int = 0
+## Set by record_run when the run beat the kill record (not saved).
+var new_best_kills: bool = false
 
 
 static func load_profile(path: String = PATH) -> Profile:
@@ -103,6 +111,17 @@ static func from_dict(d: Dictionary) -> Profile:
 	for id in d.get("unlocked_weapons", []):
 		p.unlocked_weapons.append(StringName(id))
 	p.threat = clampi(int(d.get("threat", 1)), 1, p.max_threat)
+	# Version 4 had no last run nor archive read count: no QUICK REDEPLOY
+	# until the next run, and every file already recovered counts as read.
+	var last: Variant = d.get("last_run", {})
+	if last is Dictionary and (last as Dictionary).has("class"):
+		p.last_run = {
+			"class": String(last["class"]),
+			"perks": (last.get("perks", []) as Array).map(func(x: Variant) -> String: return String(x)),
+			"threat": int(last.get("threat", 1)),
+			"expedition": String(last.get("expedition", "")),
+		}
+	p.lore_read = clampi(int(d.get("lore_read", p.lore_pages)), 0, p.lore_pages)
 	return p
 
 
@@ -120,7 +139,8 @@ func save(path: String = PATH) -> bool:
 		"unlocked_classes": unlocked_classes.map(func(x: StringName) -> String: return String(x)),
 		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x)),
 		"quality": quality, "window_mode": window_mode, "resolution": "%dx%d" % [resolution.x, resolution.y],
-		"vsync": vsync, "hud_scale": hud_scale, "third_person": third_person, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias}, "  "))
+		"vsync": vsync, "hud_scale": hud_scale, "third_person": third_person, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias,
+		"last_run": last_run, "lore_read": lore_read}, "  "))
 	return true
 
 
@@ -133,7 +153,81 @@ func record_run(ctx: RunContext) -> void:
 		extractions += 1
 		if ctx.threat == max_threat and max_threat < GameData.MAX_THREAT:
 			max_threat += 1
+	new_best_kills = ctx.kills > best_kills
 	best_kills = maxi(best_kills, ctx.kills)
+
+
+## Remembers the run being started (QUICK REDEPLOY replays it): the
+## selected class, equipped perks and threat, and which run it is.
+func remember_run(expedition: StringName) -> void:
+	last_run = {
+		"class": String(selected_class),
+		"perks": equipped_perks.map(func(x: StringName) -> String: return String(x)),
+		"threat": threat,
+		"expedition": String(expedition),
+	}
+
+
+## Why the last run cannot be replayed as it was ("" = it can). Things
+## change between runs (an old save, a perk slot sold back in a future
+## version, an expedition not built), so QUICK REDEPLOY checks first and
+## falls back to the Armory instead of starting a run with something the
+## player does not own.
+func redeploy_problem() -> String:
+	if last_run.is_empty():
+		return "No previous run yet"
+	if not unlocked_classes.has(StringName(last_run["class"])):
+		return "Class locked"
+	var perks: Array = last_run["perks"]
+	if perks.size() > slots:
+		return "Not enough perk slots"
+	for id: Variant in perks:
+		if not owned_perks.has(StringName(id)):
+			return "Perk not owned"
+	if int(last_run["threat"]) < 1 or int(last_run["threat"]) > max_threat:
+		return "Threat locked"
+	var expedition := StringName(last_run["expedition"])
+	if expedition != &"" and not Expeditions.available(expedition):
+		return "Expedition unavailable"
+	return ""
+
+
+## Selects the last run's class, perks and threat (so the Armory shows
+## what is being played). Returns false, changing nothing, if it cannot.
+func apply_last_run() -> bool:
+	if redeploy_problem() != "":
+		return false
+	selected_class = StringName(last_run["class"])
+	equipped_perks.clear()
+	for id: Variant in last_run["perks"]:
+		equipped_perks.append(StringName(id))
+	threat = int(last_run["threat"])
+	return true
+
+
+## The last run's expedition id (&"" = the archipelago).
+func last_expedition() -> StringName:
+	return StringName(last_run.get("expedition", ""))
+
+
+## "Vanguard · Archipelago · T2" for the QUICK REDEPLOY buttons.
+func last_run_summary() -> String:
+	if last_run.is_empty():
+		return ""
+	var id := StringName(last_run["class"])
+	var class_text: String = String(GameData.CLASS_INFO[id]["name"]) if GameData.CLASS_INFO.has(id) else String(id).capitalize()
+	var expedition := last_expedition()
+	var run_name: String = "Archipelago" if expedition == &"" else Expeditions.display_name(expedition).get_slice(" ", 0)
+	return "%s · %s · T%d" % [class_text, run_name, int(last_run["threat"])]
+
+
+## Intel files recovered but not yet seen in the archive.
+func unread_files() -> int:
+	return maxi(0, lore_pages - lore_read)
+
+
+func mark_archive_read() -> void:
+	lore_read = lore_pages
 
 
 ## Buys a perk or the next slot. Returns false if not affordable.

@@ -44,9 +44,10 @@ acaso e, dentro da rota, a ilha sai pela seed.
 | Sprint (não dispara enquanto corre) | Shift | L3 (clicar stick esquerdo) |
 | Granada (lança para o rato) | G ou botão do meio | LB |
 | Trocar arma | 1–5 | D-pad ← ↑ →, ↓ roda |
-| Escolher carta | 1 / 2 / 3 ou clique | X / Y / B |
+| Escolher carta (foco + confirmar; 0,4 s de espera ao abrir) | ← → e Enter, ou clique | D-pad / stick e A |
+| Trocar as cartas (reroll) | R | Y |
 | Continuar no fim da ilha | Enter / R | A / Start |
-| Pausa (Q na pausa abandona) | Esc | Start |
+| Pausa (abandonar pede confirmação: segurar 1 s) | Esc | Start |
 | Painel de debug | F3 | — |
 | Ecrã inteiro | F11 | — |
 

@@ -159,8 +159,10 @@ func _ready() -> void:
 	_crosshair.visible = third_person
 	hud = Hud.new()
 	hud.profile = profile if profile != null else Profile.new()
+	hud.context = context
 	hud.add_child(UiSfx.new())
 	hud.card_chosen.connect(func(i: int) -> void: run.choose_card(i))
+	hud.reroll_requested.connect(func() -> void: run.reroll_cards())
 	hud.resume_requested.connect(func() -> void: paused = false)
 	hud.abandon_requested.connect(_abandon)
 	add_child(hud)
@@ -730,13 +732,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed(&"pause"):
 		paused = not paused
-	elif paused:
-		if event.is_action_pressed(&"abandon"):
-			_abandon()
-	elif not run.card_choices.is_empty():
-		for i in 3:
-			if event.is_action_pressed(StringName("card_%d" % (i + 1))):
-				run.choose_card(i)
+	elif paused or not run.card_choices.is_empty():
+		# The pause menu and the level-up cards are focus-driven HUD screens
+		# (A/Enter on the focused button; the HUD handles reroll). Abandoning
+		# needs the pause menu's hold-to-confirm: no shortcut key.
+		return
 	elif event.is_action_pressed(&"breaker"):
 		_breaker_held = true
 	elif event.is_action_pressed(&"ability"):

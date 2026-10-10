@@ -211,6 +211,32 @@ const SLOT_COSTS: Array[int] = [0, 100, 250]  ## cost of the 1st, 2nd, 3rd perk 
 const MAX_THREAT: int = 3
 const EXTRACTION_INTEL_MULTIPLIER: float = 1.5
 
+## Level-up cards: rerolls (PROVISIONAL: the user still has to decide,
+## docs/design/PROGRESSION_AND_ECONOMY.md §1.6 P9). A reroll redraws the
+## offer. The run starts with REROLLS_START; every island cleared that is
+## not the last adds REROLLS_PER_ISLAND, never above REROLLS_MAX banked.
+const REROLLS_START: int = 2
+const REROLLS_PER_ISLAND: int = 1
+const REROLLS_MAX: int = 3
+
+## Card categories. PROVISIONAL: the card data has no category yet, so it
+## is derived here from what each card changes (breaker, guns, staying
+## alive). Unknown cards fall back to survival. Move this into CardData
+## when the deck grows.
+const CARD_CATEGORIES: Dictionary = {
+	&"quick_breaker": &"breaker", &"shockwave": &"breaker",
+	&"adrenaline": &"breaker", &"executioner": &"breaker",
+	&"hollow_points": &"firearms", &"fast_hands": &"firearms",
+	&"ricochet": &"firearms", &"explosive_heads": &"firearms",
+	&"bigger_mags": &"firearms", &"grenadier": &"firearms",
+	&"magnet": &"survival", &"vampire": &"survival",
+}
+
+
+static func card_category(id: StringName) -> StringName:
+	return CARD_CATEGORIES.get(id, &"survival")
+
+
 ## Horde
 const MAX_ALIVE: int = 150
 const SPAWN_MIN_DIST: float = 28.0

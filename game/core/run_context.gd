@@ -11,6 +11,8 @@ var hp: float = GameData.PLAYER_MAX_HP
 var level: int = 1
 var xp: int = 0
 var card_stacks: Dictionary = {}
+## Level-up card rerolls left (carried between islands, see GameData.REROLLS_*).
+var rerolls: int = GameData.REROLLS_START
 var ammo: PackedInt32Array = PackedInt32Array()
 var kills: int = 0
 var headshots: int = 0
@@ -105,6 +107,14 @@ func advance() -> void:
 	island_index += 1
 	if is_expedition():
 		_apply_part()
+
+
+## What the debrief shows about the island being played: biome, mission,
+## modifier, hazard pay and part name. Taken on landing (hazard pay is
+## reset when the island ends) and added to its island_log entry.
+func island_info() -> Dictionary:
+	return {"biome": String(biome), "mission": String(mission), "modifier": String(modifier),
+		"hazard_pay": hazard_pay, "part": part_name()}
 
 
 ## The part being played (empty outside an expedition).

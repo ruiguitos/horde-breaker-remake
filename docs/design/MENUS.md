@@ -119,6 +119,34 @@ Breaker UI Proposals", as 7 propostas abaixo. O utilizador regista-as em
    - os botões só respondem 0,6 s depois de o ecrã abrir;
    - BACK TO ARMORY e QUICK REDEPLOY.
 
+### Como ficou implementado
+
+O que se afasta das maquetes, ou o que elas não diziam:
+
+- **Barco:**
+  - a rota A e o primeiro mantimento útil vêm pré-escolhidos, por isso
+    DEPLOY nunca fica desativado;
+  - o mantimento só se aplica ao carregar em DEPLOY, e pode-se mudar de
+    ideias sem custo;
+  - o hazard pay não aparece no cartão da rota: é igual em todas as rotas
+    e só se aceita no briefing, ao desembarcar.
+- **Pausa e abandono:**
+  - morrer ou abandonar guarda o Intel (decisão de 2026-10-05);
+  - o que se perde é o bónus de extração ×1,5, e é esse o número de
+    "YOU LOSE".
+- **Cartas:**
+  - a categoria é provisória, tirada do id da carta
+    (`GameData.CARD_CATEGORIES`), até haver dados de categoria (P9);
+  - as regras do reroll são as constantes provisórias `GameData.REROLLS_*`;
+  - R ou Y troca as cartas.
+- **Título:** o lema não está em itálico, porque não incluímos a fonte
+  itálica.
+
+Testes novos:
+- `tests/test_title_debrief_redesign.gd`
+- `tests/test_boat_redesign.gd`
+- `tests/test_hud_redesign.gd`
+
 ## Verificação e capturas
 
 - tests/test_menus.gd: compras, limite de slots, foco modal, fecho/gravação,

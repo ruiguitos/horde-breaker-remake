@@ -94,7 +94,7 @@ func _process(_delta: float) -> bool:
 				return false
 			var title: String = (hud.get("_objective") as Label).text
 			var marker: String = (hud.get("_marker") as Label).text
-			_check(run.objective == IslandRun.Objective.RETURN_TO_BOAT and title == "LEAVE ALONG THE PATH" and marker.contains("Exit"),
+			_check(run.objective == IslandRun.Objective.RETURN_TO_BOAT and title == "LEAVE ALONG THE PATH" and marker.to_upper().contains("EXIT"),
 				"HUD: '%s', marker '%s'" % [title, marker])
 			var ring: Node3D = _scene.get("_boat_ring")
 			_check(ring.visible and Vector2(ring.position.x, ring.position.z).distance_to(Vector2(run.map.exit.x, run.map.exit.z)) < 0.5,
@@ -114,10 +114,14 @@ func _process(_delta: float) -> bool:
 			_frames = 0
 		3:
 			var boat: Node3D = _scene.get("_boat")
-			if _frames == 3:
+			# The hold ends on the next simulation step, which may take a few
+			# frames to come: wait for it (up to 60 frames) instead of a fixed frame.
+			var heading: String = (hud.get("_objective") as Label).text
+			if not has_meta(&"called_at") and ((boat.visible and heading == "BOAT INBOUND") or _frames >= 60):
+				set_meta(&"called_at", _frames)
 				set_meta(&"far", Vector2(boat.position.x, boat.position.z).distance_to(Vector2(run.map.boat.x, run.map.boat.z)))
-				_check(boat.visible and (hud.get("_objective") as Label).text == "BOAT INBOUND", "holdout scene: the boat is called and shows")
-			if _frames == 120:
+				_check(boat.visible and heading == "BOAT INBOUND", "holdout scene: the boat is called and shows (visible %s, '%s', frame %d)" % [boat.visible, heading, _frames])
+			if has_meta(&"called_at") and _frames == int(get_meta(&"called_at")) + 117:
 				var near: float = Vector2(boat.position.x, boat.position.z).distance_to(Vector2(run.map.boat.x, run.map.boat.z))
 				_check(near < float(get_meta(&"far")), "the boat sails in towards the pier (%.0f m -> %.0f m)" % [float(get_meta(&"far")), near])
 				_scene.queue_free()

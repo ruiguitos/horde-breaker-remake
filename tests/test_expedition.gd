@@ -186,16 +186,16 @@ func _expedition_run(parts: Array) -> void:
 	var camp: Node = _current()
 	_check((camp.find_child("PartName", true, false) as Label).text == "STAND-IN 2", "the camp names the next part")
 	_check(camp.find_child("Trail_1", true, false) != null and camp.find_child("Trail_4", true, false) != null, "the camp shows the 4 parts")
-	_check(not camp.call("_can_land"), "the camp needs a supply first")
-	camp.call("_land_now")
+	# One screen, no supply modal: the first useful supply (Field Repairs,
+	# HP is 42) starts selected and is applied on CONTINUE.
+	_check(int(camp.get("_supply")) == 0 and camp.call("_can_land"), "the camp preselects Field Repairs when hurt")
 	camp.call("_pick_route", 0)  # no routes on foot: ignored
-	await _settle()
-	_check(_state() == Flow.CAMP, "cannot march on without a supply")
 	camp.call("_pick", 0)  # Field Repairs
 	await _settle()
-	_check(is_equal_approx(ctx.hp, minf(ctx.max_hp, 92.0)) and camp.call("_can_land"), "Field Repairs heals at the camp")
-	_check(root.gui_get_focus_owner() == camp.find_child("MarchOn", true, false), "MARCH ON takes focus after the supply")
+	_check(is_equal_approx(ctx.hp, 42.0), "the supply is not applied before CONTINUE")
+	_check(root.gui_get_focus_owner() == camp.find_child("Deploy", true, false), "CONTINUE takes focus after the supply")
 	camp.call("_land_now")
+	_check(is_equal_approx(ctx.hp, minf(ctx.max_hp, 92.0)), "Field Repairs heals at the camp")
 	await _settle()
 	_check(_state() == Flow.ISLAND and _scene_path() == STAND_INS[1] and ctx.mission == &"activate", "part 2 plays with its mission")
 	var run2: IslandRun = _current().get("run")

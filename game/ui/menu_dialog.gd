@@ -4,6 +4,13 @@ extends Control
 
 signal closed
 
+## Alpha of translucent boxes and buttons over the blurred game.
+const GLASS_ALPHA: float = 0.55
+
+## Translucent "glass" look (the pause family): set before the dialog enters
+## the tree. No dark dim and no panel: the blurred game behind shows
+## through, text carries a dark shadow and inner boxes are translucent.
+var glass: bool = false
 var content: VBoxContainer
 var _previous_focus: Control
 
@@ -13,10 +20,13 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	theme = UiTheme.get_theme()
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.78)
+	# Glass keeps the dim invisible: it still stops clicks reaching the game.
+	dim.color = Color(0, 0, 0, 0.0 if glass else 0.78)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(dim)
 	content = UiTheme.centered_panel(self, 620)
+	if glass:
+		(content.get_parent() as Control).add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	call_deferred("_trap_focus")
 
 
@@ -155,6 +165,186 @@ static func test_island(parent: Node, on_pick: Callable) -> MenuDialog:
 		b.name = "Expedition_" + String(entry["id"])
 	UiTheme.button(dialog.content, "BACK", dialog.close, true)
 	return dialog
+
+
+## ABANDON RUN confirmation (pause menu): what you keep and what you lose,
+## KEEP FIGHTING focused, and a button that must be held for 1 s.
+## B/Esc (or KEEP FIGHTING) goes back to the pause menu.
+static func abandon(parent: Node, keep: int, keep_note: String, lose: int, lose_note: String, on_abandon: Callable) -> MenuDialog:
+	var dialog := MenuDialog.new()
+	dialog.glass = true
+	dialog.name = "AbandonDialog"
+	parent.add_child(dialog)
+	(dialog.content.get_parent() as Control).custom_minimum_size.x = 560
+	dialog.content.add_theme_constant_override("separation", 16)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 12)
+	dialog.content.add_child(head)
+	head.add_child(WarningIcon.new())
+	var title := ink(UiTheme.title("ABANDON THE RUN?", 38))
+	title.autowrap_mode = TextServer.AUTOWRAP_OFF
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	head.add_child(title)
+	dialog.content.add_child(ink(UiTheme.label("The boat leaves without you. Your build and the extraction bonus are lost; the Intel you earned is kept.", 18)))
+	var boxes := HBoxContainer.new()
+	boxes.add_theme_constant_override("separation", 12)
+	dialog.content.add_child(boxes)
+	var sides: Array = [["YOU KEEP", keep, keep_note, UiTheme.SUCCESS, "Keep"], ["YOU LOSE", lose, lose_note, UiTheme.DANGER, "Lose"]]
+	for side: Array in sides:
+		var box := glass_box(boxes)
+		box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var col := VBoxContainer.new()
+		col.add_theme_constant_override("separation", 2)
+		box.add_child(col)
+		col.add_child(ink(UiTheme.label(side[0], 13, UiTheme.TEXT_MUTED, true)))
+		var number := ink(UiTheme.label("%d INTEL" % side[1], 26, side[3]))
+		number.name = side[4]
+		number.add_theme_font_override("font", UiTheme.mono_bold_font())
+		col.add_child(number)
+		col.add_child(ink(UiTheme.label(side[2], 14, UiTheme.TEXT_MUTED)))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	dialog.content.add_child(row)
+	var stay := UiTheme.button(row, "KEEP FIGHTING", dialog.close, true)
+	stay.name = "KeepFighting"
+	stay.custom_minimum_size.y = 54
+	stay.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var hold := HoldButton.new()
+	hold.name = "HoldToAbandon"
+	hold.text = "HOLD TO ABANDON"
+	hold.custom_minimum_size.y = 54
+	hold.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hold.theme_type_variation = &"DangerButton"
+	glass_button(hold, true)
+	hold.held.connect(func() -> void:
+		dialog.close()
+		on_abandon.call())
+	row.add_child(hold)
+	var accept: String = "%s / %s" % [GameInput.prompt(&"ui_accept", false), GameInput.prompt(&"ui_accept", true)]
+	var back: String = "%s / %s" % [GameInput.prompt(&"ui_cancel", false), GameInput.prompt(&"ui_cancel", true)]
+	var hints := ink(UiTheme.label("[ %s ] HOLD 1 s     [ %s ] BACK" % [accept, back], 14, UiTheme.TEXT_MUTED, true))
+	hints.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	dialog.content.add_child(hints)
+	return dialog
+
+
+## Dark outline + drop shadow so text reads straight over the game.
+static func ink(l: Label, outline: int = 4) -> Label:
+	l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+	l.add_theme_constant_override("outline_size", outline)
+	l.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.6))
+	l.add_theme_constant_override("shadow_offset_x", 0)
+	l.add_theme_constant_override("shadow_offset_y", 2)
+	l.add_theme_constant_override("shadow_outline_size", outline + 2)
+	return l
+
+
+## Translucent panel (PANEL at GLASS_ALPHA, thin line) inside a glass screen.
+static func glass_box(parent: Control, alpha: float = GLASS_ALPHA) -> PanelContainer:
+	var box := PanelContainer.new()
+	var s := StyleBoxFlat.new()
+	s.bg_color = Color(UiTheme.PANEL, alpha)
+	s.border_color = Color(UiTheme.LINE, 0.9)
+	s.set_border_width_all(1)
+	s.set_corner_radius_all(UiTheme.RADIUS)
+	s.content_margin_left = 14
+	s.content_margin_right = 14
+	s.content_margin_top = 12
+	s.content_margin_bottom = 12
+	box.add_theme_stylebox_override("panel", s)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(box)
+	return box
+
+
+## Translucent button states for glass screens: plain buttons get a see-
+## through PANEL, danger buttons little more than their outline. Primary
+## buttons keep their amber fill: the one action that must pop.
+static func glass_button(b: Button, danger: bool = false) -> void:
+	var styles: Dictionary = {
+		"normal": [Color(UiTheme.DANGER, 0.08) if danger else Color(UiTheme.PANEL, GLASS_ALPHA), UiTheme.DANGER if danger else UiTheme.LINE],
+		"hover": [Color(UiTheme.DANGER, 0.2) if danger else Color(UiTheme.PANEL_RAISED, 0.75), UiTheme.DANGER if danger else UiTheme.TEXT],
+		"pressed": [Color(UiTheme.DANGER, 0.3) if danger else Color(UiTheme.PANEL, 0.8), UiTheme.DANGER if danger else UiTheme.ACCENT],
+	}
+	for state: String in styles:
+		var s := StyleBoxFlat.new()
+		s.bg_color = styles[state][0]
+		s.border_color = styles[state][1]
+		s.set_border_width_all(2 if danger else 1)
+		s.set_corner_radius_all(UiTheme.RADIUS)
+		s.content_margin_left = 16
+		s.content_margin_right = 16
+		s.content_margin_top = 10
+		s.content_margin_bottom = 10
+		b.add_theme_stylebox_override(state, s)
+	b.add_theme_stylebox_override("hover_pressed", b.get_theme_stylebox("pressed"))
+	b.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.7))
+	b.add_theme_constant_override("outline_size", 4)
+
+
+## A button that fires `held` only after A/Enter or the mouse button is held
+## on it for HOLD_TIME without letting go: releasing (or losing focus)
+## resets the hold. The fill bar then drains back, but only on screen.
+## Used where one mistaken press would cost the whole run.
+class HoldButton extends Button:
+	signal held
+
+	const HOLD_TIME: float = 1.0
+	var progress: float = 0.0  ## 0..1 of the current, unbroken hold
+	var _shown: float = 0.0  ## what the bar shows (drains after a release)
+	var _holding: bool = false
+	var _fill := ColorRect.new()
+
+	func _init() -> void:
+		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		_fill.name = "Fill"
+		_fill.color = Color(UiTheme.DANGER, 0.35)
+		_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_fill.show_behind_parent = true  # under the text
+		add_child(_fill)
+		focus_exited.connect(_set_holding.bind(false))
+
+	func _gui_input(event: InputEvent) -> void:
+		if event is InputEventMouseButton and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
+			_set_holding(event.is_pressed())
+			accept_event()
+		elif event.is_action(&"ui_accept") and not event.is_echo():
+			_set_holding(event.is_pressed())
+			accept_event()
+
+	func _set_holding(on: bool) -> void:
+		_holding = on
+		if not on:
+			progress = 0.0  # the hold must be one continuous second
+
+	func _process(delta: float) -> void:
+		if _holding:
+			progress = minf(1.0, progress + delta / HOLD_TIME)
+			_shown = progress
+			if progress >= 1.0:
+				_set_holding(false)
+				held.emit()
+		else:
+			_shown = maxf(0.0, _shown - delta * 3.0)
+		_fill.position = Vector2.ZERO
+		_fill.size = Vector2(size.x * _shown, size.y)
+
+
+## Warning triangle (danger colour) drawn in code.
+class WarningIcon extends Control:
+	func _init() -> void:
+		custom_minimum_size = Vector2(34, 30)
+		size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		var c: Color = UiTheme.DANGER
+		var tri := PackedVector2Array([Vector2(17, 2), Vector2(32, 28), Vector2(2, 28), Vector2(17, 2)])
+		draw_polyline(tri, Color(0, 0, 0, 0.6), 6.0, true)
+		draw_polyline(tri, c, 3.0, true)
+		draw_line(Vector2(17, 11), Vector2(17, 19), c, 3.0)
+		draw_line(Vector2(17, 22), Vector2(17, 25), c, 3.0)
 
 
 static func _scroll(parent: Control, height: float) -> VBoxContainer:

@@ -37,8 +37,8 @@ func _test() -> void:
 	_run.stamina = 1.5
 	_run.sprinting = true
 	_hud.refresh(_run, null, 0)
-	_check(_hud._hp_text.text == "23 / 100" and _hud._alerts.text.contains("LOW HEALTH"), "low health remains readable numerically and as a warning")
-	_check(_hud._breaker_status.text == "4.2 s" and _hud._ability_status.text == "9.5 s", "cooldowns show remaining seconds")
+	_check(_hud._hp_text.text == "23" and _hud._hp_max.text == "/ 100" and _hud._alerts.text.contains("LOW HEALTH"), "low health remains readable numerically and as a warning")
+	_check(_hud._breaker_status.text == "COOLDOWN" and is_equal_approx(_hud._breaker_ring.seconds, 4.2) and is_equal_approx(_hud._ability_ring.seconds, 9.5), "cooldowns show state and remaining seconds in the ring")
 	_check(_hud._fire_status.text == "SPRINTING" and is_equal_approx(_hud._stamina_bar.value, 1.5), "sprint explains suppressed auto-fire and shows stamina")
 	_run.sprinting = false
 	_run.weapon_index = 1
@@ -59,12 +59,12 @@ func _test() -> void:
 	joy.button_index = JOY_BUTTON_RIGHT_SHOULDER
 	joy.pressed = true
 	_hud._input(joy)
-	_check(_hud._breaker_key.text == "[ RB / A ]" and _hud._ability_key.text == "[ LB ]", "controller prompts match the actual InputMap")
+	_check(_hud._breaker_key.text == GameInput.prompt(&"breaker", true) and _hud._breaker_key.text.contains("RB") and _hud._ability_key.text == "LB", "controller prompts match the actual InputMap")
 	var key := InputEventKey.new()
 	key.physical_keycode = KEY_SPACE
 	key.pressed = true
 	_hud._input(key)
-	_check(_hud._breaker_key.text == "[ SPACE ]", "keyboard input restores keyboard prompts")
+	_check(_hud._breaker_key.text == "SPACE", "keyboard input restores keyboard prompts")
 	_run.hp = 100
 	_run.horde.grabbed_by = -1
 	_run.scream_progress = 0
@@ -94,7 +94,7 @@ func _test() -> void:
 	_check(_hud._boss_row.visible and _hud._boss_name.text.contains("PHASE 2"), "boss health and second phase remain visible")
 	_run.card_choices.assign(_run.all_cards.slice(0, 3))
 	_hud.refresh(_run, null, 0)
-	_check(_hud._cards_panel.visible and _hud._card_buttons[0].text.contains(_run.card_choices[0].title), "card choices remain interactive native buttons")
+	_check(_hud._cards_panel.visible and _hud._cards[0].button is Button and _hud._cards[0].title.text == _run.card_choices[0].title, "card choices remain interactive native buttons")
 	_run.card_choices.clear()
 	_run.radio.append(&"survivor_found")
 	_hud.refresh(_run, null, 0)
@@ -125,7 +125,7 @@ func _test_layout(extent: Vector2i) -> void:
 	await process_frame
 	_hud.refresh(_run, null, 0)
 	await process_frame
-	var panels: Array[PanelContainer] = [_hud._status_panel, _hud._abilities_panel, _hud._weapon_panel]
+	var panels: Array[Control] = [_hud._status_panel, _hud._abilities_panel, _hud._weapon_panel]
 	var viewport_rect := Rect2(Vector2.ZERO, Vector2(extent))
 	var contained: bool = true
 	var separated: bool = true

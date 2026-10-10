@@ -238,6 +238,8 @@ func _loadout() -> void:
 func _archive() -> void:
 	if not is_instance_valid(_dialog):
 		_dialog = MenuDialog.archive(self, profile)
+		profile.mark_archive_read()
+		profile.save()
 
 
 func _act(changed: bool) -> void:

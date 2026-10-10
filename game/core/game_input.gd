@@ -19,12 +19,14 @@ static var ACTIONS: Dictionary = {
 	&"ability": [KEY_G, "mouse:%d" % MOUSE_BUTTON_MIDDLE, "joy:%d" % JOY_BUTTON_LEFT_SHOULDER],
 	&"sprint": [KEY_SHIFT, "joy:%d" % JOY_BUTTON_LEFT_STICK],
 	&"pause": [KEY_ESCAPE, "joy:%d" % JOY_BUTTON_START],
-	&"abandon": [KEY_Q],
 	&"confirm": [KEY_ENTER, KEY_KP_ENTER, KEY_R, "joy:%d" % JOY_BUTTON_A, "joy:%d" % JOY_BUTTON_START],
 	&"debug": [KEY_F3],
 	## Debug: walk through everything, take no damage (mouse side buttons).
 	&"noclip": ["mouse:%d" % MOUSE_BUTTON_XBUTTON1, "mouse:%d" % MOUSE_BUTTON_XBUTTON2],
 	&"camera_toggle": [KEY_V, "joy:%d" % JOY_BUTTON_BACK],
+	## Level-up cards are chosen with focus + ui_accept; R / Y redraws them.
+	## card_1..3 are the boat's supply picks.
+	&"card_reroll": [KEY_R, "joy:%d" % JOY_BUTTON_Y],
 	&"card_1": [KEY_1, "joy:%d" % JOY_BUTTON_X],
 	&"card_2": [KEY_2, "joy:%d" % JOY_BUTTON_Y],
 	&"card_3": [KEY_3, "joy:%d" % JOY_BUTTON_B],
@@ -168,3 +170,59 @@ static func _decode(text: String) -> Variant:
 ## Movement vector from keys or the left stick (analog strength kept).
 static func move_vector() -> Vector2:
 	return Input.get_vector(&"move_left", &"move_right", &"move_up", &"move_down", MOVE_DEADZONE)
+
+
+## Short prompt for an action as the player has it bound right now (read
+## from the InputMap, so rebinds show up): "SPACE", "RMB", or the gamepad
+## buttons "RB / A". HUD and menus use it instead of hard-coded keys.
+static func prompt(action: StringName, gamepad: bool) -> String:
+	if not InputMap.has_action(action):
+		return "—"
+	var pads: PackedStringArray = []
+	var primary: String = ""
+	var secondary: String = ""
+	for e: InputEvent in InputMap.action_get_events(action):
+		if e is InputEventJoypadButton:
+			pads.append(pad_name((e as InputEventJoypadButton).button_index))
+		elif e is InputEventKey or e is InputEventMouseButton:
+			var b: Variant = _binding_of(e)
+			if e is InputEventKey and int(b) == 0:  # built-in ui_* actions use keycode
+				b = int((e as InputEventKey).keycode)
+			# The primary (rebindable) key wins: apply_overrides re-adds it
+			# at the end, after secondary keys such as the arrows.
+			if not _is_secondary(action, b):
+				primary = binding_name(b) if primary == "" else primary
+			elif secondary == "":
+				secondary = binding_name(b)
+	if gamepad:
+		return " / ".join(pads) if not pads.is_empty() else "—"
+	return primary if primary != "" else secondary if secondary != "" else "—"
+
+
+static func _is_secondary(action: StringName, b: Variant) -> bool:
+	for d: Variant in ACTIONS.get(action, []):
+		if is_kbm(d) and same(d, b) and not same(d, default_binding(action)):
+			return true
+	return false
+
+
+## Key/mouse binding -> short upper-case name ("SPACE", "G", "RMB").
+static func binding_name(b: Variant) -> String:
+	if b == null:
+		return "—"
+	if b is int:
+		return OS.get_keycode_string(b).to_upper()
+	var parts: PackedStringArray = String(b).split(":")
+	if parts[0] == "mouse":
+		return {1: "LMB", 2: "RMB", 3: "MMB", 8: "MOUSE 4", 9: "MOUSE 5"}.get(int(parts[1]), "MOUSE %s" % parts[1])
+	return String(b)
+
+
+## Xbox-style gamepad button names (the prompts the game shows).
+static func pad_name(button: int) -> String:
+	return {JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_X: "X", JOY_BUTTON_Y: "Y",
+		JOY_BUTTON_LEFT_SHOULDER: "LB", JOY_BUTTON_RIGHT_SHOULDER: "RB",
+		JOY_BUTTON_LEFT_STICK: "L3", JOY_BUTTON_RIGHT_STICK: "R3",
+		JOY_BUTTON_START: "START", JOY_BUTTON_BACK: "VIEW",
+		JOY_BUTTON_DPAD_UP: "D-UP", JOY_BUTTON_DPAD_DOWN: "D-DOWN",
+		JOY_BUTTON_DPAD_LEFT: "D-LEFT", JOY_BUTTON_DPAD_RIGHT: "D-RIGHT"}.get(button, "PAD %d" % button)

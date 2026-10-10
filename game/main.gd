@@ -5,6 +5,8 @@ extends Node
 ## An expedition (one real island in parts, on foot) has no boat:
 ##   ARMORY -> ISLAND (part 1) -> (cleared and more parts) CAMP -> ISLAND
 ##          -> (last part cleared, or death) DEBRIEF
+## QUICK REDEPLOY (title or debrief) skips the Armory and the run choice:
+## it starts the last run again (BOAT, or ISLAND for an expedition).
 ## Each state is a scene that is freed when the state changes; RunContext is
 ## the only thing that crosses states.
 
@@ -17,6 +19,7 @@ var context: RunContext
 var profile: Profile
 var _current: Node
 var _test_scene: PackedScene  ## TEST ISLAND: the island being tested, no run around it
+var _landing: Dictionary = {}  ## RunContext.island_info() of the island being played
 
 
 func _ready() -> void:
@@ -40,11 +43,24 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Starts a run from the Armory: the archipelago (`expedition` = &"") goes
 ## to the boat; an expedition lands straight on its first part.
 func _new_run(expedition: StringName = &"") -> void:
+	profile.remember_run(expedition)
+	profile.save()
 	context = _fresh_context()
 	if expedition != &"" and context.start_expedition(expedition):
 		_go(GameFlow.ISLAND)
 	else:
 		_go(GameFlow.BOAT)
+
+
+## QUICK REDEPLOY (title, debrief): the last run again, with the same
+## class, perks, threat and run type, skipping the Armory and the run
+## choice (the boat or the expedition flow is the same). If something of it
+## is no longer owned or available, the Armory opens instead (DEPLOY).
+func _quick_redeploy() -> void:
+	if profile.apply_last_run():
+		_new_run(profile.last_expedition())
+	else:
+		_go(GameFlow.ARMORY)
 
 
 ## A run context with the profile's threat, class, perks and weapons.
@@ -98,6 +114,7 @@ func _go(next: GameFlow) -> void:
 				if part_scene == null:
 					push_error("Expedition part scene missing: %s" % context.part_scene())
 				island.set("handmade_scene", part_scene)
+			_landing = context.island_info()
 			island.connect("finished", _on_island_finished, CONNECT_DEFERRED)
 			_current = island
 		GameFlow.DEBRIEF:
@@ -109,6 +126,7 @@ func _go(next: GameFlow) -> void:
 			debrief.set("context", context)
 			debrief.set("profile", profile)
 			debrief.connect("new_run_requested", _go.bind(GameFlow.ARMORY), CONNECT_DEFERRED)
+			debrief.connect("quick_redeploy_requested", _quick_redeploy, CONNECT_DEFERRED)
 			_current = debrief
 		GameFlow.TITLE:
 			var title := Node.new()
@@ -116,6 +134,7 @@ func _go(next: GameFlow) -> void:
 			title.set("profile", profile)
 			title.connect("play_requested", _go.bind(GameFlow.ARMORY), CONNECT_DEFERRED)
 			title.connect("test_island_requested", _test_island, CONNECT_DEFERRED)
+			title.connect("quick_redeploy_requested", _quick_redeploy, CONNECT_DEFERRED)
 			_current = title
 		GameFlow.CAMP:
 			var camp := Control.new()
@@ -157,6 +176,9 @@ func _on_island_finished(won: bool) -> void:
 		_test_scene = null  # a test: back to the title, nothing recorded
 		_go(GameFlow.TITLE)
 		return
+	# The island's entry in the log gets what the debrief cards show.
+	if not context.island_log.is_empty():
+		context.island_log[-1].merge(_landing)
 	if won and not context.is_last_island():
 		context.advance()
 		_go(GameFlow.CAMP if context.is_expedition() else GameFlow.BOAT)

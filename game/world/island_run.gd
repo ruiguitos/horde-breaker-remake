@@ -53,6 +53,11 @@ var _shots: int = 0
 var all_cards: Array[GameData.Card] = GameData.cards()
 var card_stacks: Dictionary = {}  ## StringName -> int
 var card_choices: Array[GameData.Card] = []
+## Bumps on every new card offer (level-up or reroll), even when the cards
+## drawn are the same: the HUD refreshes and locks input per offer.
+var card_offer: int = 0
+## Card rerolls left in the run (carried between islands, see GameData.REROLLS_*).
+var rerolls: int = GameData.REROLLS_START
 var _pending_levels: int = 0
 var _recycle_cd: float = 0.0
 
@@ -109,6 +114,7 @@ var _summon_cd: float = GameData.BOSS_SUMMON_INTERVAL
 var kills: int = 0
 var headshots: int = 0
 var time_alive: float = 0.0
+var landed_time: float = 0.0  ## time_alive when this island started
 ## Spawn statistics (tests, F3): enemies the director asked for, how many
 ## needed the ring fallback and how many found no spot at all.
 var spawn_requests: int = 0
@@ -183,6 +189,8 @@ func load_context(ctx: RunContext) -> void:
 	_kills_at_start = kills
 	headshots = ctx.headshots
 	time_alive = ctx.time_alive
+	landed_time = time_alive
+	rerolls = context_rerolls(ctx)
 	horde.hp_scale = (1.0 + 0.3 * ctx.island_index) * GameData.threat_hp(threat)
 	director.max_alive = GameData.MAX_ALIVE + GameData.threat_extra_alive(threat)
 	modifier = ctx.modifier
@@ -223,7 +231,7 @@ func save_to_context(ctx: RunContext) -> void:
 		"seconds": snappedf(time_alive - ctx.time_alive, 0.1),
 		"kills": kills - _kills_at_start, "headshots": headshots - ctx.headshots,
 		"damage_taken": int(damage_taken), "hp_left": int(hp), "level": level,
-		"intel": intel_earned(), "caches_opened": caches_opened(),
+		"intel": intel_earned(), "intel_hazard": intel_hazard_share(), "caches_opened": caches_opened(),
 		"cards_picked": cards_picked.map(func(x: StringName) -> String: return String(x)),
 	})
 	ctx.intel += intel_earned()
@@ -237,6 +245,26 @@ func save_to_context(ctx: RunContext) -> void:
 	ctx.kills = kills
 	ctx.headshots = headshots
 	ctx.time_alive = time_alive
+	# A cleared island that is not the last earns a reroll (capped).
+	var banked: int = rerolls
+	if objective == Objective.WON and not ctx.is_last_island():
+		banked = mini(GameData.REROLLS_MAX, banked + GameData.REROLLS_PER_ISLAND)
+	set_context_rerolls(ctx, banked)
+
+
+## Rerolls left in a run context. RunContext has no field for them yet, so
+## they ride along as metadata until it gets one (`rerolls`).
+static func context_rerolls(ctx: RunContext) -> int:
+	if &"rerolls" in ctx:
+		return int(ctx.get(&"rerolls"))
+	return int(ctx.get_meta(&"rerolls", GameData.REROLLS_START))
+
+
+static func set_context_rerolls(ctx: RunContext, n: int) -> void:
+	if &"rerolls" in ctx:
+		ctx.set(&"rerolls", n)
+	else:
+		ctx.set_meta(&"rerolls", n)
 
 
 func max_ammo(w: int) -> int:
@@ -440,7 +468,9 @@ func breaker_cooldown_total() -> float:
 	return (0.7 if player_class == &"vanguard" else 1.0) * GameData.BREAKER_COOLDOWN * pow(0.7, stacks(&"quick_breaker"))
 
 
-func intel_earned() -> int:
+## Intel earned on this island so far. with_hazard = false leaves out the
+## hazard pay +25% (for the debrief's split).
+func intel_earned(with_hazard: bool = true) -> int:
 	var done: int = 0
 	for p in generator_progress:
 		if p >= GameData.GENERATOR_HOLD_SECONDS:
@@ -455,8 +485,15 @@ func intel_earned() -> int:
 			base += done * 15
 	base += 20 if boss_killed else 0
 	base += cache_intel
-	var hazard: float = GameData.HAZARD_INTEL_MULT if hazard_pay else 1.0
+	var hazard: float = GameData.HAZARD_INTEL_MULT if hazard_pay and with_hazard else 1.0
 	return int(base * GameData.threat_intel(threat) * GameData.modifier(modifier).intel_mult * hazard)
+
+
+## The hazard pay share of intel_earned(): total minus the same Intel
+## without the +25%, both truncated as the game pays them (the debrief
+## cannot recover it by dividing the truncated total).
+func intel_hazard_share() -> int:
+	return intel_earned() - intel_earned(false)
 
 
 func switch_weapon(i: int) -> void:
@@ -482,6 +519,18 @@ func choose_card(i: int) -> void:
 	messages.append("Card: " + c.title)
 	card_choices.clear()
 	_roll_cards_if_needed()
+
+
+## Spends a reroll to redraw the current card offer (other cards when the
+## deck has enough). False when there is no offer or no reroll left.
+func reroll_cards() -> bool:
+	if card_choices.is_empty() or rerolls <= 0:
+		return false
+	rerolls -= 1
+	var previous: Array[GameData.Card] = card_choices.duplicate()
+	card_choices.clear()
+	_draw_cards(previous)
+	return true
 
 
 ## One simulation step. move = desired direction (x, z), aim = facing on XZ.
@@ -805,20 +854,34 @@ func _roll_cards_if_needed() -> void:
 	if _pending_levels <= 0 or not card_choices.is_empty():
 		return
 	_pending_levels -= 1
-	var pool: Array[GameData.Card] = []
-	for c in all_cards:
-		if stacks(c.id) < c.max_stacks:
-			pool.append(c)
-	if pool.is_empty():
+	if not _draw_cards([]):
 		# Every card maxed: levelling up still heals.
 		hp = minf(max_hp, hp + 20.0)
 		messages.append("Level up: +20 HP")
 		_roll_cards_if_needed()
-		return
-	for k in mini(3, pool.size()):
-		var pick: int = rng.randi_range(0, pool.size() - 1)
-		card_choices.append(pool[pick])
-		pool.remove_at(pick)
+
+
+## Fills card_choices with up to 3 cards that are not maxed, avoiding
+## `avoid` (the offer being rerolled) while the deck has others left.
+func _draw_cards(avoid: Array[GameData.Card]) -> bool:
+	var pool: Array[GameData.Card] = []
+	var spare: Array[GameData.Card] = []
+	for c in all_cards:
+		if stacks(c.id) >= c.max_stacks:
+			continue
+		if avoid.has(c):
+			spare.append(c)
+		else:
+			pool.append(c)
+	if pool.is_empty() and spare.is_empty():
+		return false
+	for k in mini(3, pool.size() + spare.size()):
+		var from: Array[GameData.Card] = pool if not pool.is_empty() else spare
+		var pick: int = rng.randi_range(0, from.size() - 1)
+		card_choices.append(from[pick])
+		from.remove_at(pick)
+	card_offer += 1
+	return true
 
 
 func _update_mission(dt: float) -> void:
