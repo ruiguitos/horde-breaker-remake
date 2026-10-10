@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://4orsolh6ftwu"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_q6xtr"]
+
+[resource]
+script = ExtResource("1_q6xtr")
+title = "Light Boots"
+description = "+4% movement speed per rank."
+max_stacks = 5
+tags = Array[StringName]([&"movement"])
+order = 22

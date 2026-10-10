@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://c5t4iydlgbj51"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_ndefc"]
+
+[resource]
+script = ExtResource("1_ndefc")
+title = "Fast Learner"
+description = "+5% collected XP per rank. Fractional XP carries over."
+max_stacks = 5
+tags = Array[StringName]([&"pickup", &"xp"])
+order = 21

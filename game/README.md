@@ -102,8 +102,23 @@ gráficos):
   - **Grabber** (roxo): agarra-te e não te deixa andar até o matares ou usares
     o breaker.
 - Mortes largam **orbes de XP** (azuis). Ao subir de nível o jogo pausa e
-  escolhes 1 de 3 cartas. A maioria muda comportamentos (breaker com onda de
-  choque, ricochete, headshots que explodem).
+  escolhes 1 de 3 cartas, de um catálogo de **39**. A oferta garante uma
+  carta nova e uma melhoria quando ambas existem; respeita a classe,
+  armas da run, pré-requisitos e ranks. O barco e o acampamento usam os
+  mesmos filtros, com reroll em **R / Y** da mesma reserva. Sem cartas
+  elegíveis, a recompensa é cura de 20 HP.
+  Cartas no rank máximo ficam excluídas de todas as ofertas. A partir do
+  **nível 30**, toda a XP no chão da ilha/parte é apanhada automaticamente,
+  incluindo a que já existia ao atingir esse nível e os novos drops.
+  Há fogo, frio/congelamento, descargas e veneno para a Assault Rifle,
+  além de melhorias do breaker, cura, mobilidade e habilidades de classe.
+  Ver [implementação das cartas](../docs/tech/CARDS_IMPLEMENTATION.md).
+- **Power-ups de abate**: sete ajudas ocasionais, em todas as missões e
+  partes das expedições. Apanha o ícone luminoso antes de desaparecer
+  (25 s). Há Insta-Kill, Double XP/Intel, Nuke, Full Power, Max Armor,
+  Fire Sale (+1 reroll) e Max Ammo. O escudo absorve dano antes da vida;
+  os efeitos temporários mostram segundos no HUD. Valores e regras em
+  [power-ups e derrota](../docs/tech/POWER_UPS_AND_DEFEAT.md).
 - Armas: Assault Rifle (infinita), Shotgun e Heavy Pistol (munição limitada,
   atravessam inimigos). Cada gerador ligado repõe metade da munição.
 - **Missão**: segue o marcador amarelo até cada gerador e fica dentro do anel
@@ -124,15 +139,17 @@ na ilha seguinte.
 
 ## HUD tático
 
-Painéis escuros, títulos condensados e apontamentos âmbar, a combinar com os
-menus. O centro do ecrã fica disponível para o combate.
+Texto com contorno, barras sem painéis escuros e títulos condensados,
+a combinar com os menus. O centro fica disponível para o combate.
 
-- **Em baixo**: vida numérica e XP à esquerda; Breaker, habilidade da classe e
+- **Em baixo**: vida, escudo numérico e XP à esquerda; Breaker, habilidade da classe e
   estamina ao centro; arma e munição à direita. Recargas mostram segundos ou
   `READY`; correr mostra `SPRINTING` e uma arma vazia mostra `NO AMMO`.
 - **Em cima**: objetivo, progresso e modificador da rota; vida do sobrevivente
   durante a escolta ou barra do Behemoth com indicação da fase 2. Minimapa à
   direita, com grelha discreta e barco em forma de losango âmbar.
+  Os power-ups ativos mostram ícone e segundos; drops têm marcador e
+  legenda próprios no minimapa.
 - **Avisos**: pouca vida, Grabber, Screamer, perda do sobrevivente e War Cry
   mantêm-se visíveis. As legendas de Hale aparecem acima da vida. Dano
   direcional, números de dano, cartas e pausa mantêm o funcionamento anterior.
@@ -397,6 +414,13 @@ Cada ilha (ou parte) é mais dura: o HP dos inimigos sobe 30 % e há mais
 especiais. A vida, o nível, as cartas e a munição passam de ilha para ilha
 (`core/run_context.gd`).
 
+O ecrã de derrota **CONTRACT TERMINATED** mostra os abates, headshots,
+tempo total, Intel conservado e bónus de extração perdido. O botão
+**CONTINUE TO DEBRIEF** funciona com rato, Enter e A; uma proteção inicial
+de 0,6 s evita avançar por um toque de combate. Em F6, reinicia a ilha de
+teste. Escudo e temporizadores dos power-ups passam entre ilhas/partes;
+objetos deixados no chão ficam para trás.
+
 O perfil grava-se em `user://profile.json`. No Windows fica em
 `%APPDATA%\Godot\app_userdata\Horde Breaker Remake\`. Apagar o ficheiro
 recomeça o perfil.
@@ -486,8 +510,9 @@ blindado à frente (−50 %) e não é empurrado.
 
 No fim de cada run grava-se `user://runs/run_<data>.json`, ao lado do
 perfil. Tem, por ilha: modificador, resultado, segundos, mortes, headshots,
-dano recebido, vida restante, nível, Intel, caixas abertas e cartas
-escolhidas. Serve para equilibrar com números ("morri na ilha 2 com Elite
+dano recebido na vida, vida e escudo restantes, nível, Intel, caixas abertas,
+cartas escolhidas, power-ups apanhados e bónus de Intel dos power-ups
+(antes dos multiplicadores de rota/Threat). Serve para equilibrar com números ("morri na ilha 2 com Elite
 Pack ao fim de 3 min") em vez de impressões.
 
 ## Meta: Intel, perks e Threat
@@ -617,6 +642,7 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 | `ui/route_map.gd`, `ui/route_preview.gd` | Mapa decorativo e miniaturas das rotas. |
 | `states/armory.gd`, `states/boat.gd`, `states/camp.gd`, `states/debrief.gd` | Ecrãs entre runs, entre ilhas, entre partes de uma expedição e do fim da run. O `camp.gd` herda do `boat.gd`: os mantimentos ficam num só sítio. |
 | `world/island_run.gd` | **Todas as regras**, sem nós: jogador, auto-fire, breaker, cartas, missão. Testável em headless. |
+| `world/power_ups.gd` | Drops, garantia, RNG independente e temporizadores; efeitos aplicados pelo IslandRun. |
 | `world/island.gd` | Input, render (MultiMesh), câmara média e efeitos. |
 | `world/island_map.gd` | Gera a ilha (costa irregular, edifícios, geradores, barco). |
 | `world/director.gd` | Ritmo da horda (crescer/pico/relax, intensidade). |

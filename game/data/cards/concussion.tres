@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://b8pn373gym1cb"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_yvhkr"]
+
+[resource]
+script = ExtResource("1_yvhkr")
+title = "Concussion"
+description = "Grenades stun for an extra 0.25 seconds per rank."
+max_stacks = 3
+category = "class_recruit"
+icon = &"class_recruit"
+tags = Array[StringName]([&"grenade", &"stun"])
+class_filter = Array[StringName]([&"recruit"])
+order = 27

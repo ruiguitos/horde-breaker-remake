@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://csrrmk7u0mpd7"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_5lk1u"]
+
+[resource]
+script = ExtResource("1_5lk1u")
+title = "Wildfire"
+description = "Direct kills of burning enemies spread fire to one nearby target per rank. Requires Fire Rounds."
+max_stacks = 3
+category = "elements"
+icon = &"fire"
+tags = Array[StringName]([&"fire", &"kill"])
+weapon_filter = Array[StringName]([&"rifle"])
+prerequisites = Dictionary[StringName, int]({
+&"fire_rounds": 1
+})
+order = 35

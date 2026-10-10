@@ -5,6 +5,9 @@
 [resource]
 script = ExtResource("1_i1t86")
 title = "Hollow Points"
-description = "+25% weapon damage."
-max_stacks = 3
-order = 5
+description = "+10% Assault Rifle damage per rank."
+max_stacks = 5
+category = "assault_rifle"
+icon = &"assault_rifle"
+tags = Array[StringName]([&"damage"])
+weapon_filter = Array[StringName]([&"rifle"])

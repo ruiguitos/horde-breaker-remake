@@ -72,6 +72,13 @@ class Card:
 	var title: String
 	var description: String
 	var max_stacks: int
+	var category: StringName = &"utility"
+	var icon: StringName = &"utility"
+	var tags: Array[StringName] = []
+	var class_filter: Array[StringName] = []
+	var weapon_filter: Array[StringName] = []
+	var requires_finite_weapon: bool = false
+	var prerequisites: Dictionary[StringName, int] = {}
 
 	func _init(p_id: StringName, p_title: String, p_desc: String, p_max: int) -> void:
 		id = p_id
@@ -119,6 +126,7 @@ const BREAKER_RADIUS: float = 2.2
 const BREAKER_DAMAGE: float = 15.0
 const BREAKER_STUN: float = 1.0
 const PICKUP_RADIUS: float = 3.0
+const XP_AUTO_COLLECT_LEVEL: int = 30
 ## Auto-fire picks targets inside this cone around where the player faces.
 const AIM_CONE_DEG: float = 50.0
 ## Targets this close to the facing direction get headshots.
@@ -229,22 +237,42 @@ const REROLLS_START: int = 2
 const REROLLS_PER_ISLAND: int = 1
 const REROLLS_MAX: int = 3
 
-## Card categories. PROVISIONAL: the card data has no category yet, so it
-## is derived here from what each card changes (breaker, guns, staying
-## alive). Unknown cards fall back to survival. Move this into CardData
-## when the deck grows.
-const CARD_CATEGORIES: Dictionary = {
-	&"quick_breaker": &"breaker", &"shockwave": &"breaker",
-	&"adrenaline": &"breaker", &"executioner": &"breaker",
-	&"hollow_points": &"firearms", &"fast_hands": &"firearms",
-	&"ricochet": &"firearms", &"explosive_heads": &"firearms",
-	&"bigger_mags": &"firearms", &"grenadier": &"firearms",
-	&"magnet": &"survival", &"vampire": &"survival",
+# Kill power-ups: provisional playtest values, independent of cards/weapons.
+const POWER_UP_CHANCE: float = 0.015
+const POWER_UP_SPECIAL_CHANCE: float = 0.05
+const POWER_UP_PITY_KILLS: int = 60
+const POWER_UP_DROP_INTERVAL: float = 35.0
+const POWER_UP_GROUND_SECONDS: float = 25.0
+const POWER_UP_BLINK_SECONDS: float = 10.0
+const POWER_UP_ACTIVE_SECONDS: float = 25.0
+const POWER_UP_PICKUP_RADIUS: float = 1.4
+const POWER_UP_STRONG_DAMAGE_MULT: float = 2.0
+const POWER_UP_NUKE_RADIUS: float = 40.0
+const POWER_UP_NUKE_HP_SHARE: float = 0.35
+const POWER_UP_SPAWN_DELAY: float = 5.0
+const PLAYER_MAX_SHIELD: float = 100.0
+const POWER_UP_IDS: Array[StringName] = [
+	&"insta_kill", &"double_rewards", &"nuke", &"full_power", &"max_armor", &"fire_sale", &"max_ammo",
+]
+const POWER_UP_NAMES: Dictionary = {
+	&"insta_kill": "INSTA-KILL", &"double_rewards": "DOUBLE XP / INTEL", &"nuke": "NUKE",
+	&"full_power": "FULL POWER", &"max_armor": "MAX ARMOR", &"fire_sale": "FIRE SALE", &"max_ammo": "MAX AMMO",
+}
+const POWER_UP_ICONS: Dictionary = {
+	&"insta_kill": "✕", &"double_rewards": "×2", &"nuke": "✦", &"full_power": "ϟ",
+	&"max_armor": "◇", &"fire_sale": "↻", &"max_ammo": "▥",
 }
 
 
+static func power_up_normal(kind: int) -> bool:
+	return kind == EnemyKind.WALKER or kind == EnemyKind.RUNNER
+
+
 static func card_category(id: StringName) -> StringName:
-	return CARD_CATEGORIES.get(id, &"survival")
+	for card in cards():
+		if card.id == id:
+			return card.category
+	return &"utility"
 
 
 ## Horde
@@ -353,7 +381,15 @@ static func cards() -> Array[Card]:
 	if _cards.is_empty():
 		for e: Array in _entries(CARD_REGISTRY):
 			var d: CardData = e[1]
-			_cards.append(Card.new(e[0], d.title, d.description, d.max_stacks))
+			var c := Card.new(e[0], d.title, d.description, d.max_stacks)
+			c.category = StringName(d.category)
+			c.icon = d.icon
+			c.tags = d.tags.duplicate()
+			c.class_filter = d.class_filter.duplicate()
+			c.weapon_filter = d.weapon_filter.duplicate()
+			c.requires_finite_weapon = d.requires_finite_weapon
+			c.prerequisites = d.prerequisites.duplicate()
+			_cards.append(c)
 	return _cards.duplicate()
 
 

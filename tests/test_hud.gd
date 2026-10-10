@@ -104,7 +104,7 @@ func _test() -> void:
 	_check(_hud._radio_panel.visible and _hud._radio_text.text != "" and _hud._radio_panel.get_global_rect().end.y < _hud._status_panel.get_global_rect().position.y, "radio subtitles stay on-screen above health")
 	_run.objective = IslandRun.Objective.LOST
 	_hud.refresh(_run, null, 0)
-	_check(_hud._end_panel.visible and _hud._end_label.text.contains("YOU DIED"), "end-of-run summary remains available")
+	_check(_hud._death_panel.visible and not _hud._end_panel.visible and _hud._death_intel.text == str(_run.intel_earned()), "defeat report shows retained Intel")
 	_run.horde.grabbed_by = 0
 	_run.scream_progress = 2
 	_run.hp = 10

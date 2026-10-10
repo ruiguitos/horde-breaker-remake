@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://bmyliyvy7rjcy"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_su45i"]
+
+[resource]
+script = ExtResource("1_su45i")
+title = "Wind Rounds"
+description = "Rifle hits push enemies an extra 0.15 m per rank."
+max_stacks = 5
+category = "elements"
+icon = &"elements"
+tags = Array[StringName]([&"knockback"])
+weapon_filter = Array[StringName]([&"rifle"])
+order = 16

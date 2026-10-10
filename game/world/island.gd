@@ -76,6 +76,7 @@ var _enemy_mm := MultiMesh.new()
 var _head_mm := MultiMesh.new()
 var _arm_mm := MultiMesh.new()
 var _orb_mm := MultiMesh.new()
+var _cloud_mm := MultiMesh.new()
 var _debris_mm := MultiMesh.new()
 var _tracer_mesh := ImmediateMesh.new()
 var _generators: Array[MeshInstance3D] = []
@@ -112,6 +113,9 @@ var _grenade_ring_mm := MultiMesh.new()
 var _rock_mm := MultiMesh.new()
 var _rock_ring_mm := MultiMesh.new()
 var _sim_ms: float = 0.0
+var _power_up_visual: Node3D
+var _power_up_glyph: Label3D
+var _power_up_name: Label3D
 
 
 func _ready() -> void:
@@ -174,6 +178,7 @@ func _ready() -> void:
 	hud.reroll_requested.connect(func() -> void: run.reroll_cards())
 	hud.resume_requested.connect(func() -> void: paused = false)
 	hud.abandon_requested.connect(_abandon)
+	hud.continue_requested.connect(_finish)
 	add_child(hud)
 
 
@@ -734,7 +739,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if run.is_over():
 		if event.is_action_pressed(&"confirm"):
-			_finish()
+			hud.request_continue()
 		return
 	if event.is_action_pressed(&"pause"):
 		paused = not paused
@@ -848,6 +853,8 @@ func _process(delta: float) -> void:
 	_draw_enemies()
 	_draw_orbs()
 	_draw_grenades()
+	_draw_clouds()
+	_draw_power_up()
 	_draw_rocks()
 	_draw_effects(delta)
 	_draw_mission()
@@ -1222,7 +1229,7 @@ func _draw_enemies() -> void:
 		var phase: float = now * (4.0 + speed * 2.0) + i * 1.7
 		var roll: float = sin(phase) * 0.14 * walk
 		var lean: float = 0.18 * walk
-		if h.stun[i] > 0.0:
+		if h.stun[i] > 0.0 and h.freeze_time[i] <= 0.0:
 			roll = sin(now * 25.0 + i) * 0.3
 			lean = -0.25
 		var rot := Basis(Vector3.UP, yaw) * Basis(Vector3.RIGHT, lean) * Basis(Vector3.FORWARD, roll)
@@ -1240,6 +1247,14 @@ func _draw_enemies() -> void:
 			var arm_pos: Vector3 = center + rot * Vector3(0.3 * sign * sx, t.height * 0.28, 0.3 * sx)
 			_arm_mm.set_instance_transform(i * 2 + side, Transform3D(arm_rot.scaled(Vector3.ONE * sx), arm_pos))
 		var c: Color = t.color
+		if h.burn_time[i] > 0.0:
+			c = c.lerp(Color(1.0, 0.35, 0.08), 0.65)
+		if h.poison_time[i] > 0.0:
+			c = c.lerp(Color(0.65, 0.9, 0.16), 0.65)
+		if h.cold_stacks[i] > 0:
+			c = c.lerp(Color(0.25, 0.7, 1.0), 0.5)
+		if h.freeze_time[i] > 0.0:
+			c = Color(0.55, 0.92, 1.0)
 		if h.flash[i] > 0.0:
 			c = Color.WHITE
 		elif h.stun[i] > 0.0:
@@ -1305,7 +1320,7 @@ func _draw_grenades() -> void:
 	var n: int = run.grenades.size()
 	_grenade_mm.instance_count = n
 	_grenade_ring_mm.instance_count = n
-	var radius: float = GameData.GRENADE_RADIUS + (1.0 if run.has_perk(&"demolitions") else 0.0)
+	var radius: float = GameData.GRENADE_RADIUS + (1.0 if run.has_perk(&"demolitions") else 0.0) + 0.4 * run.stacks(&"wide_blast")
 	for i in n:
 		var p: Vector3 = _on_ground(run.grenades[i])
 		# Small arc: the grenade drops onto the target as the fuse runs out.
@@ -1313,6 +1328,72 @@ func _draw_grenades() -> void:
 		var height: float = 0.25 + 2.0 * (1.0 - t) * t * 4.0 * 0.5
 		_grenade_mm.set_instance_transform(i, Transform3D(Basis(), p + Vector3(0, height, 0)))
 		_grenade_ring_mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * radius), p + Vector3(0, 0.06, 0)))
+
+
+## One batched mesh for all poison clouds; no per-cloud nodes or physics.
+func _draw_clouds() -> void:
+	var count: int = run.toxic_clouds.size()
+	if _cloud_mm.mesh == null:
+		if count == 0:
+			return
+		var disk := CylinderMesh.new()
+		disk.top_radius = 2.0
+		disk.bottom_radius = 2.0
+		disk.height = 0.08
+		_setup_multimesh(_cloud_mm, disk, true, Color(0.45, 0.85, 0.12), true)
+	_cloud_mm.instance_count = count
+	for i in count:
+		_cloud_mm.set_instance_transform(i, Transform3D(Basis(), _on_ground(run.toxic_clouds[i]) + Vector3(0, 0.08, 0)))
+		var fade: float = minf(1.0, run.toxic_cloud_times[i])
+		_cloud_mm.set_instance_color(i, Color(0.6, 0.9, 0.3).lerp(Color(0.2, 0.4, 0.08), 1.0 - fade))
+
+
+## Just one pooled icon; no per-kill nodes. Height follows terrain/bridges.
+func _draw_power_up() -> void:
+	var p: PowerUps = run.power_ups
+	if _power_up_visual == null:
+		if p.ground_kind == &"":
+			return
+		_power_up_visual = Node3D.new()
+		_power_up_visual.name = "PowerUpPickup"
+		add_child(_power_up_visual)
+		var ring := MeshInstance3D.new()
+		var mesh := TorusMesh.new()
+		mesh.inner_radius = 0.45
+		mesh.outer_radius = 0.55
+		ring.mesh = mesh
+		var material := StandardMaterial3D.new()
+		material.albedo_color = UiTheme.SUCCESS
+		material.emission_enabled = true
+		material.emission = UiTheme.SUCCESS
+		material.emission_energy_multiplier = 2.0
+		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		ring.material_override = material
+		_power_up_visual.add_child(ring)
+		_power_up_glyph = Label3D.new()
+		_power_up_glyph.font = UiTheme.mono_bold_font()
+		_power_up_glyph.font_size = 72
+		_power_up_glyph.pixel_size = 0.015
+		_power_up_glyph.outline_size = 12
+		_power_up_glyph.modulate = UiTheme.SUCCESS.lightened(0.35)
+		_power_up_glyph.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		_power_up_glyph.position.y = 1.2
+		_power_up_visual.add_child(_power_up_glyph)
+		_power_up_name = Label3D.new()
+		_power_up_name.font = UiTheme.heading_font()
+		_power_up_name.font_size = 28
+		_power_up_name.pixel_size = 0.009
+		_power_up_name.outline_size = 8
+		_power_up_name.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		_power_up_name.position.y = 2.0
+		_power_up_visual.add_child(_power_up_name)
+	_power_up_visual.visible = p.ground_kind != &"" and p.blinking_visible() and not run.is_over()
+	if p.ground_kind == &"":
+		return
+	_power_up_visual.position = _on_ground(p.ground_pos) + Vector3(0, 0.2, 0)
+	_power_up_glyph.position.y = 1.2 + sin(run.time_alive * 3.0) * 0.15
+	_power_up_glyph.text = GameData.POWER_UP_ICONS[p.ground_kind]
+	_power_up_name.text = GameData.POWER_UP_NAMES[p.ground_kind]
 
 
 func _draw_orbs() -> void:

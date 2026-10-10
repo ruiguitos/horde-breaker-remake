@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://bglm7kok63632"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_mofrm"]
+
+[resource]
+script = ExtResource("1_mofrm")
+title = "Rally"
+description = "War Cry heals 5 HP per rank."
+max_stacks = 5
+category = "class_vanguard"
+icon = &"class_vanguard"
+tags = Array[StringName]([&"war_cry", &"heal"])
+class_filter = Array[StringName]([&"vanguard"])
+order = 28

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://cbftqlruy01uw"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_gm2f4"]
+
+[resource]
+script = ExtResource("1_gm2f4")
+title = "Steady Aim"
+description = "+8% rifle fire rate per rank while standing still."
+max_stacks = 3
+category = "assault_rifle"
+icon = &"assault_rifle"
+tags = Array[StringName]([&"fire_rate", &"stationary"])
+weapon_filter = Array[StringName]([&"rifle"])
+order = 13

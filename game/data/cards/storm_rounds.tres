@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://f422gxqh140k"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_gxmut"]
+
+[resource]
+script = ExtResource("1_gxmut")
+title = "Storm Rounds"
+description = "Rifle: +5% discharge chance per rank. Strikes a neighbour within 6 m for 60% hit damage."
+max_stacks = 5
+category = "elements"
+icon = &"storm"
+tags = Array[StringName]([&"storm", &"chain"])
+weapon_filter = Array[StringName]([&"rifle"])
+order = 33

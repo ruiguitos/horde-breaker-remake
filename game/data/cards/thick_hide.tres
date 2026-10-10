@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://c8gboislmrup3"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_clh1i"]
+
+[resource]
+script = ExtResource("1_clh1i")
+title = "Thick Hide"
+description = "+15 maximum and current HP per rank."
+max_stacks = 5
+category = "defense"
+icon = &"defense"
+tags = Array[StringName]([&"health"])
+order = 17

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://dk3inea3r1q73"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_hrm63"]
+
+[resource]
+script = ExtResource("1_hrm63")
+title = "Crowd Splitter"
+description = "Breaker pushes enemies an extra 0.4 m per rank."
+max_stacks = 3
+category = "breaker"
+icon = &"breaker"
+tags = Array[StringName]([&"breaker", &"knockback"])
+order = 25

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://dbbbgruges268"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_v4hfd"]
+
+[resource]
+script = ExtResource("1_v4hfd")
+title = "Kill Rations"
+description = "Every ten kills heal 2 HP per rank."
+max_stacks = 5
+category = "sustain"
+icon = &"sustain"
+tags = Array[StringName]([&"kill", &"heal"])
+order = 18

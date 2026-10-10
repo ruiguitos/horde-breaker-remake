@@ -5,6 +5,9 @@
 [resource]
 script = ExtResource("1_b3af7")
 title = "Executioner"
-description = "+60% damage to stunned enemies."
-max_stacks = 2
+description = "+20% damage against stunned enemies per rank."
+max_stacks = 5
+category = "breaker"
+icon = &"breaker"
+tags = Array[StringName]([&"stun", &"damage"])
 order = 9

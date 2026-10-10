@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://cv8me8hr0o34c"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_4wjj5"]
+
+[resource]
+script = ExtResource("1_4wjj5")
+title = "Finish the Job"
+description = "+15% rifle damage per rank against targets below 30% HP."
+max_stacks = 3
+category = "assault_rifle"
+icon = &"assault_rifle"
+tags = Array[StringName]([&"damage", &"execute"])
+weapon_filter = Array[StringName]([&"rifle"])
+order = 15

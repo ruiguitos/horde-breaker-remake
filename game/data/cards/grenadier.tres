@@ -5,6 +5,10 @@
 [resource]
 script = ExtResource("1_luwgs")
 title = "Grenadier"
-description = "Grenade cooldown -20%."
-max_stacks = 2
+description = "Grenade cooldown is multiplied by 0.9 per rank."
+max_stacks = 5
+category = "class_recruit"
+icon = &"class_recruit"
+tags = Array[StringName]([&"grenade", &"cooldown"])
+class_filter = Array[StringName]([&"recruit"])
 order = 11

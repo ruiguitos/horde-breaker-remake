@@ -21,7 +21,7 @@ func _initialize() -> void:
 	_check(GameData.weapon_cost(&"smg") == 60 and GameData.weapon_cost(&"marksman") == 80 and GameData.weapon_cost(&"rifle") == -1,
 		"unlock costs: SMG 60, Marksman 80, Rifle not for sale")
 	_check(weapons[1].pellets == 8 and is_equal_approx(weapons[0].fire_rate, 9.0), "weapon stats come from the .tres files")
-	_check(GameData.cards().size() == 12 and GameData.perks().size() == 5, "12 cards and 5 perks")
+	_check(GameData.cards().size() == 39 and GameData.perks().size() == 5, "39 cards and 5 perks")
 	_check(GameData.perks()[0].id == &"thick_skin" and GameData.perks()[0].cost == 40, "perk order and cost")
 	var reg: Registry = load(GameData.PERK_REGISTRY)
 	var cheap: Array[StringName] = reg.filter(&"cost", func(v: int) -> bool: return v <= 40)

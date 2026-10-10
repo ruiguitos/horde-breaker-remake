@@ -134,7 +134,7 @@ func _test_cards() -> void:
 	var title: Label = cards[0].title
 	var category: Label = cards[0].category
 	var rank: Label = cards[0].rank
-	_check(title.text == _run.card_choices[0].title and category.text.contains(String(GameData.card_category(_run.card_choices[0].id)).to_upper()) and rank.text == "1 / %d" % _run.card_choices[0].max_stacks,
+	_check(title.text == _run.card_choices[0].title and category.text.contains(String(GameData.card_category(_run.card_choices[0].id)).replace("_", " ").to_upper()) and rank.text == "1 / %d" % _run.card_choices[0].max_stacks,
 		"card shows category, name and rank")
 	await _accept(true)
 	await _accept(false)
@@ -173,7 +173,7 @@ func _test_cards() -> void:
 ## New offers lock and refresh even with the same cards; the pause blocks them.
 func _test_offers() -> void:
 	var saved: Dictionary = _run.card_stacks.duplicate()
-	# Only Fast Hands (3 ranks) can be drawn: every offer is the same card.
+	# Only Fast Hands (5 ranks) can be drawn: every offer is the same card.
 	for c in _run.all_cards:
 		if c.id != &"fast_hands":
 			_run.card_stacks[c.id] = c.max_stacks
@@ -182,13 +182,13 @@ func _test_offers() -> void:
 	_run.call("_roll_cards_if_needed")
 	await _settle()
 	var cards: Array = _hud.get("_cards")
-	_check((cards[0].rank as Label).text == "1 / 3", "single-card offer shows rank 1 / 3")
+	_check((cards[0].rank as Label).text == "1 / 5", "single-card offer shows rank 1 / 5")
 	await _wait(0.45)
 	var offer: int = _run.card_offer
 	(cards[0].button as Button).grab_focus()
 	await _accept(true)
 	await _accept(false)
-	_check(_run.stacks(&"fast_hands") == 1 and _run.card_offer == offer + 1 and (cards[0].rank as Label).text == "2 / 3",
+	_check(_run.stacks(&"fast_hands") == 1 and _run.card_offer == offer + 1 and (cards[0].rank as Label).text == "2 / 5",
 		"the next pending offer of the same card refreshes its rank (%s)" % (cards[0].rank as Label).text)
 	_check(_hud.call("_cards_locked"), "the next pending offer starts a new 0.4 s lock")
 	await _wait(0.45)

@@ -14,10 +14,12 @@ signal card_chosen(index: int)
 signal reroll_requested
 signal resume_requested
 signal abandon_requested
+signal continue_requested
 
 ## Cards ignore presses this long after they open (or are rerolled), so a
 ## button mashed in combat cannot take a card blind.
 const CARD_LOCK_MS: int = 400
+const DEATH_LOCK_MS: int = 600
 ## Specials and the boss closer than this get an arrow at the screen edge.
 const THREAT_RANGE: float = 40.0
 const THREAT_ARROWS_MAX: int = 4
@@ -29,7 +31,10 @@ const MARKER_VIEW_DEG: float = 35.0
 const MARKER_NEAR_M: float = 12.0
 const MARKER_FADE_S: float = 0.2
 ## Category marks: shape and colour (never colour alone).
-const CATEGORY_GLYPH: Dictionary = {&"breaker": "◆", &"firearms": "●", &"survival": "■"}
+const CATEGORY_GLYPH: Dictionary = {
+	&"assault_rifle": "⊕", &"elements": "✦", &"defense": "◇", &"sustain": "+",
+	&"utility": "■", &"breaker": "◆", &"class_recruit": "●", &"class_vanguard": "▲",
+}
 const ROMAN: Array[String] = ["0", "I", "II", "III", "IV", "V", "VI"]
 ## Pill behind world markers (dark sea blue, mostly opaque).
 const MARKER_BG := Color(0.04, 0.1, 0.125, 0.86)
@@ -60,6 +65,9 @@ var _info: Label
 var _hp_text: Label
 var _hp_max: Label
 var _hp_bar: ProgressBar
+var _shield_bar: ProgressBar
+var _shield_text: Label
+var _power_up_timers: Label
 var _xp_bar: ProgressBar
 var _xp_text: Label
 var _stats: Label
@@ -107,6 +115,19 @@ var _damage_flash: ColorRect
 var _last_hp: float = -1.0
 var _end_panel: PanelContainer
 var _end_label: Label
+var _death_panel: Control
+var _death_where: Label
+var _death_reason: Label
+var _death_kills: Label
+var _death_heads: Label
+var _death_time: Label
+var _death_intel: Label
+var _death_intel_detail: Label
+var _death_bonus: Label
+var _death_continue: Button
+var _death_hints: Label
+var _death_opened_ms: int = -100000
+var _continue_sent: bool = false
 
 # Level-up cards
 var _cards_panel: Control
@@ -334,10 +355,9 @@ class ThreatArrows extends Control:
 			draw_string(font, Vector2(pill.position.x + 5.0, c.y + 4.5), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, UiTheme.DANGER)
 
 
-## Card category picture: shockwave (breaker), sight (firearms), cross
-## (survival), in the category colour.
+## Vector glyphs selected by CardData.icon; category also has a text label.
 class CategoryIcon extends Control:
-	var category: StringName = &"survival"
+	var category: StringName = &"utility"
 	var color: Color = UiTheme.SUCCESS
 
 	func _init() -> void:
@@ -360,11 +380,36 @@ class CategoryIcon extends Control:
 				for r in [13.0, 22.0]:
 					draw_arc(c, r, PI * 1.15, PI * 1.85, 16, color, w, true)
 					draw_arc(c, r, PI * 0.15, PI * 0.85, 16, color, w, true)
-			&"firearms":
+			&"assault_rifle":
 				draw_arc(c, 15.0, 0.0, TAU, 32, color, w, true)
 				draw_circle(c, 3.0, color)
 				for d: Vector2 in [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]:
 					draw_line(c + d * 9.0, c + d * 24.0, color, w, true)
+			&"frost":
+				for angle in 6:
+					var d := Vector2.from_angle(angle * TAU / 6.0)
+					draw_line(c, c + d * 23.0, color, w, true)
+					draw_line(c + d * 14.0, c + d * 18.0 + d.rotated(PI / 2.0) * 7.0, color, 2.0, true)
+			&"storm":
+				draw_colored_polygon(PackedVector2Array([c + Vector2(5, -24), c + Vector2(-16, 4), c + Vector2(-2, 4), c + Vector2(-7, 24), c + Vector2(17, -6), c + Vector2(3, -6)]), color)
+			&"fire":
+				draw_colored_polygon(PackedVector2Array([c + Vector2(0, -25), c + Vector2(17, 1), c + Vector2(12, 19), c + Vector2(0, 24), c + Vector2(-15, 14), c + Vector2(-18, 0), c + Vector2(-5, 7)]), color)
+			&"toxic":
+				draw_circle(c, 7, color)
+				for angle in 3:
+					var d := Vector2.from_angle(angle * TAU / 3.0 - PI / 2.0)
+					draw_arc(c + d * 12, 9, 0, TAU, 18, color, w, true)
+			&"defense", &"class_vanguard":
+				draw_polyline(PackedVector2Array([c + Vector2(0, -23), c + Vector2(19, -15), c + Vector2(15, 8), c + Vector2(0, 24), c + Vector2(-15, 8), c + Vector2(-19, -15), c + Vector2(0, -23)]), color, w, true)
+			&"utility", &"elements":
+				for angle in 4:
+					var d := Vector2.from_angle(angle * PI / 2.0)
+					draw_line(c + d * 8, c + d * 23, color, w, true)
+				draw_arc(c, 8, 0, TAU, 16, color, w, true)
+			&"class_recruit":
+				draw_circle(c + Vector2(0, 6), 16, color, false, w, true)
+				draw_line(c + Vector2(-4, -11), c + Vector2(-4, -22), color, w, true)
+				draw_line(c + Vector2(-4, -22), c + Vector2(12, -22), color, w, true)
 			_:
 				var a: float = 7.0
 				var b: float = 21.0
@@ -426,7 +471,7 @@ func _init() -> void:
 
 	_messages = _label("", 17)
 	_messages.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	_messages.position = Vector2(-240, 132)
+	_messages.position = Vector2(-240, 170)
 	_messages.size = Vector2(480, 80)
 	_messages.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	root.add_child(_messages)
@@ -452,6 +497,7 @@ func _init() -> void:
 	_end_panel.add_child(_end_label)
 
 	_build_pause(root)
+	_build_death(root)
 	_update_prompts()
 
 
@@ -615,6 +661,9 @@ func _build_field_hud(field: Control) -> void:
 	_hp_max.size_flags_vertical = Control.SIZE_SHRINK_END
 	identity.add_child(_hp_max)
 	_hp_bar = _meter(_status_panel, UiTheme.DANGER, 14)
+	_shield_bar = _meter(_status_panel, UiTheme.SUCCESS, 6)
+	_shield_text = _label("◇ SHIELD 0 / 100", 12, UiTheme.SUCCESS, true)
+	_status_panel.add_child(_shield_text)
 	_xp_bar = _meter(_status_panel, UiTheme.INFO, 5)
 	var progression := _row(_status_panel, 8)
 	_xp_text = _label("", 14, UiTheme.TEXT_MUTED, true)
@@ -622,6 +671,9 @@ func _build_field_hud(field: Control) -> void:
 	progression.add_child(_xp_text)
 	_stats = _label("", 14, UiTheme.TEXT_MUTED, true)
 	progression.add_child(_stats)
+	_power_up_timers = _label("", 16, UiTheme.SUCCESS, true)
+	_power_up_timers.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_place(field, _power_up_timers, Control.PRESET_CENTER_TOP, Vector2(-240, 115), Vector2(480, 44))
 
 	# Radio subtitles, just above the status block.
 	_radio_panel = VBoxContainer.new()
@@ -792,15 +844,20 @@ func _build_cards(root: Control) -> void:
 	hints.add_child(_reroll_reason)
 	# The current build: small chips at the bottom left.
 	var strip_box := MenuDialog.glass_box(_cards_panel, 0.8)
-	strip_box.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	strip_box.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	strip_box.position = Vector2(20, -16)
+	strip_box.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	strip_box.offset_left = 20
+	strip_box.offset_right = -20
+	strip_box.offset_top = -64
+	strip_box.offset_bottom = -14
 	(strip_box.get_theme_stylebox("panel") as StyleBoxFlat).content_margin_top = 6
 	(strip_box.get_theme_stylebox("panel") as StyleBoxFlat).content_margin_bottom = 6
 	_build_strip = HBoxContainer.new()
 	_build_strip.name = "BuildStrip"
 	_build_strip.add_theme_constant_override("separation", 8)
-	strip_box.add_child(_build_strip)
+	var scroll := ScrollContainer.new()
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	strip_box.add_child(scroll)
+	scroll.add_child(_build_strip)
 
 
 func _card_style(border: Color, width: int) -> StyleBoxFlat:
@@ -815,13 +872,13 @@ func _card_style(border: Color, width: int) -> StyleBoxFlat:
 func _card_view(i: int) -> CardView:
 	var v := CardView.new()
 	v.slot = Control.new()
-	v.slot.custom_minimum_size = Vector2(270, 364)
+	v.slot.custom_minimum_size = Vector2(270, 424)
 	v.slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_card_row.add_child(v.slot)
 	v.button = Button.new()
 	v.button.name = "Card%d" % i
 	v.button.position = Vector2(0, 14)
-	v.button.size = Vector2(270, 350)
+	v.button.size = Vector2(270, 410)
 	v.style_idle = _card_style(UiTheme.LINE, 1)
 	v.style_focus = _card_style(UiTheme.ACCENT, 2)
 	for state in ["normal", "hover", "pressed", "hover_pressed"]:
@@ -842,7 +899,7 @@ func _card_view(i: int) -> CardView:
 	v.button.add_child(margin)
 	var col := VBoxContainer.new()
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	col.add_theme_constant_override("separation", 10)
+	col.add_theme_constant_override("separation", 8)
 	margin.add_child(col)
 	var top := _row(col, 8)
 	v.category = _plain("", 13, UiTheme.ACCENT, true)
@@ -853,7 +910,7 @@ func _card_view(i: int) -> CardView:
 	top.add_child(v.tag)
 	var art := PanelContainer.new()
 	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	art.custom_minimum_size.y = 86
+	art.custom_minimum_size.y = 64
 	var art_style := StyleBoxFlat.new()
 	art_style.bg_color = UiTheme.PANEL_RAISED
 	art_style.set_corner_radius_all(4)
@@ -864,7 +921,9 @@ func _card_view(i: int) -> CardView:
 	v.title = UiTheme.label("", 28)
 	v.title.add_theme_font_override("font", UiTheme.title_font())
 	col.add_child(v.title)
-	v.text = UiTheme.label("", 17)
+	v.text = UiTheme.label("", 16)
+	v.text.max_lines_visible = 4
+	v.text.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	col.add_child(v.text)
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -881,6 +940,8 @@ func _card_view(i: int) -> CardView:
 	v.rank = _plain("", 13, UiTheme.TEXT_MUTED, true)
 	rank_row.add_child(v.rank)
 	v.synergy = UiTheme.label("", 14, UiTheme.TEXT_MUTED)
+	v.synergy.max_lines_visible = 1
+	v.synergy.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	col.add_child(v.synergy)
 	return v
 
@@ -889,8 +950,16 @@ static func category_color(category: StringName) -> Color:
 	match category:
 		&"breaker":
 			return UiTheme.ACCENT
-		&"firearms":
+		&"assault_rifle":
 			return UiTheme.INFO
+		&"elements":
+			return Color(0.72, 0.58, 1.0)
+		&"defense":
+			return Color(0.75, 0.83, 0.9)
+		&"class_recruit":
+			return Color(1.0, 0.59, 0.28)
+		&"class_vanguard":
+			return Color(0.88, 0.77, 0.48)
 	return UiTheme.SUCCESS
 
 
@@ -902,29 +971,30 @@ func _fill_card(v: CardView, c: GameData.Card, run: IslandRun) -> void:
 	var owned: int = run.stacks(c.id)
 	var category: StringName = GameData.card_category(c.id)
 	var color: Color = category_color(category)
-	v.category.text = "%s %s" % [CATEGORY_GLYPH[category], String(category).to_upper()]
+	v.category.text = "%s %s" % [CATEGORY_GLYPH[category], String(category).replace("_", " ").to_upper()]
 	v.category.add_theme_color_override("font_color", color)
 	var tag_color: Color = UiTheme.ACCENT if owned > 0 else UiTheme.SUCCESS
 	v.tag.text = "UPGRADE" if owned > 0 else "NEW"
 	v.tag.add_theme_color_override("font_color", tag_color)
 	(v.tag.get_theme_stylebox("normal") as StyleBoxFlat).border_color = tag_color
-	v.icon.show_category(category, color)
+	v.icon.show_category(c.icon, color)
 	v.title.text = c.title
 	v.text.text = c.description
+	v.button.tooltip_text = c.description
+	v.button.accessibility_name = "%s. %s. Rank %d of %d." % [c.title, c.description, owned + 1, c.max_stacks]
 	v.pips.set_state(c.max_stacks, owned + 1, color)
 	v.rank.text = "%d / %d" % [owned + 1, c.max_stacks]
 	v.synergy.text = _synergy(c, category, owned, run)
 
 
-## One honest line about how the card fits the build (no synergy data yet:
-## it names your rank or another card of the same category you own).
+## Shared tags match the offer weights; prerequisites name the base card.
 func _synergy(c: GameData.Card, category: StringName, owned: int, run: IslandRun) -> String:
 	if owned > 0:
 		return "You own rank %s." % roman(owned)
 	for other in run.all_cards:
-		if other.id != c.id and run.stacks(other.id) > 0 and GameData.card_category(other.id) == category:
+		if other.id != c.id and run.stacks(other.id) > 0 and CardOffers._intersects(c.tags, other.tags):
 			return "Pairs with your %s." % other.title
-	return "Your first %s card." % String(category)
+	return "Your first %s card." % String(category).replace("_", " ")
 
 
 func _on_card_focus(i: int, on: bool) -> void:
@@ -1066,9 +1136,6 @@ func _build_pause(root: Control) -> void:
 	var settings := UiTheme.button(menu, "SETTINGS", _settings)
 	settings.name = "Settings"
 	MenuDialog.glass_button(settings)
-	var controls := UiTheme.button(menu, "CONTROLS", _controls)
-	controls.name = "Controls"
-	MenuDialog.glass_button(controls)
 	var push := Control.new()
 	push.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	menu.add_child(push)
@@ -1079,7 +1146,7 @@ func _build_pause(root: Control) -> void:
 	menu.add_child(MenuDialog.ink(UiTheme.label("Asks you to confirm.", 14, UiTheme.TEXT_MUTED)))
 	# A closed focus loop: Tab, Shift+Tab and the d-pad never leave the menu
 	# (a card offer may be open underneath).
-	var loop: Array[Button] = [_resume_button, settings, controls, _abandon_button]
+	var loop: Array[Button] = [_resume_button, settings, _abandon_button]
 	for i in loop.size():
 		var prev: NodePath = loop[i].get_path_to(loop[posmod(i - 1, loop.size())])
 		var next: NodePath = loop[i].get_path_to(loop[(i + 1) % loop.size()])
@@ -1115,7 +1182,13 @@ func _build_pause(root: Control) -> void:
 	_pause_cards.columns = 2
 	_pause_cards.add_theme_constant_override("h_separation", 8)
 	_pause_cards.add_theme_constant_override("v_separation", 8)
-	build.add_child(_pause_cards)
+	var card_scroll := ScrollContainer.new()
+	card_scroll.custom_minimum_size.y = 130
+	card_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	card_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	build.add_child(card_scroll)
+	_pause_cards.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card_scroll.add_child(_pause_cards)
 	var fill := Control.new()
 	fill.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	build.add_child(fill)
@@ -1264,9 +1337,97 @@ func _settings() -> void:
 		_pause_dialog = MenuDialog.settings(_pause_panel, profile)
 
 
-func _controls() -> void:
-	if not is_instance_valid(_pause_dialog):
-		_pause_dialog = MenuDialog.controls(_pause_panel)
+## Defeat is a personnel report: what happened, what survives, one exit.
+func _build_death(root: Control) -> void:
+	_death_panel = Control.new()
+	_death_panel.name = "Defeat"
+	_death_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_death_panel.visible = false
+	root.add_child(_death_panel)
+	_death_panel.add_child(_blur(0.32))
+	var content: VBoxContainer = UiTheme.centered_panel(_death_panel, 620)
+	content.add_theme_constant_override("separation", 12)
+	content.add_child(_plain("SALVAGE & CO.  /  PERSONNEL REPORT", 13, UiTheme.TEXT_MUTED, true))
+	content.add_child(UiTheme.chip("CONTRACTOR LOST", UiTheme.DANGER))
+	var title := UiTheme.title("CONTRACT TERMINATED", 48)
+	title.autowrap_mode = TextServer.AUTOWRAP_OFF
+	content.add_child(title)
+	_death_where = UiTheme.label("", 14, UiTheme.TEXT_MUTED, true)
+	content.add_child(_death_where)
+	_death_reason = UiTheme.label("", 18)
+	content.add_child(_death_reason)
+	content.add_child(HSeparator.new())
+	var stats := HBoxContainer.new()
+	content.add_child(stats)
+	_death_kills = _death_stat(stats, "KILLS")
+	_death_heads = _death_stat(stats, "HEADSHOTS")
+	_death_time = _death_stat(stats, "TIME IN FIELD")
+	content.add_child(HSeparator.new())
+	var intel := HBoxContainer.new()
+	content.add_child(intel)
+	var text := VBoxContainer.new()
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.add_theme_constant_override("separation", 2)
+	intel.add_child(text)
+	text.add_child(_plain("INTEL RETAINED", 15, UiTheme.SUCCESS, true))
+	_death_intel_detail = _plain("", 13, UiTheme.TEXT_MUTED, true)
+	text.add_child(_death_intel_detail)
+	_death_intel = UiTheme.title("0", 46)
+	_death_intel.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_death_intel.add_theme_color_override("font_color", UiTheme.SUCCESS)
+	intel.add_child(_death_intel)
+	_death_bonus = _plain("", 14, UiTheme.DANGER, true)
+	content.add_child(_death_bonus)
+	_death_continue = UiTheme.button(content, "CONTINUE TO DEBRIEF  ›", request_continue, true)
+	_death_continue.name = "ContinueToDebrief"
+	_death_continue.focus_neighbor_top = _death_continue.get_path_to(_death_continue)
+	_death_continue.focus_neighbor_bottom = _death_continue.get_path_to(_death_continue)
+	_death_hints = _plain("", 12, UiTheme.TEXT_MUTED, true)
+	_death_hints.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(_death_hints)
+
+
+func _death_stat(parent: Control, caption: String) -> Label:
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.add_theme_constant_override("separation", 2)
+	parent.add_child(col)
+	col.add_child(_plain(caption, 12, UiTheme.TEXT_MUTED, true))
+	var value := UiTheme.title("0", 32)
+	col.add_child(value)
+	return value
+
+
+func request_continue() -> void:
+	if _run == null or not _run.is_over() or _continue_sent:
+		return
+	if _run.objective == IslandRun.Objective.LOST and (not _death_panel.visible or Time.get_ticks_msec() - _death_opened_ms < DEATH_LOCK_MS):
+		return
+	_continue_sent = true
+	continue_requested.emit()
+
+
+func _update_death(run: IslandRun) -> void:
+	var lost: bool = run.objective == IslandRun.Objective.LOST
+	if lost and not _death_panel.visible:
+		_death_opened_ms = Time.get_ticks_msec()
+		_continue_sent = false
+		_death_continue.text = "CONTINUE TO DEBRIEF  ›" if context != null else "RESTART FIELD TEST  ›"
+		_death_continue.grab_focus.call_deferred()
+	_death_panel.visible = lost
+	if not lost:
+		return
+	var where: String = context.part_name().to_upper() if context != null and context.is_expedition() else String(GameData.BIOMES[run.map.biome]["name"]).to_upper()
+	_death_where.text = "%s / %s / LVL %d" % [where, String(GameData.CLASS_INFO[run.player_class]["name"]).to_upper(), run.level]
+	_death_reason.text = "Survivor lost. The paperwork just doubled." if run.survivor_lost else "Recovery is mandatory. Your replacement has been notified."
+	_death_kills.text = str(run.kills)
+	_death_heads.text = str(run.headshots)
+	_death_time.text = "%02d:%02d" % [int(run.time_alive) / 60, int(run.time_alive) % 60]
+	var intel: Dictionary = _intel(run)
+	_death_intel.text = str(intel["kept"])
+	_death_intel_detail.text = "%d PREVIOUS + %d THIS ISLAND" % [intel["banked"], intel["island"]]
+	_death_bonus.text = "EXTRACTION BONUS LOST  /  +%d INTEL (×1.5)" % intel["bonus"]
+	_death_hints.text = "[ %s ] CONTINUE  /  INTEL IS KEPT EVEN ON DEATH" % GameInput.prompt(&"ui_accept", _gamepad)
 
 
 # --- Input --------------------------------------------------------------------
@@ -1284,6 +1445,10 @@ func _input(event: InputEvent) -> void:
 		_gamepad = false
 	if was != _gamepad:
 		_update_prompts()
+	if _death_panel.visible and (event.is_action_pressed(&"ui_accept") or event.is_action_pressed(&"confirm")):
+		get_viewport().set_input_as_handled()
+		if not event.is_echo():
+			request_continue()
 
 
 ## Key prompts from the real bindings (GameInput reads the InputMap, so
@@ -1333,6 +1498,15 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_info.text = "%s · LVL %d" % [String(GameData.CLASS_INFO[run.player_class]["name"]).to_upper(), run.level]
 	_hp_bar.max_value = run.max_hp
 	_hp_bar.value = run.hp
+	_shield_bar.max_value = run.max_shield
+	_shield_bar.value = run.shield
+	_shield_text.text = "◇ SHIELD %d / %d" % [ceili(run.shield), ceili(run.max_shield)]
+	var buffs := PackedStringArray()
+	if run.power_ups.insta_time > 0.0:
+		buffs.append("%s INSTA-KILL  %ds" % [GameData.POWER_UP_ICONS[&"insta_kill"], ceili(run.power_ups.insta_time)])
+	if run.power_ups.double_time > 0.0:
+		buffs.append("%s XP / INTEL  %ds" % [GameData.POWER_UP_ICONS[&"double_rewards"], ceili(run.power_ups.double_time)])
+	_power_up_timers.text = "\n".join(buffs)
 	_hp_text.text = str(ceili(run.hp))
 	_hp_max.text = "/ %d" % ceili(run.max_hp)
 	_hp_text.add_theme_color_override("font_color", UiTheme.DANGER if run.hp <= run.max_hp * 0.25 else UiTheme.TEXT)
@@ -1411,11 +1585,13 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 
 	_update_cards(run)
 
-	_end_panel.visible = run.is_over()
-	if run.is_over():
-		var won: bool = run.objective == IslandRun.Objective.WON
+	_update_death(run)
+	_field.visible = not run.is_over()
+	_messages.visible = not run.is_over()
+	_end_panel.visible = run.objective == IslandRun.Objective.WON
+	if _end_panel.visible:
 		_end_label.text = "%s\n\nKills %d · Headshots %d · Level %d\nIntel earned here: %d\n\nEnter / A: continue" % [
-			_cleared_text(run) if won else "YOU DIED", run.kills, run.headshots, run.level, run.intel_earned()]
+			_cleared_text(run), run.kills, run.headshots, run.level, run.intel_earned()]
 
 
 func _cooldown_label(label: Label, seconds: float) -> void:

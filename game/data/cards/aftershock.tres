@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://di58lh8ci123s"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_t2t51"]
+
+[resource]
+script = ExtResource("1_t2t51")
+title = "Aftershock"
+description = "Breaker stuns last 0.2 seconds longer per rank."
+max_stacks = 3
+category = "breaker"
+icon = &"breaker"
+tags = Array[StringName]([&"breaker", &"stun"])
+order = 24

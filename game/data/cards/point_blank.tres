@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://c3la5c0xjwc1e"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_nm5tb"]
+
+[resource]
+script = ExtResource("1_nm5tb")
+title = "Point Blank"
+description = "+10% rifle damage per rank against targets within 4 m."
+max_stacks = 3
+category = "assault_rifle"
+icon = &"assault_rifle"
+tags = Array[StringName]([&"damage", &"close_range"])
+weapon_filter = Array[StringName]([&"rifle"])
+order = 14

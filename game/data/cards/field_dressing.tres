@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://m0pfuu0shwap"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_ldosy"]
+
+[resource]
+script = ExtResource("1_ldosy")
+title = "Field Dressing"
+description = "Each collected XP orb heals 0.2 HP per rank."
+max_stacks = 5
+category = "sustain"
+icon = &"sustain"
+tags = Array[StringName]([&"pickup", &"heal"])
+order = 19

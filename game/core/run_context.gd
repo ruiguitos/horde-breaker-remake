@@ -8,8 +8,14 @@ const ISLAND_COUNT: int = 3
 var island_index: int = 0  ## 0-based island currently being played / next
 var rng_seed: int = 0
 var hp: float = GameData.PLAYER_MAX_HP
+var shield: float = 0.0
+var max_shield: float = GameData.PLAYER_MAX_SHIELD
+var power_up_state: Dictionary = {}
 var level: int = 1
 var xp: int = 0
+var xp_fraction: float = 0.0
+## Dedicated card RNG carries between level-ups, supplies and islands.
+var card_rng_state: int = 0
 var card_stacks: Dictionary = {}
 ## Level-up card rerolls left (carried between islands, see GameData.REROLLS_*).
 var rerolls: int = GameData.REROLLS_START
@@ -65,6 +71,17 @@ func apply_perks(p_perks: Array[StringName]) -> void:
 
 func has_perk(id: StringName) -> bool:
 	return perks.has(id)
+
+
+## Applies a supply card with the same instant-health rule as level-ups.
+func grant_card(card: GameData.Card) -> void:
+	var rank: int = int(card_stacks.get(card.id, 0))
+	if rank >= card.max_stacks:
+		return
+	card_stacks[card.id] = rank + 1
+	if card.id == &"thick_hide":
+		max_hp += 15.0
+		hp = minf(max_hp, hp + 15.0)
 
 
 func _init(p_seed: int = 0) -> void:

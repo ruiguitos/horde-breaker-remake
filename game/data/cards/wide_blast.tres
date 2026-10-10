@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://do3yg7w0fd003"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_jxj8q"]
+
+[resource]
+script = ExtResource("1_jxj8q")
+title = "Wide Blast"
+description = "+0.4 m grenade explosion radius per rank."
+max_stacks = 3
+category = "class_recruit"
+icon = &"class_recruit"
+tags = Array[StringName]([&"grenade", &"area"])
+class_filter = Array[StringName]([&"recruit"])
+order = 26

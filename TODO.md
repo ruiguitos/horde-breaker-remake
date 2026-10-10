@@ -5,7 +5,9 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 ## Equilíbrio (afinar a jogar)
 
 - [ ] **Level-up**: curva passou a quadrática (`8 + 6n + n²`; 300 XP → nível 7
-  em vez de 10) e há 12 cartas (21 escolhas). Confirmar a jogar.
+  em vez de 10) e há 39 cartas. Confirmar a jogar com o catálogo ampliado.
+- [ ] Power-ups de abate: afinar probabilidades, garantia, duração, escudo
+  e recompensas a jogar; valores provisórios em `game/data/game_data.gd`.
 - [ ] Dano corpo a corpo limitado a 25 por frame (`MAX_MELEE_PER_FRAME`):
   confirmar a jogar se cercado ainda é perigoso o suficiente.
 - [ ] Boss: confirmar a duração do combate (bot: ~2 min com a nova escolha

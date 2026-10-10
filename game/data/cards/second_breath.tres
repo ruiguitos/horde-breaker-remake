@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://c0btfen4e0ngc"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_ur5ra"]
+
+[resource]
+script = ExtResource("1_ur5ra")
+title = "Second Breath"
+description = "Headshot kills restore 0.1 seconds of sprint stamina per rank."
+max_stacks = 3
+tags = Array[StringName]([&"headshot", &"stamina"])
+order = 23

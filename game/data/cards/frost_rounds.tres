@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://bh8ypl7g3hx5p"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_3aiw2"]
+
+[resource]
+script = ExtResource("1_3aiw2")
+title = "Frost Rounds"
+description = "Rifle: +5% cold chance per rank. Cold slows 15% for 4 s; three stacks freeze for 1 s. Bosses only receive half the slow."
+max_stacks = 5
+category = "elements"
+icon = &"frost"
+tags = Array[StringName]([&"frost", &"slow"])
+weapon_filter = Array[StringName]([&"rifle"])
+order = 32

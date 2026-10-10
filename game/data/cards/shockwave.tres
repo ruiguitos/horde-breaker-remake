@@ -5,5 +5,9 @@
 [resource]
 script = ExtResource("1_rh5uk")
 title = "Shockwave Breaker"
-description = "The breaker releases a shockwave: double radius and +30 damage."
-max_stacks = 2
+description = "+15 Breaker damage and +20% radius per rank."
+max_stacks = 5
+category = "breaker"
+icon = &"breaker"
+tags = Array[StringName]([&"breaker", &"area", &"damage"])
+order = 7

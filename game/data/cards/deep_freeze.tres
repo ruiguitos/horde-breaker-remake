@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://dlbd0gwbwcnhw"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_f6hvi"]
+
+[resource]
+script = ExtResource("1_f6hvi")
+title = "Deep Freeze"
+description = "Freezes last 0.25 seconds longer per rank. Requires Frost Rounds."
+max_stacks = 3
+category = "elements"
+icon = &"frost"
+tags = Array[StringName]([&"frost", &"slow"])
+weapon_filter = Array[StringName]([&"rifle"])
+prerequisites = Dictionary[StringName, int]({
+&"frost_rounds": 1
+})
+order = 36

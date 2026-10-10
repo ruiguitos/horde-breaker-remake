@@ -1,7 +1,7 @@
 extends Control
 ## The boat between islands, on one screen: the chart (left), the two routes
 ## and the quartermaster's supplies (right), and DEPLOY (bottom right), which
-## names where you go and with what. Existing rewards and RNG order retained.
+## names where you go and with what. Cards use the shared filtered offers.
 ## The expedition camp (camp.gd) extends this script: same supplies, no routes.
 ##
 ## Selection and focus are separate: LB/RB (or 4/5) pick a route from
@@ -13,11 +13,13 @@ extends Control
 signal land_requested
 
 ## Supply tile height and route picture height, at the 1152x648 base size.
-const SUPPLY_HEIGHT: float = 80.0
+const SUPPLY_HEIGHT: float = 104.0
 const PICTURE_HEIGHT: float = 56.0
 
 var context: RunContext
 var _rng := RandomNumberGenerator.new()
+var _card_offers: CardOffers
+var _card_reroll: Button
 ## Supplies: title, short (for DEPLOY's sub-line), text, reason (why it
 ## would do nothing; "" = useful), apply.
 var _options: Array[Dictionary] = []
@@ -97,14 +99,55 @@ func _make_options() -> void:
 		"text": "Refill Shotgun and Heavy Pistol ammo.",
 		"reason": "Ammo already full" if _ammo_full() else "",
 		"apply": func() -> void: context.ammo = PackedInt32Array()})  # empty = full ammo on landing
-	var pool: Array[GameData.Card] = []
-	for c in GameData.cards():
-		if context.card_stacks.get(c.id, 0) < c.max_stacks:
-			pool.append(c)
-	if not pool.is_empty():
-		var card: GameData.Card = pool[_rng.randi_range(0, pool.size() - 1)]
-		_options.append({"title": "Card: " + card.title, "short": card.title, "text": card.description, "reason": "",
-			"apply": func() -> void: context.card_stacks[card.id] = context.card_stacks.get(card.id, 0) + 1})
+	_card_offers = CardOffers.new(context.rng_seed)
+	if context.card_rng_state != 0:
+		_card_offers.rng.state = context.card_rng_state
+	_options.append(_card_option())
+
+
+func _card_option(avoid: Array[StringName] = []) -> Dictionary:
+	var card: GameData.Card = _card_offers.single(GameData.cards(), context.player_class,
+		context.weapons, context.card_stacks, avoid)
+	if card == null:
+		return {"title": "Training: +20 HP", "short": "+20 HP", "text": "No eligible cards. Recover 20 HP.",
+			"reason": "HP already full" if context.hp >= context.max_hp else "",
+			"apply": func() -> void: context.hp = minf(context.max_hp, context.hp + 20.0)}
+	var owned: int = int(context.card_stacks.get(card.id, 0))
+	return {"title": "Card: " + card.title, "short": card.title, "card": card,
+		"meta": "%s · %s %d/%d" % [String(card.category).replace("_", " ").to_upper(),
+			"UPGRADE" if owned > 0 else "NEW", owned + 1, card.max_stacks],
+		"text": card.description, "reason": "",
+		"apply": func() -> void: context.grant_card(card)}
+
+
+## Shares the level-up reroll bank; changing supplies never spends a card.
+func reroll_supply() -> bool:
+	if _applied or context.rerolls <= 0 or not _options[2].has("card"):
+		return false
+	var old: GameData.Card = _options[2]["card"]
+	_options[2] = _card_option([old.id])
+	context.rerolls -= 1
+	context.card_rng_state = _card_offers.rng.state
+	var b: Button = _buttons[2]
+	(b.find_child("SupplyTitle", true, false) as Label).text = _options[2]["title"]
+	(b.find_child("Effect", true, false) as Label).text = _options[2]["text"]
+	var meta: Label = b.find_child("CardMeta", true, false) as Label
+	meta.text = _options[2]["meta"]
+	meta.add_theme_color_override("font_color", Hud.category_color((_options[2]["card"] as GameData.Card).category))
+	b.tooltip_text = _options[2]["text"]
+	b.accessibility_name = "%s: %s" % [_options[2]["title"], _options[2]["text"]]
+	_refresh_card_reroll()
+	_select_supply(_supply)
+	return true
+
+
+func _refresh_card_reroll() -> void:
+	if _card_reroll == null:
+		return
+	_card_reroll.text = "REROLL CARD · %d · %s" % [context.rerolls,
+		GameInput.prompt(&"card_reroll", not Input.get_connected_joypads().is_empty())]
+	_card_reroll.disabled = _applied or context.rerolls <= 0 or not _options[2].has("card")
+	_card_reroll.tooltip_text = "No rerolls left." if context.rerolls <= 0 else "Redraw the card supply using one run reroll."
 
 
 ## True when an Ammo Crate would change nothing: every owned weapon that
@@ -120,7 +163,7 @@ func _ammo_full() -> bool:
 			continue
 		if context.has_perk(&"pack_rat"):
 			most = most * 3 / 2
-		most = int(most * (1.0 + 0.3 * context.card_stacks.get(&"bigger_mags", 0)))
+		most = int(most * (1.0 + 0.15 * context.card_stacks.get(&"bigger_mags", 0)))
 		if context.ammo[w] < most:
 			return false
 	return true
@@ -326,9 +369,18 @@ func _supply_row(parent: VBoxContainer, caption: String = "QUARTERMASTER / ONE S
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	parent.add_child(box)
+	var heading := HBoxContainer.new()
+	box.add_child(heading)
 	var head := UiTheme.label(caption, 12, UiTheme.MUTED, true)
 	head.name = "SupplyCaption"
-	box.add_child(head)
+	head.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	heading.add_child(head)
+	_card_reroll = Button.new()
+	_card_reroll.name = "CardReroll"
+	_card_reroll.add_theme_font_size_override("font_size", 12)
+	_card_reroll.pressed.connect(reroll_supply)
+	heading.add_child(_card_reroll)
+	_refresh_card_reroll()
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	box.add_child(row)
@@ -356,11 +408,16 @@ func _supply_row(parent: VBoxContainer, caption: String = "QUARTERMASTER / ONE S
 		mark.visible = false
 		title_row.add_child(mark)
 		var title := UiTheme.label(option["title"], 20, UiTheme.TEXT_MUTED if useless else UiTheme.TEXT)
+		title.name = "SupplyTitle"
 		title.add_theme_font_override("font", UiTheme.heading_font())
 		title.autowrap_mode = TextServer.AUTOWRAP_OFF
 		title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		title_row.add_child(title)
+		if option.has("meta"):
+			var meta := UiTheme.label(option["meta"], 11, Hud.category_color((option["card"] as GameData.Card).category), true)
+			meta.name = "CardMeta"
+			card.add_child(meta)
 		var text := UiTheme.label(option["reason"] if useless else option["text"], 14, UiTheme.TEXT_MUTED if useless else UiTheme.TEXT)
 		text.name = "Reason" if useless else "Effect"
 		text.max_lines_visible = 2
@@ -599,6 +656,10 @@ func _wire_focus() -> void:
 		order.append(b)
 	for b in supplies:
 		order.append(b)
+	if not _card_reroll.disabled:
+		order.append(_card_reroll)
+		_card_reroll.focus_neighbor_top = _card_reroll.get_path_to(up_from_supplies if up_from_supplies != null else _supply_target())
+		_card_reroll.focus_neighbor_bottom = _card_reroll.get_path_to(_supply_target())
 	order.append(_land)
 	for row: Array in [_route_buttons, supplies]:
 		for k in row.size():
@@ -677,9 +738,11 @@ func _apply_supply() -> void:
 	if _applied:
 		return
 	_applied = true
+	context.card_rng_state = _card_offers.rng.state
 	if _supply >= 0:
 		(_options[_supply]["apply"] as Callable).call()
 	_refresh_status()
+	_refresh_card_reroll()
 
 
 ## DEPLOY: apply the supply, then Director Hale's briefing (Dialogue
@@ -706,6 +769,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed(&"ui_cancel"):
 		_back()
+		get_viewport().set_input_as_handled()
+		return
+	if event.is_action_pressed(&"card_reroll"):
+		reroll_supply()
 		get_viewport().set_input_as_handled()
 		return
 	# Number keys pick a supply; the pad's X/Y/B (also bound to card_N) do

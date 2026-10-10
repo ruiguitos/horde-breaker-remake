@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://bcy4aqjlujha6"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_i7pi4"]
+
+[resource]
+script = ExtResource("1_i7pi4")
+title = "Catch Your Breath"
+description = "After five seconds without taking damage, regenerate 0.5 HP per second per rank."
+max_stacks = 3
+category = "sustain"
+icon = &"sustain"
+tags = Array[StringName]([&"heal", &"regeneration"])
+order = 20

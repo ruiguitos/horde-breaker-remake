@@ -5,5 +5,7 @@
 [resource]
 script = ExtResource("1_mb2b1")
 title = "XP Magnet"
-description = "Pickup radius x2."
-order = 7
+description = "+40% XP attraction radius per rank."
+max_stacks = 5
+tags = Array[StringName]([&"pickup", &"xp"])
+order = 5

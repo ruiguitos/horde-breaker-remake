@@ -5,6 +5,9 @@
 [resource]
 script = ExtResource("1_4emar")
 title = "Field Medic"
-description = "Headshot kills heal 2 HP."
-max_stacks = 2
+description = "Headshot kills heal 1 HP per rank."
+max_stacks = 5
+category = "sustain"
+icon = &"sustain"
+tags = Array[StringName]([&"headshot", &"heal"])
 order = 4

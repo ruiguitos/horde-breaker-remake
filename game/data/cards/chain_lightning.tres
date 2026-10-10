@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://cf5tgxxqcfodp"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_tmei6"]
+
+[resource]
+script = ExtResource("1_tmei6")
+title = "Chain Lightning"
+description = "Discharges jump to one extra target per rank. Requires Storm Rounds."
+max_stacks = 3
+category = "elements"
+icon = &"storm"
+tags = Array[StringName]([&"storm", &"chain"])
+weapon_filter = Array[StringName]([&"rifle"])
+prerequisites = Dictionary[StringName, int]({
+&"storm_rounds": 1
+})
+order = 37

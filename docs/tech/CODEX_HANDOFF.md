@@ -13,6 +13,16 @@ fazer commit quando ele pedir. Regras do projeto: `AGENTS.md` e `CLAUDE.md`.
 
 ## 1. Cartas (pedido do utilizador)
 
+**Concluída em 2026-10-10, sem commit.** Catálogo de 39 cartas, incluindo
+as quatro melhorias elementais e as combinações. Passaram os 21 testes do
+jogo e os três dos spikes; duas runs completas terminaram com extração.
+Detalhes e escolhas de implementação: [CARDS_IMPLEMENTATION.md](CARDS_IMPLEMENTATION.md).
+
+Atualização: cartas no rank máximo ficam excluídas de level-ups,
+mantimentos e rerolls; a partir do nível 30 toda a XP no chão é recolhida
+automaticamente, incluindo ao atingir esse nível. Revalidação completa:
+**26/26 testes**, com duas runs do bot extraídas; sem commit.
+
 Especificação: `docs/design/CARDS_WEAPONS_PERKS.md`, secções A, C e D, e
 `docs/design/PROGRESSION_AND_ECONOMY.md` §1.6. O ecrã de cartas já existe
 (`game/ui/hud.gd`); as cartas estão em `game/data/cards*`
@@ -58,6 +68,14 @@ Especificação: `docs/design/CARDS_WEAPONS_PERKS.md`, secções A, C e D, e
    - o mantimento "Card:".
 
 ## 2. Power-ups de abate (aprovados pelo utilizador)
+
+**Concluída em 2026-10-10, sem commit.** Sete power-ups em todas as
+missões, escudo, ícones no chão/minimapa, avisos e temporizadores.
+O pedido adicional de melhorar a derrota também está implementado.
+Passaram **26/26 testes** (23 do jogo e três dos spikes); o bot extraiu
+nas seis ilhas das duas runs. Capturas verificadas no Godot com Forward+.
+Detalhes, valores provisórios e como testar:
+[POWER_UPS_AND_DEFEAT.md](POWER_UPS_AND_DEFEAT.md).
 
 Especificação: `docs/design/COMBAT_AND_ENEMIES.md` §6b. Aparecem em
 **todas** as missões, incluindo as partes da Berlenga.

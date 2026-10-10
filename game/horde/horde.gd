@@ -19,6 +19,12 @@ var hp: PackedFloat32Array = PackedFloat32Array()
 var stun: PackedFloat32Array = PackedFloat32Array()
 var attack_cd: PackedFloat32Array = PackedFloat32Array()
 var flash: PackedFloat32Array = PackedFloat32Array()
+## Status data moves with the enemy during swap removal.
+var burn_time: PackedFloat32Array = PackedFloat32Array()
+var poison_time: PackedFloat32Array = PackedFloat32Array()
+var cold_time: PackedFloat32Array = PackedFloat32Array()
+var cold_stacks: PackedByteArray = PackedByteArray()
+var freeze_time: PackedFloat32Array = PackedFloat32Array()
 var count: int = 0
 var target: Vector3 = Vector3.ZERO
 
@@ -58,6 +64,11 @@ func add(pos: Vector3, kind: int, rng: RandomNumberGenerator) -> int:
 	stun.append(0.0)
 	attack_cd.append(rng.randf_range(0.0, t.attack_interval))
 	flash.append(0.0)
+	burn_time.append(0.0)
+	poison_time.append(0.0)
+	cold_time.append(0.0)
+	cold_stacks.append(0)
+	freeze_time.append(0.0)
 	_next.append(-1)
 	_stamp.append(0)
 	count += 1
@@ -77,6 +88,11 @@ func remove(i: int) -> void:
 	stun[i] = stun[last]
 	attack_cd[i] = attack_cd[last]
 	flash[i] = flash[last]
+	burn_time[i] = burn_time[last]
+	poison_time[i] = poison_time[last]
+	cold_time[i] = cold_time[last]
+	cold_stacks[i] = cold_stacks[last]
+	freeze_time[i] = freeze_time[last]
 	positions.resize(last)
 	velocities.resize(last)
 	speeds.resize(last)
@@ -85,6 +101,11 @@ func remove(i: int) -> void:
 	stun.resize(last)
 	attack_cd.resize(last)
 	flash.resize(last)
+	burn_time.resize(last)
+	poison_time.resize(last)
+	cold_time.resize(last)
+	cold_stacks.resize(last)
+	freeze_time.resize(last)
 	_next.resize(last)
 	_stamp.resize(last)
 	count = last
@@ -136,6 +157,12 @@ func tick(dt: float) -> void:
 		var p: Vector3 = positions[i]
 		var t: GameData.EnemyType = types[kinds[i]]
 		flash[i] = maxf(0.0, flash[i] - dt)
+		if freeze_time[i] > 0.0:
+			velocities[i] = Vector3.ZERO
+			stun[i] = maxf(0.0, stun[i] - dt)
+			if grabbed_by == i:
+				grabbed_by = -1
+			continue  # frozen enemies neither move, separate, attack nor grab
 		var tx: float = target.x - p.x
 		var tz: float = target.z - p.z
 		var to_target2: float = tx * tx + tz * tz
@@ -168,6 +195,7 @@ func tick(dt: float) -> void:
 				if t.keep_away > 0.0 and to_target2 < t.keep_away * t.keep_away:
 					desired = -Vector3(tx, 0.0, tz).normalized() * speeds[i]
 		# Separation against the 3x3 neighbouring hash cells.
+		desired *= speed_multiplier(i)
 		var push_x: float = 0.0
 		var push_z: float = 0.0
 		var hx: int = floori(p.x / cs)
@@ -202,6 +230,11 @@ func tick(dt: float) -> void:
 			mz *= s
 		positions[i] = move_against_walls(field, p, mx, mz, RADIUS)
 	rebuild_hash()
+
+
+func speed_multiplier(i: int) -> float:
+	var per_stack: float = 0.075 if kinds[i] == GameData.EnemyKind.BOSS else 0.15
+	return 1.0 - per_stack * cold_stacks[i]
 
 
 ## Axis-separated move: slides along walls, never enters them.

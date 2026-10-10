@@ -12,12 +12,20 @@ var field: FlowField
 var horde: Horde
 var director: Director
 var rng := RandomNumberGenerator.new()
+var card_offers: CardOffers
+var _element_rng := RandomNumberGenerator.new()
+var power_ups: PowerUps
+var power_ups_picked: Array[StringName] = []
+var _intel_checkpoint: int = 0
+var _power_up_intel_bonus: int = 0
 
 # Player
 var player_pos: Vector3
 var facing: Vector3 = Vector3(0, 0, -1)
 var max_hp: float = GameData.PLAYER_MAX_HP
 var hp: float = GameData.PLAYER_MAX_HP
+var shield: float = 0.0
+var max_shield: float = GameData.PLAYER_MAX_SHIELD
 var perks: Array[StringName] = []
 var threat: int = 1
 var modifier: StringName = &"calm"
@@ -27,6 +35,7 @@ var grenades: PackedVector3Array = PackedVector3Array()
 var grenade_fuses: PackedFloat32Array = PackedFloat32Array()
 var level: int = 1
 var xp: int = 0
+var xp_fraction: float = 0.0
 var breaker_cd: float = 0.0
 var dash_time: float = 0.0
 var dash_dir: Vector3 = Vector3.ZERO
@@ -36,6 +45,12 @@ var noclip: bool = false
 var player_class: StringName = &"recruit"
 var hazard_pay: bool = false  ## boat briefing deal (see RunContext)
 var war_cry_time: float = 0.0  ## > 0 while War Cry reduces damage taken
+var battle_rhythm_time: float = 0.0
+var _last_damage_time: float = 0.0
+var _stationary: bool = true
+## Poison clouds: position and seconds remaining (not enemy indices).
+var toxic_clouds: PackedVector3Array = PackedVector3Array()
+var toxic_cloud_times: PackedFloat32Array = PackedFloat32Array()
 var stamina: float = GameData.STAMINA_MAX
 var sprinting: bool = false
 var _stamina_delay: float = 0.0
@@ -149,6 +164,9 @@ var _dead: Dictionary = {}  ## enemy index -> true, removed at the end of step()
 ## generating one from the seed.
 func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMap = null) -> void:
 	rng.seed = rng_seed
+	card_offers = CardOffers.new(rng_seed)
+	power_ups = PowerUps.new(rng_seed)
+	_element_rng.seed = rng_seed ^ 0x454c454d
 	map = custom_map if custom_map != null else IslandMap.build(rng_seed, biome)
 	field = map.field
 	horde = Horde.new(field)
@@ -185,8 +203,16 @@ func load_context(ctx: RunContext) -> void:
 	threat = ctx.threat
 	max_hp = ctx.max_hp
 	hp = ctx.hp
+	shield = ctx.shield
+	max_shield = ctx.max_shield
+	power_ups = PowerUps.new(ctx.rng_seed)
+	power_ups.restore(ctx.power_up_state)
 	level = ctx.level
 	xp = ctx.xp
+	xp_fraction = ctx.xp_fraction
+	card_offers = CardOffers.new(ctx.rng_seed)
+	if ctx.card_rng_state != 0:
+		card_offers.rng.state = ctx.card_rng_state
 	card_stacks = ctx.card_stacks.duplicate()
 	if ctx.ammo.size() == ammo.size():
 		ammo = ctx.ammo.duplicate()
@@ -194,6 +220,7 @@ func load_context(ctx: RunContext) -> void:
 	_kills_at_start = kills
 	headshots = ctx.headshots
 	time_alive = ctx.time_alive
+	_last_damage_time = time_alive
 	landed_time = time_alive
 	rerolls = context_rerolls(ctx)
 	horde.hp_scale = (1.0 + 0.3 * ctx.island_index) * GameData.threat_hp(threat)
@@ -238,13 +265,21 @@ func save_to_context(ctx: RunContext) -> void:
 		"damage_taken": int(damage_taken), "hp_left": int(hp), "level": level,
 		"intel": intel_earned(), "intel_hazard": intel_hazard_share(), "caches_opened": caches_opened(),
 		"cards_picked": cards_picked.map(func(x: StringName) -> String: return String(x)),
+		"power_ups": power_ups_picked.map(func(x: StringName) -> String: return String(x)),
+		"power_up_intel_bonus": _power_up_intel_bonus, "shield_left": int(shield),
 	})
 	ctx.intel += intel_earned()
 	ctx.hazard_pay = false  # one island only
 	ctx.lore_found += lore_found
 	ctx.hp = clampf(hp, 1.0, max_hp)
+	ctx.max_hp = max_hp
+	ctx.shield = shield
+	ctx.max_shield = max_shield
+	ctx.power_up_state = power_ups.snapshot()
 	ctx.level = level
 	ctx.xp = xp
+	ctx.xp_fraction = xp_fraction
+	ctx.card_rng_state = card_offers.rng.state
 	ctx.card_stacks = card_stacks.duplicate()
 	ctx.ammo = ammo.duplicate()
 	ctx.kills = kills
@@ -277,7 +312,7 @@ func max_ammo(w: int) -> int:
 	if m > 0 and has_perk(&"pack_rat"):
 		m = m * 3 / 2
 	if m > 0:
-		m = int(m * (1.0 + 0.3 * stacks(&"bigger_mags")))
+		m = int(m * (1.0 + 0.15 * stacks(&"bigger_mags")))
 	if m > 0 and modifier == &"short":
 		m /= 2
 	return m
@@ -288,7 +323,7 @@ func has_perk(id: StringName) -> bool:
 
 
 func grenade_cooldown_total() -> float:
-	return GameData.GRENADE_COOLDOWN * (0.65 if has_perk(&"demolitions") else 1.0) * pow(0.8, stacks(&"grenadier"))
+	return GameData.GRENADE_COOLDOWN * (0.65 if has_perk(&"demolitions") else 1.0) * pow(0.9, stacks(&"grenadier"))
 
 
 ## Throws a grenade towards `aim` (vector from the player; its length is the
@@ -301,8 +336,10 @@ func use_ability(aim: Vector3) -> bool:
 		&"vanguard":
 			for i in horde.query_radius(player_pos, GameData.WAR_CRY_RADIUS):
 				horde.stun[i] = maxf(horde.stun[i], 1.5)
-				horde.knock_back(i, player_pos, 1.0)
+				horde.knock_back(i, player_pos, 1.0 + 0.4 * stacks(&"intimidation"))
 			war_cry_time = GameData.WAR_CRY_TIME
+			_heal_player(5.0 * stacks(&"rally"))
+			battle_rhythm_time = 3.0 if stacks(&"battle_rhythm") > 0 else 0.0
 			grenade_cd = ability_cooldown_total()
 			explosions.append(player_pos)
 			messages.append("WAR CRY!")
@@ -343,7 +380,7 @@ func _update_screamers(dt: float) -> void:
 	_scream_cd = maxf(0.0, _scream_cd - dt)
 	var seen: bool = false
 	for i in horde.count:
-		if horde.kinds[i] == GameData.EnemyKind.SCREAMER and horde.stun[i] <= 0.0 \
+		if horde.kinds[i] == GameData.EnemyKind.SCREAMER and horde.stun[i] <= 0.0 and horde.freeze_time[i] <= 0.0 \
 				and horde.positions[i].distance_to(player_pos) <= GameData.SCREAM_RANGE \
 				and _line_of_sight(horde.positions[i], player_pos):
 			seen = true
@@ -359,7 +396,7 @@ func _update_screamers(dt: float) -> void:
 
 func _update_grenades(dt: float) -> void:
 	grenade_cd = maxf(0.0, grenade_cd - dt)
-	var radius: float = GameData.GRENADE_RADIUS + (1.0 if has_perk(&"demolitions") else 0.0)
+	var radius: float = GameData.GRENADE_RADIUS + (1.0 if has_perk(&"demolitions") else 0.0) + 0.4 * stacks(&"wide_blast")
 	var i: int = grenades.size() - 1
 	while i >= 0:
 		grenade_fuses[i] -= dt
@@ -368,7 +405,7 @@ func _update_grenades(dt: float) -> void:
 			explosions.append(p)
 			for j in horde.query_radius(p, radius):
 				_damage(j, GameData.GRENADE_DAMAGE, p, false, true)
-				horde.stun[j] = maxf(horde.stun[j], 0.6)
+				horde.stun[j] = maxf(horde.stun[j], 0.6 + 0.25 * stacks(&"concussion"))
 				horde.knock_back(j, p, 2.0)
 			grenades.remove_at(i)
 			grenade_fuses.remove_at(i)
@@ -470,28 +507,43 @@ func stacks(id: StringName) -> int:
 
 
 func breaker_cooldown_total() -> float:
-	return (0.7 if player_class == &"vanguard" else 1.0) * GameData.BREAKER_COOLDOWN * pow(0.7, stacks(&"quick_breaker"))
+	return (0.7 if player_class == &"vanguard" else 1.0) * GameData.BREAKER_COOLDOWN * pow(0.9, stacks(&"quick_breaker"))
 
 
 ## Intel earned on this island so far. with_hazard = false leaves out the
 ## hazard pay +25% (for the debrief's split).
 func intel_earned(with_hazard: bool = true) -> int:
+	_sync_intel_bonus()
+	var base: int = _intel_base() + _power_up_intel_bonus
+	var hazard: float = GameData.HAZARD_INTEL_MULT if hazard_pay and with_hazard else 1.0
+	return int(base * GameData.threat_intel(threat) * GameData.modifier(modifier).intel_mult * hazard)
+
+
+func _intel_base() -> int:
+	var extracted: bool = objective == Objective.WON and hp > 0.0
 	var done: int = 0
 	for p in generator_progress:
 		if p >= GameData.GENERATOR_HOLD_SECONDS:
 			done += 1
-	var base: int = (kills - _kills_at_start) / 5 + (40 if objective == Objective.WON else 0)
+	var base: int = (kills - _kills_at_start) / 5 + (40 if extracted else 0)
 	match mission:
 		&"defend", &"holdout":
 			base += 45 if defend_time >= hold_time() else int(defend_time / hold_time() * 30.0)
 		&"rescue":
-			base += 40 if survivor_found and not survivor_lost and objective == Objective.WON else 0
+			base += 40 if survivor_found and not survivor_lost and extracted else 0
 		_:
 			base += done * 15
 	base += 20 if boss_killed else 0
 	base += cache_intel
-	var hazard: float = GameData.HAZARD_INTEL_MULT if hazard_pay and with_hazard else 1.0
-	return int(base * GameData.threat_intel(threat) * GameData.modifier(modifier).intel_mult * hazard)
+	return base
+
+
+## Credit only newly earned Intel during the buff. Expiry never removes it.
+func _sync_intel_bonus() -> void:
+	var current: int = _intel_base()
+	if power_ups.double_time > 0.0:
+		_power_up_intel_bonus += maxi(0, current - _intel_checkpoint)
+	_intel_checkpoint = current
 
 
 ## The hazard pay share of intel_earned(): total minus the same Intel
@@ -519,7 +571,12 @@ func choose_card(i: int) -> void:
 	if i < 0 or i >= card_choices.size():
 		return
 	var c: GameData.Card = card_choices[i]
-	card_stacks[c.id] = stacks(c.id) + 1
+	if stacks(c.id) >= c.max_stacks:
+		return
+	card_stacks[c.id] = mini(c.max_stacks, stacks(c.id) + 1)
+	if c.id == &"thick_hide":
+		max_hp += 15.0
+		hp = minf(max_hp, hp + 15.0)
 	cards_picked.append(c.id)
 	messages.append("Card: " + c.title)
 	card_choices.clear()
@@ -542,32 +599,42 @@ func reroll_cards() -> bool:
 func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = false) -> void:
 	if is_paused():
 		return
+	_sync_intel_bonus()
+	power_ups.tick(dt)
 	time_alive += dt
 	_hp_at_step_start = hp
 	var aim_flat := Vector3(aim.x, 0, aim.z)
 	if aim_flat.length_squared() > 0.0001:
 		facing = aim_flat.normalized()
 	_update_stamina(dt, sprint and move.length_squared() > 0.01)
+	var before_move: Vector3 = player_pos
 	_update_player(dt, move, breaker)
+	_collect_power_up()
+	_stationary = player_pos.distance_squared_to(before_move) < 0.000001
 	horde.set_target(player_pos)
 	horde.tick(dt)
 	if invulnerable <= 0.0 and dash_time <= 0.0:
 		var melee: float = minf(horde.damage_to_player, GameData.MAX_MELEE_PER_FRAME)
-		hp -= melee * (0.6 if war_cry_time > 0.0 else 1.0)
+		_take_player_damage(melee * (0.6 if war_cry_time > 0.0 else 1.0))
 	war_cry_time = maxf(0.0, war_cry_time - dt)
+	battle_rhythm_time = maxf(0.0, battle_rhythm_time - dt)
 	invulnerable = maxf(0.0, invulnerable - dt)
 	if not sprinting:
 		_auto_fire(dt)
 	_update_grenades(dt)
 	_update_screamers(dt)
+	_update_states(dt)
 	_flush_dead()
 	_recycle_far(dt)
 	_update_orbs(dt)
 	_update_mission(dt)
 	_update_caches(dt)
 	_update_lava(dt)
+	_regenerate(dt)
 	var near: int = horde.query_radius(player_pos, 6.0).size()
 	var to_spawn: int = director.update(dt, horde.count, horde.damage_to_player, near)
+	if power_ups.spawn_delay > 0.0:
+		to_spawn = 0
 	for k in to_spawn:
 		_spawn_enemy()
 	if noclip:
@@ -580,6 +647,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	if hp <= 0.0:
 		hp = 0.0
 		objective = Objective.LOST
+	_sync_intel_bonus()
 
 
 ## Sprint drains stamina; it regenerates after a short pause. Running on
@@ -613,10 +681,10 @@ func _update_player(dt: float, move: Vector2, breaker: bool) -> void:
 		var speed: float = GameData.BREAKER_DISTANCE * (1.4 if has_perk(&"long_breaker") else 1.0) / GameData.BREAKER_DURATION
 		player_pos = Horde.move_against_walls(field, player_pos, dash_dir.x * speed * dt, dash_dir.z * speed * dt, GameData.PLAYER_RADIUS)
 		# Shove everything along the path out of the way.
-		var radius: float = GameData.BREAKER_RADIUS * (2.0 if stacks(&"shockwave") > 0 else 1.0)
+		var radius: float = breaker_radius()
 		for i in horde.query_radius(player_pos, radius):
-			horde.stun[i] = maxf(horde.stun[i], GameData.BREAKER_STUN)
-			horde.knock_back(i, player_pos, 0.6)
+			horde.stun[i] = maxf(horde.stun[i], GameData.BREAKER_STUN + 0.2 * stacks(&"aftershock"))
+			horde.knock_back(i, player_pos, 0.6 + 0.4 * stacks(&"crowd_splitter"))
 		if dash_time <= 0.0:
 			_breaker_impact(radius)
 		return
@@ -624,7 +692,7 @@ func _update_player(dt: float, move: Vector2, breaker: bool) -> void:
 		return
 	if move.length_squared() > 1.0:
 		move = move.normalized()
-	var v: Vector2 = move * GameData.PLAYER_SPEED * (GameData.SPRINT_MULTIPLIER if sprinting else 1.0) * dt
+	var v: Vector2 = move * GameData.PLAYER_SPEED * (1.0 + 0.04 * stacks(&"light_boots")) * (GameData.SPRINT_MULTIPLIER if sprinting else 1.0) * dt
 	player_pos = Horde.move_against_walls(field, player_pos, v.x, v.y, GameData.PLAYER_RADIUS)
 
 
@@ -642,7 +710,7 @@ func _start_breaker(move: Vector2) -> void:
 
 
 func _breaker_impact(radius: float) -> void:
-	var dmg: float = GameData.BREAKER_DAMAGE + 30.0 * stacks(&"shockwave")
+	var dmg: float = GameData.BREAKER_DAMAGE + 15.0 * stacks(&"shockwave")
 	for i in horde.query_radius(player_pos, radius):
 		_damage(i, dmg, player_pos, false, true)
 	_flush_dead()
@@ -650,7 +718,7 @@ func _breaker_impact(radius: float) -> void:
 
 func _auto_fire(dt: float) -> void:
 	var w: GameData.Weapon = weapons[weapon_index]
-	var rate: float = w.fire_rate * (1.0 + 0.2 * stacks(&"fast_hands"))
+	var rate: float = fire_rate()
 	_fire_cd -= dt
 	if _fire_cd > 0.0:
 		return
@@ -667,6 +735,98 @@ func _auto_fire(dt: float) -> void:
 			break
 		if target in _dead or target >= horde.count:
 			break
+
+
+func fire_rate() -> float:
+	var bonus: float = 0.0
+	if weapons[weapon_index].id == &"rifle":
+		bonus += 0.08 * stacks(&"fast_hands")
+		if _stationary:
+			bonus += 0.08 * stacks(&"steady_aim")
+	if battle_rhythm_time > 0.0:
+		bonus += 0.08 * stacks(&"battle_rhythm")
+	return weapons[weapon_index].fire_rate * (1.0 + bonus)
+
+
+func breaker_radius() -> float:
+	return GameData.BREAKER_RADIUS * (1.0 + 0.2 * stacks(&"shockwave"))
+
+
+func _take_player_damage(amount: float) -> void:
+	if amount > 0.0 and not noclip:
+		var absorbed: float = minf(shield, amount)
+		shield -= absorbed
+		hp -= amount - absorbed
+		_last_damage_time = time_alive
+
+
+func add_shield(amount: float) -> void:
+	shield = clampf(shield + maxf(0.0, amount), 0.0, max_shield)
+
+
+func _has_finite_weapon() -> bool:
+	for i in weapons.size():
+		if weapon_unlocked[i] and weapons[i].max_ammo > 0:
+			return true
+	return false
+
+
+func _collect_power_up() -> void:
+	if power_ups.ground_kind == &"" or hp <= 0.0:
+		return
+	var d := Vector2(player_pos.x - power_ups.ground_pos.x, player_pos.z - power_ups.ground_pos.z)
+	if d.length() > GameData.POWER_UP_PICKUP_RADIUS:
+		return
+	var kind: StringName = power_ups.ground_kind
+	power_ups.ground_kind = &""
+	power_ups.ground_time = 0.0
+	apply_power_up(kind)
+
+
+func apply_power_up(kind: StringName) -> void:
+	if not GameData.POWER_UP_IDS.has(kind):
+		return
+	_sync_intel_bonus()
+	power_ups_picked.append(kind)
+	messages.append("%s!" % GameData.POWER_UP_NAMES[kind])
+	match kind:
+		&"insta_kill":
+			power_ups.insta_time = GameData.POWER_UP_ACTIVE_SECONDS
+		&"double_rewards":
+			power_ups.double_time = GameData.POWER_UP_ACTIVE_SECONDS
+		&"nuke":
+			power_ups.spawn_delay = GameData.POWER_UP_SPAWN_DELAY
+			explosions.append(player_pos)
+			for i in horde.query_radius(player_pos, GameData.POWER_UP_NUKE_RADIUS):
+				if _dead.has(i) or not _line_of_sight(player_pos, horde.positions[i]):
+					continue
+				var kind_id: int = horde.kinds[i]
+				var max_health: float = boss_max_hp if kind_id == GameData.EnemyKind.BOSS and boss_max_hp > 0.0 else horde.types[kind_id].hp * horde.hp_scale
+				var amount: float = horde.hp[i] if GameData.power_up_normal(kind_id) else max_health * GameData.POWER_UP_NUKE_HP_SHARE
+				_damage(i, amount, player_pos, false, true, true)
+		&"full_power":
+			breaker_cd = 0.0
+			grenade_cd = 0.0
+		&"max_armor":
+			add_shield(max_shield)
+		&"fire_sale":
+			rerolls = mini(GameData.REROLLS_MAX, rerolls + 1)
+		&"max_ammo":
+			for i in weapons.size():
+				if weapon_unlocked[i] and weapons[i].max_ammo > 0:
+					ammo[i] = max_ammo(i)
+
+
+func _regenerate(dt: float) -> void:
+	if hp <= 0.0:
+		return
+	var active: float = minf(dt, maxf(0.0, time_alive - _last_damage_time - 5.0))
+	_heal_player(active * 0.5 * stacks(&"catch_your_breath"))
+
+
+func _heal_player(amount: float) -> void:
+	if amount > 0.0 and hp < max_hp:
+		hp = minf(max_hp, hp + amount)
 
 
 ## Sets the crosshair ray (world metres); see crosshair_dir.
@@ -828,19 +988,24 @@ func headshot_cone_cos() -> float:
 
 
 func _fire(w: GameData.Weapon, target: int) -> void:
-	_shots += 1
+	if w.id == &"rifle":
+		_shots += 1
 	if w.max_ammo > 0:
 		ammo[weapon_index] -= 1
 	var to: Vector3 = horde.positions[target] - player_pos
 	to.y = 0.0
 	var dir: Vector3 = to.normalized()
 	var headshot: bool = _is_headshot(target)
-	var dmg: float = w.damage * (1.0 + 0.25 * stacks(&"hollow_points"))
+	var rifle: bool = w.id == &"rifle"
+	var dmg: float = w.damage * (1.0 + 0.10 * stacks(&"hollow_points") if rifle else 1.0)
+	var pierce: int = w.pierce + (stacks(&"piercing_rounds") if rifle else 0)
+	var direct_hits: Array[int] = []
+	var ricochet_damage: float = dmg
 	for p in w.pellets:
 		var pellet_dir: Vector3 = dir
 		if w.spread_deg > 0.0:
 			pellet_dir = dir.rotated(Vector3.UP, deg_to_rad(rng.randf_range(-w.spread_deg, w.spread_deg) * 0.5))
-		var hits: Array[Vector2] = horde.hitscan(player_pos, pellet_dir, w.range_m, w.pierce)
+		var hits: Array[Vector2] = horde.hitscan(player_pos, pellet_dir, w.range_m, pierce)
 		var end: Vector3 = player_pos + pellet_dir * w.range_m
 		for h in hits:
 			var idx: int = int(h.y)
@@ -848,37 +1013,51 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 			if _dead.has(idx):
 				continue
 			var is_head: bool = headshot and idx == target
-			_damage(idx, dmg * (GameData.HEADSHOT_MULTIPLIER if is_head else 1.0), player_pos, is_head, false)
-			horde.knock_back(idx, player_pos, w.knockback)
+			var hit_damage: float = dmg * (GameData.HEADSHOT_MULTIPLIER if is_head else 1.0)
+			if rifle:
+				if horde.positions[idx].distance_to(player_pos) <= 4.0:
+					hit_damage *= 1.0 + 0.10 * stacks(&"point_blank")
+				var full_hp: float = horde.types[horde.kinds[idx]].hp * horde.hp_scale
+				if horde.hp[idx] < full_hp * 0.3:
+					hit_damage *= 1.0 + 0.15 * stacks(&"finish_the_job")
+				_apply_elements(idx, hit_damage)
+			_damage(idx, hit_damage, player_pos, is_head, false, false, rifle)
+			direct_hits.append(idx)
+			if idx == target:
+				ricochet_damage = hit_damage
+			horde.knock_back(idx, player_pos, w.knockback + (0.15 * stacks(&"wind_rounds") if rifle else 0.0))
 		tracers.append(PackedVector3Array([player_pos, end]))
-	if stacks(&"ricochet") > 0 and _shots % 4 == 0:
-		var near: PackedInt32Array = horde.query_radius(horde.positions[target], 6.0)
-		for j in near:
-			if j != target and not _dead.has(j):
-				tracers.append(PackedVector3Array([horde.positions[target], horde.positions[j]]))
-				_damage(j, dmg, horde.positions[target], false, false)
-				break
+	if rifle and direct_hits.has(target) and stacks(&"ricochet") > 0 and _shots % 4 == 0:
+		_chain_hit(target, stacks(&"ricochet"), ricochet_damage * 0.6, direct_hits)
 
 
-func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool) -> void:
+func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool,
+		secondary: bool = false, rifle_hit: bool = false) -> void:
 	if _dead.has(i):
 		return
 	var t: GameData.EnemyType = horde.types[horde.kinds[i]]
+	if power_ups.insta_time > 0.0 and not breaker and not secondary:
+		amount = maxf(amount, horde.hp[i]) if GameData.power_up_normal(horde.kinds[i]) else amount * GameData.POWER_UP_STRONG_DAMAGE_MULT
 	if t.front_armor > 0.0 and not breaker:
 		# Armoured enemies take reduced damage from the front (where they walk to).
 		var v: Vector3 = horde.velocities[i]
 		var to_src: Vector3 = from - horde.positions[i]
 		if v.length_squared() > 0.01 and v.normalized().dot(to_src.normalized()) > 0.3:
 			amount *= 1.0 - t.front_armor
-	if stacks(&"executioner") > 0 and horde.stun[i] > 0.0:
-		amount *= 1.0 + 0.6 * stacks(&"executioner")
+	if stacks(&"executioner") > 0 and (horde.stun[i] > 0.0 or horde.freeze_time[i] > 0.0):
+		amount *= 1.0 + 0.2 * stacks(&"executioner")
 	horde.hp[i] -= amount
-	horde.flash[i] = 0.1
+	if not secondary:
+		horde.flash[i] = 0.1  # DOT must not hide the status tint with a constant flash
 	if horde.hp[i] <= 0.0:
 		_dead[i] = true
 		kills += 1
+		_sync_intel_bonus()
+		power_ups.on_kill(horde.kinds[i], horde.positions[i], time_alive, field, play_area, _has_finite_weapon())
 		if stacks(&"adrenaline") > 0:
-			breaker_cd = maxf(0.0, breaker_cd - 0.3)
+			breaker_cd = maxf(0.0, breaker_cd - 0.1 * stacks(&"adrenaline"))
+		if kills % 10 == 0:
+			_heal_player(2.0 * stacks(&"kill_rations"))
 		if headshot:
 			headshots += 1
 		var p: Vector3 = horde.positions[i]
@@ -887,18 +1066,140 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 		if t.explodes:
 			explosions.append(p)
 			if player_pos.distance_to(p) <= GameData.BLOATER_RADIUS and dash_time <= 0.0:
-				hp -= GameData.BLOATER_PLAYER_DAMAGE
+				_take_player_damage(GameData.BLOATER_PLAYER_DAMAGE)
 			for j in horde.query_radius(p, GameData.BLOATER_RADIUS):
-				_damage(j, GameData.BLOATER_DAMAGE, p, false, true)
+				_damage(j, GameData.BLOATER_DAMAGE, p, false, true, true)
 				horde.knock_back(j, p, 1.5)
 		orbs.append(p)
 		orb_values.append(t.xp)
 		if headshot and stacks(&"vampire") > 0:
-			hp = minf(max_hp, hp + 2.0 * stacks(&"vampire"))
-		if headshot and stacks(&"explosive_heads") > 0:
+			_heal_player(stacks(&"vampire"))
+		if headshot:
+			stamina = minf(GameData.STAMINA_MAX, stamina + 0.1 * stacks(&"second_breath"))
+		if headshot and rifle_hit and not secondary and stacks(&"explosive_heads") > 0:
 			explosions.append(p)
 			for j in horde.query_radius(p, 3.0):
-				_damage(j, 30.0, p, false, true)
+				_damage(j, 15.0 + 15.0 * stacks(&"explosive_heads"), p, false, true, true)
+		if not secondary:
+			if horde.burn_time[i] > 0.0:
+				var used: Array[int] = [i]
+				for bounce in stacks(&"wildfire"):
+					var next: int = _nearest_enemy(p, 6.0, used)
+					if next == -1:
+						break
+					used.append(next)
+					horde.burn_time[next] = 3.0  # spread is secondary: no duo recursion
+			if horde.poison_time[i] > 0.0 and stacks(&"toxic_cloud") > 0:
+				toxic_clouds.append(p)
+				toxic_cloud_times.append(1.0 + stacks(&"toxic_cloud"))
+
+
+## Only direct rifle hits roll elements. Damage from states/chains/clouds
+## is explicitly secondary and cannot produce another card effect.
+func _apply_elements(i: int, hit_damage: float) -> void:
+	if _dead.has(i):
+		return
+	if _element_proc(&"fire_rounds"):
+		_apply_fire(i)
+	if not _dead.has(i) and _element_proc(&"frost_rounds"):
+		_apply_cold(i)
+	if not _dead.has(i) and _element_proc(&"toxic_rounds"):
+		horde.poison_time[i] = 4.0
+	if not _dead.has(i) and _element_proc(&"storm_rounds"):
+		var jumps: int = 1 + stacks(&"chain_lightning")
+		if stacks(&"frost_rounds") > 0 and horde.cold_stacks[i] > 0:
+			jumps += 1  # Conductive Frost: one bonus jump per discharge
+		_chain_hit(i, jumps, hit_damage * 0.6, [i])
+
+
+func _element_proc(id: StringName) -> bool:
+	var rank: int = stacks(id)
+	return rank > 0 and _element_rng.randf() < 0.05 * rank
+
+
+func _apply_fire(i: int) -> void:
+	var p: Vector3 = horde.positions[i]
+	if horde.freeze_time[i] > 0.0 and stacks(&"frost_rounds") > 0:
+		horde.freeze_time[i] = 0.0
+		_damage(i, 30.0, p, false, true, true)  # Thermal Shock
+	if not _dead.has(i):
+		horde.burn_time[i] = 3.0
+	# Toxic Combustion consumes a cloud before applying damage (no recursion).
+	for k in range(toxic_clouds.size() - 1, -1, -1):
+		if p.distance_to(toxic_clouds[k]) <= 2.0:
+			var center: Vector3 = toxic_clouds[k]
+			toxic_clouds.remove_at(k)
+			toxic_cloud_times.remove_at(k)
+			explosions.append(center)
+			for j in horde.query_radius(center, 3.0):
+				_damage(j, 25.0, center, false, true, true)
+
+
+func _apply_cold(i: int) -> void:
+	horde.cold_time[i] = 4.0
+	horde.cold_stacks[i] = mini(3, horde.cold_stacks[i] + 1)
+	if horde.cold_stacks[i] >= 3 and horde.kinds[i] != GameData.EnemyKind.BOSS:
+		horde.cold_stacks[i] = 0
+		horde.cold_time[i] = 0.0
+		horde.freeze_time[i] = 1.0 + 0.25 * stacks(&"deep_freeze")
+		if horde.grabbed_by == i:
+			horde.grabbed_by = -1
+
+
+func _nearest_enemy(p: Vector3, radius: float, excluded: Array[int]) -> int:
+	var nearest: int = -1
+	var best: float = INF
+	for i in horde.query_radius(p, radius):
+		if excluded.has(i) or _dead.has(i):
+			continue
+		var distance: float = p.distance_squared_to(horde.positions[i])
+		if (distance < best or (is_equal_approx(distance, best) and i < nearest)) \
+				and _line_of_sight(p, horde.positions[i]):
+			nearest = i
+			best = distance
+	return nearest
+
+
+func _chain_hit(start: int, jumps: int, damage: float, excluded: Array[int]) -> void:
+	var visited: Array[int] = excluded.duplicate()
+	if not visited.has(start):
+		visited.append(start)
+	var p: Vector3 = horde.positions[start]
+	for bounce in jumps:
+		var next: int = _nearest_enemy(p, 6.0, visited)
+		if next == -1:
+			break
+		visited.append(next)
+		var q: Vector3 = horde.positions[next]
+		tracers.append(PackedVector3Array([p, q]))
+		_damage(next, damage, p, false, false, true)
+		p = q
+
+
+func _update_states(dt: float) -> void:
+	for i in horde.count:
+		if _dead.has(i):
+			continue
+		var burn: float = minf(dt, horde.burn_time[i])
+		var poison: float = minf(dt, horde.poison_time[i])
+		if burn > 0.0:
+			_damage(i, burn * 8.0, horde.positions[i], false, true, true)
+		if poison > 0.0:
+			_damage(i, poison * 6.0, horde.positions[i], false, true, true)
+		horde.burn_time[i] = maxf(0.0, horde.burn_time[i] - dt)
+		horde.poison_time[i] = maxf(0.0, horde.poison_time[i] - dt)
+		horde.freeze_time[i] = maxf(0.0, horde.freeze_time[i] - dt)
+		horde.cold_time[i] = maxf(0.0, horde.cold_time[i] - dt)
+		if horde.cold_time[i] <= 0.0:
+			horde.cold_stacks[i] = 0
+	for k in range(toxic_clouds.size() - 1, -1, -1):
+		var active: float = minf(dt, toxic_cloud_times[k])
+		for i in horde.query_radius(toxic_clouds[k], 2.0):
+			_damage(i, active * 6.0, toxic_clouds[k], false, true, true)
+		toxic_cloud_times[k] = maxf(0.0, toxic_cloud_times[k] - dt)
+		if toxic_cloud_times[k] <= 0.0:
+			toxic_clouds.remove_at(k)
+			toxic_cloud_times.remove_at(k)
 
 
 ## Big islands (field.max_distance set): the horde's flow field only covers
@@ -935,25 +1236,45 @@ func _flush_dead() -> void:
 
 
 func _update_orbs(dt: float) -> void:
-	var radius: float = GameData.PICKUP_RADIUS * (2.0 if stacks(&"magnet") > 0 else 1.0)
+	var radius: float = GameData.PICKUP_RADIUS * (1.0 + 0.4 * stacks(&"magnet"))
+	var automatic: bool = level >= GameData.XP_AUTO_COLLECT_LEVEL
 	var i: int = orbs.size() - 1
 	while i >= 0:
 		var o: Vector3 = orbs[i]
 		var d: Vector3 = player_pos - o
 		d.y = 0.0
 		var dist: float = d.length()
-		if dist < 0.8:
-			xp += orb_values[i]
-			orbs.remove_at(i)
-			orb_values.remove_at(i)
+		if automatic or dist < 0.8:
+			_collect_xp_orb(i)
 		elif dist < radius:
 			orbs[i] = o + d / dist * minf(dist, 14.0 * dt)
 		i -= 1
+	_advance_xp_levels()
+	# Crossing 30 must collect the remaining ground XP before card choices
+	# pause the simulation, rather than waiting until the player picks a card.
+	if not automatic and level >= GameData.XP_AUTO_COLLECT_LEVEL:
+		for remaining in range(orbs.size() - 1, -1, -1):
+			_collect_xp_orb(remaining)
+		_advance_xp_levels()
+	_roll_cards_if_needed()
+
+
+func _collect_xp_orb(index: int) -> void:
+	var reward_mult: float = 2.0 if power_ups.double_time > 0.0 else 1.0
+	var earned: float = orb_values[index] * reward_mult * (1.0 + 0.05 * stacks(&"fast_learner")) + xp_fraction
+	var whole: int = floori(earned + 0.000001)
+	xp += whole
+	xp_fraction = maxf(0.0, earned - whole)
+	_heal_player(0.2 * stacks(&"field_dressing"))
+	orbs.remove_at(index)
+	orb_values.remove_at(index)
+
+
+func _advance_xp_levels() -> void:
 	while xp >= xp_needed():
 		xp -= xp_needed()
 		level += 1
 		_pending_levels += 1
-	_roll_cards_if_needed()
 
 
 func _roll_cards_if_needed() -> void:
@@ -970,22 +1291,16 @@ func _roll_cards_if_needed() -> void:
 ## Fills card_choices with up to 3 cards that are not maxed, avoiding
 ## `avoid` (the offer being rerolled) while the deck has others left.
 func _draw_cards(avoid: Array[GameData.Card]) -> bool:
-	var pool: Array[GameData.Card] = []
-	var spare: Array[GameData.Card] = []
-	for c in all_cards:
-		if stacks(c.id) >= c.max_stacks:
-			continue
-		if avoid.has(c):
-			spare.append(c)
-		else:
-			pool.append(c)
-	if pool.is_empty() and spare.is_empty():
+	var owned: Array[StringName] = []
+	for i in weapons.size():
+		if weapon_unlocked[i]:
+			owned.append(weapons[i].id)
+	var excluded: Array[StringName] = []
+	for c in avoid:
+		excluded.append(c.id)
+	card_choices = card_offers.draw(all_cards, player_class, owned, card_stacks, excluded)
+	if card_choices.is_empty():
 		return false
-	for k in mini(3, pool.size() + spare.size()):
-		var from: Array[GameData.Card] = pool if not pool.is_empty() else spare
-		var pick: int = rng.randi_range(0, from.size() - 1)
-		card_choices.append(from[pick])
-		from.remove_at(pick)
 	card_offer += 1
 	return true
 
@@ -1121,10 +1436,10 @@ func _update_lava(dt: float) -> void:
 		var c: Vector3 = map.lava[k]
 		var r: float = map.lava_radius[k]
 		if dash_time <= 0.0 and Vector2(player_pos.x - c.x, player_pos.z - c.z).length() <= r:
-			hp -= GameData.LAVA_PLAYER_DPS * dt
+			_take_player_damage(GameData.LAVA_PLAYER_DPS * dt)
 		for i in horde.query_radius(c, r):
 			if horde.kinds[i] != GameData.EnemyKind.BOSS:
-				_damage(i, GameData.LAVA_ENEMY_DPS * dt, c, false, true)
+				_damage(i, GameData.LAVA_ENEMY_DPS * dt, c, false, true, true)
 	_flush_dead()
 
 
@@ -1220,7 +1535,7 @@ func _update_boss(dt: float, b: int) -> void:
 		if slam_time <= 0.0:
 			explosions.append(slam_pos)
 			if dash_time <= 0.0 and player_pos.distance_to(slam_pos) <= GameData.BOSS_SLAM_RADIUS:
-				hp -= GameData.BOSS_SLAM_DAMAGE
+				_take_player_damage(GameData.BOSS_SLAM_DAMAGE)
 				messages.append("SLAMMED!")
 			for j in horde.query_radius(slam_pos, GameData.BOSS_SLAM_RADIUS):
 				if j != b:
@@ -1242,12 +1557,12 @@ func _update_boss(dt: float, b: int) -> void:
 		if rock_times[r] <= 0.0:
 			explosions.append(rocks[r])
 			if dash_time <= 0.0 and player_pos.distance_to(rocks[r]) <= GameData.BOSS_ROCK_RADIUS:
-				hp -= GameData.BOSS_ROCK_DAMAGE
+				_take_player_damage(GameData.BOSS_ROCK_DAMAGE)
 			rocks.remove_at(r)
 			rock_times.remove_at(r)
 			rock_origins.remove_at(r)
 		r -= 1
-	if _summon_cd <= 0.0:
+	if _summon_cd <= 0.0 and power_ups.spawn_delay <= 0.0:
 		_summon_cd = GameData.BOSS_SUMMON_INTERVAL
 		if boss_enraged:
 			var bpos: Vector3 = bp + Vector3(0, 0, 3.5)
@@ -1287,7 +1602,7 @@ func _ring_spot(center: Vector3, radii: Array) -> Vector3:
 
 
 func _spawn_enemy() -> void:
-	if horde.count >= GameData.MAX_ALIVE:
+	if horde.count >= GameData.MAX_ALIVE or power_ups.spawn_delay > 0.0:
 		return
 	spawn_requests += 1
 	for attempt in 12:

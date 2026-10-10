@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://b1y1af4pmfaho"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_b4vb0"]
+
+[resource]
+script = ExtResource("1_b4vb0")
+title = "Battle Rhythm"
+description = "War Cry grants +8% fire rate per rank for three seconds."
+max_stacks = 3
+category = "class_vanguard"
+icon = &"class_vanguard"
+tags = Array[StringName]([&"war_cry", &"fire_rate"])
+class_filter = Array[StringName]([&"vanguard"])
+order = 30

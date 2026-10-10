@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://dvqtcbxyk6fto"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_x6i7a"]
+
+[resource]
+script = ExtResource("1_x6i7a")
+title = "Fire Rounds"
+description = "Rifle: +5% burn chance per rank. Burns for 8 damage/s for 3 s. Refreshes without stacking."
+max_stacks = 5
+category = "elements"
+icon = &"fire"
+tags = Array[StringName]([&"fire", &"damage_over_time"])
+weapon_filter = Array[StringName]([&"rifle"])
+order = 31

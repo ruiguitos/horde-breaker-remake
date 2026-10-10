@@ -5,6 +5,9 @@
 [resource]
 script = ExtResource("1_ivaag")
 title = "Hair Trigger"
-description = "Breaker cooldown -30%."
-max_stacks = 2
-order = 1
+description = "Breaker cooldown is multiplied by 0.9 per rank."
+max_stacks = 5
+category = "breaker"
+icon = &"breaker"
+tags = Array[StringName]([&"breaker", &"cooldown"])
+order = 6

@@ -149,6 +149,8 @@ func _draw() -> void:
 			_mark(&"cache", _px(run.map.caches[c]))
 	if run.has_exit():
 		_mark(&"exit", _px(run.map.exit))
+	if run.power_ups.ground_kind != &"":
+		_mark(&"power_up", _px(run.power_ups.ground_pos))
 	if run.shows_boat() or run.mission == &"holdout":
 		# The holdout's pier shows before the boat comes: it is where to go.
 		_mark(&"boat", _px(run.map.boat))
@@ -183,6 +185,10 @@ static func draw_marker(item: CanvasItem, kind: StringName, p: Vector2, s: float
 			item.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -5) * s, p + Vector2(5, 3) * s, p + Vector2(0, 0.5) * s, p + Vector2(-5, 3) * s]), UiTheme.SUCCESS)
 		&"boat":
 			item.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -4) * s, p + Vector2(4, 0) * s, p + Vector2(0, 4) * s, p + Vector2(-4, 0) * s]), UiTheme.ACCENT)
+		&"power_up":
+			item.draw_circle(p, 5.0 * s, UiTheme.SUCCESS, false, 1.5 * s, true)
+			item.draw_line(p - Vector2(3, 0) * s, p + Vector2(3, 0) * s, UiTheme.SUCCESS, 1.5 * s, true)
+			item.draw_line(p - Vector2(0, 3) * s, p + Vector2(0, 3) * s, UiTheme.SUCCESS, 1.5 * s, true)
 		&"player":
 			# Player: a white triangle pointing where they face.
 			var fwd := facing.normalized() * 6.0 * s
@@ -211,6 +217,8 @@ static func legend_entries(r: IslandRun) -> Array[Array]:
 		out.append([&"cache", "CACHE"])
 	if r.has_exit():
 		out.append([&"exit", "EXIT"])
+	if r.power_ups.ground_kind != &"":
+		out.append([&"power_up", "POWER-UP"])
 	if r.shows_boat() or r.mission == &"holdout":
 		out.append([&"boat", "PIER" if r.mission == &"holdout" and not r.shows_boat() else "BOAT"])
 	return out

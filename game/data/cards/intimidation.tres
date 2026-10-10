@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://bfybfcjjqbkmv"]
+
+[ext_resource type="Script" path="res://game/data/resources/card_data.gd" id="1_3of63"]
+
+[resource]
+script = ExtResource("1_3of63")
+title = "Intimidation"
+description = "War Cry pushes enemies an extra 0.4 m per rank."
+max_stacks = 3
+category = "class_vanguard"
+icon = &"class_vanguard"
+tags = Array[StringName]([&"war_cry", &"knockback"])
+class_filter = Array[StringName]([&"vanguard"])
+order = 29
