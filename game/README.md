@@ -37,9 +37,9 @@ acaso e, dentro da rota, a ilha sai pela seed.
 
 | Ação | Teclado/rato | Comando |
 |---|---|---|
-| Mover (relativo à câmara em 3.ª pessoa) | WASD / setas | stick esquerdo |
-| Olhar / apontar (o auto-fire dispara para onde olhas) | rato | stick direito |
-| Câmara: 3.ª pessoa ↔ vista de cima | V | Back / Select |
+| Mover (relativo à câmara em 1.ª/3.ª pessoa) | WASD / setas | stick esquerdo |
+| Olhar / apontar (o auto-fire dispara para a mira) | rato | stick direito |
+| Câmara: 1.ª pessoa → 3.ª pessoa → fixa (também em Settings > Controls) | V | Back / Select |
 | Breaker (investida) | Espaço ou botão direito | A ou RB |
 | Sprint (não dispara enquanto corre) | Shift | L3 (clicar stick esquerdo) |
 | Granada (lança para o rato) | G ou botão do meio | LB |
@@ -74,13 +74,20 @@ gráficos):
 
 ## Como se joga
 
-- A arma **dispara sozinha** contra um inimigo dentro de um cone de 50° à tua
-  frente. Ganha o que tiver menor "distância + 0,4 m por grau de desvio",
-  por isso **virar-te para um inimigo torna-o o alvo**, mesmo que haja outros
-  mais perto de lado. Exceção: quem estiver a menos de 2,5 m é sempre
-  alvejado primeiro. Se o alvo estiver quase exatamente onde olhas (±9°),
-  é **headshot** (dano ×2,5). Ou seja: mira-se com o corpo. A **mira laser**
-  liga a arma ao alvo atual e fica vermelha quando o próximo tiro é headshot.
+- A arma **dispara sozinha**. Há três câmaras (V ou Settings > Controls):
+  - **1.ª pessoa** e **3.ª pessoa** (ombro, a de origem): dispara só contra
+    o inimigo que está **debaixo da mira** (a cruz ao centro), com a
+    inclinação incluída: o corpo dele tem de estar a menos de 6° do raio da
+    câmara, ao alcance e à vista. Ganha o de menor ângulo. Mira no chão ou
+    no céu sem ninguém = não dispara. Se o raio passar perto da cabeça, é
+    **headshot** (dano ×2,5). A granada cai onde a mira toca o chão.
+  - **Fixa** (a câmara média de 2026-10-05): mira-se com o corpo, como antes.
+    Cone de 50° à frente; ganha o menor "distância + 0,4 m por grau de
+    desvio", quem estiver a menos de 2,5 m é alvejado primeiro e ±9° de
+    onde olhas é headshot.
+- Os marcadores do objetivo (gerador, sobrevivente, saída…) só aparecem
+  quando olhas para eles (±35°) ou estão a menos de 12 m; o minimapa mostra
+  sempre tudo.
 - **Breaker**: investida de 5 m que empurra e atordoa tudo no caminho, dá dano
   no fim e solta-te de um Grabber. Cooldown de 6 s (barra amarela).
 - Inimigos:
@@ -135,7 +142,8 @@ menus. O centro do ecrã fica disponível para o combate.
 
 `tests/test_hud.gd` verifica os estados e o encaixe em 960×540, 1152×648 e
 1920×1080. `tools/dev/hud_preview.gd` captura o HUD real, com perfil temporário
-em memória, nos estados `normal`, `danger`, `boss` ou `third_person`:
+em memória, nos estados `normal`, `danger`, `boss`, `third_person` ou
+`first_person` (`normal` usa a câmara fixa):
 
 ```bash
 godot --path . --resolution 1152x648 --windowed --script res://tools/dev/hud_preview.gd -- <caminho-absoluto.png> normal

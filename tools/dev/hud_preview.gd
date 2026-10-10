@@ -1,6 +1,6 @@
 extends SceneTree
 ## Capture the actual in-game HUD without loading or writing a saved profile.
-## --script res://tools/dev/hud_preview.gd -- <PNG path> [normal|danger|boss|third_person]
+## --script res://tools/dev/hud_preview.gd -- <PNG path> [normal|danger|boss|third_person|first_person]
 
 var _island: Node3D
 var _frames: int = 0
@@ -18,7 +18,7 @@ func _initialize() -> void:
 		_state = args[1]
 	_island = (load("res://game/world/island.tscn") as PackedScene).instantiate()
 	var profile := Profile.new()
-	profile.third_person = _state == "third_person"
+	profile.camera_mode = {"third_person": Profile.CameraMode.THIRD_PERSON, "first_person": Profile.CameraMode.FIRST_PERSON}.get(_state, Profile.CameraMode.FIXED)
 	_island.set("profile", profile)
 	var context := RunContext.new(7)
 	context.biome = &"town"

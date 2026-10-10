@@ -308,6 +308,36 @@ Ordem de implementação no slice: 1–5 primeiro (uma semana somada), depois 7
 
 ---
 
+## 6b. Power-ups de abate (escolhido pelo utilizador a 2026-10-10)
+
+Inspirados nos power-ups do Call of Duty Zombies: de vez em quando um
+inimigo abatido larga uma "ajuda". O utilizador aprovou a lista e decidiu
+que **aparecem em todas as missões**. Se a quiser fechar, regista-a em
+`DECISIONS.md`.
+
+| Power-up | Efeito | Duração |
+|---|---|---|
+| Insta-Kill | Os inimigos normais morrem num tiro; as elites e o chefe levam dano extra | ~20–30 s |
+| Double XP / Intel | Duplica a XP e o Intel ganhos | ~20–30 s |
+| Nuke | Mata os normais visíveis, fere os fortes e atrasa os spawns uns segundos | instantâneo |
+| Full Power | O breaker e a habilidade de classe ficam prontos | instantâneo |
+| Max Armor | Enche o escudo (liga às cartas de escudo) | instantâneo |
+| Fire Sale | Um reroll grátis ou uma carta extra | instantâneo |
+| Max Ammo | Enche as armas especiais. **Depende da decisão sobre as armas** | instantâneo |
+
+Ficam para mais tarde, porque pedem sistemas novos: Death Machine (arma
+temporária) e Zombie Blood (os zombies deixam de ver o jogador).
+
+**Regras propostas** (os valores são hipóteses para playtest):
+- **Probabilidade:** pequena por abate, com uma garantia (pity) para não
+  passar demasiado tempo sem nada; maior nas elites e nos especiais.
+- **Limites:** um drop a cada 30–45 s no máximo, e só um no chão de cada
+  vez.
+- **No chão:** ícone grande e brilhante que fica 25 s e pisca nos últimos
+  10 s, como no CoD.
+- **No HUD:** temporizadores com o ícone e os segundos que faltam.
+- **Cartas:** uma carta de "sorte" aumenta a probabilidade de drops.
+
 ## 7. Decisões propostas e perguntas
 
 ### Decisões propostas (o utilizador decide)

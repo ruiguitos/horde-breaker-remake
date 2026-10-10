@@ -37,7 +37,11 @@ var max_fps: int = 0  ## 0 = unlimited
 var quality: int = GraphicsSettings.HIGH  ## Low / Medium / High / Ultra preset
 var render_scale: int = 100  ## 3D resolution in percent of the window
 var antialias: int = GraphicsSettings.AA_FXAA
-var third_person: bool = true  ## island camera: over-the-shoulder (V toggles top-down)
+## Island camera (V cycles in game). First and third person aim with the
+## centre crosshair; Fixed is the original medium camera (aim with the body).
+enum CameraMode { FIRST_PERSON, THIRD_PERSON, FIXED }
+const CAMERA_MODE_NAMES: Array[String] = ["First person", "Third person (shoulder)", "Fixed (top-down)"]
+var camera_mode: int = CameraMode.THIRD_PERSON
 var mouse_sensitivity: int = 50  ## percent
 var hud_scale: int = 100  ## HUD size in percent (60..100); new profiles start at 100
 ## Rebound keys: action -> "key:N" / "mouse:N" (see GameInput.REBINDABLE).
@@ -87,7 +91,9 @@ static func from_dict(d: Dictionary) -> Profile:
 		p.resolution = Vector2i(maxi(640, int(res[0])), maxi(360, int(res[1])))
 	p.vsync = bool(d.get("vsync", true))
 	p.hud_scale = clampi(int(d.get("hud_scale", 100)), 60, 100)
-	p.third_person = bool(d.get("third_person", true))
+	# Older saves had a third_person bool (true = shoulder, false = fixed).
+	var old_mode: int = CameraMode.THIRD_PERSON if bool(d.get("third_person", true)) else CameraMode.FIXED
+	p.camera_mode = clampi(int(d.get("camera_mode", old_mode)), 0, CAMERA_MODE_NAMES.size() - 1)
 	var kb: Variant = d.get("key_bindings", {})
 	if kb is Dictionary:
 		for k: Variant in kb:
@@ -139,7 +145,7 @@ func save(path: String = PATH) -> bool:
 		"unlocked_classes": unlocked_classes.map(func(x: StringName) -> String: return String(x)),
 		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x)),
 		"quality": quality, "window_mode": window_mode, "resolution": "%dx%d" % [resolution.x, resolution.y],
-		"vsync": vsync, "hud_scale": hud_scale, "third_person": third_person, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias,
+		"vsync": vsync, "hud_scale": hud_scale, "camera_mode": camera_mode, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias,
 		"last_run": last_run, "lore_read": lore_read}, "  "))
 	return true
 

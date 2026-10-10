@@ -21,6 +21,13 @@ const CARD_LOCK_MS: int = 400
 ## Specials and the boss closer than this get an arrow at the screen edge.
 const THREAT_RANGE: float = 40.0
 const THREAT_ARROWS_MAX: int = 4
+## The objective marker only shows when its target is within this angle of
+## where the player looks (the camera in first / third person, the body's
+## facing with the fixed camera) or closer than MARKER_NEAR_M; it fades in
+## and out over MARKER_FADE_S. The minimap always shows everything.
+const MARKER_VIEW_DEG: float = 35.0
+const MARKER_NEAR_M: float = 12.0
+const MARKER_FADE_S: float = 0.2
 ## Category marks: shape and colour (never colour alone).
 const CATEGORY_GLYPH: Dictionary = {&"breaker": "◆", &"firearms": "●", &"survival": "■"}
 const ROMAN: Array[String] = ["0", "I", "II", "III", "IV", "V", "VI"]
@@ -84,6 +91,7 @@ var _alerts: Label
 # World overlays (not scaled)
 var _marker_pill: PanelContainer
 var _marker: Label
+var _marker_alpha: float = 0.0  ## fades the pill in / out (MARKER_FADE_S)
 var _threats: ThreatArrows
 var _hit_arc: Control
 var _hit_angle: float = 0.0
@@ -1200,7 +1208,11 @@ func _fill_pause(run: IslandRun) -> void:
 		row.add_child(name_label)
 		row.add_child(MenuDialog.ink(_plain("%s / %s" % [roman(n), roman(c.max_stacks)], 13, UiTheme.TEXT_MUTED, true)))
 	if owned == 0:
-		_pause_cards.add_child(MenuDialog.ink(UiTheme.label("No cards yet: level up to draw some.", 16, UiTheme.TEXT_MUTED)))
+		# No autowrap: alone in a grid cell a wrapping label gets no width and
+		# stacks one letter per line.
+		var none := MenuDialog.ink(UiTheme.label("No cards yet: level up to draw some.", 16, UiTheme.TEXT_MUTED))
+		none.autowrap_mode = TextServer.AUTOWRAP_OFF
+		_pause_cards.add_child(none)
 	var intel: Dictionary = _intel(run)
 	_pause_banked.text = str(intel["banked"])
 	_pause_island.text = "+%d" % intel["island"]
@@ -1551,7 +1563,22 @@ func _update_radio(run: IslandRun) -> void:
 	_radio_panel.position.y = _status_panel.position.y - 12.0 - radio_h
 
 
-## Points at the current goal; sticks to the screen edge when off-screen.
+## Is a marker for `goal` (simulation point) wanted now? Near goals always;
+## farther ones only within MARKER_VIEW_DEG of the look direction (on the
+## ground plane, so looking down at your feet does not hide them).
+static func marker_in_view(run: IslandRun, goal: Vector3) -> bool:
+	var to := Vector2(goal.x - run.player_pos.x, goal.z - run.player_pos.z)
+	if to.length() < MARKER_NEAR_M:
+		return true
+	var look3: Vector3 = run.crosshair_dir if run.uses_crosshair() else run.facing
+	var look := Vector2(look3.x, look3.z)
+	if look.length_squared() < 0.0001:
+		return true
+	return absf(look.angle_to(to)) <= deg_to_rad(MARKER_VIEW_DEG)
+
+
+## Points at the current goal while it is roughly where you look (see
+## marker_in_view); clamped inside the screen margins.
 func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	var goal := Vector3.INF
 	var goal_name := ""
@@ -1580,10 +1607,15 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 		goal = run.extraction_point()
 		goal_name = run.extraction_name()
 	if goal == Vector3.INF or camera == null:
+		_marker_alpha = 0.0
 		_marker_pill.visible = false
 		_marker.text = ""
 		return
-	_marker_pill.visible = true
+	var world: Vector3 = goal + Vector3(0, run.map.ground_y(goal) + 2.5, 0)
+	var wanted: bool = marker_in_view(run, goal) and not camera.is_position_behind(world)
+	_marker_alpha = move_toward(_marker_alpha, 1.0 if wanted else 0.0, get_process_delta_time() / MARKER_FADE_S)
+	_marker_pill.modulate.a = _marker_alpha
+	_marker_pill.visible = _marker_alpha > 0.01
 	var dist: float = run.player_pos.distance_to(goal)
 	if run.objective == IslandRun.Objective.GENERATORS and run.mission == &"activate" and dist <= GameData.GENERATOR_RADIUS:
 		var g_idx: int = run.map.generators.find(goal)
@@ -1594,8 +1626,8 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	var pill: Vector2 = _marker_pill.get_combined_minimum_size()
 	_marker_pill.size = pill
 	var screen: Vector2 = view * 0.5
-	if not camera.is_position_behind(goal):
-		screen = camera.unproject_position(goal + Vector3(0, 2.5, 0))
+	if not camera.is_position_behind(world):
+		screen = camera.unproject_position(world)
 	# Keep the pill inside a margin that avoids the HUD corners.
 	screen.x = clampf(screen.x, 20.0 + pill.x * 0.5, view.x - 20.0 - pill.x * 0.5)
 	screen.y = clampf(screen.y, 150.0, view.y - 150.0)

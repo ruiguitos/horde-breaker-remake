@@ -2,8 +2,8 @@ class_name SettingsPanel
 extends MenuDialog
 ## Settings split in categories (tabs): DISPLAY (window mode, resolution,
 ## VSync, FPS cap), GRAPHICS (quality preset, render scale, anti-aliasing),
-## AUDIO (master / effects / music percentages) and CONTROLS (key icons and
-## rebinding through G.U.I.D.E, mouse sensitivity).
+## AUDIO (master / effects / music percentages) and CONTROLS (camera mode,
+## key icons and rebinding through G.U.I.D.E, mouse sensitivity).
 ## Every change is applied at once through GraphicsSettings / Profile and
 ## saved to the profile.
 
@@ -123,6 +123,10 @@ func _audio() -> void:
 
 
 func _controls() -> void:
+	# The island picks the change up at once (V also cycles it in game).
+	_options("Camera", Profile.CAMERA_MODE_NAMES, profile.camera_mode, func(i: int) -> void:
+		profile.camera_mode = i
+		profile.save())
 	_percent_row("Mouse sensitivity", profile.mouse_sensitivity, 1, func(v: int) -> void:
 		profile.mouse_sensitivity = v
 		profile.save())

@@ -371,9 +371,10 @@ func _test_target_priority() -> void:
 	var side: int = run.horde.add(p + Vector3(-3.5, 0, -5), GameData.EnemyKind.WALKER, run.rng)  # nearer, ~35° off
 	var ahead: int = run.horde.add(p + Vector3(0, 0, -9), GameData.EnemyKind.BRUTE, run.rng)  # farther, dead ahead
 	run.facing = Vector3(0, 0, -1)
-	_check(run.aim_info()[0] == ahead and run.aim_info()[1], "facing an enemy makes it the target (headshot) over a nearer one off to the side")
+	var range_m: float = run.weapons[run.weapon_index].range_m
+	_check(run._pick_target(range_m) == ahead and run._is_headshot(ahead), "facing an enemy makes it the target (headshot) over a nearer one off to the side")
 	run.horde.positions[side] = p + Vector3(-1.0, 0, -1.6)
-	_check(run.aim_info()[0] == side, "an enemy within 2.5 m always takes priority")
+	_check(run._pick_target(range_m) == side, "an enemy within 2.5 m always takes priority")
 
 
 func _test_input_actions() -> void:

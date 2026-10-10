@@ -124,6 +124,16 @@ const AIM_CONE_DEG: float = 50.0
 ## Targets this close to the facing direction get headshots.
 const HEADSHOT_CONE_DEG: float = 9.0
 const HEADSHOT_MULTIPLIER: float = 2.5
+## First / third person: auto-fire only shoots an enemy whose body lies
+## within this angle of the crosshair ray (seen from the camera), so pointing
+## at the ground or the sky with nobody there fires nothing.
+const CROSSHAIR_CONE_DEG: float = 6.0
+## Body radius (metres, times the enemy's size) for the crosshair test: the
+## ray anywhere on a body counts as 0 degrees off (close enemies are wide).
+const CROSSHAIR_BODY_RADIUS: float = 0.35
+## Crosshair headshot: the ray passes this close (metres, times the enemy's
+## size) to the centre of the head. Head Hunter widens it like its cone.
+const CROSSHAIR_HEAD_RADIUS: float = 0.4
 
 ## Max melee damage taken in one frame: being swarmed is dangerous, but never
 ## an instant death without a chance to react (telegraphed boss attacks are

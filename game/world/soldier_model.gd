@@ -133,6 +133,13 @@ func _gun(shotgun: bool) -> void:
 	gun.add_child(muzzle)
 
 
+## First person: the body is not drawn but still casts its shadow.
+func set_shadow_only(on: bool) -> void:
+	var mode: GeometryInstance3D.ShadowCastingSetting = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY if on else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	for n in find_children("*", "MeshInstance3D", true, false):
+		(n as MeshInstance3D).cast_shadow = mode
+
+
 ## Walk cycle: `speed` 0..1 (fraction of top speed), `t` seconds.
 func animate(speed: float, t: float) -> void:
 	var swing: float = sin(t * 9.0) * 0.6 * clampf(speed, 0.0, 1.0)

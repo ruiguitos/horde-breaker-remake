@@ -30,6 +30,11 @@ var _handmade: HandmadeIsland
 @export var tp_shoulder: float = 1.0  ## sideways offset (over the right shoulder)
 @export var tp_pitch_min: float = -10.0
 @export var tp_pitch_max: float = 45.0
+@export_group("First-person camera")
+@export var fp_eye_height: float = 1.72  ## the soldier's eyes (visor at ~1.8 m)
+@export var fp_fov: float = 70.0
+@export var fp_pitch_min: float = -60.0  ## looking up
+@export var fp_pitch_max: float = 70.0  ## looking down
 
 const DEBRIS_MAX: int = 600
 
@@ -51,12 +56,17 @@ var _camera: Camera3D
 var _terrain: Node3D  ## Terrain3D ground, or null (flat tiles)
 var _player: Node3D
 var _walk_speed: float = 0.0  ## 0..1, drives the soldier's walk cycle
-## Third-person camera: yaw/pitch in radians; the mouse (captured) or the
-## right stick turns it, WASD moves relative to it and you aim at the centre.
-var third_person: bool = true
+## Profile.CameraMode. First and third person: yaw/pitch in radians; the
+## mouse (captured) or the right stick turns the view, WASD moves relative to
+## it and auto-fire shoots what the centre crosshair is on. Fixed: the
+## original medium camera, auto-fire aims with the body.
+var camera_mode: int = Profile.CameraMode.THIRD_PERSON
 var _tp_yaw: float = 0.0
-var _tp_pitch: float = deg_to_rad(14.0)
+## Positive looks down. 8 degrees puts the crosshair on chests from ~3 to ~20 m.
+var _tp_pitch: float = deg_to_rad(8.0)
 var _crosshair: Control
+var _view_model: ViewModel  ## first-person placeholder gun (child of the camera)
+var _camera_placed: bool = false  ## the camera has been positioned once
 ## Phantom Camera (addon) drives the third-person camera: a SpringArm3D
 ## follows `_tp_pivot` with damping. Null when the addon is missing.
 var _pcam: Node3D
@@ -68,8 +78,6 @@ var _arm_mm := MultiMesh.new()
 var _orb_mm := MultiMesh.new()
 var _debris_mm := MultiMesh.new()
 var _tracer_mesh := ImmediateMesh.new()
-var _laser_mesh := ImmediateMesh.new()
-var _laser_mat: StandardMaterial3D
 var _generators: Array[MeshInstance3D] = []
 var _generator_rings: Array[MeshInstance3D] = []
 var _boat_ring: MeshInstance3D
@@ -139,11 +147,12 @@ func _ready() -> void:
 		sfx.process_mode = Node.PROCESS_MODE_DISABLED
 		run.player_pos = Vector3(run.field.width * 0.5, 0, run.field.height * 0.5)
 		run.director.trigger_peak(1000000.0)
-		third_person = false
+		camera_mode = Profile.CameraMode.FIXED
 		return
-	third_person = profile.third_person if profile != null else true
+	camera_mode = profile.camera_mode if profile != null else Profile.CameraMode.THIRD_PERSON
 	_tp_yaw = atan2(-run.facing.x, -run.facing.z)
-	# Centre crosshair for the third-person camera (you aim where you look).
+	# Centre crosshair for the first / third-person cameras (auto-fire shoots
+	# what it is on).
 	var layer := CanvasLayer.new()
 	add_child(layer)
 	_crosshair = CenterContainer.new()
@@ -156,7 +165,7 @@ func _ready() -> void:
 	dot.add_theme_constant_override("outline_size", 6)
 	_crosshair.add_child(dot)
 	layer.add_child(_crosshair)
-	_crosshair.visible = third_person
+	_set_camera_mode(camera_mode, false)
 	hud = Hud.new()
 	hud.profile = profile if profile != null else Profile.new()
 	hud.context = context
@@ -296,16 +305,12 @@ func _build_world() -> void:
 	tracer.material_override = tmat
 	add_child(tracer)
 
-	var laser := MeshInstance3D.new()
-	laser.mesh = _laser_mesh
-	_laser_mat = _mat(Color(1, 1, 1, 0.35), true)
-	_laser_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	laser.material_override = _laser_mat
-	add_child(laser)
-
 	_camera = Camera3D.new()
 	_camera.fov = camera_fov
 	add_child(_camera)
+	_view_model = ViewModel.create(run.player_class)
+	_view_model.visible = false
+	_camera.add_child(_view_model)
 	if _terrain != null:
 		_terrain.call("set_camera", _camera)  # terrain LOD follows this camera
 	# Biome colour grading (Color Grading addon; Forward+ only, High/Ultra).
@@ -718,10 +723,11 @@ func _ring(center: Vector3, radius: float, color: Color) -> MeshInstance3D:
 func _unhandled_input(event: InputEvent) -> void:
 	if showcase:
 		return
-	if third_person and event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+	if _free_look() and event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		var sens: float = 0.0006 * (profile.mouse_sensitivity if profile != null else 50) / 10.0
 		_tp_yaw -= event.relative.x * sens
-		_tp_pitch = clampf(_tp_pitch + event.relative.y * sens, deg_to_rad(tp_pitch_min), deg_to_rad(tp_pitch_max))
+		var limits: Vector2 = _pitch_limits()
+		_tp_pitch = clampf(_tp_pitch + event.relative.y * sens, limits.x, limits.y)
 		return
 	# Actions come from GameInput (InputMap): keyboard, mouse and gamepad alike.
 	if event.is_echo() or not event.is_pressed():
@@ -749,7 +755,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		run.noclip = not run.noclip
 		run.messages.append("NOCLIP ON (Space up, Ctrl down, no walls, no damage)" if run.noclip else "NOCLIP OFF")
 	elif event.is_action_pressed(&"camera_toggle"):
-		_set_third_person(not third_person)
+		# V cycles First person -> Third person -> Fixed.
+		_set_camera_mode((camera_mode + 1) % Profile.CAMERA_MODE_NAMES.size())
 	else:
 		for i in 5:
 			if event.is_action_pressed(StringName("weapon_%d" % (i + 1))):
@@ -775,6 +782,7 @@ func _physics_process(delta: float) -> void:
 	if showcase:
 		run.hp = run.max_hp
 		run.card_choices.clear()
+		run.clear_crosshair()
 		run.step(delta, Vector2.ZERO, Vector3(1, 0, 0), false, true)  # sprint = gun silent
 		return
 	if paused:
@@ -786,32 +794,39 @@ func _physics_process(delta: float) -> void:
 	var stick: Vector2 = move
 	var aim: Vector3 = _mouse_aim()
 	var right := Vector2(Input.get_joy_axis(0, JOY_AXIS_RIGHT_X), Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y))
-	if third_person:
+	if _free_look():
 		# Right stick turns the camera; movement is relative to where it looks
-		# and you always aim at the centre of the screen.
+		# and auto-fire shoots what the centre crosshair is on.
 		if right.length() > 0.2:
 			_tp_yaw -= right.x * 2.6 * delta
-			_tp_pitch = clampf(_tp_pitch + right.y * 1.6 * delta, deg_to_rad(tp_pitch_min), deg_to_rad(tp_pitch_max))
+			var limits: Vector2 = _pitch_limits()
+			_tp_pitch = clampf(_tp_pitch + right.y * 1.6 * delta, limits.x, limits.y)
 		var m3 := Vector3(move.x, 0, move.y).rotated(Vector3.UP, _tp_yaw)
 		move = Vector2(m3.x, m3.z)
 		aim = _tp_forward() * 12.0
-	elif right.length() > 0.3:
-		aim = Vector3(right.x, 0, right.y)
-	elif stick.length() > 0.2 and aim == Vector3.ZERO:
-		aim = Vector3(stick.x, 0, stick.y)
+		var ray: Array[Vector3] = crosshair_ray()
+		run.set_crosshair(ray[0], ray[1])
+	else:
+		run.clear_crosshair()
+		if right.length() > 0.3:
+			aim = Vector3(right.x, 0, right.y)
+		elif stick.length() > 0.2 and aim == Vector3.ZERO:
+			aim = Vector3(stick.x, 0, stick.y)
 	var t0: int = Time.get_ticks_usec()
 	var sprint: bool = Input.is_action_pressed(&"sprint")
 	run.step(delta, move, aim, _breaker_held, sprint)
 	if _grenade_held:
-		# Without a mouse (gamepad) throw 8 m ahead.
-		run.use_ability(aim if aim.length() > 1.0 else run.facing * 8.0)
+		# First / third person: where the crosshair meets the ground. Without
+		# a mouse (gamepad, fixed camera) throw 8 m ahead.
+		var throw: Vector3 = _crosshair_ground_aim() if _free_look() else aim
+		run.use_ability(throw if throw.length() > 1.0 else run.facing * 8.0)
 		_grenade_held = false
 	_sim_ms = lerpf(_sim_ms, (Time.get_ticks_usec() - t0) / 1000.0, 0.05)
 	_breaker_held = false
 
 
 func _mouse_aim() -> Vector3:
-	if third_person or _camera == null or DisplayServer.get_name() == "headless":
+	if _free_look() or _camera == null or DisplayServer.get_name() == "headless":
 		return Vector3.ZERO
 	var mouse: Vector2 = get_viewport().get_mouse_position()
 	var from: Vector3 = _camera.project_ray_origin(mouse)
@@ -826,12 +841,13 @@ func _mouse_aim() -> Vector3:
 
 func _process(delta: float) -> void:
 	_play_audio()  # before drawing: the draw functions consume the run's events
+	if profile != null and not showcase and profile.camera_mode != camera_mode:
+		_set_camera_mode(profile.camera_mode, false)  # changed in Settings (pause)
 	_update_mouse_mode()
 	_draw_player_and_camera()
 	_draw_enemies()
 	_draw_orbs()
 	_draw_grenades()
-	_draw_laser()
 	_draw_rocks()
 	_draw_effects(delta)
 	_draw_mission()
@@ -919,28 +935,111 @@ func _play_audio() -> void:
 	_audio_generators = gens
 
 
-# --- Third-person camera ---------------------------------------------------
+# --- First / third-person camera ------------------------------------------
 
-## Horizontal direction the third-person camera looks at.
+## Horizontal direction the first / third-person camera looks at.
 func _tp_forward() -> Vector3:
 	return Vector3(0, 0, -1).rotated(Vector3.UP, _tp_yaw)
 
 
-func _set_third_person(on: bool) -> void:
-	third_person = on
-	if not on:
+## Full look direction (yaw + pitch; positive pitch looks down).
+func _look_dir() -> Vector3:
+	return Basis.from_euler(Vector3(-_tp_pitch, _tp_yaw, 0)) * Vector3.FORWARD
+
+
+## First or third person: mouse / right-stick look and the centre crosshair.
+func _free_look() -> bool:
+	return camera_mode != Profile.CameraMode.FIXED
+
+
+func _pitch_limits() -> Vector2:
+	if camera_mode == Profile.CameraMode.FIRST_PERSON:
+		return Vector2(deg_to_rad(fp_pitch_min), deg_to_rad(fp_pitch_max))
+	return Vector2(deg_to_rad(tp_pitch_min), deg_to_rad(tp_pitch_max))
+
+
+## The crosshair ray [origin, direction] in world metres: from the camera
+## through the screen centre, as seen. Before the camera is first placed it
+## is derived from yaw/pitch (the eye, or the shoulder pivot).
+func crosshair_ray() -> Array[Vector3]:
+	if _camera_placed:
+		return [_camera.global_position, -_camera.global_basis.z]
+	if camera_mode == Profile.CameraMode.FIRST_PERSON:
+		return [_view_pos() + Vector3(0, fp_eye_height, 0), _look_dir()]
+	var right: Vector3 = _tp_forward().cross(Vector3.UP).normalized()
+	return [_view_pos() + Vector3(0, tp_height, 0) + right * tp_shoulder, _look_dir()]
+
+
+## Where the crosshair ray meets the ground, as a flat vector from the player
+## (for the grenade); 12 m ahead when it points at the sky or too far.
+func _crosshair_ground_aim() -> Vector3:
+	var ray: Array[Vector3] = crosshair_ray()
+	var d: float = 0.5
+	while d <= GameData.GRENADE_RANGE + tp_distance + 2.0:
+		var p: Vector3 = ray[0] + ray[1] * d
+		if p.y <= run.map.ground_y(p):
+			return Vector3(p.x - run.player_pos.x, 0, p.z - run.player_pos.z)
+		d += 0.5
+	return _tp_forward() * 12.0
+
+
+## Switches the island camera (V cycles; Settings > Controls sets it too).
+func _set_camera_mode(mode: int, save: bool = true) -> void:
+	var was_free: bool = _free_look()
+	camera_mode = clampi(mode, 0, Profile.CAMERA_MODE_NAMES.size() - 1)
+	if was_free and not _free_look():
 		# Keep the soldier facing where the camera was looking.
 		run.facing = _tp_forward()
-	else:
+	elif _free_look() and not was_free:
 		_tp_yaw = atan2(-run.facing.x, -run.facing.z)
+	var limits: Vector2 = _pitch_limits()
+	_tp_pitch = clampf(_tp_pitch, limits.x, limits.y)
+	var first: bool = camera_mode == Profile.CameraMode.FIRST_PERSON
 	if _crosshair != null:
-		_crosshair.visible = on
-	_set_pcam_active(on)
+		_crosshair.visible = _free_look()
+	_set_pcam_active(camera_mode == Profile.CameraMode.THIRD_PERSON)
 	_camera.h_offset = 0.0
 	_camera.v_offset = 0.0
-	if profile != null:
-		profile.third_person = on
+	_camera.fov = fp_fov if first else camera_fov
+	_camera.near = 0.03 if first else 0.05  # the gun sits close to the eye
+	(_player as SoldierModel).set_shadow_only(first)
+	_view_model.visible = first
+	_camera_placed = false  # the new camera is placed on the next frame
+	if not _free_look():
+		run.clear_crosshair()
+	if save and profile != null:
+		profile.camera_mode = camera_mode
 		profile.save()
+
+
+## Where shots leave the gun: the first-person gun's tip, else the soldier's.
+func muzzle_position() -> Vector3:
+	if camera_mode == Profile.CameraMode.FIRST_PERSON:
+		return _view_model.tip.global_position
+	return (_player as SoldierModel).muzzle.global_position
+
+
+## Eye height, yaw + pitch. The body only casts its shadow; the placeholder
+## gun is pulled back when a wall or slope is right in front of it.
+func _update_first_person_camera(jitter: Vector3, delta: float) -> void:
+	var eye: Vector3 = _view_pos() + Vector3(0, fp_eye_height, 0)
+	var look: Vector3 = _look_dir()
+	_camera.global_transform = Transform3D(Basis.from_euler(Vector3(-_tp_pitch, _tp_yaw, 0)), eye + jitter * 0.3)
+	const REACH: float = 1.1  # a bit more than the barrel's reach from the eye
+	var free: float = REACH
+	for box in _building_boxes:
+		var hit: Variant = _segment_hits_box(eye, eye + look * REACH, box)
+		if hit != null:
+			free = minf(free, float(hit))
+	var d: float = 0.1
+	while d < free:
+		var p: Vector3 = eye + look * d
+		if p.y < run.map.ground_y(p) + 0.05:
+			free = d
+			break
+		d += 0.1
+	_view_model.set_weapon(run.weapons[run.weapon_index].id)
+	_view_model.update(delta, clampf(REACH - free, 0.0, ViewModel.MAX_PULL), _walk_speed, Time.get_ticks_msec() / 1000.0)
 
 
 ## The mouse is captured (hidden, turns the camera) only while playing in
@@ -948,7 +1047,7 @@ func _set_third_person(on: bool) -> void:
 func _update_mouse_mode() -> void:
 	if DisplayServer.get_name() == "headless":
 		return
-	var playing: bool = third_person and not paused and run.card_choices.is_empty() and not run.is_over()
+	var playing: bool = _free_look() and not paused and run.card_choices.is_empty() and not run.is_over()
 	var want: Input.MouseMode = Input.MOUSE_MODE_CAPTURED if playing else Input.MOUSE_MODE_VISIBLE
 	if Input.mouse_mode != want:
 		Input.mouse_mode = want
@@ -982,7 +1081,7 @@ func _setup_phantom_camera() -> void:
 	_pcam.set("follow_damping_value", Vector3(0.08, 0.08, 0.08))
 	_pcam.set("priority", 10)
 	add_child(_pcam)
-	_set_pcam_active(third_person)
+	_set_pcam_active(camera_mode == Profile.CameraMode.THIRD_PERSON)
 
 
 func _set_pcam_active(on: bool) -> void:
@@ -1090,13 +1189,17 @@ func _draw_player_and_camera() -> void:
 	_trauma = maxf(0.0, _trauma - delta * 1.8)
 	var shake: float = _trauma * _trauma * 0.6
 	var jitter := Vector3(randf_range(-1, 1), randf_range(-1, 1), randf_range(-1, 1)) * shake
-	if third_person:
-		_update_third_person_camera(jitter)
-	else:
-		var pitch: float = deg_to_rad(camera_pitch_deg)
-		var offset := Vector3(0, sin(pitch), cos(pitch)) * camera_distance
-		_camera.position = _view_pos() + Vector3(0, 1, 0) + offset + jitter
-		_camera.look_at(_view_pos() + Vector3(0, 1, 0) + jitter * 0.5)
+	match camera_mode:
+		Profile.CameraMode.FIRST_PERSON:
+			_update_first_person_camera(jitter, delta)
+		Profile.CameraMode.THIRD_PERSON:
+			_update_third_person_camera(jitter)
+		_:
+			var pitch: float = deg_to_rad(camera_pitch_deg)
+			var offset := Vector3(0, sin(pitch), cos(pitch)) * camera_distance
+			_camera.position = _view_pos() + Vector3(0, 1, 0) + offset + jitter
+			_camera.look_at(_view_pos() + Vector3(0, 1, 0) + jitter * 0.5)
+	_camera_placed = not showcase
 	# Muzzle flash: a short-lived light at the gun.
 	_muzzle.light_energy = maxf(0.0, _muzzle.light_energy - delta * 40.0)
 
@@ -1148,23 +1251,21 @@ func _draw_enemies() -> void:
 		_head_mm.set_instance_color(i, c if h.flash[i] > 0.0 else c.lerp(Color(0.85, 0.8, 0.7), 0.45))
 
 
-## Laser sight from the gun: to the current target, red when a shot now
-## would be a headshot, faint white otherwise.
-func _draw_laser() -> void:
-	_laser_mesh.clear_surfaces()
-	if showcase or run.is_paused() or run.sprinting:
-		return
-	var info: Array = run.aim_info()
-	var right := Vector3(-run.facing.z, 0, run.facing.x)
-	var from: Vector3 = _view_pos() + Vector3(0, 1.2, 0) + right * 0.22 + run.facing * 0.9
-	var to: Vector3 = from + run.facing * 12.0
-	if info[0] != -1:
-		to = _on_ground(run.horde.positions[info[0]]) + Vector3(0, 1.5, 0)
-	_laser_mat.albedo_color = Color(1, 0.15, 0.1, 0.8) if info[1] else Color(1, 1, 1, 0.3)
-	_laser_mesh.surface_begin(Mesh.PRIMITIVE_LINES)
-	_laser_mesh.surface_add_vertex(from)
-	_laser_mesh.surface_add_vertex(to)
-	_laser_mesh.surface_end()
+## Where a tracer ends: 1.2 m up, or (crosshair aim) at the height of the
+## crosshair ray over that spot, so shots fly to what the crosshair is on.
+func _tracer_end(hit: Vector3, from_player: bool) -> Vector3:
+	var end: Vector3 = _on_ground(hit) + Vector3(0, 1.2, 0)
+	if not from_player or not run.uses_crosshair():
+		return end
+	var o: Vector3 = run.crosshair_origin
+	var dir: Vector3 = run.crosshair_dir
+	var flat: float = Vector2(dir.x, dir.z).length()
+	if flat < 0.05:
+		return end
+	var along: float = Vector2(hit.x - o.x, hit.z - o.z).length() / flat
+	var ground: float = end.y - 1.2
+	end.y = clampf(o.y + dir.y * along, ground + 0.2, ground + 2.5)
+	return end
 
 
 func _is_volcano() -> bool:
@@ -1230,15 +1331,20 @@ func _draw_effects(delta: float) -> void:
 			fx.emit(&"spark", _on_ground(seg[1]) + Vector3(0, 1.2, 0), seg[0] - seg[1])
 		_tracers = run.tracers.duplicate()
 		_muzzle.light_energy = 3.0
+		if camera_mode == Profile.CameraMode.FIRST_PERSON:
+			_view_model.fire()
 		run.tracers.clear()
 		_tracer_life = 0.05
 	_tracer_life -= delta
 	_tracer_mesh.clear_surfaces()
 	if _tracer_life > 0.0 and not _tracers.is_empty():
 		_tracer_mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+		var muzzle: Vector3 = muzzle_position()
 		for seg in _tracers:
-			_tracer_mesh.surface_add_vertex(_on_ground(seg[0]) + Vector3(0, 1.2, 0))
-			_tracer_mesh.surface_add_vertex(_on_ground(seg[1]) + Vector3(0, 1.2, 0))
+			# Shots start at the gun; ricochets go from enemy to enemy.
+			var from_player: bool = Vector2(seg[0].x - run.player_pos.x, seg[0].z - run.player_pos.z).length() < 1.0
+			_tracer_mesh.surface_add_vertex(muzzle if from_player else _on_ground(seg[0]) + Vector3(0, 1.2, 0))
+			_tracer_mesh.surface_add_vertex(_tracer_end(seg[1], from_player))
 		_tracer_mesh.surface_end()
 
 	# Dismemberment with primitives: chunks fly off killed enemies.
@@ -1342,7 +1448,8 @@ func _fade_occluders(delta: float) -> void:
 	var from: Vector3 = _camera.global_position
 	var to: Vector3 = run.player_pos + Vector3(0, 1.0, 0)
 	for i in _buildings.size():
-		var hit: bool = _building_boxes[i].grow(0.3).intersects_segment(from, to) != null
+		# First person: the camera is the soldier's eyes, nothing to see through.
+		var hit: bool = camera_mode != Profile.CameraMode.FIRST_PERSON and _building_boxes[i].grow(0.3).intersects_segment(from, to) != null
 		var m: StandardMaterial3D = _buildings[i].material_override
 		var target: float = 0.25 if hit else 1.0
 		m.albedo_color.a = move_toward(m.albedo_color.a, target, delta * 4.0)

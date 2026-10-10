@@ -39,6 +39,11 @@ var war_cry_time: float = 0.0  ## > 0 while War Cry reduces damage taken
 var stamina: float = GameData.STAMINA_MAX
 var sprinting: bool = false
 var _stamina_delay: float = 0.0
+## Crosshair aim (first / third person camera): the camera's ray through the
+## screen centre, in world metres (y includes the terrain height). A zero
+## direction means no crosshair (fixed camera): auto-fire aims with the body.
+var crosshair_origin: Vector3 = Vector3.ZERO
+var crosshair_dir: Vector3 = Vector3.ZERO
 
 # Weapons
 var weapons: Array[GameData.Weapon] = GameData.weapons()
@@ -664,12 +669,28 @@ func _auto_fire(dt: float) -> void:
 			break
 
 
-## Nearest visible enemy inside the aim cone.
-## Best visible enemy inside the aim cone. Score = distance + 0.4 m per
-## degree off the facing direction, so turning towards an enemy (a special,
-## the boss) makes it the target ("aim with your body"). Enemies within
-## 2.5 m always win: whoever is biting you gets shot first.
+## Sets the crosshair ray (world metres); see crosshair_dir.
+func set_crosshair(origin: Vector3, dir: Vector3) -> void:
+	crosshair_origin = origin
+	crosshair_dir = dir.normalized() if dir.length_squared() > 0.000001 else Vector3.ZERO
+
+
+func clear_crosshair() -> void:
+	crosshair_dir = Vector3.ZERO
+
+
+func uses_crosshair() -> bool:
+	return crosshair_dir != Vector3.ZERO
+
+
+## Fixed camera: best visible enemy inside the body's aim cone. Score =
+## distance + 0.4 m per degree off the facing direction, so turning towards
+## an enemy (a special, the boss) makes it the target ("aim with your body").
+## Enemies within 2.5 m always win: whoever is biting you gets shot first.
+## First / third person: the enemy under the crosshair (_pick_crosshair_target).
 func _pick_target(range_m: float) -> int:
+	if uses_crosshair():
+		return _pick_crosshair_target(range_m)
 	var best: int = -1
 	var best_score: float = INF
 	var cos_cone: float = cos(deg_to_rad(GameData.AIM_CONE_DEG))
@@ -695,6 +716,103 @@ func _pick_target(range_m: float) -> int:
 	return best
 
 
+## Visible enemy in range under the crosshair: the angular gap between the
+## crosshair ray and the enemy's body (a vertical capsule from the feet to
+## the head, as seen from the camera) is below GameData.CROSSHAIR_CONE_DEG.
+## The smallest gap wins (the nearer one if the ray is on several bodies).
+## Enemies behind the player (between a shoulder camera and the soldier) and
+## enemies hidden by a building or a hill are ignored. -1 = no target, so
+## aiming at the ground or the sky with nobody there fires nothing.
+func _pick_crosshair_target(range_m: float) -> int:
+	var best: int = -1
+	var best_score: float = deg_to_rad(GameData.CROSSHAIR_CONE_DEG)
+	var ahead := Vector3(crosshair_dir.x, 0, crosshair_dir.z)
+	for i in horde.query_radius(player_pos, range_m):
+		if _dead.has(i):
+			continue
+		var to: Vector3 = horde.positions[i] - player_pos
+		if Vector3(to.x, 0, to.z).dot(ahead) <= 0.0:
+			continue
+		var aim: Vector3 = _crosshair_body_point(i)
+		var v: Vector3 = aim - crosshair_origin
+		var dist: float = v.length()
+		if dist < 0.01:
+			continue
+		var t: GameData.EnemyType = horde.types[horde.kinds[i]]
+		# Gap to the body's silhouette (0 when the ray is on it), plus a tiny
+		# distance term so the front one of a line of bodies wins.
+		var gap: float = maxf(0.0, crosshair_dir.angle_to(v) - atan(GameData.CROSSHAIR_BODY_RADIUS * t.radius_scale / dist))
+		var score: float = gap + dist * 0.00001
+		if score >= best_score:
+			continue
+		if not _line_of_sight(player_pos, horde.positions[i]) or not _above_ground(crosshair_origin, aim):
+			continue
+		best = i
+		best_score = score
+	return best
+
+
+## Point of enemy i's vertical axis (feet + 0.2 m up to the head centre)
+## closest to the crosshair ray.
+func _crosshair_body_point(i: int) -> Vector3:
+	var p: Vector3 = horde.positions[i]
+	var head: Vector3 = enemy_head(i)
+	var low := Vector3(p.x, p.y + map.ground_y(p) + 0.2, p.z)
+	var seg: Vector3 = head - low
+	# Closest points between the lines origin + s * dir (dir is unit length)
+	# and low + u * seg: u = (seg.w - b * dir.w) / (seg.seg - b * b).
+	var w: Vector3 = crosshair_origin - low
+	var b: float = crosshair_dir.dot(seg)
+	var denom: float = seg.dot(seg) - b * b
+	var u: float = 1.0
+	if denom > 0.000001:
+		u = (seg.dot(w) - b * crosshair_dir.dot(w)) / denom
+	return low + seg * clampf(u, 0.0, 1.0)
+
+
+## No terrain between a and b (sampled every metre; buildings are checked on
+## the grid by _line_of_sight).
+func _above_ground(a: Vector3, b: Vector3) -> bool:
+	var n: int = ceili(a.distance_to(b))
+	for k in range(1, n):
+		var p: Vector3 = a.lerp(b, float(k) / n)
+		if p.y < map.ground_y(p) - 0.1:
+			return false
+	return true
+
+
+## World position (terrain height included) of an enemy's chest and head, as
+## the Island scene draws them (body capsule of t.height, head on top).
+func enemy_chest(i: int) -> Vector3:
+	var p: Vector3 = horde.positions[i]
+	var t: GameData.EnemyType = horde.types[horde.kinds[i]]
+	return Vector3(p.x, p.y + map.ground_y(p) + t.height * 0.6, p.z)
+
+
+func enemy_head(i: int) -> Vector3:
+	var p: Vector3 = horde.positions[i]
+	var t: GameData.EnemyType = horde.types[horde.kinds[i]]
+	return Vector3(p.x, p.y + map.ground_y(p) + t.height + 0.08 * t.radius_scale, p.z)
+
+
+## Would a shot at `target` now be a headshot? Fixed camera: the target sits
+## where the body faces. Crosshair: the ray passes close to the head.
+func _is_headshot(target: int) -> bool:
+	if uses_crosshair():
+		var v: Vector3 = enemy_head(target) - crosshair_origin
+		var along: float = v.dot(crosshair_dir)
+		if along <= 0.0:
+			return false
+		var t: GameData.EnemyType = horde.types[horde.kinds[target]]
+		var radius: float = GameData.CROSSHAIR_HEAD_RADIUS * t.radius_scale
+		if has_perk(&"head_hunter"):
+			radius *= 15.0 / GameData.HEADSHOT_CONE_DEG
+		return (v - crosshair_dir * along).length() <= radius
+	var to: Vector3 = horde.positions[target] - player_pos
+	to.y = 0.0
+	return facing.dot(to.normalized()) >= headshot_cone_cos()
+
+
 func _line_of_sight(a: Vector3, b: Vector3) -> bool:
 	var d: Vector3 = b - a
 	var n: int = ceili(d.length() / 0.5)
@@ -709,17 +827,6 @@ func headshot_cone_cos() -> float:
 	return cos(deg_to_rad(15.0 if has_perk(&"head_hunter") else GameData.HEADSHOT_CONE_DEG))
 
 
-## For the laser sight: current auto-fire target (-1 if none) and whether a
-## shot now would be a headshot.
-func aim_info() -> Array:
-	var target: int = _pick_target(weapons[weapon_index].range_m)
-	if target == -1:
-		return [-1, false]
-	var to: Vector3 = horde.positions[target] - player_pos
-	to.y = 0.0
-	return [target, facing.dot(to.normalized()) >= headshot_cone_cos()]
-
-
 func _fire(w: GameData.Weapon, target: int) -> void:
 	_shots += 1
 	if w.max_ammo > 0:
@@ -727,8 +834,7 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 	var to: Vector3 = horde.positions[target] - player_pos
 	to.y = 0.0
 	var dir: Vector3 = to.normalized()
-	# Headshot when the target sits where the player is facing.
-	var headshot: bool = facing.dot(dir) >= headshot_cone_cos()
+	var headshot: bool = _is_headshot(target)
 	var dmg: float = w.damage * (1.0 + 0.25 * stacks(&"hollow_points"))
 	for p in w.pellets:
 		var pellet_dir: Vector3 = dir
