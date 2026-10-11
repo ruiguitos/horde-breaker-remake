@@ -1,0 +1,5 @@
+# Keep downloaded originals out of Git; track only folder instructions.
+*
+!.gdignore
+!.gitignore
+!README.md
