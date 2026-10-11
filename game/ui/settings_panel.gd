@@ -15,6 +15,8 @@ var _body: VBoxContainer
 var _tab_buttons: Array[Button] = []
 var _capturing: StringName = &""  ## action waiting for a new key, or empty
 var _detector: Node
+var _panel: Control
+var _body_scroll: ScrollContainer
 
 
 static func open(parent: Control, p: Profile) -> SettingsPanel:
@@ -26,7 +28,10 @@ static func open(parent: Control, p: Profile) -> SettingsPanel:
 
 func _ready() -> void:
 	super()
-	content.get_parent().custom_minimum_size.x = 720
+	_panel = content.get_parent()
+	_panel.name = "SettingsFrame"
+	get_viewport().size_changed.connect(_size_panel)
+	_size_panel()
 	content.add_child(UiTheme.title("SETTINGS", 36))
 	var tabs := HBoxContainer.new()
 	content.add_child(tabs)
@@ -36,18 +41,37 @@ func _ready() -> void:
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_tab_buttons.append(b)
 	content.add_child(HSeparator.new())
+	_body_scroll = ScrollContainer.new()
+	_body_scroll.name = "SettingsContent"
+	_body_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_body_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_body_scroll.follow_focus = true
+	content.add_child(_body_scroll)
 	_body = VBoxContainer.new()
-	_body.custom_minimum_size.y = 300
+	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body.add_theme_constant_override("separation", 10)
-	content.add_child(_body)
+	_body_scroll.add_child(_body)
 	content.add_child(UiTheme.label("Changes apply immediately and are saved to your profile.", 16, UiTheme.MUTED))
 	UiTheme.button(content, "DONE", _close, true)
 	closed.connect(func() -> void: profile.save())
 	_show(tab)
+	Input.joy_connection_changed.connect(_controller_changed)
+
+
+## A shared frame for every tab; long content scrolls instead of resizing it.
+func _size_panel() -> void:
+	var available: Vector2 = get_viewport_rect().size - Vector2(32, 32)
+	_panel.custom_minimum_size = Vector2(minf(720, available.x), minf(580, available.y))
+
+
+func _controller_changed(_device: int, _connected: bool) -> void:
+	if tab == "CONTROLS" and _capturing == &"":
+		_show(tab)
 
 
 func _show(t: String) -> void:
 	tab = t
+	_body_scroll.scroll_vertical = 0
 	for b in _tab_buttons:
 		b.theme_type_variation = &"SelectedButton" if b.name == "Tab_" + t else &""
 	for child in _body.get_children():
@@ -133,14 +157,20 @@ func _controls() -> void:
 	_percent_row("Mouse sensitivity", profile.mouse_sensitivity, 1, func(v: int) -> void:
 		profile.mouse_sensitivity = v
 		profile.save())
-	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size.y = 240
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.follow_focus = true
-	_body.add_child(scroll)
+	_options("Controller icons", InputIcons.PLATFORM_NAMES, profile.controller_icons, func(i: int) -> void:
+		profile.controller_icons = i
+		profile.save()
+		_show("CONTROLS"))
+	var headings := HBoxContainer.new()
+	headings.add_theme_constant_override("separation", 10)
+	_body.add_child(headings)
+	for column: Array in [["ACTION", 180], ["KEY / MOUSE", 80], ["PAD", 80]]:
+		var heading := UiTheme.label(column[0], 12, UiTheme.MUTED, true)
+		heading.custom_minimum_size.x = column[1]
+		headings.add_child(heading)
 	var list := VBoxContainer.new()
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(list)
+	_body.add_child(list)
 	for action: StringName in GameInput.REBINDABLE:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
@@ -148,21 +178,24 @@ func _controls() -> void:
 		var name_label := Label.new()
 		name_label.text = GameInput.REBINDABLE[action]
 		name_label.custom_minimum_size.x = 180
+		name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(name_label)
 		var key_icon := _icon_label()
 		key_icon.name = "Key_" + String(action)
 		row.add_child(key_icon)
 		var pad: Array = GameInput.ACTIONS[action].filter(func(b: Variant) -> bool: return not GameInput.is_kbm(b)).slice(0, 1)
 		var pad_icon := _icon_label()
+		pad_icon.name = "Pad_" + String(action)
 		row.add_child(pad_icon)
 		var b := Button.new()
 		b.name = "Rebind_" + String(action)
-		b.text = "PRESS A KEY…  (Esc cancels)" if _capturing == action else "REBIND"
-		b.custom_minimum_size.x = 120
+		b.text = "PRESS KEY…" if _capturing == action else "REBIND"
+		b.tooltip_text = "Press a key or mouse button. Esc cancels."
+		b.custom_minimum_size.x = 100
 		b.pressed.connect(_start_rebind.bind(action))
 		row.add_child(b)
 		InputIcons.fill(key_icon, [GameInput.current_binding(action, profile.key_bindings)])
-		InputIcons.fill(pad_icon, pad)
+		InputIcons.fill(pad_icon, pad, profile.controller_icons)
 	var reset := UiTheme.button(_body, "RESET DEFAULT KEYS", func() -> void:
 		profile.key_bindings.clear()
 		GameInput.apply_overrides(profile.key_bindings)
@@ -177,7 +210,8 @@ func _icon_label() -> RichTextLabel:
 	l.fit_content = true
 	l.scroll_active = false
 	l.autowrap_mode = TextServer.AUTOWRAP_OFF
-	l.custom_minimum_size = Vector2(110, 32)
+	l.custom_minimum_size = Vector2(80, 32)
+	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return l
 

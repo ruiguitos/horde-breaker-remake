@@ -7,6 +7,8 @@ var _failures: int = 0
 var _frames: int = 0
 var _panel: SettingsPanel
 var _profile: Profile
+var _layout_done: bool = false
+var _display_tested: bool = false
 
 
 func _check(ok: bool, what: String) -> void:
@@ -21,6 +23,47 @@ func _initialize() -> void:
 	var host := Control.new()
 	root.add_child(host)
 	_panel = SettingsPanel.open(host, _profile)
+	call_deferred("_test_layout")
+
+
+func _test_layout() -> void:
+	await process_frame
+	await process_frame
+	var panel: Control = _panel.content.get_parent()
+	var initial: Rect2 = panel.get_global_rect()
+	for category in SettingsPanel.TABS:
+		_panel.call("_show", category)
+		await process_frame
+		await process_frame
+		_check(panel.get_global_rect().is_equal_approx(initial), "Settings keeps the same position and size on " + category)
+	var icons: OptionButton = _panel.find_child("Option_Controller_icons", true, false)
+	_check(icons != null, "Controls offers automatic and platform-specific controller icons")
+	if icons != null:
+		icons.item_selected.emit(2)
+		_check(_profile.get("controller_icons") == 2, "PlayStation icon preference is saved to the profile")
+	_check(InputIcons.text("joy:0", 2) == "Cross" and InputIcons.text("joy:0", 1) == "A", "same physical button has PlayStation and Xbox labels")
+	_check(InputIcons.text("joy:0", 3) == "B" and InputIcons.platform_for_name("DualSense Wireless Controller") == 2
+		and InputIcons.platform_for_name("Nintendo Switch Pro Controller") == 3 and InputIcons.platform_for_name("Steam Deck") == 4,
+		"Nintendo button positions and automatic controller identification")
+	var direction: Resource = InputIcons.to_guide("axis:0:-1")
+	_check(direction.get("direction") == 1, "movement icon retains its left/up direction")
+	_profile.save("user://test_icon_profile.json")
+	_check(Profile.load_profile("user://test_icon_profile.json").controller_icons == 2, "controller icon choice survives saving and loading")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_icon_profile.json"))
+	_check(Profile.from_dict({"controller_icons": 900}).controller_icons == 4 and Profile.from_dict({}).controller_icons == 0,
+		"old saves use automatic icons and invalid preferences are clamped")
+	root.size = Vector2i(640, 360)
+	await process_frame
+	await process_frame
+	for category in SettingsPanel.TABS:
+		_panel.call("_show", category)
+		await process_frame
+		await process_frame
+		var bounds: Rect2 = panel.get_global_rect()
+		_check(root.get_visible_rect().encloses(bounds), "Settings frame fits a 640x360 window on " + category)
+	root.size = Vector2i(1152, 648)
+	_panel.call("_show", "DISPLAY")
+	_layout_done = true
 
 
 ## Display and Graphics tabs: the options exist and change the engine.
@@ -95,11 +138,15 @@ func _test_controls() -> void:
 
 func _process(_delta: float) -> bool:
 	_frames += 1
-	if _frames == 2:
+	if not _layout_done:
+		return false
+	if not _display_tested:
+		_display_tested = true
 		_test_display_graphics()
 		_panel.call("_show", "AUDIO")
+		_frames = 0
 		return false
-	if _frames < 4:
+	if _frames < 2:
 		return false
 	var sliders: Array = _panel.find_children("*", "HSlider", true, false)
 	var fields: Array = _panel.find_children("*", "LineEdit", true, false)

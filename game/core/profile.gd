@@ -45,6 +45,7 @@ enum CameraMode { FIRST_PERSON, THIRD_PERSON, FIXED }
 const CAMERA_MODE_NAMES: Array[String] = ["First person", "Third person (shoulder)", "Fixed (top-down)"]
 var camera_mode: int = CameraMode.THIRD_PERSON
 var mouse_sensitivity: int = 50  ## percent
+var controller_icons: int = 0  ## 0 = auto; see InputIcons.PLATFORM_NAMES
 var hud_scale: int = 100  ## HUD size in percent (60..100); new profiles start at 100
 ## Rebound keys: action -> "key:N" / "mouse:N" (see GameInput.REBINDABLE).
 var key_bindings: Dictionary = {}
@@ -102,6 +103,7 @@ static func from_dict(d: Dictionary) -> Profile:
 			if GameInput.REBINDABLE.has(StringName(k)):
 				p.key_bindings[String(k)] = String(kb[k])
 	p.mouse_sensitivity = clampi(int(d.get("mouse_sensitivity", 50)), 1, 100)
+	p.controller_icons = clampi(int(d.get("controller_icons", 0)), 0, InputIcons.PLATFORM_NAMES.size() - 1)
 	p.max_fps = maxi(0, int(d.get("max_fps", 0)))
 	p.render_scale = clampi(int(d.get("render_scale", 100)), 50, 100)
 	p.antialias = clampi(int(d.get("antialias", GraphicsSettings.AA_FXAA)), 0, GraphicsSettings.AA_NAMES.size() - 1)
@@ -148,7 +150,7 @@ func save(path: String = PATH) -> bool:
 		"unlocked_classes": unlocked_classes.map(func(x: StringName) -> String: return String(x)),
 		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x)),
 		"quality": quality, "window_mode": window_mode, "resolution": "%dx%d" % [resolution.x, resolution.y],
-		"vsync": vsync, "hud_scale": hud_scale, "camera_mode": camera_mode, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias,
+		"vsync": vsync, "hud_scale": hud_scale, "camera_mode": camera_mode, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "controller_icons": controller_icons, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias,
 		"last_run": last_run, "lore_read": lore_read}, "  "))
 	return true
 
