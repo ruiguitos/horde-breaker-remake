@@ -13,7 +13,7 @@ const GUN_SCALE: float = 0.6
 ## Largest pull towards the eye (metres); at it the gun is also lowered.
 const MAX_PULL: float = 0.3
 ## Barrel length per weapon id (metres); unknown ids use the rifle.
-const LENGTHS: Dictionary = {&"pistol": 0.2, &"smg": 0.38, &"shotgun": 0.6, &"rifle": 0.66, &"marksman": 0.8}
+const LENGTHS: Dictionary = {&"machine_gun": 0.86, &"smg": 0.38, &"shotgun": 0.6, &"rifle": 0.66, &"marksman": 0.8}
 
 var class_id: StringName = &"recruit"
 var weapon_id: StringName = &""
@@ -49,10 +49,11 @@ func set_weapon(id: StringName) -> void:
 	# Receiver + barrel, stock (long guns), magazine or pump, rear sight.
 	_box(Vector3(0.06, 0.09, length), Vector3(0, 0, front * 0.5 + 0.04), "gun")
 	_box(Vector3(0.03, 0.03, 0.12), Vector3(0, 0.01, front - 0.04), "dark")  # muzzle brake
-	if id != &"pistol":
-		_box(Vector3(0.05, 0.08, 0.18), Vector3(0, -0.03, 0.17), "gun")
+	_box(Vector3(0.05, 0.08, 0.18), Vector3(0, -0.03, 0.17), "gun")
 	if id == &"shotgun":
 		_box(Vector3(0.08, 0.06, 0.2), Vector3(0, -0.07, front * 0.6), "dark")
+	elif id == &"machine_gun":
+		_box(Vector3(0.16, 0.16, 0.14), Vector3(0.05, -0.13, -0.13), "gun")
 	else:
 		_box(Vector3(0.045, 0.13, 0.06), Vector3(0, -0.1, -0.05), "gun")
 	if id == &"marksman":

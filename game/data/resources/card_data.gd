@@ -5,7 +5,7 @@ extends Resource
 @export var title: String = ""
 @export_multiline var description: String = ""
 @export var max_stacks: int = 1
-@export_enum("assault_rifle", "elements", "defense", "sustain", "utility", "breaker", "class_recruit", "class_vanguard") var category: String = "utility"
+@export_enum("primary_weapon", "elements", "defense", "sustain", "utility", "breaker", "class_recruit", "class_vanguard") var category: String = "utility"
 ## Vector glyph drawn by the HUD; no external icon asset required.
 @export var icon: StringName = &"utility"
 @export var tags: Array[StringName] = []

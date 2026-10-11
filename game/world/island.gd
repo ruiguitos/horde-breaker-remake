@@ -767,7 +767,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		# V cycles First person -> Third person -> Fixed.
 		_set_camera_mode((camera_mode + 1) % Profile.CAMERA_MODE_NAMES.size())
 	else:
-		for i in 5:
+		for i in run.weapons.size():
 			if event.is_action_pressed(StringName("weapon_%d" % (i + 1))):
 				run.switch_weapon(i)
 
@@ -898,8 +898,7 @@ func _play_audio() -> void:
 	music.update_mix(target if not run.is_over() else 0.0, get_process_delta_time())
 	if not run.tracers.is_empty():
 		var wid: StringName = run.weapons[run.weapon_index].id
-		var shot: StringName = {&"shotgun": &"shotgun", &"pistol": &"pistol", &"marksman": &"marksman"}.get(wid, &"rifle")
-		sfx.play(shot, -10.0 if shot == &"pistol" or shot == &"marksman" else -6.0, 0.06, 40)
+		sfx.play(wid, -10.0 if wid == &"marksman" else -6.0, 0.06, 40)
 	# Events announced on the radio also get a sound.
 	for key in run.radio:
 		match key:
@@ -1279,6 +1278,12 @@ func _view_pos() -> Vector3:
 
 
 func _draw_player_and_camera() -> void:
+	var soldier := _player as SoldierModel
+	var equipped_id: StringName = run.weapons[run.weapon_index].id
+	if soldier.weapon_id != equipped_id:
+		_muzzle.reparent(soldier, false)
+		soldier.set_weapon(equipped_id)
+		_muzzle.reparent(soldier.muzzle, false)
 	var delta: float = get_process_delta_time()
 	if run.noclip:
 		var climb: float = float(Input.is_physical_key_pressed(KEY_SPACE)) - float(Input.is_physical_key_pressed(KEY_CTRL))

@@ -43,7 +43,7 @@ acaso e, dentro da rota, a ilha sai pela seed.
 | Breaker (investida) | Espaço ou botão direito | A ou RB |
 | Sprint (não dispara enquanto corre) | Shift | L3 (clicar stick esquerdo) |
 | Granada (lança para o rato) | G ou botão do meio | LB |
-| Trocar arma | 1–5 | D-pad ← ↑ →, ↓ roda |
+| Trocar arma | 1 principal / 2 secundária | D-pad ← principal / ↑ secundária, ↓ roda |
 | Escolher carta (foco + confirmar; 0,4 s de espera ao abrir) | ← → e Enter, ou clique | D-pad / stick e A |
 | Trocar as cartas (reroll) | R | Y |
 | Continuar no fim da ilha | Enter / R | A / Start |
@@ -52,7 +52,7 @@ acaso e, dentro da rota, a ilha sai pela seed.
 | Painel de debug | F3 | — |
 | Ecrã inteiro | F11 | — |
 
-**Settings** (no título e na pausa), em três separadores; tudo se aplica na
+**Settings** (no título e na pausa), em quatro separadores; tudo se aplica na
 hora e fica gravado no perfil (`core/graphics_settings.gd` aplica ecrã e
 gráficos):
 - **Display:** modo de janela (janela, ecrã inteiro sem bordas, ecrã inteiro
@@ -72,6 +72,10 @@ gráficos):
   do rato e "Reset default keys".
 - **Audio:** volumes Master, Sound effects e Music, cada um com slider e campo
   editável em percentagem. Os sons vão para os buses SFX e Music.
+
+**Credits** (no título): atribuições do OpenStreetMap, Via Láctea, arte,
+som, fontes e ferramentas. Inclui links de origem/licença, scroll por rato
+ou comando e regresso com Esc/B. Ver `docs/tech/CREDITS.md`.
 
 ## Como se joga
 
@@ -122,7 +126,7 @@ run. Antes da primeira ilha, voltar cancela só a preparação.
   Cartas no rank máximo ficam excluídas de todas as ofertas. A partir do
   **nível 30**, toda a XP no chão da ilha/parte é apanhada automaticamente,
   incluindo a que já existia ao atingir esse nível e os novos drops.
-  Há fogo, frio/congelamento, descargas e veneno para a Assault Rifle,
+  Há fogo, frio/congelamento, descargas e veneno para a arma principal,
   além de melhorias do breaker, cura, mobilidade e habilidades de classe.
   A nova escala usa `10 × (8 + 6n + n²)` XP por nível: começa em 150 XP.
   Walker/Runner rendem 10/12 XP; Brute 100; Grabber/Bloater 45;
@@ -138,9 +142,13 @@ run. Antes da primeira ilha, voltar cancela só a preparação.
   [power-ups e derrota](../docs/tech/POWER_UPS_AND_DEFEAT.md).
   **Sem recolha, não há efeito:** um item expirado ou deixado na ilha
   perde-se. A recolha global de XP do nível 30 não apanha power-ups.
-- Armas: Assault Rifle (infinita, carregador de 30 que por agora se
-  repõe logo ao esvaziar; o HUD mostra `30 / ∞`), Shotgun e Heavy Pistol (munição limitada,
-  atravessam inimigos). Cada gerador ligado repõe metade da munição.
+- **Armas — opção B:** escolhe uma principal e uma secundária no Armory.
+  Principais com reserva infinita: Assault Rifle (30, recarga instantânea),
+  SMG (40, recarga 1,1 s, +15% movimento e +25% dano até 6 m) e Machine Gun
+  (90, recarga 3,2 s, −20% movimento). Secundárias: Shotgun e Marksman,
+  com reserva finita. Usa 1/2 ou D-pad; a principal continua a recarregar
+  enquanto usas a secundária. Cada gerador repõe metade da reserva.
+  Heavy Pistol removida; seleções antigas passam para Shotgun sem reembolso.
 - **Missão**: segue o marcador amarelo até cada gerador e fica dentro do anel
   8 s. Ao começares, a horda entra em pico. Com os 3 ligados, volta ao barco
   (anel verde).
@@ -600,15 +608,15 @@ Pack ao fim de 3 min") em vez de impressões.
 ## Som
 
 - **Sons gravados** do pack Ovani (`assets/audio/ovani_sfx_starter_vol1/`):
-  Heavy Pistol, Marksman, explosões, breaker, dano, level-up, gerador,
+  Marksman, explosões, breaker, dano, level-up, gerador,
   Screamer, golpe do boss (aviso e impacto), caixas, sobrevivente,
   vitória/derrota, vida baixa e sons de UI (passar o rato/foco e clicar).
   O mapa evento → ficheiro está em `audio/sfx.gd` (`FILES`); se um ficheiro
   faltar, o jogo usa o som sintetizado.
 - **Ambiente por bioma** (`audio/ambience.gd`): ondas na praia e nos menus,
   floresta na selva, vento na vila e no porto, tremor no vulcão.
-- O pack não tem rajadas de espingarda: Assault Rifle, SMG e Shotgun ainda
-  usam os sons sintetizados. Fica no TODO arranjar estes três.
+- Assault Rifle, SMG, Machine Gun e Shotgun usam sons sintetizados;
+  a SMG e a Machine Gun têm timbres próprios.
 - Volumes em `world/island.gd::_play_audio`.
 
 **Música adaptativa** (`audio/music.gd`): dois loops sintetizados de 8 s

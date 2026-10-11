@@ -46,7 +46,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _trap_focus() -> void:
 	var buttons: Array[Control] = []
 	for node in find_children("*", "Control", true, false):
-		if (node is Button and not node.disabled) or node is HSlider or node is LineEdit:
+		if (node is BaseButton and not node.disabled) or node is HSlider or node is LineEdit:
 			buttons.append(node as Control)
 	if buttons.is_empty():
 		return
@@ -56,10 +56,10 @@ func _trap_focus() -> void:
 		buttons[i].focus_previous = previous
 		buttons[i].focus_next = next
 		buttons[i].focus_neighbor_top = previous
-		if buttons[i] is Button:
+		if buttons[i] is BaseButton:
 			buttons[i].focus_neighbor_left = previous
 		buttons[i].focus_neighbor_bottom = next
-		if buttons[i] is Button:
+		if buttons[i] is BaseButton:
 			buttons[i].focus_neighbor_right = next
 	buttons[0].grab_focus()
 
@@ -77,6 +77,12 @@ static func settings(parent: Node, profile: Profile) -> MenuDialog:
 	# Runtime load avoids a circular class dependency: SettingsPanel inherits us.
 	var dialog: MenuDialog = (load("res://game/ui/settings_panel.gd") as Script).new() as MenuDialog
 	dialog.set("profile", profile)
+	parent.add_child(dialog)
+	return dialog
+
+
+static func credits(parent: Node) -> MenuDialog:
+	var dialog: MenuDialog = (load("res://game/ui/credits_panel.gd") as Script).new() as MenuDialog
 	parent.add_child(dialog)
 	return dialog
 
@@ -102,7 +108,7 @@ static func controls(parent: Node) -> MenuDialog:
 	dialog.content.add_child(UiTheme.title("CONTROLS", 36))
 	var list := _scroll(dialog.content, 300)
 	list.add_child(UiTheme.label("Your weapon fires automatically at enemies in front of you. Turn your body to choose a target.", 18, UiTheme.ACCENT))
-	list.add_child(UiTheme.label("MOVE       WASD / arrows / left stick\nAIM        Mouse / right stick\nBREAKER    Space / RMB / A / RB\nABILITY    G / MMB / LB\nSPRINT     Shift / L3\nWEAPONS    1–5 / D-pad\nPAUSE      Esc / Start\nMENUS      Enter / A · Esc / B back\nSUPPLIES   1–3 / X · Y · B\nROUTES     4–5 / LB · RB", 18, UiTheme.TEXT, true))
+	list.add_child(UiTheme.label("MOVE       WASD / arrows / left stick\nAIM        Mouse / right stick\nBREAKER    Space / RMB / A / RB\nABILITY    G / MMB / LB\nSPRINT     Shift / L3\nWEAPONS    1–2 / D-pad\nPAUSE      Esc / Start\nMENUS      Enter / A · Esc / B back\nSUPPLIES   1–3 / X · Y · B\nROUTES     4–5 / LB · RB", 18, UiTheme.TEXT, true))
 	UiTheme.button(dialog.content, "BACK", dialog.close, true)
 	return dialog
 

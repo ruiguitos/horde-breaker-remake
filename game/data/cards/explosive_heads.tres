@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_mbveo")
 title = "Pop Goes the Head"
-description = "Rifle headshot kills explode within 3 m: 15 + 15 damage per rank."
+description = "Primary headshot kills explode within 3 m: 15 + 15 damage per rank."
 max_stacks = 3
-category = "assault_rifle"
-icon = &"assault_rifle"
+category = "primary_weapon"
+icon = &"primary_weapon"
 tags = Array[StringName]([&"headshot", &"area"])
-weapon_filter = Array[StringName]([&"rifle"])
+weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 order = 3

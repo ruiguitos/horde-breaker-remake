@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_45wkq")
 title = "Fast Hands"
-description = "+8% Assault Rifle fire rate per rank."
+description = "+8% primary weapon fire rate per rank."
 max_stacks = 5
-category = "assault_rifle"
-icon = &"assault_rifle"
+category = "primary_weapon"
+icon = &"primary_weapon"
 tags = Array[StringName]([&"fire_rate"])
-weapon_filter = Array[StringName]([&"rifle"])
+weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 order = 1

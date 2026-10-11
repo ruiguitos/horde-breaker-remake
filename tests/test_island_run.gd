@@ -223,7 +223,7 @@ func _test_perks_and_threat() -> void:
 	var run := IslandRun.new(ctx.island_seed())
 	run.load_context(ctx)
 	_check(run.max_hp == 130.0 and run.hp == 130.0, "Thick Skin gives 130 max HP")
-	_check(run.ammo[1] == 60 and run.ammo[2] == 90, "Pack Rat gives +50% special ammo")
+	_check(run.ammo[1] == 60 and run.ammo[0] == -1, "Pack Rat gives +50% secondary ammo; primary stays infinite")
 	_check(is_equal_approx(run.horde.hp_scale, 1.4) and run.director.max_alive == 200, "Threat 3: enemy HP x1.4 and 200 alive")
 
 
@@ -298,7 +298,7 @@ func _test_modifiers() -> void:
 	ctx.modifier = &"short"
 	var run := IslandRun.new(ctx.island_seed())
 	run.load_context(ctx)
-	_check(run.ammo[1] == 20 and run.ammo[2] == 30, "Supply Shortage halves special ammo")
+	_check(run.ammo[1] == 20 and run.ammo[0] == -1, "Supply Shortage halves secondary ammo; primary stays infinite")
 	ctx.modifier = &"swarm"
 	var run2 := IslandRun.new(ctx.island_seed())
 	run2.load_context(ctx)
@@ -319,9 +319,8 @@ func _test_weapon_unlocks() -> void:
 	ctx.weapons.append_array(p.unlocked_weapons)
 	var run2 := IslandRun.new(5)
 	run2.load_context(ctx)
-	run2.switch_weapon(3)
-	_check(locked and bought and too_poor and run2.weapon_index == 3 and run2.weapons[3].id == &"smg",
-		"SMG is locked until bought in the armory, then usable on key 4")
+	_check(locked and bought and too_poor and run2.weapon_index == 0 and run2.weapons[0].id == &"smg",
+		"selected SMG replaces the primary on key 1")
 
 
 func _test_bloater_and_screamer() -> void:

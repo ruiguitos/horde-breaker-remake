@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_3aiw2")
 title = "Frost Rounds"
-description = "Rifle: +5% cold chance per rank. Cold slows 15% for 4 s; three stacks freeze for 1 s. Bosses only receive half the slow."
+description = "Primary: +5% cold chance per rank. Cold slows 15% for 4 s; three stacks freeze for 1 s. Bosses only receive half the slow."
 max_stacks = 5
 category = "elements"
 icon = &"frost"
 tags = Array[StringName]([&"frost", &"slow"])
-weapon_filter = Array[StringName]([&"rifle"])
+weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 order = 32

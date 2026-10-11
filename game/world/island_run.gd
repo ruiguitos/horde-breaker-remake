@@ -74,7 +74,7 @@ var _shot_r := PackedFloat32Array()
 var _shot_los: Dictionary = {}  ## enemy index -> the soldier's line is clear
 
 # Weapons
-var weapons: Array[GameData.Weapon] = GameData.weapons()
+var weapons: Array[GameData.Weapon] = GameData.loadout(GameData.starting_weapons())
 var weapon_index: int = 0
 ## Which weapons can be used this run (locked ones are skipped).
 var weapon_unlocked: Array[bool] = []
@@ -82,8 +82,10 @@ var ammo: PackedInt32Array = PackedInt32Array()
 ## Rounds left in each weapon's magazine (only weapons with a magazine, see
 ## magazine_size; the others read 0). Every island starts with full magazines.
 var mag: PackedInt32Array = PackedInt32Array()
-## Seconds left of a magazine reload (always 0 while RELOAD_SECONDS is 0).
-var reload_left: float = 0.0
+## Independent reload timers; the HUD reads the currently equipped weapon.
+var reload_times: PackedFloat32Array = PackedFloat32Array()
+var reload_left: float:
+	get: return reload_times[weapon_index] if weapon_index < reload_times.size() else 0.0
 ## True while a Nuke resolves: its kills credit XP/Intel but roll no new drop.
 var _nuking: bool = false
 var _fire_cd: float = 0.0
@@ -200,7 +202,8 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMa
 	for w in weapons:
 		ammo.append(w.max_ammo)
 		mag.append(w.magazine)
-		weapon_unlocked.append(GameData.starting_weapons().has(w.id))
+		weapon_unlocked.append(true)
+		reload_times.append(0.0)
 	_build_sight()
 	for c in map.caches:
 		cache_progress.append(0.0)
@@ -246,8 +249,17 @@ func load_context(ctx: RunContext) -> void:
 	if has_boss:
 		radio.append(&"land_boss")
 	player_class = ctx.player_class
-	for w in weapons.size():
-		weapon_unlocked[w] = ctx.weapons.has(weapons[w].id)
+	weapons = GameData.loadout(ctx.weapons)
+	weapon_index = 0
+	mag.clear()
+	ammo.clear()
+	weapon_unlocked.clear()
+	reload_times.clear()
+	for entry in weapons:
+		mag.append(entry.magazine)
+		ammo.append(entry.max_ammo)
+		weapon_unlocked.append(true)
+		reload_times.append(0.0)
 	threat = ctx.threat
 	max_hp = ctx.max_hp
 	hp = ctx.hp
@@ -362,11 +374,19 @@ func magazine_size(w: int) -> int:
 	return weapons[w].magazine
 
 
-## Refill the magazine. TODO(reload): with RELOAD_SECONDS > 0 this starts a
-## timed reload (firing waits in _auto_fire); at 0 it is instant.
+## An empty magazine refills instantly or starts this weapon's timed reload.
 func _reload(w: int) -> void:
-	mag[w] = magazine_size(w)
-	reload_left = GameData.RELOAD_SECONDS
+	reload_times[w] = weapons[w].reload_seconds
+	mag[w] = magazine_size(w) if reload_times[w] <= 0.0 else 0
+
+
+func _update_reloads(dt: float) -> void:
+	for w in reload_times.size():
+		if reload_times[w] <= 0.0:
+			continue
+		reload_times[w] = maxf(0.0, reload_times[w] - dt)
+		if reload_times[w] <= 0.0:
+			mag[w] = magazine_size(w)
 
 
 func max_ammo(w: int) -> int:
@@ -672,6 +692,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 		return
 	_sync_intel_bonus()
 	power_ups.tick(dt)
+	_update_reloads(dt)
 	time_alive += dt
 	_hp_at_step_start = hp
 	var aim_flat := Vector3(aim.x, 0, aim.z)
@@ -763,7 +784,7 @@ func _update_player(dt: float, move: Vector2, breaker: bool) -> void:
 		return
 	if move.length_squared() > 1.0:
 		move = move.normalized()
-	var v: Vector2 = move * GameData.PLAYER_SPEED * (1.0 + 0.04 * stacks(&"light_boots")) * (GameData.SPRINT_MULTIPLIER if sprinting else 1.0) * dt
+	var v: Vector2 = move * GameData.PLAYER_SPEED * weapons[weapon_index].movement_mult * (1.0 + 0.04 * stacks(&"light_boots")) * (GameData.SPRINT_MULTIPLIER if sprinting else 1.0) * dt
 	player_pos = Horde.move_against_walls(field, player_pos, v.x, v.y, GameData.PLAYER_RADIUS)
 
 
@@ -792,7 +813,6 @@ func _auto_fire(dt: float) -> void:
 	var rate: float = fire_rate()
 	_fire_cd -= dt
 	if reload_left > 0.0:
-		reload_left = maxf(0.0, reload_left - dt)
 		_fire_cd = maxf(_fire_cd, 0.0)
 		return
 	if _fire_cd > 0.0:
@@ -814,7 +834,7 @@ func _auto_fire(dt: float) -> void:
 
 func fire_rate() -> float:
 	var bonus: float = 0.0
-	if weapons[weapon_index].id == &"rifle":
+	if weapons[weapon_index].primary:
 		bonus += 0.08 * stacks(&"fast_hands")
 		if _stationary:
 			bonus += 0.08 * stacks(&"steady_aim")
@@ -1123,7 +1143,7 @@ func headshot_cone_cos() -> float:
 
 
 func _fire(w: GameData.Weapon, target: int) -> void:
-	if w.id == &"rifle":
+	if w.primary:
 		_shots += 1
 	if w.max_ammo > 0:
 		ammo[weapon_index] -= 1
@@ -1146,7 +1166,7 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 		to.y = 0.0
 		dir = to.normalized()
 	var headshot: bool = _is_headshot(target)
-	var rifle: bool = w.id == &"rifle"
+	var rifle: bool = w.primary
 	var dmg: float = w.damage * (1.0 + 0.10 * stacks(&"hollow_points") if rifle else 1.0)
 	var pierce: int = w.pierce + (stacks(&"piercing_rounds") if rifle else 0)
 	var direct_hits: Array[int] = []
@@ -1172,6 +1192,8 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 				continue
 			var is_head: bool = headshot and idx == target
 			var hit_damage: float = dmg * (GameData.HEADSHOT_MULTIPLIER if is_head else 1.0)
+			if w.close_range > 0.0 and horde.positions[idx].distance_to(player_pos) <= w.close_range:
+				hit_damage *= w.close_damage_mult
 			if rifle:
 				if horde.positions[idx].distance_to(player_pos) <= 4.0:
 					hit_damage *= 1.0 + 0.10 * stacks(&"point_blank")
@@ -1359,7 +1381,7 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 				toxic_cloud_times.append(1.0 + stacks(&"toxic_cloud"))
 
 
-## Only direct rifle hits roll elements. Damage from states/chains/clouds
+## Only direct primary hits roll elements. Damage from states/chains/clouds
 ## is explicitly secondary and cannot produce another card effect.
 func _apply_elements(i: int, hit_damage: float) -> void:
 	if _dead.has(i):

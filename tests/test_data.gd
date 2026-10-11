@@ -16,8 +16,8 @@ func _check(ok: bool, what: String) -> void:
 func _initialize() -> void:
 	var weapons: Array[GameData.Weapon] = GameData.weapons()
 	var ids: Array = weapons.map(func(w: GameData.Weapon) -> StringName: return w.id)
-	_check(ids == [&"rifle", &"shotgun", &"pistol", &"smg", &"marksman"], "5 weapons in slot order (%s)" % [ids])
-	_check(GameData.starting_weapons() == ([&"rifle", &"shotgun", &"pistol"] as Array[StringName]), "starting weapons are the free ones")
+	_check(ids == [&"rifle", &"shotgun", &"marksman", &"smg", &"machine_gun"], "5 weapons in catalog order (%s)" % [ids])
+	_check(GameData.starting_weapons() == ([&"rifle", &"shotgun"] as Array[StringName]), "starting weapons are the free ones")
 	_check(GameData.weapon_cost(&"smg") == 60 and GameData.weapon_cost(&"marksman") == 80 and GameData.weapon_cost(&"rifle") == -1,
 		"unlock costs: SMG 60, Marksman 80, Rifle not for sale")
 	_check(weapons[1].pellets == 8 and is_equal_approx(weapons[0].fire_rate, 9.0), "weapon stats come from the .tres files")

@@ -34,9 +34,6 @@ static var ACTIONS: Dictionary = {
 	&"menu_route_2": [KEY_5, "joy:%d" % JOY_BUTTON_RIGHT_SHOULDER],
 	&"weapon_1": [KEY_1, "joy:%d" % JOY_BUTTON_DPAD_LEFT],
 	&"weapon_2": [KEY_2, "joy:%d" % JOY_BUTTON_DPAD_UP],
-	&"weapon_3": [KEY_3, "joy:%d" % JOY_BUTTON_DPAD_RIGHT],
-	&"weapon_4": [KEY_4],
-	&"weapon_5": [KEY_5],
 	&"weapon_next": ["joy:%d" % JOY_BUTTON_DPAD_DOWN],
 }
 
@@ -97,7 +94,7 @@ const REBINDABLE: Dictionary = {
 	&"move_left": "Move left", &"move_right": "Move right",
 	&"breaker": "Breaker (charge)", &"ability": "Class ability",
 	&"sprint": "Sprint", &"camera_toggle": "Camera view",
-	&"weapon_1": "Weapon 1", &"weapon_2": "Weapon 2", &"weapon_3": "Weapon 3",
+	&"weapon_1": "Primary weapon", &"weapon_2": "Secondary weapon",
 	&"pause": "Pause",
 }
 

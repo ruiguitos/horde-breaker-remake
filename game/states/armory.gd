@@ -157,17 +157,28 @@ func _scroll_list() -> VBoxContainer:
 
 func _weapons() -> void:
 	_content.add_child(UiTheme.title("WEAPONS", 36))
-	_content.add_child(UiTheme.label("Unlock additional weapons for every expedition.", 16, UiTheme.MUTED))
+	_content.add_child(UiTheme.label("Equip one primary and one secondary. Unlocking keeps the weapon permanently.", 16, UiTheme.MUTED))
 	var list := _scroll_list()
 	for weapon in GameData.weapons():
 		var card := UiTheme.panel(list)
 		card.add_child(UiTheme.title(weapon.display_name.to_upper(), 22))
+		card.add_child(UiTheme.label("PRIMARY" if weapon.primary else "SECONDARY", 13, UiTheme.ACCENT, true))
 		card.add_child(UiTheme.label("%d DAMAGE / %.1f SHOTS PER SECOND / %d M" % [int(weapon.damage), weapon.fire_rate, int(weapon.range_m)], 16, UiTheme.MUTED, true))
+		card.add_child(UiTheme.label(weapon.role, 16))
 		var cost: int = maxi(0, GameData.weapon_cost(weapon.id))
 		var owned: bool = cost == 0 or profile.unlocked_weapons.has(weapon.id)
-		var b := UiTheme.button(card, "IN LOADOUT" if owned else "UNLOCK / %d INTEL" % cost, func() -> void: _act(profile.buy_weapon(weapon.id)))
+		var selected: bool = weapon.id in profile.weapon_loadout()
+		var b := UiTheme.button(card, "EQUIPPED" if selected else "EQUIP" if owned else "UNLOCK / %d INTEL" % cost, _choose_weapon.bind(weapon.id))
 		b.name = "Weapon_" + String(weapon.id)
-		b.disabled = owned or profile.intel < cost
+		b.disabled = selected or not owned and profile.intel < cost
+		if selected:
+			b.theme_type_variation = &"SelectedButton"
+
+
+func _choose_weapon(id: StringName) -> void:
+	if not profile.owns_weapon(id) and not profile.buy_weapon(id):
+		return
+	_act(profile.select_weapon(id))
 
 
 func _perks() -> void:
@@ -218,6 +229,9 @@ func _loadout() -> void:
 	_summary.add_child(UiTheme.label("INTEL MULTIPLIER / ×%.2f" % GameData.threat_intel(profile.threat), 16, UiTheme.MUTED, true))
 	_summary.add_child(HSeparator.new())
 	_summary.add_child(UiTheme.label("INTEL  %d" % profile.intel, 28, UiTheme.TEXT, true))
+	for id in profile.weapon_loadout():
+		var weapon: GameData.Weapon = GameData.weapon(id)
+		_summary.add_child(UiTheme.label(("PRIMARY / " if weapon.primary else "SECONDARY / ") + weapon.display_name, 16))
 	_summary.add_child(UiTheme.label("PERK SLOTS  %d / %d" % [profile.equipped_perks.size(), profile.slots], 16, UiTheme.MUTED, true))
 	for i in profile.slots:
 		var plate := UiTheme.panel(_summary)

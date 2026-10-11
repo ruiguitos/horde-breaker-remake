@@ -10,7 +10,7 @@ max_stacks = 3
 category = "elements"
 icon = &"toxic"
 tags = Array[StringName]([&"toxic", &"kill", &"area"])
-weapon_filter = Array[StringName]([&"rifle"])
+weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 prerequisites = Dictionary[StringName, int]({
 &"toxic_rounds": 1
 })

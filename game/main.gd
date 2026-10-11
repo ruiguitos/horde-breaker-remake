@@ -76,7 +76,7 @@ func _fresh_context() -> RunContext:
 	ctx.threat = profile.threat
 	ctx.apply_class(profile.selected_class)
 	ctx.apply_perks(profile.equipped_perks)
-	ctx.weapons.append_array(profile.unlocked_weapons)
+	ctx.weapons = profile.weapon_loadout()
 	return ctx
 
 

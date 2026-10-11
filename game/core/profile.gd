@@ -4,7 +4,7 @@ extends RefCounted
 ## user:// (on Windows: %APPDATA%/Godot/app_userdata/Horde Breaker Remake).
 
 const PATH: String = "user://profile.json"
-const VERSION: int = 5
+const VERSION: int = 6
 
 var intel: int = 0
 var runs: int = 0
@@ -26,6 +26,8 @@ var dialogue_voice: bool = true
 ## can open the settings panel.
 static var current: Profile
 var unlocked_weapons: Array[StringName] = []  ## bought in the armory
+var selected_primary: StringName = &"rifle"
+var selected_secondary: StringName = &"shotgun"
 var unlocked_classes: Array[StringName] = [&"recruit"]
 var selected_class: StringName = &"recruit"
 var lore_pages: int = 0
@@ -120,7 +122,20 @@ static func from_dict(d: Dictionary) -> Profile:
 	if not p.unlocked_classes.has(p.selected_class):
 		p.selected_class = &"recruit"
 	for id in d.get("unlocked_weapons", []):
-		p.unlocked_weapons.append(StringName(id))
+		var weapon_id := StringName(id)
+		if GameData.weapon(weapon_id) != null and not p.unlocked_weapons.has(weapon_id):
+			p.unlocked_weapons.append(weapon_id)
+	# Removed Heavy Pistol selections become the free Shotgun, without refund.
+	var primary_id := StringName(d.get("selected_primary", "rifle"))
+	var secondary_id := StringName(d.get("selected_secondary", d.get("selected_weapon", "shotgun")))
+	var primary: GameData.Weapon = GameData.weapon(primary_id)
+	if primary != null and primary.primary:
+		p.select_weapon(primary_id)
+	if secondary_id == &"pistol":
+		secondary_id = &"shotgun"
+	var secondary: GameData.Weapon = GameData.weapon(secondary_id)
+	if secondary != null and not secondary.primary:
+		p.select_weapon(secondary_id)
 	p.threat = clampi(int(d.get("threat", 1)), 1, p.max_threat)
 	# Version 4 had no last run nor archive read count: no QUICK REDEPLOY
 	# until the next run, and every file already recovered counts as read.
@@ -131,6 +146,8 @@ static func from_dict(d: Dictionary) -> Profile:
 			"perks": (last.get("perks", []) as Array).map(func(x: Variant) -> String: return String(x)),
 			"threat": int(last.get("threat", 1)),
 			"expedition": String(last.get("expedition", "")),
+			"primary": "rifle" if String(last.get("primary", "rifle")) == "pistol" else String(last.get("primary", "rifle")),
+			"secondary": "shotgun" if String(last.get("secondary", "shotgun")) == "pistol" else String(last.get("secondary", "shotgun")),
 		}
 	p.lore_read = clampi(int(d.get("lore_read", p.lore_pages)), 0, p.lore_pages)
 	return p
@@ -149,6 +166,7 @@ func save(path: String = PATH) -> bool:
 		"slots": slots, "max_threat": max_threat, "threat": threat, "master_volume": master_volume, "sfx_volume": sfx_volume, "music_volume": music_volume, "dialogue_voice": dialogue_voice, "lore_pages": lore_pages, "ending": ending, "selected_class": String(selected_class),
 		"unlocked_classes": unlocked_classes.map(func(x: StringName) -> String: return String(x)),
 		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x)),
+		"selected_primary": String(selected_primary), "selected_secondary": String(selected_secondary),
 		"quality": quality, "window_mode": window_mode, "resolution": "%dx%d" % [resolution.x, resolution.y],
 		"vsync": vsync, "hud_scale": hud_scale, "camera_mode": camera_mode, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "controller_icons": controller_icons, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias,
 		"last_run": last_run, "lore_read": lore_read}, "  "))
@@ -176,6 +194,7 @@ func remember_run(expedition: StringName) -> void:
 		"perks": equipped_perks.map(func(x: StringName) -> String: return String(x)),
 		"threat": threat,
 		"expedition": String(expedition),
+		"primary": String(selected_primary), "secondary": String(selected_secondary),
 	}
 
 
@@ -189,6 +208,12 @@ func redeploy_problem() -> String:
 		return "No previous run yet"
 	if not unlocked_classes.has(StringName(last_run["class"])):
 		return "Class locked"
+	var primary: GameData.Weapon = GameData.weapon(StringName(last_run.get("primary", "rifle")))
+	var secondary: GameData.Weapon = GameData.weapon(StringName(last_run.get("secondary", "shotgun")))
+	if primary == null or not primary.primary or not owns_weapon(primary.id):
+		return "Primary weapon unavailable"
+	if secondary == null or secondary.primary or not owns_weapon(secondary.id):
+		return "Secondary weapon unavailable"
 	var perks: Array = last_run["perks"]
 	if perks.size() > slots:
 		return "Not enough perk slots"
@@ -209,6 +234,8 @@ func apply_last_run() -> bool:
 	if redeploy_problem() != "":
 		return false
 	selected_class = StringName(last_run["class"])
+	selected_primary = StringName(last_run.get("primary", "rifle"))
+	selected_secondary = StringName(last_run.get("secondary", "shotgun"))
 	equipped_perks.clear()
 	for id: Variant in last_run["perks"]:
 		equipped_perks.append(StringName(id))
@@ -266,6 +293,26 @@ func buy_weapon(id: StringName) -> bool:
 	intel -= cost
 	unlocked_weapons.append(id)
 	return true
+
+
+func owns_weapon(id: StringName) -> bool:
+	return GameData.starting_weapons().has(id) or unlocked_weapons.has(id) and GameData.weapon(id) != null
+
+
+## Selecting changes only that slot; ownership and Intel are untouched.
+func select_weapon(id: StringName) -> bool:
+	var entry: GameData.Weapon = GameData.weapon(id)
+	if entry == null or not owns_weapon(id):
+		return false
+	if entry.primary:
+		selected_primary = id
+	else:
+		selected_secondary = id
+	return true
+
+
+func weapon_loadout() -> Array[StringName]:
+	return [selected_primary, selected_secondary]
 
 
 func next_slot_cost() -> int:

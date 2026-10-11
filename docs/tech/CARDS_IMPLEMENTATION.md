@@ -5,6 +5,12 @@ de `docs/design/CARDS_WEAPONS_PERKS.md`. São **39 cartas**: as 12 existentes
 reequilibradas, 19 novas sem sistemas adiados, quatro elementos e quatro
 melhorias elementais. Os IDs e UIDs das 12 originais mantêm-se.
 
+Atualização de 2026-10-11: as oito cartas da Assault Rifle e as nove
+elementais passam a servir qualquer principal equipada (AR, SMG ou Machine
+Gun). A categoria é `primary_weapon`; os filtros listam as três armas.
+Ids, ranks e pré-requisitos mantêm-se. As secundárias não recebem estes
+efeitos. Ver [catálogo de combate](COMBAT_CATALOG.md).
+
 ## Dados e ofertas
 
 Cada recurso `game/data/cards/*.tres` guarda categoria, ícone, etiquetas,

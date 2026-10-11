@@ -53,6 +53,12 @@ class Weapon:
 	var max_ammo: int       ## -1 = infinite
 	var knockback: float    ## metres pushed per hit
 	var magazine: int       ## rounds per magazine; 0 = none (shots come straight from the reserve)
+	var primary: bool = false
+	var reload_seconds: float = 0.0
+	var movement_mult: float = 1.0
+	var close_damage_mult: float = 1.0
+	var close_range: float = 0.0
+	var role: String = ""
 
 	func _init(p_id: StringName, p_name: String, p_damage: float, p_rate: float, p_range: float,
 			p_pellets: int, p_spread: float, p_pierce: int, p_ammo: int, p_knockback: float,
@@ -267,12 +273,6 @@ const POWER_UP_ICONS: Dictionary = {
 }
 
 
-## Magazine refill time in seconds. 0 = instant, no reload yet.
-## TODO(reload): give it a value (e.g. 1.8) once there is a reload animation
-## and sound; IslandRun already blocks firing while `reload_left` > 0.
-const RELOAD_SECONDS: float = 0.0
-
-
 static func power_up_id(id: StringName) -> StringName:
 	return POWER_UP_LEGACY_IDS.get(id, id)
 
@@ -369,7 +369,31 @@ static func weapons() -> Array[Weapon]:
 		var d: WeaponData = e[1]
 		list.append(Weapon.new(e[0], d.display_name, d.damage, d.fire_rate, d.range_m,
 			d.pellets, d.spread_deg, d.pierce, d.max_ammo, d.knockback, d.magazine))
+		var weapon: Weapon = list[-1]
+		weapon.primary = d.primary
+		weapon.reload_seconds = d.reload_seconds
+		weapon.movement_mult = d.movement_mult
+		weapon.close_damage_mult = d.close_damage_mult
+		weapon.close_range = d.close_range
+		weapon.role = d.role
 	return list
+
+
+static func weapon(id: StringName) -> Weapon:
+	for entry in weapons():
+		if entry.id == id:
+			return entry
+	return null
+
+
+## Exactly two slots: the last valid primary and secondary, or free defaults.
+static func loadout(ids: Array[StringName]) -> Array[Weapon]:
+	var selected: Array[Weapon] = [weapon(&"rifle"), weapon(&"shotgun")]
+	for id in ids:
+		var entry: Weapon = weapon(&"shotgun" if id == &"pistol" else id)
+		if entry != null:
+			selected[0 if entry.primary else 1] = entry
+	return selected
 
 
 ## Weapons every run starts with (unlock cost 0).

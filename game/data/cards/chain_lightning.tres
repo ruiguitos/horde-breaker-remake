@@ -10,7 +10,7 @@ max_stacks = 3
 category = "elements"
 icon = &"storm"
 tags = Array[StringName]([&"storm", &"chain"])
-weapon_filter = Array[StringName]([&"rifle"])
+weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 prerequisites = Dictionary[StringName, int]({
 &"storm_rounds": 1
 })

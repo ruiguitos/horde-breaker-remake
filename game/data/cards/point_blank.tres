@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_nm5tb")
 title = "Point Blank"
-description = "+10% rifle damage per rank against targets within 4 m."
+description = "+10% primary damage per rank against targets within 4 m."
 max_stacks = 3
-category = "assault_rifle"
-icon = &"assault_rifle"
+category = "primary_weapon"
+icon = &"primary_weapon"
 tags = Array[StringName]([&"damage", &"close_range"])
-weapon_filter = Array[StringName]([&"rifle"])
+weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 order = 14

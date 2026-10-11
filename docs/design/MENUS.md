@@ -8,7 +8,7 @@ O texto do jogo continua em inglês.
 
 | Ecrã | Ação principal | Dados reais |
 |---|---|---|
-| Título | Deploy → Armory | Estatísticas do perfil; definições e arquivo |
+| Título | Deploy → Armory | Estatísticas do perfil; definições, créditos e arquivo |
 | Armory | Start Run | Classes, armas, Intel, Threat e slots/perks |
 | Barco / rotas | Confirm Route | Mantimento, bioma, missão e modificador sorteados |
 | Pausa | Resume | Jogo atual desfocado; definições, controlos e abandono |
@@ -73,6 +73,7 @@ Breaker UI Proposals", as 7 propostas abaixo. A decisão foi registada em
      sobreposição;
    - novo botão QUICK REDEPLOY, que repete a última corrida;
    - o TEST ISLAND fica discreto;
+   - CREDITS abre as atribuições de mapas, céu, assets e ferramentas;
    - o lema deixa de sair do ecrã.
 3. **Barco num só ecrã, sem janela por cima:**
    - rotas e mantimentos lado a lado;

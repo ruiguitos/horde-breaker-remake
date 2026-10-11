@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_su45i")
 title = "Wind Rounds"
-description = "Rifle hits push enemies an extra 0.15 m per rank."
+description = "Primary hits push enemies an extra 0.15 m per rank."
 max_stacks = 5
 category = "elements"
 icon = &"elements"
 tags = Array[StringName]([&"knockback"])
-weapon_filter = Array[StringName]([&"rifle"])
+weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 order = 16

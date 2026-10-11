@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_gm2f4")
 title = "Steady Aim"
-description = "+8% rifle fire rate per rank while standing still."
+description = "+8% primary fire rate per rank while standing still."
 max_stacks = 3
-category = "assault_rifle"
-icon = &"assault_rifle"
+category = "primary_weapon"
+icon = &"primary_weapon"
 tags = Array[StringName]([&"fire_rate", &"stationary"])
-weapon_filter = Array[StringName]([&"rifle"])
+weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 order = 13

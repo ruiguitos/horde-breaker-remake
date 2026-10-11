@@ -26,14 +26,14 @@ func _initialize() -> void:
 
 
 ## 30-round magazine, infinite reserve: counts down per shot, refills at 0
-## at once (RELOAD_SECONDS = 0), and Bigger Mags does not touch it.
+## at once (rifle.reload_seconds = 0), and Bigger Mags does not touch it.
 func _test_rifle_magazine() -> void:
 	var run := IslandRun.new(7)
 	run.director.max_alive = 0
 	run.horde.add(run.player_pos + Vector3(0, 0, -6), GameData.EnemyKind.BRUTE, run.rng)
 	run.horde.hp[0] = 1e9
 	var rifle: GameData.Weapon = run.weapons[0]
-	_check(rifle.id == &"rifle" and run.magazine_size(0) == 30 and run.mag[0] == 30 and GameData.RELOAD_SECONDS == 0.0, "rifle starts with a full 30-round magazine; reload time is 0 for now")
+	_check(rifle.id == &"rifle" and run.magazine_size(0) == 30 and run.mag[0] == 30 and rifle.reload_seconds == 0.0, "rifle starts with a full 30-round magazine and instant reload")
 	run._fire(rifle, 0)
 	_check(run.mag[0] == 29 and run.ammo[0] == -1 and Hud.ammo_text(run, 0) == "29 / ∞", "one shot takes one round; the reserve stays infinite")
 	for i in 28:

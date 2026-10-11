@@ -10,7 +10,7 @@ max_stacks = 3
 category = "elements"
 icon = &"frost"
 tags = Array[StringName]([&"frost", &"slow"])
-weapon_filter = Array[StringName]([&"rifle"])
+weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 prerequisites = Dictionary[StringName, int]({
 &"frost_rounds": 1
 })

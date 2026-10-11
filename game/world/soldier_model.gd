@@ -32,6 +32,9 @@ var _leg_l: Node3D
 var _leg_r: Node3D
 var _arm_pivot: Node3D
 var _mats: Dictionary = {}
+var weapon_id: StringName = &""
+var _gun_node: Node3D
+var _shadow_only: bool = false
 
 
 static func create(id: StringName) -> SoldierModel:
@@ -100,7 +103,7 @@ func _build() -> void:
 	_box(_arm_pivot, Vector3(0.11, 0.11, 0.34), Vector3(-0.2, -0.26, -0.24), "cloth", Vector3(0, 25, 0))  # left forearm
 	_box(_arm_pivot, Vector3(0.09, 0.09, 0.09), Vector3(0.18, -0.3, -0.36), "dark")  # gloves
 	_box(_arm_pivot, Vector3(0.09, 0.09, 0.09), Vector3(-0.06, -0.26, -0.46), "dark")
-	_gun(heavy)
+	set_weapon(&"shotgun" if heavy else &"rifle")
 
 
 func _leg(hip: Vector3, pad: float) -> Node3D:
@@ -114,27 +117,42 @@ func _leg(hip: Vector3, pad: float) -> Node3D:
 	return pivot
 
 
-## Rifle (recruit) or shotgun (vanguard), held diagonally across the chest.
-func _gun(shotgun: bool) -> void:
+## The equipped weapon, held diagonally across the chest.
+func set_weapon(id: StringName) -> void:
+	if weapon_id == id:
+		return
+	weapon_id = id
+	if _gun_node != null:
+		_arm_pivot.remove_child(_gun_node)
+		_gun_node.queue_free()
+	var shotgun: bool = id == &"shotgun"
 	var gun := Node3D.new()
+	_gun_node = gun
 	gun.position = Vector3(0.08, -0.26, -0.38)
 	gun.rotation_degrees = Vector3(0, -8, 0)
 	_arm_pivot.add_child(gun)
-	var length: float = 0.62 if shotgun else 0.78
+	var length: float = {&"shotgun": 0.62, &"smg": 0.48, &"machine_gun": 0.9, &"marksman": 0.92}.get(id, 0.78)
 	_box(gun, Vector3(0.07, 0.11, length), Vector3(0, 0, 0), "gun")  # receiver + barrel
 	_box(gun, Vector3(0.06, 0.12, 0.24), Vector3(0, -0.02, length * 0.5 + 0.1), "gun")  # stock
 	if shotgun:
 		_box(gun, Vector3(0.09, 0.08, 0.3), Vector3(0, -0.08, -0.12), "dark")  # pump
+	elif id == &"machine_gun":
+		_box(gun, Vector3(0.18, 0.18, 0.15), Vector3(0.06, -0.14, -0.08), "gun")
 	else:
 		_box(gun, Vector3(0.05, 0.16, 0.08), Vector3(0, -0.12, -0.04), "gun")  # magazine
 		_box(gun, Vector3(0.05, 0.05, 0.14), Vector3(0, 0.08, 0.02), "dark")  # sight
+	if id == &"marksman":
+		_box(gun, Vector3(0.06, 0.06, 0.23), Vector3(0, 0.12, 0), "dark")
 	muzzle = Node3D.new()
 	muzzle.position = Vector3(0, 0, -length * 0.5 - 0.05)
 	gun.add_child(muzzle)
+	if _shadow_only:
+		set_shadow_only(true)
 
 
 ## First person: the body is not drawn but still casts its shadow.
 func set_shadow_only(on: bool) -> void:
+	_shadow_only = on
 	var mode: GeometryInstance3D.ShadowCastingSetting = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY if on else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	for n in find_children("*", "MeshInstance3D", true, false):
 		(n as MeshInstance3D).cast_shadow = mode

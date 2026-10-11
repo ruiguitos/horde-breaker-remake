@@ -74,10 +74,11 @@ func _build_menu() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 11)
 	menu.add_child(row)
-	for item: Array in [["SETTINGS", _settings], ["QUIT", func() -> void: get_tree().quit()]]:
+	for item: Array in [["SETTINGS", _settings], ["CREDITS", _credits], ["QUIT", func() -> void: get_tree().quit()]]:
 		var b := _menu_button(row, item[0], item[1])
 		b.name = String(item[0]).capitalize()
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.add_theme_font_size_override("font_size", 18)
 	var gap := Control.new()
 	gap.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -348,6 +349,11 @@ func _deploy() -> void:
 func _settings() -> void:
 	if not is_instance_valid(_dialog):
 		_dialog = MenuDialog.settings(_root, profile)
+
+
+func _credits() -> void:
+	if not is_instance_valid(_dialog):
+		_dialog = MenuDialog.credits(_root)
 
 
 func _test_island() -> void:

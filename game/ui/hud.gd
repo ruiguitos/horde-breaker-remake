@@ -34,7 +34,7 @@ const MARKER_NEAR_M: float = 12.0
 const MARKER_FADE_S: float = 0.2
 ## Category marks: shape and colour (never colour alone).
 const CATEGORY_GLYPH: Dictionary = {
-	&"assault_rifle": "⊕", &"elements": "✦", &"defense": "◇", &"sustain": "+",
+	&"primary_weapon": "⊕", &"elements": "✦", &"defense": "◇", &"sustain": "+",
 	&"utility": "■", &"breaker": "◆", &"class_recruit": "●", &"class_vanguard": "▲",
 }
 const ROMAN: Array[String] = ["0", "I", "II", "III", "IV", "V", "VI"]
@@ -285,7 +285,7 @@ class Pips extends Control:
 					draw_arc(c, 8.0, 0.0, TAU, 24, color, 2.5, true)
 
 
-## Weapon slots 1-5: amber = in hand, outline = owned (key and ammo), red
+## Weapon slots 1-2: amber = in hand, outline = owned (key and ammo), red
 ## outline = owned but empty, dashed = not owned in this run.
 class WeaponSlots extends Control:
 	var slots: Array = []  ## [state, text]
@@ -387,7 +387,7 @@ class CategoryIcon extends Control:
 				for r in [13.0, 22.0]:
 					draw_arc(c, r, PI * 1.15, PI * 1.85, 16, color, w, true)
 					draw_arc(c, r, PI * 0.15, PI * 0.85, 16, color, w, true)
-			&"assault_rifle":
+			&"primary_weapon":
 				draw_arc(c, 15.0, 0.0, TAU, 32, color, w, true)
 				draw_circle(c, 3.0, color)
 				for d: Vector2 in [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]:
@@ -733,7 +733,7 @@ func _build_field_hud(field: Control) -> void:
 	_stamina_bar = _meter(_sprint_row, UiTheme.TEXT, 5)
 	_stamina_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 
-	# Weapon, bottom right: name, ammo and the five slots.
+	# Weapon, bottom right: name, ammo and the two equipped slots.
 	_weapon_panel = VBoxContainer.new()
 	_weapon_panel.name = "Weapon"
 	_weapon_panel.add_theme_constant_override("separation", 5)
@@ -972,7 +972,7 @@ static func category_color(category: StringName) -> Color:
 	match category:
 		&"breaker":
 			return UiTheme.ACCENT
-		&"assault_rifle":
+		&"primary_weapon":
 			return UiTheme.INFO
 		&"elements":
 			return Color(0.72, 0.58, 1.0)

@@ -196,9 +196,8 @@ func _test_effects() -> void:
 	_check(not GameData.POWER_UP_NAMES.values().has("FIRE SALE") and not GameData.POWER_UP_NAMES.values().has("MAX ARMOR"), "old display names are gone")
 	run.card_stacks[&"bigger_mags"] = 2
 	run.ammo[1] = 0
-	var locked_ammo: int = run.ammo[4]
 	run.apply_power_up(&"max_ammo")
-	_check(run.ammo[0] == -1 and run.ammo[1] == run.max_ammo(1) and run.ammo[4] == locked_ammo, "Max Ammo refills owned specials to their modified capacity; infinite and locked weapons stay unchanged")
+	_check(run.ammo.size() == 2 and run.ammo[0] == -1 and run.ammo[1] == run.max_ammo(1), "Max Ammo refills the equipped secondary; primary stays infinite and unequipped weapons are absent")
 	run = _open_run()
 	run.power_ups.ground_kind = &"max_shield"
 	run.power_ups.ground_time = 25.0

@@ -122,6 +122,9 @@ Evoluções numa fase posterior: Fire Rounds V + Wildfire III → **Inferno Roun
 
 **E. Armas**
 
+Esta tabela e a recomendação seguinte registam o estado anterior à opção B.
+O arsenal implementado está em E2 e em `docs/tech/COMBAT_CATALOG.md`.
+
 DPS teórico = dano × cadência × projéteis acertados. Exclui headshots, armadura, dispersão e interrupções; perfuração aumenta dano agregado, não dano ao mesmo alvo. Todas acessíveis às duas classes.
 
 | Arma | Dano | Tiros/s | Alcance | Proj. | Dispersão | Alvos/proj. | Munição | Intel | DPS individual/agregado máximo | Papel/evidência |
@@ -142,7 +145,9 @@ Hoje, desbloquear incorpora a arma automaticamente; não existe seleção princi
 
 O utilizador escolheu a **opção B** (armas principais trocáveis) e este
 arsenal. Decisão registada em `docs/DECISIONS.md` a 2026-10-11, por pedido
-explícito do utilizador. A implementação continua pendente.
+explícito do utilizador. **Implementada em 2026-10-11:** escolha dos dois
+espaços, Machine Gun, SMG reformulada, cartas de principal e migração de
+saves. Valores atuais em [COMBAT_CATALOG.md](../tech/COMBAT_CATALOG.md).
 
 | Espaço | Arma | Como se obtém | Papel |
 |---|---|---|---|
@@ -153,16 +158,16 @@ explícito do utilizador. A implementação continua pendente.
 | Secundária | Marksman Rifle | Desbloqueável | Perfuração e elites |
 | — | ~~Heavy Pistol~~ | **Removida** | A Marksman cobre o papel de perfuração |
 
-Consequências a tratar na implementação:
+Regras implementadas:
 - **Escolha da principal:** escolher uma principal troca-a pela que estava
   selecionada, sem perder a propriedade (por exemplo, AR ↔ SMG).
 - **Cartas:** as cartas "Assault Rifle" passam a ser cartas da **arma
   principal**, para funcionarem com a SMG e a Machine Gun.
 - **Munição:** Max Ammo, Bigger Mags e o "Ammo Crate" continuam a servir as
   secundárias, que têm munição limitada.
-- **Saves antigos:** perfis que tenham a Heavy Pistol desbloqueada ou
-  selecionada têm de carregar sem erro. Proposta: reembolsar o Intel, ou
-  passar para a Shotgun se a pistola estava equipada.
+- **Saves antigos:** Heavy Pistol retirada dos desbloqueios; qualquer
+  seleção antiga passa para a Shotgun, **sem reembolso**, por escolha do
+  utilizador a 2026-10-11. Quick Redeploy também migra a seleção.
 - **Números:** os valores da SMG e da Machine Gun são hipóteses para
   playtest.
 
@@ -206,7 +211,7 @@ Escolhida pelo utilizador a 2026-10-11 (árvore estilo Hades: 2 alternativas por
 
 **Proposta:** três ramos, três tiers por ramo, duas alternativas por nó. Só os perks equipados atuam. Os valores são hipóteses de playtest; cada especialização inclui uma contrapartida para respeitar os desbloqueios horizontais de `PROGRESSION_AND_ECONOMY.md` §3.
 
-**Verificado por leitura:** cinco perks sem ranks; perfil com um slot inicial e compras de 100/250 Intel; Armory apresenta uma lista. Evidência: `game/data/perks/`, `game/core/profile.gd:13`, `game/data/game_data.gd:231`, `game/states/armory.gd:173`. A Machine Gun e a seleção principal/secundária ainda não existem. Não foram executados testes nem Godot; JEV indisponível.
+**Verificado por leitura na proposta original:** cinco perks sem ranks; perfil com um slot inicial e compras de 100/250 Intel; Armory apresenta uma lista. Evidência: `game/data/perks/`, `game/core/profile.gd:13`, `game/data/game_data.gd:231`, `game/states/armory.gd:173`. A Machine Gun e a seleção principal/secundária foram entretanto implementadas em E2. A proposta da árvore mantém a validação original por leitura.
 
 ### 1. Nós e alternativas
 

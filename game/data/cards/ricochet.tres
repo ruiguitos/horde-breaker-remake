@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_mhno7")
 title = "Ricochet"
-description = "Every fourth rifle shot ricochets to one extra target per rank. Each bounce deals 60% damage within 6 m."
+description = "Every fourth primary shot ricochets to one extra target per rank. Each bounce deals 60% damage within 6 m."
 max_stacks = 3
-category = "assault_rifle"
-icon = &"assault_rifle"
+category = "primary_weapon"
+icon = &"primary_weapon"
 tags = Array[StringName]([&"chain", &"damage"])
-weapon_filter = Array[StringName]([&"rifle"])
+weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 order = 2

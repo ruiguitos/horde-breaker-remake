@@ -5,11 +5,59 @@ créditos. Fazê-las **por esta ordem, uma de cada vez**. No fim de cada uma:
 correr todos os `tests/test_*.gd`, mostrar ao utilizador o que mudou e só
 fazer commit quando ele pedir. Regras do projeto: `AGENTS.md` e `CLAUDE.md`.
 
-**Fora de âmbito por agora**, porque o utilizador ainda não decidiu:
+**Fora de âmbito na entrega original (2026-10-10)**, por falta de decisão:
 - remover armas;
 - a escolha de arma principal ou secundária;
 - a árvore de perks;
 - a carta "Run and Gun" (contradiz o `DECISIONS.md`: o sprint não dispara).
+
+**Atualização de 2026-10-11:** o utilizador aprovou a opção B das armas,
+entretanto implementada: principal/secundária escolhidas, Machine Gun,
+SMG com mobilidade/proximidade e remoção da Heavy Pistol. Saves antigos
+trocam a seleção da pistola pela Shotgun, sem reembolso. Estado e valores:
+[COMBAT_CATALOG.md](COMBAT_CATALOG.md). A árvore de perks está a cargo do
+Claude; não foi alterada nesta implementação.
+
+Também estão implementados os pedidos de Settings com tamanho comum e
+ícones por plataforma ([SETTINGS_INPUT.md](SETTINGS_INPUT.md)) e o ecrã
+de créditos com atribuições de OpenStreetMap e Via Láctea
+([CREDITS.md](CREDITS.md)).
+
+## Passagem ao Claude — Settings, armas e créditos (2026-10-11)
+
+Os três pedidos estão implementados e documentados nas fontes acima.
+Na verificação deste registo, Settings está no commit `e3ae8f8`; armas
+e créditos estão no diretório de trabalho, com comandos de commit
+entregues ao utilizador. Confirmar `git status` e `git log` antes de
+continuar: esta indicação descreve o momento da passagem.
+
+A validação anterior passou **31/31 scripts**, incluindo duas runs do
+bot com extração nas seis ilhas. Capturas reais foram verificadas em
+Forward+. Limitações do encerramento do Godot no Windows e da revisão
+JEV estão registadas em [CREDITS.md](CREDITS.md).
+
+Ao integrar a árvore de perks, preservar estes contratos:
+
+1. **Perfil versão 6:** `selected_primary`, `selected_secondary`,
+   propriedade das armas, `controller_icons` e as armas de Quick Redeploy.
+   Seleções antigas da pistola passam para Shotgun, sem reembolso.
+2. **Run com dois espaços:** AR/SMG/Machine Gun na principal e
+   Shotgun/Marksman na secundária. `RunContext.weapons` contém as armas
+   equipadas; desbloquear não acrescenta espaços à run.
+3. **Cartas:** categoria `primary_weapon` e filtros para as três
+   principais; efeitos de principal e elementos não atuam na secundária.
+4. **Combate:** recargas independentes, modificador de movimento da arma
+   e munição da secundária entre ilhas. Os valores novos são provisórios
+   para playtest; consultar o catálogo antes de alterar números.
+5. **Interface:** manter a moldura comum das Settings, ícones por
+   plataforma e créditos com as atribuições completas e links.
+
+Retomar a árvore de perks sobre este estado, conciliando alterações nos
+ficheiros partilhados (`profile.gd`, `armory.gd`, `game_data.gd` e
+`island_run.gd`). Depois de alterações de código, correr a suite completa,
+incluindo `test_weapon_loadout`, `test_settings` e `test_credits`, e
+documentar os resultados. Mostrar alterações antes de commit; commit e
+push só quando o utilizador pedir.
 
 ## 1. Cartas (pedido do utilizador)
 

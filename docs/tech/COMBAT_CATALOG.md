@@ -13,58 +13,58 @@ DPS significa dano por segundo; `r` significa rank da carta.
 
 ## 1. Armas
 
-Todas as classes podem usar todas as armas desbloqueadas. Assault Rifle,
-Shotgun e Heavy Pistol fazem parte de todas as runs; comprar SMG ou Marksman
-acrescenta-as às runs seguintes. Ainda não existe escolha de arma principal
-e secundária.
+A opção B está implementada: cada run leva **uma principal e uma secundária**,
+escolhidas no Armory. Desbloquear conserva a propriedade; equipar troca só
+esse espaço. As teclas 1 e 2 selecionam principal/secundária e o D-pad permite
+selecionar ou alternar. Quick Redeploy repete também as armas da última run.
 
 ### Valores base
 
-| Arma / ID | Dano por projétil | Tiros/s | Alcance | Projéteis por tiro | Dispersão total | Alvos por projétil | Munição máxima | Empurrão por acerto | Desbloqueio Intel |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Assault Rifle / `rifle` | 12 | 9 | 30 m | 1 | 2° | 1 | Infinita | 0,05 m | Inicial |
-| Shotgun / `shotgun` | 9 | 1,4 | 12 m | 8 | 22° | 2 | 40 tiros | 0,6 m | Inicial |
-| Heavy Pistol / `pistol` | 60 | 2,2 | 35 m | 1 | 0° | 4 | 60 tiros | 0,3 m | Inicial |
-| SMG / `smg` | 7 | 16 | 18 m | 1 | 7° | 1 | 300 tiros | 0,02 m | 60 |
-| Marksman Rifle / `marksman` | 110 | 1,2 | 45 m | 1 | 0° | 6 | 30 tiros | 0,5 m | 80 |
+| Arma / ID | Espaço | Dano | Tiros/s | Alcance | Projéteis / perfuração | Dispersão | Reserva | Intel |
+|---|---|---:|---:|---:|---|---:|---|---:|
+| Assault Rifle / `rifle` | Principal | 12 | 9 | 30 m | 1 / 1 | 2° | Infinita | Inicial |
+| SMG / `smg` | Principal | 8; 10 até 6 m | 16 | 16 m | 1 / 1 | 7° | Infinita | 60 |
+| Machine Gun / `machine_gun` | Principal | 18 | 12 | 32 m | 1 / 1 | 4° | Infinita | 120 |
+| Shotgun / `shotgun` | Secundária | 9 | 1,4 | 12 m | 8 / 2 | 22° | 40 tiros | Inicial |
+| Marksman Rifle / `marksman` | Secundária | 110 | 1,2 | 45 m | 1 / 6 | 0° | 30 tiros | 80 |
 
-Perfuração conta o **total** de alvos, incluindo o primeiro. Cada tiro da
-Shotgun gasta uma munição, apesar dos oito projéteis. Não há carregadores nem
-recarga manual: munição é a reserva total. Não há críticos aleatórios nem
-queda de dano com a distância dentro do alcance.
+| Principal | Carregador | Recarga automática | Movimento enquanto equipada | DPS de corpo durante fogo / com recargas |
+|---|---:|---:|---:|---|
+| Assault Rifle | 30 | Instantânea, como antes | ×1,00 | 108 / 108 |
+| SMG | 40 | 1,1 s | ×1,15 | 128 / 88,9; até 6 m: 160 / 111,1 |
+| Machine Gun | 90 | 3,2 s | ×0,80 | 216 / 151,4 |
 
-### Comparação teórica, sem melhorias
+A SMG privilegia proximidade e mobilidade. A Machine Gun oferece mais fogo
+sustentado, com penalizações de movimento e recarga. Estes números são
+**hipóteses de playtest**, não valores finais. O modificador de movimento
+aplica-se ao andar e sprint com a arma equipada; o Breaker conserva a distância.
 
-| Arma | Dano por tiro no corpo | Dano por tiro em headshot | DPS num alvo | DPS agregado máximo com perfuração | Munição ÷ cadência |
-|---|---:|---:|---:|---:|---:|
-| Assault Rifle | 12 | 30 | 108 | 108 | Ilimitado |
-| Shotgun | 72 | 180 | 100,8 | 201,6 | 28,57 s |
-| Heavy Pistol | 60 | 150 | 132 | 528 | 27,27 s |
-| SMG | 7 | 17,5 | 112 | 112 | 18,75 s |
-| Marksman Rifle | 110 | 275 | 132 | 792 | 25 s |
+São limites teóricos: assumem acertos de corpo contínuos, sem armadura,
+sprint, mudanças de alvo ou melhorias. DPS com recargas usa
+`dano × carregador / (carregador ÷ cadência + tempo de recarga)`.
+Headshots multiplicam por 2,5. Shotgun tem 100,8 DPS por alvo se os oito
+projéteis acertarem; Marksman tem 132, ou até 792 agregado em seis alvos.
+Perfuração conta o total de alvos, incluindo o primeiro.
 
-São **limites de cálculo**, não DPS medido em jogo: assumem todos os
-projéteis acertados, alvos alinhados quando há perfuração, ausência de
-armadura, sprint e interrupções. Na Shotgun, 180 exige os oito projéteis
-acertarem o alvo marcado para headshot. Outros inimigos atravessados pelo
-mesmo tiro recebem dano de corpo. A última coluna é uma comparação de
-reserva, não uma medição do instante do último disparo.
+As recargas são independentes: pode usar-se a secundária enquanto a
+principal recarrega. Os carregadores começam cheios em cada ilha, como
+antes; a munição restante da secundária transita. O HUD mostra rounds/reserva
+nas principais e o estado RELOADING quando aplicável. Não há recarga manual.
 
-### Modificadores que já funcionam
+### Cartas, munição e saves
 
-- Headshot: dano ×2,5. Apenas o alvo selecionado recebe o marcador de
-  headshot; os restantes alvos perfurados não o recebem.
-- Assault Rifle: Hollow Points, Fast Hands, Ricochet, Pop Goes the Head,
-  Piercing Rounds, Steady Aim, Point Blank, Finish the Job e nove cartas
-  elementais. As outras armas **não ativam** esses efeitos exclusivos.
-- Todas as armas: Executioner aumenta dano contra atordoados/congelados;
-  Battle Rhythm aumenta cadência após War Cry. Field Medic e Second Breath
-  recompensam abates por headshot.
-- Munição finita: Pack Rat aplica ×1,5; Bigger Mags aplica `1 + 0,15r`;
-  Supply Shortage divide a capacidade por dois. O jogo trunca para inteiro
-  nas etapas do cálculo. Bigger Mags não repõe munição.
-- Ao esgotar uma arma, o jogo volta à Assault Rifle. Um gerador concluído
-  repõe metade da capacidade atual das armas finitas, até ao máximo.
+- As oito cartas antes exclusivas da Assault Rifle e as nove elementais
+  passam a servir **qualquer principal**. A categoria é `primary_weapon`;
+  os ids das cartas mantêm-se. As secundárias não recebem estes efeitos.
+- Executioner, Battle Rhythm e recompensas por headshot mantêm as regras comuns.
+- Pack Rat, Bigger Mags e Supply Shortage modificam a reserva da secundária;
+  Max Ammo, Ammo Crate e geradores repõem-na. Não aumentam os carregadores.
+- Esgotar a secundária regressa à principal equipada. Só as duas armas da
+  run entram no HUD, nos filtros de cartas e nos cálculos de mantimentos.
+- Heavy Pistol foi retirada do catálogo, YARD, menus, sons e modelos.
+  Saves antigos descartam o desbloqueio e trocam a seleção pela Shotgun,
+  **sem reembolso**, conforme escolha do utilizador. Seleções inválidas ou
+  não desbloqueadas usam AR/Shotgun. Perfis antigos da última run também migram.
 
 ## 2. Personagens e classes
 
@@ -136,24 +136,24 @@ dentro da mesma fórmula, salvo o cooldown multiplicativo de Hair Trigger e
 Grenadier. Os valores máximos abaixo isolam cada carta, sem outros perks
 ou cartas.
 
-### Assault Rifle — 8 cartas
+### Arma principal — 8 cartas
 
-Estas cartas exigem possuir a Assault Rifle; o efeito de combate usa essa
+Estas cartas exigem uma principal equipada; o efeito de combate usa essa
 arma. Ambas as classes podem recebê-las.
 
 | Carta / ID | Ranks máximos | Efeito atual | Resultado no máximo |
 |---|---:|---|---|
 | Hollow Points / `hollow_points` | 5 | Dano base da AR ×`(1 + 0,10r)` | +50%; 12 → 18 por bala |
-| Fast Hands / `fast_hands` | 5 | Cadência da AR +8% por rank | +40%; 9 → 12,6 tiros/s isoladamente |
+| Fast Hands / `fast_hands` | 5 | Cadência da principal +8% por rank | +40%; 9 → 12,6 tiros/s isoladamente |
 | Ricochet / `ricochet` | 3 | Cada quarto tiro de AR que acerte o alvo ricocheteia para `r` alvos adicionais; 60% do dano do acerto original; até 6 m por salto | Até 3 ricochetes |
 | Pop Goes the Head / `explosive_heads` | 3 | Abate direto de AR por headshot: explosão de raio 3 m, `15 + 15r` dano | 60 dano por inimigo na área |
 | Piercing Rounds / `piercing_rounds` | 3 | AR atravessa mais um alvo por rank | 4 alvos totais por bala |
 | Steady Aim / `steady_aim` | 3 | AR parada: +8% cadência por rank | +24%; 11,16 tiros/s isoladamente |
-| Point Blank / `point_blank` | 3 | Dano da AR ×`(1 + 0,10r)` a distância ≤4 m | +30% nesse alcance |
-| Finish the Job / `finish_the_job` | 3 | Dano da AR ×`(1 + 0,15r)` se alvo tiver menos de 30% da vida máxima escalada | +45% nessa condição |
+| Point Blank / `point_blank` | 3 | Dano da principal ×`(1 + 0,10r)` a distância ≤4 m | +30% nesse alcance |
+| Finish the Job / `finish_the_job` | 3 | Dano da principal ×`(1 + 0,15r)` se alvo tiver menos de 30% da vida máxima escalada | +45% nessa condição |
 
 Fast Hands e Steady Aim somam os bónus de cadência: ambos no máximo dão
-**14,76 tiros/s** parado, antes de Battle Rhythm. Hollow Points, Point
+**×1,64 de cadência** parado (AR: 14,76 tiros/s), antes de Battle Rhythm. Hollow Points, Point
 Blank e Finish the Job multiplicam entre si quando as condições coincidem.
 Os ricochetes não repetem inimigos já atingidos pelo disparo e escolhem o
 vizinho vivo mais próximo com linha de visão. O seu dano pode transportar
@@ -162,14 +162,14 @@ headshot.
 
 ### Elementos — 9 cartas
 
-O filtro de oferta exige possuir a Assault Rifle. Apenas acertos diretos
-da AR sorteiam fogo, frio, veneno e descarga. Cada elemento tem sorteio
+O filtro de oferta exige uma principal equipada. Apenas acertos diretos
+da principal sorteiam fogo, frio, veneno e descarga. Cada elemento tem sorteio
 independente: podem ocorrer vários no mesmo acerto. `+5%` significa mais
 cinco pontos percentuais de probabilidade por rank, até 25%.
 
 | Carta / ID | Ranks máximos | Efeito atual | Resultado no máximo / requisito |
 |---|---:|---|---|
-| Wind Rounds / `wind_rounds` | 5 | Acertos de AR acrescentam `0,15r` m de empurrão | +0,75 m; total 0,8 m; sem efeito nos não empurráveis |
+| Wind Rounds / `wind_rounds` | 5 | Acertos da principal acrescentam `0,15r` m de empurrão | +0,75 m; total 0,8 m; sem efeito nos não empurráveis |
 | Fire Rounds / `fire_rounds` | 5 | 5% por rank de queimadura: 8 dano/s durante 3 s | 25%; 24 dano por aplicação completa sem modificadores |
 | Frost Rounds / `frost_rounds` | 5 | 5% por rank de frio: −15% velocidade por aplicação durante 4 s; terceira aplicação congela 1 s e consome o frio | 25% de aplicação; boss recebe −7,5% por aplicação, até −22,5%, sem congelar |
 | Storm Rounds / `storm_rounds` | 5 | 5% por rank de descarga: um salto a até 6 m, 60% do dano do acerto | 25% de descarga |

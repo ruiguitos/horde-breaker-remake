@@ -138,7 +138,7 @@ func _hurt_boat() -> void:
 	var context := RunContext.new(11)
 	context.island_index = 1
 	context.hp = 20.0
-	var weapons: Array[GameData.Weapon] = GameData.weapons()
+	var weapons: Array[GameData.Weapon] = GameData.loadout(context.weapons)
 	var ammo := PackedInt32Array()
 	var spent: bool = false
 	for w in weapons:

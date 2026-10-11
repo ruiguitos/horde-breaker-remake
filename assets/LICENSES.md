@@ -2,9 +2,11 @@
 
 Só entram assets com licença que permita usá-los num jogo (CC0, MIT, OFL ou
 royalty-free comercial). Cada entrada indica a origem e a licença. Exceção
-aceite pelo utilizador: os dados do OpenStreetMap (ODbL) da Berlenga. Quando o
-jogo tiver ecrã de créditos, este tem de mostrar "© OpenStreetMap
-contributors".
+aceite pelo utilizador: os dados do OpenStreetMap (ODbL) da Berlenga e de
+Hashima, e o céu noturno do Sky3D (CC BY 4.0). O ecrã **CREDITS** no título
+mostra "© OpenStreetMap contributors" e a atribuição da Via Láctea,
+incluindo fontes, licenças e indicação das modificações. Ver
+`docs/tech/CREDITS.md`.
 
 | Caminho | O quê | Autor / origem | Licença |
 |---|---|---|---|

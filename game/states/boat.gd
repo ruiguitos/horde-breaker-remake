@@ -99,7 +99,7 @@ func _make_options() -> void:
 		"reason": "" if hurt else "HP already full",
 		"apply": func() -> void: context.hp = minf(context.max_hp, context.hp + 50.0)})
 	_options.append({"title": "Ammo Crate", "short": "Ammo Crate",
-		"text": "Refill Shotgun and Heavy Pistol ammo.",
+		"text": "Refill your equipped secondary weapon's ammo.",
 		"reason": "Ammo already full" if _ammo_full() else "",
 		"apply": func() -> void: context.ammo = PackedInt32Array()})  # empty = full ammo on landing
 	_card_offers = CardOffers.new(context.rng_seed)
@@ -157,7 +157,7 @@ func _refresh_card_reroll() -> void:
 ## uses ammo is at its maximum (the same maximum IslandRun.max_ammo uses,
 ## before a route's Supply Shortage). Empty ammo = full on landing.
 func _ammo_full() -> bool:
-	var weapons: Array[GameData.Weapon] = GameData.weapons()
+	var weapons: Array[GameData.Weapon] = GameData.loadout(context.weapons)
 	if context.ammo.size() != weapons.size():
 		return true
 	for w in weapons.size():

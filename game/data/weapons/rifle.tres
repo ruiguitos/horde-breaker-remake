@@ -11,3 +11,5 @@ range_m = 30.0
 spread_deg = 2.0
 knockback = 0.05
 magazine = 30
+primary = true
+role = "Balanced primary. Infinite reserve, 30-round magazine."

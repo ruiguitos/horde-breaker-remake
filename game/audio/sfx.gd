@@ -12,7 +12,6 @@ const PACK: String = "res://assets/audio/ovani_sfx_starter_vol1/"
 ## the synthesised ones. Missing files fall back to synthesis, so the game
 ## never breaks if the pack is trimmed.
 const FILES: Dictionary = {
-	&"pistol": "Hollywood/Titan Handgun.wav",
 	&"marksman": "Sci-Fi/Pulse Sniper.wav",
 	&"explosion": "Hollywood/Mega Bomb.wav",
 	&"breaker": "Motions and Impacts/Swoosh Thunder.wav",
@@ -97,7 +96,8 @@ static func _build_all() -> void:
 	# Gunshots: a noise crack with a fast decay; heavier guns are longer and lower.
 	_streams[&"rifle"] = _make(0.09, 0.0, 0.0, 1.0, 40.0, 0.35)
 	_streams[&"shotgun"] = _make(0.28, 90.0, 50.0, 1.0, 14.0, 0.6)
-	_streams[&"pistol"] = _make(0.2, 140.0, 60.0, 0.8, 18.0, 0.5)
+	_streams[&"smg"] = _make(0.06, 0.0, 0.0, 0.8, 55.0, 0.25)
+	_streams[&"machine_gun"] = _make(0.12, 90.0, 40.0, 1.0, 30.0, 0.5)
 	_streams[&"hit"] = _make(0.05, 900.0, 600.0, 0.3, 60.0, 0.0)
 	_streams[&"kill"] = _make(0.12, 300.0, 90.0, 0.6, 25.0, 0.4)
 	_streams[&"headshot"] = _make(0.1, 1400.0, 700.0, 0.4, 30.0, 0.0)

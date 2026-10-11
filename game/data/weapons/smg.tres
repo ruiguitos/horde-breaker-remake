@@ -5,11 +5,17 @@
 [resource]
 script = ExtResource("1_imhj6")
 display_name = "SMG"
-damage = 7.0
+damage = 8.0
 fire_rate = 16.0
-range_m = 18.0
+range_m = 16.0
 spread_deg = 7.0
-max_ammo = 300
+magazine = 40
+primary = true
+reload_seconds = 1.1
+movement_mult = 1.15
+close_damage_mult = 1.25
+close_range = 6.0
+role = "Mobile primary. +15% movement; +25% damage within 6 m. Short range, 40-round magazine, 1.1 s reload. Infinite reserve."
 knockback = 0.02
 unlock_cost = 60
 order = 3

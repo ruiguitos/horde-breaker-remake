@@ -28,7 +28,7 @@ func _initialize() -> void:
 		_check(recruit.has(id) and not vanguard.has(id), "Recruit-only offer: " + String(id))
 	for id: StringName in [&"rally", &"intimidation", &"battle_rhythm"]:
 		_check(vanguard.has(id) and not recruit.has(id), "Vanguard-only offer: " + String(id))
-	var pistol: Array[StringName] = [&"pistol"]
+	var pistol: Array[StringName] = [&"marksman"]
 	var pistol_ids: Array[StringName] = _ids(offers.eligible(catalog, &"recruit", pistol, {}))
 	_check(not pistol_ids.has(&"hollow_points") and not pistol_ids.has(&"fire_rounds") and pistol_ids.has(&"bigger_mags"), "rifle and finite weapon filters")
 	var rifle: Array[StringName] = [&"rifle"]
@@ -475,15 +475,16 @@ func _test_boundaries() -> void:
 	var run: IslandRun = _run()
 	var target: int = _enemy(run, Vector3(4.01, 0, 0))
 	run.card_stacks = {&"hollow_points": 5, &"point_blank": 3, &"fire_rounds": 5, &"ricochet": 3}
-	run.weapon_index = 2
+	run.weapons[1] = GameData.weapon(&"marksman")
+	run.weapon_index = 1
 	run.set("_shots", 3)
-	run.call("_fire", run.weapons[2], target)
-	_check(is_equal_approx(run.horde.hp[target], 1000.0 - run.weapons[2].damage) and run.horde.burn_time[target] == 0.0 and run.get("_shots") == 3,
-		"rifle cards do not change pistol damage, statuses or rifle shot counter")
+	run.call("_fire", run.weapons[1], target)
+	_check(is_equal_approx(run.horde.hp[target], 1000.0 - run.weapons[1].damage) and run.horde.burn_time[target] == 0.0 and run.get("_shots") == 3,
+		"primary cards do not change secondary damage, statuses or primary shot counter")
 	run.card_stacks = {&"point_blank": 3}
 	run.weapon_index = 0
 	run.call("_fire", run.weapons[0], target)
-	_check(is_equal_approx(run.horde.hp[target], 928.0), "Point Blank excludes targets beyond four metres")
+	_check(is_equal_approx(run.horde.hp[target], 878.0), "Point Blank excludes targets beyond four metres")
 	run = _run()
 	target = _enemy(run)
 	run.card_stacks = {&"finish_the_job": 3}
@@ -532,7 +533,7 @@ func _test_supplies() -> void:
 	for screen: String in ["boat", "camp"]:
 		var ctx := RunContext.new(77)
 		ctx.player_class = &"vanguard"
-		ctx.weapons = [&"pistol"]
+		ctx.weapons = [&"rifle", &"shotgun"]
 		for c in GameData.cards():
 			if c.id != &"thick_hide":
 				ctx.card_stacks[c.id] = c.max_stacks

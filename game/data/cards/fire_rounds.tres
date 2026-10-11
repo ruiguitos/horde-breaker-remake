@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_x6i7a")
 title = "Fire Rounds"
-description = "Rifle: +5% burn chance per rank. Burns for 8 damage/s for 3 s. Refreshes without stacking."
+description = "Primary: +5% burn chance per rank. Burns for 8 damage/s for 3 s. Refreshes without stacking."
 max_stacks = 5
 category = "elements"
 icon = &"fire"
 tags = Array[StringName]([&"fire", &"damage_over_time"])
-weapon_filter = Array[StringName]([&"rifle"])
+weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 order = 31

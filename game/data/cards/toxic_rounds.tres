@@ -5,10 +5,10 @@
 [resource]
 script = ExtResource("1_ikcc7")
 title = "Toxic Rounds"
-description = "Rifle: +5% poison chance per rank. Deals 6 damage/s for 4 s. Refreshes without stacking."
+description = "Primary: +5% poison chance per rank. Deals 6 damage/s for 4 s. Refreshes without stacking."
 max_stacks = 5
 category = "elements"
 icon = &"toxic"
 tags = Array[StringName]([&"toxic", &"damage_over_time"])
-weapon_filter = Array[StringName]([&"rifle"])
+weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 order = 34
