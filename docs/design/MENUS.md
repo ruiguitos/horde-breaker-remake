@@ -262,3 +262,24 @@ godot --path . --script res://tools/dev/menu_preview.gd -- C:/Temp/armory.png ar
 
 Capturas disponíveis: title, armory, routes, supplies, pause, settings,
 archive, weapons e perks.
+
+## Próximo redesenho — escolha visual de 2026-10-11
+
+O utilizador escolheu as maquetas **Armory — Abrigo 3D** e **Perks — Três
+ramos** apresentadas pelo Codex. Preferência registada para implementação
+depois da integração do Vanguard; não descreve o estado atual dos menus.
+
+Referências PNG geradas por IA, guardadas no projeto como maquetas:
+[Armory — Abrigo 3D](menu_references/armory_abrigo_3d.png) e
+[Perks — Três ramos](menu_references/perks_tres_ramos.png). São referências
+de composição; os modelos, ícones e textos finais vêm dos dados do jogo.
+A pasta tem `.gdignore` e não é usada como assets de runtime.
+
+- **Armory:** abrigo costeiro em 3D, personagem maior, iluminação quente
+  interior e fria do Atlântico. Resumo fixo com as duas armas, três slots,
+  Threat e Start Run visíveis; evitar o corte de conteúdo atual.
+- **Perks:** três ramos × três tiers, alternativas A/B lado a lado,
+  estados/ranks legíveis, painel do efeito atual e seguinte e uma fila
+  permanente de perks equipados. Preservar custos, trocas grátis e slots.
+- **Identidade:** manter paleta Atlântico e azulejo, tipografia existente
+  e dicas de input por plataforma. O azulejo fica como detalhe discreto.

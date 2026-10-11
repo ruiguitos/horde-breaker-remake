@@ -1,0 +1,1874 @@
+{
+  "blender": "5.2.2 LTS",
+  "character": "Vanguard",
+  "height_m": 2.025,
+  "bone_count": 53,
+  "mesh_count": 104,
+  "triangles": 4056,
+  "material_count": 35,
+  "base_pose": "T-pose",
+  "animations_in_main_glb": 0,
+  "bounds_blender_m": [
+    [
+      -1.1682049036026,
+      -0.4440000057220459,
+      0.0
+    ],
+    [
+      1.1192600727081299,
+      0.5974041223526001,
+      2.0250000953674316
+    ]
+  ],
+  "rebuilt_pieces": [
+    "Helmet_Crown",
+    "Helmet_Brim",
+    "Helmet_Front_Plate",
+    "Helmet_Side_Shield_L",
+    "Arm_Upper_L",
+    "Arm_Forearm_L",
+    "Arm_Elbow_L",
+    "Arm_Shoulder_Facet_L",
+    "Arm_Upper_Patch_L",
+    "Leg_Thigh_L",
+    "Leg_Shin_L",
+    "Kneepad_L",
+    "Boot_L_Sole",
+    "Boot_L_Vamp",
+    "Boot_L_Shaft",
+    "Helmet_Side_Shield_R",
+    "Arm_Upper_R",
+    "Arm_Forearm_R",
+    "Arm_Elbow_R",
+    "Arm_Shoulder_Facet_R",
+    "Arm_Upper_Patch_R",
+    "Leg_Thigh_R",
+    "Leg_Shin_R",
+    "Kneepad_R",
+    "Boot_R_Sole",
+    "Boot_R_Vamp",
+    "Boot_R_Shaft",
+    "Uniform_Torso",
+    "Uniform_Pelvis",
+    "Uniform_Belt",
+    "Belt_Buckle",
+    "Vest_Carrier",
+    "Vest_Chest_Plate",
+    "Vest_Upper_Webbing",
+    "Vest_Magazine_Pouch_01",
+    "Vest_Magazine_Flap_01",
+    "Vest_Magazine_Pouch_02",
+    "Vest_Magazine_Flap_02",
+    "Vest_Magazine_Pouch_03",
+    "Vest_Magazine_Flap_03",
+    "Vest_Shoulder_Strap_L",
+    "Vest_Front_Strap_L",
+    "Vest_Side_Pouch_L",
+    "Vest_Side_Pouch_Flap_L",
+    "Vest_Shoulder_Strap_R",
+    "Vest_Front_Strap_R",
+    "Vest_Side_Pouch_R",
+    "Vest_Side_Pouch_Flap_R",
+    "Backpack_Main",
+    "Backpack_Rear_Pocket",
+    "Backpack_Flap",
+    "Backpack_Retention_L",
+    "Backpack_Shoulder_Strap_L",
+    "Backpack_Retention_R",
+    "Backpack_Shoulder_Strap_R"
+  ],
+  "mapping": [
+    {
+      "piece": "Arm_Elbow_L",
+      "bone": "DEF-forearm.L",
+      "materials": [
+        "VG_cloth_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Arm_Elbow_R",
+      "bone": "DEF-forearm.R",
+      "materials": [
+        "VG_cloth_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Arm_Forearm_L",
+      "bone": "DEF-forearm.L",
+      "materials": [
+        "VG_cloth",
+        "VG_cloth_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Arm_Forearm_R",
+      "bone": "DEF-forearm.R",
+      "materials": [
+        "VG_cloth",
+        "VG_cloth_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Arm_Shoulder_Facet_L",
+      "bone": "DEF-shoulder.L",
+      "materials": [
+        "VG_helmet",
+        "VG_helmet_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Arm_Shoulder_Facet_R",
+      "bone": "DEF-shoulder.R",
+      "materials": [
+        "VG_helmet",
+        "VG_helmet_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Arm_Upper_L",
+      "bone": "DEF-upper_arm.L",
+      "materials": [
+        "VG_cloth",
+        "VG_cloth_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Arm_Upper_Patch_L",
+      "bone": "DEF-shoulder.L",
+      "materials": [
+        "VG_cloth_light"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Arm_Upper_Patch_R",
+      "bone": "DEF-shoulder.R",
+      "materials": [
+        "VG_cloth_light"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Arm_Upper_R",
+      "bone": "DEF-upper_arm.R",
+      "materials": [
+        "VG_cloth",
+        "VG_cloth_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Backpack_Flap",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_pouch_flap"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Backpack_Main",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_helmet_trim",
+        "VG_vest"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Backpack_Rear_Pocket",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_plate"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Backpack_Retention_L",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_vest_strap"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Backpack_Retention_R",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_vest_strap"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Backpack_Shoulder_Strap_L",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_helmet_trim"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Backpack_Shoulder_Strap_R",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_helmet_trim"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Belt_Buckle",
+      "bone": "DEF-hips",
+      "materials": [
+        "VG_helmet_trim"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Boot_L_Shaft",
+      "bone": "DEF-foot.L",
+      "materials": [
+        "VG_boot",
+        "VG_boot_shadow"
+      ],
+      "vertices": 16,
+      "rebuilt": true
+    },
+    {
+      "piece": "Boot_L_Sole",
+      "bone": "DEF-foot.L",
+      "materials": [
+        "VG_sole"
+      ],
+      "vertices": 16,
+      "rebuilt": true
+    },
+    {
+      "piece": "Boot_L_Vamp",
+      "bone": "DEF-foot.L",
+      "materials": [
+        "VG_boot",
+        "VG_boot_shadow",
+        "VG_boot_light"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Boot_R_Shaft",
+      "bone": "DEF-foot.R",
+      "materials": [
+        "VG_boot",
+        "VG_boot_shadow"
+      ],
+      "vertices": 16,
+      "rebuilt": true
+    },
+    {
+      "piece": "Boot_R_Sole",
+      "bone": "DEF-foot.R",
+      "materials": [
+        "VG_sole"
+      ],
+      "vertices": 16,
+      "rebuilt": true
+    },
+    {
+      "piece": "Boot_R_Vamp",
+      "bone": "DEF-foot.R",
+      "materials": [
+        "VG_boot",
+        "VG_boot_shadow",
+        "VG_boot_light"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Face_Brow_L",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_brow"
+      ],
+      "vertices": 8,
+      "rebuilt": false
+    },
+    {
+      "piece": "Face_Brow_R",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_brow"
+      ],
+      "vertices": 8,
+      "rebuilt": false
+    },
+    {
+      "piece": "Face_Eye_L",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_eyes"
+      ],
+      "vertices": 8,
+      "rebuilt": false
+    },
+    {
+      "piece": "Face_Eye_R",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_eyes"
+      ],
+      "vertices": 8,
+      "rebuilt": false
+    },
+    {
+      "piece": "Face_Mouth_Neutral",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_mouth"
+      ],
+      "vertices": 8,
+      "rebuilt": false
+    },
+    {
+      "piece": "Face_Nose",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_nose",
+        "VG_skin"
+      ],
+      "vertices": 8,
+      "rebuilt": false
+    },
+    {
+      "piece": "Glove_Cuff_L",
+      "bone": "DEF-forearm.L",
+      "materials": [
+        "VG_glove_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Glove_Cuff_R",
+      "bone": "DEF-forearm.R",
+      "materials": [
+        "VG_glove_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Glove_L_Finger_01",
+      "bone": "DEF-hand.L",
+      "materials": [
+        "VG_glove_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Glove_L_Finger_02",
+      "bone": "DEF-hand.L",
+      "materials": [
+        "VG_glove_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Glove_L_Finger_03",
+      "bone": "DEF-hand.L",
+      "materials": [
+        "VG_glove_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Glove_L_Palm",
+      "bone": "DEF-hand.L",
+      "materials": [
+        "VG_glove"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Glove_L_Thumb",
+      "bone": "DEF-hand.L",
+      "materials": [
+        "VG_glove"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Glove_R_Finger_01",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_glove_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Glove_R_Finger_02",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_glove_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Glove_R_Finger_03",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_glove_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Glove_R_Palm",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_glove"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Glove_R_Thumb",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_glove"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Head_Ear_L",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_skin_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Head_Ear_R",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_skin_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Head_Face_Skin",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_skin",
+        "VG_skin_shadow"
+      ],
+      "vertices": 32,
+      "rebuilt": false
+    },
+    {
+      "piece": "Head_Sideburn_L",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_hair"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Head_Sideburn_R",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_hair"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Helmet_Brim",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_helmet_trim",
+        "VG_helmet_shadow",
+        "VG_helmet"
+      ],
+      "vertices": 16,
+      "rebuilt": true
+    },
+    {
+      "piece": "Helmet_Chinstrap_L",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_vest_strap"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Helmet_Chinstrap_R",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_vest_strap"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Helmet_Crown",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_helmet",
+        "VG_helmet_shadow",
+        "VG_helmet_top"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Helmet_Ear_Protection_L",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_glove_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Helmet_Ear_Protection_R",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_glove_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Helmet_Front_Plate",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_helmet_patch"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Helmet_Side_Shield_L",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_helmet",
+        "VG_helmet_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Helmet_Side_Shield_R",
+      "bone": "DEF-head",
+      "materials": [
+        "VG_helmet",
+        "VG_helmet_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Knee_Strap_L",
+      "bone": "DEF-shin.L",
+      "materials": [
+        "VG_vest_strap"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Knee_Strap_R",
+      "bone": "DEF-shin.R",
+      "materials": [
+        "VG_vest_strap"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Kneepad_L",
+      "bone": "DEF-shin.L",
+      "materials": [
+        "VG_knee",
+        "VG_knee_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Kneepad_R",
+      "bone": "DEF-shin.R",
+      "materials": [
+        "VG_knee",
+        "VG_knee_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Leg_Shin_L",
+      "bone": "DEF-shin.L",
+      "materials": [
+        "VG_pants",
+        "VG_pants_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Leg_Shin_R",
+      "bone": "DEF-shin.R",
+      "materials": [
+        "VG_pants",
+        "VG_pants_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Leg_Thigh_L",
+      "bone": "DEF-thigh.L",
+      "materials": [
+        "VG_pants",
+        "VG_pants_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Leg_Thigh_R",
+      "bone": "DEF-thigh.R",
+      "materials": [
+        "VG_pants",
+        "VG_pants_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Neck_Skin",
+      "bone": "DEF-neck",
+      "materials": [
+        "VG_skin_shadow"
+      ],
+      "vertices": 16,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Barrel",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal_light"
+      ],
+      "vertices": 16,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Front_Sight",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal_dark"
+      ],
+      "vertices": 8,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Handguard",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Magazine",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal"
+      ],
+      "vertices": 12,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Muzzle",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal_dark"
+      ],
+      "vertices": 16,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Muzzle_Bore",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_eyes"
+      ],
+      "vertices": 16,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Pistol_Grip",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Rear_Sight",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal_dark"
+      ],
+      "vertices": 8,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Receiver",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Stock",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal_dark"
+      ],
+      "vertices": 8,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Stock_Butt",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Stock_Neck",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Trigger_Guard_Base",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal_dark"
+      ],
+      "vertices": 8,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Trigger_Guard_Front",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal_dark"
+      ],
+      "vertices": 8,
+      "rebuilt": false
+    },
+    {
+      "piece": "Rifle_Upper_Receiver",
+      "bone": "DEF-hand.R",
+      "materials": [
+        "VG_metal_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Thigh_Utility_Flap_R",
+      "bone": "DEF-thigh.R",
+      "materials": [
+        "VG_pouch_flap"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Thigh_Utility_Pouch_R",
+      "bone": "DEF-thigh.R",
+      "materials": [
+        "VG_pouch"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Uniform_Belt",
+      "bone": "DEF-hips",
+      "materials": [
+        "VG_vest_strap"
+      ],
+      "vertices": 16,
+      "rebuilt": true
+    },
+    {
+      "piece": "Uniform_Collar_L",
+      "bone": "DEF-neck",
+      "materials": [
+        "VG_cloth_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Uniform_Collar_R",
+      "bone": "DEF-neck",
+      "materials": [
+        "VG_cloth_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": false
+    },
+    {
+      "piece": "Uniform_Pelvis",
+      "bone": "DEF-hips",
+      "materials": [
+        "VG_pants",
+        "VG_pants_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Uniform_Torso",
+      "bone": "DEF-spine.002",
+      "materials": [
+        "VG_cloth",
+        "VG_cloth_dark"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Carrier",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_vest",
+        "VG_vest_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Chest_Plate",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_plate",
+        "VG_vest_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Front_Strap_L",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_helmet_trim"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Front_Strap_R",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_helmet_trim"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Magazine_Flap_01",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_helmet_trim"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Magazine_Flap_02",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_helmet_trim"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Magazine_Flap_03",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_helmet_trim"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Magazine_Pouch_01",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_pouch"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Magazine_Pouch_02",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_pouch_light"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Magazine_Pouch_03",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_pouch"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Shoulder_Strap_L",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_vest"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Shoulder_Strap_R",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_vest"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Side_Pouch_Flap_L",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_pouch_flap"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Side_Pouch_Flap_R",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_pouch_flap"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Side_Pouch_L",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_pouch"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Side_Pouch_R",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_pouch"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    },
+    {
+      "piece": "Vest_Upper_Webbing",
+      "bone": "DEF-spine.003",
+      "materials": [
+        "VG_vest_shadow"
+      ],
+      "vertices": 24,
+      "rebuilt": true
+    }
+  ],
+  "bones": [
+    {
+      "name": "root",
+      "parent": "",
+      "head_global_godot_m": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "tail_global_godot_m": [
+        2.622683403785686e-08,
+        0.0,
+        0.30000001192092896
+      ]
+    },
+    {
+      "name": "DEF-hips",
+      "parent": "root",
+      "head_global_godot_m": [
+        0.0,
+        0.9998437762260437,
+        0.030375000089406967
+      ],
+      "tail_global_godot_m": [
+        -3.3150935330183984e-09,
+        1.1469086408615112,
+        -0.007545251399278641
+      ]
+    },
+    {
+      "name": "DEF-spine.001",
+      "parent": "DEF-hips",
+      "head_global_godot_m": [
+        0.0,
+        1.1517187356948853,
+        0.030375000089406967
+      ],
+      "tail_global_godot_m": [
+        -1.9660568728596672e-09,
+        1.3338510990142822,
+        0.007885914295911789
+      ]
+    },
+    {
+      "name": "DEF-spine.002",
+      "parent": "DEF-spine.001",
+      "head_global_godot_m": [
+        0.0,
+        1.33523428440094,
+        0.030375000089406967
+      ],
+      "tail_global_godot_m": [
+        4.053111180013502e-10,
+        1.4807072877883911,
+        0.03501121699810028
+      ]
+    },
+    {
+      "name": "DEF-spine.003",
+      "parent": "DEF-spine.002",
+      "head_global_godot_m": [
+        0.0,
+        1.4807811975479126,
+        0.030375000089406967
+      ],
+      "tail_global_godot_m": [
+        3.1702418468171345e-10,
+        1.592678427696228,
+        0.03400133177638054
+      ]
+    },
+    {
+      "name": "DEF-neck",
+      "parent": "DEF-spine.003",
+      "head_global_godot_m": [
+        0.0,
+        1.590890645980835,
+        0.010125000029802322
+      ],
+      "tail_global_godot_m": [
+        -1.0376531855982307e-09,
+        1.6525962352752686,
+        -0.0017443671822547913
+      ]
+    },
+    {
+      "name": "DEF-head",
+      "parent": "DEF-neck",
+      "head_global_godot_m": [
+        0.0,
+        1.6529062986373901,
+        -0.0
+      ],
+      "tail_global_godot_m": [
+        -5.685409920630491e-10,
+        1.8528004884719849,
+        -0.0065033468417823315
+      ]
+    },
+    {
+      "name": "DEF-shoulder.L",
+      "parent": "DEF-spine.003",
+      "head_global_godot_m": [
+        -0.09492187947034836,
+        1.5757031440734863,
+        0.03164062649011612
+      ],
+      "tail_global_godot_m": [
+        -0.2528954744338989,
+        1.5755914449691772,
+        0.12463857233524323
+      ]
+    },
+    {
+      "name": "DEF-upper_arm.L",
+      "parent": "DEF-shoulder.L",
+      "head_global_godot_m": [
+        -0.2759062349796295,
+        1.5516562461853027,
+        0.015187500044703484
+      ],
+      "tail_global_godot_m": [
+        -0.5758622884750366,
+        1.5516562461853027,
+        0.020325224846601486
+      ]
+    },
+    {
+      "name": "DEF-forearm.L",
+      "parent": "DEF-upper_arm.L",
+      "head_global_godot_m": [
+        -0.6384695172309875,
+        1.5516562461853027,
+        0.021397579461336136
+      ],
+      "tail_global_godot_m": [
+        -0.9384249448776245,
+        1.5516563653945923,
+        0.016225941479206085
+      ]
+    },
+    {
+      "name": "DEF-hand.L",
+      "parent": "DEF-forearm.L",
+      "head_global_godot_m": [
+        -0.991748571395874,
+        1.5516563653945923,
+        0.015306569635868073
+      ],
+      "tail_global_godot_m": [
+        -1.0635721683502197,
+        1.5516563653945923,
+        0.0153065649792552
+      ]
+    },
+    {
+      "name": "DEF-f_index.01.L",
+      "parent": "DEF-hand.L",
+      "head_global_godot_m": [
+        -1.0612905025482178,
+        1.5504964590072632,
+        -0.002615431323647499
+      ],
+      "tail_global_godot_m": [
+        -1.0862904787063599,
+        1.5504964590072632,
+        -0.00261542946100235
+      ]
+    },
+    {
+      "name": "DEF-f_index.02.L",
+      "parent": "DEF-f_index.01.L",
+      "head_global_godot_m": [
+        -1.0848965644836426,
+        1.5504963397979736,
+        -0.00261542946100235
+      ],
+      "tail_global_godot_m": [
+        -1.1098965406417847,
+        1.5504963397979736,
+        -0.0026154271326959133
+      ]
+    },
+    {
+      "name": "DEF-f_index.03.L",
+      "parent": "DEF-f_index.02.L",
+      "head_global_godot_m": [
+        -1.105080485343933,
+        1.5504963397979736,
+        -0.00261542946100235
+      ],
+      "tail_global_godot_m": [
+        -1.140080451965332,
+        1.5504963397979736,
+        -0.0026154264342039824
+      ]
+    },
+    {
+      "name": "DEF-f_middle.01.L",
+      "parent": "DEF-hand.L",
+      "head_global_godot_m": [
+        -1.0622766017913818,
+        1.5518885850906372,
+        0.012290563434362411
+      ],
+      "tail_global_godot_m": [
+        -1.087248682975769,
+        1.5518885850906372,
+        0.013471280224621296
+      ]
+    },
+    {
+      "name": "DEF-f_middle.02.L",
+      "parent": "DEF-f_middle.01.L",
+      "head_global_godot_m": [
+        -1.08681058883667,
+        1.5518885850906372,
+        0.01345057226717472
+      ],
+      "tail_global_godot_m": [
+        -1.111786127090454,
+        1.5518885850906372,
+        0.014555688947439194
+      ]
+    },
+    {
+      "name": "DEF-f_middle.03.L",
+      "parent": "DEF-f_middle.02.L",
+      "head_global_godot_m": [
+        -1.1064726114273071,
+        1.5518885850906372,
+        0.014320571906864643
+      ],
+      "tail_global_godot_m": [
+        -1.1414347887039185,
+        1.5518885850906372,
+        0.015946734696626663
+      ]
+    },
+    {
+      "name": "DEF-f_pinky.01.L",
+      "parent": "DEF-hand.L",
+      "head_global_godot_m": [
+        -1.0542144775390625,
+        1.5507285594940186,
+        0.03897055611014366
+      ],
+      "tail_global_godot_m": [
+        -1.0791583061218262,
+        1.5507285594940186,
+        0.04064588621258736
+      ]
+    },
+    {
+      "name": "DEF-f_pinky.02.L",
+      "parent": "DEF-f_pinky.01.L",
+      "head_global_godot_m": [
+        -1.0775303840637207,
+        1.550728678703308,
+        0.0405365526676178
+      ],
+      "tail_global_godot_m": [
+        -1.1024713516235352,
+        1.550728678703308,
+        0.04225350543856621
+      ]
+    },
+    {
+      "name": "DEF-f_pinky.03.L",
+      "parent": "DEF-f_pinky.02.L",
+      "head_global_godot_m": [
+        -1.0935384035110474,
+        1.550728678703308,
+        0.041638556867837906
+      ],
+      "tail_global_godot_m": [
+        -1.1284586191177368,
+        1.550728678703308,
+        0.04399971663951874
+      ]
+    },
+    {
+      "name": "DEF-f_ring.01.L",
+      "parent": "DEF-hand.L",
+      "head_global_godot_m": [
+        -1.0608264207839966,
+        1.5517144203186035,
+        0.025224562734365463
+      ],
+      "tail_global_godot_m": [
+        -1.0858105421066284,
+        1.5517144203186035,
+        0.026114577427506447
+      ]
+    },
+    {
+      "name": "DEF-f_ring.02.L",
+      "parent": "DEF-f_ring.01.L",
+      "head_global_godot_m": [
+        -1.083620548248291,
+        1.5517144203186035,
+        0.026036564260721207
+      ],
+      "tail_global_godot_m": [
+        -1.1086046695709229,
+        1.5517144203186035,
+        0.02692597173154354
+      ]
+    },
+    {
+      "name": "DEF-f_ring.03.L",
+      "parent": "DEF-f_ring.02.L",
+      "head_global_godot_m": [
+        -1.1015424728393555,
+        1.551714539527893,
+        0.02667456865310669
+      ],
+      "tail_global_godot_m": [
+        -1.1365175247192383,
+        1.551714539527893,
+        0.027994386851787567
+      ]
+    },
+    {
+      "name": "DEF-thumb.01.L",
+      "parent": "DEF-hand.L",
+      "head_global_godot_m": [
+        -1.0075825452804565,
+        1.5384324789047241,
+        -0.0041814446449279785
+      ],
+      "tail_global_godot_m": [
+        -1.0274524688720703,
+        1.5272774696350098,
+        -0.014464998617768288
+      ]
+    },
+    {
+      "name": "DEF-thumb.02.L",
+      "parent": "DEF-thumb.01.L",
+      "head_global_godot_m": [
+        -1.0274184942245483,
+        1.527296543121338,
+        -0.014447415247559547
+      ],
+      "tail_global_godot_m": [
+        -1.0500383377075195,
+        1.514594554901123,
+        -0.0261633712798357
+      ]
+    },
+    {
+      "name": "DEF-thumb.03.L",
+      "parent": "DEF-thumb.02.L",
+      "head_global_godot_m": [
+        -1.050038456916809,
+        1.5145946741104126,
+        -0.026163391768932343
+      ],
+      "tail_global_godot_m": [
+        -1.0778758525848389,
+        1.4990057945251465,
+        -0.04055318608880043
+      ]
+    },
+    {
+      "name": "DEF-shoulder.R",
+      "parent": "DEF-spine.003",
+      "head_global_godot_m": [
+        0.09492187947034836,
+        1.5757031440734863,
+        0.03164062649011612
+      ],
+      "tail_global_godot_m": [
+        0.2528954744338989,
+        1.5755914449691772,
+        0.12463854253292084
+      ]
+    },
+    {
+      "name": "DEF-upper_arm.R",
+      "parent": "DEF-shoulder.R",
+      "head_global_godot_m": [
+        0.2759062349796295,
+        1.5516562461853027,
+        0.015187500044703484
+      ],
+      "tail_global_godot_m": [
+        0.5718486309051514,
+        1.5516562461853027,
+        0.02025640942156315
+      ]
+    },
+    {
+      "name": "DEF-forearm.R",
+      "parent": "DEF-upper_arm.R",
+      "head_global_godot_m": [
+        0.5718486309051514,
+        1.5516562461853027,
+        0.02025640942156315
+      ],
+      "tail_global_godot_m": [
+        0.8718041181564331,
+        1.5516562461853027,
+        0.015084641054272652
+      ]
+    },
+    {
+      "name": "DEF-hand.R",
+      "parent": "DEF-forearm.R",
+      "head_global_godot_m": [
+        0.9042179584503174,
+        1.5516562461853027,
+        0.014525769278407097
+      ],
+      "tail_global_godot_m": [
+        0.9760414361953735,
+        1.5516562461853027,
+        0.014525741338729858
+      ]
+    },
+    {
+      "name": "DEF-f_index.01.R",
+      "parent": "DEF-hand.R",
+      "head_global_godot_m": [
+        0.9737598299980164,
+        1.5504963397979736,
+        -0.00339626707136631
+      ],
+      "tail_global_godot_m": [
+        0.9987598061561584,
+        1.5504963397979736,
+        -0.003396274521946907
+      ]
+    },
+    {
+      "name": "DEF-f_index.02.R",
+      "parent": "DEF-f_index.01.R",
+      "head_global_godot_m": [
+        0.9973658919334412,
+        1.5504963397979736,
+        -0.003396274521946907
+      ],
+      "tail_global_godot_m": [
+        1.022365927696228,
+        1.5504963397979736,
+        -0.0033962822053581476
+      ]
+    },
+    {
+      "name": "DEF-f_index.03.R",
+      "parent": "DEF-f_index.02.R",
+      "head_global_godot_m": [
+        1.0175498723983765,
+        1.5504963397979736,
+        -0.0033962782472372055
+      ],
+      "tail_global_godot_m": [
+        1.0525498390197754,
+        1.5504963397979736,
+        -0.00339628872461617
+      ]
+    },
+    {
+      "name": "DEF-f_middle.01.R",
+      "parent": "DEF-hand.R",
+      "head_global_godot_m": [
+        0.9747459292411804,
+        1.551888346672058,
+        0.011509733274579048
+      ],
+      "tail_global_godot_m": [
+        0.9997180104255676,
+        1.551888346672058,
+        0.012690437026321888
+      ]
+    },
+    {
+      "name": "DEF-f_middle.02.R",
+      "parent": "DEF-f_middle.01.R",
+      "head_global_godot_m": [
+        0.9992799162864685,
+        1.5518884658813477,
+        0.012669723480939865
+      ],
+      "tail_global_godot_m": [
+        1.0242555141448975,
+        1.5518884658813477,
+        0.013774828054010868
+      ]
+    },
+    {
+      "name": "DEF-f_middle.03.R",
+      "parent": "DEF-f_middle.02.R",
+      "head_global_godot_m": [
+        1.0189419984817505,
+        1.5518884658813477,
+        0.013539721257984638
+      ],
+      "tail_global_godot_m": [
+        1.0539041757583618,
+        1.5518884658813477,
+        0.015165862627327442
+      ]
+    },
+    {
+      "name": "DEF-f_pinky.01.R",
+      "parent": "DEF-hand.R",
+      "head_global_godot_m": [
+        0.9666838645935059,
+        1.5507283210754395,
+        0.038189731538295746
+      ],
+      "tail_global_godot_m": [
+        0.9916276931762695,
+        1.5507283210754395,
+        0.039865054190158844
+      ]
+    },
+    {
+      "name": "DEF-f_pinky.02.R",
+      "parent": "DEF-f_pinky.01.R",
+      "head_global_godot_m": [
+        0.9899998307228088,
+        1.550728440284729,
+        0.039755724370479584
+      ],
+      "tail_global_godot_m": [
+        1.014940857887268,
+        1.550728440284729,
+        0.0414726585149765
+      ]
+    },
+    {
+      "name": "DEF-f_pinky.03.R",
+      "parent": "DEF-f_pinky.02.R",
+      "head_global_godot_m": [
+        1.0060079097747803,
+        1.5507283210754395,
+        0.040857717394828796
+      ],
+      "tail_global_godot_m": [
+        1.0409281253814697,
+        1.5507283210754395,
+        0.04321886599063873
+      ]
+    },
+    {
+      "name": "DEF-f_ring.01.R",
+      "parent": "DEF-hand.R",
+      "head_global_godot_m": [
+        0.9732958078384399,
+        1.5517141819000244,
+        0.0244437362998724
+      ],
+      "tail_global_godot_m": [
+        0.9982799291610718,
+        1.5517141819000244,
+        0.025333745405077934
+      ]
+    },
+    {
+      "name": "DEF-f_ring.02.R",
+      "parent": "DEF-f_ring.01.R",
+      "head_global_godot_m": [
+        0.9960898756980896,
+        1.551714301109314,
+        0.025255732238292694
+      ],
+      "tail_global_godot_m": [
+        1.0210740566253662,
+        1.551714301109314,
+        0.026145130395889282
+      ]
+    },
+    {
+      "name": "DEF-f_ring.03.R",
+      "parent": "DEF-f_ring.02.R",
+      "head_global_godot_m": [
+        1.0140118598937988,
+        1.5517144203186035,
+        0.02589372731745243
+      ],
+      "tail_global_godot_m": [
+        1.0489869117736816,
+        1.5517144203186035,
+        0.027213530614972115
+      ]
+    },
+    {
+      "name": "DEF-thumb.01.R",
+      "parent": "DEF-hand.R",
+      "head_global_godot_m": [
+        0.9200519323348999,
+        1.5384323596954346,
+        -0.004962246865034103
+      ],
+      "tail_global_godot_m": [
+        0.9399218559265137,
+        1.5272773504257202,
+        -0.015245823189616203
+      ]
+    },
+    {
+      "name": "DEF-thumb.02.R",
+      "parent": "DEF-thumb.01.R",
+      "head_global_godot_m": [
+        0.9398879408836365,
+        1.5272963047027588,
+        -0.015228264033794403
+      ],
+      "tail_global_godot_m": [
+        0.9625078439712524,
+        1.514594316482544,
+        -0.0269442331045866
+      ]
+    },
+    {
+      "name": "DEF-thumb.03.R",
+      "parent": "DEF-thumb.02.R",
+      "head_global_godot_m": [
+        0.9625079035758972,
+        1.5145944356918335,
+        -0.0269442331045866
+      ],
+      "tail_global_godot_m": [
+        0.990345299243927,
+        1.4990055561065674,
+        -0.04133403301239014
+      ]
+    },
+    {
+      "name": "DEF-thigh.L",
+      "parent": "DEF-hips",
+      "head_global_godot_m": [
+        -0.12529687583446503,
+        0.9606093764305115,
+        0.021515626460313797
+      ],
+      "tail_global_godot_m": [
+        -0.12529687583446503,
+        0.6606166362762451,
+        0.023613963276147842
+      ]
+    },
+    {
+      "name": "DEF-shin.L",
+      "parent": "DEF-thigh.L",
+      "head_global_godot_m": [
+        -0.12529687583446503,
+        0.5530781149864197,
+        0.0063281250186264515
+      ],
+      "tail_global_godot_m": [
+        -0.12529687583446503,
+        0.25404196977615356,
+        0.030357161536812782
+      ]
+    },
+    {
+      "name": "DEF-foot.L",
+      "parent": "DEF-shin.L",
+      "head_global_godot_m": [
+        -0.12529687583446503,
+        0.22148437798023224,
+        0.03164062649011612
+      ],
+      "tail_global_godot_m": [
+        -0.12529689073562622,
+        0.07707135379314423,
+        -0.2114952951669693
+      ]
+    },
+    {
+      "name": "DEF-toe.L",
+      "parent": "DEF-foot.L",
+      "head_global_godot_m": [
+        -0.12529687583446503,
+        0.037968747317790985,
+        -0.18351562321186066
+      ],
+      "tail_global_godot_m": [
+        -0.12529687583446503,
+        0.03796873986721039,
+        -0.21851561963558197
+      ]
+    },
+    {
+      "name": "DEF-thigh.R",
+      "parent": "DEF-hips",
+      "head_global_godot_m": [
+        0.12529687583446503,
+        0.9606093764305115,
+        0.021515626460313797
+      ],
+      "tail_global_godot_m": [
+        0.12529687583446503,
+        0.6606167554855347,
+        0.023613953962922096
+      ]
+    },
+    {
+      "name": "DEF-shin.R",
+      "parent": "DEF-thigh.R",
+      "head_global_godot_m": [
+        0.12529687583446503,
+        0.5530781149864197,
+        0.0063281250186264515
+      ],
+      "tail_global_godot_m": [
+        0.12529687583446503,
+        0.25404196977615356,
+        0.03035717085003853
+      ]
+    },
+    {
+      "name": "DEF-foot.R",
+      "parent": "DEF-shin.R",
+      "head_global_godot_m": [
+        0.12529687583446503,
+        0.22148437798023224,
+        0.03164062649011612
+      ],
+      "tail_global_godot_m": [
+        0.12529686093330383,
+        0.07707135379314423,
+        -0.2114953100681305
+      ]
+    },
+    {
+      "name": "DEF-toe.R",
+      "parent": "DEF-foot.R",
+      "head_global_godot_m": [
+        0.12529687583446503,
+        0.037968747317790985,
+        -0.18351562321186066
+      ],
+      "tail_global_godot_m": [
+        0.12529687583446503,
+        0.03796874359250069,
+        -0.21851561963558197
+      ]
+    }
+  ],
+  "original_sha256": {
+    "Horde_Braker_Recruit_v03_rigged.blend": "f2ea655defd744d626b72a8d3330e1c95e24bd0e33a6e7b3dee799876c88a9c8",
+    "Horde_Braker_Recruit_v03_rigged.glb": "2a9d61ca90977f6dc0da5f09cea1de9892d630a2cf25862e909515fbe6b08cf3",
+    "Recruit_UAL_compatible.tres": "73fad518444978dbf35dbc73f217901637e42d1c79cb3b2dcf5860732406ff61",
+    "Recruit_Rifle_Hold_pose.json": "3218eb21c738bed2cbfd6f53c7005b029f99ac8803697f0720d81292a0da286e",
+    "AnimationLibrary_Godot_Standard.glb": "1b7bf67866360665426bb99e4c71bd619f19b408453c24e30f0c3071601eee5c"
+  },
+  "palette_srgb_hex": {
+    "helmet": "858B4C",
+    "helmet_top": "9BA160",
+    "helmet_shadow": "555B36",
+    "helmet_trim": "737A42",
+    "helmet_patch": "383E2C",
+    "cloth": "626B48",
+    "cloth_dark": "404A34",
+    "cloth_light": "808958",
+    "pants": "535B3C",
+    "pants_shadow": "373F2A",
+    "vest": "6B7346",
+    "vest_shadow": "3A422D",
+    "plate": "40472F",
+    "pouch": "515A3B",
+    "pouch_light": "626B43",
+    "pouch_flap": "353D29",
+    "vest_strap": "30372A",
+    "knee": "7C8552",
+    "knee_shadow": "505A39",
+    "boot": "353C2C",
+    "boot_light": "4C5540",
+    "boot_shadow": "242A21",
+    "glove": "30382B",
+    "glove_shadow": "21281F",
+    "sole": "20271F"
+  },
+  "reference": "reference_vanguard_back.png",
+  "design_authorization": "User approved Recruit face/front as basis; heavier olive armor and hanging backpack",
+  "topology": "All pieces manifold, positive volume, nondegenerate faces",
+  "notes": [
+    "Same exact skeleton rest as approved Recruit; compatible external UAL library can be reused",
+    "Existing Assault Rifle is replaceable placeholder, not a new machine gun",
+    "Gloves remain rigid; original finger bones retained"
+  ],
+  "hold_pose": {
+    "gun_grip_world_blender": [
+      0.03999999910593033,
+      0.27000001072883606,
+      1.3799999952316284
+    ],
+    "support_target_world_blender": [
+      0.05898437276482582,
+      0.6281718611717224,
+      1.4344218969345093
+    ],
+    "overridden_bones": [
+      "DEF-shoulder.L",
+      "DEF-upper_arm.L",
+      "DEF-forearm.L",
+      "DEF-hand.L",
+      "DEF-shoulder.R",
+      "DEF-upper_arm.R",
+      "DEF-forearm.R",
+      "DEF-hand.R"
+    ],
+    "left_palm_in_left_hand": [
+      3.4187470987490087e-07,
+      0.07845914363861084,
+      -1.569832619452427e-08
+    ],
+    "support_in_right_hand": [
+      0.05442104861140251,
+      0.13151487708091736,
+      0.3581719994544983
+    ],
+    "barrel_direction_in_right_hand": [
+      -1.0291724947819603e-06,
+      3.9848475807957584e-07,
+      1.000000238418579
+    ],
+    "role": "Optional upper-body overlay; base rig remains T-pose; original UAL clips unchanged in intent."
+  },
+  "hip_motion_scale": 1.0906989966107214
+}

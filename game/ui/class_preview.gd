@@ -53,3 +53,4 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if _model != null:
 		_model.rotation.y += delta * 0.5
+		_model.animate(0.0, 0.0, false, delta)

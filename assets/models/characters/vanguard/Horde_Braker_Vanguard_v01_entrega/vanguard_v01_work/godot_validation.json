@@ -1,0 +1,315 @@
+{
+	"adapted_track_count": 2279,
+	"animation_names": [
+		"A_TPose",
+		"Crouch_Fwd_Loop",
+		"Crouch_Idle_Loop",
+		"Dance_Loop",
+		"Death01",
+		"Driving_Loop",
+		"Fixing_Kneeling",
+		"Hit_Chest",
+		"Hit_Head",
+		"Idle_Loop",
+		"Idle_Talking_Loop",
+		"Idle_Torch_Loop",
+		"Interact",
+		"Jog_Fwd_Loop",
+		"Jump_Land",
+		"Jump_Loop",
+		"Jump_Start",
+		"PickUp_Table",
+		"Pistol_Aim_Down",
+		"Pistol_Aim_Neutral",
+		"Pistol_Aim_Up",
+		"Pistol_Idle_Loop",
+		"Pistol_Reload",
+		"Pistol_Shoot",
+		"Punch_Cross",
+		"Punch_Enter",
+		"Punch_Jab",
+		"Push_Loop",
+		"Roll",
+		"Roll_RM",
+		"Sitting_Enter",
+		"Sitting_Exit",
+		"Sitting_Idle_Loop",
+		"Sitting_Talking_Loop",
+		"Spell_Simple_Enter",
+		"Spell_Simple_Exit",
+		"Spell_Simple_Idle_Loop",
+		"Spell_Simple_Shoot",
+		"Sprint_Loop",
+		"Swim_Fwd_Loop",
+		"Swim_Idle_Loop",
+		"Sword_Attack",
+		"Sword_Attack_RM",
+		"Sword_Idle",
+		"Walk_Formal_Loop",
+		"Walk_Loop"
+	],
+	"clip_count": 46,
+	"clips": {
+		"A_TPose": {
+			"length_s": 0.16666667163372,
+			"max_bone_distance_from_root_m": 1.90600287914276,
+			"samples": 5
+		},
+		"Crouch_Fwd_Loop": {
+			"length_s": 2.0,
+			"max_bone_distance_from_root_m": 1.04834532737732,
+			"samples": 5
+		},
+		"Crouch_Idle_Loop": {
+			"length_s": 2.93333339691162,
+			"max_bone_distance_from_root_m": 1.00556147098541,
+			"samples": 5
+		},
+		"Dance_Loop": {
+			"length_s": 1.0,
+			"max_bone_distance_from_root_m": 1.62702608108521,
+			"samples": 5
+		},
+		"Death01": {
+			"length_s": 2.40000009536743,
+			"max_bone_distance_from_root_m": 1.89695537090302,
+			"samples": 5
+		},
+		"Driving_Loop": {
+			"length_s": 1.66666662693024,
+			"max_bone_distance_from_root_m": 1.2871515750885,
+			"samples": 5
+		},
+		"Fixing_Kneeling": {
+			"length_s": 5.19999980926514,
+			"max_bone_distance_from_root_m": 1.59556257724762,
+			"samples": 5
+		},
+		"Hit_Chest": {
+			"length_s": 0.333333343267441,
+			"max_bone_distance_from_root_m": 1.59556257724762,
+			"samples": 5
+		},
+		"Hit_Head": {
+			"length_s": 0.433333337306976,
+			"max_bone_distance_from_root_m": 1.60570251941681,
+			"samples": 5
+		},
+		"Idle_Loop": {
+			"length_s": 2.5,
+			"max_bone_distance_from_root_m": 1.59829020500183,
+			"samples": 17
+		},
+		"Idle_Talking_Loop": {
+			"length_s": 2.93333339691162,
+			"max_bone_distance_from_root_m": 1.59775257110596,
+			"samples": 5
+		},
+		"Idle_Torch_Loop": {
+			"length_s": 1.26666665077209,
+			"max_bone_distance_from_root_m": 1.67045474052429,
+			"samples": 5
+		},
+		"Interact": {
+			"length_s": 2.0,
+			"max_bone_distance_from_root_m": 1.59955596923828,
+			"samples": 5
+		},
+		"Jog_Fwd_Loop": {
+			"length_s": 0.933333337306976,
+			"max_bone_distance_from_root_m": 1.60576498508453,
+			"samples": 5
+		},
+		"Jump_Land": {
+			"length_s": 1.26666665077209,
+			"max_bone_distance_from_root_m": 1.63420939445496,
+			"samples": 5
+		},
+		"Jump_Loop": {
+			"length_s": 2.5,
+			"max_bone_distance_from_root_m": 1.70174336433411,
+			"samples": 5
+		},
+		"Jump_Start": {
+			"length_s": 1.33333337306976,
+			"max_bone_distance_from_root_m": 1.82420074939728,
+			"samples": 5
+		},
+		"PickUp_Table": {
+			"length_s": 0.833333313465118,
+			"max_bone_distance_from_root_m": 1.6014815568924,
+			"samples": 5
+		},
+		"Pistol_Aim_Down": {
+			"length_s": 0.16666667163372,
+			"max_bone_distance_from_root_m": 1.53556668758392,
+			"samples": 5
+		},
+		"Pistol_Aim_Neutral": {
+			"length_s": 0.16666667163372,
+			"max_bone_distance_from_root_m": 1.63863182067871,
+			"samples": 5
+		},
+		"Pistol_Aim_Up": {
+			"length_s": 0.16666667163372,
+			"max_bone_distance_from_root_m": 2.22067952156067,
+			"samples": 5
+		},
+		"Pistol_Idle_Loop": {
+			"length_s": 1.66666662693024,
+			"max_bone_distance_from_root_m": 1.63667297363281,
+			"samples": 5
+		},
+		"Pistol_Reload": {
+			"length_s": 1.66666662693024,
+			"max_bone_distance_from_root_m": 1.69865024089813,
+			"samples": 5
+		},
+		"Pistol_Shoot": {
+			"length_s": 0.633333325386047,
+			"max_bone_distance_from_root_m": 1.64698386192322,
+			"samples": 5
+		},
+		"Punch_Cross": {
+			"length_s": 1.0,
+			"max_bone_distance_from_root_m": 1.64764893054962,
+			"samples": 5
+		},
+		"Punch_Enter": {
+			"length_s": 0.866666674613953,
+			"max_bone_distance_from_root_m": 1.62245118618011,
+			"samples": 5
+		},
+		"Punch_Jab": {
+			"length_s": 0.866666674613953,
+			"max_bone_distance_from_root_m": 1.76835417747498,
+			"samples": 5
+		},
+		"Push_Loop": {
+			"length_s": 2.66666674613953,
+			"max_bone_distance_from_root_m": 1.57457888126373,
+			"samples": 5
+		},
+		"Roll": {
+			"length_s": 1.46666669845581,
+			"max_bone_distance_from_root_m": 1.6004022359848,
+			"samples": 5
+		},
+		"Roll_RM": {
+			"length_s": 1.46666669845581,
+			"max_bone_distance_from_root_m": 1.60040235519409,
+			"samples": 5
+		},
+		"Sitting_Enter": {
+			"length_s": 1.29999995231628,
+			"max_bone_distance_from_root_m": 1.59787940979004,
+			"samples": 5
+		},
+		"Sitting_Exit": {
+			"length_s": 1.03333330154419,
+			"max_bone_distance_from_root_m": 1.59800279140472,
+			"samples": 5
+		},
+		"Sitting_Idle_Loop": {
+			"length_s": 1.66666662693024,
+			"max_bone_distance_from_root_m": 1.24907863140106,
+			"samples": 5
+		},
+		"Sitting_Talking_Loop": {
+			"length_s": 2.93333339691162,
+			"max_bone_distance_from_root_m": 1.25460612773895,
+			"samples": 5
+		},
+		"Spell_Simple_Enter": {
+			"length_s": 0.533333361148834,
+			"max_bone_distance_from_root_m": 1.87504756450653,
+			"samples": 5
+		},
+		"Spell_Simple_Exit": {
+			"length_s": 0.433333337306976,
+			"max_bone_distance_from_root_m": 1.87393534183502,
+			"samples": 5
+		},
+		"Spell_Simple_Idle_Loop": {
+			"length_s": 2.09999990463257,
+			"max_bone_distance_from_root_m": 1.87486171722412,
+			"samples": 5
+		},
+		"Spell_Simple_Shoot": {
+			"length_s": 0.5,
+			"max_bone_distance_from_root_m": 1.88055169582367,
+			"samples": 5
+		},
+		"Sprint_Loop": {
+			"length_s": 0.666666686534882,
+			"max_bone_distance_from_root_m": 1.6145840883255,
+			"samples": 17
+		},
+		"Swim_Fwd_Loop": {
+			"length_s": 1.33333337306976,
+			"max_bone_distance_from_root_m": 1.55349636077881,
+			"samples": 5
+		},
+		"Swim_Idle_Loop": {
+			"length_s": 3.33333325386047,
+			"max_bone_distance_from_root_m": 1.64855408668518,
+			"samples": 5
+		},
+		"Sword_Attack": {
+			"length_s": 1.53333330154419,
+			"max_bone_distance_from_root_m": 1.70504343509674,
+			"samples": 5
+		},
+		"Sword_Attack_RM": {
+			"length_s": 1.53333330154419,
+			"max_bone_distance_from_root_m": 1.70858383178711,
+			"samples": 5
+		},
+		"Sword_Idle": {
+			"length_s": 1.66666662693024,
+			"max_bone_distance_from_root_m": 1.4303286075592,
+			"samples": 5
+		},
+		"Walk_Formal_Loop": {
+			"length_s": 1.33333337306976,
+			"max_bone_distance_from_root_m": 1.63315117359161,
+			"samples": 5
+		},
+		"Walk_Loop": {
+			"length_s": 1.33333337306976,
+			"max_bone_distance_from_root_m": 1.63903415203094,
+			"samples": 17
+		}
+	},
+	"errors": [],
+	"godot_version": {
+		"build": "official",
+		"hash": "ed1daf0bf001b61586d9930840f2f1394092c079",
+		"hex": 263938,
+		"major": 4,
+		"minor": 7,
+		"patch": 2,
+		"status": "stable",
+		"string": "4.7.2-stable (official)",
+		"timestamp": 0
+	},
+	"hold_callbacks": 81,
+	"loader_playback": "UAL/Idle_Loop",
+	"material_count": 35,
+	"max_local_rest_angle_rad": 0.000690533954184502,
+	"maximum_bone_scale_error": 0.00000202655792236328,
+	"maximum_hold_contact_error_m": 0.000000678452977354027,
+	"maximum_muzzle_attachment_error_m": 0.000000553553547888441,
+	"mesh_count": 104,
+	"minimum_hold_forward_dot": 0.430686384439468,
+	"motion_scale": 1.09069899661072,
+	"muzzle_class": "Node3D",
+	"muzzle_parent_class": "BoneAttachment3D",
+	"muzzle_path": "Rig/Skeleton3D/DEF-hand_R/Muzzle",
+	"passed": true,
+	"rigid_vertices": 8524,
+	"source_bone_count": 53,
+	"target_bone_count": 53,
+	"target_skeleton_path": "Rig/Skeleton3D",
+	"target_skeleton_transform": "[X: (-1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (-0.0, 0.0, -1.0), O: (0.0, 0.0, 0.0)]"
+}

@@ -40,7 +40,8 @@ func _initialize() -> void:
 		_check(t.origin.z < -0.3 and t.origin.y > 0.9, "%s model has a forward muzzle at chest height" % id)
 		s.animate(1.0, 0.1)
 		s.free()
-	_test_recruit_model()
+	for id: StringName in [&"recruit", &"vanguard"]:
+		_test_imported_model(id)
 	# Terrain: a 10x10 grid with a 4x4 island in the middle.
 	var land := PackedByteArray()
 	land.resize(100)
@@ -69,11 +70,11 @@ func _process(_delta: float) -> bool:
 	return true
 
 
-## The Recruit uses the user's GLB: loaded, standing on the ground, ~2 m tall,
+## Both classes use the user's GLBs: loaded, grounded and ~2 m tall,
 ## muzzle at the rifle tip; other guns and first person still work.
-func _test_recruit_model() -> void:
-	var s := SoldierModel.create(&"recruit")
-	_check(s.get("_model") != null and s.uses_skeleton(), "recruit uses the imported v03 rig")
+func _test_imported_model(id: StringName) -> void:
+	var s := SoldierModel.create(id)
+	_check(s.get("_model") != null and s.uses_skeleton(), String(id) + " uses the delivered rig")
 	var lo := INF
 	var hi := -INF
 	for mi in s.find_children("*", "MeshInstance3D", true, false):
@@ -86,18 +87,18 @@ func _test_recruit_model() -> void:
 		var b: AABB = t * m.get_aabb()
 		lo = minf(lo, b.position.y)
 		hi = maxf(hi, b.end.y)
-	_check(absf(lo) < 0.02 and hi > 1.8 and hi < 2.2, "recruit model stands on the ground, %.2f m tall" % hi)
+	_check(absf(lo) < 0.02 and is_equal_approx(hi, 2.025), "%s model stands on the ground, %.3f m tall" % [id, hi])
 	var mt := Transform3D()
 	var mn: Node3D = s.muzzle
 	while mn != s:
 		mt = mn.transform * mt
 		mn = mn.get_parent()
-	_check(mt.origin.y > 0.9 and mt.origin.y < 1.9, "recruit muzzle at chest height (%.2f m)" % mt.origin.y)
+	_check(mt.origin.y > 0.9 and mt.origin.y < 1.9, "%s muzzle at chest height (%.2f m)" % [id, mt.origin.y])
 	s.set_shadow_only(true)
 	s.set_weapon(&"shotgun")
-	_check(s.muzzle != null and s.muzzle.get_parent() != null, "recruit model swaps to a placeholder shotgun with a muzzle")
+	_check(s.muzzle != null and s.muzzle.get_parent() != null, String(id) + " swaps to a placeholder shotgun with a muzzle")
 	s.set_weapon(&"rifle")
 	_check(s.find_children("*", "MeshInstance3D", true, false).all(func(x: Node) -> bool:
-		return (x as MeshInstance3D).cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY), "recruit body stays shadow-only in first person")
+		return (x as MeshInstance3D).cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY), String(id) + " body stays shadow-only in first person")
 	s.animate(1.0, 0.2)
 	s.free()

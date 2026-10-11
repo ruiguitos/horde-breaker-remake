@@ -1,7 +1,7 @@
 extends SkeletonModifier3D
 ## Delivered two-hand pose, cached once and layered over locomotion.
 
-const POSE_FILE: String = "res://assets/models/characters/recruit/recruit_rifle_hold.json"
+@export_file("*.json") var pose_file: String = "res://assets/models/characters/recruit/recruit_rifle_hold.json"
 var _bones: PackedInt32Array = PackedInt32Array()
 var _rotations: Array[Quaternion] = []
 var _positions: Array[Vector3] = []
@@ -9,7 +9,7 @@ var _positions: Array[Vector3] = []
 
 func _ready() -> void:
 	var skeleton: Skeleton3D = get_skeleton()
-	var pose: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(POSE_FILE))
+	var pose: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(pose_file))
 	for bone: String in pose:
 		var index: int = skeleton.find_bone(bone)
 		if index < 0:

@@ -2,7 +2,8 @@
 
 Integração de 2026-10-11, a pedido do utilizador. O Recruit usa agora o
 modelo com rig da pasta `Horde_Braker_Recruit_v03_entrega`, em vez da v02
-com pivots artificiais. O Vanguard mantém o seu modelo atual.
+com pivots artificiais. O Vanguard recebeu depois o seu próprio rig v01;
+ver [VANGUARD_MODEL.md](VANGUARD_MODEL.md).
 
 ## Assets e origem
 

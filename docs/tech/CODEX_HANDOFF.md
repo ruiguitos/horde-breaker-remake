@@ -98,6 +98,16 @@ sem instalar Blender. Comparação com primitivas disponível no editor.
 Estado, validação, reversão e restantes oito modelos para o Claude:
 [REALISTIC_PROPS.md](REALISTIC_PROPS.md).
 
+## Vanguard v01 — integração adicional (2026-10-11)
+
+Vanguard v01 com rig e Idle/Walk/Sprint aplicado ao Armory e ao jogo,
+sem Blender. Estado, assets, testes e continuação:
+[VANGUARD_MODEL.md](VANGUARD_MODEL.md).
+
+Etapa seguinte escolhida pelo utilizador: Armory **Abrigo 3D** e perks
+**Três ramos**, mantendo as regras atuais. Ver a escolha em
+[MENUS.md](../design/MENUS.md).
+
 ## Recruit v03 — integração adicional (2026-10-11)
 
 Recruit v03 com rig e locomoção

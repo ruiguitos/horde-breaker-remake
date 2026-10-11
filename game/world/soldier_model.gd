@@ -1,11 +1,13 @@
 class_name SoldierModel
 extends Node3D
-## Recruit: delivered v03 rig with UAL locomotion and a two-hand rifle hold.
-## Vanguard: the original box placeholder and procedural walk cycle.
+## Delivered Recruit v03 and Vanguard v01 rigs with UAL locomotion.
 ## Both face -Z, expose an equipped muzzle and support first-person shadows.
 
 const RECRUIT_MODEL: String = "res://assets/models/characters/recruit/recruit_v03.glb"
 const RECRUIT_ANIMATIONS: String = "res://assets/models/characters/recruit/recruit_animations.tres"
+const VANGUARD_MODEL: String = "res://assets/models/characters/vanguard/vanguard_v01.glb"
+const VANGUARD_ANIMATIONS: String = "res://assets/models/characters/vanguard/vanguard_animations.tres"
+const VANGUARD_HOLD: String = "res://assets/models/characters/vanguard/vanguard_rifle_hold.json"
 const HIP_Y: float = 0.92
 const SHOULDER_Y: float = 1.52
 
@@ -31,7 +33,7 @@ var _mats: Dictionary = {}
 var weapon_id: StringName = &""
 var _gun_node: Node3D
 var _shadow_only: bool = false
-## Imported model (Recruit) instead of boxes; null for the placeholder.
+## Imported model instead of boxes; null for the placeholder.
 var _model: Node3D
 var _skeleton: Skeleton3D
 var _animation_player: AnimationPlayer
@@ -71,8 +73,9 @@ func _box(parent: Node3D, size: Vector3, pos: Vector3, key: String, rot_deg: Vec
 
 
 func _build() -> void:
-	if class_id == &"recruit" and ResourceLoader.exists(RECRUIT_MODEL):
-		var scene := load(RECRUIT_MODEL) as PackedScene
+	var model_path: String = VANGUARD_MODEL if class_id == &"vanguard" else RECRUIT_MODEL
+	if ResourceLoader.exists(model_path):
+		var scene := load(model_path) as PackedScene
 		if scene != null:
 			_build_model(scene)
 			return
@@ -127,12 +130,15 @@ func _build_model(scene: PackedScene) -> void:
 	_rifle_muzzle.get_parent().add_child(_gun_mount)
 	_gun_mount.transform = _rifle_muzzle.transform
 	_animation_player = AnimationPlayer.new()
-	_animation_player.name = "RecruitAnimationPlayer"
+	_animation_player.name = String(class_id).capitalize() + "AnimationPlayer"
 	_animation_player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	_skeleton.add_child(_animation_player)
 	_animation_player.root_node = NodePath("..")
-	_animation_player.add_animation_library(&"UAL", load(RECRUIT_ANIMATIONS) as AnimationLibrary)
+	var animations: String = VANGUARD_ANIMATIONS if class_id == &"vanguard" else RECRUIT_ANIMATIONS
+	_animation_player.add_animation_library(&"UAL", load(animations) as AnimationLibrary)
 	var hold: SkeletonModifier3D = (load("res://game/world/recruit_rifle_hold.gd") as Script).new()
+	if class_id == &"vanguard":
+		hold.set("pose_file", VANGUARD_HOLD)
 	_skeleton.add_child(hold)
 	set_weapon(&"rifle")
 

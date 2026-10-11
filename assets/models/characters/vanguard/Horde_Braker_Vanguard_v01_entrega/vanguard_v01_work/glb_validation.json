@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "joints": 53,
+  "pieces": 104,
+  "triangles": 4056,
+  "materials": 35,
+  "render_vertices": 8524,
+  "animations": 0,
+  "textures": 0,
+  "rigid_one_weight_per_piece": true,
+  "height_m": 2.025000197184883,
+  "bounds_min_godot_m": [
+    -1.1682051212520081,
+    -1.0973141387770557e-07,
+    -0.5974043369101961
+  ],
+  "bounds_max_godot_m": [
+    1.1192601739115227,
+    2.0250000874534693,
+    0.44399994862279835
+  ],
+  "max_bind_matrix_error": 4.0609621714503275e-07,
+  "maximum_rest_difference_from_recruit": 0.0,
+  "olive_palette_verified": true,
+  "skin_and_weapon_colors_preserved": true,
+  "original_hashes_unchanged": true,
+  "muzzle_local_forward": "-Z",
+  "muzzle_world_forward": [
+    -3.1795310031237806e-07,
+    2.967141590651336e-07,
+    -0.9999999999999054
+  ]
+}
