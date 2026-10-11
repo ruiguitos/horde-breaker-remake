@@ -198,3 +198,67 @@ Em `armory.gd:173`, substituir lista por três colunas ligadas; seleção mostra
 5. Duos/evoluções; depois árvore. Validar custos, slots e persistência nos testes existentes; playtest separado para equilíbrio.
 
 
+
+Escolhida pelo utilizador a 2026-10-11 (árvore estilo Hades: 2 alternativas por nó, troca grátis). Desenho do Codex; maqueta na tela "Horde Breaker UI Proposals". Por implementar.
+
+## F2. Árvore de perks com alternativas
+
+**Proposta:** três ramos, três tiers por ramo, duas alternativas por nó. Só os perks equipados atuam. Os valores são hipóteses de playtest; cada especialização inclui uma contrapartida para respeitar os desbloqueios horizontais de `PROGRESSION_AND_ECONOMY.md` §3.
+
+**Verificado por leitura:** cinco perks sem ranks; perfil com um slot inicial e compras de 100/250 Intel; Armory apresenta uma lista. Evidência: `game/data/perks/`, `game/core/profile.gd:13`, `game/data/game_data.gd:231`, `game/states/armory.gd:173`. A Machine Gun e a seleção principal/secundária ainda não existem. Não foram executados testes nem Godot; JEV indisponível.
+
+### 1. Nós e alternativas
+
+Valores separados por `/` correspondem a **I/II/III**, totais, não incrementos. **†** exige uma regra, evento ou temporizador novo; todos os nós precisam da infraestrutura de ranks. AR = Assault Rifle; MG = Machine Gun. A coluna final identifica interações relevantes.
+
+| Nó | Alternativa A: efeito e estilo | Alternativa B: efeito e estilo | Interações |
+|---|---|---|---|
+| **Combat I** | **Head Hunter:** cone 11/13/15°; dano corporal −5/10/15%. Especialista em headshots. | **Body Count†:** dano corporal +10/20/30%; desativa headshots. Fogo consistente na massa. | Marksman; Field Medic, Second Breath, Pop Goes the Head. |
+| **Combat II** | **Steady Grip:** parado, dispersão da principal −20/40/60%; em movimento, cadência −5/10/15%. Posição defensiva. | **Skirmisher†:** andando e disparando, velocidade +4/8/12%; parado, dispersão +20/40/60%. Combate móvel. | AR/SMG/MG; Steady Aim. |
+| **Combat III** | **Opening Volley†:** após breaker, dano da principal +10/20/30% durante 2 s; cooldown do breaker +0,5/1/1,5 s. Entrada explosiva. | **Kill Chain†:** abate direto da principal repõe 1/2/3 balas no pente, até à capacidade; dano da principal −5/10/15%. Sustentação contra hordas. | Principais; Hair Trigger e efeitos de abate. |
+| **Survival I** | **Thick Skin:** +10/20/30 HP máximos; cura recebida −5/10/15%. Aguentar impactos. | **Fleet Footed:** velocidade a andar +4/8/12%; HP máximos −10/20/30. Evitar contacto. | Thick Hide, Light Boots; mobilidade da SMG/MG. |
+| **Survival II** | **Pack Rat:** munição máxima da secundária +20/35/50%; velocidade a andar −2/4/6%. Expedições prolongadas. | **Quick Draw†:** trocar para secundária dá +15/25/35% cadência durante 2 s, uma vez por 8 s; munição máxima −20/35/50%. Resposta de emergência. | Shotgun/Marksman; Bigger Mags, Max Ammo, Ammo Crate. |
+| **Survival III** | **Trail Rations:** cada orbe cura 0,2/0,4/0,6 HP; raio de atração −10/20/30%. Recolha arriscada para recuperar. | **Surveyor:** parado, raio de atração +50/75/100%; em movimento, −10/20/30%. Defender pontos de recolha. | XP Magnet, Field Dressing; Double Rewards aumenta XP, não cura por orbe. |
+| **Breaker I** | **Battering Ram:** distância +13/27/40%; cooldown +0,5/1/1,5 s. Atravessar a horda. | **Crowd Anchor†:** distância −10/20/30%; pulso final empurra 1/2/3 m. Abrir espaço localmente. | Shockwave Breaker, Crowd Splitter. |
+| **Breaker II** | **Recovery:** cooldown −5/10/15%; distância −10/20/30%. Investidas curtas frequentes. | **Heavy Impact:** dano do breaker +30/60/90%; cooldown +1/2/3 s. Investidas ofensivas ocasionais. | Hair Trigger, Adrenaline, Executioner; Full Power. |
+| **Breaker III** | **Recruit — Demolitions:** cooldown da granada −12/24/35%, raio +0,3/0,6/1 m; dano −10/20/30%. Cobertura frequente. **Vanguard — Bulwark:** War Cry dura +0,5/1/1,5 s; velocidade durante o efeito −10/20/30%. Resistência. | **Recruit — Concussion†:** granada acrescenta 1/2/3 s de atordoamento; dano −25/50/75%. Controlo. **Vanguard — Intimidating Cry:** empurrão adicional 1/2/3 m; proteção dura −1/2/3 s. Dispersar ameaças. | Grenadier, Wide Blast, Concussion; Rally, Intimidation; Full Power. |
+
+Head Hunter conserva a equivalência nas câmaras com mira: multiplicador do raio de cabeça = cone/9. Skirmisher não permite disparar durante sprint.
+
+### 2. Intel, ranks e slots
+
+| Tier | Comprar I | Comprar II | Comprar III |
+|---|---:|---:|---:|
+| I | 40 | 60 | 80 |
+| II | 60 | 90 | 120 |
+| III | 100 | 140 | 180 |
+
+A compra pertence ao **nó**: desbloqueia o mesmo rank nas duas alternativas, incluindo variantes de classe. Tier II exige o nó anterior em I; III exige II em I, independentemente de estarem equipados.
+
+Equipam-se **0–1, 0–2 ou 0–3 perks**, conforme os slots globais: primeiro gratuito, segundo 100, terceiro 250 Intel. Um perk por nó, sem quota por ramo.
+
+Trocar A/B, equipar, remover ou escolher um rank inferior já comprado é gratuito, **apenas na Armory antes da run**. Trocar A/B num nó equipado substitui atomicamente o perk nesse slot. Comprar ranks nunca equipa automaticamente.
+
+### 3. Migração e combinação
+
+Cada perk antigo comprado migra gratuitamente para **III**, na alternativa A correspondente. Conservar IDs, incluindo `long_breaker`. Conceder I aos antecessores necessários, sem os equipar; preservar Intel e slots. Migração versionada e idempotente.
+
+Preservar equipamento compatível. Demolitions é **Recruit-only**: noutra classe, removê-lo do equipamento com aviso, conservando propriedade. Os benefícios antigos chegam aos valores anteriores; as contrapartidas propostas são alterações de equilíbrio explícitas.
+
+Pack Rat passa exclusivamente para Shotgun/Marksman: não altera pentes nem reserva das principais. Somar bónus das cartas antes dos multiplicadores dos perks; aplicar penalizações multiplicativamente. Abates indiretos não ativam Kill Chain. Body Count exclui ofertas dependentes de headshots.
+
+### 4. Armory e comando
+
+Mostrar três colunas, **Combat / Survival / Breaker**, com três nós ligados verticalmente. Cada nó apresenta A/B, nome, três indicadores de rank, equipamento e cadeado.
+
+Painel de detalhe: efeitos positivos/negativos, rank atual/seguinte, custo, requisito e classe; ações **Equip/Remove** e **Unlock/Upgrade**. Manter resumo lateral com Intel e slots.
+
+Direcional navega entre nós; LB/RB alterna A/B; confirmar abre ações; cancelar regressa à grelha. Nós bloqueados continuam selecionáveis para consultar requisitos. Restaurar foco pelo ID estável após compras/trocas; mostrar substituição de slot quando estiver cheio.
+
+### 5. Implementação e testes propostos
+
+1. **Dados/perfil:** ampliar `resources/perk_data.gd`, `game_data.gd`, `perks/`, `perks.tres` e `core/profile.gd`. Novo `tests/test_perk_tree.gd`: custos, pré-requisitos, ranks partilhados, migração repetida, classes e slots.
+2. **Run:** atualizar `run_context.gd`, `main.gd`, `island_run.gd` e `card_offers.gd`; copiar equipamento/ranks ao iniciar. Alargar `test_island_run.gd`, `test_cards_catalog.gd` e `test_power_ups.gd`: só equipados atuam, contrapartidas, munição, câmaras e ausência de cadeias.
+3. **UI/persistência:** reformular `armory.gd`; adaptar `test_menus.gd` e `test_title_debrief_redesign.gd` para foco, troca gratuita e Quick Redeploy. Validar visualmente e com comando depois da implementação.
+
+

@@ -8,18 +8,25 @@ extends Node
 ## QUICK REDEPLOY (title or debrief) skips the Armory and the run choice:
 ## it starts the last run again (BOAT, or ISLAND for an expedition).
 ## Each state is a scene that is freed when the state changes; RunContext is
-## the only thing that crosses states.
+## the only thing that crosses states. Every ISLAND goes through the
+## LoadingScreen overlay (game/ui/loading_screen.gd), which loads the scenes
+## before the island is built.
 
 enum GameFlow { BOAT, ISLAND, DEBRIEF, ARMORY, TITLE, CAMP }
 
 const ISLAND_SCENE: String = "res://game/world/island.tscn"
 
+## A loading screen opened for an island (tests watch it; it frees itself).
+signal loading_started(screen: LoadingScreen)
+
 var state: GameFlow = GameFlow.BOAT
 var context: RunContext
 var profile: Profile
 var _current: Node
-var _test_scene: PackedScene  ## TEST ISLAND: the island being tested, no run around it
+var _test_path: String = ""  ## TEST ISLAND: the scene being tested, no run around it
+var _test_scene: PackedScene  ## ...and that scene once loaded
 var _landing: Dictionary = {}  ## RunContext.island_info() of the island being played
+var _loading: LoadingScreen  ## while an island loads
 
 
 func _ready() -> void:
@@ -88,13 +95,17 @@ func _test_island(path: String, mission: StringName) -> void:
 	else:
 		context.biome = Expeditions.biome(where["expedition"])
 	context.mission = mission
-	_test_scene = load(path)
+	_test_path = path
+	_test_scene = null
 	_go(GameFlow.ISLAND)
 
 
 func _go(next: GameFlow) -> void:
 	if _current != null:
 		_current.queue_free()
+	if _loading != null:  # leaving while an island was still loading
+		_loading.queue_free()
+		_loading = null
 	state = next
 	match next:
 		GameFlow.BOAT:
@@ -105,19 +116,9 @@ func _go(next: GameFlow) -> void:
 			boat.connect("exit_requested", _leave_between_islands, CONNECT_DEFERRED)
 			_current = boat
 		GameFlow.ISLAND:
-			var island: Node = (load(ISLAND_SCENE) as PackedScene).instantiate()
-			island.set("context", context)
-			island.set("profile", profile)
-			if _test_scene != null:
-				island.set("handmade_scene", _test_scene)
-			elif context.is_expedition():
-				var part_scene := load(context.part_scene()) as PackedScene
-				if part_scene == null:
-					push_error("Expedition part scene missing: %s" % context.part_scene())
-				island.set("handmade_scene", part_scene)
-			_landing = context.island_info()
-			island.connect("finished", _on_island_finished, CONNECT_DEFERRED)
-			_current = island
+			_current = null
+			_enter_island()  # through the loading screen; it attaches the island
+			return
 		GameFlow.DEBRIEF:
 			profile.record_run(context)
 			_write_telemetry()
@@ -151,7 +152,12 @@ func _go(next: GameFlow) -> void:
 			armory.connect("start_requested", _new_run, CONNECT_DEFERRED)
 			armory.connect("back_requested", _go.bind(GameFlow.TITLE), CONNECT_DEFERRED)
 			_current = armory
-	add_child(_current)
+	_attach(_current)
+
+
+func _attach(node: Node) -> void:
+	_current = node
+	add_child(node)
 	# Scenes build their sun/sky in _ready (Sky3D a frame later): re-apply
 	# the graphics preset to whatever lights they created.
 	get_tree().process_frame.connect(func() -> void: GraphicsSettings.apply_graphics(profile, get_tree()), CONNECT_ONE_SHOT)
@@ -172,6 +178,60 @@ func _leave_between_islands(to_title: bool) -> void:
 	_go(GameFlow.TITLE if to_title else GameFlow.ARMORY)
 
 
+## ISLAND: opens the loading screen over everything, loads the island scene
+## (and the hand-made part or test scene), builds the island under the
+## screen and lets it fade. The run (context) is not touched here, so HP,
+## cards and the expedition part carry over exactly as before. Headless,
+## all of it happens synchronously inside this call.
+func _enter_island() -> void:
+	var part_path: String = _test_path if _test_path != "" else context.part_scene()
+	var paths := PackedStringArray([ISLAND_SCENE])
+	if part_path != "":
+		paths.append(part_path)
+	var screen := LoadingScreen.new(LoadingScreen.describe(context, _test_path))
+	screen.name = "LoadingScreen"
+	_loading = screen
+	add_child(screen)
+	screen.fetch_radio(context)
+	loading_started.emit(screen)
+	var loaded: Dictionary = await screen.load_all(paths)
+	if _loading != screen:
+		return  # replaced meanwhile (another _go)
+	var island_scene := loaded.get(ISLAND_SCENE) as PackedScene
+	var part_scene: PackedScene = loaded.get(part_path) as PackedScene if part_path != "" else null
+	if island_scene == null or (part_path != "" and part_scene == null):
+		var missing: String = ISLAND_SCENE if island_scene == null else part_path
+		push_warning("Cannot load %s" % missing)
+		screen.fail(tr("Could not load %s. This run ends here; your profile is safe.") % missing.get_file())
+		screen.back_requested.connect(_on_load_failed.bind(screen), CONNECT_ONE_SHOT | CONNECT_DEFERRED)
+		return
+	await screen.building()
+	if _loading != screen:
+		return
+	var island: Node = island_scene.instantiate()
+	island.set("context", context)
+	island.set("profile", profile)
+	if _test_path != "":
+		_test_scene = part_scene
+	if part_scene != null:
+		island.set("handmade_scene", part_scene)
+	_landing = context.island_info()
+	island.connect("finished", _on_island_finished, CONNECT_DEFERRED)
+	_attach(island)
+	_loading = null
+	screen.finish()
+
+
+## BACK TO TITLE on a failed load: the run is dropped, the profile kept.
+func _on_load_failed(screen: LoadingScreen) -> void:
+	if _loading == screen:
+		_loading = null
+	screen.queue_free()
+	_test_path = ""
+	_test_scene = null
+	_go(GameFlow.TITLE)
+
+
 ## Writes a JSON summary of the run to user://runs/ for balancing.
 func _write_telemetry() -> void:
 	DirAccess.make_dir_recursive_absolute("user://runs")
@@ -189,8 +249,9 @@ func _write_telemetry() -> void:
 
 
 func _on_island_finished(won: bool) -> void:
-	if _test_scene != null:
-		_test_scene = null  # a test: back to the title, nothing recorded
+	if _test_path != "":
+		_test_path = ""  # a test: back to the title, nothing recorded
+		_test_scene = null
 		_go(GameFlow.TITLE)
 		return
 	# The island's entry in the log gets what the debrief cards show.

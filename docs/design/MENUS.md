@@ -166,6 +166,69 @@ Testes novos:
 - `tests/test_hud_redesign.gd`
 - `tests/test_island_end_panel.gd`
 
+## Ecrã de carregamento e diálogos (2026-10-11)
+
+**Ecrã de carregamento** (`game/ui/loading_screen.gd`). O Boot Splash Plus
+fica só para o arranque; entre o DEPLOY e a ilha, e entre duas partes da
+expedição, aparece o nosso ecrã:
+
+- mostra a corrida e a parte ("BERLENGA EXPEDITION / PART 2 OF 4"), o nome
+  do sítio, a missão com o objetivo numa linha, o Threat e o hazard pay;
+- traz uma linha de rádio do Director Hale, com retrato;
+- a barra é real: primeiro o carregamento em thread
+  (`ResourceLoader.load_threaded_request` / `load_threaded_get_status`),
+  depois a fase "BUILDING THE ISLAND", quando a ilha é instanciada.
+
+Arranca sozinho quando acaba, sem "carrega para começar": a corrida nunca
+deve ficar à espera de um ecrã. Fica pelo menos 1,2 s, para dar tempo de
+ler o objetivo; com cenas em cache, de outro modo, só piscava.
+
+É uma camada por cima do `main.gd`, não uma troca de cena. Por isso o
+`RunContext` (vida, cartas, parte da expedição) passa intacto. Se uma cena
+não carrega, o ecrã diz qual foi e oferece BACK TO TITLE, em vez de o jogo
+rebentar. Em headless tudo é síncrono, sem esperas nem fades, e os testes
+continuam rápidos.
+
+**Diálogos** (`game/ui/dialogue_box.gd`, `typewriter.gd`, `portrait.gd`,
+`dialogue_voice.gd`):
+
+- **Retratos:** são desenhados em código, para o Director Hale, o
+  Surveyor e o Contractor; quem não é conhecido aparece como silhueta com
+  estática. Para pôr arte a sério basta um PNG em
+  `game/ui/art/portraits/<id>.png`.
+- **Texto:** aparece letra a letra, com um "blip" de voz a cada 3 letras.
+  O tom muda por personagem e a boca do retrato mexe.
+  - O primeiro A/Enter completa a linha. As respostas só aparecem depois
+    disso, para o mesmo toque não escolher uma resposta sem querer.
+  - O segundo A/Enter avança.
+  - SKIP (Esc/B, ou o botão, que não recebe foco) fecha a conversa. O que
+    já foi escolhido fica aplicado (o hazard pay, por exemplo).
+- **Rádio do HUD:** usa o mesmo retrato, a mesma escrita e a mesma voz,
+  mais depressa, e nunca bloqueia.
+- **Voz:** em Settings > Audio > "Dialogue voice", gravado no perfil.
+  - O blip é um AudioStreamWAV sintetizado uma vez, como o `Sfx`.
+  - Não usamos AudioStreamGenerator: um som de 50 ms não precisa de um
+    stream ao vivo.
+- **Condições:** o briefing vê o Threat, a expedição, a parte e o
+  resultado da ilha anterior (`hurt`, `fast`, `cleared`).
+  - A resposta "What do we know" avisa quando o Threat é alto e comenta a
+    ilha anterior.
+  - A cue `radio` dá a linha do ecrã de carregamento: uma por cada parte
+    da Berlenga, depois avisos de Threat. Se não houver nenhuma, mostra uma
+    dica de `radio.dialogue`.
+- **Tradução:** todas as linhas têm `[ID:...]` estável.
+  - As linhas do rádio passaram de `story.gd` para `radio.dialogue`, para
+    a geração de POT do Godot as encontrar.
+  - O inglês continua a ser a fonte.
+  - Os novos `.gd` usam `tr()` e estão na lista de POT.
+
+### Decisões propostas
+
+- O briefing específico de cada parte da Berlenga aparece no ecrã de
+  carregamento e não no acampamento. O acampamento continua sem briefing,
+  como foi pedido para a viagem a pé.
+- Tempo mínimo do ecrã de carregamento: 1,2 s.
+
 ## Verificação e capturas
 
 **Correção do BACK no barco/acampamento — 2026-10-11:** o atalho antes

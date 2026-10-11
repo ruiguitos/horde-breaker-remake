@@ -2,7 +2,7 @@ class_name SettingsPanel
 extends MenuDialog
 ## Settings split in categories (tabs): DISPLAY (window mode, resolution,
 ## VSync, FPS cap), GRAPHICS (quality preset, render scale, anti-aliasing),
-## AUDIO (master / effects / music percentages) and CONTROLS (camera mode,
+## AUDIO (master / effects / music percentages, dialogue voice) and CONTROLS (camera mode,
 ## key icons and rebinding through G.U.I.D.E, mouse sensitivity).
 ## Every change is applied at once through GraphicsSettings / Profile and
 ## saved to the profile.
@@ -120,6 +120,9 @@ func _audio() -> void:
 	_percent_row("Master volume", profile.master_volume, 0, set_audio.call(func(v: int) -> void: profile.master_volume = v))
 	_percent_row("Sound effects", profile.sfx_volume, 0, set_audio.call(func(v: int) -> void: profile.sfx_volume = v))
 	_percent_row("Music", profile.music_volume, 0, set_audio.call(func(v: int) -> void: profile.music_volume = v))
+	_toggle("Dialogue voice", profile.dialogue_voice, func(on: bool) -> void:
+		profile.dialogue_voice = on
+		profile.save())
 
 
 func _controls() -> void:

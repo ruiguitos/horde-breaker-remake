@@ -19,6 +19,8 @@ var threat: int = 1  ## last chosen
 var master_volume: int = 80
 var sfx_volume: int = 100
 var music_volume: int = 70
+## Short voice blips while dialogue and radio lines type out (Settings > Audio).
+var dialogue_voice: bool = true
 
 ## The profile in use, so screens without a reference (e.g. the pause menu)
 ## can open the settings panel.
@@ -107,6 +109,7 @@ static func from_dict(d: Dictionary) -> Profile:
 	p.master_volume = clampi(int(d.get("master_volume", int(d.get("volume", 8)) * 10)), 0, 100)
 	p.sfx_volume = clampi(int(d.get("sfx_volume", 100)), 0, 100)
 	p.music_volume = clampi(int(d.get("music_volume", 70)), 0, 100)
+	p.dialogue_voice = bool(d.get("dialogue_voice", true))
 	for id in d.get("unlocked_classes", []):
 		# Classes removed from the game (e.g. Field Medic) are dropped.
 		if GameData.CLASSES.has(StringName(id)) and not p.unlocked_classes.has(StringName(id)):
@@ -141,7 +144,7 @@ func save(path: String = PATH) -> bool:
 		"extractions": extractions, "best_kills": best_kills,
 		"owned_perks": owned_perks.map(func(x: StringName) -> String: return String(x)),
 		"equipped_perks": equipped_perks.map(func(x: StringName) -> String: return String(x)),
-		"slots": slots, "max_threat": max_threat, "threat": threat, "master_volume": master_volume, "sfx_volume": sfx_volume, "music_volume": music_volume, "lore_pages": lore_pages, "ending": ending, "selected_class": String(selected_class),
+		"slots": slots, "max_threat": max_threat, "threat": threat, "master_volume": master_volume, "sfx_volume": sfx_volume, "music_volume": music_volume, "dialogue_voice": dialogue_voice, "lore_pages": lore_pages, "ending": ending, "selected_class": String(selected_class),
 		"unlocked_classes": unlocked_classes.map(func(x: StringName) -> String: return String(x)),
 		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x)),
 		"quality": quality, "window_mode": window_mode, "resolution": "%dx%d" % [resolution.x, resolution.y],

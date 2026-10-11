@@ -1,31 +1,67 @@
+# Director Hale's briefing (boat DEPLOY) and the radio line of the loading
+# screen. Game state comes from game/data/briefing.gd as `briefing`:
+# island_name, mission_name, mission_text, island_lore, advice, hazard_pay,
+# threat, is_expedition, expedition, part_index, part_name, island_number,
+# islands_done, last_result ("none", "hurt", "fast", "cleared"), hp_percent.
+# Every line has a stable [ID:] (translation key).
+
 ~ start
-Director Hale: Contractor. {{briefing.island_name}}, {{briefing.mission_name}}. {{briefing.mission_text}}
-- Understood. => END
-- What do we know about this island? => intel
-- I want hazard pay. [if not briefing.hazard_pay /] => hazard
-- Any advice? => advice
+Director Hale: Contractor. {{briefing.island_name}}, {{briefing.mission_name}}. {{briefing.mission_text}} [ID:BRIEF_START]
+- Understood. [ID:BRIEF_R_UNDERSTOOD] => END
+- What do we know about this island? [ID:BRIEF_R_INTEL] => intel
+- I want hazard pay. [if not briefing.hazard_pay /] [ID:BRIEF_R_HAZARD] => hazard
+- Any advice? [ID:BRIEF_R_ADVICE] => advice
 
 ~ intel
-Director Hale: {{briefing.island_lore}}
+Director Hale: {{briefing.island_lore}} [ID:BRIEF_LORE]
+if briefing.threat >= 5
+	Director Hale: Threat {{briefing.threat}}. Our models stopped at four. You are the model now. [ID:BRIEF_THREAT_5]
+elif briefing.threat >= 3
+	Director Hale: Threat {{briefing.threat}}. They are faster up there, and there are more of them. Budget your ammo. [ID:BRIEF_THREAT_3]
+if briefing.last_result == "hurt"
+	Director Hale: You came off the last island at {{briefing.hp_percent}} percent. Patch up before you play hero. [ID:BRIEF_PREV_HURT]
+elif briefing.last_result == "fast"
+	Director Hale: That last island was quick work. Don't let it go to your head, this one bites. [ID:BRIEF_PREV_FAST]
 => choice
 
 ~ advice
-Director Hale: {{briefing.advice}}
+Director Hale: {{briefing.advice}} [ID:BRIEF_ADVICE]
 => choice
 
 ~ hazard
-Director Hale: Hazard pay. Bold. Twenty-five percent more Intel...
-Director Hale: ...and I tell the island you're coming. Expect a lot more company.
-- Deal.
+Director Hale: Hazard pay. Bold. Twenty-five percent more Intel... [ID:BRIEF_HAZARD_1]
+if briefing.threat >= 3
+	Director Hale: ...at Threat {{briefing.threat}}. I'll have legal update your will. [ID:BRIEF_HAZARD_THREAT]
+Director Hale: ...and I tell the island you're coming. Expect a lot more company. [ID:BRIEF_HAZARD_2]
+- Deal. [ID:BRIEF_R_DEAL]
 	do briefing.take_hazard_pay()
-	Director Hale: Signed. Try to live long enough to spend it.
-- Forget it.
-	Director Hale: Wise. Cheap, but wise.
+	Director Hale: Signed. Try to live long enough to spend it. [ID:BRIEF_HAZARD_SIGNED]
+- Forget it. [ID:BRIEF_R_FORGET]
+	Director Hale: Wise. Cheap, but wise. [ID:BRIEF_HAZARD_DECLINED]
 => choice
 
 ~ choice
-Director Hale: Anything else?
-- That's all. => END
-- What do we know about this island? => intel
-- I want hazard pay. [if not briefing.hazard_pay /] => hazard
-- Any advice? => advice
+Director Hale: Anything else? [ID:BRIEF_ANYTHING_ELSE]
+- That's all. [ID:BRIEF_R_THATS_ALL] => END
+- What do we know about this island? [ID:BRIEF_R_INTEL_AGAIN] => intel
+- I want hazard pay. [if not briefing.hazard_pay /] [ID:BRIEF_R_HAZARD_AGAIN] => hazard
+- Any advice? [ID:BRIEF_R_ADVICE_AGAIN] => advice
+
+# One line for the loading screen: the part of an expedition first, then
+# warnings, then a tip from radio.dialogue (the screen falls back to it).
+~ radio
+if briefing.expedition == "berlenga" and briefing.part_index == 1
+	Director Hale: Carreiro do Mosteiro. The fishermen's quarter is quiet. Too quiet. Our surveyor went in and didn't come out. [ID:LOAD_BERLENGA_1]
+elif briefing.expedition == "berlenga" and briefing.part_index == 2
+	Director Hale: The lighthouse plateau. No cover, lots of wind, three generators. The lighthouse still works, which is more than I can say for you. [ID:LOAD_BERLENGA_2]
+elif briefing.expedition == "berlenga" and briefing.part_index == 3
+	Director Hale: Southwest coast. Cliffs on one side, them on the other. Keep the uplink talking. [ID:LOAD_BERLENGA_3]
+elif briefing.expedition == "berlenga" and briefing.part_index == 4
+	Director Hale: The fort. Seventeenth-century stone, very thick, very old. Hold it until the boat comes. It's the only way off this rock. [ID:LOAD_BERLENGA_4]
+elif briefing.threat >= 5
+	Director Hale: Threat {{briefing.threat}}. If you see the boat leave without you, that was a scheduling decision. [ID:LOAD_THREAT_5]
+elif briefing.threat >= 3
+	Director Hale: Threat {{briefing.threat}}. More of them, faster. Shoot first, invoice later. [ID:LOAD_THREAT_3]
+elif briefing.last_result == "hurt"
+	Director Hale: You're still bleeding from the last one. Try to bleed less on this one. [ID:LOAD_PREV_HURT]
+=> END
