@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://enu77arl3g0v"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Quick Draw"
+description = "Emergency answer: swap and unload."
+branch = "survival"
+tier = 2
+option = 1
+benefit = "Switching to the secondary: its fire rate +{v}% for 2 s (once per 8 s)"
+benefit_values = PackedFloat32Array(15, 25, 35)
+penalty = "Secondary max ammo −{v}%"
+penalty_values = PackedFloat32Array(20, 35, 50)
+order = 9

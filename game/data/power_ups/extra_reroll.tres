@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PowerUpData" format=3 uid="uid://ckkvfhb5m7qni"]
+
+[ext_resource type="Script" path="res://game/data/resources/power_up_data.gd" id="1_pwr"]
+
+[resource]
+script = ExtResource("1_pwr")
+display_name = "EXTRA REROLL"
+glyph = "↻"
+reroll_amount = 1
+legacy_ids = Array[StringName]([&"fire_sale"])
+order = 5

@@ -4,14 +4,26 @@ extends RefCounted
 ## user:// (on Windows: %APPDATA%/Godot/app_userdata/Horde Breaker Remake).
 
 const PATH: String = "user://profile.json"
-const VERSION: int = 6
+## 7: perk tree (ranks per node, A/B choice); older saves migrate on load.
+const VERSION: int = 7
 
 var intel: int = 0
 var runs: int = 0
 var extractions: int = 0
 var best_kills: int = 0
-var owned_perks: Array[StringName] = []
+## Perk tree (GameData.perk_nodes): rank bought per node, 0..3. Both
+## alternatives of a node share it.
+var perk_ranks: Dictionary = {}
+## Alternative picked per node (0 = A, 1 = B). Free to change in the Armory.
+var perk_options: Dictionary = {}
+## Rank used per node when the player picked one lower than bought (free);
+## missing = the bought rank.
+var perk_use_ranks: Dictionary = {}
+## Equipped perk ids (class variants resolved), at most one per node and
+## `slots` in total. Only these act in a run.
 var equipped_perks: Array[StringName] = []
+## Message for the Armory after a migration changed the equipment (not saved).
+var perk_notice: String = ""
 var slots: int = 1
 var max_threat: int = 1  ## highest Threat unlocked (extract on N to unlock N+1)
 var threat: int = 1  ## last chosen
@@ -80,11 +92,7 @@ static func from_dict(d: Dictionary) -> Profile:
 	p.runs = int(d.get("runs", 0))
 	p.extractions = int(d.get("extractions", 0))
 	p.best_kills = int(d.get("best_kills", 0))
-	for id in d.get("owned_perks", []):
-		p.owned_perks.append(StringName(id))
-	for id in d.get("equipped_perks", []):
-		p.equipped_perks.append(StringName(id))
-	p.slots = int(d.get("slots", 1))
+	p.slots = clampi(int(d.get("slots", 1)), 1, GameData.SLOT_COSTS.size())
 	p.max_threat = int(d.get("max_threat", 1))
 	p.lore_pages = int(d.get("lore_pages", 0))
 	p.ending = String(d.get("ending", ""))
@@ -137,6 +145,11 @@ static func from_dict(d: Dictionary) -> Profile:
 	if secondary != null and not secondary.primary:
 		p.select_weapon(secondary_id)
 	p.threat = clampi(int(d.get("threat", 1)), 1, p.max_threat)
+	# Version 7 has the perk tree; older saves had five flat perks.
+	if int(d.get("version", 1)) >= 7:
+		p._read_perk_tree(d)
+	else:
+		p.migrate_legacy_perks(d.get("owned_perks", []), d.get("equipped_perks", []))
 	# Version 4 had no last run nor archive read count: no QUICK REDEPLOY
 	# until the next run, and every file already recovered counts as read.
 	var last: Variant = d.get("last_run", {})
@@ -149,6 +162,12 @@ static func from_dict(d: Dictionary) -> Profile:
 			"primary": "rifle" if String(last.get("primary", "rifle")) == "pistol" else String(last.get("primary", "rifle")),
 			"secondary": "shotgun" if String(last.get("secondary", "shotgun")) == "pistol" else String(last.get("secondary", "shotgun")),
 		}
+		var ranks: Variant = last.get("perk_ranks", {})
+		if ranks is Dictionary:
+			var clean: Dictionary = {}
+			for id: Variant in ranks:
+				clean[String(id)] = clampi(int(ranks[id]), 1, GameData.PERK_MAX_RANK)
+			p.last_run["perk_ranks"] = clean
 	p.lore_read = clampi(int(d.get("lore_read", p.lore_pages)), 0, p.lore_pages)
 	return p
 
@@ -161,7 +180,8 @@ func save(path: String = PATH) -> bool:
 	f.store_string(JSON.stringify({
 		"version": VERSION, "intel": intel, "runs": runs,
 		"extractions": extractions, "best_kills": best_kills,
-		"owned_perks": owned_perks.map(func(x: StringName) -> String: return String(x)),
+		"perk_ranks": _string_keys(perk_ranks), "perk_options": _string_keys(perk_options),
+		"perk_use_ranks": _string_keys(perk_use_ranks),
 		"equipped_perks": equipped_perks.map(func(x: StringName) -> String: return String(x)),
 		"slots": slots, "max_threat": max_threat, "threat": threat, "master_volume": master_volume, "sfx_volume": sfx_volume, "music_volume": music_volume, "dialogue_voice": dialogue_voice, "lore_pages": lore_pages, "ending": ending, "selected_class": String(selected_class),
 		"unlocked_classes": unlocked_classes.map(func(x: StringName) -> String: return String(x)),
@@ -192,6 +212,7 @@ func remember_run(expedition: StringName) -> void:
 	last_run = {
 		"class": String(selected_class),
 		"perks": equipped_perks.map(func(x: StringName) -> String: return String(x)),
+		"perk_ranks": equipped_perk_ranks_json(),
 		"threat": threat,
 		"expedition": String(expedition),
 		"primary": String(selected_primary), "secondary": String(selected_secondary),
@@ -217,9 +238,14 @@ func redeploy_problem() -> String:
 	var perks: Array = last_run["perks"]
 	if perks.size() > slots:
 		return "Not enough perk slots"
+	var nodes: Array[StringName] = []
 	for id: Variant in perks:
-		if not owned_perks.has(StringName(id)):
+		var perk: GameData.Perk = GameData.perk(StringName(id))
+		if perk == null or not owns_perk(perk.id):
 			return "Perk not owned"
+		if not perk.fits_class(StringName(last_run["class"])) or nodes.has(perk.node()):
+			return "Perk unavailable for this class"
+		nodes.append(perk.node())
 	if int(last_run["threat"]) < 1 or int(last_run["threat"]) > max_threat:
 		return "Threat locked"
 	var expedition := StringName(last_run["expedition"])
@@ -236,9 +262,17 @@ func apply_last_run() -> bool:
 	selected_class = StringName(last_run["class"])
 	selected_primary = StringName(last_run.get("primary", "rifle"))
 	selected_secondary = StringName(last_run.get("secondary", "shotgun"))
+	# Same perks, same A/B choice and the same ranks (never above what is
+	# bought now; older saves without ranks use the bought rank).
 	equipped_perks.clear()
+	var ranks: Dictionary = last_run.get("perk_ranks", {})
 	for id: Variant in last_run["perks"]:
-		equipped_perks.append(StringName(id))
+		var perk: GameData.Perk = GameData.perk(StringName(id))
+		equipped_perks.append(perk.id)
+		perk_options[perk.node()] = perk.option
+		perk_use_ranks.erase(perk.node())
+		if ranks.has(String(id)):
+			set_use_rank(perk.node(), mini(int(ranks[String(id)]), node_rank(perk.node())))
 	threat = int(last_run["threat"])
 	return true
 
@@ -268,13 +302,213 @@ func mark_archive_read() -> void:
 	lore_read = lore_pages
 
 
-## Buys a perk or the next slot. Returns false if not affordable.
-func buy_perk(perk: GameData.Perk) -> bool:
-	if owned_perks.has(perk.id) or intel < perk.cost:
+## --- Perk tree (docs/design/CARDS_WEAPONS_PERKS.md §F2) ---------------
+
+## Rank bought in `node` (0 = not bought).
+func node_rank(node: StringName) -> int:
+	return int(perk_ranks.get(node, 0))
+
+
+## A perk is owned when its node has rank I or more (both alternatives).
+func owns_perk(id: StringName) -> bool:
+	var perk: GameData.Perk = GameData.perk(id)
+	return perk != null and node_rank(perk.node()) >= 1
+
+
+## Rank `node` acts at when equipped: the bought rank, or a lower one picked.
+func use_rank(node: StringName) -> int:
+	var bought: int = node_rank(node)
+	return clampi(int(perk_use_ranks.get(node, bought)), mini(1, bought), bought)
+
+
+## Picks a lower bought rank (free). False if `rank` is not bought.
+func set_use_rank(node: StringName, rank: int) -> bool:
+	if rank < 1 or rank > node_rank(node):
 		return false
-	intel -= perk.cost
-	owned_perks.append(perk.id)
+	if rank == node_rank(node):
+		perk_use_ranks.erase(node)
+	else:
+		perk_use_ranks[node] = rank
 	return true
+
+
+## Next lower bought rank, wrapping to the highest (Armory rank button).
+func cycle_use_rank(node: StringName) -> bool:
+	var bought: int = node_rank(node)
+	if bought < 2:
+		return false
+	var rank: int = use_rank(node) - 1
+	return set_use_rank(node, rank if rank >= 1 else bought)
+
+
+## Rank of an equipped perk id for the run (0 when it is not equipped).
+func equipped_rank(id: StringName) -> int:
+	var perk: GameData.Perk = GameData.perk(id)
+	return use_rank(perk.node()) if perk != null and equipped_perks.has(id) else 0
+
+
+func equipped_perk_ranks() -> Dictionary:
+	var ranks: Dictionary = {}
+	for id in equipped_perks:
+		ranks[id] = equipped_rank(id)
+	return ranks
+
+
+func equipped_perk_ranks_json() -> Dictionary:
+	var ranks: Dictionary = {}
+	for id in equipped_perks:
+		ranks[String(id)] = equipped_rank(id)
+	return ranks
+
+
+## Intel for the next rank of `node`; -1 at rank III or for an unknown node.
+func next_rank_cost(node: StringName) -> int:
+	if not GameData.perk_nodes().has(node):
+		return -1
+	return GameData.perk_rank_cost(GameData.perk_node_tier(node), node_rank(node) + 1)
+
+
+## Why the next rank of `node` cannot be bought now ("" = it can). Tier n
+## needs rank I of tier n-1 in the same branch, equipped or not.
+func rank_problem(node: StringName) -> String:
+	var cost: int = next_rank_cost(node)
+	if cost < 0:
+		return "Max rank"
+	var tier: int = GameData.perk_node_tier(node)
+	if tier > 1:
+		var before: StringName = GameData.perk_node(GameData.perk_node_branch(node), tier - 1)
+		if node_rank(before) < 1:
+			return "Requires %s %s rank I" % [String(GameData.perk_node_branch(node)).capitalize(), GameData.RANK_NAMES[tier - 1]]
+	if intel < cost:
+		return "Not enough Intel"
+	return ""
+
+
+## Buys the next rank of `node` for both alternatives. Never equips.
+func buy_rank(node: StringName) -> bool:
+	if rank_problem(node) != "":
+		return false
+	intel -= next_rank_cost(node)
+	perk_ranks[node] = node_rank(node) + 1
+	perk_use_ranks.erase(node)  # a new rank is used at once
+	return true
+
+
+## The equipped perk of `node` (&"" = none).
+func equipped_in(node: StringName) -> StringName:
+	for id in equipped_perks:
+		var perk: GameData.Perk = GameData.perk(id)
+		if perk != null and perk.node() == node:
+			return id
+	return &""
+
+
+## Alternative picked in `node`: the equipped one, else the last picked.
+func perk_option(node: StringName) -> int:
+	var current: StringName = equipped_in(node)
+	if current != &"":
+		return GameData.perk(current).option
+	return clampi(int(perk_options.get(node, 0)), 0, 1)
+
+
+## The perk the Armory shows for `node` (picked alternative, class variant).
+func perk_choice(node: StringName) -> GameData.Perk:
+	return GameData.perk_for(node, perk_option(node), selected_class)
+
+
+## Switches `node` between A and B (free, Armory only). An equipped node
+## swaps its perk in the same slot, so the loadout never has both.
+func switch_option(node: StringName) -> bool:
+	var next: int = 1 - perk_option(node)
+	var perk: GameData.Perk = GameData.perk_for(node, next, selected_class)
+	if perk == null:
+		return false
+	perk_options[node] = next
+	var current: StringName = equipped_in(node)
+	if current != &"":
+		equipped_perks[equipped_perks.find(current)] = perk.id
+	return true
+
+
+## Equips or removes the picked alternative of `node`.
+func toggle_equip_node(node: StringName) -> bool:
+	var current: StringName = equipped_in(node)
+	if current != &"":
+		equipped_perks.erase(current)
+		return true
+	var perk: GameData.Perk = perk_choice(node)
+	return perk != null and toggle_equip(perk.id)
+
+
+## After a class change: class variants (Breaker III) follow the class,
+## keeping the node, the A/B choice and the rank. Returns true if changed.
+func sync_perks_to_class() -> bool:
+	var changed: bool = false
+	for i in range(equipped_perks.size() - 1, -1, -1):
+		var perk: GameData.Perk = GameData.perk(equipped_perks[i])
+		if perk == null or perk.fits_class(selected_class):
+			continue
+		var variant: GameData.Perk = GameData.perk_for(perk.node(), perk.option, selected_class)
+		if variant != null:
+			equipped_perks[i] = variant.id
+		else:
+			equipped_perks.remove_at(i)
+		changed = true
+	return changed
+
+
+## Version <= 6 saves: each old perk becomes rank III of its node, on
+## alternative A, for free; earlier tiers of its branch get rank I (not
+## equipped). Intel and slots are untouched. Ranks only ever go up, so
+## running this again changes nothing. Demolitions is Recruit-only: equipped
+## on another class it is removed (kept owned) with a notice.
+func migrate_legacy_perks(old_owned: Array, old_equipped: Array) -> void:
+	for raw: Variant in old_owned:
+		var perk: GameData.Perk = GameData.perk(StringName(raw))
+		if perk == null:
+			continue
+		perk_ranks[perk.node()] = maxi(node_rank(perk.node()), GameData.PERK_MAX_RANK)
+		if not perk_options.has(perk.node()):
+			perk_options[perk.node()] = perk.option
+		for tier in range(1, perk.tier):
+			var before: StringName = GameData.perk_node(perk.branch, tier)
+			perk_ranks[before] = maxi(node_rank(before), 1)
+	for raw: Variant in old_equipped:
+		var id := StringName(raw)
+		var perk: GameData.Perk = GameData.perk(id)
+		if perk == null or not owns_perk(id) or equipped_perks.has(id) or equipped_in(perk.node()) != &"":
+			continue
+		if not perk.fits_class(selected_class):
+			perk_notice = "%s is Recruit-only: removed from your %s loadout (still owned)." % [perk.title, String(GameData.CLASS_INFO[selected_class]["name"])]
+			continue
+		if equipped_perks.size() < slots:
+			equipped_perks.append(id)
+
+
+## Version 7 fields, validated (unknown nodes/perks are dropped).
+func _read_perk_tree(d: Dictionary) -> void:
+	var nodes: Array[StringName] = GameData.perk_nodes()
+	for key: String in ["perk_ranks", "perk_options", "perk_use_ranks"]:
+		var raw: Variant = d.get(key, {})
+		if not raw is Dictionary:
+			continue
+		var target: Dictionary = get(key)
+		for k: Variant in raw:
+			if nodes.has(StringName(k)):
+				var high: int = 1 if key == "perk_options" else GameData.PERK_MAX_RANK
+				target[StringName(k)] = clampi(int(raw[k]), 0, high)
+	for raw: Variant in d.get("equipped_perks", []):
+		var perk: GameData.Perk = GameData.perk(StringName(raw))
+		if perk != null and owns_perk(perk.id) and perk.fits_class(selected_class) \
+				and equipped_in(perk.node()) == &"" and equipped_perks.size() < slots:
+			equipped_perks.append(perk.id)
+
+
+static func _string_keys(dict: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	for k: Variant in dict:
+		out[String(k)] = dict[k]
+	return out
 
 
 func buy_class(id: StringName) -> bool:
@@ -328,15 +562,25 @@ func buy_slot() -> bool:
 	return true
 
 
-## Equips or unequips an owned perk, respecting the slot count.
+## Equips or unequips an owned perk (free, Armory only). Equipping the
+## other alternative of an equipped node replaces it in the same slot;
+## otherwise a free slot is needed.
 func toggle_equip(id: StringName) -> bool:
 	if equipped_perks.has(id):
 		equipped_perks.erase(id)
 		return true
-	if owned_perks.has(id) and equipped_perks.size() < slots:
-		equipped_perks.append(id)
+	var perk: GameData.Perk = GameData.perk(id)
+	if perk == null or not owns_perk(id) or not perk.fits_class(selected_class):
+		return false
+	perk_options[perk.node()] = perk.option
+	var current: StringName = equipped_in(perk.node())
+	if current != &"":
+		equipped_perks[equipped_perks.find(current)] = id
 		return true
-	return false
+	if equipped_perks.size() >= slots:
+		return false
+	equipped_perks.append(id)
+	return true
 
 
 ## Audio buses: every sound player sends to "SFX" or "Music", both routed

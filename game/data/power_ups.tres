@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Registry" format=3]
+
+[ext_resource type="Script" path="res://addons/yard/registry.gd" id="1_pwreg"]
+
+[resource]
+script = ExtResource("1_pwreg")
+_class_restriction = &"PowerUpData"
+_scan_directory = "res://game/data/power_ups/"
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://247w8ky6w3bb": &"full_power",
+&"uid://76d4i2xt0b87": &"max_shield",
+&"uid://bbgpki3mriaoq": &"max_ammo",
+&"uid://bjq4u6ytt1gnd": &"nuke",
+&"uid://bva8twiw8n3ve": &"double_rewards",
+&"uid://ckkvfhb5m7qni": &"extra_reroll",
+&"uid://dlgxtsk8uepsy": &"insta_kill"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"double_rewards": &"uid://bva8twiw8n3ve",
+&"extra_reroll": &"uid://ckkvfhb5m7qni",
+&"full_power": &"uid://247w8ky6w3bb",
+&"insta_kill": &"uid://dlgxtsk8uepsy",
+&"max_ammo": &"uid://bbgpki3mriaoq",
+&"max_shield": &"uid://76d4i2xt0b87",
+&"nuke": &"uid://bjq4u6ytt1gnd"
+})

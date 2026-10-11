@@ -1434,7 +1434,7 @@ func _draw_grenades() -> void:
 	var n: int = run.grenades.size()
 	_grenade_mm.instance_count = n
 	_grenade_ring_mm.instance_count = n
-	var radius: float = GameData.GRENADE_RADIUS + (1.0 if run.has_perk(&"demolitions") else 0.0) + 0.4 * run.stacks(&"wide_blast")
+	var radius: float = run.grenade_radius()
 	for i in n:
 		var p: Vector3 = _on_ground(run.grenades[i])
 		# Small arc: the grenade drops onto the target as the fuse runs out.
@@ -1506,8 +1506,15 @@ func _draw_power_up() -> void:
 		return
 	_power_up_visual.position = _on_ground(p.ground_pos) + Vector3(0, 0.2, 0)
 	_power_up_glyph.position.y = 1.2 + sin(run.time_alive * 3.0) * 0.15
-	_power_up_glyph.text = GameData.POWER_UP_ICONS[p.ground_kind]
-	_power_up_name.text = GameData.POWER_UP_NAMES[p.ground_kind]
+	var data: PowerUpData = GameData.power_up(p.ground_kind)
+	if data == null:
+		return
+	_power_up_glyph.text = data.glyph
+	_power_up_name.text = data.display_name
+	_power_up_glyph.modulate = data.color.lightened(0.35)
+	var ring_material: StandardMaterial3D = (_power_up_visual.get_child(0) as MeshInstance3D).material_override
+	ring_material.albedo_color = data.color
+	ring_material.emission = data.color
 
 
 func _draw_orbs() -> void:

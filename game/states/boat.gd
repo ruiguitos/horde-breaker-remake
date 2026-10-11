@@ -97,7 +97,7 @@ func _make_options() -> void:
 	_options.append({"title": "Field Repairs", "short": "Field Repairs",
 		"text": "Heal 50 HP (now %d/%d)." % [int(context.hp), int(context.max_hp)],
 		"reason": "" if hurt else "HP already full",
-		"apply": func() -> void: context.hp = minf(context.max_hp, context.hp + 50.0)})
+		"apply": func() -> void: context.heal(50.0)})
 	_options.append({"title": "Ammo Crate", "short": "Ammo Crate",
 		"text": "Refill your equipped secondary weapon's ammo.",
 		"reason": "Ammo already full" if _ammo_full() else "",
@@ -105,6 +105,7 @@ func _make_options() -> void:
 	_card_offers = CardOffers.new(context.rng_seed)
 	if context.card_rng_state != 0:
 		_card_offers.rng.state = context.card_rng_state
+	_card_offers.blocked_tags = CardOffers.blocked_tags_for(context.perks)
 	_options.append(_card_option())
 
 
@@ -114,7 +115,7 @@ func _card_option(avoid: Array[StringName] = []) -> Dictionary:
 	if card == null:
 		return {"title": "Training: +20 HP", "short": "+20 HP", "text": "No eligible cards. Recover 20 HP.",
 			"reason": "HP already full" if context.hp >= context.max_hp else "",
-			"apply": func() -> void: context.hp = minf(context.max_hp, context.hp + 20.0)}
+			"apply": func() -> void: context.heal(20.0)}
 	var owned: int = int(context.card_stacks.get(card.id, 0))
 	return {"title": "Card: " + card.title, "short": card.title, "card": card,
 		"meta": "%s · %s %d/%d" % [String(card.category).replace("_", " ").to_upper(),
@@ -164,9 +165,9 @@ func _ammo_full() -> bool:
 		var most: int = weapons[w].max_ammo
 		if most <= 0 or not context.weapons.has(weapons[w].id):
 			continue
-		if context.has_perk(&"pack_rat"):
-			most = most * 3 / 2
 		most = int(most * (1.0 + 0.15 * context.card_stacks.get(&"bigger_mags", 0)))
+		if not weapons[w].primary:
+			most = int(most * context.secondary_ammo_mult())
 		if context.ammo[w] < most:
 			return false
 	return true

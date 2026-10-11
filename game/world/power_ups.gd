@@ -43,15 +43,33 @@ func on_kill(kind: int, at: Vector3, now: float, field: FlowField,
 	var chance: float = GameData.POWER_UP_CHANCE if GameData.power_up_normal(kind) else GameData.POWER_UP_SPECIAL_CHANCE
 	if kills_without_drop < GameData.POWER_UP_PITY_KILLS and rng.randf() >= chance:
 		return false
-	var pool: Array[StringName] = GameData.POWER_UP_IDS.duplicate()
-	if not finite_weapon:
-		pool.erase(&"max_ammo")
-	ground_kind = pool[rng.randi_range(0, pool.size() - 1)]
+	ground_kind = pick_kind(finite_weapon)
 	ground_pos = spot
 	ground_time = GameData.POWER_UP_GROUND_SECONDS
 	next_drop_at = now + GameData.POWER_UP_DROP_INTERVAL
 	kills_without_drop = 0
 	return true
+
+
+## Which power-up drops, by the `weight` of each .tres. All weights equal
+## keeps the uniform draw (and the same random sequence as before weights).
+func pick_kind(finite_weapon: bool) -> StringName:
+	var pool: Array[StringName] = []
+	var weights := PackedFloat32Array()
+	for id: StringName in GameData.power_up_ids():
+		var d: PowerUpData = GameData.power_up(id)
+		if d.weight <= 0.0 or (d.requires_finite_weapon and not finite_weapon):
+			continue
+		pool.append(id)
+		weights.append(d.weight)
+	if pool.is_empty():
+		return &""
+	var uniform: bool = true
+	for w in weights:
+		uniform = uniform and is_equal_approx(w, weights[0])
+	if uniform:
+		return pool[rng.randi_range(0, pool.size() - 1)]
+	return pool[rng.rand_weighted(weights)]
 
 
 ## Nearest safe cell within 3 m of the kill, using the current navigation

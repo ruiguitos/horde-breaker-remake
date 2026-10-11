@@ -1,8 +1,16 @@
 [gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://cwehc575wai4h"]
 
-[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_47ji0"]
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
 
 [resource]
-script = ExtResource("1_47ji0")
+script = ExtResource("1_perk")
 title = "Thick Skin"
-description = "+30 max HP."
+description = "Soak up the hits."
+branch = "survival"
+tier = 1
+option = 0
+benefit = "Max HP +{v}"
+benefit_values = PackedFloat32Array(10, 20, 30)
+penalty = "Healing received −{v}%"
+penalty_values = PackedFloat32Array(5, 10, 15)
+order = 6

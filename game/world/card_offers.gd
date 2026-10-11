@@ -3,6 +3,9 @@ extends RefCounted
 ## Shared by level-ups and boat/camp supplies. Filtering never consumes RNG.
 
 var rng := RandomNumberGenerator.new()
+## Cards with any of these tags are never offered (e.g. Body Count turns
+## headshots off, so headshot cards would be dead picks).
+var blocked_tags: Array[StringName] = []
 
 
 func _init(seed_value: int = 7) -> void:
@@ -17,6 +20,8 @@ func eligible(catalog: Array[GameData.Card], player_class: StringName,
 		if seen.has(card.id) or int(ranks.get(card.id, 0)) >= card.max_stacks:
 			continue
 		if not card.class_filter.is_empty() and not card.class_filter.has(player_class):
+			continue
+		if _intersects(card.tags, blocked_tags):
 			continue
 		if not card.weapon_filter.is_empty() and not _intersects(card.weapon_filter, weapons):
 			continue
@@ -105,3 +110,11 @@ static func _owns_finite_weapon(owned: Array[StringName]) -> bool:
 		if owned.has(w.id) and w.max_ammo > 0:
 			return true
 	return false
+
+
+## Tags the equipped perks rule out of every offer (level-ups and supplies).
+static func blocked_tags_for(perks: Array[StringName]) -> Array[StringName]:
+	var tags: Array[StringName] = []
+	if perks.has(&"body_count"):
+		tags.append(&"headshot")
+	return tags

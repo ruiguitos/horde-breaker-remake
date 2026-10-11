@@ -50,7 +50,8 @@ Não regenera automaticamente; `add_shield()` prepara as futuras cartas.
 
 Os ids internos passaram a `max_shield` e `extra_reroll`. Os antigos
 (`max_armor`, `fire_sale`) só existiam na telemetria das runs; o
-`GameData.POWER_UP_LEGACY_IDS` traduz-nos, por isso saves antigos não partem.
+campo `legacy_ids` de cada `.tres` traduz-nos (`GameData.power_up_id()`),
+por isso saves antigos não partem.
 
 ### Carregador da Assault Rifle (2026-10-11)
 
@@ -81,10 +82,12 @@ acessíveis em **Settings → Controls**, sem duplicar a entrada.
 
 ## Valores provisórios para playtest
 
-Todos os valores de equilíbrio estão em `game/data/game_data.gd`:
+As **regras de drop** (iguais para todos os power-ups) estão em
+`game/data/game_data.gd`; os **valores de cada power-up** estão num
+`.tres` próprio (ver a secção seguinte).
 
 - Probabilidade por abate elegível: **1,5%** em Walker/Runner, **5%** nos
-  especiais/chefe. Os sete tipos têm o mesmo peso no sorteio.
+  especiais/chefe. Os sete tipos têm o mesmo peso (`weight = 1`) no sorteio.
 - Garantia após **60 abates sem drop**. Acumula durante o cooldown, mas
   aguarda um abate elegível num ponto alcançável.
 - Pelo menos **35 s entre drops**, também no arranque; só **um no chão**.
@@ -96,6 +99,45 @@ pelo flow field, com espaço para o raio do jogador e dentro do polígono
 da parte. Células desligadas, fora do mapa ou ainda não calculadas pelo
 campo de navegação não recebem drops; a garantia aguarda o próximo
 abate válido. Não se recomputa a navegação por abate.
+
+## Afinar cada power-up no editor (YARD)
+
+Cada power-up é um ficheiro em `game/data/power_ups/` (`nuke.tres`,
+`max_shield.tres`…), do tipo `PowerUpData`
+(`game/data/resources/power_up_data.gd`). O registo YARD
+`game/data/power_ups.tres` lista-os, tal como já acontece com armas,
+cartas e perks. Para mudar valores:
+
+1. No editor Godot, abre o separador **Registry** (YARD), no topo.
+2. Escolhe `game/data/power_ups.tres`.
+3. Edita as colunas na tabela (ou clica numa linha e usa o Inspector).
+4. Guarda (Ctrl+S). Não é preciso mexer em código.
+
+O que cada coluna faz:
+
+| Campo | Para quê |
+|---|---|
+| `display_name` | Nome no chão, no aviso e no relatório da ilha. |
+| `glyph` | Símbolo no chão, nos temporizadores e no relatório. |
+| `color` | Cor do anel e do símbolo no chão. |
+| `weight` | Peso no sorteio de *qual* power-up cai (0 = nunca cai). Todos iguais = sorteio uniforme, exatamente como antes. |
+| `requires_finite_weapon` | Só cai com uma arma de munição finita (Max Ammo). |
+| `duration` | Segundos ativos (Insta-Kill, Double XP / Intel). |
+| `spawn_delay` | Segundos sem novos inimigos depois da Nuke. |
+| `reroll_amount` | Rerolls dados pelo Extra Reroll (o máximo continua a ser `REROLLS_MAX`). |
+| `shield_fill` | Fração do escudo máximo que o Max Shield enche (1 = cheio). |
+| `legacy_ids` | Ids antigos que apontam para este power-up. |
+| `order` | Ordem no registo (e no sorteio). |
+
+Os campos de efeito só contam no power-up a que dizem respeito (por
+exemplo, `spawn_delay` só é lido na Nuke). Full Power e Max Ammo não têm
+números: recarregam tudo. A **probabilidade de haver drop**, a garantia,
+o cooldown, o tempo no chão e o piscar são regras globais e ficam em
+`GameData` (`POWER_UP_*`), porque valem para todos.
+
+Um power-up novo precisa de código em `IslandRun.apply_power_up()` para
+o efeito; os dados sozinhos não chegam. `tests/test_power_ups.gd`
+confirma que o registo tem os sete e os valores atuais.
 
 ## Organização e continuidade
 

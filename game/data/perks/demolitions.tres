@@ -1,10 +1,19 @@
 [gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://d0wt54cacykqt"]
 
-[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_nkv3t"]
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
 
 [resource]
-script = ExtResource("1_nkv3t")
+script = ExtResource("1_perk")
 title = "Demolitions"
-description = "Grenade cooldown -35%, radius +1 m."
-cost = 50
-order = 4
+description = "Frequent grenade cover."
+branch = "breaker"
+tier = 3
+option = 0
+class_filter = &"recruit"
+benefit = "Grenade cooldown −{v}%"
+benefit_values = PackedFloat32Array(12, 24, 35)
+benefit_2 = "Grenade radius +{v} m"
+benefit_2_values = PackedFloat32Array(0.3, 0.6, 1)
+penalty = "Grenade damage −{v}%"
+penalty_values = PackedFloat32Array(10, 20, 30)
+order = 16

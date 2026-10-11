@@ -1,10 +1,16 @@
 [gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://b6ddxb643fhnc"]
 
-[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_dkbmd"]
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
 
 [resource]
-script = ExtResource("1_dkbmd")
+script = ExtResource("1_perk")
 title = "Head Hunter"
-description = "Wider headshot cone (9° -> 15°)."
-cost = 60
-order = 2
+description = "Headshot specialist."
+branch = "combat"
+tier = 1
+option = 0
+benefit = "Headshot cone {v}°"
+benefit_values = PackedFloat32Array(11, 13, 15)
+penalty = "Body-shot damage −{v}%"
+penalty_values = PackedFloat32Array(5, 10, 15)
+order = 0

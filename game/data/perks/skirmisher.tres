@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://sbiq0wmtow6g"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Skirmisher"
+description = "Mobile combat: keep moving while you shoot."
+branch = "combat"
+tier = 2
+option = 1
+benefit = "Moving while firing: speed +{v}%"
+benefit_values = PackedFloat32Array(4, 8, 12)
+penalty = "Standing still: primary spread +{v}%"
+penalty_values = PackedFloat32Array(20, 40, 60)
+order = 3

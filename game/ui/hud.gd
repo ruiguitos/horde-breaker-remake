@@ -1529,9 +1529,9 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_shield_text.text = "◇ SHIELD %d / %d" % [ceili(run.shield), ceili(run.max_shield)]
 	var buffs := PackedStringArray()
 	if run.power_ups.insta_time > 0.0:
-		buffs.append("%s INSTA-KILL  %ds" % [GameData.POWER_UP_ICONS[&"insta_kill"], ceili(run.power_ups.insta_time)])
+		buffs.append("%s INSTA-KILL  %ds" % [GameData.power_up_icon(&"insta_kill"), ceili(run.power_ups.insta_time)])
 	if run.power_ups.double_time > 0.0:
-		buffs.append("%s XP / INTEL  %ds" % [GameData.POWER_UP_ICONS[&"double_rewards"], ceili(run.power_ups.double_time)])
+		buffs.append("%s XP / INTEL  %ds" % [GameData.power_up_icon(&"double_rewards"), ceili(run.power_ups.double_time)])
 	_power_up_timers.text = "\n".join(buffs)
 	_hp_text.text = str(ceili(run.hp))
 	_hp_max.text = "/ %d" % ceili(run.max_hp)

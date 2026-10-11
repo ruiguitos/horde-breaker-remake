@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://0m2tt6a8c342"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Surveyor"
+description = "Hold the ground and let the XP come."
+branch = "survival"
+tier = 3
+option = 1
+benefit = "Standing still: XP pickup radius +{v}%"
+benefit_values = PackedFloat32Array(50, 75, 100)
+penalty = "Moving: XP pickup radius −{v}%"
+penalty_values = PackedFloat32Array(10, 20, 30)
+order = 11

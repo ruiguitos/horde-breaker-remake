@@ -21,12 +21,15 @@ func _initialize() -> void:
 	_check(GameData.weapon_cost(&"smg") == 60 and GameData.weapon_cost(&"marksman") == 80 and GameData.weapon_cost(&"rifle") == -1,
 		"unlock costs: SMG 60, Marksman 80, Rifle not for sale")
 	_check(weapons[1].pellets == 8 and is_equal_approx(weapons[0].fire_rate, 9.0), "weapon stats come from the .tres files")
-	_check(GameData.cards().size() == 39 and GameData.perks().size() == 5, "39 cards and 5 perks")
-	_check(GameData.perks()[0].id == &"thick_skin" and GameData.perks()[0].cost == 40, "perk order and cost")
+	# Perk tree: 9 nodes x A/B, plus the Vanguard variants of Breaker III.
+	_check(GameData.cards().size() == 39 and GameData.perks().size() == 20, "39 cards and 20 perk alternatives")
+	_check(GameData.perks()[0].id == &"head_hunter" and GameData.perks()[0].node() == &"combat_1"
+		and GameData.perk_rank_cost(1, 1) == 40, "perk order, node and cost")
 	var reg: Registry = load(GameData.PERK_REGISTRY)
-	var cheap: Array[StringName] = reg.filter(&"cost", func(v: int) -> bool: return v <= 40)
-	cheap.sort()
-	_check(cheap == ([&"pack_rat", &"thick_skin"] as Array[StringName]), "registry index query: perks costing <= 40 Intel")
+	var tier_one: Array[StringName] = reg.filter(&"tier", func(v: int) -> bool: return v == 1)
+	var expected: Array[StringName] = [&"body_count", &"crowd_anchor", &"fleet_footed", &"head_hunter", &"long_breaker", &"thick_skin"]
+	_check(tier_one.size() == expected.size() and expected.all(func(id: StringName) -> bool: return tier_one.has(id)),
+		"registry index query: tier I perks")
 	# World data: enemies follow EnemyKind, routes exclude the volcano.
 	var enemies: Array[GameData.EnemyType] = GameData.enemy_types()
 	_check(enemies.size() == 7 and enemies[GameData.EnemyKind.BRUTE].id == &"brute" and enemies[GameData.EnemyKind.BOSS].id == &"behemoth",

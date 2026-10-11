@@ -598,6 +598,41 @@ static func hints(parent: Control, text: String = "[ ENTER / A ] SELECT     [ ES
 	parent.add_child(l)
 
 
+## Card background for custom widgets (perk tree nodes): a filled box, or
+## the dashed outline of a LOCKED item when `dashed`.
+static func card_box(bg: Color, border: Color, width: int = 1, dashed: bool = false) -> StyleBox:
+	var box: StyleBox = _dashed(false, border) if dashed else _box(bg, border, width)
+	return _margins(box, 10, 8)
+
+
+## One control hint: the platform's button/key icons (InputIcons, so the
+## Settings "Controller icons" choice applies) and a word. `keys` are shown
+## without a gamepad, `pads` ("joy:N") with one connected.
+static func icon_hint(parent: Control, keys: Array, pads: Array, word: String) -> HBoxContainer:
+	var hint := HBoxContainer.new()
+	hint.name = "Hint" + word.to_pascal_case()
+	hint.add_theme_constant_override("separation", 6)
+	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(hint)
+	var icons := RichTextLabel.new()
+	icons.name = "Icons"
+	icons.bbcode_enabled = true  # InputIcons writes [img] tags
+	icons.fit_content = true
+	icons.autowrap_mode = TextServer.AUTOWRAP_OFF
+	icons.scroll_active = false
+	icons.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icons.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icons.add_theme_font_override("normal_font", mono_font())
+	icons.add_theme_font_size_override("normal_font_size", 13)
+	hint.add_child(icons)
+	InputIcons.fill(icons, pads if not Input.get_connected_joypads().is_empty() else keys)
+	var l := label(word, 13, TEXT_MUTED, true)
+	l.autowrap_mode = TextServer.AUTOWRAP_OFF
+	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	hint.add_child(l)
+	return hint
+
+
 static func panel(parent: Control) -> VBoxContainer:
 	var plate := PanelContainer.new()
 	parent.add_child(plate)

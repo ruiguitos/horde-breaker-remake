@@ -35,6 +35,8 @@ var mission: StringName = &"activate"
 ## Story pages recovered during this run.
 var lore_found: int = 0
 var perks: Array[StringName] = []
+## Rank (1..3) of each equipped perk id.
+var perk_ranks: Dictionary = {}
 var max_hp: float = GameData.PLAYER_MAX_HP
 ## Equipped primary and secondary; ownership stays in Profile.
 var weapons: Array[StringName] = GameData.starting_weapons()
@@ -61,16 +63,51 @@ func apply_class(id: StringName) -> void:
 	hp = max_hp
 
 
-## Applies the equipped perks that change starting values.
-func apply_perks(p_perks: Array[StringName]) -> void:
-	perks = p_perks.duplicate()
-	if perks.has(&"thick_skin"):
-		max_hp += 30.0
+## Applies the equipped perks (ids -> rank 1..3; a missing rank counts as
+## III, the rank old perks migrate to). Only these act during the run;
+## perks for another class are dropped. Call after apply_class.
+func apply_perks(p_perks: Array[StringName], ranks: Dictionary = {}) -> void:
+	perks.clear()
+	perk_ranks.clear()
+	for id in p_perks:
+		var perk: GameData.Perk = GameData.perk(id)
+		if perk == null or not perk.fits_class(player_class) or perks.has(id):
+			continue
+		perks.append(id)
+		perk_ranks[id] = clampi(int(ranks.get(id, GameData.PERK_MAX_RANK)), 1, GameData.PERK_MAX_RANK)
+	max_hp += perk_value(&"thick_skin") - perk_cost(&"fleet_footed")
 	hp = max_hp
 
 
 func has_perk(id: StringName) -> bool:
 	return perks.has(id)
+
+
+## Rank of an equipped perk (0 = not equipped).
+func perk_rank(id: StringName) -> int:
+	return int(perk_ranks.get(id, 0)) if perks.has(id) else 0
+
+
+## Benefit / trade-off totals of an equipped perk at its rank (0 if not).
+func perk_value(id: StringName) -> float:
+	var perk: GameData.Perk = GameData.perk(id)
+	return perk.value(perk_rank(id)) if perk != null else 0.0
+
+
+func perk_cost(id: StringName) -> float:
+	var perk: GameData.Perk = GameData.perk(id)
+	return perk.cost_value(perk_rank(id)) if perk != null else 0.0
+
+
+## Healing outside the island (boat/camp) follows Thick Skin's trade-off.
+func heal(amount: float) -> void:
+	hp = minf(max_hp, hp + amount * (1.0 - perk_cost(&"thick_skin") / 100.0))
+
+
+## Secondary weapons' reserve multiplier from perks (Pack Rat / Quick Draw);
+## primaries are never changed. Card bonuses are added before this.
+func secondary_ammo_mult() -> float:
+	return (1.0 + perk_value(&"pack_rat") / 100.0) * (1.0 - perk_cost(&"quick_draw") / 100.0)
 
 
 ## Applies a supply card with the same instant-health rule as level-ups.

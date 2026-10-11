@@ -1,10 +1,16 @@
 [gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://3xd1wwpvu3ht"]
 
-[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_wgfsv"]
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
 
 [resource]
-script = ExtResource("1_wgfsv")
+script = ExtResource("1_perk")
 title = "Battering Ram"
-description = "Breaker goes 40% further."
-cost = 50
-order = 3
+description = "Charge right through the horde."
+branch = "breaker"
+tier = 1
+option = 0
+benefit = "Breaker distance +{v}%"
+benefit_values = PackedFloat32Array(13, 27, 40)
+penalty = "Breaker cooldown +{v} s"
+penalty_values = PackedFloat32Array(0.5, 1, 1.5)
+order = 12

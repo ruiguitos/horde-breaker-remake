@@ -96,17 +96,48 @@ class Card:
 		max_stacks = p_max
 
 
+## One alternative (A/B) of a perk tree node; see PerkData.
 class Perk:
 	var id: StringName
 	var title: String
 	var description: String
-	var cost: int
+	var branch: StringName
+	var tier: int
+	var option: int  ## 0 = A, 1 = B
+	var class_filter: StringName  ## &"" = every class
+	var benefit: String
+	var benefit_values: PackedFloat32Array
+	var benefit_2: String
+	var benefit_2_values: PackedFloat32Array
+	var penalty: String
+	var penalty_values: PackedFloat32Array
 
-	func _init(p_id: StringName, p_title: String, p_desc: String, p_cost: int) -> void:
+	func _init(p_id: StringName, p_title: String, p_desc: String) -> void:
 		id = p_id
 		title = p_title
 		description = p_desc
-		cost = p_cost
+
+	## "combat_2": the node this alternative belongs to (ranks are per node).
+	func node() -> StringName:
+		return GameData.perk_node(branch, tier)
+
+	func fits_class(player_class: StringName) -> bool:
+		return class_filter == &"" or class_filter == player_class
+
+	## Totals at `rank` (1..3); 0 at rank 0.
+	func value(rank: int) -> float:
+		return _at(benefit_values, rank)
+
+	func value_2(rank: int) -> float:
+		return _at(benefit_2_values, rank)
+
+	func cost_value(rank: int) -> float:
+		return _at(penalty_values, rank)
+
+	static func _at(values: PackedFloat32Array, rank: int) -> float:
+		if rank <= 0 or values.is_empty():
+			return 0.0
+		return values[mini(rank, values.size()) - 1]
 
 
 class Modifier:
@@ -235,6 +266,18 @@ const WAR_CRY_COOLDOWN: float = 16.0
 
 ## Meta progression
 const SLOT_COSTS: Array[int] = [0, 100, 250]  ## cost of the 1st, 2nd, 3rd perk slot
+## Perk tree (docs/design/CARDS_WEAPONS_PERKS.md §F2): three branches of
+## three tiers. Intel to buy rank I, II and III of a node, per tier.
+const PERK_BRANCHES: Array[StringName] = [&"combat", &"survival", &"breaker"]
+const PERK_TIERS: int = 3
+const PERK_MAX_RANK: int = 3
+const PERK_RANK_COSTS: Array = [[40, 60, 80], [60, 90, 120], [100, 140, 180]]
+## Timed perk rules (playtest hypotheses, like the values in the .tres).
+const OPENING_VOLLEY_SECONDS: float = 2.0
+const QUICK_DRAW_SECONDS: float = 2.0
+const QUICK_DRAW_COOLDOWN: float = 8.0
+## Skirmisher counts the player as "firing" this long after a shot.
+const SKIRMISHER_FIRING_WINDOW: float = 0.3
 const MAX_THREAT: int = 3
 const EXTRACTION_INTEL_MULTIPLIER: float = 1.5
 
@@ -253,28 +296,59 @@ const POWER_UP_PITY_KILLS: int = 60
 const POWER_UP_DROP_INTERVAL: float = 35.0
 const POWER_UP_GROUND_SECONDS: float = 25.0
 const POWER_UP_BLINK_SECONDS: float = 10.0
-const POWER_UP_ACTIVE_SECONDS: float = 25.0
 const POWER_UP_PICKUP_RADIUS: float = 1.4
-const POWER_UP_SPAWN_DELAY: float = 5.0
 const PLAYER_MAX_SHIELD: float = 100.0
-const POWER_UP_IDS: Array[StringName] = [
-	&"insta_kill", &"double_rewards", &"nuke", &"full_power", &"max_shield", &"extra_reroll", &"max_ammo",
-]
+## Everything per power-up (name, glyph, colour, weight, duration, effect
+## amounts, old ids) lives in game/data/power_ups/ (YARD registry
+## game/data/power_ups.tres). The drop rules above apply to all of them.
+const POWER_UP_REGISTRY: String = "res://game/data/power_ups.tres"
+static var _power_ups: Dictionary = {}  ## id -> PowerUpData, registry order
+static var _power_up_legacy: Dictionary = {}  ## old id -> current id
+
+
+static func _power_up_table() -> Dictionary:
+	if _power_ups.is_empty():
+		for e: Array in _entries(POWER_UP_REGISTRY):
+			var d: PowerUpData = e[1]
+			_power_ups[e[0]] = d
+			for old: StringName in d.legacy_ids:
+				_power_up_legacy[old] = e[0]
+	return _power_ups
+
+
+## Power-up ids in registry order (the order of the drop pool).
+static func power_up_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for id: StringName in _power_up_table():
+		ids.append(id)
+	return ids
+
+
 ## Ids used before the renames (Max Armor -> Max Shield, Fire Sale -> Extra
-## Reroll). Only run telemetry ever stored them; old ids are mapped on use.
-const POWER_UP_LEGACY_IDS: Dictionary = {&"max_armor": &"max_shield", &"fire_sale": &"extra_reroll"}
-const POWER_UP_NAMES: Dictionary = {
-	&"insta_kill": "INSTA-KILL", &"double_rewards": "DOUBLE XP / INTEL", &"nuke": "NUKE",
-	&"full_power": "FULL POWER", &"max_shield": "MAX SHIELD", &"extra_reroll": "EXTRA REROLL", &"max_ammo": "MAX AMMO",
-}
-const POWER_UP_ICONS: Dictionary = {
-	&"insta_kill": "✕", &"double_rewards": "×2", &"nuke": "✦", &"full_power": "ϟ",
-	&"max_shield": "◇", &"extra_reroll": "↻", &"max_ammo": "▥",
-}
+## Reroll) are mapped to the current id; read from each .tres `legacy_ids`.
+static func power_up_legacy_ids() -> Dictionary:
+	_power_up_table()
+	return _power_up_legacy.duplicate()
 
 
 static func power_up_id(id: StringName) -> StringName:
-	return POWER_UP_LEGACY_IDS.get(id, id)
+	_power_up_table()
+	return _power_up_legacy.get(id, id)
+
+
+## Data of a power-up (old ids accepted); null if unknown.
+static func power_up(id: StringName) -> PowerUpData:
+	return _power_up_table().get(power_up_id(id))
+
+
+static func power_up_name(id: StringName) -> String:
+	var d: PowerUpData = power_up(id)
+	return d.display_name if d != null else String(id).to_upper()
+
+
+static func power_up_icon(id: StringName) -> String:
+	var d: PowerUpData = power_up(id)
+	return d.glyph if d != null else "•"
 
 
 static func power_up_normal(kind: int) -> bool:
@@ -430,12 +504,77 @@ static func cards() -> Array[Card]:
 	return _cards.duplicate()
 
 
+## Every perk alternative of the tree (all classes), in registry order.
 static func perks() -> Array[Perk]:
 	if _perks.is_empty():
 		for e: Array in _entries(PERK_REGISTRY):
 			var d: PerkData = e[1]
-			_perks.append(Perk.new(e[0], d.title, d.description, d.cost))
+			var item := Perk.new(e[0], d.title, d.description)
+			item.branch = StringName(d.branch)
+			item.tier = d.tier
+			item.option = d.option
+			item.class_filter = d.class_filter
+			item.benefit = d.benefit
+			item.benefit_values = d.benefit_values
+			item.benefit_2 = d.benefit_2
+			item.benefit_2_values = d.benefit_2_values
+			item.penalty = d.penalty
+			item.penalty_values = d.penalty_values
+			_perks.append(item)
 	return _perks.duplicate()
+
+
+static func perk(id: StringName) -> Perk:
+	for entry in perks():
+		if entry.id == id:
+			return entry
+	return null
+
+
+static func perk_node(branch: StringName, tier: int) -> StringName:
+	return StringName("%s_%d" % [branch, tier])
+
+
+## Every node id, branch by branch, tier I first.
+static func perk_nodes() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for branch in PERK_BRANCHES:
+		for tier in range(1, PERK_TIERS + 1):
+			ids.append(perk_node(branch, tier))
+	return ids
+
+
+static func perk_node_branch(node: StringName) -> StringName:
+	return StringName(String(node).get_slice("_", 0))
+
+
+static func perk_node_tier(node: StringName) -> int:
+	return int(String(node).get_slice("_", 1))
+
+
+## The alternative `option` (0 = A, 1 = B) of `node` for `player_class`
+## (Breaker III has one per class); null when none fits.
+static func perk_for(node: StringName, option: int, player_class: StringName) -> Perk:
+	for entry in perks():
+		if entry.node() == node and entry.option == option and entry.fits_class(player_class):
+			return entry
+	return null
+
+
+## Intel to buy rank `rank` (1..3) of a node of tier `tier`; -1 if invalid.
+static func perk_rank_cost(tier: int, rank: int) -> int:
+	if tier < 1 or tier > PERK_RANK_COSTS.size() or rank < 1 or rank > PERK_MAX_RANK:
+		return -1
+	return int(PERK_RANK_COSTS[tier - 1][rank - 1])
+
+
+## "Headshot cone 13°": a perk text format with its value at a rank.
+static func perk_text(format: String, value: float) -> String:
+	var shown: String = str(int(value)) if is_equal_approx(value, roundf(value)) else String.num(value, 1)
+	return format.replace("{v}", shown)
+
+
+const RANK_NAMES: Array[String] = ["—", "I", "II", "III"]
 
 
 ## Threat level rules: enemy HP and Intel multipliers, extra enemies alive.

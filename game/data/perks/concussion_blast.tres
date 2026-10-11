@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://kf20i87p74ak"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Concussion"
+description = "Grenades for control, not for kills."
+branch = "breaker"
+tier = 3
+option = 1
+class_filter = &"recruit"
+benefit = "Grenade stun +{v} s"
+benefit_values = PackedFloat32Array(1, 2, 3)
+penalty = "Grenade damage −{v}%"
+penalty_values = PackedFloat32Array(25, 50, 75)
+order = 18

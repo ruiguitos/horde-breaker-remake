@@ -54,19 +54,28 @@ func _run_tests() -> void:
 	profile.intel = 80
 	armory.call("_select_category", "PERKS")
 	await _settle()
-	var perk: Button = armory.find_child("Perk_thick_skin", true, false) as Button
-	perk.pressed.emit()
+	var node: Button = armory.find_child("PerkNode_survival_1", true, false) as Button
+	node.grab_focus()
 	await _settle()
-	_check(profile.owned_perks.has(&"thick_skin") and profile.intel == 40, "perk purchase uses existing economy")
-	perk = armory.find_child("Perk_thick_skin", true, false) as Button
-	perk.pressed.emit()
+	node.pressed.emit()
 	await _settle()
-	_check(profile.equipped_perks.has(&"thick_skin"), "owned perk equips")
-	profile.owned_perks.append(&"pack_rat")
+	var upgrade: Button = armory.find_child("PerkUpgrade", true, false) as Button
+	_check(root.gui_get_focus_owner() == upgrade, "A on a perk node focuses its upgrade action")
+	upgrade.pressed.emit()
+	await _settle()
+	_check(profile.node_rank(&"survival_1") == 1 and profile.intel == 40 and profile.equipped_perks.is_empty(),
+		"perk rank purchase uses existing economy and never equips")
+	var equip: Button = armory.find_child("PerkEquip", true, false) as Button
+	equip.pressed.emit()
+	await _settle()
+	_check(profile.equipped_perks == [&"thick_skin"], "owned perk equips")
+	profile.perk_ranks[&"combat_1"] = 1
 	armory.call("_rebuild")
 	await _settle()
-	perk = armory.find_child("Perk_pack_rat", true, false) as Button
-	_check(perk.disabled, "full slots prevent additional equipment")
+	(armory.find_child("PerkNode_combat_1", true, false) as Button).grab_focus()
+	await _settle()
+	equip = armory.find_child("PerkEquip", true, false) as Button
+	_check(equip.disabled and equip.text == "SLOTS FULL", "full slots prevent additional equipment")
 	start = armory.get("_start_button")
 	start.grab_focus()
 	var saves_before: int = profile.saves

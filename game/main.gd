@@ -75,7 +75,7 @@ func _fresh_context() -> RunContext:
 	var ctx := RunContext.new()
 	ctx.threat = profile.threat
 	ctx.apply_class(profile.selected_class)
-	ctx.apply_perks(profile.equipped_perks)
+	ctx.apply_perks(profile.equipped_perks, profile.equipped_perk_ranks())
 	ctx.weapons = profile.weapon_loadout()
 	return ctx
 
@@ -244,6 +244,7 @@ func _write_telemetry() -> void:
 		"expedition": String(context.expedition),
 		"class": String(context.player_class),
 		"perks": context.perks.map(func(x: StringName) -> String: return String(x)),
+		"perk_ranks": context.perks.map(func(x: StringName) -> int: return context.perk_rank(x)),
 		"intel": context.intel, "total_seconds": snappedf(context.time_alive, 0.1),
 		"islands": context.island_log}, "  "))
 

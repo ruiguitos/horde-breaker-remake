@@ -142,9 +142,13 @@ func items_in_reach() -> Array[Dictionary]:
 		var cost: int = GameData.weapon_cost(weapon.id)
 		if cost > 0 and not profile.unlocked_weapons.has(weapon.id):
 			all.append({"name": weapon.display_name, "kind": "Weapon", "cost": cost})
-	for perk in GameData.perks():
-		if not profile.owned_perks.has(perk.id):
-			all.append({"name": "Perk: " + perk.title, "kind": "Permanent perk", "cost": perk.cost})
+	for node in GameData.perk_nodes():
+		var problem: String = profile.rank_problem(node)
+		if problem == "" or problem == "Not enough Intel":
+			var choice: GameData.Perk = profile.perk_choice(node)
+			var rank: int = profile.node_rank(node) + 1
+			all.append({"name": "Perk: %s %s" % [choice.title if choice != null else String(node).capitalize(), GameData.RANK_NAMES[rank]],
+				"kind": "Perk rank (A and B)", "cost": profile.next_rank_cost(node)})
 	if profile.next_slot_cost() > 0:
 		all.append({"name": "Perk slot %d" % (profile.slots + 1), "kind": "One more perk per run", "cost": profile.next_slot_cost()})
 	var before: int = int(_breakdown.get("before", profile.intel - context.intel))

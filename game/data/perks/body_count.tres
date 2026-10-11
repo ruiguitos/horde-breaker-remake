@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://5w5vrdcw4caw"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Body Count"
+description = "Steady fire into the crowd."
+branch = "combat"
+tier = 1
+option = 1
+benefit = "Body-shot damage +{v}%"
+benefit_values = PackedFloat32Array(10, 20, 30)
+penalty = "No headshots"
+penalty_values = PackedFloat32Array(1, 1, 1)
+order = 1

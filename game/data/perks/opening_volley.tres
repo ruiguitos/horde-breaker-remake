@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://k2e4vvxsu3oo"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Opening Volley"
+description = "Explosive entry: break in, then open fire."
+branch = "combat"
+tier = 3
+option = 0
+benefit = "After a Breaker: primary damage +{v}% for 2 s"
+benefit_values = PackedFloat32Array(10, 20, 30)
+penalty = "Breaker cooldown +{v} s"
+penalty_values = PackedFloat32Array(0.5, 1, 1.5)
+order = 4

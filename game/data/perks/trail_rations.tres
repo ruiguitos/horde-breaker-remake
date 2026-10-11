@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://m8ay5hvjv2xa"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Trail Rations"
+description = "Risky pickups that patch you up."
+branch = "survival"
+tier = 3
+option = 0
+benefit = "Each XP orb heals {v} HP"
+benefit_values = PackedFloat32Array(0.2, 0.4, 0.6)
+penalty = "XP pickup radius −{v}%"
+penalty_values = PackedFloat32Array(10, 20, 30)
+order = 10

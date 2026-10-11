@@ -30,6 +30,8 @@ var hp: float = GameData.PLAYER_MAX_HP
 var shield: float = 0.0
 var max_shield: float = GameData.PLAYER_MAX_SHIELD
 var perks: Array[StringName] = []
+## Rank (1..3) of each equipped perk; only equipped perks act.
+var perk_ranks: Dictionary = {}
 var threat: int = 1
 var modifier: StringName = &"calm"
 var grenade_cd: float = 0.0
@@ -49,6 +51,12 @@ var player_class: StringName = &"recruit"
 var hazard_pay: bool = false  ## boat briefing deal (see RunContext)
 var war_cry_time: float = 0.0  ## > 0 while War Cry reduces damage taken
 var battle_rhythm_time: float = 0.0
+## Perk timers: Opening Volley after a Breaker, Quick Draw after switching
+## to the secondary (and its internal cooldown), Skirmisher "firing" window.
+var opening_volley_time: float = 0.0
+var quick_draw_time: float = 0.0
+var _quick_draw_cd: float = 0.0
+var _firing_time: float = 0.0
 var _last_damage_time: float = 0.0
 var _stationary: bool = true
 ## Poison clouds: position and seconds remaining (not enemy indices).
@@ -240,6 +248,7 @@ func sight_is_blocked(x: int, z: int) -> bool:
 ## Loads the run state carried from previous islands and scales difficulty.
 func load_context(ctx: RunContext) -> void:
 	perks = ctx.perks.duplicate()
+	perk_ranks = ctx.perk_ranks.duplicate()
 	set_mission(ctx.mission)
 	exit_label = next_part_name(ctx)
 	radio.append(StringName("land_" + String(mission)))
@@ -273,6 +282,7 @@ func load_context(ctx: RunContext) -> void:
 	card_offers = CardOffers.new(ctx.rng_seed)
 	if ctx.card_rng_state != 0:
 		card_offers.rng.state = ctx.card_rng_state
+	card_offers.blocked_tags = CardOffers.blocked_tags_for(perks)
 	card_stacks = ctx.card_stacks.duplicate()
 	if ctx.ammo.size() == ammo.size():
 		ammo = ctx.ammo.duplicate()
@@ -389,12 +399,14 @@ func _update_reloads(dt: float) -> void:
 			mag[w] = magazine_size(w)
 
 
+## Card bonuses add up first; perks then multiply, and only the
+## secondaries' reserve (Pack Rat / Quick Draw).
 func max_ammo(w: int) -> int:
 	var m: int = weapons[w].max_ammo
-	if m > 0 and has_perk(&"pack_rat"):
-		m = m * 3 / 2
 	if m > 0:
 		m = int(m * (1.0 + 0.15 * stacks(&"bigger_mags")))
+	if m > 0 and not weapons[w].primary:
+		m = int(m * (1.0 + perk_value(&"pack_rat") / 100.0) * (1.0 - perk_cost(&"quick_draw") / 100.0))
 	if m > 0 and modifier == &"short":
 		m /= 2
 	return m
@@ -404,8 +416,44 @@ func has_perk(id: StringName) -> bool:
 	return perks.has(id)
 
 
+## Rank of an equipped perk (0 = not equipped). Contexts from before the
+## tree (no ranks) count as rank III.
+func perk_rank(id: StringName) -> int:
+	return int(perk_ranks.get(id, GameData.PERK_MAX_RANK)) if perks.has(id) else 0
+
+
+## Benefit (up), second benefit and trade-off (down) totals of an equipped perk.
+func perk_value(id: StringName) -> float:
+	var perk: GameData.Perk = GameData.perk(id)
+	return perk.value(perk_rank(id)) if perk != null else 0.0
+
+
+func perk_value_2(id: StringName) -> float:
+	var perk: GameData.Perk = GameData.perk(id)
+	return perk.value_2(perk_rank(id)) if perk != null else 0.0
+
+
+func perk_cost(id: StringName) -> float:
+	var perk: GameData.Perk = GameData.perk(id)
+	return perk.cost_value(perk_rank(id)) if perk != null else 0.0
+
+
 func grenade_cooldown_total() -> float:
-	return GameData.GRENADE_COOLDOWN * (0.65 if has_perk(&"demolitions") else 1.0) * pow(0.9, stacks(&"grenadier"))
+	return GameData.GRENADE_COOLDOWN * pow(0.9, stacks(&"grenadier")) * (1.0 - perk_value(&"demolitions") / 100.0)
+
+
+func grenade_radius() -> float:
+	return GameData.GRENADE_RADIUS + perk_value_2(&"demolitions") + 0.4 * stacks(&"wide_blast")
+
+
+## Demolitions and Concussion trade grenade damage for cooldown/stun.
+func grenade_damage() -> float:
+	return GameData.GRENADE_DAMAGE * (1.0 - perk_cost(&"demolitions") / 100.0) * (1.0 - perk_cost(&"concussion_blast") / 100.0)
+
+
+## War Cry protection time: Bulwark adds, Intimidating Cry takes away.
+func war_cry_duration() -> float:
+	return maxf(0.0, GameData.WAR_CRY_TIME + perk_value(&"bulwark") - perk_cost(&"intimidating_cry"))
 
 
 ## Throws a grenade towards `aim` (vector from the player; its length is the
@@ -418,8 +466,8 @@ func use_ability(aim: Vector3) -> bool:
 		&"vanguard":
 			for i in horde.query_radius(player_pos, GameData.WAR_CRY_RADIUS):
 				horde.stun[i] = maxf(horde.stun[i], 1.5)
-				horde.knock_back(i, player_pos, 1.0 + 0.4 * stacks(&"intimidation"))
-			war_cry_time = GameData.WAR_CRY_TIME
+				horde.knock_back(i, player_pos, 1.0 + 0.4 * stacks(&"intimidation") + perk_value(&"intimidating_cry"))
+			war_cry_time = war_cry_duration()
 			_heal_player(5.0 * stacks(&"rally"))
 			battle_rhythm_time = 3.0 if stacks(&"battle_rhythm") > 0 else 0.0
 			grenade_cd = ability_cooldown_total()
@@ -478,7 +526,7 @@ func _update_screamers(dt: float) -> void:
 
 func _update_grenades(dt: float) -> void:
 	grenade_cd = maxf(0.0, grenade_cd - dt)
-	var radius: float = GameData.GRENADE_RADIUS + (1.0 if has_perk(&"demolitions") else 0.0) + 0.4 * stacks(&"wide_blast")
+	var radius: float = grenade_radius()
 	var i: int = grenades.size() - 1
 	while i >= 0:
 		grenade_fuses[i] -= dt
@@ -486,8 +534,8 @@ func _update_grenades(dt: float) -> void:
 			var p: Vector3 = grenades[i]
 			explosions.append(p)
 			for j in horde.query_radius(p, radius):
-				_damage(j, GameData.GRENADE_DAMAGE, p, false, true)
-				horde.stun[j] = maxf(horde.stun[j], 0.6 + 0.25 * stacks(&"concussion"))
+				_damage(j, grenade_damage(), p, false, true)
+				horde.stun[j] = maxf(horde.stun[j], 0.6 + 0.25 * stacks(&"concussion") + perk_value(&"concussion_blast"))
 				horde.knock_back(j, p, 2.0)
 			grenades.remove_at(i)
 			grenade_fuses.remove_at(i)
@@ -597,8 +645,27 @@ func stacks(id: StringName) -> int:
 	return card_stacks.get(id, 0)
 
 
+## Class and cards first; Recovery multiplies; Battering Ram, Heavy Impact
+## and Opening Volley add seconds.
 func breaker_cooldown_total() -> float:
-	return (0.7 if player_class == &"vanguard" else 1.0) * GameData.BREAKER_COOLDOWN * pow(0.9, stacks(&"quick_breaker"))
+	var base: float = (0.7 if player_class == &"vanguard" else 1.0) * GameData.BREAKER_COOLDOWN * pow(0.9, stacks(&"quick_breaker"))
+	return base * (1.0 - perk_value(&"recovery") / 100.0) \
+		+ perk_cost(&"long_breaker") + perk_cost(&"heavy_impact") + perk_cost(&"opening_volley")
+
+
+func breaker_distance() -> float:
+	return GameData.BREAKER_DISTANCE * (1.0 + perk_value(&"long_breaker") / 100.0) \
+		* (1.0 - perk_cost(&"crowd_anchor") / 100.0) * (1.0 - perk_cost(&"recovery") / 100.0)
+
+
+## Walking speed multiplier from perks (cards and the weapon apply apart).
+func perk_speed_mult() -> float:
+	var mult: float = (1.0 + perk_value(&"fleet_footed") / 100.0) * (1.0 - perk_cost(&"pack_rat") / 100.0)
+	if _firing_time > 0.0 and not sprinting:
+		mult *= 1.0 + perk_value(&"skirmisher") / 100.0
+	if war_cry_time > 0.0:
+		mult *= 1.0 - perk_cost(&"bulwark") / 100.0
+	return mult
 
 
 ## Intel earned on this island so far. with_hazard = false leaves out the
@@ -646,7 +713,7 @@ func intel_hazard_share() -> int:
 
 func switch_weapon(i: int) -> void:
 	if i >= 0 and i < weapons.size() and ammo[i] != 0 and weapon_unlocked[i]:
-		weapon_index = i
+		_set_weapon(i)
 
 
 ## Next usable weapon (gamepad cycling).
@@ -654,8 +721,18 @@ func cycle_weapon() -> void:
 	for k in range(1, weapons.size() + 1):
 		var i: int = (weapon_index + k) % weapons.size()
 		if weapon_unlocked[i] and ammo[i] != 0:
-			weapon_index = i
+			_set_weapon(i)
 			return
+
+
+## Quick Draw: switching from the primary to the secondary speeds the
+## secondary up for a moment, at most once per QUICK_DRAW_COOLDOWN.
+func _set_weapon(i: int) -> void:
+	var drawing: bool = i != weapon_index and weapons[weapon_index].primary and not weapons[i].primary
+	weapon_index = i
+	if drawing and has_perk(&"quick_draw") and _quick_draw_cd <= 0.0:
+		quick_draw_time = GameData.QUICK_DRAW_SECONDS
+		_quick_draw_cd = GameData.QUICK_DRAW_COOLDOWN
 
 
 func choose_card(i: int) -> void:
@@ -710,6 +787,10 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 		_take_player_damage(melee * (0.6 if war_cry_time > 0.0 else 1.0))
 	war_cry_time = maxf(0.0, war_cry_time - dt)
 	battle_rhythm_time = maxf(0.0, battle_rhythm_time - dt)
+	opening_volley_time = maxf(0.0, opening_volley_time - dt)
+	quick_draw_time = maxf(0.0, quick_draw_time - dt)
+	_quick_draw_cd = maxf(0.0, _quick_draw_cd - dt)
+	_firing_time = maxf(0.0, _firing_time - dt)
 	invulnerable = maxf(0.0, invulnerable - dt)
 	if not sprinting:
 		_auto_fire(dt)
@@ -770,7 +851,7 @@ func _update_player(dt: float, move: Vector2, breaker: bool) -> void:
 		_start_breaker(move)
 	if dash_time > 0.0:
 		dash_time -= dt
-		var speed: float = GameData.BREAKER_DISTANCE * (1.4 if has_perk(&"long_breaker") else 1.0) / GameData.BREAKER_DURATION
+		var speed: float = breaker_distance() / GameData.BREAKER_DURATION
 		player_pos = Horde.move_against_walls(field, player_pos, dash_dir.x * speed * dt, dash_dir.z * speed * dt, GameData.PLAYER_RADIUS)
 		# Shove everything along the path out of the way.
 		var radius: float = breaker_radius()
@@ -784,7 +865,7 @@ func _update_player(dt: float, move: Vector2, breaker: bool) -> void:
 		return
 	if move.length_squared() > 1.0:
 		move = move.normalized()
-	var v: Vector2 = move * GameData.PLAYER_SPEED * weapons[weapon_index].movement_mult * (1.0 + 0.04 * stacks(&"light_boots")) * (GameData.SPRINT_MULTIPLIER if sprinting else 1.0) * dt
+	var v: Vector2 = move * GameData.PLAYER_SPEED * weapons[weapon_index].movement_mult * (1.0 + 0.04 * stacks(&"light_boots")) * perk_speed_mult() * (GameData.SPRINT_MULTIPLIER if sprinting else 1.0) * dt
 	player_pos = Horde.move_against_walls(field, player_pos, v.x, v.y, GameData.PLAYER_RADIUS)
 
 
@@ -802,9 +883,14 @@ func _start_breaker(move: Vector2) -> void:
 
 
 func _breaker_impact(radius: float) -> void:
-	var dmg: float = GameData.BREAKER_DAMAGE + 15.0 * stacks(&"shockwave")
+	var dmg: float = (GameData.BREAKER_DAMAGE + 15.0 * stacks(&"shockwave")) * (1.0 + perk_value(&"heavy_impact") / 100.0)
+	var pulse: float = perk_value(&"crowd_anchor")  # Crowd Anchor: final push
 	for i in horde.query_radius(player_pos, radius):
 		_damage(i, dmg, player_pos, false, true)
+		if pulse > 0.0 and not _dead.has(i):
+			horde.knock_back(i, player_pos, pulse)
+	if has_perk(&"opening_volley"):
+		opening_volley_time = GameData.OPENING_VOLLEY_SECONDS
 	_flush_dead()
 
 
@@ -832,15 +918,29 @@ func _auto_fire(dt: float) -> void:
 			break
 
 
+## Card bonuses add up; perk effects then multiply.
 func fire_rate() -> float:
 	var bonus: float = 0.0
+	var mult: float = 1.0
 	if weapons[weapon_index].primary:
 		bonus += 0.08 * stacks(&"fast_hands")
 		if _stationary:
 			bonus += 0.08 * stacks(&"steady_aim")
+		else:
+			mult *= 1.0 - perk_cost(&"steady_grip") / 100.0
+	elif quick_draw_time > 0.0:
+		mult *= 1.0 + perk_value(&"quick_draw") / 100.0
 	if battle_rhythm_time > 0.0:
 		bonus += 0.08 * stacks(&"battle_rhythm")
-	return weapons[weapon_index].fire_rate * (1.0 + bonus)
+	return weapons[weapon_index].fire_rate * (1.0 + bonus) * mult
+
+
+## Spread of weapon `w` now: Steady Grip tightens the primary standing
+## still; Skirmisher widens it standing still.
+func weapon_spread(w: GameData.Weapon) -> float:
+	if not w.primary or not _stationary:
+		return w.spread_deg
+	return w.spread_deg * (1.0 - perk_value(&"steady_grip") / 100.0) * (1.0 + perk_cost(&"skirmisher") / 100.0)
 
 
 func breaker_radius() -> float:
@@ -885,25 +985,26 @@ func _collect_power_up() -> void:
 
 func apply_power_up(kind: StringName) -> void:
 	kind = GameData.power_up_id(kind)
-	if not GameData.POWER_UP_IDS.has(kind):
+	var data: PowerUpData = GameData.power_up(kind)
+	if data == null:
 		return
 	_sync_intel_bonus()
 	power_ups_picked.append(kind)
-	messages.append("%s!" % GameData.POWER_UP_NAMES[kind])
+	messages.append("%s!" % data.display_name)
 	match kind:
 		&"insta_kill":
-			power_ups.insta_time = GameData.POWER_UP_ACTIVE_SECONDS
+			power_ups.insta_time = data.duration
 		&"double_rewards":
-			power_ups.double_time = GameData.POWER_UP_ACTIVE_SECONDS
+			power_ups.double_time = data.duration
 		&"nuke":
-			_nuke()
+			_nuke(data.spawn_delay)
 		&"full_power":
 			breaker_cd = 0.0
 			grenade_cd = 0.0
 		&"max_shield":
-			add_shield(max_shield)
+			add_shield(max_shield * data.shield_fill)
 		&"extra_reroll":
-			rerolls = mini(GameData.REROLLS_MAX, rerolls + 1)
+			rerolls = mini(GameData.REROLLS_MAX, rerolls + data.reroll_amount)
 		&"max_ammo":
 			for i in weapons.size():
 				if weapon_unlocked[i] and weapons[i].max_ammo > 0:
@@ -914,8 +1015,8 @@ func apply_power_up(kind: StringName) -> void:
 ## Kills, XP orbs and Intel are credited as usual (the boss objective sees
 ## the boss gone on the next mission update), but Nuke kills roll no new
 ## power-up drop and bloaters do not chain-explode on the player.
-func _nuke() -> void:
-	power_ups.spawn_delay = GameData.POWER_UP_SPAWN_DELAY
+func _nuke(spawn_delay: float) -> void:
+	power_ups.spawn_delay = spawn_delay
 	explosions.append(player_pos)
 	_nuking = true
 	for i in horde.count:
@@ -931,7 +1032,9 @@ func _regenerate(dt: float) -> void:
 	_heal_player(active * 0.5 * stacks(&"catch_your_breath"))
 
 
+## Every heal in the island goes through here (Thick Skin's trade-off).
 func _heal_player(amount: float) -> void:
+	amount *= 1.0 - perk_cost(&"thick_skin") / 100.0
 	if amount > 0.0 and hp < max_hp:
 		hp = minf(max_hp, hp + amount)
 
@@ -1113,6 +1216,8 @@ func enemy_head(i: int) -> Vector3:
 ## Would a shot at `target` now be a headshot? Fixed camera: the target sits
 ## where the body faces. Crosshair: the ray passes close to the head.
 func _is_headshot(target: int) -> bool:
+	if has_perk(&"body_count"):
+		return false  # Body Count: no headshots at all
 	if uses_crosshair():
 		var v: Vector3 = enemy_head(target) - crosshair_origin
 		var along: float = v.dot(crosshair_dir)
@@ -1120,8 +1225,7 @@ func _is_headshot(target: int) -> bool:
 			return false
 		var t: GameData.EnemyType = horde.types[horde.kinds[target]]
 		var radius: float = GameData.CROSSHAIR_HEAD_RADIUS * t.radius_scale
-		if has_perk(&"head_hunter"):
-			radius *= 15.0 / GameData.HEADSHOT_CONE_DEG
+		radius *= headshot_cone_deg() / GameData.HEADSHOT_CONE_DEG
 		return (v - crosshair_dir * along).length() <= radius
 	var to: Vector3 = horde.positions[target] - player_pos
 	to.y = 0.0
@@ -1139,10 +1243,17 @@ func _line_of_sight(a: Vector3, b: Vector3) -> bool:
 
 
 func headshot_cone_cos() -> float:
-	return cos(deg_to_rad(15.0 if has_perk(&"head_hunter") else GameData.HEADSHOT_CONE_DEG))
+	return cos(deg_to_rad(headshot_cone_deg()))
+
+
+## Head Hunter sets the cone (11/13/15 degrees); crosshair cameras scale the
+## head radius by the same cone / 9.
+func headshot_cone_deg() -> float:
+	return perk_value(&"head_hunter") if has_perk(&"head_hunter") else GameData.HEADSHOT_CONE_DEG
 
 
 func _fire(w: GameData.Weapon, target: int) -> void:
+	_firing_time = GameData.SKIRMISHER_FIRING_WINDOW
 	if w.primary:
 		_shots += 1
 	if w.max_ammo > 0:
@@ -1168,16 +1279,19 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 	var headshot: bool = _is_headshot(target)
 	var rifle: bool = w.primary
 	var dmg: float = w.damage * (1.0 + 0.10 * stacks(&"hollow_points") if rifle else 1.0)
+	if rifle:  # perks multiply after the cards
+		dmg *= (1.0 - perk_cost(&"kill_chain") / 100.0) * (1.0 + (perk_value(&"opening_volley") / 100.0 if opening_volley_time > 0.0 else 0.0))
+	var spread: float = weapon_spread(w)
 	var pierce: int = w.pierce + (stacks(&"piercing_rounds") if rifle else 0)
 	var direct_hits: Array[int] = []
 	var ricochet_damage: float = dmg
 	var candidates := PackedInt32Array()
 	if crosshair:
-		candidates = _shot_candidates(origin, dir, w.range_m, w.spread_deg * 0.5)
+		candidates = _shot_candidates(origin, dir, w.range_m, spread * 0.5)
 	for p in w.pellets:
 		var pellet_dir: Vector3 = dir
-		if w.spread_deg > 0.0:
-			pellet_dir = dir.rotated(Vector3.UP, deg_to_rad(rng.randf_range(-w.spread_deg, w.spread_deg) * 0.5))
+		if spread > 0.0:
+			pellet_dir = dir.rotated(Vector3.UP, deg_to_rad(rng.randf_range(-spread, spread) * 0.5))
 		var hits: Array[Vector2] = _crosshair_hits(origin, pellet_dir, pierce, candidates) if crosshair \
 			else horde.hitscan(player_pos, pellet_dir, w.range_m, pierce)
 		var end: Vector3 = player_pos + Vector3(pellet_dir.x, 0, pellet_dir.z).normalized() * w.range_m
@@ -1191,7 +1305,7 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 			if _dead.has(idx):
 				continue
 			var is_head: bool = headshot and idx == target
-			var hit_damage: float = dmg * (GameData.HEADSHOT_MULTIPLIER if is_head else 1.0)
+			var hit_damage: float = dmg * (GameData.HEADSHOT_MULTIPLIER if is_head else body_damage_mult())
 			if w.close_range > 0.0 and horde.positions[idx].distance_to(player_pos) <= w.close_range:
 				hit_damage *= w.close_damage_mult
 			if rifle:
@@ -1359,6 +1473,8 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 				horde.knock_back(j, p, 1.5)
 		orbs.append(p)
 		orb_values.append(t.xp)
+		if rifle_hit and not secondary and has_perk(&"kill_chain"):
+			_kill_chain_refill()
 		if headshot and stacks(&"vampire") > 0:
 			_heal_player(stacks(&"vampire"))
 		if headshot:
@@ -1379,6 +1495,20 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 			if horde.poison_time[i] > 0.0 and stacks(&"toxic_cloud") > 0:
 				toxic_clouds.append(p)
 				toxic_cloud_times.append(1.0 + stacks(&"toxic_cloud"))
+
+
+## Body-shot damage: Body Count raises it, Head Hunter's trade-off lowers it.
+func body_damage_mult() -> float:
+	return (1.0 + perk_value(&"body_count") / 100.0) * (1.0 - perk_cost(&"head_hunter") / 100.0)
+
+
+## Kill Chain: a direct primary kill puts rounds back in the magazine of the
+## primary being fired, up to its capacity (not while it reloads).
+func _kill_chain_refill() -> void:
+	var w: int = weapon_index
+	if not weapons[w].primary or magazine_size(w) <= 0 or reload_times[w] > 0.0:
+		return
+	mag[w] = mini(magazine_size(w), mag[w] + int(perk_value(&"kill_chain")))
 
 
 ## Only direct primary hits roll elements. Damage from states/chains/clouds
@@ -1523,7 +1653,7 @@ func _flush_dead() -> void:
 
 
 func _update_orbs(dt: float) -> void:
-	var radius: float = GameData.PICKUP_RADIUS * (1.0 + 0.4 * stacks(&"magnet"))
+	var radius: float = pickup_radius()
 	var automatic: bool = level >= GameData.XP_AUTO_COLLECT_LEVEL
 	var i: int = orbs.size() - 1
 	while i >= 0:
@@ -1546,13 +1676,22 @@ func _update_orbs(dt: float) -> void:
 	_roll_cards_if_needed()
 
 
+## XP attraction radius: XP Magnet adds; Trail Rations and Surveyor
+## (moving) shrink it; Surveyor standing still widens it.
+func pickup_radius() -> float:
+	var radius: float = GameData.PICKUP_RADIUS * (1.0 + 0.4 * stacks(&"magnet")) * (1.0 - perk_cost(&"trail_rations") / 100.0)
+	if has_perk(&"surveyor"):
+		radius *= 1.0 + perk_value(&"surveyor") / 100.0 if _stationary else 1.0 - perk_cost(&"surveyor") / 100.0
+	return radius
+
+
 func _collect_xp_orb(index: int) -> void:
 	var reward_mult: float = 2.0 if power_ups.double_time > 0.0 else 1.0
 	var earned: float = orb_values[index] * reward_mult * (1.0 + fast_learner_bonus()) + xp_fraction
 	var whole: int = floori(earned + 0.000001)
 	xp += whole
 	xp_fraction = maxf(0.0, earned - whole)
-	_heal_player(0.2 * stacks(&"field_dressing"))
+	_heal_player(0.2 * stacks(&"field_dressing") + perk_value(&"trail_rations"))
 	orbs.remove_at(index)
 	orb_values.remove_at(index)
 
@@ -1570,7 +1709,7 @@ func _roll_cards_if_needed() -> void:
 	_pending_levels -= 1
 	if not _draw_cards([]):
 		# Every card maxed: levelling up still heals.
-		hp = minf(max_hp, hp + 20.0)
+		_heal_player(20.0)
 		messages.append("Level up: +20 HP")
 		_roll_cards_if_needed()
 
@@ -1758,7 +1897,7 @@ func _open_cache() -> void:
 		messages.append("Intel file recovered!")
 	match rng.randi_range(0, 3):
 		0:
-			hp = minf(max_hp, hp + 30.0)
+			_heal_player(30.0)
 			messages.append("Cache: med supplies (+30 HP)")
 		1:
 			for w in weapons.size():

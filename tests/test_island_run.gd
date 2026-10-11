@@ -230,15 +230,13 @@ func _test_perks_and_threat() -> void:
 func _test_meta_shop() -> void:
 	var p := Profile.new()
 	p.intel = 120
-	var perk: GameData.Perk = GameData.perks()[0]
-	var bought: bool = p.buy_perk(perk)
-	var equipped: bool = p.toggle_equip(perk.id)
-	var second: GameData.Perk = GameData.perks()[1]
-	p.buy_perk(second)
-	var no_slot: bool = p.toggle_equip(second.id)
+	var bought: bool = p.buy_rank(&"combat_1")
+	var equipped: bool = p.toggle_equip(&"head_hunter")
+	p.buy_rank(&"survival_1")
+	var no_slot: bool = p.toggle_equip(&"thick_skin")
 	var slot: bool = p.buy_slot()
 	_check(bought and equipped and not no_slot and not slot and p.intel == 40,
-		"buying perks costs Intel and equipping respects slots")
+		"buying perk ranks costs Intel and equipping respects slots")
 	var ctx := RunContext.new(1)
 	ctx.won = true
 	ctx.threat = 1

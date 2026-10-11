@@ -174,6 +174,9 @@ func _destination(parent: Control) -> void:
 	row.add_child(plate)
 	var picture := RoutePreview.new()
 	picture.biome = info.get("biome", &"beach") if GameData.BIOMES.has(info.get("biome", &"beach")) else &"beach"
+	if String(info.get("expedition", "")) != "":
+		picture.expedition = StringName(info["expedition"])
+		picture.part = int(info.get("part", 1)) - 1
 	picture.custom_minimum_size = Vector2(320, 170)
 	plate.add_child(picture)
 

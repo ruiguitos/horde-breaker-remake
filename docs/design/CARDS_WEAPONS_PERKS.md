@@ -205,7 +205,7 @@ Em `armory.gd:173`, substituir lista por três colunas ligadas; seleção mostra
 
 
 
-Escolhida pelo utilizador a 2026-10-11 (árvore estilo Hades: 2 alternativas por nó, troca grátis). Desenho do Codex; maqueta na tela "Horde Breaker UI Proposals". Por implementar.
+Escolhida pelo utilizador a 2026-10-11 (árvore estilo Hades: 2 alternativas por nó, troca grátis). Desenho do Codex; maqueta na tela "Horde Breaker UI Proposals". **Implementada a 2026-10-11** (ver «Estado» no fim desta secção).
 
 ## F2. Árvore de perks com alternativas
 
@@ -266,5 +266,32 @@ Direcional navega entre nós; LB/RB alterna A/B; confirmar abre ações; cancela
 1. **Dados/perfil:** ampliar `resources/perk_data.gd`, `game_data.gd`, `perks/`, `perks.tres` e `core/profile.gd`. Novo `tests/test_perk_tree.gd`: custos, pré-requisitos, ranks partilhados, migração repetida, classes e slots.
 2. **Run:** atualizar `run_context.gd`, `main.gd`, `island_run.gd` e `card_offers.gd`; copiar equipamento/ranks ao iniciar. Alargar `test_island_run.gd`, `test_cards_catalog.gd` e `test_power_ups.gd`: só equipados atuam, contrapartidas, munição, câmaras e ausência de cadeias.
 3. **UI/persistência:** reformular `armory.gd`; adaptar `test_menus.gd` e `test_title_debrief_redesign.gd` para foco, troca gratuita e Quick Redeploy. Validar visualmente e com comando depois da implementação.
+
+### Estado (2026-10-11, Claude)
+
+Implementado tudo o que está acima, incluindo os sete perks †. Os valores
+estão nos `.tres` de `game/data/perks/` (totais por rank) e os tempos em
+`GameData` (`OPENING_VOLLEY_SECONDS`, `QUICK_DRAW_*`); são hipóteses de
+playtest. Perfil passa à **versão 7**; a migração é idempotente.
+
+Escolhas pequenas tomadas na implementação, onde o texto deixava margem:
+
+- **Mudar de classe** no Armory troca o perk de Breaker III equipado pela
+  variante da nova classe (mesmo nó, mesma alternativa). A remoção com aviso
+  aplica-se só à migração de saves antigos (Demolitions num Vanguard).
+- **Escolher um rank inferior**: botão «USE RANK…» no painel, que roda
+  III → II → I. Comprar um rank novo passa a usá-lo.
+- **Thick Skin**: a redução de cura aplica-se a toda a cura, incluindo as
+  reparações do barco/acampamento.
+- **Skirmisher**: conta como «a disparar» durante 0,3 s após cada tiro;
+  o bónus nunca se aplica em sprint, e o sprint continua sem disparar.
+- **Opening Volley** começa no impacto do Breaker.
+- **Kill Chain** não repõe balas durante uma recarga (SMG/MG).
+- **Velocidade** (Fleet Footed, Pack Rat, Bulwark) multiplica também o sprint.
+- Head Hunter conserva cone 15° no rank III e Battering Ram 7 m; os saves
+  antigos recebem estes valores com as contrapartidas novas.
+
+Testes: `tests/test_perk_tree.gd` (139 verificações). Capturas do Armory
+verificadas a 1152×648 e 1920×1080.
 
 

@@ -16,6 +16,7 @@ incluindo fontes, licenças e indicação das modificações. Ver
 | `addons/sky_3d/assets/thirdparty/textures/milkyway/` (`Milkyway.jpg`, `StarField.jpg`) | Céu noturno do Sky3D: "The Milky Way panorama"; `StarField.jpg` é uma versão modificada | ESO/S. Brunier | **CC BY 4.0**: exceção aceite pelo utilizador a 2026-10-11. Os créditos do jogo têm de mostrar: "The Milky Way panorama by ESO/S. Brunier, licensed under CC BY 4.0 and used in original and modified forms." |
 | `addons/phantom_camera/` | Phantom Camera 0.11 (transições de câmara) | Marcus Skov | MIT (`LICENSE`) |
 | `assets/animations/AnimationLibrary_Godot_Standard.glb` | Universal Animation Library (animações humanoides) | Quaternius | CC0 (`QUATERNIUS_LICENSE.txt`) |
+| `assets/models/characters/recruit/recruit.glb` (original: `Horde_Braker_Recruit_v02_escala_jogo.glb`) | Horde Breaker Recruit v02 (personagem da classe Recruit, com espingarda de assalto) | o utilizador (gerado com uma ferramenta de IA, provavelmente o Codex) | propriedade do utilizador (output de IA); nenhuma fonte de terceiros conhecida (o glTF só indica "Khronos glTF Blender I/O v5.2.40", sem texturas) |
 | `assets/models/nature_megakit/` | Stylized Nature MegaKit (versão grátis, glTF): árvores, rochas, relva, flores | Quaternius | CC0 (`License_Standard.txt`) |
 | `addons/road-generator/` + `road_demos/` | Road Generator 0.9.4 (estradas 3D) | Moo-Ack! Productions | MIT (`LICENSE`) |
 | `addons/lit/` | Lit 1.1.6 (luz **2D**; não usado no 3D) | Shawn Deprey | MIT (`LICENSE`) |

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://eaw40iyxj3aj"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Heavy Impact"
+description = "Rare, crushing charges."
+branch = "breaker"
+tier = 2
+option = 1
+benefit = "Breaker damage +{v}%"
+benefit_values = PackedFloat32Array(30, 60, 90)
+penalty = "Breaker cooldown +{v} s"
+penalty_values = PackedFloat32Array(1, 2, 3)
+order = 15

@@ -7,7 +7,7 @@ regista o que o jogo executa hoje. A proposta de design em
 anteriores e funcionalidades por implementar: não deve ser lida como catálogo
 atual.
 
-**5 armas · 39 cartas · 2 classes jogáveis · 7 inimigos · 5 perks.**
+**5 armas · 39 cartas · 2 classes jogáveis · 7 inimigos · árvore de perks (9 nós, 20 alternativas).**
 Os nomes apresentados mantêm o inglês usado no jogo. HP significa vida;
 DPS significa dano por segundo; `r` significa rank da carta.
 
@@ -413,21 +413,14 @@ Walker; Runner mantém a sua percentagem. O diretor não sorteia Behemoth.
 
 ## 5. Perks e outros modificadores
 
-Os perks são compras permanentes, com um único nível atual; só produzem
-efeito quando equipados. Existem três slots, o primeiro grátis e os
-adicionais por 100 e 250 Intel. A árvore de ranks continua por implementar.
-
-| Perk / ID | Intel | Efeito executado |
-|---|---:|---|
-| Thick Skin / `thick_skin` | 40 | +30 HP máximos e iniciais; não reduz dano |
-| Pack Rat / `pack_rat` | 40 | +50% capacidade de todas as armas finitas, incluindo SMG e Marksman |
-| Head Hunter / `head_hunter` | 60 | Cone de headshot ±9° → ±15°; na mira 1.ª/3.ª pessoa amplia o raio de cabeça por 15/9 |
-| Battering Ram / `long_breaker` | 50 | Distância do Breaker ×1,4: 5 → 7 m; mesma duração de 0,18 s |
-| Demolitions / `demolitions` | 50 | Granada: cooldown ×0,65, 12 → 7,8 s; raio +1 m, 5 → 6 m; não aumenta dano |
-
-HP máximo combinado de Vanguard + Thick Skin + Thick Hide V = **245 HP**;
-Recruit com os mesmos perk/carta = **205 HP**. Escudo mantém capacidade 100.
-Demolitions não tem filtro de classe ao equipar e não beneficia o War Cry.
+Os perks formam uma árvore de três ramos × três tiers; cada nó tem duas
+alternativas com uma contrapartida e ranks I–III comprados por nó. Só os
+perks equipados atuam. Três slots (grátis, 100, 250 Intel). Valores por
+rank, custos e regras: [CARDS_WEAPONS_PERKS.md §F2](../design/CARDS_WEAPONS_PERKS.md)
+e `game/data/perks/`. Os perks antigos migram para o rank III da
+alternativa A, com os mesmos benefícios de antes (por exemplo, Thick Skin
+III = +30 HP, Battering Ram III = 7 m, Demolitions III = −35% / +1 m) e as
+contrapartidas novas. Pack Rat afeta só as secundárias.
 
 | Modificador de rota / ID | Intel | Comportamento atual |
 |---|---:|---|
@@ -459,9 +452,9 @@ por decidir.
 | Field Medic | Nome já usado pela carta de cura; classe/Med Kit ainda ausentes | Escolher se a classe continua planeada e evitar nomes ambíguos |
 | Limite da horda | Diretor permite mais de 150 em Swarm/Threat/Hazard; `_spawn_enemy()` recusa a partir de 150; chefe pode acrescentar invocações acima disso | Uniformizar limites e medir desempenho antes de aumentar a população |
 | War Cry | Texto da classe promete −40% dano recebido; execução só reduz contacto corpo a corpo | Restringir a descrição ou aplicar a proteção também aos restantes danos |
-| Pack Rat | Descrição cita Shotgun/Heavy Pistol; execução inclui todas as armas finitas | Atualizar texto para descrever o efeito real |
+| Pack Rat | Resolvido pela árvore de perks (2026-10-11): só a munição das secundárias | — |
 | Elite Pack | Descrição cita Brutes/Grabbers; execução também duplica Bloaters/Screamers; em Jungle substitui ×1,4 por ×2 | Corrigir texto e decidir se os multiplicadores devem acumular |
-| Demolitions no Vanguard | Pode ocupar um slot sem melhorar War Cry | Filtrar por classe ou criar efeito equivalente para Vanguard |
+| Demolitions no Vanguard | Resolvido pela árvore: Demolitions é só Recruit; o Vanguard tem Bulwark / Intimidating Cry | — |
 | XP Magnet após nível 30 | Continua elegível antes do rank máximo, mas XP já é recolhida globalmente | Excluir da oferta, convertê-la ou aceitar a redundância |
 | Acesso ao nível 30 | Curva atual exige 113 970 XP recebidos desde nível 1; Walker/Runner rendem 10/12 XP base; especiais e chefe passaram a valer mais | Medir níveis por minuto e contribuição dos especiais numa run normal antes de ajustar a curva tardia |
 | Armadura e dimensão | Blindagem depende da velocidade; colisão/hitscan comuns apesar de tamanhos visuais diferentes | Confirmar se é a simplificação pretendida ou se chefes/especiais precisam de volumes próprios |

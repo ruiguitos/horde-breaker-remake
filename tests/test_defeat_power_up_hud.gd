@@ -84,7 +84,7 @@ func _run_tests() -> void:
 	_check(hud._minimap.drawn_kinds.has(&"power_up") and keys.has(&"power_up"), "ground pickup has a matching minimap marker and key")
 	var icon: Node3D = island.get("_power_up_visual")
 	var glyph: Label3D = island.get("_power_up_glyph")
-	_check(icon != null and icon.visible and glyph.text == GameData.POWER_UP_ICONS[&"full_power"], "ground pickup uses a large floating icon")
+	_check(icon != null and icon.visible and glyph.text == GameData.power_up_icon(&"full_power"), "ground pickup uses a large floating icon")
 	run.power_ups.tick(26.0)
 	await _settle()
 	_check(not icon.visible and hud._power_up_timers.text == "", "expired pickup and buffs disappear visually")

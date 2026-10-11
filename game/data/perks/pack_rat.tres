@@ -1,9 +1,16 @@
 [gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://d1mk31bg77twy"]
 
-[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_lk0sq"]
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
 
 [resource]
-script = ExtResource("1_lk0sq")
+script = ExtResource("1_perk")
 title = "Pack Rat"
-description = "+50% Shotgun and Heavy Pistol ammo."
-order = 1
+description = "Long expeditions: more secondary ammo."
+branch = "survival"
+tier = 2
+option = 0
+benefit = "Secondary max ammo +{v}%"
+benefit_values = PackedFloat32Array(20, 35, 50)
+penalty = "Movement speed −{v}%"
+penalty_values = PackedFloat32Array(2, 4, 6)
+order = 8

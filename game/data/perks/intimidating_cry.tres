@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://flra8ftlrlb6"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Intimidating Cry"
+description = "Scatter the threats around you."
+branch = "breaker"
+tier = 3
+option = 1
+class_filter = &"vanguard"
+benefit = "War Cry pushes {v} m further"
+benefit_values = PackedFloat32Array(1, 2, 3)
+penalty = "War Cry protection −{v} s"
+penalty_values = PackedFloat32Array(1, 2, 3)
+order = 19

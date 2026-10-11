@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://56wng762urdn"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Crowd Anchor"
+description = "Open space where you stand."
+branch = "breaker"
+tier = 1
+option = 1
+benefit = "Breaker end pulse pushes {v} m"
+benefit_values = PackedFloat32Array(1, 2, 3)
+penalty = "Breaker distance −{v}%"
+penalty_values = PackedFloat32Array(10, 20, 30)
+order = 13

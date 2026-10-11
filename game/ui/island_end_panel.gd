@@ -267,7 +267,7 @@ static func _power_ups_text(run: IslandRun) -> String:
 		count[id] += 1
 	var parts := PackedStringArray()
 	for id in order:
-		var text: String = "%s %s" % [GameData.POWER_UP_ICONS.get(id, "•"), GameData.POWER_UP_NAMES.get(id, String(id).to_upper())]
+		var text: String = "%s %s" % [GameData.power_up_icon(id), GameData.power_up_name(id)]
 		parts.append(text + (" ×%d" % count[id] if count[id] > 1 else ""))
 	return "  ·  ".join(parts)
 

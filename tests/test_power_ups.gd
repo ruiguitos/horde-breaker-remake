@@ -19,6 +19,7 @@ func _check(ok: bool, description: String) -> void:
 
 
 func _run_tests() -> void:
+	_test_registry()
 	_test_drops()
 	_test_shield()
 	_test_effects()
@@ -27,6 +28,25 @@ func _run_tests() -> void:
 	_test_carry()
 	await _test_handmade()
 	quit(1 if _failures > 0 else 0)
+
+
+## Per-type values come from the YARD registry game/data/power_ups.tres.
+func _test_registry() -> void:
+	var ids: Array[StringName] = GameData.power_up_ids()
+	_check(ids == [&"insta_kill", &"double_rewards", &"nuke", &"full_power", &"max_shield", &"extra_reroll", &"max_ammo"],
+		"registry lists the 7 power-ups in drop-pool order")
+	_check(GameData.power_up_legacy_ids() == {&"max_armor": &"max_shield", &"fire_sale": &"extra_reroll"},
+		"legacy ids come from the .tres files")
+	_check(GameData.power_up(&"insta_kill").duration == 25.0 and GameData.power_up(&"nuke").spawn_delay == 5.0
+		and GameData.power_up(&"extra_reroll").reroll_amount == 1 and GameData.power_up(&"max_shield").shield_fill == 1.0,
+		"effect parameters are read from the .tres files")
+	_check(GameData.power_up(&"max_ammo").requires_finite_weapon and GameData.power_up(&"fire_sale").display_name == "EXTRA REROLL",
+		"Max Ammo needs a finite weapon; old ids resolve to current data")
+	var p := PowerUps.new(3)
+	var seen: Dictionary = {}
+	for i in 200:
+		seen[p.pick_kind(false)] = true
+	_check(not seen.has(&"max_ammo") and seen.size() == 6, "drop pool skips Max Ammo without a finite weapon")
 
 
 func _open_run() -> IslandRun:
@@ -193,7 +213,7 @@ func _test_effects() -> void:
 	run.apply_power_up(&"max_armor")
 	_check(run.rerolls == 1 and run.shield == run.max_shield and run.power_ups_picked.slice(-2) == [&"extra_reroll", &"max_shield"],
 		"old ids (fire_sale, max_armor) map to the renamed power-ups")
-	_check(not GameData.POWER_UP_NAMES.values().has("FIRE SALE") and not GameData.POWER_UP_NAMES.values().has("MAX ARMOR"), "old display names are gone")
+	_check(not GameData.power_up_name(&"extra_reroll").contains("FIRE SALE") and not GameData.power_up_name(&"max_shield").contains("MAX ARMOR"), "old display names are gone")
 	run.card_stacks[&"bigger_mags"] = 2
 	run.ammo[1] = 0
 	run.apply_power_up(&"max_ammo")
@@ -209,7 +229,7 @@ func _test_effects() -> void:
 
 ## Expiry, level-30 XP collection and island transitions never use ground items.
 func _test_pickup_required() -> void:
-	for kind: StringName in GameData.POWER_UP_IDS:
+	for kind: StringName in GameData.power_up_ids():
 		var run := _open_run()
 		run.level = 30
 		run.hp = 60.0
@@ -246,7 +266,7 @@ func _test_pickup_required() -> void:
 		run._collect_power_up()
 		var after: Dictionary = _power_effect_state(run)
 		_check(after != before and run.power_ups_picked == [kind] and run.power_ups.ground_kind == &""
-			and run.power_ups.ground_time == 0.0 and run.messages.has("%s!" % GameData.POWER_UP_NAMES[kind]),
+			and run.power_ups.ground_time == 0.0 and run.messages.has("%s!" % GameData.power_up_name(kind)),
 			"%s activates after collection and consumes its ground item" % kind)
 		run._collect_power_up()
 		_check(_power_effect_state(run) == after, "%s cannot activate twice from one pickup" % kind)

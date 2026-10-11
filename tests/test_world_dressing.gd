@@ -36,9 +36,11 @@ func _initialize() -> void:
 		while n != s:
 			t = n.transform * t
 			n = n.get_parent()
-		_check(t.origin.z < -0.3 and t.origin.y > 1.0, "%s model has a forward muzzle at chest height" % id)
+		# The Recruit's own model holds its rifle low across the body (~1 m).
+		_check(t.origin.z < -0.3 and t.origin.y > 0.9, "%s model has a forward muzzle at chest height" % id)
 		s.animate(1.0, 0.1)
 		s.free()
+	_test_recruit_model()
 	# Terrain: a 10x10 grid with a 4x4 island in the middle.
 	var land := PackedByteArray()
 	land.resize(100)
@@ -65,3 +67,37 @@ func _process(_delta: float) -> bool:
 		_check(sea_h < -1.0, "terrain: the sea floor slopes down (%.2f m)" % sea_h)
 	quit(1 if _failures > 0 else 0)
 	return true
+
+
+## The Recruit uses the user's GLB: loaded, standing on the ground, ~2 m tall,
+## muzzle at the rifle tip; other guns and first person still work.
+func _test_recruit_model() -> void:
+	var s := SoldierModel.create(&"recruit")
+	_check(s.get("_model") != null, "recruit uses the imported model (recruit.glb)")
+	var lo := INF
+	var hi := -INF
+	for mi in s.find_children("*", "MeshInstance3D", true, false):
+		var m := mi as MeshInstance3D
+		var t := Transform3D()
+		var n: Node = m
+		while n != s:
+			t = (n as Node3D).transform * t
+			n = n.get_parent()
+		var b: AABB = t * m.get_aabb()
+		lo = minf(lo, b.position.y)
+		hi = maxf(hi, b.end.y)
+	_check(absf(lo) < 0.02 and hi > 1.8 and hi < 2.2, "recruit model stands on the ground, %.2f m tall" % hi)
+	var mt := Transform3D()
+	var mn: Node3D = s.muzzle
+	while mn != s:
+		mt = mn.transform * mt
+		mn = mn.get_parent()
+	_check(mt.origin.y > 0.9 and mt.origin.y < 1.6, "recruit muzzle at chest height (%.2f m)" % mt.origin.y)
+	s.set_shadow_only(true)
+	s.set_weapon(&"shotgun")
+	_check(s.muzzle != null and s.muzzle.get_parent() != null, "recruit model swaps to a placeholder shotgun with a muzzle")
+	s.set_weapon(&"rifle")
+	_check(s.find_children("*", "MeshInstance3D", true, false).all(func(x: Node) -> bool:
+		return (x as MeshInstance3D).cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY), "recruit body stays shadow-only in first person")
+	s.animate(1.0, 0.2)
+	s.free()

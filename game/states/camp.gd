@@ -113,6 +113,9 @@ func _next_part() -> Control:
 	plate.add_child(box)
 	var preview := RoutePreview.new()
 	preview.biome = context.biome
+	if context.is_expedition():
+		preview.expedition = context.expedition
+		preview.part = context.island_index
 	preview.custom_minimum_size.y = PICTURE_HEIGHT
 	preview.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(preview)

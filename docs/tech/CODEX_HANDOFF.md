@@ -15,8 +15,8 @@ fazer commit quando ele pedir. Regras do projeto: `AGENTS.md` e `CLAUDE.md`.
 entretanto implementada: principal/secundária escolhidas, Machine Gun,
 SMG com mobilidade/proximidade e remoção da Heavy Pistol. Saves antigos
 trocam a seleção da pistola pela Shotgun, sem reembolso. Estado e valores:
-[COMBAT_CATALOG.md](COMBAT_CATALOG.md). A árvore de perks está a cargo do
-Claude; não foi alterada nesta implementação.
+[COMBAT_CATALOG.md](COMBAT_CATALOG.md). A árvore de perks foi depois
+implementada pelo Claude (secção «Árvore de perks» abaixo).
 
 Também estão implementados os pedidos de Settings com tamanho comum e
 ícones por plataforma ([SETTINGS_INPUT.md](SETTINGS_INPUT.md)) e o ecrã
@@ -58,6 +58,38 @@ ficheiros partilhados (`profile.gd`, `armory.gd`, `game_data.gd` e
 incluindo `test_weapon_loadout`, `test_settings` e `test_credits`, e
 documentar os resultados. Mostrar alterações antes de commit; commit e
 push só quando o utilizador pedir.
+
+## Árvore de perks (Claude, 2026-10-11, sem commit)
+
+Implementada a árvore aprovada (§F2 de
+[CARDS_WEAPONS_PERKS.md](../design/CARDS_WEAPONS_PERKS.md), com o estado e
+as pequenas escolhas no fim da secção). Resumo:
+
+- **Dados:** 20 alternativas em `game/data/perks/` (9 nós × A/B + variantes
+  Vanguard de Breaker III); valores por rank nos `.tres`, custos e tempos
+  em `GameData`. IDs antigos conservados como alternativa A.
+- **Perfil v7:** `perk_ranks`, `perk_options`, `perk_use_ranks`,
+  `equipped_perks`; migração v6→v7 versionada e idempotente (perks antigos
+  → rank III em A, antecessores → rank I, Intel/slots intactos;
+  Demolitions num Vanguard sai do equipamento com aviso). Campos de armas
+  e comandos da versão 6 mantêm-se.
+- **Run:** `RunContext` leva ids e ranks; Quick Redeploy guarda e repõe
+  perks, A/B e ranks (ranks acima do comprado são limitados). Efeitos e
+  contrapartidas em `island_run.gd`; Pack Rat só nas secundárias; Body
+  Count tira as cartas de headshot das ofertas (`card_offers.gd`, também no
+  barco/acampamento); Kill Chain só com abates diretos da principal;
+  Skirmisher não permite disparar em sprint.
+- **Armory:** separador PERKS com três colunas ligadas, A/B, pips, estados
+  OWNED/EQUIPPED/NEW/LOCKED e painel de detalhe (▲/▼, rank → seguinte,
+  UPGRADE, EQUIP/REMOVE, USE RANK). D-pad navega, LB/RB (Q/E) troca A/B,
+  A abre as ações, B volta à grelha; dicas com ícones do `InputIcons`.
+
+Validação: **32/32 scripts** (29 do jogo, incluindo o novo
+`tests/test_perk_tree.gd` com 139 verificações, e 3 dos spikes), sem
+`TEST FAIL`, `SCRIPT ERROR` nem erros de parsing; o bot extraiu nas seis
+ilhas das duas runs. Mantém-se o código de saída nativo do Godot no
+Windows (`-1073741819`). Capturas reais (Forward+) do separador PERKS a
+1152×648 e 1920×1080 verificadas.
 
 ## 1. Cartas (pedido do utilizador)
 

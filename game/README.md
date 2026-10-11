@@ -545,10 +545,11 @@ Pack ao fim de 3 min") em vez de impressões.
 
 ## Meta: Intel, perks e Threat
 
-- **Perks** compram-se uma vez com Intel e equipam-se em slots: começas com
-  1 slot, o 2.º custa 100 e o 3.º 250. São 5 perks: Thick Skin, Pack Rat,
-  Head Hunter, Battering Ram e Demolitions. São bónus pequenos, para dar
-  opções e não poder bruto.
+- **Perks** formam uma árvore (Combat / Survival / Breaker × 3 tiers). Cada
+  nó tem duas alternativas, A e B, com uma contrapartida; os ranks I–III
+  compram-se por nó com Intel e servem às duas. Trocar A/B é grátis no
+  Armory. Equipam-se em slots: começas com 1, o 2.º custa 100 e o 3.º 250.
+  Detalhes: `docs/design/CARDS_WEAPONS_PERKS.md` §F2.
 - **Classes** (escolhe-se uma no Armory; a tecla G usa a habilidade):
   Recruit (grátis; Granada), Vanguard (150; +40 HP, breaker −30 %; War Cry:
   atordoa a 7 m e −40 % de dano recebido durante 5 s). O Field Medic foi
@@ -667,10 +668,10 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 | `states/title.gd` | Título com porto ilustrado e botões nativos. |
 | `ui/ui_theme.gd` | Tema partilhado por menus e HUD (painéis, botões, cores). |
 | `ui/menu_dialog.gd` | Foco e input modal; arquivo e controlos. |
-| `ui/route_map.gd`, `ui/route_preview.gd` | Mapa decorativo e miniaturas das rotas. |
+| `ui/route_map.gd`, `ui/route_preview.gd` | Mapa decorativo e miniaturas das rotas; as partes de expedição (Berlenga) têm imagem própria: granito, vegetação rasteira e o marco da parte (aldeia, farol, costa, forte). |
 | `states/armory.gd`, `states/boat.gd`, `states/camp.gd`, `states/debrief.gd` | Ecrãs entre runs, entre ilhas, entre partes de uma expedição e do fim da run. O `camp.gd` herda do `boat.gd`: os mantimentos ficam num só sítio. |
 | `world/island_run.gd` | **Todas as regras**, sem nós: jogador, auto-fire, breaker, cartas, missão. Testável em headless. |
-| `world/power_ups.gd` | Drops, garantia, RNG independente e temporizadores; efeitos aplicados pelo IslandRun. |
+| `world/power_ups.gd` | Drops, garantia, RNG independente e temporizadores; efeitos aplicados pelo IslandRun. Valores por power-up em `data/power_ups/` (registo YARD `data/power_ups.tres`). |
 | `world/island.gd` | Input, render (MultiMesh), câmara média e efeitos. |
 | `world/island_map.gd` | Gera a ilha (costa irregular, edifícios, geradores, barco). |
 | `world/director.gd` | Ritmo da horda (crescer/pico/relax, intensidade). |

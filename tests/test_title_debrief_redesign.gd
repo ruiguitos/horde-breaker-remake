@@ -49,7 +49,7 @@ func _veteran() -> Profile:
 	p.intel = 400
 	p.unlocked_classes = [&"recruit", &"vanguard"]
 	p.selected_class = &"vanguard"
-	p.owned_perks = [&"thick_skin"]
+	p.perk_ranks = {&"survival_1": 3}
 	p.equipped_perks = [&"thick_skin"]
 	p.max_threat = 2
 	p.threat = 2
@@ -69,7 +69,7 @@ func _profile_tests() -> void:
 	var real := Profile.from_dict({})
 	real.unlocked_classes = p.unlocked_classes.duplicate()
 	real.selected_class = p.selected_class
-	real.owned_perks = p.owned_perks.duplicate()
+	real.perk_ranks = p.perk_ranks.duplicate()
 	real.equipped_perks = p.equipped_perks.duplicate()
 	real.max_threat = 2
 	real.threat = 2
@@ -93,7 +93,7 @@ func _profile_tests() -> void:
 	_check(changed.redeploy_problem() == "Class locked" and not changed.apply_last_run(), "a locked class blocks the replay")
 	changed = _veteran()
 	changed.remember_run(&"")
-	changed.owned_perks.clear()
+	changed.perk_ranks.clear()
 	_check(changed.redeploy_problem() == "Perk not owned", "a perk no longer owned blocks the replay")
 	changed = _veteran()
 	changed.remember_run(&"")
@@ -154,10 +154,10 @@ func _main_tests() -> void:
 	await _settle()
 	var ctx: RunContext = main.get("context")
 	_check(main.get("state") == 0, "QUICK REDEPLOY goes straight to the boat")  # BOAT
-	_check(ctx.player_class == &"vanguard" and ctx.threat == 2 and ctx.perks == [&"thick_skin"] and not ctx.is_expedition(),
+	_check(ctx.player_class == &"vanguard" and ctx.threat == 2 and ctx.perks == [&"thick_skin"] and ctx.perk_rank(&"thick_skin") == 3 and not ctx.is_expedition(),
 		"the replayed run has the last class, perks, threat and run type")
 	# Something no longer owned: the Armory instead.
-	p.owned_perks.clear()
+	p.perk_ranks.clear()
 	p.equipped_perks.clear()
 	main.call("_quick_redeploy")
 	await _settle()

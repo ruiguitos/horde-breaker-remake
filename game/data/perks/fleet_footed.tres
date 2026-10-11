@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://raun0x0qgew4"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Fleet Footed"
+description = "Stay out of reach."
+branch = "survival"
+tier = 1
+option = 1
+benefit = "Movement speed +{v}%"
+benefit_values = PackedFloat32Array(4, 8, 12)
+penalty = "Max HP −{v}"
+penalty_values = PackedFloat32Array(10, 20, 30)
+order = 7
