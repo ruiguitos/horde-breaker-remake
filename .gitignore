@@ -15,3 +15,7 @@ addons/GD-Sync/keys.cfg
 
 # Agent worktrees (Claude Code); never commit them
 .claude/worktrees/
+
+# The user's own hand-made test scene (never commit)
+game/world/handmade/world_test_handmade.tscn
+game/world/handmade/world_test_handmade_data/
