@@ -41,4 +41,18 @@ func _initialize() -> void:
 		"4 missions, 3 on the boat routes (holdout is expedition-only)")
 	_check(GameData.CLASSES == ([&"recruit", &"vanguard"] as Array[StringName]) and GameData.CLASS_INFO[&"vanguard"]["cost"] == 150, "2 classes with costs")
 	_check(GameData.modifiers().size() == 5 and is_equal_approx(GameData.modifier(&"swarm").intel_mult, 1.3), "5 route modifiers")
+	_test_xp_scale(enemies)
 	quit(1 if _failures > 0 else 0)
+
+
+func _test_xp_scale(enemies: Array[GameData.EnemyType]) -> void:
+	var costs: Dictionary[int, int] = {1: 150, 5: 630, 10: 1680, 15: 3230, 20: 5280, 25: 7830, 30: 10880}
+	for level: int in costs:
+		_check(GameData.xp_for_level(level) == costs[level], "level %d costs %d XP" % [level, costs[level]])
+	var total: int = 0
+	for level in range(1, 30):
+		total += GameData.xp_for_level(level)
+	_check(total == 113970, "level 1 to 30 costs 113970 received XP")
+	var rewards: Array[int] = [10, 12, 100, 45, 1000, 45, 60]  # EnemyKind order
+	for kind in rewards.size():
+		_check(enemies[kind].xp == rewards[kind], "%s rewards %d base XP" % [enemies[kind].id, rewards[kind]])

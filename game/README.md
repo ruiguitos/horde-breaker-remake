@@ -48,6 +48,7 @@ acaso e, dentro da rota, a ilha sai pela seed.
 | Trocar as cartas (reroll) | R | Y |
 | Continuar no fim da ilha | Enter / R | A / Start |
 | Pausa (abandonar pede confirmação: segurar 1 s) | Esc | Start |
+| Voltar no barco/acampamento (abre opções de saída) | Esc ou botão BACK | B |
 | Painel de debug | F3 | — |
 | Ecrã inteiro | F11 | — |
 
@@ -73,6 +74,12 @@ gráficos):
   editável em percentagem. Os sons vão para os buses SFX e Music.
 
 ## Como se joga
+
+**Sair entre ilhas ou partes:** Esc / B ou o botão BACK abrem opções para
+continuar, voltar ao Armory (classes) ou ir ao menu principal. Voltar a um
+menu termina a run, conserva o Intel e ficheiros ganhos nas partes concluídas
+e perde a build e o bónus de extração. Fechar a janela com Esc / B mantém a
+run. Antes da primeira ilha, voltar cancela só a preparação.
 
 - A arma **dispara sozinha**. Há três câmaras (V ou Settings > Controls):
   - **1.ª pessoa** e **3.ª pessoa** (ombro, a de origem): dispara só contra
@@ -117,6 +124,10 @@ gráficos):
   incluindo a que já existia ao atingir esse nível e os novos drops.
   Há fogo, frio/congelamento, descargas e veneno para a Assault Rifle,
   além de melhorias do breaker, cura, mobilidade e habilidades de classe.
+  A nova escala usa `10 × (8 + 6n + n²)` XP por nível: começa em 150 XP.
+  Walker/Runner rendem 10/12 XP; Brute 100; Grabber/Bloater 45;
+  Screamer 60 e Behemoth 1000. Fast Learner IV dá +20% (Walker: 12 XP,
+  ou 24 XP com Double XP). Ver [catálogo de combate](../docs/tech/COMBAT_CATALOG.md).
   Ver [implementação das cartas](../docs/tech/CARDS_IMPLEMENTATION.md).
 - **Power-ups de abate**: sete ajudas ocasionais, em todas as missões e
   partes das expedições. Apanha o ícone luminoso antes de desaparecer
@@ -125,6 +136,8 @@ gráficos):
   Full Power, Max Shield, Extra Reroll (+1 reroll) e Max Ammo. O escudo absorve dano antes da vida;
   os efeitos temporários mostram segundos no HUD. Valores e regras em
   [power-ups e derrota](../docs/tech/POWER_UPS_AND_DEFEAT.md).
+  **Sem recolha, não há efeito:** um item expirado ou deixado na ilha
+  perde-se. A recolha global de XP do nível 30 não apanha power-ups.
 - Armas: Assault Rifle (infinita, carregador de 30 que por agora se
   repõe logo ao esvaziar; o HUD mostra `30 / ∞`), Shotgun e Heavy Pistol (munição limitada,
   atravessam inimigos). Cada gerador ligado repõe metade da munição.

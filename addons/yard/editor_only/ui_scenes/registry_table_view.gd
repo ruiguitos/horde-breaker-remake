@@ -150,6 +150,12 @@ func _notification(what: int) -> void:
 			_on_drag_end()
 
 
+func _input(event: InputEvent) -> void:
+	if is_visible_in_tree() and event is InputEventKey:
+		# runs prior to shortcut handling
+		toggle_edit_menu_items(edit_context_menu)
+
+
 func _shortcut_input(event: InputEvent) -> void:
 	if not event.is_pressed() or event.is_echo():
 		return
@@ -260,17 +266,14 @@ func do_edit_menu_action(action_id: int) -> void:
 			_enter_subresource_view(focused_col)
 		EditMenuAction.CUT_CELL_VALUE:
 			var value: Variant = data_table.get_cell_value(focused_row, focused_col)
-			if data_table.is_cell_valid(focused_row, focused_col):
-				clipboard = value
-				_on_cell_edited(focused_row, focused_col, value, null)
+			clipboard = value
+			_on_cell_edited(focused_row, focused_col, value, null)
 		EditMenuAction.COPY_CELL_VALUE:
 			var value: Variant = data_table.get_cell_value(focused_row, focused_col)
-			if data_table.is_cell_valid(focused_row, focused_col):
-				clipboard = value
+			clipboard = value
 		EditMenuAction.PASTE_TO_CELL:
 			var value: Variant = data_table.get_cell_value(focused_row, focused_col)
-			if data_table.is_cell_valid(focused_row, focused_col):
-				_on_cell_edited(focused_row, focused_col, value, clipboard)
+			_on_cell_edited(focused_row, focused_col, value, clipboard)
 		EditMenuAction.SELECT_ALL:
 			_select_all()
 		EditMenuAction.INVERT_SELECTION:
@@ -342,6 +345,8 @@ func toggle_edit_menu_items(edit_menu: PopupMenu) -> void:
 	var in_subresource := is_in_subresource_view()
 	var cant_be_cut := col in [UID_COLUMN, STRINGID_COLUMN]
 	var is_cell_invalid: bool = not data_table.is_cell_valid(row, col)
+	var column := data_table.get_column(col)
+	var is_read_only := column != null and column.read_only
 	edit_menu.set_item_disabled(
 		edit_menu.get_item_index(EditMenuAction.DELETE_ENTRIES),
 		!has_selected_row or in_subresource,
@@ -364,7 +369,7 @@ func toggle_edit_menu_items(edit_menu: PopupMenu) -> void:
 	)
 	edit_menu.set_item_disabled(
 		edit_menu.get_item_index(EditMenuAction.CUT_CELL_VALUE),
-		!has_selected_cell or cant_be_cut or is_cell_invalid,
+		!has_selected_cell or cant_be_cut or is_cell_invalid or is_read_only,
 	)
 	edit_menu.set_item_disabled(
 		edit_menu.get_item_index(EditMenuAction.COPY_CELL_VALUE),
@@ -372,7 +377,7 @@ func toggle_edit_menu_items(edit_menu: PopupMenu) -> void:
 	)
 	edit_menu.set_item_disabled(
 		edit_menu.get_item_index(EditMenuAction.PASTE_TO_CELL),
-		!has_selected_cell or is_cell_invalid,
+		!has_selected_cell or is_cell_invalid or is_read_only,
 	)
 
 	for select_action: int in [
@@ -466,6 +471,7 @@ func _build_columns(
 		var class_string: String = prop[&"class_name"]
 		var column := DataTable.ColumnConfig.new(prop_name, prop_header, prop_type)
 		column.frozen = is_column_frozen(column.identifier)
+		column.read_only = prop[&"usage"] & PROPERTY_USAGE_READ_ONLY != 0
 
 		if hint:
 			column.property_hint = hint

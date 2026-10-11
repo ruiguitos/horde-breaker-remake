@@ -11,6 +11,7 @@ func _initialize() -> void:
 	_test_map_is_playable()
 	_test_hitscan_orders_and_pierces()
 	_test_auto_fire_kills_and_drops_xp()
+	_test_enemy_xp_rewards()
 	_test_cards_on_level_up()
 	_test_breaker_frees_grab()
 	_test_mission_flow()
@@ -81,6 +82,35 @@ func _test_auto_fire_kills_and_drops_xp() -> void:
 	for t in 30:
 		run.step(DT, Vector2.ZERO, Vector3(0, 0, -1), false)
 	_check(run.kills == 1, "auto-fire ignores enemies behind the player")
+
+
+func _test_enemy_xp_rewards() -> void:
+	var rewards: Array[int] = [10, 12, 100, 45, 1000, 45, 60]
+	for kind in rewards.size():
+		for boosted in [false, true]:
+			var run := IslandRun.new(7)
+			run.level = 20
+			if boosted:
+				run.card_stacks[&"fast_learner"] = 4
+				run.power_ups.double_time = 25.0
+			run.horde.add(run.player_pos, kind, run.rng)
+			run._damage(0, 10000.0, run.player_pos, false, true, true)
+			_check(run.kills == 1 and run.orb_values == PackedInt32Array([rewards[kind]]) and run.xp == 0,
+				"enemy %d drops %d XP without granting it before collection" % [kind, rewards[kind]])
+			run._update_orbs(0.0)
+			var expected: float = rewards[kind] * (2.4 if boosted else 1.0)
+			_check(is_equal_approx(run.xp_progress(), expected) and run.orbs.is_empty(),
+				"enemy %d pickup grants %.2f XP (boosted: %s)" % [kind, expected, boosted])
+	var run := IslandRun.new(7)
+	for kill in 15:
+		run.horde.add(run.player_pos, GameData.EnemyKind.WALKER, run.rng)
+		run._damage(0, 1000.0, run.player_pos, false, true, true)
+		run._flush_dead()
+		run._update_orbs(0.0)
+		if kill == 13:
+			_check(run.level == 1 and run.xp == 140 and run.card_choices.is_empty(), "fourteen Walkers leave level 1 at 140/150 XP")
+	_check(run.level == 2 and run.xp == 0 and run.card_choices.size() == 3,
+		"fifteen Walkers still reach level 2 and offer three cards")
 
 
 func _test_cards_on_level_up() -> void:

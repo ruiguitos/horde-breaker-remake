@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_2r70k")
 display_name = "Walker"
+xp = 10
 speed_min = 1.8
 speed_max = 2.6
 color = Color(0.45, 0.6, 0.35, 1)

@@ -57,6 +57,18 @@ func _run_tests() -> void:
 	island.connect("finished", func(won: bool) -> void:
 		_check(not won, "defeat continues as a lost run")
 		_continued += 1)
+	run.power_ups.ground_kind = &"double_rewards"
+	run.power_ups.ground_pos = run.player_pos + Vector3(10, 0, 0)
+	run.power_ups.ground_time = 25.0
+	await _settle()
+	_check(hud._power_up_timers.text == "" and run.power_ups.double_time == 0.0
+		and run.power_ups_picked.is_empty() and hud._minimap.drawn_kinds.has(&"power_up"),
+		"uncollected drop appears on the minimap without an active buff")
+	run.power_ups.tick(25.0)
+	await _settle()
+	_check(hud._power_up_timers.text == "" and run.power_ups_picked.is_empty()
+		and not hud._minimap.drawn_kinds.has(&"power_up") and not hud._messages.text.contains("DOUBLE XP / INTEL!"),
+		"lost drop disappears without an active timer or collection toast")
 	run.apply_power_up(&"max_shield")
 	run.apply_power_up(&"insta_kill")
 	run.apply_power_up(&"double_rewards")

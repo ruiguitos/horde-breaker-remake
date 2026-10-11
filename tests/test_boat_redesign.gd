@@ -2,7 +2,7 @@ extends SceneTree
 ## Boat and camp on one screen (MENUS.md, October 2026 redesign): no supply
 ## modal over the routes, useless supplies disabled with a reason, DEPLOY
 ## names the destination, LB/RB pick routes, focus goes routes -> supplies
-## -> DEPLOY, B goes back up and never picks a supply, the supply is applied
+## -> DEPLOY, B opens the exit choices and never picks a supply, the supply is applied
 ## on DEPLOY, and the camp shows the next expedition part.
 
 var _failures: int = 0
@@ -106,10 +106,15 @@ func _fresh_boat() -> void:
 	await _press(_key(KEY_DOWN))
 	_check(root.gui_get_focus_owner() == land, "down from the supplies goes to DEPLOY")
 	await _press(_pad(JOY_BUTTON_B))
-	_check(root.gui_get_focus_owner() == supplies[2], "B goes back up to the supplies")
+	var dialog: MenuDialog = boat.get("_exit_dialog")
+	_check(is_instance_valid(dialog), "B opens the exit menu from DEPLOY")
 	_check(int(boat.get("_supply")) == 2, "B never picks a supply (card_3 is ignored from the pad)")
 	await _press(_pad(JOY_BUTTON_B))
-	_check(root.gui_get_focus_owner() == routes[0], "B again goes back up to the routes")
+	_check(root.gui_get_focus_owner() == land, "B closes the exit menu and restores DEPLOY focus")
+	await _press(_key(KEY_UP))
+	_check(root.gui_get_focus_owner() == supplies[2], "up from DEPLOY returns to the supplies")
+	await _press(_key(KEY_UP))
+	_check(root.gui_get_focus_owner() == routes[0], "up from the supplies returns to the routes")
 	# LB/RB switch routes without moving focus.
 	await _press(_pad(JOY_BUTTON_RIGHT_SHOULDER))
 	_check(int(boat.get("_route")) == 1 and context.biome == biomes[1], "RB selects route B")
@@ -179,5 +184,28 @@ func _camp() -> void:
 	_check(root.gui_get_focus_owner() == supplies[0], "focus opens on the preselected supply")
 	await _press(_key(KEY_DOWN))
 	_check(root.gui_get_focus_owner() == camp.get("_land"), "down from the supplies goes to CONTINUE")
+	await _press(_key(KEY_ESCAPE))
+	var dialog: MenuDialog = camp.get("_exit_dialog")
+	_check(is_instance_valid(dialog), "Escape opens exit choices in a camp without routes")
+	if is_instance_valid(dialog):
+		var keep: Button = dialog.find_child("KeepPlaying", true, false)
+		_check(root.gui_get_focus_owner() == keep, "keep playing is focused when exit choices open")
+		_check(dialog.find_child("ReturnToArmory", true, false) != null
+			and dialog.find_child("ReturnToTitle", true, false) != null, "camp offers both classes and the main menu")
+		var before: int = context.rerolls
+		await _press(_key(KEY_R))
+		await _press(_key(KEY_3))
+		_check(context.rerolls == before and context.hp == 50.0 and not bool(camp.get("_applied")),
+			"exit choices block rerolls, supply selection and deployment behind the dialog")
+		await _press(_key(KEY_ESCAPE))
+		_check(root.gui_get_focus_owner() == camp.get("_land") and not is_instance_valid(camp.get("_exit_dialog")),
+			"Escape closes exit choices and restores the camp without ending the run")
+		# A visible Back button gives mouse users the same choices.
+		var back: Button = camp.find_child("Back", true, false)
+		_check(back != null, "camp has a clickable Back button")
+		if back != null:
+			back.pressed.emit()
+			await _settle()
+			_check(is_instance_valid(camp.get("_exit_dialog")), "clicking Back opens the same exit choices")
 	camp.queue_free()
 	await _settle()

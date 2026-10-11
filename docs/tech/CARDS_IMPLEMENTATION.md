@@ -35,6 +35,28 @@ repor munição. Thick Hide aumenta vida máxima e atual imediatamente, também
 quando vem de um mantimento. Vida máxima e XP fracionária passam de ilha
 para ilha.
 
+## Fast Learner: ganho e feedback de XP
+
+Fast Learner mantém **+5% de XP recolhida por rank**: rank 4 dá +20% e
+rank 5 dá +25%. A fração é acumulada e passa de ilha para ilha; não é
+descartada por cada orbe. No rank 4, dez orbes de 1 XP dão 12 XP. Com
+Double XP ativo, um orbe de 1 XP dá 2,4 XP nesse rank.
+
+Correção de 2026-10-11: o HUD mostrava só a parte inteira, fazendo um
+ganho de 1,2 XP parecer igual a 1 XP. O número e a barra agora incluem
+a fração, com até duas casas decimais; aparece também `XP +20%` junto
+ao escudo quando se tem a carta no rank 4. O cálculo da recompensa e
+o indicador usam o mesmo bónus. Não foram alterados os valores de equilíbrio.
+
+Os testes cobrem ranks 0–5, Double XP, continuidade entre ilhas e a
+apresentação de 1,2 XP / +20% e 1,05 XP / +5% no HUD.
+
+Após a mudança de escala de XP de 2026-10-11, um Walker dá 10 XP base,
+12 XP no rank IV ou 24 XP com Double XP. Os exemplos de 1 XP acima
+continuam a explicar a conservação de frações; os testes também verificam
+as novas recompensas reais. Custos e valores atuais estão no
+[catálogo de combate](COMBAT_CATALOG.md#escala-de-xp--2026-10-11).
+
 ## Recolha automática de XP a partir do nível 30
 
 A partir do **nível 30**, toda a XP no chão da ilha/parte atual é

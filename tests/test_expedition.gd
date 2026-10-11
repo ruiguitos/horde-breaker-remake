@@ -86,6 +86,7 @@ func _run_tests() -> void:
 	await _expedition_death()
 	await _archipelago_run()
 	await _test_island_part(parts)
+	await _between_islands_exit()
 	_main.queue_free()
 	await _settle()
 	Expeditions.stand_ins.clear()
@@ -93,6 +94,73 @@ func _run_tests() -> void:
 	if _failures == 0:
 		print("TEST: expedition OK (%d checks)" % _checks)
 	quit(1 if _failures > 0 else 0)
+
+
+func _between_islands_exit() -> void:
+	for flow in [Flow.CAMP, Flow.BOAT]:
+		for to_title in [false, true]:
+			var profile := MemoryProfile.new()
+			profile.intel = 100
+			_main.set("profile", profile)
+			Profile.current = profile
+			var ctx := RunContext.new(5)
+			if flow == Flow.CAMP:
+				ctx.start_expedition(&"berlenga")
+			ctx.advance()
+			ctx.intel = 80
+			ctx.time_alive = 90.0
+			ctx.kills = 44
+			ctx.lore_found = 1
+			ctx.hp = 40.0
+			ctx.island_log.append({"island": 1, "result": "cleared", "intel": 80})
+			_main.set("context", ctx)
+			_main.call("_go", flow)
+			await _settle()
+			var screen: Node = _current()
+			var event := InputEventKey.new()
+			event.keycode = KEY_ESCAPE
+			event.physical_keycode = KEY_ESCAPE
+			event.pressed = true
+			Input.parse_input_event(event)
+			await _settle()
+			var dialog: MenuDialog = screen.get("_exit_dialog")
+			_check(is_instance_valid(dialog) and _context() == ctx and profile.intel == 100,
+				"Escape at state %d opens choices without ending or banking the run" % flow)
+			if not is_instance_valid(dialog):
+				continue
+			var consequences: Label = dialog.find_child("ExitConsequences", true, false)
+			_check(consequences.text.contains("80 Intel"), "exit choices show the exact earned Intel to keep")
+			screen.call("_land_now")
+			_check(not bool(screen.get("_applied")) and ctx.hp == 40.0,
+				"exit modal prevents deployment or supply application")
+			var pick: Button = dialog.find_child("ReturnToTitle" if to_title else "ReturnToArmory", true, false)
+			pick.pressed.emit()
+			pick.pressed.emit()  # two same-frame clicks must emit only once
+			await _settle()
+			_check(_state() == (Flow.TITLE if to_title else Flow.ARMORY) and _context() == null,
+				"leaving state %d reaches the requested menu and clears the active run" % flow)
+			_check(profile.intel == 180 and profile.runs == 1 and profile.extractions == 0
+				and profile.best_kills == 44 and profile.lore_pages == 1 and not ctx.won,
+				"leaving keeps Intel and lore exactly once, without extraction bonus or a win")
+			_main.call("_leave_between_islands", to_title)
+			_check(profile.intel == 180 and profile.runs == 1, "stale exit callback cannot deposit the run twice")
+	# No completed island: returning cancels setup without recording an empty run.
+	var profile := MemoryProfile.new()
+	_main.set("profile", profile)
+	Profile.current = profile
+	_main.set("context", RunContext.new(7))
+	_main.call("_go", Flow.BOAT)
+	await _settle()
+	_current().call("_back")
+	await _settle()
+	var dialog: MenuDialog = _current().get("_exit_dialog")
+	if is_instance_valid(dialog):
+		(dialog.find_child("ReturnToArmory", true, false) as Button).pressed.emit()
+		await _settle()
+		_check(_state() == Flow.ARMORY and profile.runs == 0 and profile.intel == 0,
+			"leaving before first landing returns to classes without recording an empty run")
+	else:
+		_check(false, "first-landing setup also has exit choices")
 
 
 func _context_tests(parts: Array) -> void:

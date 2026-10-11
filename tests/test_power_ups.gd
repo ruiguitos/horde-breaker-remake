@@ -22,6 +22,7 @@ func _run_tests() -> void:
 	_test_drops()
 	_test_shield()
 	_test_effects()
+	_test_pickup_required()
 	_test_rewards()
 	_test_carry()
 	await _test_handmade()
@@ -205,6 +206,79 @@ func _test_effects() -> void:
 	run._collect_power_up()
 	run._collect_power_up()
 	_check(run.shield == 100.0 and run.power_ups_picked == [&"max_shield"] and run.messages.has("MAX SHIELD!"), "walking onto a drop collects once and produces a toast event")
+
+
+## Expiry, level-30 XP collection and island transitions never use ground items.
+func _test_pickup_required() -> void:
+	for kind: StringName in GameData.POWER_UP_IDS:
+		var run := _open_run()
+		run.level = 30
+		run.hp = 60.0
+		run.shield = 7.0
+		run.breaker_cd = 4.0
+		run.grenade_cd = 6.0
+		run.ammo[1] = 0
+		run.rerolls = 0
+		run.horde.add(run.player_pos + Vector3(20, 0, 0), GameData.EnemyKind.WALKER, run.rng)
+		run.power_ups.ground_kind = kind
+		run.power_ups.ground_pos = run.player_pos + Vector3(10, 0, 0)
+		run.power_ups.ground_time = GameData.POWER_UP_GROUND_SECONDS
+		var before: Dictionary = _power_effect_state(run)
+		run._collect_power_up()
+		run._update_orbs(0.0)
+		_check(_power_effect_state(run) == before and run.power_ups.ground_kind == kind,
+			"%s requires physical pickup, even at level 30" % kind)
+		var ctx := RunContext.new(21)
+		run.save_to_context(ctx)
+		var next := _open_run()
+		next.load_context(ctx)
+		_check(next.power_ups.ground_kind == &"" and next.power_ups.insta_time == 0.0
+			and next.power_ups.double_time == 0.0 and next.power_ups.spawn_delay == 0.0
+			and next.shield == 7.0 and next.ammo[1] == 0 and next.rerolls == 0 and next.kills == 0
+			and ctx.island_log[0]["power_ups"].is_empty(), "%s left behind is not used or carried to the next island" % kind)
+		run.power_ups.tick(GameData.POWER_UP_GROUND_SECONDS)
+		run.player_pos = run.power_ups.ground_pos
+		run._collect_power_up()
+		_check(_power_effect_state(run) == before and run.power_ups.ground_kind == &"",
+			"%s expires without effects, rewards, pickup telemetry or a toast" % kind)
+		# The same item produces its effect only while alive and within pickup range.
+		run.power_ups.ground_kind = kind
+		run.power_ups.ground_time = GameData.POWER_UP_GROUND_SECONDS
+		run._collect_power_up()
+		var after: Dictionary = _power_effect_state(run)
+		_check(after != before and run.power_ups_picked == [kind] and run.power_ups.ground_kind == &""
+			and run.power_ups.ground_time == 0.0 and run.messages.has("%s!" % GameData.POWER_UP_NAMES[kind]),
+			"%s activates after collection and consumes its ground item" % kind)
+		run._collect_power_up()
+		_check(_power_effect_state(run) == after, "%s cannot activate twice from one pickup" % kind)
+	var stale := _open_run()
+	stale.power_ups.ground_kind = &"max_shield"
+	stale.power_ups.ground_pos = stale.player_pos
+	stale.power_ups.ground_time = 0.0
+	stale._collect_power_up()
+	_check(stale.shield == 0.0 and stale.power_ups_picked.is_empty() and stale.messages.is_empty()
+		and stale.power_ups.ground_kind == &"", "pickup rejects an expired item even before the timer cleanup runs")
+	var reused := PowerUps.new(21)
+	reused.ground_kind = &"insta_kill"
+	reused.ground_time = 25.0
+	reused.restore(PowerUps.new(22).snapshot())
+	_check(reused.ground_kind == &"" and reused.ground_time == 0.0, "restoring an island context discards any old ground item")
+	# Expiry wins when the player arrives on the final frame.
+	var boundary := _open_run()
+	boundary.director.max_alive = 0
+	boundary.power_ups.ground_kind = &"max_shield"
+	boundary.power_ups.ground_pos = boundary.player_pos
+	boundary.power_ups.ground_time = 0.01
+	boundary.step(0.01, Vector2.ZERO, Vector3.FORWARD, false)
+	_check(boundary.shield == 0.0 and boundary.power_ups_picked.is_empty(), "arrival on the expiration frame does not use the expired item")
+
+
+func _power_effect_state(run: IslandRun) -> Dictionary:
+	return {"insta": run.power_ups.insta_time, "double": run.power_ups.double_time,
+		"spawn_delay": run.power_ups.spawn_delay, "shield": run.shield, "hp": run.hp,
+		"breaker": run.breaker_cd, "ability": run.grenade_cd, "ammo": run.ammo.duplicate(),
+		"rerolls": run.rerolls, "kills": run.kills, "xp": run.xp_progress(), "orbs": run.orbs.size(),
+		"intel": run.intel_earned(), "pickups": run.power_ups_picked.duplicate(), "messages": run.messages.duplicate()}
 
 
 ## The boss objective sees an Insta-Kill (or Nuke) boss kill like any other.

@@ -83,6 +83,9 @@ func snapshot() -> Dictionary:
 
 
 func restore(data: Dictionary) -> void:
+	# Ground items belong to the old island, including when reusing this object.
+	ground_kind = &""
+	ground_time = 0.0
 	if data.is_empty():
 		return
 	rng.state = int(data["rng_state"])

@@ -1,8 +1,8 @@
 # Catálogo de combate — revisão de valores atuais
 
-Estado verificado em **2026-10-10**, incluindo as alterações locais ainda sem
-commit. Este documento regista o que o jogo executa hoje; não aprova novos
-valores nem altera o equilíbrio. A proposta de design em
+Catálogo atualizado em **2026-10-11**, incluindo a nova escala de XP aprovada
+pelo utilizador e as alterações locais ainda sem commit. Este documento
+regista o que o jogo executa hoje. A proposta de design em
 [CARDS_WEAPONS_PERKS.md](../design/CARDS_WEAPONS_PERKS.md) contém também valores
 anteriores e funcionalidades por implementar: não deve ser lida como catálogo
 atual.
@@ -265,13 +265,42 @@ Nenhuma destas três altera o cooldown de 16 s do War Cry.
   duas opções. Mantimento de carta oferece uma única elegível.
 - Sem elegíveis: cura de 20 HP. Rerolls: dois iniciais, +1 por ilha
   intermédia concluída, reserva máxima três.
-- XP do nível `n` para `n+1`: **`8 + 6n + n²`**. Exemplos: 1→2 = 15;
-  10→11 = 168; 29→30 = 1023; 30→31 = 1088.
-- Do nível 1 ao 30 são necessários **11 397 XP de progressão**. Fast Learner
+- XP do nível `n` para `n+1`: **`10 × (8 + 6n + n²)`**. Exemplos: 1→2 = 150;
+  10→11 = 1680; 29→30 = 10 230; 30→31 = 10 880.
+- Do nível 1 ao 30 são necessários **113 970 XP de progressão**. Fast Learner
   e Double XP aumentam quanto recebe cada orbe, reduzindo o número de
   abates/orbes necessários. Nível 30 não é o limite de níveis.
 - XP Magnet ainda pode ser oferecida depois do nível 30 se tiver ranks
   disponíveis; não existe um filtro para a nova recolha global.
+
+### Escala de XP — 2026-10-11
+
+Custos e recompensa do Walker aumentaram ambos ×10: continuam a ser
+necessários **15 Walkers recolhidos para passar de nível 1 a 2**, sem bónus.
+A mudança permite recompensas mais expressivas e frações menores em relação
+ao valor de um abate. Runner rende agora 12 XP; especiais e chefe valem mais
+em relação ao Walker (tabela seguinte). Não é uma aceleração uniforme de ×10.
+
+| Passagem de nível | XP necessária |
+|---|---:|
+| 1 → 2 | 150 |
+| 5 → 6 | 630 |
+| 10 → 11 | 1680 |
+| 15 → 16 | 3230 |
+| 20 → 21 | 5280 |
+| 25 → 26 | 7830 |
+| 30 → 31 | 10 880 |
+
+Fast Learner continua a dar +5% por rank. No rank IV, um Walker rende
+**12 XP**; com Double XP ativo, **24 XP**. Um Runner rende 14,4 XP nesse
+rank, ou 28,8 XP com ambos os efeitos. Field Dressing continua a curar por
+orbe, sem multiplicar a cura pela nova escala. As caixas de XP já usam metade
+do custo do nível atual, pelo que acompanham a escala automaticamente.
+
+O objetivo de **25–30 níveis numa run de 20–30 minutos** precisa de playtests
+com jogadores. Multiplicar custos e XP do Walker pelo mesmo valor não torna
+o nível 30 mais próximo; a contribuição dos especiais aumentou, mas a curva
+quadrática tardia ainda precisa de ser medida. Não foi aplicada outra curva.
 
 ## 4. Inimigos
 
@@ -279,13 +308,13 @@ Nenhuma destas três altera o cooldown de 16 s do War Cry.
 
 | Inimigo / ID | HP | Velocidade sorteada | Dano de contacto definido | Intervalo | DPS de contacto bruto | XP por abate | Redução frontal | Empurrável |
 |---|---:|---|---:|---:|---:|---:|---:|---|
-| Walker / `walker` | 30 | 1,8–2,6 m/s | 8 | 1 s | 8 | 1 | 0% | Sim |
-| Runner / `runner` | 18 | 4,6–5,4 m/s | 6 | 0,7 s | 8,57 | 1 | 0% | Sim |
-| Brute / `brute` | 260 | 1,6–1,9 m/s | 25 | 1,6 s | 15,63 | 6 | 75% | Não |
-| Grabber / `grabber` | 70 | 2,8–3,2 m/s | 4 | 0,5 s | 8 | 3 | 0% | Sim |
-| Behemoth / `behemoth` | 1800 | 1,7 m/s; 2,7 na fase 2 | 35 | 1,4 s | 25 bruto | 40 | 50% | Não |
-| Bloater / `bloater` | 90 | 1,3–1,5 m/s | 10 | 1,2 s | 8,33 | 3 | 0% | Sim |
-| Screamer / `screamer` | 45 | 3–3,4 m/s | 3 | 1 s | 3 | 4 | 0% | Sim |
+| Walker / `walker` | 30 | 1,8–2,6 m/s | 8 | 1 s | 8 | 10 | 0% | Sim |
+| Runner / `runner` | 18 | 4,6–5,4 m/s | 6 | 0,7 s | 8,57 | 12 | 0% | Sim |
+| Brute / `brute` | 260 | 1,6–1,9 m/s | 25 | 1,6 s | 15,63 | 100 | 75% | Não |
+| Grabber / `grabber` | 70 | 2,8–3,2 m/s | 4 | 0,5 s | 8 | 45 | 0% | Sim |
+| Behemoth / `behemoth` | 1800 | 1,7 m/s; 2,7 na fase 2 | 35 | 1,4 s | 25 bruto | 1000 | 50% | Não |
+| Bloater / `bloater` | 90 | 1,3–1,5 m/s | 10 | 1,2 s | 8,33 | 45 | 0% | Sim |
+| Screamer / `screamer` | 45 | 3–3,4 m/s | 3 | 1 s | 3 | 60 | 0% | Sim |
 
 DPS bruto é `dano / intervalo`, sem atordoamento, congelamento, distância,
 War Cry ou limite por passo. **O golpe de contacto de 35 do Behemoth também
@@ -420,7 +449,8 @@ XP/Intel, Nuke, Full Power, Max Shield, Extra Reroll e Max Ammo.
 ## 6. Pontos para decidir na revisão
 
 Esta lista distingue diferenças confirmadas no código de hipóteses de
-equilíbrio. **Nenhuma foi corrigida ou reequilibrada nesta revisão.**
+equilíbrio. A escala de XP foi atualizada; os restantes pontos mantêm-se
+por decidir.
 
 | Ponto | Constatação | Questão de design / correção a considerar |
 |---|---|---|
@@ -433,7 +463,7 @@ equilíbrio. **Nenhuma foi corrigida ou reequilibrada nesta revisão.**
 | Elite Pack | Descrição cita Brutes/Grabbers; execução também duplica Bloaters/Screamers; em Jungle substitui ×1,4 por ×2 | Corrigir texto e decidir se os multiplicadores devem acumular |
 | Demolitions no Vanguard | Pode ocupar um slot sem melhorar War Cry | Filtrar por classe ou criar efeito equivalente para Vanguard |
 | XP Magnet após nível 30 | Continua elegível antes do rank máximo, mas XP já é recolhida globalmente | Excluir da oferta, convertê-la ou aceitar a redundância |
-| Acesso ao nível 30 | Curva atual exige 11 397 XP recebidos desde nível 1; cada Walker/Runner rende 1 XP base | Medir se o limiar é atingível numa run normal antes de rever a curva |
+| Acesso ao nível 30 | Curva atual exige 113 970 XP recebidos desde nível 1; Walker/Runner rendem 10/12 XP base; especiais e chefe passaram a valer mais | Medir níveis por minuto e contribuição dos especiais numa run normal antes de ajustar a curva tardia |
 | Armadura e dimensão | Blindagem depende da velocidade; colisão/hitscan comuns apesar de tamanhos visuais diferentes | Confirmar se é a simplificação pretendida ou se chefes/especiais precisam de volumes próprios |
 | Executioner | No rank V duplica qualquer dano contra atordoados, incluindo DOT, nuvens e Breaker | Medir builds de atordoamento e chefes; ainda não prova desequilíbrio |
 | Largura do cone | O valor 50° é usado como semiângulo: 100° totais na câmara fixa | Confirmar se a intenção de «cone de 50°» era largura total ou desvio para cada lado |
@@ -458,4 +488,20 @@ e medir runs sem invulnerabilidade.
 A exportação headless confirmou os seis catálogos; os números derivados
 foram calculados a partir desses dados e comparados com as fórmulas do
 código. Esta revisão documental **não é um playtest de equilíbrio**.
-Não foram alterados scripts, recursos de gameplay nem testes nesta tarefa.
+Os testes `test_data.gd` e `test_island_run.gd` verificam os custos, as sete
+recompensas, os abates/recolhas reais e a combinação com Fast Learner e
+Double XP. Os valores anteriores continuam no histórico Git.
+
+Verificação da atualização de 2026-10-11: **27/27 scripts de teste passaram**
+(26 existentes e o novo `test_island_end_panel.gd` criado externamente durante
+a tarefa), sem `TEST FAIL`, `SCRIPT ERROR` ou `Parse Error`. O bot extraiu nas
+seis ilhas de duas runs, cobrindo os cinco biomas e os chefes. Terminou ambas
+no nível 15 em cerca de oito minutos simulados; usa vida elevada e não
+valida o objetivo de níveis para partidas humanas de 20–30 minutos.
+
+O HUD foi visto no Godot Forward+ a 1280×720 com `XP 8999.2/10880` e
+`XP +20%`, sem sobreposição. Trocar temporariamente a escala ×10 por ×9
+provocou oito falhas; permitir a recolha de um drop com tempo zero provocou
+uma falha. Ambas as alterações foram restauradas e os testes focados
+voltaram a passar. A revisão JEV recebeu apenas um resumo sanitizado e
+foi inconclusiva; a validação baseia-se na inspeção local e nos testes.

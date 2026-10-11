@@ -12,6 +12,26 @@ Um ícone grande flutua sobre um anel luminoso e acompanha o relevo e as
 pontes. O minimapa usa um círculo com cruz e a legenda `POWER-UP`.
 O jogador apanha-o ao aproximar-se; não precisa de premir uma tecla.
 
+### Recolha obrigatória — 2026-10-11
+
+**Um power-up só tem efeito quando é apanhado a até 1,4 m.** Se os 25 s
+acabarem ou o jogador sair da ilha/parte sem o recolher, perde-se: não
+concede efeitos, munição, escudo, rerolls, XP ou Intel, não mostra aviso de
+utilização e não conta como recolha na telemetria. A recolha automática de
+XP a partir do nível 30 não recolhe power-ups.
+
+O ciclo normal já descartava os drops ao expirar. Foi reforçada a validação
+da recolha para recusar um item cujo tempo terminou mesmo antes da limpeza
+dos temporizadores. Restaurar o estado entre ilhas também limpa qualquer
+objeto no chão que reste numa instância reutilizada. O efeito de um item
+recolhido continua a funcionar normalmente, incluindo a continuidade dos
+bónus ativos entre ilhas.
+
+Os testes percorrem os sete tipos: distância, perda por expiração, saída
+da ilha, recolha válida e consumo único. Cobrem ainda a chegada no instante
+de expiração e o HUD: um drop no minimapa não aparece como bónus ativo;
+quando se perde, desaparece sem aviso de recolha.
+
 | Power-up | Efeito atual |
 |---|---|
 | Insta-Kill | 25 s: qualquer tiro direto mata qualquer inimigo, elites, especiais e chefe incluídos (aplica-se depois da armadura frontal, que já não o trava). Não transforma breaker ou dano secundário em abates instantâneos. |
@@ -110,6 +130,14 @@ pay aplicam-se ao total, e o ×1,5 de extração mantém a regra existente.
 
 ## Verificação
 
+Na atualização de 2026-10-11, os novos testes da recolha obrigatória e do
+HUD passaram, juntamente com os restantes: **27/27 scripts**. Os dois casos
+de estado residual falharam antes das proteções e passaram depois. Uma
+alteração temporária que aceitava um drop com tempo zero voltou a fazer
+falhar o teste; o código correto foi restaurado e o teste voltou a passar.
+Os resultados completos desta atualização estão no
+[catálogo de combate](COMBAT_CATALOG.md#7-fontes-e-verificação).
+
 `tests/test_power_ups.gd` cobre limites, garantia, probabilidade maior nos
 especiais, determinismo, RNG independente, expiração, cada efeito,
 escudo, contabilização de Intel, pausa e continuidade. Usa também um
@@ -122,7 +150,7 @@ a 960×540, 1152×648 e 1920×1080. `test_hud.gd` foi atualizado para verificar
 o relatório que substituiu `YOU DIED`. Capturas no Godot a 1152×648
 confirmaram visualmente o HUD e a derrota.
 
-Resultado final: **26/26 testes** (23 do jogo e três dos spikes), sem
+Resultado da implementação inicial: **26/26 testes** (23 do jogo e três dos spikes), sem
 `TEST FAIL` ou `SCRIPT ERROR`. O bot extraiu nas seis ilhas de duas runs,
 com os cinco biomas e o chefe. As capturas foram verificadas também com
 o renderer **Forward+** do projeto, na RTX 5060 deste PC. Os perfis dos

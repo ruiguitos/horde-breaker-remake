@@ -564,6 +564,15 @@ func xp_needed() -> int:
 	return GameData.xp_for_level(level)
 
 
+## Earned progress includes the fractions banked by Fast Learner.
+func xp_progress() -> float:
+	return xp + xp_fraction
+
+
+func fast_learner_bonus() -> float:
+	return 0.05 * stacks(&"fast_learner")
+
+
 func stacks(id: StringName) -> int:
 	return card_stacks.get(id, 0)
 
@@ -839,6 +848,11 @@ func _has_finite_weapon() -> bool:
 
 func _collect_power_up() -> void:
 	if power_ups.ground_kind == &"" or hp <= 0.0:
+		return
+	# Expired drops are lost, even if called before the timer cleanup.
+	if power_ups.ground_time <= 0.0:
+		power_ups.ground_kind = &""
+		power_ups.ground_time = 0.0
 		return
 	var d := Vector2(player_pos.x - power_ups.ground_pos.x, player_pos.z - power_ups.ground_pos.z)
 	if d.length() > GameData.POWER_UP_PICKUP_RADIUS:
@@ -1512,7 +1526,7 @@ func _update_orbs(dt: float) -> void:
 
 func _collect_xp_orb(index: int) -> void:
 	var reward_mult: float = 2.0 if power_ups.double_time > 0.0 else 1.0
-	var earned: float = orb_values[index] * reward_mult * (1.0 + 0.05 * stacks(&"fast_learner")) + xp_fraction
+	var earned: float = orb_values[index] * reward_mult * (1.0 + fast_learner_bonus()) + xp_fraction
 	var whole: int = floori(earned + 0.000001)
 	xp += whole
 	xp_fraction = maxf(0.0, earned - whole)

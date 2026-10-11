@@ -81,6 +81,14 @@ Breaker UI Proposals", as 7 propostas abaixo. O utilizador regista-as em
    - os mantimentos sem efeito ficam desativados, com o motivo;
    - o botão diz o destino ("DEPLOY TO JUNGLE").
    - O acampamento da expedição usa o mesmo esquema.
+   - **Esc / B** ou o botão **BACK** abrem uma janela com KEEP PLAYING,
+     RETURN TO ARMORY / CLASSES e MAIN MENU. Não movem apenas o foco.
+   - Sair termina a run: conserva o Intel e os ficheiros recuperados nas
+     partes/ilhas concluídas, sem o bónus de extração. Antes do primeiro
+     desembarque, cancela a preparação sem contar uma run vazia.
+   - KEEP PLAYING ou Esc / B fecham a janela e devolvem o foco ao ecrã
+     anterior. Mantimentos, rerolls e desembarque ficam bloqueados enquanto
+     a janela está aberta; escolher sair só contabiliza a run uma vez.
 4. **Cartas de nível:**
    - cada carta tem categoria (cor e forma), ícone, nome, efeito, rank em
      pips, etiqueta NEW/UPGRADE e a sinergia com outras cartas;
@@ -141,13 +149,39 @@ O que se afasta das maquetes, ou o que elas não diziam:
   - R ou Y troca as cartas.
 - **Título:** o lema não está em itálico, porque não incluímos a fonte
   itálica.
+- **Fim de ilha ou de parte** (`game/ui/island_end_panel.gd`): tem o mesmo
+  vidro da pausa e da derrota.
+  - O cabeçalho tem visto e cor de sucesso: ISLAND CLEARED, PART CLEARED ou
+    EXTRACTED na última.
+  - Os números grandes são só desta ilha. Os totais da corrida ficam numa
+    linha pequena com a etiqueta RUN TOTAL, para não se confundirem.
+  - Mostra as cartas e os power-ups apanhados aqui.
+  - A linha NEXT diz para onde vai o CONTINUE.
+  - O CONTINUE ignora toques nos primeiros 0,6 s, porque o A do comando
+    também é o Breaker.
 
 Testes novos:
 - `tests/test_title_debrief_redesign.gd`
 - `tests/test_boat_redesign.gd`
 - `tests/test_hud_redesign.gd`
+- `tests/test_island_end_panel.gd`
 
 ## Verificação e capturas
+
+**Correção do BACK no barco/acampamento — 2026-10-11:** o atalho antes
+movia só o foco para a fila anterior. Sem rotas no acampamento, Esc numa
+opção de mantimentos não fazia nada. Agora abre as opções de saída descritas
+acima. `test_boat_redesign.gd` passou 50 verificações; `test_expedition.gd`
+passou 77, incluindo ambos os destinos, conservação do Intel e ficheiros,
+ausência de bónus de extração, cancelamento e proteção contra saída dupla.
+A bateria completa passou **27/27 scripts**, sem falhas de teste/script.
+
+A janela real foi vista no Godot Forward+ a 1280×720, com KEEP PLAYING
+selecionado e todos os elementos dentro do ecrã. Inverter temporariamente a
+condição dos estados autorizados a sair provocou 13 falhas; a função foi
+restaurada e o teste de expedição voltou a passar. Os perfis de teste ficaram
+isolados do perfil real. A revisão JEV recebeu apenas um resumo sanitizado e
+foi inconclusiva; a validação assenta na inspeção local e nos testes.
 
 - tests/test_menus.gd: compras, limite de slots, foco modal, fecho/gravação,
   mantimentos, rotas, última ilha e isolamento dos atalhos na pausa.

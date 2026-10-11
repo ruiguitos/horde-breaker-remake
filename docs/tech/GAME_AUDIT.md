@@ -2,6 +2,13 @@
 
 **Data:** 2026-10-11. **Estado analisado:** `48d0c42ae3fc7501d0eb3993fb9351ab3e9daa61`, depois das alterações do Claude.
 
+**Atualização posterior à auditoria (2026-10-11):** a escala de XP mudou
+para custos ×10 e recompensas 10/12/100/45/1000/45/60 por EnemyKind.
+Os valores abaixo são o retrato da revisão indicada; os atuais estão no
+[catálogo de combate](COMBAT_CATALOG.md). O feedback de Fast Learner no
+HUD e a rejeição de power-ups expirados também foram reforçados, conforme
+[cartas](CARDS_IMPLEMENTATION.md) e [power-ups](POWER_UPS_AND_DEFEAT.md).
+
 O jogo já tem um ciclo completo e testável. O trabalho principal que falta é
 resolver algumas incoerências, validar o equilíbrio com jogadores e substituir
 o grey-box por modelos, animações e cenários consistentes. Os menus principais

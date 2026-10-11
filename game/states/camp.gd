@@ -140,6 +140,6 @@ func _can_land() -> bool:
 
 ## No briefing on foot: apply the supply and go straight on to the next part.
 func _land_now() -> void:
-	if _can_land() and not _applied:
+	if _can_land() and not _applied and not _exit_sent and not is_instance_valid(_exit_dialog):
 		_apply_supply()
 		land_requested.emit()

@@ -11,6 +11,7 @@ extends Control
 ## once. The supply is applied on DEPLOY, so changing your mind is free.
 
 signal land_requested
+signal exit_requested(to_title: bool)
 
 ## Supply tile height and route picture height, at the 1152x648 base size.
 const SUPPLY_HEIGHT: float = 104.0
@@ -38,6 +39,8 @@ var _route_biomes: Array[StringName] = []
 var _route_missions: Array[StringName] = []
 var _map: RouteMap
 var _briefing: DialogueBox
+var _exit_dialog: MenuDialog
+var _exit_sent: bool = false
 
 
 func _ready() -> void:
@@ -122,7 +125,7 @@ func _card_option(avoid: Array[StringName] = []) -> Dictionary:
 
 ## Shares the level-up reroll bank; changing supplies never spends a card.
 func reroll_supply() -> bool:
-	if _applied or context.rerolls <= 0 or not _options[2].has("card"):
+	if _applied or _exit_sent or is_instance_valid(_exit_dialog) or context.rerolls <= 0 or not _options[2].has("card"):
 		return false
 	var old: GameData.Card = _options[2]["card"]
 	_options[2] = _card_option([old.id])
@@ -442,7 +445,11 @@ func _footer(screen: VBoxContainer, routes: bool) -> void:
 		_hint(hints, [_key_name(&"menu_route_1", pad), _key_name(&"menu_route_2", pad)], "ROUTE")
 	_hint(hints, ["D-PAD" if pad else "↑↓←→"], "MOVE")
 	_hint(hints, [_key_name(&"ui_accept", pad)], "CHOOSE")
-	_hint(hints, [_key_name(&"ui_cancel", pad)], "BACK")
+	var back := UiTheme.button(hints, "%s BACK" % _key_name(&"ui_cancel", pad), _back)
+	back.name = "Back"
+	back.focus_mode = Control.FOCUS_NONE  # Escape/B is the keyboard/pad equivalent.
+	back.custom_minimum_size.y = 32
+	back.add_theme_font_size_override("font_size", 13)
 	var gap := Control.new()
 	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(gap)
@@ -589,7 +596,7 @@ func _on_supply_pressed(i: int) -> void:
 ## Selects supply `i` (if it would do something) and moves focus to DEPLOY.
 ## Applied on DEPLOY, not here.
 func _pick(i: int) -> void:
-	if _applied or not _select_supply(i):
+	if _applied or _exit_sent or is_instance_valid(_exit_dialog) or not _select_supply(i):
 		return
 	if is_inside_tree():
 		_land.grab_focus()
@@ -608,7 +615,7 @@ func _select_supply(i: int) -> bool:
 
 ## Selects route `i` (LB/RB, 4/5, or A on its card). Focus does not move.
 func _pick_route(i: int) -> void:
-	if _applied:
+	if _applied or _exit_sent or is_instance_valid(_exit_dialog):
 		return
 	_select_route(i)
 
@@ -684,17 +691,34 @@ func _wire_focus() -> void:
 		order[k].focus_previous = order[k].get_path_to(order[posmod(k - 1, order.size())])
 
 
-## B / Esc: one row back up (DEPLOY -> supplies -> routes).
+## B / Esc: choose whether to stay or end the run at the Armory/title.
 func _back() -> void:
-	var focus: Control = get_viewport().gui_get_focus_owner()
-	if focus == _land:
-		var above: Control = _land.get_node(_land.focus_neighbor_top) as Control
-		if above != null:
-			above.grab_focus()
-	elif focus != null and _buttons.has(focus):
-		var target: Control = _route_target()
-		if target != null:
-			target.grab_focus()
+	if _applied or _exit_sent or is_instance_valid(_exit_dialog) or is_instance_valid(_briefing):
+		return
+	_exit_dialog = MenuDialog.new()
+	_exit_dialog.name = "RunExitDialog"
+	add_child(_exit_dialog)
+	_exit_dialog.content.add_child(UiTheme.title("LEAVE THE RUN?", 36))
+	var note := UiTheme.label("Returning to the Armory or main menu ends this run. Your level, cards and build are lost.", 18)
+	_exit_dialog.content.add_child(note)
+	var intel := UiTheme.label("You keep %d Intel earned so far. The extraction bonus is not awarded." % context.intel, 18, UiTheme.SUCCESS)
+	intel.name = "ExitConsequences"
+	_exit_dialog.content.add_child(intel)
+	var keep := UiTheme.button(_exit_dialog.content, "KEEP PLAYING", _exit_dialog.close, true)
+	keep.name = "KeepPlaying"
+	var armory := UiTheme.button(_exit_dialog.content, "RETURN TO ARMORY / CLASSES", _request_exit.bind(false))
+	armory.name = "ReturnToArmory"
+	var title := UiTheme.button(_exit_dialog.content, "MAIN MENU", _request_exit.bind(true))
+	title.name = "ReturnToTitle"
+	_exit_dialog.content.add_child(UiTheme.label("ESC / B: stay in this run", 14, UiTheme.MUTED, true))
+
+
+func _request_exit(to_title: bool) -> void:
+	if _exit_sent or _applied or not is_instance_valid(_exit_dialog):
+		return
+	_exit_sent = true
+	_exit_dialog.close()
+	exit_requested.emit(to_title)
 
 
 func _update_land() -> void:
@@ -748,7 +772,7 @@ func _apply_supply() -> void:
 ## DEPLOY: apply the supply, then Director Hale's briefing (Dialogue
 ## Manager), then land.
 func _land_now() -> void:
-	if not _can_land() or _applied:
+	if not _can_land() or _applied or _exit_sent or is_instance_valid(_exit_dialog):
 		return  # also stops a second press while the briefing is open
 	_apply_supply()
 	var dialogue: Resource = load(Briefing.RESOURCE) if ResourceLoader.exists(Briefing.RESOURCE) else null

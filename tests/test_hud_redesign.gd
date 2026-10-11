@@ -78,6 +78,7 @@ func _run_tests() -> void:
 	_run.noclip = true  # no damage while the test waits
 	_run.director.max_alive = 0
 	await _test_field()
+	_test_fast_learner_feedback()
 	await _test_cards()
 	await _test_offers()
 	await _test_pause()
@@ -120,6 +121,37 @@ func _test_field() -> void:
 	defend.set_mission(&"defend")
 	var defend_keys: Array = Minimap.legend_entries(defend).map(func(e: Array) -> StringName: return e[0])
 	_check(defend_keys.has(&"site") and not defend_keys.has(&"generator"), "defend legend: the uplink, no generators")
+
+
+func _test_fast_learner_feedback() -> void:
+	var camera: Camera3D = _island.get("_camera")
+	var xp_text: Label = _hud.get("_xp_text")
+	var xp_bar: ProgressBar = _hud.get("_xp_bar")
+	var field: Control = _hud.get("_field")
+	_run.card_stacks = {&"fast_learner": 4}
+	_run.orbs.append(_run.player_pos)
+	_run.orb_values.append(1)
+	_run._update_orbs(0.0)
+	_hud.refresh(_run, camera, 0.0)
+	_check(xp_text.text == "XP 1.2/%d" % _run.xp_needed() and is_equal_approx(xp_bar.value, 1.2),
+		"rank 4 one-XP pickup visibly grants 1.2 XP in both label and bar")
+	var bonus: Label = field.find_child("XpBonus", true, false) as Label
+	_check(bonus != null and bonus.visible and bonus.text == "XP +20%", "HUD shows rank 4 Fast Learner bonus")
+	_run.card_stacks = {&"fast_learner": 1}
+	_run.xp = 0
+	_run.xp_fraction = 0.0
+	_run.orbs.append(_run.player_pos)
+	_run.orb_values.append(1)
+	_run._update_orbs(0.0)
+	_hud.refresh(_run, camera, 0.0)
+	_check(xp_text.text == "XP 1.05/%d" % _run.xp_needed() and is_equal_approx(xp_bar.value, 1.05),
+		"rank 1 feedback preserves the five percent bonus instead of rounding it away")
+	_run.card_stacks.clear()
+	_run.xp = 0
+	_run.xp_fraction = 0.0
+	_hud.refresh(_run, camera, 0.0)
+	_check(xp_text.text == "XP 0/%d" % _run.xp_needed() and (bonus == null or not bonus.visible),
+		"no card uses the normal integer XP display without a bonus badge")
 
 
 func _test_cards() -> void:

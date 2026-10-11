@@ -102,6 +102,7 @@ func _go(next: GameFlow) -> void:
 			boat.set_script(load("res://game/states/boat.gd"))
 			boat.set("context", context)
 			boat.connect("land_requested", _go.bind(GameFlow.ISLAND), CONNECT_DEFERRED)
+			boat.connect("exit_requested", _leave_between_islands, CONNECT_DEFERRED)
 			_current = boat
 		GameFlow.ISLAND:
 			var island: Node = (load(ISLAND_SCENE) as PackedScene).instantiate()
@@ -141,6 +142,7 @@ func _go(next: GameFlow) -> void:
 			camp.set_script(load("res://game/states/camp.gd"))
 			camp.set("context", context)
 			camp.connect("land_requested", _go.bind(GameFlow.ISLAND), CONNECT_DEFERRED)
+			camp.connect("exit_requested", _leave_between_islands, CONNECT_DEFERRED)
 			_current = camp
 		GameFlow.ARMORY:
 			var armory := Control.new()
@@ -153,6 +155,21 @@ func _go(next: GameFlow) -> void:
 	# Scenes build their sun/sky in _ready (Sky3D a frame later): re-apply
 	# the graphics preset to whatever lights they created.
 	get_tree().process_frame.connect(func() -> void: GraphicsSettings.apply_graphics(profile, get_tree()), CONNECT_ONE_SHOT)
+
+
+## Leaving a camp/boat banks only completed islands' Intel, once, without extraction.
+func _leave_between_islands(to_title: bool) -> void:
+	if state not in [GameFlow.BOAT, GameFlow.CAMP] or context == null:
+		return
+	context.won = false
+	# Before the first landing this just cancels setup, not a played run.
+	if not context.island_log.is_empty():
+		profile.record_run(context)
+		_write_telemetry()
+		profile.save()
+	context = null
+	_landing.clear()
+	_go(GameFlow.TITLE if to_title else GameFlow.ARMORY)
 
 
 ## Writes a JSON summary of the run to user://runs/ for balancing.

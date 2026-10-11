@@ -58,6 +58,7 @@ func _initialize() -> void:
 	_test_offer_edges(catalog)
 	_test_maxed_offer_exclusion(catalog)
 	_test_auto_xp()
+	_test_fast_learner_ranks()
 	for card in catalog:
 		_test_card(card.id)
 	_test_states()
@@ -147,6 +148,37 @@ func _test_auto_xp() -> void:
 	run.orb_values.append(1)
 	run._update_orbs(0.1)
 	_check(run.level == 31 and run.xp == 0 and not run.card_choices.is_empty(), "automatic XP continues levelling and offering eligible cards")
+
+
+func _test_fast_learner_ranks() -> void:
+	for rank in range(6):
+		var run: IslandRun = _run()
+		run.level = 20  # avoid level-ups while measuring ten one-XP pickups
+		run.card_stacks = {&"fast_learner": rank}
+		for pickup in 10:
+			run.orbs.append(run.player_pos)
+			run.orb_values.append(1)
+			run._update_orbs(0.0)
+		var expected: float = 10.0 * (1.0 + 0.05 * rank)
+		_check(is_equal_approx(run.xp + run.xp_fraction, expected),
+			"Fast Learner rank %d: ten base XP grant %.2f XP without losing fractions" % [rank, expected])
+	var run: IslandRun = _run()
+	run.level = 20
+	run.card_stacks = {&"fast_learner": 4}
+	run.power_ups.double_time = 10.0
+	run.orbs.append(run.player_pos)
+	run.orb_values.append(1)
+	run._update_orbs(0.0)
+	_check(is_equal_approx(run.xp + run.xp_fraction, 2.4), "rank 4 and Double XP grant 2.4 XP from one base XP")
+	var ctx := RunContext.new(77)
+	run.save_to_context(ctx)
+	var next: IslandRun = _run()
+	next.load_context(ctx)
+	next.power_ups.double_time = 0.0
+	next.orbs.append(next.player_pos)
+	next.orb_values.append(1)
+	next._update_orbs(0.0)
+	_check(is_equal_approx(next.xp + next.xp_fraction, 3.6), "rank 4 and fractional XP still apply after changing island")
 
 
 func _enemy(run: IslandRun, offset: Vector3 = Vector3(3, 0, 0), health: float = 1000.0,

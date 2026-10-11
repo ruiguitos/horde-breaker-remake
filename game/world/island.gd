@@ -57,6 +57,7 @@ var _audio_over: bool = false
 
 var _camera: Camera3D
 var _terrain: Node3D  ## Terrain3D ground, or null (flat tiles)
+var _terrain_data: Object  ## its Terrain3DData (real heights), or null
 var _player: Node3D
 var _walk_speed: float = 0.0  ## 0..1, drives the soldier's walk cycle
 ## Profile.CameraMode. First and third person: yaw/pitch in radians; the
@@ -981,9 +982,8 @@ func _pitch_limits() -> Vector2:
 func crosshair_ray() -> Array[Vector3]:
 	if camera_mode == Profile.CameraMode.FIRST_PERSON:
 		return [_view_pos() + Vector3(0, fp_eye_height, 0), _look_dir()]
-	var pivot: Vector3 = _tp_pivot_pos()
-	var back: Vector3 = _tp_back()
-	return [pivot + back * _tp_arm(pivot, back), _look_dir()]
+	var rig: Array = _tp_rig()
+	return [rig[0] + _tp_back() * float(rig[1]), _look_dir()]
 
 
 ## Shortest grenade throw (metres) when the crosshair is on the ground at
@@ -1131,8 +1131,36 @@ func _set_pcam_active(on: bool) -> void:
 		_pcam_host.process_mode = Node.PROCESS_MODE_INHERIT if on else Node.PROCESS_MODE_DISABLED
 
 
+## Space kept between the shoulder camera (and its pivot) and the ground
+## under it: with the near plane at 0.05 m and a 60 degree view, 0.5 m keeps
+## a slope from filling the screen or showing its underside.
+const TP_GROUND_CLEARANCE: float = 0.5
+## Step when walking the shoulder offset and the arm looking for ground.
+const TP_PROBE_STEP: float = 0.25
+
+
+## The shoulder camera as [pivot, arm length]: the camera sits at
+## pivot + _tp_back() * arm. One function feeds both the camera the player
+## sees and the crosshair ray, so they never disagree. In order:
+##   1. pivot: chest + shoulder offset, shorter when a building or a slope is
+##      beside the soldier, never under the ground;
+##   2. arm: tp_distance, pulled in when a building or the ground is in the
+##      way (the spring arm has no physics);
+##   3. if the pulled-in camera is still too low (a steep slope right
+##      behind), pivot and camera rise together: the view direction stays
+##      the same, so the crosshair keeps aiming where the player looks.
+func _tp_rig() -> Array:
+	var pivot: Vector3 = _tp_pivot_pos()
+	var back: Vector3 = _tp_back()
+	var arm: float = _tp_arm(pivot, back)
+	var cam: Vector3 = pivot + back * arm
+	var lift: float = maxf(0.0, _camera_floor(cam) - cam.y)
+	return [pivot + Vector3.UP * lift, arm]
+
+
 ## The third-person pivot: chest height, tp_shoulder to the right (less when
-## a building is right beside the soldier, so the view stays outside it).
+## a building or rising ground is right beside the soldier, so the view
+## stays outside it), and never closer than TP_GROUND_CLEARANCE to the ground.
 func _tp_pivot_pos() -> Vector3:
 	var chest: Vector3 = _view_pos() + Vector3(0, tp_height, 0)
 	var right: Vector3 = _tp_forward().cross(Vector3.UP).normalized()
@@ -1141,7 +1169,16 @@ func _tp_pivot_pos() -> Vector3:
 		var hit: Variant = _segment_hits_box(chest, chest + right * tp_shoulder, box)
 		if hit != null:
 			side = minf(side, maxf(0.0, float(hit) - 0.3))
-	return chest + right * side
+	var d: float = TP_PROBE_STEP
+	while d <= side:
+		var p: Vector3 = chest + right * d
+		if p.y < ground_height(p) + TP_GROUND_CLEARANCE:
+			side = maxf(0.0, d - TP_PROBE_STEP)
+			break
+		d += TP_PROBE_STEP
+	var pivot: Vector3 = chest + right * side
+	pivot.y = maxf(pivot.y, ground_height(pivot) + TP_GROUND_CLEARANCE)
+	return pivot
 
 
 ## From the pivot back to the third-person camera (the opposite of _look_dir).
@@ -1162,9 +1199,10 @@ func _tp_arm(pivot: Vector3, back: Vector3) -> float:
 
 func _update_third_person_camera(jitter: Vector3) -> void:
 	if _pcam != null and is_instance_valid(_pcam) and bool(_pcam.get("_has_follow_spring_arm")):
-		_tp_pivot.global_position = _tp_pivot_pos()
+		var rig: Array = _tp_rig()
+		_tp_pivot.global_position = rig[0]
 		_pcam.call("set_third_person_rotation", Vector3(-_tp_pitch, _tp_yaw, 0))
-		_pcam.call("set_spring_length", _tp_arm(_tp_pivot.global_position, _tp_back()))
+		_pcam.call("set_spring_length", float(rig[1]))
 		# Shake through the camera's offsets (Phantom Camera owns its transform).
 		_camera.h_offset = jitter.x
 		_camera.v_offset = jitter.y
@@ -1174,21 +1212,48 @@ func _update_third_person_camera(jitter: Vector3) -> void:
 
 ## Fallback without Phantom Camera (same framing, no damping).
 func _update_manual_third_person_camera(jitter: Vector3) -> void:
-	var pivot: Vector3 = _tp_pivot_pos()
-	var back: Vector3 = _tp_back()
-	_camera.position = pivot + back * _tp_arm(pivot, back) + jitter
+	var rig: Array = _tp_rig()
+	var pivot: Vector3 = rig[0]
+	_camera.position = pivot + _tp_back() * float(rig[1]) + jitter
 	_camera.look_at(pivot + jitter * 0.5)
 
 
-## Shortens the camera arm so the camera never ends up inside a hill.
+## Shortens the camera arm so the camera never ends up inside a hill: walks
+## out from the pivot and stops one step before the first point closer than
+## TP_GROUND_CLEARANCE to the ground (the arm's end included).
 func _terrain_limit(pivot: Vector3, back: Vector3, dist: float) -> float:
-	var d: float = 0.5
-	while d <= dist:
-		var p: Vector3 = pivot + back * d
-		if p.y < run.map.ground_y(p) + 0.4:
-			return maxf(0.8, d - 0.5)
-		d += 0.5
+	var d: float = TP_PROBE_STEP
+	while d < dist + TP_PROBE_STEP:
+		var at: float = minf(d, dist)
+		var p: Vector3 = pivot + back * at
+		if p.y < ground_height(p) + TP_GROUND_CLEARANCE:
+			return maxf(0.8, at - TP_PROBE_STEP)
+		d += TP_PROBE_STEP
 	return dist
+
+
+## Lowest height the camera may have at `cam`: the ground under it and a
+## little around it (the near plane is a small square, not a point), plus
+## TP_GROUND_CLEARANCE.
+func _camera_floor(cam: Vector3) -> float:
+	var top: float = ground_height(cam)
+	for offset: Vector3 in [Vector3(0.3, 0, 0), Vector3(-0.3, 0, 0), Vector3(0, 0, 0.3), Vector3(0, 0, -0.3)]:
+		top = maxf(top, ground_height(cam + offset))
+	return top + TP_GROUND_CLEARANCE
+
+
+## Ground height at a world point as drawn: the island map's height, or
+## Terrain3D's own height when it is higher (hand-made islands average
+## their vertices into cells, which cuts the top off ridges and cliff edges).
+func ground_height(p: Vector3) -> float:
+	var g: float = run.map.ground_y(p)
+	if _terrain_data == null and _terrain != null:
+		_terrain_data = _terrain.get("data")
+	if _terrain_data != null:
+		var h: float = _terrain_data.call("get_height", p)
+		if not is_nan(h):
+			g = maxf(g, h)
+	return g
 
 
 ## Distance along the segment a→b to the box, or null if it does not hit.

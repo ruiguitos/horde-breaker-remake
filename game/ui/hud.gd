@@ -70,6 +70,7 @@ var _shield_text: Label
 var _power_up_timers: Label
 var _xp_bar: ProgressBar
 var _xp_text: Label
+var _xp_bonus: Label
 var _stats: Label
 var _abilities_panel: VBoxContainer
 var _breaker_ring: AbilityRing
@@ -113,8 +114,7 @@ var _message_time: float = 0.0
 var _debug: Label
 var _damage_flash: ColorRect
 var _last_hp: float = -1.0
-var _end_panel: PanelContainer
-var _end_label: Label
+var _end_panel: IslandEndPanel
 var _death_panel: Control
 var _death_where: Label
 var _death_reason: Label
@@ -485,16 +485,10 @@ func _init() -> void:
 
 	_build_cards(root)
 
-	_end_panel = PanelContainer.new()
-	_end_panel.set_anchors_preset(Control.PRESET_CENTER)
-	_end_panel.position = Vector2(-200, -100)
-	_end_panel.custom_minimum_size = Vector2(400, 200)
-	_end_panel.visible = false
+	# Won island / part: field report (glass, like the pause and defeat).
+	_end_panel = IslandEndPanel.new()
+	_end_panel.continue_pressed.connect(request_continue)
 	root.add_child(_end_panel)
-	_end_label = Label.new()
-	_end_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_end_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_end_panel.add_child(_end_label)
 
 	_build_pause(root)
 	_build_death(root)
@@ -662,9 +656,16 @@ func _build_field_hud(field: Control) -> void:
 	identity.add_child(_hp_max)
 	_hp_bar = _meter(_status_panel, UiTheme.DANGER, 14)
 	_shield_bar = _meter(_status_panel, UiTheme.SUCCESS, 6)
+	var protection := _row(_status_panel, 8)
 	_shield_text = _label("◇ SHIELD 0 / 100", 12, UiTheme.SUCCESS, true)
-	_status_panel.add_child(_shield_text)
+	_shield_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	protection.add_child(_shield_text)
+	_xp_bonus = _label("", 12, UiTheme.INFO, true)
+	_xp_bonus.name = "XpBonus"
+	_xp_bonus.visible = false
+	protection.add_child(_xp_bonus)
 	_xp_bar = _meter(_status_panel, UiTheme.INFO, 5)
+	_xp_bar.step = 0.0  # fractional XP must move the gauge too
 	var progression := _row(_status_panel, 8)
 	_xp_text = _label("", 14, UiTheme.TEXT_MUTED, true)
 	_xp_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1403,6 +1404,8 @@ func request_continue() -> void:
 		return
 	if _run.objective == IslandRun.Objective.LOST and (not _death_panel.visible or Time.get_ticks_msec() - _death_opened_ms < DEATH_LOCK_MS):
 		return
+	if _run.objective == IslandRun.Objective.WON and (not _end_panel.visible or _end_panel.is_locked()):
+		return
 	_continue_sent = true
 	continue_requested.emit()
 
@@ -1445,7 +1448,7 @@ func _input(event: InputEvent) -> void:
 		_gamepad = false
 	if was != _gamepad:
 		_update_prompts()
-	if _death_panel.visible and (event.is_action_pressed(&"ui_accept") or event.is_action_pressed(&"confirm")):
+	if (_death_panel.visible or _end_panel.visible) and (event.is_action_pressed(&"ui_accept") or event.is_action_pressed(&"confirm")):
 		get_viewport().set_input_as_handled()
 		if not event.is_echo():
 			request_continue()
@@ -1458,6 +1461,8 @@ func _update_prompts() -> void:
 	_ability_key.text = GameInput.prompt(&"ability", _gamepad)
 	_sprint_key.text = "%s SPRINT" % GameInput.prompt(&"sprint", _gamepad)
 	_take_key.text = GameInput.prompt(&"ui_accept", _gamepad)
+	if _end_panel != null:
+		_end_panel.set_prompt(_gamepad)
 	_switch_hint.text = "%s NEXT" % GameInput.prompt(&"weapon_next", true) if _gamepad else ""
 
 
@@ -1511,8 +1516,13 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_hp_max.text = "/ %d" % ceili(run.max_hp)
 	_hp_text.add_theme_color_override("font_color", UiTheme.DANGER if run.hp <= run.max_hp * 0.25 else UiTheme.TEXT)
 	_xp_bar.max_value = run.xp_needed()
-	_xp_bar.value = run.xp
-	_xp_text.text = "XP %d/%d" % [run.xp, run.xp_needed()]
+	_xp_bar.value = run.xp_progress()
+	var xp_number: String = str(run.xp) if run.xp_fraction < 0.000001 else String.num(run.xp_progress(), 2)
+	_xp_text.text = "XP %s/%d" % [xp_number, run.xp_needed()]
+	var learner_bonus: int = roundi(run.fast_learner_bonus() * 100.0)
+	_xp_bonus.visible = learner_bonus > 0
+	_xp_bonus.text = "XP +%d%%" % learner_bonus
+	_xp_bonus.tooltip_text = "Fast Learner: +%d%% collected XP. Fractional XP is included in the bar and total." % learner_bonus
 	_stats.text = "%d KILLS · %d HS" % [run.kills, run.headshots]
 
 	var total: float = run.breaker_cooldown_total()
@@ -1588,10 +1598,12 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_update_death(run)
 	_field.visible = not run.is_over()
 	_messages.visible = not run.is_over()
-	_end_panel.visible = run.objective == IslandRun.Objective.WON
-	if _end_panel.visible:
-		_end_label.text = "%s\n\nKills %d · Headshots %d · Level %d\nIntel earned here: %d\n\nEnter / A: continue" % [
-			_cleared_text(run), run.kills, run.headshots, run.level, run.intel_earned()]
+	var won: bool = run.objective == IslandRun.Objective.WON
+	if won and not _end_panel.visible:
+		_continue_sent = false
+		_end_panel.open(run, context, _gamepad)
+	elif not won:
+		_end_panel.visible = false
 
 
 func _cooldown_label(label: Label, seconds: float) -> void:
@@ -1621,13 +1633,6 @@ func _update_weapon_slots(run: IslandRun) -> void:
 			var ammo: String = str(run.ammo[k]) if finite else "∞"
 			slots.append([&"dry" if finite and run.ammo[k] == 0 else &"owned", "%s·%s" % [key, ammo]])
 	_weapon_slots.set_slots(slots)
-
-
-## End panel title for a win: the fort's extraction, an expedition part, or an island.
-func _cleared_text(run: IslandRun) -> String:
-	if run.mission == &"holdout":
-		return "EXTRACTED!"
-	return "PART CLEARED!" if run.has_exit() else "ISLAND CLEARED!"
 
 
 func _update_objective(run: IslandRun, island_text: String) -> void:

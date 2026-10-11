@@ -302,9 +302,9 @@ const BOAT_RADIUS: float = 4.0
 
 ## XP needed to go from level n to n+1.
 static func xp_for_level(level: int) -> int:
-	# Quadratic: early levels come fast, later ones need real effort.
-	# First playtest: the old linear curve (6 + 5n) maxed every card by ~300 kills.
-	return 8 + level * 6 + level * level
+	# Costs and Walker rewards share a x10 scale, preserving baseline pacing.
+	# Specials pay more relative XP; later levels still require more kills.
+	return 10 * (8 + level * 6 + level * level)
 
 
 ## Enemy types from game/data/enemies/ (order = EnemyKind). Fresh objects

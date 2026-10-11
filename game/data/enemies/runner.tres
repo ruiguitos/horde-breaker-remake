@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_5ealh")
 display_name = "Runner"
+xp = 12
 hp = 18.0
 speed_min = 4.6
 speed_max = 5.4
