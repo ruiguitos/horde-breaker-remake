@@ -11,6 +11,7 @@ contributors".
 | `addons/terrain_3d/` | Terrain3D 1.0.2 (terreno por heightmap, GDExtension) | Cory Petkovsek & Roope Palmroos | MIT (`LICENSE.txt`) |
 | `addons/terrabrush/` | TerraBrush (terreno pintável, GDExtension) | spimort | MIT (`LICENSE`) |
 | `addons/sky_3d/` | Sky3D 2.1 (céu e ciclo dia/noite) | Cory Petkovsek, J. Cuéllar e contribuidores | MIT (`LICENSE.txt`) |
+| `addons/sky_3d/assets/thirdparty/textures/milkyway/` (`Milkyway.jpg`, `StarField.jpg`) | Céu noturno do Sky3D: "The Milky Way panorama"; `StarField.jpg` é uma versão modificada | ESO/S. Brunier | **CC BY 4.0**: exceção aceite pelo utilizador a 2026-10-11. Os créditos do jogo têm de mostrar: "The Milky Way panorama by ESO/S. Brunier, licensed under CC BY 4.0 and used in original and modified forms." |
 | `addons/phantom_camera/` | Phantom Camera 0.11 (transições de câmara) | Marcus Skov | MIT (`LICENSE`) |
 | `assets/animations/AnimationLibrary_Godot_Standard.glb` | Universal Animation Library (animações humanoides) | Quaternius | CC0 (`QUATERNIUS_LICENSE.txt`) |
 | `assets/models/nature_megakit/` | Stylized Nature MegaKit (versão grátis, glTF): árvores, rochas, relva, flores | Quaternius | CC0 (`License_Standard.txt`) |

@@ -63,7 +63,9 @@ Testes: `extends SceneTree`, lógica em `_initialize()`, imprimem `TEST: ...` ou
   "Decisões propostas" do teu próprio documento; o utilizador decide.
 - **Assets externos só com licença livre** (CC0, MIT, OFL ou royalty-free
   comercial) e registados em `assets/LICENSES.md`. Exceção aceite pelo
-  utilizador: dados do OpenStreetMap (ODbL), com atribuição. Addons em `addons/`,
+  utilizador: dados do OpenStreetMap (ODbL), com atribuição. Também aceite:
+  as texturas do céu noturno do Sky3D (CC BY 4.0, ESO/S. Brunier), com
+  créditos no ecrã de créditos. Addons em `addons/`,
   assets do jogo em `assets/`. O jogo tem de continuar a funcionar sem GPU
   (testes headless).
 - Spikes ficam em `spikes/<nome>/` e não dependem uns dos outros nem de `game/`.
