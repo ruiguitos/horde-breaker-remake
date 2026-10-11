@@ -580,9 +580,10 @@ Pack ao fim de 3 min") em vez de impressões.
 - **Natureza** (Quaternius Nature MegaKit, `world/nature_kit.gd`): árvores e
   rochas reais, e relva, fetos, flores ou seixos por bioma, desenhados com
   `MultiMesh`. A praia e o porto mantêm as palmeiras feitas em código.
-- **Soldado** (`world/soldier_model.gd`): o contratado low-poly, com farda e
-  arma por classe (Recruit: caqui e espingarda; Vanguard: armadura pesada e
-  caçadeira). Anda com pernas a balançar e aparece a rodar no Armory.
+- **Soldado** (`world/soldier_model.gd`): Recruit v03 com rig, animações
+  Idle/Walk/Sprint e empunhadura de duas mãos; Vanguard com armadura pesada
+  e animação procedural. A arma acompanha a seleção da run. Ver
+  `docs/tech/RECRUIT_MODEL.md` para assets, câmaras e integração.
 - Tonemap ACES sempre ligado. O preset de Graphics (Settings) decide
   sombras, bloom, SSAO e SSIL.
 - Partículas GPU (`world/fx.gd`): faíscas nos impactos, sangue nas mortes e

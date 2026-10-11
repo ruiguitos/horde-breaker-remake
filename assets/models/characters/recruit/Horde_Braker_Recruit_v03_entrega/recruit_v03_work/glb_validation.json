@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "joints": 53,
+  "pieces": 104,
+  "triangles": 4000,
+  "materials": 35,
+  "render_vertices": 8402,
+  "animations": 0,
+  "textures": 0,
+  "single_weight_per_piece": true,
+  "source_material_properties_exact": true,
+  "source_hashes_unchanged": true,
+  "bounds_min_godot_m": [
+    -1.1682051212520081,
+    -1.0867106915480103e-07,
+    -0.5974043369101961
+  ],
+  "bounds_max_godot_m": [
+    1.1192601739115227,
+    2.0250000855377297,
+    0.4360077668964673
+  ],
+  "height_m": 2.0250001942087987,
+  "maximum_bind_matrix_error": 4.0609621714503275e-07,
+  "muzzle_forward_world": [
+    -3.1795310031237806e-07,
+    2.967141590651336e-07,
+    -0.9999999999999054
+  ],
+  "muzzle_forward_local_axis": "-Z",
+  "muzzle_position_world_m": [
+    1.0167480838063057,
+    1.6794839301552749,
+    -0.5974040432410228
+  ]
+}

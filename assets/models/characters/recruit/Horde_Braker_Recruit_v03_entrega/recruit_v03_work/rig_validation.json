@@ -1,0 +1,3056 @@
+{
+  "blender": "5.2.2 LTS",
+  "bone_count": 53,
+  "reference_json_coordinate_error_m": 1.2137477309195983e-06,
+  "maximum_rest_orientation_error_rad": 1.7484556025237907e-07,
+  "base_pose": "T-pose",
+  "mesh_count": 104,
+  "mapping": [
+    {
+      "piece": "Arm_Elbow_L",
+      "bone": "DEF-forearm.L",
+      "vertices": 24,
+      "materials": [
+        "cloth_dark"
+      ]
+    },
+    {
+      "piece": "Arm_Elbow_R",
+      "bone": "DEF-forearm.R",
+      "vertices": 24,
+      "materials": [
+        "cloth_dark"
+      ]
+    },
+    {
+      "piece": "Arm_Forearm_L",
+      "bone": "DEF-forearm.L",
+      "vertices": 24,
+      "materials": [
+        "cloth",
+        "cloth_dark"
+      ]
+    },
+    {
+      "piece": "Arm_Forearm_R",
+      "bone": "DEF-forearm.R",
+      "vertices": 24,
+      "materials": [
+        "cloth",
+        "cloth_dark"
+      ]
+    },
+    {
+      "piece": "Arm_Shoulder_Facet_L",
+      "bone": "DEF-upper_arm.L",
+      "vertices": 24,
+      "materials": [
+        "cloth_light"
+      ]
+    },
+    {
+      "piece": "Arm_Shoulder_Facet_R",
+      "bone": "DEF-upper_arm.R",
+      "vertices": 24,
+      "materials": [
+        "cloth_light"
+      ]
+    },
+    {
+      "piece": "Arm_Upper_L",
+      "bone": "DEF-upper_arm.L",
+      "vertices": 24,
+      "materials": [
+        "cloth",
+        "cloth_dark"
+      ]
+    },
+    {
+      "piece": "Arm_Upper_Patch_L",
+      "bone": "DEF-upper_arm.L",
+      "vertices": 24,
+      "materials": [
+        "vest_shadow"
+      ]
+    },
+    {
+      "piece": "Arm_Upper_Patch_R",
+      "bone": "DEF-upper_arm.R",
+      "vertices": 24,
+      "materials": [
+        "vest_shadow"
+      ]
+    },
+    {
+      "piece": "Arm_Upper_R",
+      "bone": "DEF-upper_arm.R",
+      "vertices": 24,
+      "materials": [
+        "cloth",
+        "cloth_dark"
+      ]
+    },
+    {
+      "piece": "Backpack_Flap",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "pouch_flap"
+      ]
+    },
+    {
+      "piece": "Backpack_Main",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "vest_shadow",
+        "plate"
+      ]
+    },
+    {
+      "piece": "Backpack_Rear_Pocket",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "pouch"
+      ]
+    },
+    {
+      "piece": "Backpack_Retention_L",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "vest_strap"
+      ]
+    },
+    {
+      "piece": "Backpack_Retention_R",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "vest_strap"
+      ]
+    },
+    {
+      "piece": "Backpack_Shoulder_Strap_L",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "helmet_trim"
+      ]
+    },
+    {
+      "piece": "Backpack_Shoulder_Strap_R",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "helmet_trim"
+      ]
+    },
+    {
+      "piece": "Belt_Buckle",
+      "bone": "DEF-hips",
+      "vertices": 24,
+      "materials": [
+        "helmet_trim"
+      ]
+    },
+    {
+      "piece": "Boot_L_Shaft",
+      "bone": "DEF-foot.L",
+      "vertices": 16,
+      "materials": [
+        "boot",
+        "boot_shadow"
+      ]
+    },
+    {
+      "piece": "Boot_L_Sole",
+      "bone": "DEF-foot.L",
+      "vertices": 16,
+      "materials": [
+        "sole"
+      ]
+    },
+    {
+      "piece": "Boot_L_Vamp",
+      "bone": "DEF-foot.L",
+      "vertices": 14,
+      "materials": [
+        "boot",
+        "boot_light",
+        "boot_shadow"
+      ]
+    },
+    {
+      "piece": "Boot_R_Shaft",
+      "bone": "DEF-foot.R",
+      "vertices": 16,
+      "materials": [
+        "boot",
+        "boot_shadow"
+      ]
+    },
+    {
+      "piece": "Boot_R_Sole",
+      "bone": "DEF-foot.R",
+      "vertices": 16,
+      "materials": [
+        "sole"
+      ]
+    },
+    {
+      "piece": "Boot_R_Vamp",
+      "bone": "DEF-foot.R",
+      "vertices": 14,
+      "materials": [
+        "boot",
+        "boot_light",
+        "boot_shadow"
+      ]
+    },
+    {
+      "piece": "Face_Brow_L",
+      "bone": "DEF-head",
+      "vertices": 8,
+      "materials": [
+        "brow"
+      ]
+    },
+    {
+      "piece": "Face_Brow_R",
+      "bone": "DEF-head",
+      "vertices": 8,
+      "materials": [
+        "brow"
+      ]
+    },
+    {
+      "piece": "Face_Eye_L",
+      "bone": "DEF-head",
+      "vertices": 8,
+      "materials": [
+        "eyes"
+      ]
+    },
+    {
+      "piece": "Face_Eye_R",
+      "bone": "DEF-head",
+      "vertices": 8,
+      "materials": [
+        "eyes"
+      ]
+    },
+    {
+      "piece": "Face_Mouth_Neutral",
+      "bone": "DEF-head",
+      "vertices": 8,
+      "materials": [
+        "mouth"
+      ]
+    },
+    {
+      "piece": "Face_Nose",
+      "bone": "DEF-head",
+      "vertices": 8,
+      "materials": [
+        "nose",
+        "skin"
+      ]
+    },
+    {
+      "piece": "Glove_Cuff_L",
+      "bone": "DEF-forearm.L",
+      "vertices": 24,
+      "materials": [
+        "glove_shadow"
+      ]
+    },
+    {
+      "piece": "Glove_Cuff_R",
+      "bone": "DEF-forearm.R",
+      "vertices": 24,
+      "materials": [
+        "glove_shadow"
+      ]
+    },
+    {
+      "piece": "Glove_L_Finger_01",
+      "bone": "DEF-hand.L",
+      "vertices": 24,
+      "materials": [
+        "glove_shadow"
+      ]
+    },
+    {
+      "piece": "Glove_L_Finger_02",
+      "bone": "DEF-hand.L",
+      "vertices": 24,
+      "materials": [
+        "glove_shadow"
+      ]
+    },
+    {
+      "piece": "Glove_L_Finger_03",
+      "bone": "DEF-hand.L",
+      "vertices": 24,
+      "materials": [
+        "glove_shadow"
+      ]
+    },
+    {
+      "piece": "Glove_L_Palm",
+      "bone": "DEF-hand.L",
+      "vertices": 24,
+      "materials": [
+        "glove"
+      ]
+    },
+    {
+      "piece": "Glove_L_Thumb",
+      "bone": "DEF-hand.L",
+      "vertices": 24,
+      "materials": [
+        "glove"
+      ]
+    },
+    {
+      "piece": "Glove_R_Finger_01",
+      "bone": "DEF-hand.R",
+      "vertices": 24,
+      "materials": [
+        "glove_shadow"
+      ]
+    },
+    {
+      "piece": "Glove_R_Finger_02",
+      "bone": "DEF-hand.R",
+      "vertices": 24,
+      "materials": [
+        "glove_shadow"
+      ]
+    },
+    {
+      "piece": "Glove_R_Finger_03",
+      "bone": "DEF-hand.R",
+      "vertices": 24,
+      "materials": [
+        "glove_shadow"
+      ]
+    },
+    {
+      "piece": "Glove_R_Palm",
+      "bone": "DEF-hand.R",
+      "vertices": 24,
+      "materials": [
+        "glove"
+      ]
+    },
+    {
+      "piece": "Glove_R_Thumb",
+      "bone": "DEF-hand.R",
+      "vertices": 24,
+      "materials": [
+        "glove"
+      ]
+    },
+    {
+      "piece": "Head_Ear_L",
+      "bone": "DEF-head",
+      "vertices": 24,
+      "materials": [
+        "skin_shadow"
+      ]
+    },
+    {
+      "piece": "Head_Ear_R",
+      "bone": "DEF-head",
+      "vertices": 24,
+      "materials": [
+        "skin_shadow"
+      ]
+    },
+    {
+      "piece": "Head_Face_Skin",
+      "bone": "DEF-head",
+      "vertices": 32,
+      "materials": [
+        "skin",
+        "skin_shadow"
+      ]
+    },
+    {
+      "piece": "Head_Sideburn_L",
+      "bone": "DEF-head",
+      "vertices": 24,
+      "materials": [
+        "hair"
+      ]
+    },
+    {
+      "piece": "Head_Sideburn_R",
+      "bone": "DEF-head",
+      "vertices": 24,
+      "materials": [
+        "hair"
+      ]
+    },
+    {
+      "piece": "Helmet_Brim",
+      "bone": "DEF-head",
+      "vertices": 16,
+      "materials": [
+        "helmet_trim",
+        "helmet_shadow",
+        "helmet"
+      ]
+    },
+    {
+      "piece": "Helmet_Chinstrap_L",
+      "bone": "DEF-head",
+      "vertices": 24,
+      "materials": [
+        "vest_strap"
+      ]
+    },
+    {
+      "piece": "Helmet_Chinstrap_R",
+      "bone": "DEF-head",
+      "vertices": 24,
+      "materials": [
+        "vest_strap"
+      ]
+    },
+    {
+      "piece": "Helmet_Crown",
+      "bone": "DEF-head",
+      "vertices": 24,
+      "materials": [
+        "helmet",
+        "helmet_shadow",
+        "helmet_top"
+      ]
+    },
+    {
+      "piece": "Helmet_Ear_Protection_L",
+      "bone": "DEF-head",
+      "vertices": 24,
+      "materials": [
+        "glove_shadow"
+      ]
+    },
+    {
+      "piece": "Helmet_Ear_Protection_R",
+      "bone": "DEF-head",
+      "vertices": 24,
+      "materials": [
+        "glove_shadow"
+      ]
+    },
+    {
+      "piece": "Helmet_Front_Plate",
+      "bone": "DEF-head",
+      "vertices": 24,
+      "materials": [
+        "helmet_patch"
+      ]
+    },
+    {
+      "piece": "Helmet_Side_Shield_L",
+      "bone": "DEF-head",
+      "vertices": 24,
+      "materials": [
+        "helmet"
+      ]
+    },
+    {
+      "piece": "Helmet_Side_Shield_R",
+      "bone": "DEF-head",
+      "vertices": 24,
+      "materials": [
+        "helmet"
+      ]
+    },
+    {
+      "piece": "Knee_Strap_L",
+      "bone": "DEF-shin.L",
+      "vertices": 24,
+      "materials": [
+        "vest_strap"
+      ]
+    },
+    {
+      "piece": "Knee_Strap_R",
+      "bone": "DEF-shin.R",
+      "vertices": 24,
+      "materials": [
+        "vest_strap"
+      ]
+    },
+    {
+      "piece": "Kneepad_L",
+      "bone": "DEF-shin.L",
+      "vertices": 24,
+      "materials": [
+        "knee",
+        "knee_shadow"
+      ]
+    },
+    {
+      "piece": "Kneepad_R",
+      "bone": "DEF-shin.R",
+      "vertices": 24,
+      "materials": [
+        "knee",
+        "knee_shadow"
+      ]
+    },
+    {
+      "piece": "Leg_Shin_L",
+      "bone": "DEF-shin.L",
+      "vertices": 24,
+      "materials": [
+        "pants",
+        "pants_shadow"
+      ]
+    },
+    {
+      "piece": "Leg_Shin_R",
+      "bone": "DEF-shin.R",
+      "vertices": 24,
+      "materials": [
+        "pants",
+        "pants_shadow"
+      ]
+    },
+    {
+      "piece": "Leg_Thigh_L",
+      "bone": "DEF-thigh.L",
+      "vertices": 24,
+      "materials": [
+        "pants",
+        "pants_shadow"
+      ]
+    },
+    {
+      "piece": "Leg_Thigh_R",
+      "bone": "DEF-thigh.R",
+      "vertices": 24,
+      "materials": [
+        "pants",
+        "pants_shadow"
+      ]
+    },
+    {
+      "piece": "Neck_Skin",
+      "bone": "DEF-neck",
+      "vertices": 16,
+      "materials": [
+        "skin_shadow"
+      ]
+    },
+    {
+      "piece": "Rifle_Barrel",
+      "bone": "DEF-hand.R",
+      "vertices": 16,
+      "materials": [
+        "metal_light"
+      ]
+    },
+    {
+      "piece": "Rifle_Front_Sight",
+      "bone": "DEF-hand.R",
+      "vertices": 8,
+      "materials": [
+        "metal_dark"
+      ]
+    },
+    {
+      "piece": "Rifle_Handguard",
+      "bone": "DEF-hand.R",
+      "vertices": 24,
+      "materials": [
+        "metal_dark"
+      ]
+    },
+    {
+      "piece": "Rifle_Magazine",
+      "bone": "DEF-hand.R",
+      "vertices": 12,
+      "materials": [
+        "metal"
+      ]
+    },
+    {
+      "piece": "Rifle_Muzzle",
+      "bone": "DEF-hand.R",
+      "vertices": 16,
+      "materials": [
+        "metal_dark"
+      ]
+    },
+    {
+      "piece": "Rifle_Muzzle_Bore",
+      "bone": "DEF-hand.R",
+      "vertices": 16,
+      "materials": [
+        "eyes"
+      ]
+    },
+    {
+      "piece": "Rifle_Pistol_Grip",
+      "bone": "DEF-hand.R",
+      "vertices": 24,
+      "materials": [
+        "metal_dark"
+      ]
+    },
+    {
+      "piece": "Rifle_Rear_Sight",
+      "bone": "DEF-hand.R",
+      "vertices": 8,
+      "materials": [
+        "metal_dark"
+      ]
+    },
+    {
+      "piece": "Rifle_Receiver",
+      "bone": "DEF-hand.R",
+      "vertices": 24,
+      "materials": [
+        "metal"
+      ]
+    },
+    {
+      "piece": "Rifle_Stock",
+      "bone": "DEF-hand.R",
+      "vertices": 8,
+      "materials": [
+        "metal_dark"
+      ]
+    },
+    {
+      "piece": "Rifle_Stock_Butt",
+      "bone": "DEF-hand.R",
+      "vertices": 24,
+      "materials": [
+        "metal_dark"
+      ]
+    },
+    {
+      "piece": "Rifle_Stock_Neck",
+      "bone": "DEF-hand.R",
+      "vertices": 24,
+      "materials": [
+        "metal_dark"
+      ]
+    },
+    {
+      "piece": "Rifle_Trigger_Guard_Base",
+      "bone": "DEF-hand.R",
+      "vertices": 8,
+      "materials": [
+        "metal_dark"
+      ]
+    },
+    {
+      "piece": "Rifle_Trigger_Guard_Front",
+      "bone": "DEF-hand.R",
+      "vertices": 8,
+      "materials": [
+        "metal_dark"
+      ]
+    },
+    {
+      "piece": "Rifle_Upper_Receiver",
+      "bone": "DEF-hand.R",
+      "vertices": 24,
+      "materials": [
+        "metal_dark"
+      ]
+    },
+    {
+      "piece": "Thigh_Utility_Flap_R",
+      "bone": "DEF-thigh.R",
+      "vertices": 24,
+      "materials": [
+        "pouch_flap"
+      ]
+    },
+    {
+      "piece": "Thigh_Utility_Pouch_R",
+      "bone": "DEF-thigh.R",
+      "vertices": 24,
+      "materials": [
+        "pouch"
+      ]
+    },
+    {
+      "piece": "Uniform_Belt",
+      "bone": "DEF-hips",
+      "vertices": 16,
+      "materials": [
+        "vest_strap"
+      ]
+    },
+    {
+      "piece": "Uniform_Collar_L",
+      "bone": "DEF-neck",
+      "vertices": 24,
+      "materials": [
+        "cloth_dark"
+      ]
+    },
+    {
+      "piece": "Uniform_Collar_R",
+      "bone": "DEF-neck",
+      "vertices": 24,
+      "materials": [
+        "cloth_dark"
+      ]
+    },
+    {
+      "piece": "Uniform_Pelvis",
+      "bone": "DEF-hips",
+      "vertices": 24,
+      "materials": [
+        "pants",
+        "pants_shadow"
+      ]
+    },
+    {
+      "piece": "Uniform_Torso",
+      "bone": "DEF-spine.002",
+      "vertices": 24,
+      "materials": [
+        "cloth",
+        "cloth_dark"
+      ]
+    },
+    {
+      "piece": "Vest_Carrier",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "vest",
+        "vest_shadow"
+      ]
+    },
+    {
+      "piece": "Vest_Chest_Plate",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "plate"
+      ]
+    },
+    {
+      "piece": "Vest_Front_Strap_L",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "helmet_trim"
+      ]
+    },
+    {
+      "piece": "Vest_Front_Strap_R",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "helmet_trim"
+      ]
+    },
+    {
+      "piece": "Vest_Magazine_Flap_01",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "helmet_trim"
+      ]
+    },
+    {
+      "piece": "Vest_Magazine_Flap_02",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "helmet_trim"
+      ]
+    },
+    {
+      "piece": "Vest_Magazine_Flap_03",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "helmet_trim"
+      ]
+    },
+    {
+      "piece": "Vest_Magazine_Pouch_01",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "pouch"
+      ]
+    },
+    {
+      "piece": "Vest_Magazine_Pouch_02",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "pouch_light"
+      ]
+    },
+    {
+      "piece": "Vest_Magazine_Pouch_03",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "pouch"
+      ]
+    },
+    {
+      "piece": "Vest_Shoulder_Strap_L",
+      "bone": "DEF-spine.003",
+      "vertices": 20,
+      "materials": [
+        "vest"
+      ]
+    },
+    {
+      "piece": "Vest_Shoulder_Strap_R",
+      "bone": "DEF-spine.003",
+      "vertices": 20,
+      "materials": [
+        "vest"
+      ]
+    },
+    {
+      "piece": "Vest_Side_Pouch_Flap_L",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "pouch_flap"
+      ]
+    },
+    {
+      "piece": "Vest_Side_Pouch_Flap_R",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "pouch_flap"
+      ]
+    },
+    {
+      "piece": "Vest_Side_Pouch_L",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "pouch"
+      ]
+    },
+    {
+      "piece": "Vest_Side_Pouch_R",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "pouch"
+      ]
+    },
+    {
+      "piece": "Vest_Upper_Webbing",
+      "bone": "DEF-spine.003",
+      "vertices": 24,
+      "materials": [
+        "vest_shadow"
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "root",
+      "parent": "",
+      "head_global_godot_m": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "tail_global_godot_m": [
+        2.622683403785686e-08,
+        0.0,
+        0.30000001192092896
+      ],
+      "local_rest_matrix_blender": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-hips",
+      "parent": "root",
+      "head_global_godot_m": [
+        0.0,
+        0.9998437762260437,
+        0.030375000089406967
+      ],
+      "tail_global_godot_m": [
+        -3.3150935330183984e-09,
+        1.1469086408615112,
+        -0.007545251399278641
+      ],
+      "local_rest_matrix_blender": [
+        [
+          1.0,
+          0.0,
+          1.192092469182171e-07,
+          2.6554667353906325e-09
+        ],
+        [
+          1.1543368572120016e-07,
+          -0.24968072772026062,
+          -0.9683281779289246,
+          0.030375003814697266
+        ],
+        [
+          2.9764255060626965e-08,
+          0.9683281779289246,
+          -0.24968063831329346,
+          0.9998437762260437
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-spine.001",
+      "parent": "DEF-hips",
+      "head_global_godot_m": [
+        0.0,
+        1.1517187356948853,
+        0.030375000089406967
+      ],
+      "tail_global_godot_m": [
+        -1.9660568728596672e-09,
+        1.3338510990142822,
+        0.007885914295911789
+      ],
+      "local_rest_matrix_blender": [
+        [
+          1.0,
+          -7.105427357601002e-15,
+          2.8204158297739923e-07,
+          2.6554671794798423e-09
+        ],
+        [
+          2.7991578122055216e-07,
+          -0.12254591286182404,
+          -0.9924628138542175,
+          0.030374985188245773
+        ],
+        [
+          3.4563047535129954e-08,
+          0.992462694644928,
+          -0.12254585325717926,
+          1.1517187356948853
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-spine.002",
+      "parent": "DEF-spine.001",
+      "head_global_godot_m": [
+        0.0,
+        1.33523428440094,
+        0.030375000089406967
+      ],
+      "tail_global_godot_m": [
+        4.053111180013502e-10,
+        1.4807072877883911,
+        0.03501121699810028
+      ],
+      "local_rest_matrix_blender": [
+        [
+          1.0,
+          3.552713678800501e-15,
+          7.078055830334051e-08,
+          2.6554671794798423e-09
+        ],
+        [
+          7.074463326262048e-08,
+          0.03185376524925232,
+          -0.9994924664497375,
+          0.030374987050890923
+        ],
+        [
+          -2.2546213784835345e-09,
+          0.9994924068450928,
+          0.031853802502155304,
+          1.3352344036102295
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-spine.003",
+      "parent": "DEF-spine.002",
+      "head_global_godot_m": [
+        0.0,
+        1.4807811975479126,
+        0.030375000089406967
+      ],
+      "tail_global_godot_m": [
+        3.1702418468171345e-10,
+        1.592678427696228,
+        0.03400133177638054
+      ],
+      "local_rest_matrix_blender": [
+        [
+          1.0,
+          -1.249000902703301e-16,
+          1.2995874953958264e-07,
+          2.655467623569052e-09
+        ],
+        [
+          1.2989053743694967e-07,
+          0.03239068761467934,
+          -0.9994752407073975,
+          0.030374987050890923
+        ],
+        [
+          -4.209445680913859e-09,
+          0.9994751214981079,
+          0.03239072859287262,
+          1.4807813167572021
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-neck",
+      "parent": "DEF-spine.003",
+      "head_global_godot_m": [
+        0.0,
+        1.590890645980835,
+        0.010125000029802322
+      ],
+      "tail_global_godot_m": [
+        -1.0376531855982307e-09,
+        1.6525962352752686,
+        -0.0017443671822547913
+      ],
+      "local_rest_matrix_blender": [
+        [
+          1.0,
+          -1.7763568394002505e-15,
+          1.2013697414658964e-07,
+          8.851568367163054e-10
+        ],
+        [
+          1.1797423837833776e-07,
+          -0.18889197707176208,
+          -0.9819978475570679,
+          0.010124986991286278
+        ],
+        [
+          2.2692917767130893e-08,
+          0.9819977283477783,
+          -0.1888919174671173,
+          1.5908907651901245
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-head",
+      "parent": "DEF-neck",
+      "head_global_godot_m": [
+        0.0,
+        1.6529062986373901,
+        -0.0
+      ],
+      "tail_global_godot_m": [
+        -5.685409920630491e-10,
+        1.8528004884719849,
+        -0.0065033468417823315
+      ],
+      "local_rest_matrix_blender": [
+        [
+          1.0,
+          0.0,
+          1.5017114662896347e-07,
+          9.992007221626409e-16
+        ],
+        [
+          1.500917221619602e-07,
+          -0.032516732811927795,
+          -0.999471127986908,
+          -1.3969838619232178e-08
+        ],
+        [
+          4.88308238288937e-09,
+          0.9994710087776184,
+          -0.032516688108444214,
+          1.6529064178466797
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-shoulder.L",
+      "parent": "DEF-spine.003",
+      "head_global_godot_m": [
+        -0.09492187947034836,
+        1.5757031440734863,
+        0.03164062649011612
+      ],
+      "tail_global_godot_m": [
+        -0.2528954744338989,
+        1.5755914449691772,
+        0.12463857233524323
+      ],
+      "local_rest_matrix_blender": [
+        [
+          0.5073131322860718,
+          0.861761748790741,
+          0.000551153440028429,
+          0.09492187947034836
+        ],
+        [
+          -0.8617619276046753,
+          0.5073131322860718,
+          0.00026481226086616516,
+          0.03164060413837433
+        ],
+        [
+          -5.139783024787903e-05,
+          -0.0006092898547649384,
+          0.9999997019767761,
+          1.5757032632827759
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-upper_arm.L",
+      "parent": "DEF-shoulder.L",
+      "head_global_godot_m": [
+        -0.2759062349796295,
+        1.5516562461853027,
+        0.015187500044703484
+      ],
+      "tail_global_godot_m": [
+        -0.5758622884750366,
+        1.5516562461853027,
+        0.020325224846601486
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -6.651971489191055e-07,
+          0.9998533725738525,
+          0.017125681042671204,
+          0.2759062349796295
+        ],
+        [
+          4.0621060179546475e-05,
+          0.01712578348815441,
+          -0.9998534321784973,
+          0.015187498182058334
+        ],
+        [
+          -0.9999999403953552,
+          -1.0419171303510666e-08,
+          -4.0616345359012485e-05,
+          1.5516563653945923
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-forearm.L",
+      "parent": "DEF-upper_arm.L",
+      "head_global_godot_m": [
+        -0.6384695172309875,
+        1.5516562461853027,
+        0.021397579461336136
+      ],
+      "tail_global_godot_m": [
+        -0.9384249448776245,
+        1.5516563653945923,
+        0.016225941479206085
+      ],
+      "local_rest_matrix_blender": [
+        [
+          4.355558758106781e-07,
+          0.999851405620575,
+          -0.017238983884453773,
+          0.6384694576263428
+        ],
+        [
+          -1.4404577086679637e-07,
+          -0.017238881438970566,
+          -0.9998514652252197,
+          0.021397583186626434
+        ],
+        [
+          -0.9999999403953552,
+          3.9736414692015387e-07,
+          1.4805846149101853e-07,
+          1.5516563653945923
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-hand.L",
+      "parent": "DEF-forearm.L",
+      "head_global_godot_m": [
+        -0.991748571395874,
+        1.5516563653945923,
+        0.015306569635868073
+      ],
+      "tail_global_godot_m": [
+        -1.0635721683502197,
+        1.5516563653945923,
+        0.0153065649792552
+      ],
+      "local_rest_matrix_blender": [
+        [
+          4.08029592335879e-08,
+          0.9999999403953552,
+          -2.6263296604156494e-07,
+          0.9917485117912292
+        ],
+        [
+          -1.0183314316236647e-06,
+          -1.5832483768463135e-07,
+          -1.0,
+          0.015306541696190834
+        ],
+        [
+          -0.9999999403953552,
+          7.30526750203353e-14,
+          1.029172153721447e-06,
+          1.5516564846038818
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_index.01.L",
+      "parent": "DEF-hand.L",
+      "head_global_godot_m": [
+        -1.0612905025482178,
+        1.5504964590072632,
+        -0.002615431323647499
+      ],
+      "tail_global_godot_m": [
+        -1.0862904787063599,
+        1.5504964590072632,
+        -0.00261542946100235
+      ],
+      "local_rest_matrix_blender": [
+        [
+          1.1362089935573749e-07,
+          0.9999998807907104,
+          4.080384385929392e-08,
+          1.0612905025482178
+        ],
+        [
+          1.0,
+          -9.313069426752918e-09,
+          6.893193130963482e-06,
+          -0.0026154639199376106
+        ],
+        [
+          6.882351044623647e-06,
+          -8.030607564568984e-14,
+          -0.9999999403953552,
+          1.5504965782165527
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_index.02.L",
+      "parent": "DEF-f_index.01.L",
+      "head_global_godot_m": [
+        -1.0848965644836426,
+        1.5504963397979736,
+        -0.00261542946100235
+      ],
+      "tail_global_godot_m": [
+        -1.1098965406417847,
+        1.5504963397979736,
+        -0.0026154271326959133
+      ],
+      "local_rest_matrix_blender": [
+        [
+          1.0430782992898457e-07,
+          0.9999998211860657,
+          4.080383675386656e-08,
+          1.0848965644836426
+        ],
+        [
+          1.0,
+          0.0,
+          6.826715434726793e-06,
+          -0.0026154639199376106
+        ],
+        [
+          6.815873348386958e-06,
+          -1.6210259046536835e-14,
+          -0.9999999403953552,
+          1.5504964590072632
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_index.03.L",
+      "parent": "DEF-f_index.02.L",
+      "head_global_godot_m": [
+        -1.105080485343933,
+        1.5504963397979736,
+        -0.00261542946100235
+      ],
+      "tail_global_godot_m": [
+        -1.140080451965332,
+        1.5504963397979736,
+        -0.0026154264342039824
+      ],
+      "local_rest_matrix_blender": [
+        [
+          1.0430782992898457e-07,
+          0.9999998211860657,
+          4.0803854517434957e-08,
+          1.105080485343933
+        ],
+        [
+          1.0,
+          -1.1066285898554656e-19,
+          6.826715434726793e-06,
+          -0.00261546578258276
+        ],
+        [
+          6.815873348386958e-06,
+          3.3881317890172014e-21,
+          -0.9999999403953552,
+          1.5504964590072632
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_middle.01.L",
+      "parent": "DEF-hand.L",
+      "head_global_godot_m": [
+        -1.0622766017913818,
+        1.5518885850906372,
+        0.012290563434362411
+      ],
+      "tail_global_godot_m": [
+        -1.087248682975769,
+        1.5518885850906372,
+        0.013471280224621296
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.047228530049324036,
+          0.9988839626312256,
+          -2.87020469613708e-07,
+          1.0622766017913818
+        ],
+        [
+          0.9988840818405151,
+          0.04722863808274269,
+          6.885803486511577e-06,
+          0.012290528044104576
+        ],
+        [
+          6.882358320581261e-06,
+          -1.7771384364095866e-10,
+          -0.9999999403953552,
+          1.5518887042999268
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_middle.02.L",
+      "parent": "DEF-f_middle.01.L",
+      "head_global_godot_m": [
+        -1.08681058883667,
+        1.5518885850906372,
+        0.01345057226717472
+      ],
+      "tail_global_godot_m": [
+        -1.111786127090454,
+        1.5518885850906372,
+        0.014555688947439194
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.04420452192425728,
+          0.999022364616394,
+          -2.6315393597542425e-07,
+          1.08681058883667
+        ],
+        [
+          0.9990224838256836,
+          0.044204629957675934,
+          6.821750957897166e-06,
+          0.013450535014271736
+        ],
+        [
+          6.817281700932654e-06,
+          1.9539925233402755e-14,
+          -0.9999999403953552,
+          1.5518887042999268
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_middle.03.L",
+      "parent": "DEF-f_middle.02.L",
+      "head_global_godot_m": [
+        -1.1064726114273071,
+        1.5518885850906372,
+        0.014320571906864643
+      ],
+      "tail_global_godot_m": [
+        -1.1414347887039185,
+        1.5518885850906372,
+        0.015946734696626663
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.04646160826086998,
+          0.9989199638366699,
+          -2.785452295483992e-07,
+          1.1064726114273071
+        ],
+        [
+          0.9989200234413147,
+          0.046461716294288635,
+          6.821140232204925e-06,
+          0.01432053279131651
+        ],
+        [
+          6.817369467171375e-06,
+          -3.019806626980426e-14,
+          -0.9999999403953552,
+          1.5518887042999268
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_pinky.01.L",
+      "parent": "DEF-hand.L",
+      "head_global_godot_m": [
+        -1.0542144775390625,
+        1.5507285594940186,
+        0.03897055611014366
+      ],
+      "tail_global_godot_m": [
+        -1.0791583061218262,
+        1.5507285594940186,
+        0.04064588621258736
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.06701301783323288,
+          0.9977518916130066,
+          -4.285815009552607e-07,
+          1.054214358329773
+        ],
+        [
+          0.9977520704269409,
+          0.06701312959194183,
+          6.877421583340038e-06,
+          0.03897051885724068
+        ],
+        [
+          6.882321031298488e-06,
+          -1.912916047785984e-09,
+          -0.9999999403953552,
+          1.550728678703308
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_pinky.02.L",
+      "parent": "DEF-f_pinky.01.L",
+      "head_global_godot_m": [
+        -1.0775303840637207,
+        1.550728678703308,
+        0.0405365526676178
+      ],
+      "tail_global_godot_m": [
+        -1.1024713516235352,
+        1.550728678703308,
+        0.04225350543856621
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.0686778575181961,
+          0.9976386427879333,
+          -4.3374154756747885e-07,
+          1.0775302648544312
+        ],
+        [
+          0.9976388812065125,
+          0.06867796182632446,
+          6.813013442297233e-06,
+          0.04053651541471481
+        ],
+        [
+          6.818413112341659e-06,
+          1.829647544582258e-13,
+          -0.9999999403953552,
+          1.5507287979125977
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_pinky.03.L",
+      "parent": "DEF-f_pinky.02.L",
+      "head_global_godot_m": [
+        -1.0935384035110474,
+        1.550728678703308,
+        0.041638556867837906
+      ],
+      "tail_global_godot_m": [
+        -1.1284586191177368,
+        1.550728678703308,
+        0.04399971663951874
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.06746168434619904,
+          0.9977216124534607,
+          -4.2544641587483056e-07,
+          1.0935382843017578
+        ],
+        [
+          0.9977219104766846,
+          0.06746178865432739,
+          6.813536401750753e-06,
+          0.04163851588964462
+        ],
+        [
+          6.818370366090676e-06,
+          7.016609515630989e-14,
+          -0.9999999403953552,
+          1.5507287979125977
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_ring.01.L",
+      "parent": "DEF-hand.L",
+      "head_global_godot_m": [
+        -1.0608264207839966,
+        1.5517144203186035,
+        0.025224562734365463
+      ],
+      "tail_global_godot_m": [
+        -1.0858105421066284,
+        1.5517144203186035,
+        0.026114577427506447
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.035600446164608,
+          0.9993659853935242,
+          -2.0133880695993867e-07,
+          1.060826301574707
+        ],
+        [
+          0.9993661046028137,
+          0.03560055047273636,
+          6.88871386955725e-06,
+          0.025224529206752777
+        ],
+        [
+          6.882350589876296e-06,
+          6.137170771580713e-10,
+          -0.9999999403953552,
+          1.551714539527893
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_ring.02.L",
+      "parent": "DEF-f_ring.01.L",
+      "head_global_godot_m": [
+        -1.083620548248291,
+        1.5517144203186035,
+        0.026036564260721207
+      ],
+      "tail_global_godot_m": [
+        -1.1086046695709229,
+        1.5517144203186035,
+        0.02692597173154354
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.035576194524765015,
+          0.999366819858551,
+          -1.994798850546431e-07,
+          1.0836204290390015
+        ],
+        [
+          0.9993669390678406,
+          0.03557629883289337,
+          6.82393829265493e-06,
+          0.02603652887046337
+        ],
+        [
+          6.817550001869677e-06,
+          -1.63202784619898e-14,
+          -0.9999999403953552,
+          1.551714539527893
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_ring.03.L",
+      "parent": "DEF-f_ring.02.L",
+      "head_global_godot_m": [
+        -1.1015424728393555,
+        1.551714539527893,
+        0.02667456865310669
+      ],
+      "tail_global_godot_m": [
+        -1.1365175247192383,
+        1.551714539527893,
+        0.027994386851787567
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.03770899027585983,
+          0.9992884993553162,
+          -2.140237285175317e-07,
+          1.101542353630066
+        ],
+        [
+          0.9992887377738953,
+          0.03770909085869789,
+          6.823497642471921e-06,
+          0.026674531400203705
+        ],
+        [
+          6.8176427703292575e-06,
+          8.615330671091215e-14,
+          -0.9999999403953552,
+          1.5517146587371826
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-thumb.01.L",
+      "parent": "DEF-hand.L",
+      "head_global_godot_m": [
+        -1.0075825452804565,
+        1.5384324789047241,
+        -0.0041814446449279785
+      ],
+      "tail_global_godot_m": [
+        -1.0274524688720703,
+        1.5272774696350098,
+        -0.014464998617768288
+      ],
+      "local_rest_matrix_blender": [
+        [
+          0.4898049533367157,
+          0.7947974801063538,
+          0.3583132326602936,
+          1.0075825452804565
+        ],
+        [
+          0.0006905477494001389,
+          -0.41134241223335266,
+          0.911480724811554,
+          -0.004181475378572941
+        ],
+        [
+          0.8718317151069641,
+          -0.44620057940483093,
+          -0.20202630758285522,
+          1.5384325981140137
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-thumb.02.L",
+      "parent": "DEF-thumb.01.L",
+      "head_global_godot_m": [
+        -1.0274184942245483,
+        1.527296543121338,
+        -0.014447415247559547
+      ],
+      "tail_global_godot_m": [
+        -1.0500383377075195,
+        1.514594554901123,
+        -0.0261633712798357
+      ],
+      "local_rest_matrix_blender": [
+        [
+          0.4899360239505768,
+          0.7946522235870361,
+          0.35845616459846497,
+          1.0274184942245483
+        ],
+        [
+          0.0007869120454415679,
+          -0.41159048676490784,
+          0.9113686084747314,
+          -0.014447448775172234
+        ],
+        [
+          0.8717580437660217,
+          -0.4462304413318634,
+          -0.2022782266139984,
+          1.5272966623306274
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-thumb.03.L",
+      "parent": "DEF-thumb.02.L",
+      "head_global_godot_m": [
+        -1.050038456916809,
+        1.5145946741104126,
+        -0.026163391768932343
+      ],
+      "tail_global_godot_m": [
+        -1.0778758525848389,
+        1.4990057945251465,
+        -0.04055318608880043
+      ],
+      "local_rest_matrix_blender": [
+        [
+          0.4890272319316864,
+          0.7953543066978455,
+          0.3581397831439972,
+          1.050038456916809
+        ],
+        [
+          0.0010819934541359544,
+          -0.41113710403442383,
+          0.9115729331970215,
+          -0.026163429021835327
+        ],
+        [
+          0.8722678422927856,
+          -0.44539669156074524,
+          -0.20191772282123566,
+          1.5145947933197021
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-shoulder.R",
+      "parent": "DEF-spine.003",
+      "head_global_godot_m": [
+        0.09492187947034836,
+        1.5757031440734863,
+        0.03164062649011612
+      ],
+      "tail_global_godot_m": [
+        0.2528954744338989,
+        1.5755914449691772,
+        0.12463854253292084
+      ],
+      "local_rest_matrix_blender": [
+        [
+          0.507313072681427,
+          -0.8617615699768066,
+          -0.0005511599592864513,
+          -0.09492187947034836
+        ],
+        [
+          0.861761748790741,
+          0.5073129534721375,
+          0.0002646893262863159,
+          0.03164061903953552
+        ],
+        [
+          5.1433220505714417e-05,
+          -0.0006093140691518784,
+          0.9999996423721313,
+          1.5757032632827759
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-upper_arm.R",
+      "parent": "DEF-shoulder.R",
+      "head_global_godot_m": [
+        0.2759062349796295,
+        1.5516562461853027,
+        0.015187500044703484
+      ],
+      "tail_global_godot_m": [
+        0.5718486309051514,
+        1.5516562461853027,
+        0.02025640942156315
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -6.523332558572292e-07,
+          -0.9998529553413391,
+          -0.017125651240348816,
+          -0.2759062349796295
+        ],
+        [
+          -4.095453186891973e-05,
+          0.01712566427886486,
+          -0.9998531937599182,
+          0.015187516808509827
+        ],
+        [
+          0.9999997615814209,
+          4.0512531995773315e-08,
+          -4.0882499888539314e-05,
+          1.5516563653945923
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-forearm.R",
+      "parent": "DEF-upper_arm.R",
+      "head_global_godot_m": [
+        0.5718486309051514,
+        1.5516562461853027,
+        0.02025640942156315
+      ],
+      "tail_global_godot_m": [
+        0.8718041181564331,
+        1.5516562461853027,
+        0.015084641054272652
+      ],
+      "local_rest_matrix_blender": [
+        [
+          8.053348210523836e-09,
+          -0.9998509287834167,
+          0.01723913662135601,
+          -0.5718485713005066
+        ],
+        [
+          -1.2103919289074838e-07,
+          -0.017239131033420563,
+          -0.9998512268066406,
+          0.020256470888853073
+        ],
+        [
+          0.9999997615814209,
+          1.1368683772161603e-13,
+          -4.3717591324821115e-08,
+          1.5516563653945923
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-hand.R",
+      "parent": "DEF-forearm.R",
+      "head_global_godot_m": [
+        0.9042179584503174,
+        1.5516562461853027,
+        0.014525769278407097
+      ],
+      "tail_global_godot_m": [
+        0.9760414361953735,
+        1.5516562461853027,
+        0.014525741338729858
+      ],
+      "local_rest_matrix_blender": [
+        [
+          7.299259863202678e-09,
+          -0.9999995827674866,
+          3.110617399215698e-07,
+          -0.9042178392410278
+        ],
+        [
+          9.51843958318932e-07,
+          -2.998858690261841e-07,
+          -0.9999998211860657,
+          0.01452585868537426
+        ],
+        [
+          0.9999997615814209,
+          -2.220446049250313e-16,
+          1.0291720400346094e-06,
+          1.5516563653945923
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_index.01.R",
+      "parent": "DEF-hand.R",
+      "head_global_godot_m": [
+        0.9737598299980164,
+        1.5504963397979736,
+        -0.00339626707136631
+      ],
+      "tail_global_godot_m": [
+        0.9987598061561584,
+        1.5504963397979736,
+        -0.003396274521946907
+      ],
+      "local_rest_matrix_blender": [
+        [
+          2.3655584868720325e-07,
+          -0.9999995231628418,
+          -7.301184101748959e-09,
+          -0.9737597107887268
+        ],
+        [
+          -0.9999998211860657,
+          -2.2538000621352694e-07,
+          7.198097137006698e-06,
+          -0.0033961678855121136
+        ],
+        [
+          -7.1207691689778585e-06,
+          -7.69013894447515e-14,
+          -0.9999997615814209,
+          1.5504964590072632
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_index.02.R",
+      "parent": "DEF-f_index.01.R",
+      "head_global_godot_m": [
+        0.9973658919334412,
+        1.5504963397979736,
+        -0.003396274521946907
+      ],
+      "tail_global_godot_m": [
+        1.022365927696228,
+        1.5504963397979736,
+        -0.0033962822053581476
+      ],
+      "local_rest_matrix_blender": [
+        [
+          2.2537962252044963e-07,
+          -0.999999463558197,
+          -7.30115123914743e-09,
+          -0.9973657727241516
+        ],
+        [
+          -0.9999998211860657,
+          -2.142037658359186e-07,
+          7.065132649586303e-06,
+          -0.003396173706278205
+        ],
+        [
+          -6.9878046815574635e-06,
+          2.022291161569642e-19,
+          -0.9999997615814209,
+          1.5504964590072632
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_index.03.R",
+      "parent": "DEF-f_index.02.R",
+      "head_global_godot_m": [
+        1.0175498723983765,
+        1.5504963397979736,
+        -0.0033962782472372055
+      ],
+      "tail_global_godot_m": [
+        1.0525498390197754,
+        1.5504963397979736,
+        -0.00339628872461617
+      ],
+      "local_rest_matrix_blender": [
+        [
+          2.2404967126021802e-07,
+          -0.9999994039535522,
+          -7.301141913274023e-09,
+          -1.017549753189087
+        ],
+        [
+          -0.9999998211860657,
+          -2.1287380036483228e-07,
+          7.065132649586303e-06,
+          -0.003396175568923354
+        ],
+        [
+          -6.9878046815574635e-06,
+          1.0503208545953324e-19,
+          -0.9999997615814209,
+          1.5504964590072632
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_middle.01.R",
+      "parent": "DEF-hand.R",
+      "head_global_godot_m": [
+        0.9747459292411804,
+        1.551888346672058,
+        0.011509733274579048
+      ],
+      "tail_global_godot_m": [
+        0.9997180104255676,
+        1.551888346672058,
+        0.012690437026321888
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.04722826927900314,
+          -0.9988836050033569,
+          3.205236680514645e-07,
+          -0.9747458100318909
+        ],
+        [
+          -0.9988839030265808,
+          0.047228287905454636,
+          6.952288913453231e-06,
+          0.011509828269481659
+        ],
+        [
+          -6.882357411086559e-06,
+          -1.7758594594852184e-10,
+          -0.9999997019767761,
+          1.5518884658813477
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_middle.02.R",
+      "parent": "DEF-f_middle.01.R",
+      "head_global_godot_m": [
+        0.9992799162864685,
+        1.5518884658813477,
+        0.012669723480939865
+      ],
+      "tail_global_godot_m": [
+        1.0242555141448975,
+        1.5518884658813477,
+        0.013774828054010868
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.04420415684580803,
+          -0.9990220069885254,
+          2.9365503451117547e-07,
+          -0.999279797077179
+        ],
+        [
+          -0.9990223050117493,
+          0.04420417174696922,
+          6.820401267759735e-06,
+          0.0126698212698102
+        ],
+        [
+          -6.749379281245638e-06,
+          1.4210854715202004e-14,
+          -0.9999997019767761,
+          1.5518885850906372
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_middle.03.R",
+      "parent": "DEF-f_middle.02.R",
+      "head_global_godot_m": [
+        1.0189419984817505,
+        1.5518884658813477,
+        0.013539721257984638
+      ],
+      "tail_global_godot_m": [
+        1.0539041757583618,
+        1.5518884658813477,
+        0.015165862627327442
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.046461258083581924,
+          -0.9989195466041565,
+          3.0888986657373607e-07,
+          -1.018941879272461
+        ],
+        [
+          -0.9989198446273804,
+          0.04646127298474312,
+          6.819727332185721e-06,
+          0.013539820909500122
+        ],
+        [
+          -6.749396561644971e-06,
+          1.7763568394002505e-15,
+          -0.9999997019767761,
+          1.5518885850906372
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_pinky.01.R",
+      "parent": "DEF-hand.R",
+      "head_global_godot_m": [
+        0.9666838645935059,
+        1.5507283210754395,
+        0.038189731538295746
+      ],
+      "tail_global_godot_m": [
+        0.9916276931762695,
+        1.5507283210754395,
+        0.039865054190158844
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.06701283901929855,
+          -0.9977515339851379,
+          4.620846709713078e-07,
+          -0.9666837453842163
+        ],
+        [
+          -0.9977518916130066,
+          0.06701286882162094,
+          6.943907010281691e-06,
+          0.03818982467055321
+        ],
+        [
+          -6.882320121803787e-06,
+          -1.912880520649196e-09,
+          -0.9999997019767761,
+          1.550728440284729
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_pinky.02.R",
+      "parent": "DEF-f_pinky.01.R",
+      "head_global_godot_m": [
+        0.9899998307228088,
+        1.550728440284729,
+        0.039755724370479584
+      ],
+      "tail_global_godot_m": [
+        1.014940857887268,
+        1.550728440284729,
+        0.0414726585149765
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.06867729872465134,
+          -0.9976383447647095,
+          4.62529101241671e-07,
+          -0.9899997115135193
+        ],
+        [
+          -0.9976387023925781,
+          0.06867732852697372,
+          6.811030289100017e-06,
+          0.039755817502737045
+        ],
+        [
+          -6.749781732651172e-06,
+          -8.881784197001252e-14,
+          -0.9999997019767761,
+          1.5507285594940186
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_pinky.03.R",
+      "parent": "DEF-f_pinky.02.R",
+      "head_global_godot_m": [
+        1.0060079097747803,
+        1.5507283210754395,
+        0.040857717394828796
+      ],
+      "tail_global_godot_m": [
+        1.0409281253814697,
+        1.5507283210754395,
+        0.04321886599063873
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.06746141612529755,
+          -0.9977213144302368,
+          4.5432159367919667e-07,
+          -1.0060077905654907
+        ],
+        [
+          -0.9977216720581055,
+          0.06746144592761993,
+          6.8115823523839936e-06,
+          0.040857814252376556
+        ],
+        [
+          -6.749774001946207e-06,
+          -4.3520742565306136e-14,
+          -0.9999997019767761,
+          1.550728440284729
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_ring.01.R",
+      "parent": "DEF-hand.R",
+      "head_global_godot_m": [
+        0.9732958078384399,
+        1.5517141819000244,
+        0.0244437362998724
+      ],
+      "tail_global_godot_m": [
+        0.9982799291610718,
+        1.5517141819000244,
+        0.025333745405077934
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.035600446164608,
+          -0.9993656277656555,
+          2.2739153848760907e-07,
+          -0.9732956886291504
+        ],
+        [
+          -0.9993659257888794,
+          0.035600464791059494,
+          6.7168971327191684e-06,
+          0.02444383129477501
+        ],
+        [
+          -6.643931101280032e-06,
+          6.135785213245981e-10,
+          -0.9999997615814209,
+          1.551714301109314
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_ring.02.R",
+      "parent": "DEF-f_ring.01.R",
+      "head_global_godot_m": [
+        0.9960898756980896,
+        1.551714301109314,
+        0.025255732238292694
+      ],
+      "tail_global_godot_m": [
+        1.0210740566253662,
+        1.551714301109314,
+        0.026145130395889282
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.03557595610618591,
+          -0.9993665218353271,
+          2.2313038527954632e-07,
+          -0.9960897564888
+        ],
+        [
+          -0.999366819858551,
+          0.035575974732637405,
+          6.58452609059168e-06,
+          0.025255829095840454
+        ],
+        [
+          -6.5114923017972615e-06,
+          -1.3183898417423734e-14,
+          -0.9999997615814209,
+          1.5517144203186035
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-f_ring.03.R",
+      "parent": "DEF-f_ring.02.R",
+      "head_global_godot_m": [
+        1.0140118598937988,
+        1.5517144203186035,
+        0.02589372731745243
+      ],
+      "tail_global_godot_m": [
+        1.0489869117736816,
+        1.5517144203186035,
+        0.027213530614972115
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.037708740681409836,
+          -0.9992883801460266,
+          2.3701898044237169e-07,
+          -1.0140117406845093
+        ],
+        [
+          -0.9992886185646057,
+          0.03770876303315163,
+          6.584040875168284e-06,
+          0.02589382603764534
+        ],
+        [
+          -6.511516858154209e-06,
+          -8.526512829121202e-14,
+          -0.9999997615814209,
+          1.551714539527893
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-thumb.01.R",
+      "parent": "DEF-hand.R",
+      "head_global_godot_m": [
+        0.9200519323348999,
+        1.5384323596954346,
+        -0.004962246865034103
+      ],
+      "tail_global_godot_m": [
+        0.9399218559265137,
+        1.5272773504257202,
+        -0.015245823189616203
+      ],
+      "local_rest_matrix_blender": [
+        [
+          0.48980578780174255,
+          -0.7947965860366821,
+          -0.3583125174045563,
+          -0.9200518131256104
+        ],
+        [
+          -0.0006925511988811195,
+          -0.411342978477478,
+          0.9114801287651062,
+          -0.004962154198437929
+        ],
+        [
+          -0.8718310594558716,
+          -0.44620025157928467,
+          -0.20202873647212982,
+          1.5384324789047241
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-thumb.02.R",
+      "parent": "DEF-thumb.01.R",
+      "head_global_godot_m": [
+        0.9398879408836365,
+        1.5272963047027588,
+        -0.015228264033794403
+      ],
+      "tail_global_godot_m": [
+        0.9625078439712524,
+        1.514594316482544,
+        -0.0269442331045866
+      ],
+      "local_rest_matrix_blender": [
+        [
+          0.4899353086948395,
+          -0.7946524620056152,
+          -0.3584551513195038,
+          -0.9398878216743469
+        ],
+        [
+          -0.0007879237527959049,
+          -0.4115898311138153,
+          0.9113686084747314,
+          -0.015228170901536942
+        ],
+        [
+          -0.871758222579956,
+          -0.44622939825057983,
+          -0.20227864384651184,
+          1.5272964239120483
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-thumb.03.R",
+      "parent": "DEF-thumb.02.R",
+      "head_global_godot_m": [
+        0.9625079035758972,
+        1.5145944356918335,
+        -0.0269442331045866
+      ],
+      "tail_global_godot_m": [
+        0.990345299243927,
+        1.4990055561065674,
+        -0.04133403301239014
+      ],
+      "local_rest_matrix_blender": [
+        [
+          0.48902663588523865,
+          -0.7953540086746216,
+          -0.35814011096954346,
+          -0.9625077843666077
+        ],
+        [
+          -0.0010808915831148624,
+          -0.41113701462745667,
+          0.9115726947784424,
+          -0.02694413810968399
+        ],
+        [
+          -0.8722679018974304,
+          -0.44539642333984375,
+          -0.20191673934459686,
+          1.514594554901123
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-thigh.L",
+      "parent": "DEF-hips",
+      "head_global_godot_m": [
+        -0.12529687583446503,
+        0.9606093764305115,
+        0.021515626460313797
+      ],
+      "tail_global_godot_m": [
+        -0.12529687583446503,
+        0.6606166362762451,
+        0.023613963276147842
+      ],
+      "local_rest_matrix_blender": [
+        [
+          1.0,
+          -2.071439908490902e-08,
+          3.847856078209588e-08,
+          0.12529687583446503
+        ],
+        [
+          -3.833332584690652e-08,
+          0.006994456052780151,
+          0.9999771118164062,
+          0.021515607833862305
+        ],
+        [
+          -2.098309259679354e-08,
+          -0.9999755024909973,
+          0.006994783878326416,
+          0.9606093764305115
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-shin.L",
+      "parent": "DEF-thigh.L",
+      "head_global_godot_m": [
+        -0.12529687583446503,
+        0.5530781149864197,
+        0.0063281250186264515
+      ],
+      "tail_global_godot_m": [
+        -0.12529687583446503,
+        0.25404196977615356,
+        0.030357161536812782
+      ],
+      "local_rest_matrix_blender": [
+        [
+          0.9999999403953552,
+          -1.0020873020266663e-12,
+          -0.00026252129464410245,
+          0.12529687583446503
+        ],
+        [
+          0.0002616782730910927,
+          0.0800967663526535,
+          0.9967886209487915,
+          0.006328108720481396
+        ],
+        [
+          2.1027160983067006e-05,
+          -0.9967870116233826,
+          0.08009697496891022,
+          0.5530781149864197
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-foot.L",
+      "parent": "DEF-shin.L",
+      "head_global_godot_m": [
+        -0.12529687583446503,
+        0.22148437798023224,
+        0.03164062649011612
+      ],
+      "tail_global_godot_m": [
+        -0.12529689073562622,
+        0.07707135379314423,
+        -0.2114952951669693
+      ],
+      "local_rest_matrix_blender": [
+        [
+          0.9999994039535522,
+          1.4551915228366852e-11,
+          -0.0010358012514188886,
+          0.12529687583446503
+        ],
+        [
+          0.0005289561813697219,
+          -0.8597766160964966,
+          0.5106731653213501,
+          0.03164060786366463
+        ],
+        [
+          -0.000890555907972157,
+          -0.510672926902771,
+          -0.8597745299339294,
+          0.22148439288139343
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-toe.L",
+      "parent": "DEF-foot.L",
+      "head_global_godot_m": [
+        -0.12529687583446503,
+        0.037968747317790985,
+        -0.18351562321186066
+      ],
+      "tail_global_godot_m": [
+        -0.12529687583446503,
+        0.03796873986721039,
+        -0.21851561963558197
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.9999999403953552,
+          -5.820766091346741e-11,
+          -2.782326191663742e-07,
+          0.12529686093330383
+        ],
+        [
+          5.820766091346741e-11,
+          -1.0000017881393433,
+          1.1920928955078125e-07,
+          -0.18351568281650543
+        ],
+        [
+          -2.782908268272877e-07,
+          -1.7881393432617188e-07,
+          0.9999999403953552,
+          0.03796873986721039
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-thigh.R",
+      "parent": "DEF-hips",
+      "head_global_godot_m": [
+        0.12529687583446503,
+        0.9606093764305115,
+        0.021515626460313797
+      ],
+      "tail_global_godot_m": [
+        0.12529687583446503,
+        0.6606167554855347,
+        0.023613953962922096
+      ],
+      "local_rest_matrix_blender": [
+        [
+          1.0,
+          -2.0714407966693216e-08,
+          1.1682968192872067e-07,
+          -0.12529687583446503
+        ],
+        [
+          -1.166823366816061e-07,
+          0.006994470953941345,
+          0.9999768733978271,
+          0.021515628322958946
+        ],
+        [
+          -2.1531111116246393e-08,
+          -0.9999755024909973,
+          0.0069947391748428345,
+          0.9606093764305115
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-shin.R",
+      "parent": "DEF-thigh.R",
+      "head_global_godot_m": [
+        0.12529687583446503,
+        0.5530781149864197,
+        0.0063281250186264515
+      ],
+      "tail_global_godot_m": [
+        0.12529687583446503,
+        0.25404196977615356,
+        0.03035717085003853
+      ],
+      "local_rest_matrix_blender": [
+        [
+          0.9999999403953552,
+          2.424727085781342e-13,
+          -0.000262521265540272,
+          -0.12529687583446503
+        ],
+        [
+          0.0002616781275719404,
+          0.08009680360555649,
+          0.9967883825302124,
+          0.006328141316771507
+        ],
+        [
+          2.10271573450882e-05,
+          -0.9967870116233826,
+          0.08009696751832962,
+          0.5530780553817749
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-foot.R",
+      "parent": "DEF-shin.R",
+      "head_global_godot_m": [
+        0.12529687583446503,
+        0.22148437798023224,
+        0.03164062649011612
+      ],
+      "tail_global_godot_m": [
+        0.12529686093330383,
+        0.07707135379314423,
+        -0.2114953100681305
+      ],
+      "local_rest_matrix_blender": [
+        [
+          0.9999994039535522,
+          -2.9103830456733704e-11,
+          -0.0010358012514188886,
+          -0.12529687583446503
+        ],
+        [
+          0.0005289559485390782,
+          -0.8597763776779175,
+          0.5106729865074158,
+          0.03164064139127731
+        ],
+        [
+          -0.0008905559661798179,
+          -0.5106728672981262,
+          -0.8597745895385742,
+          0.22148433327674866
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "DEF-toe.R",
+      "parent": "DEF-foot.R",
+      "head_global_godot_m": [
+        0.12529687583446503,
+        0.037968747317790985,
+        -0.18351562321186066
+      ],
+      "tail_global_godot_m": [
+        0.12529687583446503,
+        0.03796874359250069,
+        -0.21851561963558197
+      ],
+      "local_rest_matrix_blender": [
+        [
+          -0.9999999403953552,
+          1.7462298274040222e-10,
+          -2.7811620384454727e-07,
+          -0.12529689073562622
+        ],
+        [
+          0.0,
+          -1.0000016689300537,
+          2.980232238769531e-07,
+          -0.18351557850837708
+        ],
+        [
+          -2.7852365747094154e-07,
+          2.9802322387695312e-08,
+          1.0,
+          0.03796868026256561
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ],
+  "original_sha256": {
+    "Horde_Braker_Recruit_v02_escala_jogo.glb": "1eccac6a475af412012f4b37eca402af7f2269d5128e5ba1f606439c77a48743",
+    "Horde_Braker_Recruit_v02_escala_jogo.blend": "0168038e7b0436edeb2af01fd26482984b730abe703357e080fb5184c2138f0d",
+    "AnimationLibrary_Godot_Standard.glb": "1b7bf67866360665426bb99e4c71bd619f19b408453c24e30f0c3071601eee5c"
+  },
+  "animations_in_main_glb": 0,
+  "hip_motion_scale": 1.0906989966107214,
+  "source_forward_observation": "JSON says -Z, but toes extend toward +Z. Fixed 180-degree rig-container yaw preserves source local orientations and model -Z forward.",
+  "notes": [
+    "104 rigid pieces; one bone and weight 1.0 per vertex",
+    "Finger bones preserved, rigid mitts attached to hand",
+    "Source has 46 clips; Run is Sprint_Loop, not a clip named Run",
+    "Generic Idle/Walk/Sprint do not maintain two-handed rifle aiming"
+  ],
+  "base_bounds_blender": [
+    [
+      -1.1682049036026,
+      -0.4360078275203705,
+      0.0
+    ],
+    [
+      1.1192600727081299,
+      0.5974041223526001,
+      2.0250000953674316
+    ]
+  ],
+  "triangles": 4000,
+  "material_count": 35,
+  "hold_pose": {
+    "gun_grip_world_blender": [
+      0.03999999910593033,
+      0.27000001072883606,
+      1.3799999952316284
+    ],
+    "support_target_world_blender": [
+      0.05898437276482582,
+      0.6281718611717224,
+      1.4344218969345093
+    ],
+    "overridden_bones": [
+      "DEF-shoulder.L",
+      "DEF-upper_arm.L",
+      "DEF-forearm.L",
+      "DEF-hand.L",
+      "DEF-shoulder.R",
+      "DEF-upper_arm.R",
+      "DEF-forearm.R",
+      "DEF-hand.R"
+    ],
+    "left_palm_in_left_hand": [
+      3.4187470987490087e-07,
+      0.07845914363861084,
+      -1.569832619452427e-08
+    ],
+    "support_in_right_hand": [
+      0.05442104861140251,
+      0.13151487708091736,
+      0.3581719994544983
+    ],
+    "barrel_direction_in_right_hand": [
+      -1.0291724947819603e-06,
+      3.9848475807957584e-07,
+      1.000000238418579
+    ],
+    "role": "Optional upper-body overlay; base rig remains T-pose; original UAL clips unchanged in intent."
+  }
+}

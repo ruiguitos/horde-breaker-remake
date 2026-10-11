@@ -73,7 +73,7 @@ func _process(_delta: float) -> bool:
 ## muzzle at the rifle tip; other guns and first person still work.
 func _test_recruit_model() -> void:
 	var s := SoldierModel.create(&"recruit")
-	_check(s.get("_model") != null, "recruit uses the imported model (recruit.glb)")
+	_check(s.get("_model") != null and s.uses_skeleton(), "recruit uses the imported v03 rig")
 	var lo := INF
 	var hi := -INF
 	for mi in s.find_children("*", "MeshInstance3D", true, false):
@@ -92,7 +92,7 @@ func _test_recruit_model() -> void:
 	while mn != s:
 		mt = mn.transform * mt
 		mn = mn.get_parent()
-	_check(mt.origin.y > 0.9 and mt.origin.y < 1.6, "recruit muzzle at chest height (%.2f m)" % mt.origin.y)
+	_check(mt.origin.y > 0.9 and mt.origin.y < 1.9, "recruit muzzle at chest height (%.2f m)" % mt.origin.y)
 	s.set_shadow_only(true)
 	s.set_weapon(&"shotgun")
 	_check(s.muzzle != null and s.muzzle.get_parent() != null, "recruit model swaps to a placeholder shotgun with a muzzle")

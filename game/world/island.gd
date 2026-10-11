@@ -1309,12 +1309,15 @@ func _draw_player_and_camera() -> void:
 		_fly = move_toward(_fly, 0.0, FLY_SPEED * 2.0 * delta)
 	var moved: float = _player.position.distance_to(_view_pos())
 	_walk_speed = lerpf(_walk_speed, clampf(moved / maxf(delta, 0.001) / 6.0, 0.0, 1.0), 0.2)
-	(_player as SoldierModel).animate(_walk_speed, Time.get_ticks_msec() / 1000.0)
+	var animation_delta: float = 0.0 if paused or not run.card_choices.is_empty() or _hitstop > 0.0 or run.is_over() else delta
+	soldier.animate(_walk_speed, Time.get_ticks_msec() / 1000.0, run.sprinting or run.dash_time > 0.0, animation_delta)
 	_player.position = _view_pos()
 	_player.basis = Basis.looking_at(run.facing, Vector3.UP)
 	# Stretch along the dash direction while breaking through.
 	if run.dash_time > 0.0:
-		_player.basis = Basis.looking_at(run.dash_dir, Vector3.UP).scaled(Vector3(0.8, 0.9, 1.6))
+		_player.basis = Basis.looking_at(run.dash_dir, Vector3.UP)
+		if not soldier.uses_skeleton():
+			_player.basis = _player.basis.scaled(Vector3(0.8, 0.9, 1.6))
 		if not _was_dashing:
 			_trauma = minf(1.0, _trauma + 0.35)
 			fx.emit(&"dust", _on_ground(run.player_pos) + Vector3(0, 0.3, 0))

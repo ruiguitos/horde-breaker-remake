@@ -1,26 +1,11 @@
 class_name SoldierModel
 extends Node3D
-## Low-poly armoured contractor built from boxes (no external assets), in the
-## style of the Armory portrait: helmet with a dark visor, plate carrier with
-## pouches, shoulder pads, knee pads, boots and a rifle held across the
-## chest. Faces -Z, feet at y = 0, about 1.9 m tall.
-##
-## Variants per class:
-##   recruit  - tan/khaki kit, assault rifle.
-##   vanguard - dark olive heavy armour (bigger pads, face shield), shotgun.
-##
-## animate() swings legs and arms from pivots (hips/shoulders) so walking
-## reads without skeletal animation.
-##
-## The Recruit uses the user's own model when it is in the project
-## (RECRUIT_MODEL, originally "Horde_Braker_Recruit_v02_escala_jogo.glb"):
-## 104 rigid parts, no skeleton, already 2.02 m tall, feet at y = 0 and
-## facing -Z, so it needs no scale or offset. Its leg and arm parts are moved
-## under the same hip/shoulder pivots, so the walk cycle is the same as the
-## placeholder's. It holds its own assault rifle; other weapons are built
-## as placeholders in the same hands. Vanguard keeps the box placeholder.
+## Recruit: delivered v03 rig with UAL locomotion and a two-hand rifle hold.
+## Vanguard: the original box placeholder and procedural walk cycle.
+## Both face -Z, expose an equipped muzzle and support first-person shadows.
 
-const RECRUIT_MODEL: String = "res://assets/models/characters/recruit/recruit.glb"
+const RECRUIT_MODEL: String = "res://assets/models/characters/recruit/recruit_v03.glb"
+const RECRUIT_ANIMATIONS: String = "res://assets/models/characters/recruit/recruit_animations.tres"
 const HIP_Y: float = 0.92
 const SHOULDER_Y: float = 1.52
 
@@ -48,7 +33,10 @@ var _gun_node: Node3D
 var _shadow_only: bool = false
 ## Imported model (Recruit) instead of boxes; null for the placeholder.
 var _model: Node3D
-var _model_rifle: Node3D  ## the GLB's own assault rifle
+var _skeleton: Skeleton3D
+var _animation_player: AnimationPlayer
+var _rifle_parts: Array[MeshInstance3D] = []
+var _rifle_muzzle: Node3D
 var _gun_mount: Node3D  ## where placeholder guns sit (the GLB's hands)
 
 
@@ -126,60 +114,37 @@ func _build() -> void:
 	set_weapon(&"shotgun" if heavy else &"rifle")
 
 
-## Imported model: same pivots as the placeholder, with the GLB's parts moved
-## under them (keeping their place) so animate() works unchanged.
+## Keep the imported hierarchy and skins intact; never reparent skinned pieces.
 func _build_model(scene: PackedScene) -> void:
 	_model = scene.instantiate() as Node3D
 	add_child(_model)
-	_leg_l = _pivot(Vector3(-0.17, HIP_Y, 0))
-	_leg_r = _pivot(Vector3(0.17, HIP_Y, 0))
-	_arm_pivot = _pivot(Vector3(0, SHOULDER_Y, 0))
-	var parts: Array[Node] = []
-	for top in _model.get_children():
-		parts.append(top)
-		parts.append_array(top.get_children())
-	for n in parts:
-		if not n is Node3D or n.get_parent() == _model and n.get_child_count() > 0 and n.name != &"Weapon_AssaultRifle":
-			continue  # the "Recruit" group itself stays; its children are sorted
-		var part := n as Node3D
-		var pname: String = part.name
-		var target: Node3D = null
-		if pname.begins_with("Leg_") or pname.begins_with("Boot_") or pname.begins_with("Knee"):
-			target = _leg_l if pname.ends_with("_L") or pname.contains("_L_") else _leg_r
-		elif pname.begins_with("Arm_") or pname.begins_with("Glove_") or pname.begins_with("Hand") 				or pname.begins_with("Weapon"):
-			target = _arm_pivot
-		if target != null:
-			_move_under(part, target)
-	_model_rifle = _arm_pivot.find_child("Weapon_AssaultRifle", false, false) as Node3D
+	_skeleton = _model.find_child("Skeleton3D", true, false) as Skeleton3D
+	_rifle_muzzle = _model.find_child("Muzzle", true, false) as Node3D
+	for part: MeshInstance3D in _model.find_children("Rifle_*", "MeshInstance3D", true, false):
+		_rifle_parts.append(part)
 	_gun_mount = Node3D.new()
-	_arm_pivot.add_child(_gun_mount)
-	if _model_rifle != null:
-		_gun_mount.transform = _model_rifle.transform
+	_gun_mount.name = "WeaponMount"
+	_rifle_muzzle.get_parent().add_child(_gun_mount)
+	_gun_mount.transform = _rifle_muzzle.transform
+	_animation_player = AnimationPlayer.new()
+	_animation_player.name = "RecruitAnimationPlayer"
+	_animation_player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+	_skeleton.add_child(_animation_player)
+	_animation_player.root_node = NodePath("..")
+	_animation_player.add_animation_library(&"UAL", load(RECRUIT_ANIMATIONS) as AnimationLibrary)
+	var hold: SkeletonModifier3D = (load("res://game/world/recruit_rifle_hold.gd") as Script).new()
+	_skeleton.add_child(hold)
 	set_weapon(&"rifle")
 
 
-func _pivot(pos: Vector3) -> Node3D:
-	var p := Node3D.new()
-	p.position = pos
-	add_child(p)
-	return p
+func _ready() -> void:
+	if _animation_player != null:
+		_animation_player.play(&"UAL/Idle_Loop")
+		_animation_player.advance(0.0)
 
 
-## Transform of `n` in this node's space (works outside the scene tree).
-func _local_to_self(n: Node3D) -> Transform3D:
-	var t := Transform3D()
-	var c: Node = n
-	while c != null and c != self and c is Node3D:
-		t = (c as Node3D).transform * t
-		c = c.get_parent()
-	return t
-
-
-func _move_under(part: Node3D, pivot: Node3D) -> void:
-	var t: Transform3D = pivot.transform.affine_inverse() * _local_to_self(part)
-	part.get_parent().remove_child(part)
-	pivot.add_child(part)
-	part.transform = t
+func uses_skeleton() -> bool:
+	return _skeleton != null
 
 
 func _leg(hip: Vector3, pad: float) -> Node3D:
@@ -202,25 +167,18 @@ func set_weapon(id: StringName) -> void:
 		_gun_node.get_parent().remove_child(_gun_node)
 		_gun_node.queue_free()
 		_gun_node = null
-	if _model != null and _model_rifle != null:
-		# The model's own rifle for the rifle; placeholders for the rest.
-		_model_rifle.visible = id == &"rifle"
+	if _skeleton != null:
+		for part in _rifle_parts:
+			part.visible = id == &"rifle"
 		if id == &"rifle":
-			if muzzle == null or muzzle.get_parent() != _model_rifle:
-				muzzle = Node3D.new()
-				muzzle.name = &"Muzzle"
-				muzzle.position = Vector3(0.63, 0.128, 0)  # just past Rifle_Muzzle_Bore
-				_model_rifle.add_child(muzzle)
-			if _shadow_only:
-				set_shadow_only(true)
+			muzzle = _rifle_muzzle
 			return
 	var shotgun: bool = id == &"shotgun"
 	var gun := Node3D.new()
 	_gun_node = gun
-	if _model != null:
-		# GLB hand frame: +X along the barrel, so turn the gun's -Z onto +X.
-		gun.position = Vector3(0.12, 0.1, 0)
-		gun.rotation_degrees = Vector3(0, -90, 0)
+	if _skeleton != null:
+		# Mount's -Z follows the delivered rifle's barrel on the animated hand.
+		gun.position = Vector3(0, 0, 0.32)
 		_gun_mount.add_child(gun)
 	else:
 		gun.position = Vector3(0.08, -0.26, -0.38)
@@ -254,7 +212,16 @@ func set_shadow_only(on: bool) -> void:
 
 
 ## Walk cycle: `speed` 0..1 (fraction of top speed), `t` seconds.
-func animate(speed: float, t: float) -> void:
+func animate(speed: float, t: float, sprinting: bool = false, delta: float = 0.0) -> void:
+	if _animation_player != null:
+		if not is_inside_tree() or delta <= 0.0:
+			return
+		var clip: StringName = &"UAL/Idle_Loop" if speed < 0.05 else &"UAL/Sprint_Loop" if sprinting else &"UAL/Walk_Loop"
+		if _animation_player.current_animation != clip:
+			_animation_player.play(clip, 0.15)
+		_animation_player.speed_scale = 1.0 if speed < 0.05 else clampf(speed, 0.6, 1.4)
+		_animation_player.advance(delta)
+		return
 	var swing: float = sin(t * 9.0) * 0.6 * clampf(speed, 0.0, 1.0)
 	_leg_l.rotation.x = swing
 	_leg_r.rotation.x = -swing

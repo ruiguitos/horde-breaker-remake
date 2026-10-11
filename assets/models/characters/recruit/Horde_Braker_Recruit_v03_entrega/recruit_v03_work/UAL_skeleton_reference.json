@@ -1,0 +1,535 @@
+{
+  "animations": [
+    "A_TPose",
+    "Crouch_Fwd",
+    "Crouch_Idle",
+    "Dance",
+    "Death01",
+    "Driving",
+    "Fixing_Kneeling",
+    "Hit_Chest",
+    "Hit_Head",
+    "Idle",
+    "Idle_Talking",
+    "Idle_Torch",
+    "Interact",
+    "Jog_Fwd",
+    "Jump",
+    "Jump_Land",
+    "Jump_Start",
+    "PickUp_Table",
+    "Pistol_Aim_Down",
+    "Pistol_Aim_Neutral",
+    "Pistol_Aim_Up",
+    "Pistol_Idle",
+    "Pistol_Reload",
+    "Pistol_Shoot",
+    "Punch_Cross",
+    "Punch_Enter",
+    "Punch_Jab",
+    "Push",
+    "Roll",
+    "Roll_RM",
+    "Sitting_Enter",
+    "Sitting_Exit",
+    "Sitting_Idle",
+    "Sitting_Talking",
+    "Spell_Simple_Enter",
+    "Spell_Simple_Exit",
+    "Spell_Simple_Idle",
+    "Spell_Simple_Shoot",
+    "Sprint",
+    "Swim_Fwd",
+    "Swim_Idle",
+    "Sword_Attack",
+    "Sword_Attack_RM",
+    "Sword_Idle",
+    "Walk",
+    "Walk_Formal"
+  ],
+  "bone_count": 53,
+  "bones": [
+    {
+      "head_global_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "name": "root",
+      "parent": ""
+    },
+    {
+      "head_global_m": [
+        0.0,
+        0.9167,
+        -0.0501
+      ],
+      "name": "DEF-hips",
+      "parent": "root"
+    },
+    {
+      "head_global_m": [
+        0.0,
+        1.0505,
+        -0.0156
+      ],
+      "name": "DEF-spine.001",
+      "parent": "DEF-hips"
+    },
+    {
+      "head_global_m": [
+        0.0,
+        1.1736,
+        -0.0004
+      ],
+      "name": "DEF-spine.002",
+      "parent": "DEF-spine.001"
+    },
+    {
+      "head_global_m": [
+        0.0,
+        1.3148,
+        -0.0049
+      ],
+      "name": "DEF-spine.003",
+      "parent": "DEF-spine.002"
+    },
+    {
+      "head_global_m": [
+        0.0,
+        1.4876,
+        -0.0105
+      ],
+      "name": "DEF-neck",
+      "parent": "DEF-spine.003"
+    },
+    {
+      "head_global_m": [
+        0.0,
+        1.5687,
+        0.0051
+      ],
+      "name": "DEF-head",
+      "parent": "DEF-neck"
+    },
+    {
+      "head_global_m": [
+        0.0188,
+        1.4579,
+        0.0714
+      ],
+      "name": "DEF-shoulder.L",
+      "parent": "DEF-spine.003"
+    },
+    {
+      "head_global_m": [
+        0.1919,
+        1.4408,
+        -0.0654
+      ],
+      "name": "DEF-upper_arm.L",
+      "parent": "DEF-shoulder.L"
+    },
+    {
+      "head_global_m": [
+        0.4663,
+        1.4408,
+        -0.0701
+      ],
+      "name": "DEF-forearm.L",
+      "parent": "DEF-upper_arm.L"
+    },
+    {
+      "head_global_m": [
+        0.7389,
+        1.4408,
+        -0.0654
+      ],
+      "name": "DEF-hand.L",
+      "parent": "DEF-forearm.L"
+    },
+    {
+      "head_global_m": [
+        0.8588,
+        1.4388,
+        -0.0345
+      ],
+      "name": "DEF-f_index.01.L",
+      "parent": "DEF-hand.L"
+    },
+    {
+      "head_global_m": [
+        0.8995,
+        1.4388,
+        -0.0345
+      ],
+      "name": "DEF-f_index.02.L",
+      "parent": "DEF-f_index.01.L"
+    },
+    {
+      "head_global_m": [
+        0.9343,
+        1.4388,
+        -0.0345
+      ],
+      "name": "DEF-f_index.03.L",
+      "parent": "DEF-f_index.02.L"
+    },
+    {
+      "head_global_m": [
+        0.8605,
+        1.4412,
+        -0.0602
+      ],
+      "name": "DEF-f_middle.01.L",
+      "parent": "DEF-hand.L"
+    },
+    {
+      "head_global_m": [
+        0.9028,
+        1.4412,
+        -0.0622
+      ],
+      "name": "DEF-f_middle.02.L",
+      "parent": "DEF-f_middle.01.L"
+    },
+    {
+      "head_global_m": [
+        0.9367,
+        1.4412,
+        -0.0637
+      ],
+      "name": "DEF-f_middle.03.L",
+      "parent": "DEF-f_middle.02.L"
+    },
+    {
+      "head_global_m": [
+        0.8466,
+        1.4392,
+        -0.1062
+      ],
+      "name": "DEF-f_pinky.01.L",
+      "parent": "DEF-hand.L"
+    },
+    {
+      "head_global_m": [
+        0.8868,
+        1.4392,
+        -0.1089
+      ],
+      "name": "DEF-f_pinky.02.L",
+      "parent": "DEF-f_pinky.01.L"
+    },
+    {
+      "head_global_m": [
+        0.9144,
+        1.4392,
+        -0.1108
+      ],
+      "name": "DEF-f_pinky.03.L",
+      "parent": "DEF-f_pinky.02.L"
+    },
+    {
+      "head_global_m": [
+        0.858,
+        1.4409,
+        -0.0825
+      ],
+      "name": "DEF-f_ring.01.L",
+      "parent": "DEF-hand.L"
+    },
+    {
+      "head_global_m": [
+        0.8973,
+        1.4409,
+        -0.0839
+      ],
+      "name": "DEF-f_ring.02.L",
+      "parent": "DEF-f_ring.01.L"
+    },
+    {
+      "head_global_m": [
+        0.9282,
+        1.4409,
+        -0.085
+      ],
+      "name": "DEF-f_ring.03.L",
+      "parent": "DEF-f_ring.02.L"
+    },
+    {
+      "head_global_m": [
+        0.7662,
+        1.418,
+        -0.0318
+      ],
+      "name": "DEF-thumb.01.L",
+      "parent": "DEF-hand.L"
+    },
+    {
+      "head_global_m": [
+        0.8004,
+        1.3988,
+        -0.0141
+      ],
+      "name": "DEF-thumb.02.L",
+      "parent": "DEF-thumb.01.L"
+    },
+    {
+      "head_global_m": [
+        0.8394,
+        1.3769,
+        0.0061
+      ],
+      "name": "DEF-thumb.03.L",
+      "parent": "DEF-thumb.02.L"
+    },
+    {
+      "head_global_m": [
+        -0.0188,
+        1.4579,
+        0.0714
+      ],
+      "name": "DEF-shoulder.R",
+      "parent": "DEF-spine.003"
+    },
+    {
+      "head_global_m": [
+        -0.1919,
+        1.4408,
+        -0.0654
+      ],
+      "name": "DEF-upper_arm.R",
+      "parent": "DEF-shoulder.R"
+    },
+    {
+      "head_global_m": [
+        -0.4663,
+        1.4408,
+        -0.0701
+      ],
+      "name": "DEF-forearm.R",
+      "parent": "DEF-upper_arm.R"
+    },
+    {
+      "head_global_m": [
+        -0.7389,
+        1.4408,
+        -0.0654
+      ],
+      "name": "DEF-hand.R",
+      "parent": "DEF-forearm.R"
+    },
+    {
+      "head_global_m": [
+        -0.8588,
+        1.4388,
+        -0.0345
+      ],
+      "name": "DEF-f_index.01.R",
+      "parent": "DEF-hand.R"
+    },
+    {
+      "head_global_m": [
+        -0.8995,
+        1.4388,
+        -0.0345
+      ],
+      "name": "DEF-f_index.02.R",
+      "parent": "DEF-f_index.01.R"
+    },
+    {
+      "head_global_m": [
+        -0.9343,
+        1.4388,
+        -0.0345
+      ],
+      "name": "DEF-f_index.03.R",
+      "parent": "DEF-f_index.02.R"
+    },
+    {
+      "head_global_m": [
+        -0.8605,
+        1.4412,
+        -0.0602
+      ],
+      "name": "DEF-f_middle.01.R",
+      "parent": "DEF-hand.R"
+    },
+    {
+      "head_global_m": [
+        -0.9028,
+        1.4412,
+        -0.0622
+      ],
+      "name": "DEF-f_middle.02.R",
+      "parent": "DEF-f_middle.01.R"
+    },
+    {
+      "head_global_m": [
+        -0.9367,
+        1.4412,
+        -0.0637
+      ],
+      "name": "DEF-f_middle.03.R",
+      "parent": "DEF-f_middle.02.R"
+    },
+    {
+      "head_global_m": [
+        -0.8466,
+        1.4392,
+        -0.1062
+      ],
+      "name": "DEF-f_pinky.01.R",
+      "parent": "DEF-hand.R"
+    },
+    {
+      "head_global_m": [
+        -0.8868,
+        1.4392,
+        -0.1089
+      ],
+      "name": "DEF-f_pinky.02.R",
+      "parent": "DEF-f_pinky.01.R"
+    },
+    {
+      "head_global_m": [
+        -0.9144,
+        1.4392,
+        -0.1108
+      ],
+      "name": "DEF-f_pinky.03.R",
+      "parent": "DEF-f_pinky.02.R"
+    },
+    {
+      "head_global_m": [
+        -0.858,
+        1.4409,
+        -0.0825
+      ],
+      "name": "DEF-f_ring.01.R",
+      "parent": "DEF-hand.R"
+    },
+    {
+      "head_global_m": [
+        -0.8973,
+        1.4409,
+        -0.0839
+      ],
+      "name": "DEF-f_ring.02.R",
+      "parent": "DEF-f_ring.01.R"
+    },
+    {
+      "head_global_m": [
+        -0.9282,
+        1.4409,
+        -0.085
+      ],
+      "name": "DEF-f_ring.03.R",
+      "parent": "DEF-f_ring.02.R"
+    },
+    {
+      "head_global_m": [
+        -0.7662,
+        1.418,
+        -0.0318
+      ],
+      "name": "DEF-thumb.01.R",
+      "parent": "DEF-hand.R"
+    },
+    {
+      "head_global_m": [
+        -0.8004,
+        1.3988,
+        -0.0141
+      ],
+      "name": "DEF-thumb.02.R",
+      "parent": "DEF-thumb.01.R"
+    },
+    {
+      "head_global_m": [
+        -0.8394,
+        1.3769,
+        0.0061
+      ],
+      "name": "DEF-thumb.03.R",
+      "parent": "DEF-thumb.02.R"
+    },
+    {
+      "head_global_m": [
+        0.089,
+        0.9321,
+        0.0014
+      ],
+      "name": "DEF-thigh.L",
+      "parent": "DEF-hips"
+    },
+    {
+      "head_global_m": [
+        0.089,
+        0.5318,
+        -0.0014
+      ],
+      "name": "DEF-shin.L",
+      "parent": "DEF-thigh.L"
+    },
+    {
+      "head_global_m": [
+        0.089,
+        0.1037,
+        -0.0358
+      ],
+      "name": "DEF-foot.L",
+      "parent": "DEF-shin.L"
+    },
+    {
+      "head_global_m": [
+        0.089,
+        0.0152,
+        0.1132
+      ],
+      "name": "DEF-toe.L",
+      "parent": "DEF-foot.L"
+    },
+    {
+      "head_global_m": [
+        -0.089,
+        0.9321,
+        0.0014
+      ],
+      "name": "DEF-thigh.R",
+      "parent": "DEF-hips"
+    },
+    {
+      "head_global_m": [
+        -0.089,
+        0.5318,
+        -0.0014
+      ],
+      "name": "DEF-shin.R",
+      "parent": "DEF-thigh.R"
+    },
+    {
+      "head_global_m": [
+        -0.089,
+        0.1037,
+        -0.0358
+      ],
+      "name": "DEF-foot.R",
+      "parent": "DEF-shin.R"
+    },
+    {
+      "head_global_m": [
+        -0.089,
+        0.0152,
+        0.1132
+      ],
+      "name": "DEF-toe.R",
+      "parent": "DEF-foot.R"
+    }
+  ],
+  "forward": "-Z",
+  "skeleton_node": "Skeleton3D",
+  "source": "Universal Animation Library (Quaternius, CC0) - AnimationLibrary_Godot_Standard.glb",
+  "units": "metres",
+  "up": "+Y"
+}

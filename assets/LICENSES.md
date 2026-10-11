@@ -17,6 +17,8 @@ incluindo fontes, licenças e indicação das modificações. Ver
 | `addons/phantom_camera/` | Phantom Camera 0.11 (transições de câmara) | Marcus Skov | MIT (`LICENSE`) |
 | `assets/animations/AnimationLibrary_Godot_Standard.glb` | Universal Animation Library (animações humanoides) | Quaternius | CC0 (`QUATERNIUS_LICENSE.txt`) |
 | `assets/models/characters/recruit/recruit.glb` (original: `Horde_Braker_Recruit_v02_escala_jogo.glb`) | Horde Breaker Recruit v02 (personagem da classe Recruit, com espingarda de assalto) | o utilizador (gerado com uma ferramenta de IA, provavelmente o Codex) | propriedade do utilizador (output de IA); nenhuma fonte de terceiros conhecida (o glTF só indica "Khronos glTF Blender I/O v5.2.40", sem texturas) |
+| `assets/models/characters/recruit/recruit_v03.glb`, `recruit_rifle_hold.json` | Recruit v03 com rig e pose de empunhadura; entrega gerada noutro ChatGPT a pedido do utilizador | Utilizador; modelo e pose fornecidos para este jogo | Output de IA do utilizador; sem novas fontes de terceiros identificadas no modelo |
+| `assets/models/characters/recruit/recruit_animations.tres` | 46 clips UAL adaptados às proporções do Recruit v03 | Quaternius; adaptação incluída na entrega do utilizador | CC0 (`assets/animations/QUATERNIUS_LICENSE.txt`) |
 | `assets/models/nature_megakit/` | Stylized Nature MegaKit (versão grátis, glTF): árvores, rochas, relva, flores | Quaternius | CC0 (`License_Standard.txt`) |
 | `addons/road-generator/` + `road_demos/` | Road Generator 0.9.4 (estradas 3D) | Moo-Ack! Productions | MIT (`LICENSE`) |
 | `addons/lit/` | Lit 1.1.6 (luz **2D**; não usado no 3D) | Shawn Deprey | MIT (`LICENSE`) |

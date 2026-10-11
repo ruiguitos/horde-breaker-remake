@@ -91,6 +91,12 @@ ilhas das duas runs. Mantém-se o código de saída nativo do Godot no
 Windows (`-1073741819`). Capturas reais (Forward+) do separador PERKS a
 1152×648 e 1920×1080 verificadas.
 
+## Recruit v03 — integração adicional (2026-10-11)
+
+Recruit v03 com rig e locomoção
+Idle/Walk/Sprint aplicado ao jogo. Estado, assets e pontos a preservar
+para o Claude: [RECRUIT_MODEL.md](RECRUIT_MODEL.md).
+
 ## 1. Cartas (pedido do utilizador)
 
 **Concluída em 2026-10-10, sem commit.** Catálogo de 39 cartas, incluindo
