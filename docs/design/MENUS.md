@@ -44,8 +44,8 @@ A integração preserva o céu Sky3D e o áudio gravado existentes.
 ## Redesenho de outubro de 2026 (escolhido pelo utilizador)
 
 A 2026-10-10 o utilizador escolheu, a partir das maquetes da tela "Horde
-Breaker UI Proposals", as 7 propostas abaixo. O utilizador regista-as em
-`docs/DECISIONS.md` se as quiser fechar.
+Breaker UI Proposals", as 7 propostas abaixo. A decisão foi registada em
+`docs/DECISIONS.md` a 2026-10-11, por pedido explícito do utilizador.
 
 1. **Paleta B, "Atlântico e azulejo":**
 

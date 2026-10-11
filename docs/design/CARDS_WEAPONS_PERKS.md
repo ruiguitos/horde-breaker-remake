@@ -141,7 +141,8 @@ Hoje, desbloquear incorpora a arma automaticamente; não existe seleção princi
 **E2. Escolha do utilizador (2026-10-11)**
 
 O utilizador escolheu a **opção B** (armas principais trocáveis) e este
-arsenal. Se a quiser fechar, regista-a em `DECISIONS.md`.
+arsenal. Decisão registada em `docs/DECISIONS.md` a 2026-10-11, por pedido
+explícito do utilizador. A implementação continua pendente.
 
 | Espaço | Arma | Como se obtém | Papel |
 |---|---|---|---|

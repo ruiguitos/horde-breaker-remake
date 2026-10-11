@@ -14,7 +14,8 @@ se percorrem a pé de uma para a outra.
   cada uma com o seu objetivo, e a última tem o final. Fica ao lado das
   viagens atuais por várias ilhas.
 
-Isto ainda não está no `docs/DECISIONS.md`: é o utilizador que o regista.
+Decisão registada em `docs/DECISIONS.md` a 2026-10-11, por pedido explícito
+do utilizador.
 
 **Porquê:** com 1,5 km, uma missão é demasiado longa. O bot leva 6 minutos
 só no Activate, e foi preciso o `horde_radius` e a reciclagem de inimigos.
