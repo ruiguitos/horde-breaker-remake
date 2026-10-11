@@ -31,6 +31,11 @@ var defend_zone := Vector3(-1, 0, -1)
 ## Hold Sequence points (HoldPoint_* markers), in the order to hold them.
 ## Empty = the run picks them (pick_hold_points).
 var hold_points: Array[Vector3] = []
+## Fuel Run: where the fuel cans start (Cargo_* markers, in number order;
+## empty = the run picks spots, pick_cargo_points) and where they are
+## delivered (Delivery marker; x < 0 = the extraction point).
+var cargo_points: Array[Vector3] = []
+var delivery := Vector3(-1, 0, -1)
 ## Optional supply caches (detours with a reward).
 var caches: Array[Vector3] = []
 ## Biome id: beach, town, jungle, port or volcano (see GameData.BIOMES).
@@ -157,6 +162,15 @@ const HOLD_MIN_SPACING: float = 12.0
 ## Walking distance searched from the start (m): bounds the search on big
 ## hand-made islands (a 1.5 km Berlenga has two million cells).
 const HOLD_MAX_WALK: int = 240
+
+## Fuel Run on a map without Cargo_* markers: the same search as the hold
+## points (reachable from the start, at least HOLD_MIN_FROM_BOAT from the
+## boat, spread apart, fixed per seed), with another salt on the seed so
+## the cans do not land on the spots a Hold Sequence would use, and a
+## smaller open area (3 m: room to put a can down and fight beside it).
+static func pick_cargo_points(map: IslandMap, count: int, rng_seed: int) -> Array[Vector3]:
+	return pick_hold_points(map, count, rng_seed ^ 0x4655454c, 3.0)
+
 
 static func pick_hold_points(map: IslandMap, count: int, rng_seed: int, radius: float = 5.0) -> Array[Vector3]:
 	var out: Array[Vector3] = []

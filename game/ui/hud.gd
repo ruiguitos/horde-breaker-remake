@@ -1326,6 +1326,8 @@ func _mission_progress(run: IslandRun) -> String:
 					return "searching"
 				&"hold_sequence":
 					return "%d/%d" % [run.holds_done(), run.hold_points.size()]
+				&"fuel_run":
+					return "%d/%d" % [run.cargo_delivered(), run.cargo_pos.size()]
 				_:
 					return "%d/%d" % [_generators_done(run), GameData.GENERATOR_COUNT]
 		IslandRun.Objective.BOSS:
@@ -1679,6 +1681,15 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 					detail += " · %d OF %d s" % [int(run.hold_progress), int(IslandRun.hold_seconds())]
 					pips = n
 					pips_done = run.holds_done()
+				&"fuel_run":
+					var cans: int = run.cargo_pos.size()
+					_objective.text = "FUEL %d / %d" % [run.cargo_delivered(), cans]
+					if run.is_carrying():
+						detail += " · TO THE %s · [%s] DROP" % [run.delivery_name().to_upper(), GameInput.prompt(&"interact", _gamepad)]
+					else:
+						detail += " · FIND A CAN"
+					pips = cans
+					pips_done = run.cargo_delivered()
 				_:
 					_objective.text = "ACTIVATE THE GENERATORS"
 					detail += " · %d OF %d ONLINE" % [_generators_done(run), GameData.GENERATOR_COUNT]
@@ -1818,6 +1829,9 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"hold_sequence":
 		goal = run.site
 		goal_name = "Point %d" % (run.hold_index + 1)
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"fuel_run":
+		goal = run.fuel_goal()  # the nearest can, or the delivery point while carrying
+		goal_name = run.delivery_name() if run.is_carrying() or run.nearest_waiting_can() == -1 else "Fuel can"
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"rescue":
 		goal = run.survivor_pos
 		goal_name = "Survivor"

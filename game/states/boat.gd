@@ -83,15 +83,17 @@ func _make_routes() -> void:
 	var biomes: Array[StringName] = GameData.ISLAND_BIOMES.duplicate()
 	# Route missions (not the expedition-only holdout), never the mission
 	# just played again: context.mission still holds it after island 1.
-	var missions: Array[StringName] = GameData.route_missions_after(context.mission if context.island_index > 0 else &"")
+	# The biome is drawn first so the mission draw can favour the biome's
+	# signature mission (GameData.pick_route_mission: Fuel Run on the Beach).
+	var previous: StringName = context.mission if context.island_index > 0 else &""
 	for i in 2:
-		_route_missions.append(missions[_rng.randi_range(0, missions.size() - 1)])
 		if context.is_last_island():
 			_route_biomes.append(&"volcano")
 		else:
 			var pick: int = _rng.randi_range(0, biomes.size() - 1)
 			_route_biomes.append(biomes[pick])
 			biomes.remove_at(pick)
+		_route_missions.append(GameData.pick_route_mission(_rng, previous, _route_biomes[i]))
 
 
 func _make_options() -> void:

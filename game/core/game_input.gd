@@ -18,6 +18,9 @@ static var ACTIONS: Dictionary = {
 	&"breaker": [KEY_SPACE, "mouse:%d" % MOUSE_BUTTON_RIGHT, "joy:%d" % JOY_BUTTON_A, "joy:%d" % JOY_BUTTON_RIGHT_SHOULDER],
 	&"ability": [KEY_G, "mouse:%d" % MOUSE_BUTTON_MIDDLE, "joy:%d" % JOY_BUTTON_LEFT_SHOULDER],
 	&"sprint": [KEY_SHIFT, "joy:%d" % JOY_BUTTON_LEFT_STICK],
+	## Pick up / put down a carried object (Fuel Run cans). Pad X is free on
+	## the island (card_1 uses it only on the boat).
+	&"interact": [KEY_E, "joy:%d" % JOY_BUTTON_X],
 	&"pause": [KEY_ESCAPE, "joy:%d" % JOY_BUTTON_START],
 	&"confirm": [KEY_ENTER, KEY_KP_ENTER, KEY_R, "joy:%d" % JOY_BUTTON_A, "joy:%d" % JOY_BUTTON_START],
 	&"debug": [KEY_F3],
@@ -93,7 +96,7 @@ const REBINDABLE: Dictionary = {
 	&"move_up": "Move forward", &"move_down": "Move back",
 	&"move_left": "Move left", &"move_right": "Move right",
 	&"breaker": "Breaker (charge)", &"ability": "Class ability",
-	&"sprint": "Sprint", &"camera_toggle": "Camera view",
+	&"sprint": "Sprint", &"interact": "Pick up / drop", &"camera_toggle": "Camera view",
 	&"weapon_1": "Primary weapon", &"weapon_2": "Secondary weapon",
 	&"pause": "Pause",
 }

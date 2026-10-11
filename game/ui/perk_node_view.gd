@@ -1,103 +1,130 @@
 extends RefCounted
 ## Presentation of one perk node; Profile owns all progression and effects.
+## A node is one focusable card holding its two alternatives side by side
+## (large icon, name below) and three vertical rank pips on the right:
+##   picked + owned  -> teal outline (tick when it is equipped)
+##   picked, rank 0  -> light outline, full colour
+##   not picked      -> muted
+##   locked tier     -> muted, small padlock on each alternative
+## The state word (EQUIPPED / OWNED / NEW / LOCKED) stays in a hidden
+## "State" label and in the tooltip, for tests and screen readers.
 
 const Art = preload("res://game/ui/armory_art.gd")
+
+const ICON_SIZE := 30
 
 
 static func create(profile: Profile, node: StringName, state: String, focus: Callable, actions: Callable) -> Button:
 	var b := Button.new()
 	b.name = "PerkNode_" + String(node)
-	b.custom_minimum_size = Vector2(0, 88)
+	b.custom_minimum_size = Vector2(0, 78)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	b.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	var bg: Color = Color.TRANSPARENT if state == "LOCKED" else (UiTheme.PANEL_RAISED if state == "EQUIPPED" else UiTheme.PANEL)
-	var border: Color = UiTheme.SUCCESS if state == "EQUIPPED" else UiTheme.LINE
+	var locked: bool = state == "LOCKED"
+	var bg := Color(0.035, 0.085, 0.1, 0.78 if locked else 0.92)
 	for style in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
-		var box: StyleBox = UiTheme.card_box(bg, border.lightened(0.25) if style.begins_with("hover") else border, 1, state == "LOCKED")
-		if box is MarkedBox:
-			(box as MarkedBox).base.bg_color = Color(0.04, 0.1, 0.12, 0.95)
+		var box := StyleBoxFlat.new()
+		box.bg_color = bg.lightened(0.05) if style.begins_with("hover") else bg
+		box.border_color = UiTheme.LINE.lightened(0.3) if style.begins_with("hover") else UiTheme.LINE
+		box.set_border_width_all(1)
+		box.set_corner_radius_all(3)
 		b.add_theme_stylebox_override(style, box)
 	b.pressed.connect(actions.bind(node))
 	b.focus_entered.connect(focus.bind(node))
 	b.mouse_entered.connect(func() -> void: if not b.has_focus(): b.grab_focus())
-	var box := VBoxContainer.new()
-	box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	box.offset_left = 10
-	box.offset_right = -10
-	box.offset_top = 5
-	box.offset_bottom = -5
-	box.add_theme_constant_override("separation", 2)
-	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	b.add_child(box)
-	# The button does not lay out its children: grow it to fit the content.
-	box.minimum_size_changed.connect(func() -> void: b.custom_minimum_size.y = maxf(88.0, box.get_combined_minimum_size().y + 10.0))
 	var row := HBoxContainer.new()
+	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	row.offset_left = 3
+	row.offset_right = -5
+	row.offset_top = 3
+	row.offset_bottom = -3
+	row.add_theme_constant_override("separation", 3)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(row)
-	var tier_label := UiTheme.label("TIER " + GameData.RANK_NAMES[GameData.perk_node_tier(node)], 11, UiTheme.MUTED, true)
-	tier_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	tier_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-	row.add_child(tier_label)
-	var tag_colors: Dictionary = {"LOCKED": UiTheme.MUTED, "EQUIPPED": UiTheme.SUCCESS, "OWNED": UiTheme.TEXT, "NEW": UiTheme.ACCENT}
-	var tag := UiTheme.label("✓ EQUIPPED" if state == "EQUIPPED" else state, 11, tag_colors[state], true)
+	b.add_child(row)
+	# The button does not lay out its children: grow it to fit the content.
+	row.minimum_size_changed.connect(func() -> void: b.custom_minimum_size.y = maxf(78.0, row.get_combined_minimum_size().y + 6.0))
+	var tag := UiTheme.label("✓ EQUIPPED" if state == "EQUIPPED" else state, 11, UiTheme.MUTED, true)
 	tag.name = "State"
-	tag.autowrap_mode = TextServer.AUTOWRAP_OFF
+	tag.visible = false
 	row.add_child(tag)
 	var picked: int = profile.perk_option(node)
+	var rank: int = profile.node_rank(node)
 	var alternatives := HBoxContainer.new()
 	alternatives.name = "Alternatives"
-	alternatives.add_theme_constant_override("separation", 6)
+	alternatives.add_theme_constant_override("separation", 2)
 	alternatives.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	alternatives.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	box.add_child(alternatives)
+	alternatives.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(alternatives)
+	var names: Array[String] = []
 	for option in 2:
 		var perk: GameData.Perk = GameData.perk_for(node, option, profile.selected_class)
-		var on: bool = option == picked and state != "LOCKED"
-		var tile := VBoxContainer.new()
-		tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		alternatives.add_child(tile)
-		var symbol_row := HBoxContainer.new()
-		symbol_row.alignment = BoxContainer.ALIGNMENT_CENTER
-		symbol_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		tile.add_child(symbol_row)
-		symbol_row.add_child(Art.image(perk.id, 24, UiTheme.SUCCESS if on else UiTheme.MUTED))
-		if on:
-			var tick := Art.image(perk.id, 12, UiTheme.SUCCESS)
-			tick.texture = UiTheme.tick_icon()
-			symbol_row.add_child(tick)
-		var line := UiTheme.label("%s · %s" % ["AB"[option], perk.title if perk != null else "—"], 13, UiTheme.TEXT if on else UiTheme.MUTED)
-		line.name = "Option" + "AB"[option]
-		line.add_theme_font_override("font", UiTheme.heading_font())
-		line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		var fill: StyleBox = UiTheme.card_box(UiTheme.PANEL_RAISED if on else Color.TRANSPARENT, UiTheme.SUCCESS if on else Color.TRANSPARENT, 1 if on else 0)
-		fill.content_margin_top = 1
-		fill.content_margin_bottom = 1
-		fill.content_margin_left = 2
-		fill.content_margin_right = 2
-		line.add_theme_stylebox_override("normal", fill)
-		tile.add_child(line)
-	var foot := HBoxContainer.new()
-	foot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(foot)
-	var pips := HBoxContainer.new()
+		names.append(perk.title if perk != null else "—")
+		var on: bool = option == picked and not locked
+		alternatives.add_child(_alternative(perk, option, on, rank > 0, state == "EQUIPPED", locked))
+	var pips := VBoxContainer.new()
 	pips.name = "Pips"
+	pips.alignment = BoxContainer.ALIGNMENT_CENTER
 	pips.add_theme_constant_override("separation", 4)
-	pips.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pips.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	foot.add_child(pips)
+	row.add_child(pips)
 	for k in range(1, GameData.PERK_MAX_RANK + 1):
 		var pip := ColorRect.new()
-		pip.custom_minimum_size = Vector2(18, 6)
-		pip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		pip.color = UiTheme.ACCENT if k <= profile.node_rank(node) else UiTheme.LINE
+		pip.custom_minimum_size = Vector2(8, 12)
+		pip.color = UiTheme.ACCENT if k <= rank else UiTheme.LINE
 		pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		pips.add_child(pip)
-	var rank: int = profile.node_rank(node)
-	var foot_text: String = "REQ. TIER " + GameData.RANK_NAMES[GameData.perk_node_tier(node) - 1] if state == "LOCKED" else ("%d INTEL" % profile.next_rank_cost(node) if rank == 0 else "RANK " + GameData.RANK_NAMES[profile.use_rank(node)])
-	var foot_label := UiTheme.label(foot_text, 11, UiTheme.MUTED, true)
-	foot_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-	foot.add_child(foot_label)
+	var cost: int = profile.next_rank_cost(node)
+	var foot: String = "Requires tier " + GameData.RANK_NAMES[GameData.perk_node_tier(node) - 1] if locked \
+		else ("%d Intel" % cost if rank == 0 else "Rank " + GameData.RANK_NAMES[profile.use_rank(node)])
+	b.tooltip_text = "%s / %s\n%s · %s" % [names[0], names[1], tag.text, foot]
 	return b
 
+
+## One alternative: icon above its name, inside a box that marks the pick.
+static func _alternative(perk: GameData.Perk, option: int, on: bool, owned: bool, equipped: bool, locked: bool) -> Control:
+	var tile := PanelContainer.new()
+	tile.name = "Alternative" + "AB"[option]
+	tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var box := StyleBoxFlat.new()
+	box.set_corner_radius_all(2)
+	box.content_margin_left = 2
+	box.content_margin_right = 2
+	box.content_margin_top = 4
+	box.content_margin_bottom = 3
+	box.bg_color = Color.TRANSPARENT
+	if on and owned:
+		box.bg_color = Color(UiTheme.SUCCESS, 0.1)
+		box.border_color = UiTheme.SUCCESS
+		box.set_border_width_all(2)
+	elif on:
+		box.border_color = UiTheme.LINE.lightened(0.25)
+		box.set_border_width_all(1)
+	tile.add_theme_stylebox_override("panel", box)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 2)
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tile.add_child(column)
+	var tint: Color = UiTheme.TEXT if on else (Color(UiTheme.MUTED, 0.55) if locked else UiTheme.MUTED)
+	column.add_child(Art.image(perk.id if perk != null else &"", ICON_SIZE, tint))
+	var line := UiTheme.label(perk.title.to_upper() if perk != null else "—", 11, tint)
+	line.name = "Option" + "AB"[option]
+	line.add_theme_font_override("font", UiTheme.heading_font())
+	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	line.custom_minimum_size.x = 40
+	column.add_child(line)
+	# Corner marks: tick on the equipped pick, padlock on locked tiers.
+	var mark_texture: Texture2D = UiTheme.tick_icon() if on and equipped else (UiTheme.lock_icon() if locked else null)
+	if mark_texture != null:
+		var mark := TextureRect.new()
+		mark.name = "Mark"
+		mark.texture = mark_texture
+		mark.modulate = UiTheme.SUCCESS if on else UiTheme.MUTED
+		mark.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		mark.custom_minimum_size = Vector2(12, 12)
+		mark.size_flags_horizontal = Control.SIZE_SHRINK_END
+		mark.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		tile.add_child(mark)
+	return tile

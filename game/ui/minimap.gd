@@ -22,6 +22,8 @@ const SURVIVOR_COLOR := Color(1.0, 0.55, 0.1)
 const GENERATOR_COLOR := Color(1, 0.85, 0.2)
 const GENERATOR_ON_COLOR := Color(0.3, 1, 0.4)
 const CACHE_COLOR := Color(0.4, 0.95, 1.0)
+## Fuel Run cans and their delivery point (the world uses the same colour).
+const FUEL_COLOR := Color(1.0, 0.6, 0.15)
 
 var run: IslandRun
 var _texture: ImageTexture
@@ -139,6 +141,13 @@ func _draw() -> void:
 		_mark(&"site", _px(run.site))
 	elif run.mission == &"hold_sequence" and run.objective == IslandRun.Objective.GENERATORS:
 		_mark(&"site", _px(run.site))  # only the active point: one goal at a time
+	elif run.mission == &"fuel_run" and run.objective == IslandRun.Objective.GENERATORS:
+		# Every can still on the ground (the carried one is with the player)
+		# and the delivery point.
+		for c in run.cargo_pos.size():
+			if run.cargo_state[c] == IslandRun.CAN_WAITING:
+				_mark(&"fuel", _px(run.cargo_pos[c]))
+		_mark(&"delivery", _px(run.delivery_point()))
 	elif run.mission == &"rescue" and not run.survivor_lost:
 		_mark(&"survivor", _px(run.survivor_pos))
 	for g in GameData.GENERATOR_COUNT:
@@ -182,6 +191,12 @@ static func draw_marker(item: CanvasItem, kind: StringName, p: Vector2, s: float
 			item.draw_circle(p, 4.0 * s, GENERATOR_ON_COLOR)
 		&"cache":
 			item.draw_rect(Rect2(p - Vector2(2.5, 2.5) * s, Vector2(5, 5) * s), CACHE_COLOR)
+		&"fuel":
+			# A fuel can: an upright orange block.
+			item.draw_rect(Rect2(p - Vector2(2.0, 3.0) * s, Vector2(4, 6) * s), FUEL_COLOR)
+		&"delivery":
+			# Where the fuel goes: an orange ring.
+			item.draw_arc(p, 5.0 * s, 0, TAU, 20, FUEL_COLOR, 1.5 * s, true)
 		&"exit":
 			# The Exit: a green chevron pointing up (the way on).
 			item.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -5) * s, p + Vector2(5, 3) * s, p + Vector2(0, 0.5) * s, p + Vector2(-5, 3) * s]), UiTheme.SUCCESS)
@@ -213,6 +228,10 @@ static func legend_entries(r: IslandRun) -> Array[Array]:
 		&"hold_sequence":
 			if r.objective == IslandRun.Objective.GENERATORS:
 				out.append([&"site", "POINT"])
+		&"fuel_run":
+			if r.objective == IslandRun.Objective.GENERATORS:
+				out.append([&"fuel", "FUEL"])
+				out.append([&"delivery", "DELIVERY"])
 		&"rescue":
 			out.append([&"survivor", "SURVIVOR"])
 		&"activate":

@@ -588,11 +588,13 @@ func _test_armory_screen() -> void:
 	c1.grab_focus()
 	await _settle()
 	var effects: Control = armory.find_child("PerkEffects", true, false)
-	var lines: Array = effects.get_children().map(func(l: Label) -> String: return l.text)
+	var lines: Array = effects.get_children().map(func(row: Control) -> String: return row.tooltip_text)
+	var values: Array = effects.get_children().map(func(row: Control) -> String: return (row.find_child("Value", false, false) as Label).text)
+	_check(values == ["13°", "−10%"], "effect values line up on the right (%s)" % [values])
 	_check(lines.size() == 2 and lines[0].begins_with("▲ Headshot cone 13°") and lines[1].begins_with("▼ Body-shot damage −10%"),
 		"detail shows benefit and trade-off at the rank (%s)" % [lines])
 	_check((armory.find_child("PerkRank", true, false) as Label).text == "RANK II → III"
-		and (armory.find_child("PerkUpgrade", true, false) as Button).text == "UPGRADE TO III · 80", "detail shows rank → next rank and cost")
+		and (armory.find_child("PerkUpgrade", true, false) as Button).text == "UPGRADE TO III / 80 INTEL", "detail shows rank → next rank and cost")
 	# LB/RB (here Q) switches A/B for free, keeping the slot.
 	var intel: int = profile.intel
 	var q := InputEventKey.new()
@@ -640,7 +642,7 @@ func _test_armory_screen() -> void:
 	armory.call("_select_category", "PERKS")
 	await _settle()
 	var b3: Button = armory.get("_perk_buttons")[&"breaker_3"]
-	_check((b3.find_child("OptionA", true, false) as Label).text == "A · Bulwark" and (b3.find_child("OptionB", true, false) as Label).text == "B · Intimidating Cry",
+	_check((b3.find_child("OptionA", true, false) as Label).text == "BULWARK" and (b3.find_child("OptionB", true, false) as Label).text == "INTIMIDATING CRY",
 		"Breaker III shows the class's variants")
 	armory.queue_free()
 	await _settle()

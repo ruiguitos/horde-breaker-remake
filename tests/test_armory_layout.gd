@@ -49,6 +49,10 @@ func _run() -> void:
 	armory.set("profile", profile)
 	root.add_child(armory)
 	await _settle()
+	var script: GDScript = load("res://game/states/armory.gd")
+	_check(script.split_effect("Headshot cone {v}°", 13.0) == ["Headshot cone", "13°"]
+		and script.split_effect("Each XP orb heals {v} HP", 0.4) == ["Each XP orb heals", "0.4 HP"]
+		and script.split_effect("No headshots", 1.0) == ["No headshots", ""], "effect text splits into label / value")
 	_check(_fits(armory), "class loadout and hints fit 1152x648")
 	_check(armory.find_children("*", "ScrollContainer", true, false).is_empty(), "fixed loadout needs no scrolling")
 	var shelter: ClassPreview = armory.get("_shelter")
@@ -72,7 +76,7 @@ func _run() -> void:
 		_check(_fits(armory), "all perk effects/actions/hints fit for " + String(node))
 		var perk: GameData.Perk = profile.perk_choice(node)
 		var next: Control = armory.find_child("PerkNextEffects", true, false)
-		_check(next != null and (next.get_child(0) as Label).text == "▲ " + GameData.perk_text(perk.benefit, perk.value(profile.node_rank(node) + 1)),
+		_check(next != null and (next.get_child(0) as Control).tooltip_text == "▲ " + GameData.perk_text(perk.benefit, perk.value(profile.node_rank(node) + 1)),
 			"next-rank benefit comes from data for " + String(node))
 	# Purchased rank II, using rank I: next purchase is still rank III.
 	profile.set_use_rank(&"combat_1", 1)
@@ -82,9 +86,10 @@ func _run() -> void:
 	await _settle()
 	var current: Control = armory.find_child("PerkEffects", true, false)
 	var next: Control = armory.find_child("PerkNextEffects", true, false)
-	_check((current.get_child(0) as Label).text.contains("11°") and (next.get_child(0) as Label).text.contains("15°"),
+	_check((current.get_child(0).find_child("Value", false, false) as Label).text == "11°" and (next.get_child(0).find_child("Value", false, false) as Label).text == "15°",
 		"lower used rank changes current effect, not the next purchase")
-	_check((next.get_child(1) as Label).text.contains("−15%"), "next-rank penalty is visible before buying")
+	_check((next.get_child(1).find_child("Value", false, false) as Label).text == "−15%" and (next.get_child(1) as Control).tooltip_text.begins_with("▼ "),
+		"next-rank penalty is visible before buying")
 	# Slot strip opens the equipped perk's node, without removing it.
 	var slot: Button = armory.find_child("EquippedSlot_1", true, false)
 	slot.pressed.emit()

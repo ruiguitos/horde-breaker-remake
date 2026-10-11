@@ -28,6 +28,11 @@ Director Hale: Survey points are marked, in order. Hold each one until the readi
 Director Hale: One point at a time, contractor. The horde in between is not on the schedule. [ID:RADIO_LAND_HOLD_SEQUENCE_2]
 => END
 
+~ land_fuel_run
+Director Hale: The boat's running on fumes. Fuel cans on this rock, all marked. Bring them home. [ID:RADIO_LAND_FUEL_RUN_1]
+Director Hale: Fuel run, contractor. No fuel, no ride home. I'd hate to bill you for the swim. [ID:RADIO_LAND_FUEL_RUN_2]
+=> END
+
 ~ land_boss
 Director Hale: Thermal readings on the volcano are... large. Do the job, then leave before it notices. [ID:RADIO_LAND_BOSS_1]
 => END
@@ -46,6 +51,21 @@ Director Hale: Readings logged. Move to the next point before they log you. [ID:
 ~ hold_done
 Director Hale: All points held. Survey complete. Get to the boat. [ID:RADIO_HOLD_DONE_1]
 Director Hale: That's the last point. Now the hard part: leaving. [ID:RADIO_HOLD_DONE_2]
+=> END
+
+~ fuel_pickup
+Director Hale: That's a full can. They heard you lift it. Walk faster. [ID:RADIO_FUEL_PICKUP_1]
+Director Hale: Got it? Good. Hands full means no shooting. Put it down if you must, not for long. [ID:RADIO_FUEL_PICKUP_2]
+=> END
+
+~ fuel_delivered
+Director Hale: Fuel's aboard. The next can won't carry itself. [ID:RADIO_FUEL_DELIVERED_1]
+Director Hale: Delivered. Accounting wants a receipt. Go get another. [ID:RADIO_FUEL_DELIVERED_2]
+=> END
+
+~ fuel_done
+Director Hale: Tanks are full. Get on the boat before the horde does. [ID:RADIO_FUEL_DONE_1]
+Director Hale: That's the last can. Engine's warm. Climb aboard. [ID:RADIO_FUEL_DONE_2]
 => END
 
 ~ objective_done

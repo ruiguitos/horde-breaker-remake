@@ -47,8 +47,8 @@ func _ready() -> void:
 	vp.add_child(cam)
 	cam.look_at(Vector3(0, 1.0, 0))
 	if face_only:
-		cam.position = Vector3(0, 1.7, 1.6)
-		cam.look_at(Vector3(0, 1.65, 0))
+		cam.position = Vector3(0, 1.5, 1.9)
+		cam.look_at(Vector3(0, 1.42, 0))
 	_model = SoldierModel.create(class_id)
 	_model.rotation_degrees.y = 200.0  # three-quarter view to start
 	vp.add_child(_model)

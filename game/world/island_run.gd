@@ -144,7 +144,25 @@ var hold_points: Array[Vector3] = []
 var hold_index: int = 0
 var hold_progress: float = 0.0
 var hold_started: bool = false
-## The seed this island was built with (fallback hold points).
+## Fuel Run: one entry per fuel can. Its position (where it waits, or the
+## player's while carried), its state (CAN_*) and whether its pickup spike
+## has fired (only the first pickup calls the horde). `carrying` is the can
+## in the player's hands (-1 = none). `_cargo_dropped` is the can just put
+## down: walking over it does not pick it up again until the player has
+## stepped away (the interact action still does), so dropping to fight
+## does not grab it back on the next frame.
+const CAN_WAITING: int = 0
+const CAN_CARRIED: int = 1
+const CAN_DELIVERED: int = 2
+var cargo_pos: Array[Vector3] = []
+var cargo_state: PackedInt32Array = PackedInt32Array()
+var cargo_touched: Array[bool] = []
+var carrying: int = -1
+var _cargo_dropped: int = -1
+## Last spot the player stood on walkable ground (not in noclip): a can
+## dropped while flying over a wall lands here instead, so it can't be lost.
+var _last_walkable: Vector3 = Vector3.ZERO
+## The seed this island was built with (fallback hold points, fuel cans).
 var run_seed: int = 7
 var survivor_pos: Vector3 = Vector3.ZERO
 var survivor_hp: float = GameData.SURVIVOR_HP
@@ -215,6 +233,7 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMa
 		horde.field_budget = 4000  # big island: a fresher field around the player (~1 ms more per step)
 	director = Director.new(rng_seed)
 	player_pos = map.player_start
+	_last_walkable = player_pos
 	field.compute_now(field.world_to_cell(player_pos))
 	horde.set_target(player_pos)
 	for w in weapons:
@@ -470,7 +489,14 @@ func war_cry_duration() -> float:
 ## throw distance, clamped to the grenade range).
 ## Uses the class ability (Recruit: grenade, Vanguard: War Cry).
 func use_ability(aim: Vector3) -> bool:
-	if grenade_cd > 0.0 or is_paused():
+	if is_paused():
+		return false
+	if carrying >= 0:
+		# Hands full: the ability button puts the fuel can down instead, so
+		# "I want to fight" works without learning the interact key.
+		drop_cargo()
+		return false
+	if grenade_cd > 0.0:
 		return false
 	match player_class:
 		&"vanguard":
@@ -495,7 +521,7 @@ func ability_cooldown_total() -> float:
 
 
 func throw_grenade(aim: Vector3) -> bool:
-	if grenade_cd > 0.0 or is_paused():
+	if grenade_cd > 0.0 or is_paused() or carrying >= 0:
 		return false
 	var flat := Vector3(aim.x, 0, aim.z)
 	if flat.length_squared() < 0.01:
@@ -578,6 +604,140 @@ func set_mission(id: StringName) -> void:
 		if hold_points.is_empty():
 			hold_points.append(site)  # a map too small to pick from: one point
 		site = hold_points[0]
+	cargo_pos.clear()
+	cargo_state.clear()
+	cargo_touched.clear()
+	carrying = -1
+	_cargo_dropped = -1
+	if mission == &"fuel_run":
+		cargo_pos = map.cargo_points.duplicate()
+		if cargo_pos.is_empty():
+			cargo_pos = IslandMap.pick_cargo_points(map, cargo_count_wanted(), run_seed)
+		if cargo_pos.is_empty():
+			cargo_pos.append(site)  # a map too small to pick from: one can
+		for c in cargo_pos.size():
+			cargo_state.append(CAN_WAITING)
+			cargo_touched.append(false)
+		site = fuel_goal()
+
+
+## Fuel Run numbers, from the mission's data (fuel_run.tres).
+static func cargo_count_wanted() -> int:
+	return int(GameData.mission_value(&"fuel_run", "points", 3.0))
+
+
+static func cargo_pickup_radius() -> float:
+	return GameData.mission_value(&"fuel_run", "pickup_radius", 1.8)
+
+
+static func cargo_delivery_radius() -> float:
+	return GameData.mission_value(&"fuel_run", "delivery_radius", 6.0)
+
+
+static func carry_speed_mult() -> float:
+	return GameData.mission_value(&"fuel_run", "carry_speed_mult", 0.8)
+
+
+static func cargo_spike_seconds() -> float:
+	return GameData.mission_value(&"fuel_run", "spike_seconds", 20.0)
+
+
+## True while the player has a fuel can in their hands (no firing, no
+## sprint, no class ability, slower walk).
+func is_carrying() -> bool:
+	return carrying >= 0
+
+
+## Fuel cans delivered so far.
+func cargo_delivered() -> int:
+	var n: int = 0
+	for s in cargo_state:
+		if s == CAN_DELIVERED:
+			n += 1
+	return n
+
+
+## Where the fuel goes: the map's Delivery marker, else the extraction
+## point (the boat; the Exit on an expedition part).
+func delivery_point() -> Vector3:
+	return map.delivery if map.delivery.x >= 0.0 else extraction_point()
+
+
+## Short name of the delivery point (HUD marker, objective text).
+func delivery_name() -> String:
+	return "Fuel drop" if map.delivery.x >= 0.0 else extraction_name()
+
+
+## Where the player should go next in a Fuel Run: the delivery point while
+## carrying, else the nearest can still waiting (the delivery point when
+## none is left).
+func fuel_goal() -> Vector3:
+	if carrying >= 0:
+		return delivery_point()
+	var c: int = nearest_waiting_can()
+	return cargo_pos[c] if c >= 0 else delivery_point()
+
+
+## The waiting can nearest to the player (-1 = none). `reach` > 0: only
+## cans within that many metres; `skip`: a can to leave out.
+func nearest_waiting_can(reach: float = INF, skip: int = -1) -> int:
+	var best: int = -1
+	var best_d: float = reach
+	for c in cargo_pos.size():
+		if cargo_state[c] != CAN_WAITING or c == skip:
+			continue
+		var d: float = Vector2(cargo_pos[c].x - player_pos.x, cargo_pos[c].z - player_pos.z).length()
+		if d <= best_d:
+			best_d = d
+			best = c
+	return best
+
+
+## The interact action (E / pad X): drops the can being carried, else picks
+## up a can within reach (even the one just dropped).
+func interact() -> bool:
+	if mission != &"fuel_run" or is_paused():
+		return false
+	if carrying >= 0:
+		return drop_cargo()
+	var c: int = nearest_waiting_can(cargo_pickup_radius())
+	if c == -1:
+		return false
+	_pick_up_can(c)
+	return true
+
+
+## Puts the carried can down at the player's feet, on walkable ground, so
+## the player can fight; it can be picked up again. False if not carrying.
+func drop_cargo() -> bool:
+	if carrying < 0:
+		return false
+	var cell: Vector2i = field.world_to_cell(player_pos)
+	var spot: Vector3 = Vector3(player_pos.x, 0, player_pos.z)
+	if noclip or field.is_blocked(cell.x, cell.y):
+		spot = _last_walkable
+	cargo_pos[carrying] = spot
+	cargo_state[carrying] = CAN_WAITING
+	_cargo_dropped = carrying
+	carrying = -1
+	site = fuel_goal()
+	messages.append("Fuel can dropped")
+	return true
+
+
+func _pick_up_can(c: int) -> void:
+	carrying = c
+	cargo_state[c] = CAN_CARRIED
+	_cargo_dropped = -1
+	if not cargo_touched[c]:
+		cargo_touched[c] = true
+		director.trigger_peak(cargo_spike_seconds())
+		var where: String = "fuel drop" if map.delivery.x >= 0.0 else ("exit" if has_exit() else "boat")
+		messages.append("Fuel can %d of %d: get it to the %s!" % [cargo_delivered() + 1, cargo_pos.size(), where])
+		radio.append(&"fuel_pickup")
+	else:
+		messages.append("Fuel can picked up")
+	site = fuel_goal()
 
 
 ## Hold Sequence numbers, from the mission's data (hold_sequence.tres).
@@ -655,6 +815,8 @@ func _main_task_done() -> bool:
 			return survivor_found or survivor_lost
 		&"hold_sequence":
 			return hold_index >= hold_points.size()
+		&"fuel_run":
+			return cargo_delivered() >= cargo_pos.size()
 	for p in generator_progress:
 		if p < GameData.GENERATOR_HOLD_SECONDS:
 			return false
@@ -732,6 +894,8 @@ func _intel_base() -> int:
 			base += 40 if survivor_found and not survivor_lost and extracted else 0
 		&"hold_sequence":
 			base += holds_done() * 15
+		&"fuel_run":
+			base += cargo_delivered() * 15
 		_:
 			base += done * 15
 	base += 20 if boss_killed else 0
@@ -818,9 +982,14 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	var aim_flat := Vector3(aim.x, 0, aim.z)
 	if aim_flat.length_squared() > 0.0001:
 		facing = aim_flat.normalized()
-	_update_stamina(dt, sprint and move.length_squared() > 0.01)
+	# A fuel can in the hands: no sprint (and no firing, below).
+	_update_stamina(dt, sprint and move.length_squared() > 0.01 and carrying < 0)
 	var before_move: Vector3 = player_pos
 	_update_player(dt, move, breaker)
+	if not noclip:
+		var cell: Vector2i = field.world_to_cell(player_pos)
+		if not field.is_blocked(cell.x, cell.y):
+			_last_walkable = Vector3(player_pos.x, 0, player_pos.z)
 	_collect_power_up()
 	_stationary = player_pos.distance_squared_to(before_move) < 0.000001
 	horde.set_target(player_pos)
@@ -835,7 +1004,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	_quick_draw_cd = maxf(0.0, _quick_draw_cd - dt)
 	_firing_time = maxf(0.0, _firing_time - dt)
 	invulnerable = maxf(0.0, invulnerable - dt)
-	if not sprinting:
+	if not sprinting and carrying < 0:
 		_auto_fire(dt)
 	_update_grenades(dt)
 	_update_screamers(dt)
@@ -909,6 +1078,8 @@ func _update_player(dt: float, move: Vector2, breaker: bool) -> void:
 	if move.length_squared() > 1.0:
 		move = move.normalized()
 	var v: Vector2 = move * GameData.PLAYER_SPEED * weapons[weapon_index].movement_mult * (1.0 + 0.04 * stacks(&"light_boots")) * perk_speed_mult() * (GameData.SPRINT_MULTIPLIER if sprinting else 1.0) * dt
+	if carrying >= 0:
+		v *= carry_speed_mult()
 	player_pos = Horde.move_against_walls(field, player_pos, v.x, v.y, GameData.PLAYER_RADIUS)
 
 
@@ -1784,6 +1955,8 @@ func _update_mission(dt: float) -> void:
 					_update_rescue(dt)
 				&"hold_sequence":
 					_update_hold_sequence(dt)
+				&"fuel_run":
+					_update_fuel_run()
 				_:
 					_update_generators(dt)
 			if _main_task_done() and has_boss:
@@ -1796,6 +1969,8 @@ func _update_mission(dt: float) -> void:
 				director.trigger_peak(25.0)
 				if mission == &"hold_sequence" and not has_exit():
 					radio.append(&"hold_done")
+				elif mission == &"fuel_run" and not has_exit():
+					radio.append(&"fuel_done")
 				elif mission != &"rescue":
 					radio.append(&"objective_done_on_foot" if has_exit() else &"objective_done")
 		Objective.BOSS:
@@ -1881,6 +2056,34 @@ func _update_hold_sequence(dt: float) -> void:
 		site = hold_points[hold_index]
 		messages.append("Point secured. Move to point %d!" % (hold_index + 1))
 		radio.append(&"hold_point")
+
+
+## Fuel Run: walking over a waiting can picks it up (one at a time); the
+## carried can moves with the player and counts as delivered within
+## cargo_delivery_radius() of delivery_point(). `site` follows the next
+## goal (the HUD marker, the minimap and the test bots read it).
+func _update_fuel_run() -> void:
+	if carrying >= 0:
+		cargo_pos[carrying] = Vector3(player_pos.x, 0, player_pos.z)
+		var to: Vector3 = delivery_point()
+		if Vector2(to.x - player_pos.x, to.z - player_pos.z).length() <= cargo_delivery_radius():
+			cargo_state[carrying] = CAN_DELIVERED
+			cargo_pos[carrying] = to
+			carrying = -1
+			for w in weapons.size():
+				if weapons[w].max_ammo > 0:
+					ammo[w] = mini(max_ammo(w), ammo[w] + max_ammo(w) / 3)
+			if cargo_delivered() < cargo_pos.size():
+				messages.append("Fuel delivered (%d / %d). Go get the next can!" % [cargo_delivered(), cargo_pos.size()])
+				radio.append(&"fuel_delivered")
+	else:
+		if _cargo_dropped >= 0 and Vector2(cargo_pos[_cargo_dropped].x - player_pos.x,
+				cargo_pos[_cargo_dropped].z - player_pos.z).length() > cargo_pickup_radius() + 1.0:
+			_cargo_dropped = -1  # stepped away: walking over it picks it up again
+		var c: int = nearest_waiting_can(cargo_pickup_radius(), _cargo_dropped)
+		if c >= 0:
+			_pick_up_can(c)
+	site = fuel_goal()
 
 
 ## The survivor waits at the site, then follows the player and can be hurt.
@@ -2182,6 +2385,10 @@ func objective_text() -> String:
 			if mission == &"hold_sequence":
 				return "Hold point %d / %d (%d / %d s)" % [mini(hold_index + 1, hold_points.size()), hold_points.size(),
 					int(hold_progress), int(hold_seconds())]
+			if mission == &"fuel_run":
+				if carrying >= 0:
+					return "Fuel %d / %d: carry the can to the %s" % [cargo_delivered(), cargo_pos.size(), delivery_name().to_lower()]
+				return "Fuel %d / %d: find a fuel can" % [cargo_delivered(), cargo_pos.size()]
 			var done: int = 0
 			for p in generator_progress:
 				if p >= GameData.GENERATOR_HOLD_SECONDS:

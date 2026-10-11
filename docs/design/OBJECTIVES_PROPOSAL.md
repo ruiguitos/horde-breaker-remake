@@ -97,5 +97,38 @@ Marcadores `HoldPoint_1..` (ordem pelo número); sem eles, o jogo escolhe
 pontos alcançáveis e afastados, fixos por seed. Entra no sorteio do barco,
 que já não repete a missão anterior (Defend e Holdout contam como a mesma
 família). A Berlenga P3 (Costa Sudoeste) usa-a com três marcadores reais.
-Testes: `tests/test_hold_sequence.gd`. Próximo passo: transporte de
-combustível na Beach.
+Testes: `tests/test_hold_sequence.gd`.
+
+**Passo 2 feito: Fuel Run** (`game/data/missions/fuel_run.tres`). Números
+(todos no `.tres`, para afinar em playtest):
+
+| Valor | Número | Porquê |
+|---|---|---|
+| Bidões | 3 | Igual aos geradores e aos pontos: três idas e voltas. |
+| Raio de recolha | 1,8 m | Apanha-se ao passar por cima, sem apanhar por acidente do outro lado de uma parede. |
+| Raio de entrega | 6 m | Maior do que o anel do barco (4 m): entrega-se ao chegar, a extração pede mais um passo. |
+| Velocidade com bidão | ×0,8, sem sprint | Penalização ligeira: a horda apanha-te se não limpares o caminho. |
+| Pico ao pegar | 20 s | Só na primeira vez de cada bidão; pegar de novo não chama a horda. |
+| Sorteio | peso 3 na Beach, 1 nas outras | Na Beach sai em cerca de 43 % das rotas (3 em 7), nas outras 20 %. |
+
+Regras: um bidão de cada vez; com ele não se dispara, não se corre e não se
+usa a habilidade da classe (o Breaker continua: é a fuga). A tecla nova
+`interact` (E / X no comando) pousa o bidão aos pés, em terreno transitável
+(em noclip, no último sítio onde se pisou chão), para combater; a tecla da
+habilidade também o pousa. O bidão pousado não é reapanhado ao ficar em cima
+dele, só depois de te afastares (ou com E). Entrega a 6 m do barco (ou do
+`Exit` numa parte de expedição, ou de um marcador `Delivery`); a extração
+só abre com todos entregues, e cada entrega repõe um terço da munição.
+Marcadores `Cargo_1..` e `Delivery`; sem eles, o jogo escolhe sítios como
+no Hold Sequence (alcançáveis, a 30 m ou mais do barco, afastados entre si,
+fixos por seed, com outra "sal" na seed para não coincidirem). Morrer com o
+bidão termina a ilha como sempre; um Quick Redeploy cria a ilha de novo com
+os bidões no sítio. Visual: bidão Poly Haven (ou caixa laranja sem o
+modelo) com um farol enquanto está no chão, levado na mão direita do
+soldado nas três câmaras; anel laranja no ponto de entrega; minimapa com
+`FUEL` e `DELIVERY`; HUD `FUEL 1 / 3`. Ainda nenhuma ilha tem marcadores
+`Cargo_*` (usa-se o recurso automático). Testes: `tests/test_fuel_run.gd`
+(inclui um bot que completa a missão; na Beach a T2 precisou de 499 s e de
+70 pousos para combater: vale a pena confirmar o ritmo em playtest).
+
+Próximo passo: destruir ninhos na Jungle.

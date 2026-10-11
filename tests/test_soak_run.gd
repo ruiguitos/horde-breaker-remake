@@ -83,7 +83,7 @@ func _soak(run_seed: int) -> void:
 ## then the boat.
 func _goal(run: IslandRun) -> Vector3:
 	match run.objective:
-		IslandRun.Objective.GENERATORS when run.mission == &"defend" or run.mission == &"hold_sequence":
+		IslandRun.Objective.GENERATORS when run.mission in [&"defend", &"hold_sequence", &"fuel_run"]:
 			return run.site
 		IslandRun.Objective.GENERATORS when run.mission == &"rescue":
 			return run.survivor_pos

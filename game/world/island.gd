@@ -42,6 +42,11 @@ var _handmade: HandmadeIsland
 @export var fp_pitch_max: float = 70.0  ## looking down
 
 const DEBRIS_MAX: int = 600
+## Fuel Run: cans, their beacons and the delivery ring (same colour as on
+## the minimap).
+const FUEL_COLOR := Minimap.FUEL_COLOR
+## Where a carried can hangs (its base), in the soldier's space: right hand.
+const CARRY_OFFSET := Vector3(0.38, 0.25, 0.05)
 
 var run: IslandRun
 var hud: Hud
@@ -96,6 +101,11 @@ var _defend_ring: MeshInstance3D
 ## to the next point once one is held).
 var _hold_ring: MeshInstance3D
 var _hold_beacon: MeshInstance3D
+## Fuel Run: one node per can (jerrycan model or an orange box, with a
+## beacon above it while it waits on the ground) and the delivery ring.
+var _cans: Array[Node3D] = []
+var _can_beacons: Array[MeshInstance3D] = []
+var _delivery_ring: MeshInstance3D
 var _survivor: MeshInstance3D
 var _caches: Array[MeshInstance3D] = []
 var _buildings: Array[MeshInstance3D] = []
@@ -286,6 +296,10 @@ func _build_world() -> void:
 	_hold_beacon.position = _on_ground(run.site) + Vector3(0, 2, 0)
 	_hold_beacon.visible = run.mission == &"hold_sequence"
 	add_child(_hold_beacon)
+	if run.mission == &"fuel_run":
+		for c in run.cargo_pos.size():
+			_build_fuel_can()
+		_delivery_ring = _ring(run.delivery_point(), IslandRun.cargo_delivery_radius(), FUEL_COLOR)
 	_survivor = MeshInstance3D.new()
 	_survivor.mesh = _capsule(0.35, 1.7)
 	_survivor.material_override = _mat(Color(1.0, 0.55, 0.1))
@@ -762,6 +776,37 @@ func _sphere(r: float) -> SphereMesh:
 	return s
 
 
+## One Fuel Run can: the CC0 jerrycan model (IslandProps) or, without it,
+## an orange box of the same size; plus a thin beacon above it, shown while
+## the can waits on the ground so it can be found from afar.
+func _build_fuel_can() -> void:
+	var can := Node3D.new()
+	can.name = "FuelCan%d" % _cans.size()
+	var model: Node3D = IslandProps.create(&"jerrycan", 0.5) if realistic_props else null
+	if model != null:
+		can.add_child(model)
+	else:
+		var box := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(0.18, 0.5, 0.36)
+		box.mesh = bm
+		box.position.y = 0.25
+		box.material_override = _mat(FUEL_COLOR.darkened(0.2))
+		can.add_child(box)
+	var beacon := MeshInstance3D.new()
+	var cm := CylinderMesh.new()
+	cm.top_radius = 0.04
+	cm.bottom_radius = 0.12
+	cm.height = 3.0
+	beacon.mesh = cm
+	beacon.position.y = 2.0
+	beacon.material_override = _mat(FUEL_COLOR, true)
+	can.add_child(beacon)
+	add_child(can)
+	_cans.append(can)
+	_can_beacons.append(beacon)
+
+
 func _ring(center: Vector3, radius: float, color: Color) -> MeshInstance3D:
 	var ring := MeshInstance3D.new()
 	var torus := TorusMesh.new()
@@ -803,6 +848,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_breaker_held = true
 	elif event.is_action_pressed(&"ability"):
 		_grenade_held = true
+	elif event.is_action_pressed(&"interact"):
+		run.interact()  # Fuel Run: pick up / put down a can
 	elif event.is_action_pressed(&"weapon_next"):
 		run.cycle_weapon()
 	elif event.is_action_pressed(&"debug"):
@@ -1747,6 +1794,23 @@ func _draw_mission() -> void:
 			hm.albedo_color = Color(0.3, 1.0, 0.5) if inside else Color(0.3, 0.8, 1.0)
 			var bmat: StandardMaterial3D = _hold_beacon.material_override
 			bmat.albedo_color = Color(0.3, 0.8, 1.0).lerp(Color(0.3, 1.0, 0.5), run.hold_progress / IslandRun.hold_seconds())
+	if run.mission == &"fuel_run":
+		for c in mini(_cans.size(), run.cargo_pos.size()):
+			var state: int = run.cargo_state[c]
+			_can_beacons[c].visible = state == IslandRun.CAN_WAITING
+			if state == IslandRun.CAN_CARRIED:
+				# In the right hand, turning with the soldier (all camera modes:
+				# in first person it shows at the hip when looking down).
+				_cans[c].position = _player.position + _player.basis.orthonormalized() * CARRY_OFFSET
+				_cans[c].basis = _player.basis.orthonormalized()
+			elif state == IslandRun.CAN_DELIVERED:
+				# Delivered cans wait in a row beside the delivery point.
+				_cans[c].position = _on_ground(run.delivery_point() + Vector3(-1.0 + 0.5 * c, 0, 1.5))
+			else:
+				_cans[c].position = _on_ground(run.cargo_pos[c])
+		var ring: StandardMaterial3D = _delivery_ring.material_override
+		ring.albedo_color = Color(0.3, 1.0, 0.5) if run.is_carrying() else FUEL_COLOR
+		_delivery_ring.visible = run.objective == IslandRun.Objective.GENERATORS
 	for g in _generators.size():
 		var p: float = run.generator_progress[g] / GameData.GENERATOR_HOLD_SECONDS
 		var m: StandardMaterial3D = _generators[g].material_override

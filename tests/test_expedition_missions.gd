@@ -221,7 +221,7 @@ func _test_markers() -> void:
 
 func _test_holdout() -> void:
 	_check(GameData.MISSIONS.has(&"holdout") and GameData.MISSIONS[&"holdout"]["name"] == "Holdout"
-		and not GameData.ROUTE_MISSIONS.has(&"holdout") and GameData.ROUTE_MISSIONS.size() == 4,
+		and not GameData.ROUTE_MISSIONS.has(&"holdout") and GameData.ROUTE_MISSIONS.size() == 5,
 		"holdout mission exists and is not offered on boat routes")
 	var ctx := RunContext.new(3)
 	ctx.island_index = RunContext.ISLAND_COUNT - 1  # the last island

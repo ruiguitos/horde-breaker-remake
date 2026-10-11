@@ -23,6 +23,7 @@ const ADVICE: Dictionary = {
 	&"defend": "The uplink zone is a circle. Stay inside it. Use the breaker to push them out, not to leave.",
 	&"rescue": "The surveyor follows you, slowly, and they don't heal. Take the short way back.",
 	&"hold_sequence": "The points come one at a time. Leave a point and its clock stops. Clear a space, then hold.",
+	&"fuel_run": "One can at a time, and you can't shoot with your hands full. Put it down to fight, pick it up after.",
 	&"holdout": "Hold the courtyard until I can send the boat. When it comes, run for the pier. It won't wait.",
 }
 

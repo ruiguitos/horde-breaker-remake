@@ -43,6 +43,7 @@ acaso e, dentro da rota, a ilha sai pela seed.
 | Breaker (investida) | Espaço ou botão direito | A ou RB |
 | Sprint (não dispara enquanto corre) | Shift | L3 (clicar stick esquerdo) |
 | Granada (lança para o rato) | G ou botão do meio | LB |
+| Apanhar / pousar (bidões da Fuel Run) | E | X |
 | Trocar arma | 1 principal / 2 secundária | D-pad ← principal / ↑ secundária, ↓ roda |
 | Escolher carta (foco + confirmar; 0,4 s de espera ao abrir) | ← → e Enter, ou clique | D-pad / stick e A |
 | Trocar as cartas (reroll) | R | Y |
@@ -369,7 +370,7 @@ só visual. A câmara de 3.ª pessoa encurta para não entrar nas colinas.
 | `Trees/` | Cada filho bloqueia só a célula do tronco (a copa não conta) |
 | `Bridges/` | Cada filho é o tabuleiro de uma ponte (`MeshInstance3D`): as células por baixo andam-se à altura do tabuleiro, mesmo sobre água; os filhos (guardas) são decoração |
 | `Decor/` | Nunca bloqueia: relva, flores, estradas, luzes, água de pré-visualização |
-| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed) (nós `Marker3D`) |
+| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed), `Cargo_1..` e `Delivery` (missão Fuel Run: onde estão os bidões e onde se entregam; sem `Cargo_*` o jogo escolhe sítios como os do Hold Sequence, sem `Delivery` entrega-se no barco/Exit) (nós `Marker3D`) |
 
 A ilha ocupa o quadrado de 0 a `size` metros em X e Z (160 por omissão;
 muda no inspetor do nó raiz). Mantém tudo lá dentro.
@@ -498,6 +499,14 @@ Cada rota mostra também a missão da ilha:
 - **Rescue**: encontra o sobrevivente (cápsula laranja, também no minimapa).
   Depois ele segue-te; se muitos zombies lhe tocarem, morre. Só podes partir
   com ele no barco, ou depois de ele morrer, e aí sem o bónus de +40 de Intel.
+- **Hold Sequence**: segura três pontos por ordem (20 s cada, raio 5 m).
+- **Fuel Run**: leva três bidões de combustível (laranja, com farol) ao barco,
+  um de cada vez. Apanhas um ao passar por cima (ou com E / X). Com o bidão
+  nas mãos andas a 80 %, não corres, não disparas e não usas a habilidade;
+  E / X (ou a tecla da habilidade) pousa-o no chão para combater, e voltas a
+  apanhá-lo depois. A primeira vez que pegas em cada bidão, a horda entra em
+  pico. Entrega a menos de 6 m do barco; a saída só abre com os três
+  entregues. É a missão "da casa" da Beach: lá sai com peso 3 no sorteio.
 
 No Vulcão, o boss aparece depois de cumprires a missão.
 

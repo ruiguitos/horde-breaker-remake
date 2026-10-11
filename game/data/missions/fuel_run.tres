@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://cfuelrun0can"]
+
+[ext_resource type="Script" path="res://game/data/resources/mission_data.gd" id="1_fuel"]
+
+[resource]
+script = ExtResource("1_fuel")
+display_name = "Fuel Run"
+text = "Carry three fuel cans to the boat, then get out."
+order = 5
+points = 3
+pickup_radius = 1.8
+delivery_radius = 6.0
+carry_speed_mult = 0.8
+spike_seconds = 20.0
+preferred_biomes = Array[StringName]([&"beach"])
+preferred_weight = 3

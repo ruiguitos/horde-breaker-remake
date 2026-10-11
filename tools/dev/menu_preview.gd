@@ -39,7 +39,7 @@ func _process(delta: float) -> bool:
 		profile.selected_secondary = &"marksman"
 		profile.unlocked_weapons = [&"machine_gun", &"marksman"]
 		profile.unlocked_classes = [&"recruit", &"vanguard"]
-		profile.selected_class = &"vanguard"
+		profile.selected_class = &"recruit"
 		profile.max_threat = 2
 		profile.threat = 2
 		profile.lore_pages = 3
@@ -63,6 +63,9 @@ func _process(delta: float) -> bool:
 			"pause": current.set("paused", true)
 			"settings": current.call("_settings")
 			"archive": current.call("_archive")
+	if _frames == 6 and _screen == "perks":
+		# As in the mockup: the first node focused, its detail on the right.
+		(_main.get("_current").get("_perk_buttons")[&"combat_1"] as Button).grab_focus()
 	# BootSplashPlus stays visible for at least 2.3 s, irrespective of FPS.
 	if _frames >= 12 and _elapsed >= 3.0:
 		var screenshot := root.get_texture().get_image()

@@ -630,7 +630,10 @@ static func _load_missions() -> Dictionary:
 	for e: Array in _entries(MISSION_REGISTRY):
 		var d: MissionData = e[1]
 		out[e[0]] = {"name": d.display_name, "text": d.text, "on_route": d.on_route,
-			"points": d.points, "seconds": d.seconds_per_point, "radius": d.radius}
+			"points": d.points, "seconds": d.seconds_per_point, "radius": d.radius,
+			"pickup_radius": d.pickup_radius, "delivery_radius": d.delivery_radius,
+			"carry_speed_mult": d.carry_speed_mult, "spike_seconds": d.spike_seconds,
+			"preferred_biomes": d.preferred_biomes.duplicate(), "preferred_weight": d.preferred_weight}
 	return out
 
 
@@ -658,6 +661,33 @@ static func route_missions_after(previous: StringName) -> Array[StringName]:
 		if previous == &"" or mission_family(id) != mission_family(previous):
 			out.append(id)
 	return out if not out.is_empty() else ROUTE_MISSIONS.duplicate()
+
+
+## Weight of mission `id` in the boat's draw for an island of `biome`: 1,
+## or its preferred_weight on one of its preferred_biomes (Fuel Run is the
+## Beach's signature: more likely there, still possible elsewhere).
+static func mission_weight(id: StringName, biome: StringName) -> int:
+	var m: Dictionary = MISSIONS.get(id, {})
+	if biome in (m.get("preferred_biomes", []) as Array):
+		return maxi(1, int(m.get("preferred_weight", 1)))
+	return 1
+
+
+## The boat's draw of one route mission for an island of `biome`, after an
+## island played with `previous`: route_missions_after() (no repeat), each
+## mission weighted by mission_weight(). A weighted lottery: add up the
+## weights, roll below the total, walk the list until the roll is used up.
+static func pick_route_mission(rng: RandomNumberGenerator, previous: StringName, biome: StringName) -> StringName:
+	var pool: Array[StringName] = route_missions_after(previous)
+	var total: int = 0
+	for id: StringName in pool:
+		total += mission_weight(id, biome)
+	var roll: int = rng.randi_range(0, total - 1)
+	for id: StringName in pool:
+		roll -= mission_weight(id, biome)
+		if roll < 0:
+			return id
+	return pool[-1]
 
 
 ## A number of a mission's data (e.g. &"hold_sequence", &"points"), or
