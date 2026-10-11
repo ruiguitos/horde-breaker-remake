@@ -91,6 +91,13 @@ ilhas das duas runs. Mantém-se o código de saída nativo do Godot no
 Windows (`-1073741819`). Capturas reais (Forward+) do separador PERKS a
 1152×648 e 1920×1080 verificadas.
 
+## Props Poly Haven — primeiro conjunto (2026-10-11)
+
+Gerador, bidão, caixote e barricada integrados com glTFs oficiais de 1K,
+sem instalar Blender. Comparação com primitivas disponível no editor.
+Estado, validação, reversão e restantes oito modelos para o Claude:
+[REALISTIC_PROPS.md](REALISTIC_PROPS.md).
+
 ## Recruit v03 — integração adicional (2026-10-11)
 
 Recruit v03 com rig e locomoção

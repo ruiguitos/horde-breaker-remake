@@ -20,6 +20,10 @@ incluindo fontes, licenças e indicação das modificações. Ver
 | `assets/models/characters/recruit/recruit_v03.glb`, `recruit_rifle_hold.json` | Recruit v03 com rig e pose de empunhadura; entrega gerada noutro ChatGPT a pedido do utilizador | Utilizador; modelo e pose fornecidos para este jogo | Output de IA do utilizador; sem novas fontes de terceiros identificadas no modelo |
 | `assets/models/characters/recruit/recruit_animations.tres` | 46 clips UAL adaptados às proporções do Recruit v03 | Quaternius; adaptação incluída na entrega do utilizador | CC0 (`assets/animations/QUATERNIUS_LICENSE.txt`) |
 | `assets/models/nature_megakit/` | Stylized Nature MegaKit (versão grátis, glTF): árvores, rochas, relva, flores | Quaternius | CC0 (`License_Standard.txt`) |
+| `assets/models/polyhaven/portable_generator/` | Gerador portátil, glTF oficial com texturas de 1K | James Ray Cock / [Poly Haven](https://polyhaven.com/a/portable_generator) | CC0 (`assets/models/polyhaven/LICENSE.txt`) |
+| `assets/models/polyhaven/metal_jerrycan_green/` | Bidão de combustível, glTF oficial com texturas de 1K | Ulan Cabanilla / [Poly Haven](https://polyhaven.com/a/metal_jerrycan_green) | CC0 (`assets/models/polyhaven/LICENSE.txt`) |
+| `assets/models/polyhaven/wooden_crate_02/` | Caixote de madeira, glTF oficial com texturas de 1K | James Ray Cock e Jurita Burger / [Poly Haven](https://polyhaven.com/a/wooden_crate_02) | CC0 (`assets/models/polyhaven/LICENSE.txt`) |
+| `assets/models/polyhaven/concrete_road_barrier_02/` | Barricada de betão, glTF oficial com texturas de 1K | Amal Kumar / [Poly Haven](https://polyhaven.com/a/concrete_road_barrier_02) | CC0 (`assets/models/polyhaven/LICENSE.txt`) |
 | `addons/road-generator/` + `road_demos/` | Road Generator 0.9.4 (estradas 3D) | Moo-Ack! Productions | MIT (`LICENSE`) |
 | `addons/lit/` | Lit 1.1.6 (luz **2D**; não usado no 3D) | Shawn Deprey | MIT (`LICENSE`) |
 | `addons/guide/` + `guide_examples/` | G.U.I.D.E 0.14 (input e ícones de comandos) | Jan Thomä | MIT (`LICENSE.md`) |

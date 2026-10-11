@@ -1,0 +1,20 @@
+Poly Haven model assets
+License: CC0 1.0 Universal (public domain dedication)
+License text: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+Provider license statement: https://polyhaven.com/license
+
+Portable Generator: James Ray Cock
+https://polyhaven.com/a/portable_generator
+
+Metal Jerrycan Green: Ulan Cabanilla
+https://polyhaven.com/a/metal_jerrycan_green
+
+Wooden Crate 02: James Ray Cock (modeling), Jurita Burger (graphic design)
+https://polyhaven.com/a/wooden_crate_02
+
+Concrete Road Barrier 02: Amal Kumar
+https://polyhaven.com/a/concrete_road_barrier_02
+
+The official 1K glTF files and their dependencies are unmodified downloads.
+Source URLs, byte lengths and MD5 checksums are recorded in manifest.json.
+Runtime placement, scale and barrier instancing are implemented by the game.

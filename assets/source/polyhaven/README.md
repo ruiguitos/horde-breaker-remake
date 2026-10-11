@@ -3,7 +3,10 @@
 Pasta preparada em 2026-10-11 para os modelos descarregados pelo utilizador.
 A extração foi verificada nessa data: 11 modelos Poly Haven em Blender,
 com texturas de 4K, e o barco Venus em glTF, com cor de 4K e normal de 2K.
-Ainda não foram integrados estes modelos no jogo.
+O primeiro teste integra gerador, bidão, caixote e barricada através de
+glTFs oficiais de 1K descarregados separadamente, sem Blender. Os originais
+de 4K desta pasta não foram modificados. Estado e continuação:
+[REALISTIC_PROPS.md](../../../docs/tech/REALISTIC_PROPS.md).
 
 ## Colocar os ficheiros
 

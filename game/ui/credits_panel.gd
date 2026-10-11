@@ -42,7 +42,7 @@ func _ready() -> void:
 	_link(list, "Creative Commons Attribution 4.0", "https://creativecommons.org/licenses/by/4.0/")
 	list.add_child(HSeparator.new())
 	list.add_child(UiTheme.title("ART, ANIMATION & SOUND", 24))
-	list.add_child(UiTheme.label("Quaternius / Stylized Nature MegaKit & Universal Animation Library / CC0\nPoly Haven / island textures / CC0\nOvani Sound / Sound FX Starter Pack Vol. 1 / royalty-free", 16))
+	list.add_child(UiTheme.label("Quaternius / Stylized Nature MegaKit & Universal Animation Library / CC0\nPoly Haven / island textures & props / CC0\nOvani Sound / Sound FX Starter Pack Vol. 1 / royalty-free", 16))
 	list.add_child(HSeparator.new())
 	list.add_child(UiTheme.title("TYPEFACES", 24))
 	list.add_child(UiTheme.label("Barlow & Barlow Condensed / The Barlow Project Authors (Jeremy Tribby)\nIBM Plex Mono / IBM Corp.\nBoth font families use the SIL Open Font License 1.1.", 16))

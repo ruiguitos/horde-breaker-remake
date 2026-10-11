@@ -1,0 +1,149 @@
+[
+  {
+    "asset": "portable_generator",
+    "file": "portable_generator/portable_generator_1k.gltf",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/portable_generator/portable_generator_1k.gltf",
+    "md5": "13c2380487daae6726443b9f38dd7e53",
+    "bytes": 10130
+  },
+  {
+    "asset": "portable_generator",
+    "file": "portable_generator/textures/portable_generator_spec_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/portable_generator/portable_generator_spec_1k.jpg",
+    "md5": "b3044dbc984897ed902bd47a450f742f",
+    "bytes": 23119
+  },
+  {
+    "asset": "portable_generator",
+    "file": "portable_generator/textures/portable_generator_nor_gl_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/portable_generator/portable_generator_nor_gl_1k.jpg",
+    "md5": "89a51a982488c21eddec2c6e02249591",
+    "bytes": 818829
+  },
+  {
+    "asset": "portable_generator",
+    "file": "portable_generator/textures/portable_generator_diff_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/portable_generator/portable_generator_diff_1k.jpg",
+    "md5": "3d572e1716148ca5d641d8a199fe9192",
+    "bytes": 755079
+  },
+  {
+    "asset": "portable_generator",
+    "file": "portable_generator/textures/portable_generator_arm_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/portable_generator/portable_generator_arm_1k.jpg",
+    "md5": "7dbb8b9f0aa4e9d3ce6ad37e0326299f",
+    "bytes": 887711
+  },
+  {
+    "asset": "portable_generator",
+    "file": "portable_generator/portable_generator.bin",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/portable_generator/portable_generator.bin",
+    "md5": "81b2f4c4c6d0b0d7388ae9aa1123563a",
+    "bytes": 939572
+  },
+  {
+    "asset": "metal_jerrycan_green",
+    "file": "metal_jerrycan_green/metal_jerrycan_green_1k.gltf",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/metal_jerrycan_green/metal_jerrycan_green_1k.gltf",
+    "md5": "8816bb58283db5d391b6b57d00171df1",
+    "bytes": 9539
+  },
+  {
+    "asset": "metal_jerrycan_green",
+    "file": "metal_jerrycan_green/textures/metal_jerrycan_green_nor_gl_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/metal_jerrycan_green/metal_jerrycan_green_nor_gl_1k.jpg",
+    "md5": "2771ff769c5265dd1e9e97ce052c1a72",
+    "bytes": 744758
+  },
+  {
+    "asset": "metal_jerrycan_green",
+    "file": "metal_jerrycan_green/textures/metal_jerrycan_green_diff_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/metal_jerrycan_green/metal_jerrycan_green_diff_1k.jpg",
+    "md5": "c0e675b4fac7dbe66d301ca34626a4c9",
+    "bytes": 577269
+  },
+  {
+    "asset": "metal_jerrycan_green",
+    "file": "metal_jerrycan_green/textures/metal_jerrycan_green_arm_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/metal_jerrycan_green/metal_jerrycan_green_arm_1k.jpg",
+    "md5": "dc7cbd1b48df78d62afd7c2a1c33e048",
+    "bytes": 1050155
+  },
+  {
+    "asset": "metal_jerrycan_green",
+    "file": "metal_jerrycan_green/metal_jerrycan_green.bin",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/metal_jerrycan_green/metal_jerrycan_green.bin",
+    "md5": "d413746af56ec6ed4b2b532eda0c4800",
+    "bytes": 273368
+  },
+  {
+    "asset": "wooden_crate_02",
+    "file": "wooden_crate_02/wooden_crate_02_1k.gltf",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/wooden_crate_02/wooden_crate_02_1k.gltf",
+    "md5": "a69eb62fd20e6badb6bb56f052930e06",
+    "bytes": 4150
+  },
+  {
+    "asset": "wooden_crate_02",
+    "file": "wooden_crate_02/textures/wooden_crate_02_diff_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wooden_crate_02/wooden_crate_02_diff_1k.jpg",
+    "md5": "45bca8f49da9d541e06bc926ab001c81",
+    "bytes": 716110
+  },
+  {
+    "asset": "wooden_crate_02",
+    "file": "wooden_crate_02/textures/wooden_crate_02_arm_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wooden_crate_02/wooden_crate_02_arm_1k.jpg",
+    "md5": "a7537612dbfb7fd25e756074eec5624e",
+    "bytes": 819577
+  },
+  {
+    "asset": "wooden_crate_02",
+    "file": "wooden_crate_02/wooden_crate_02.bin",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/wooden_crate_02/wooden_crate_02.bin",
+    "md5": "08d98507231cdeda1070d1a2d0646254",
+    "bytes": 150064
+  },
+  {
+    "asset": "wooden_crate_02",
+    "file": "wooden_crate_02/textures/wooden_crate_02_nor_gl_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wooden_crate_02/wooden_crate_02_nor_gl_1k.jpg",
+    "md5": "314226b31765168cd8070898f8a7e18e",
+    "bytes": 546319
+  },
+  {
+    "asset": "concrete_road_barrier_02",
+    "file": "concrete_road_barrier_02/concrete_road_barrier_02_1k.gltf",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/concrete_road_barrier_02/concrete_road_barrier_02_1k.gltf",
+    "md5": "4e6ba4903224a56a2dc3ce4126529c1e",
+    "bytes": 2910
+  },
+  {
+    "asset": "concrete_road_barrier_02",
+    "file": "concrete_road_barrier_02/concrete_road_barrier_02.bin",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/concrete_road_barrier_02/concrete_road_barrier_02.bin",
+    "md5": "205f6effdf30936bd1db4ea7d56e179c",
+    "bytes": 542900
+  },
+  {
+    "asset": "concrete_road_barrier_02",
+    "file": "concrete_road_barrier_02/textures/concrete_road_barrier_02_arm_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/concrete_road_barrier_02/concrete_road_barrier_02_arm_1k.jpg",
+    "md5": "1da1c5b70aacf06c2aef3f7fe72d3bda",
+    "bytes": 717138
+  },
+  {
+    "asset": "concrete_road_barrier_02",
+    "file": "concrete_road_barrier_02/textures/concrete_road_barrier_02_nor_gl_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/concrete_road_barrier_02/concrete_road_barrier_02_nor_gl_1k.jpg",
+    "md5": "473dc2f984640804503c500ccf677ae4",
+    "bytes": 923479
+  },
+  {
+    "asset": "concrete_road_barrier_02",
+    "file": "concrete_road_barrier_02/textures/concrete_road_barrier_02_diff_1k.jpg",
+    "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/concrete_road_barrier_02/concrete_road_barrier_02_diff_1k.jpg",
+    "md5": "f2f6eea94258691bc344441b9e6a15fc",
+    "bytes": 741673
+  }
+]

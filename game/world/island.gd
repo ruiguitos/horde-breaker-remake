@@ -9,6 +9,8 @@ signal finished(won: bool)
 ## Play this hand-made island (F6 on island.tscn to test one). Empty: the run
 ## picks one from HandmadeIsland.ISLANDS_DIR for the biome, or generates.
 @export var handmade_scene: PackedScene
+## Disable to compare the original primitive props without removing assets.
+@export var realistic_props: bool = true
 
 ## Set by main before the scene enters the tree; null when run with F6.
 var context: RunContext
@@ -98,6 +100,7 @@ var _survivor: MeshInstance3D
 var _caches: Array[MeshInstance3D] = []
 var _buildings: Array[MeshInstance3D] = []
 var _building_boxes: Array[AABB] = []
+var _building_detail_mats: Array[StandardMaterial3D] = []
 var _slam_ring: MeshInstance3D
 var _explosions: Array[MeshInstance3D] = []
 var _tracers: Array[PackedVector3Array] = []
@@ -219,6 +222,14 @@ func _build_world() -> void:
 		crate.mesh = cm
 		crate.position = _on_ground(c) + Vector3(0, 0.35, 0)
 		crate.material_override = _mat(Color(0.3, 0.75, 0.85))
+		if realistic_props:
+			var detail: Node3D = IslandProps.create(&"crate", 0.7)
+			if detail != null:
+				# The coloured beacon keeps cache progress readable above the wood.
+				crate.mesh = _sphere(0.12)
+				crate.position = _on_ground(c) + Vector3(0, 1.0, 0)
+				detail.position.y -= 1.0
+				crate.add_child(detail)
 		add_child(crate)
 		_caches.append(crate)
 
@@ -231,6 +242,18 @@ func _build_world() -> void:
 		gen.mesh = cyl
 		gen.position = _on_ground(g) + Vector3(0, 1, 0)
 		gen.material_override = _mat(Color(0.7, 0.2, 0.15))
+		if realistic_props:
+			var detail: Node3D = IslandProps.create(&"generator", 1.0)
+			if detail != null:
+				gen.mesh = _sphere(0.12)
+				gen.position = _on_ground(g) + Vector3(0, 1.3, 0)
+				detail.position.y -= 1.3
+				gen.add_child(detail)
+				var can: Node3D = IslandProps.create(&"jerrycan")
+				if can != null:
+					var slope: float = run.map.ground_y(g + Vector3(0.8, 0, 0)) - run.map.ground_y(g)
+					can.position += Vector3(0.8, -1.3 + slope, 0)
+					gen.add_child(can)
 		add_child(gen)
 		_generators.append(gen)
 		_generator_rings.append(_ring(g, GameData.GENERATOR_RADIUS, Color(1, 0.8, 0.2)))
@@ -398,8 +421,16 @@ func _build_generated_world() -> void:
 		b.mesh = box
 		b.position = Vector3(r.position.x + r.size.x * 0.5, h * 0.5, r.position.y + r.size.y * 0.5)
 		b.material_override = _mat(_building_color(r, rng))
+		var detail_material: StandardMaterial3D = null
+		if realistic_props and (r.size.x == 1 or r.size.y == 1):
+			var wall: MultiMeshInstance3D = IslandProps.barrier_wall(Vector3(r.size.x, h, r.size.y))
+			if wall != null:
+				b.mesh = null
+				b.add_child(wall)
+				detail_material = wall.material_override as StandardMaterial3D
 		add_child(b)
 		_buildings.append(b)
+		_building_detail_mats.append(detail_material)
 		_building_boxes.append(AABB(Vector3(r.position.x, 0, r.position.y), Vector3(r.size.x, h, r.size.y)))
 
 	_build_props(rng)
@@ -1678,6 +1709,10 @@ func _fade_occluders(delta: float) -> void:
 		m.albedo_color.a = move_toward(m.albedo_color.a, target, delta * 4.0)
 		# Opaque materials are cheaper and cast shadows: only go transparent when needed.
 		m.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED if m.albedo_color.a >= 0.999 else BaseMaterial3D.TRANSPARENCY_ALPHA
+		var detail: StandardMaterial3D = _building_detail_mats[i]
+		if detail != null:
+			detail.albedo_color.a = m.albedo_color.a
+			detail.transparency = m.transparency
 
 
 ## Where the boat model floats: moored 3 m out from the Boat marker; the
