@@ -656,9 +656,11 @@ Como a ilha é criada pelo `main`, para afinar a câmara podes abrir
 | `horde/horde.gd`, `horde/flow_field.gd` | Horda como dados, vinda do spike `horde_flowfield`. |
 | `ui/hud.gd` | HUD em código. |
 | `ui/settings_panel.gd` | Painel de definições (volumes, gráficos, ecrã inteiro). |
+| `ui/loading_screen.gd` | Ecrã de carregamento de cada ilha/parte (camada dentro do `main.gd`). |
+| `ui/dialogue_box.gd`, `ui/typewriter.gd`, `ui/portrait.gd`, `ui/dialogue_voice.gd` | Diálogos: texto letra a letra, retratos desenhados em código, voz em "blips", SKIP. |
 | `world/fx.gd`, `world/visuals.gd` | Partículas GPU; céu, pós-processamento e materiais partilhados. |
 | `audio/sfx.gd`, `audio/music.gd` | Sons e música sintetizados em código. |
-| `data/story.gd` | Falas do rádio e ficheiros de Intel. |
+| `data/story.gd` | Ficheiros de Intel; lê as falas do rádio de `data/dialogue/radio.dialogue`. |
 | `data/game_data.gd` | Dados e valores de equilíbrio. |
 
 `tests/test_soak_run.gd` é um bot que joga runs completas (3 ilhas, boss

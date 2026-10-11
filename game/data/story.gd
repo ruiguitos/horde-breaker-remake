@@ -2,71 +2,17 @@ class_name Story
 extends RefCounted
 ## Story content: the radio voice of Salvage & Co. and the recovered Intel
 ## files that slowly explain what happened on the archipelago. Text only, so
-## writers can edit it here without touching gameplay code.
+## writers can edit it without touching gameplay code: the radio lines and
+## loading tips live in RADIO_RESOURCE, the Intel files here.
 
 const SPEAKER: String = "Director Hale — Salvage & Co."
 
-## Radio lines per event. One is picked at random each time.
-const RADIO: Dictionary = {
-	&"land_activate": [
-		"Three generators, contractor. Turn them on, don't turn into one of them.",
-		"Power's out on this rock. Fix that. Overtime is not authorised.",
-	],
-	&"land_defend": [
-		"The uplink needs seventy-five seconds of uninterrupted transmission. Interrupt nothing.",
-		"Plant yourself in the antenna zone. Think of it as a very aggressive meeting.",
-	],
-	&"land_rescue": [
-		"One of our surveyors is still alive. Probably. Bring them back, they owe us a report.",
-		"Survivor signal detected. Retrieval is billable, so let's do it right.",
-	],
-	&"land_holdout": [
-		"The fort's yours until the boat gets there. Hold the courtyard, then get on board.",
-		"Rescue boat is on its way. Keep the courtyard clear. And the pier. Especially the pier.",
-	],
-	&"land_boss": [
-		"Thermal readings on the volcano are... large. Do the job, then leave before it notices.",
-	],
-	&"generator": [
-		"Generator online. Accounting thanks you.",
-		"That's one. The other two won't switch themselves on.",
-		"Power restored. Try not to stand in it.",
-	],
-	&"objective_done": [
-		"Objective complete. Get to the boat, the meter's running.",
-		"Good work. Now leave, quickly, with all your limbs.",
-	],
-	&"objective_done_on_foot": [
-		"Objective complete. Follow the path out, the next stretch won't clear itself.",
-		"Done here. Keep moving along the trail, no sightseeing.",
-	],
-	&"survivor_found": [
-		"Survivor located. Keep them breathing, the paperwork for the other outcome is awful.",
-	],
-	&"survivor_lost": [
-		"Survivor lost. I'll file it under 'acceptable'. You won't.",
-	],
-	&"boss": [
-		"That is the Behemoth. Company policy is: shoot it until it stops.",
-		"Large specimen inbound. Its rocks are not covered by your insurance.",
-	],
-	&"boss_down": [
-		"Behemoth down. Legal says we can now call this a 'successful outcome'.",
-	],
-	&"low_hp": [
-		"Your vitals are trending towards 'former employee'.",
-		"Medical says you're leaking. Stop that.",
-	],
-	&"screamer": [
-		"That noise was a Screamer. Everything heard it. Everything.",
-	],
-	&"cache": [
-		"Supply cache cracked. Look, free stuff. Don't get used to it.",
-	],
-	&"extract": [
-		"On the boat. Nicely done, contractor.",
-	],
-}
+## Radio lines per event (cue -> [{id, speaker, text}]), read from
+## RADIO_RESOURCE. It uses Dialogue Manager's format so every line has a
+## stable [ID:] and Godot's POT generation finds it; it is read here as
+## plain data (no choices, no conditions), so the HUD gets it at once.
+const RADIO_RESOURCE: String = "res://game/data/dialogue/radio.dialogue"
+static var RADIO: Dictionary = _load_cues(RADIO_RESOURCE)
 
 ## Intel files, unlocked in order (caches and bosses recover them).
 const FILES: Array[Dictionary] = [
@@ -83,8 +29,57 @@ const FILES: Array[Dictionary] = [
 ]
 
 
+## Text of a random line for radio event `key` ("" when none).
 static func radio_line(key: StringName, rng: RandomNumberGenerator) -> String:
+	return String(radio_entry(key, rng).get("text", ""))
+
+
+## A random line of event `key`: {id, speaker, text}, the text already
+## translated ({} when the event has no lines).
+static func radio_entry(key: StringName, rng: RandomNumberGenerator) -> Dictionary:
 	var lines: Array = RADIO.get(key, [])
 	if lines.is_empty():
-		return ""
-	return lines[rng.randi_range(0, lines.size() - 1)]
+		return {}
+	var entry: Dictionary = (lines[rng.randi_range(0, lines.size() - 1)] as Dictionary).duplicate()
+	entry["text"] = translate(entry)
+	return entry
+
+
+## A line's text the way Dialogue Manager translates it (the stable id is
+## the key, context "dialogue"); the English source when no translation is
+## loaded or the id is missing from it.
+static func translate(entry: Dictionary) -> String:
+	var text: String = String(entry.get("text", ""))
+	var id: String = String(entry.get("id", ""))
+	if id == "" or TranslationServer.get_loaded_locales().is_empty():
+		return text
+	var out: String = String(TranslationServer.translate(StringName(id), &"dialogue"))
+	return text if out == id else out
+
+
+## Every cue of a .dialogue file as plain lines, cue -> [{id, speaker,
+## text}], following each cue until it ends.
+static func _load_cues(path: String) -> Dictionary:
+	var out: Dictionary = {}
+	var res: Resource = load(path) if ResourceLoader.exists(path) else null
+	if res == null:
+		push_warning("Story: cannot load " + path)
+		return out
+	var cues: Dictionary = res.get("cues")
+	var lines: Dictionary = res.get("lines")
+	for cue: String in cues:
+		var list: Array[Dictionary] = []
+		var id: String = String(cues[cue])
+		while lines.has(id):
+			var line: Dictionary = lines[id]
+			var kind: String = String(line.get("type", ""))
+			if kind == "dialogue":
+				list.append({"id": String(line.get("static_id", "")), "speaker": String(line.get("character", "")),
+					"text": String(line.get("text", ""))})
+			elif kind != "cue":
+				break
+			id = String(line.get("next_id", ""))
+		out[StringName(cue)] = list
+	return out
+
+

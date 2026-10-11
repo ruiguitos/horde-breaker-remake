@@ -20,6 +20,8 @@ signal continue_requested
 ## button mashed in combat cannot take a card blind.
 const CARD_LOCK_MS: int = 400
 const DEATH_LOCK_MS: int = 600
+## Radio typing speed: faster than the dialogue box, it is read mid-fight.
+const RADIO_CHARS_PER_SECOND: float = 75.0
 ## Specials and the boss closer than this get an arrow at the screen edge.
 const THREAT_RANGE: float = 40.0
 const THREAT_ARROWS_MAX: int = 4
@@ -89,11 +91,16 @@ var _ammo_text: Label
 var _weapon_slots: WeaponSlots
 var _fire_status: Label
 var _switch_hint: Label
-var _radio_panel: VBoxContainer
+var _radio_panel: HBoxContainer
+var _radio_portrait: Portrait
+var _radio_header: Label
 var _radio_text: Label
-var _radio_queue: PackedStringArray = PackedStringArray()
+var _radio_queue: Array[Dictionary] = []  ## Story.radio_entry lines waiting
 var _radio_time: float = 0.0
 var _radio_rng := RandomNumberGenerator.new()
+var _radio_typer := Typewriter.new()
+var _radio_speaker: String = ""
+var _radio_voice: DialogueVoice
 var _alerts: Label
 
 # World overlays (not scaled)
@@ -675,17 +682,31 @@ func _build_field_hud(field: Control) -> void:
 	_power_up_timers.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_place(field, _power_up_timers, Control.PRESET_CENTER_TOP, Vector2(-240, 115), Vector2(480, 44))
 
-	# Radio subtitles, just above the status block.
-	_radio_panel = VBoxContainer.new()
+	# Radio subtitles, just above the status block: who speaks (portrait and
+	# name) and the line, typed out like the dialogue box but never blocking.
+	_radio_panel = HBoxContainer.new()
 	_radio_panel.name = "Radio"
-	_radio_panel.add_theme_constant_override("separation", 2)
-	_place(field, _radio_panel, Control.PRESET_BOTTOM_LEFT, Vector2(16, -190), Vector2(320, 80))
-	_radio_panel.add_child(_label("RADIO / DIRECTOR HALE", 13, UiTheme.ACCENT, true))
+	_radio_panel.add_theme_constant_override("separation", 10)
+	_place(field, _radio_panel, Control.PRESET_BOTTOM_LEFT, Vector2(16, -190), Vector2(382, 80))
+	_radio_portrait = Portrait.new()
+	_radio_portrait.name = "RadioPortrait"
+	_radio_portrait.framed = false  # the field HUD has no panel backgrounds
+	_radio_portrait.custom_minimum_size = Vector2(52, 52)
+	_radio_portrait.size_flags_vertical = Control.SIZE_SHRINK_END
+	_radio_panel.add_child(_radio_portrait)
+	var radio_col := VBoxContainer.new()
+	radio_col.add_theme_constant_override("separation", 2)
+	_radio_panel.add_child(radio_col)
+	_radio_header = _label("RADIO / DIRECTOR HALE", 13, UiTheme.ACCENT, true)
+	radio_col.add_child(_radio_header)
 	_radio_text = _label("", 17)
 	_radio_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_radio_text.custom_minimum_size.x = 320
-	_radio_panel.add_child(_radio_text)
+	radio_col.add_child(_radio_text)
 	_radio_panel.visible = false
+	_radio_voice = DialogueVoice.new()
+	_radio_voice.volume_db = -20.0
+	add_child(_radio_voice)
 
 	# Abilities, bottom centre: cooldown rings, real keys, ready state.
 	_abilities_panel = VBoxContainer.new()
@@ -1723,23 +1744,30 @@ func _update_popups(run: IslandRun, camera: Camera3D) -> void:
 		i -= 1
 
 
-## Shows queued radio lines one at a time, typed out letter by letter.
+## Shows queued radio lines one at a time, typed out letter by letter with
+## the speaker's portrait and voice blips (faster than the dialogue box:
+## this is read mid-fight, and it never takes input).
 func _update_radio(run: IslandRun) -> void:
 	for key in run.radio:
-		var line: String = Story.radio_line(key, _radio_rng)
-		if line != "" and _radio_queue.size() < 3:
-			_radio_queue.append(line)
+		var entry: Dictionary = Story.radio_entry(key, _radio_rng)
+		if not entry.is_empty() and _radio_queue.size() < 3:
+			_radio_queue.append(entry)
 	run.radio.clear()
 	var dt: float = get_process_delta_time()
 	if _radio_time > 0.0:
 		_radio_time -= dt
-		_radio_text.visible_ratio = minf(1.0, _radio_text.visible_ratio + dt * 2.0)
+		if _radio_typer.step(dt):
+			_radio_voice.blip(_radio_speaker)
+			_radio_portrait.talk()
 		if _radio_time <= 0.0:
 			_radio_panel.visible = false
 	elif not _radio_queue.is_empty():
-		_radio_text.text = _radio_queue[0]
-		_radio_queue.remove_at(0)
-		_radio_text.visible_ratio = 0.0
+		var entry: Dictionary = _radio_queue.pop_front()
+		_radio_speaker = String(entry.get("speaker", "Director Hale"))
+		_radio_header.text = "RADIO / " + _radio_speaker.to_upper()
+		_radio_portrait.speaker = _radio_speaker
+		_radio_typer.speed = RADIO_CHARS_PER_SECOND
+		_radio_typer.start(_radio_text, String(entry["text"]))
 		_radio_time = 2.5 + _radio_text.text.length() * 0.045
 		_radio_panel.visible = true
 	# Longer lines grow upwards, keeping a clear gap above the status block.

@@ -6,6 +6,9 @@ extends RefCounted
 ## Writers edit the .dialogue file; numbers and rules stay here.
 
 const RESOURCE: String = "res://game/data/dialogue/briefing.dialogue"
+## last_result: "hurt" under this share of max HP, "fast" under these seconds.
+const HURT_RATIO: float = 0.35
+const FAST_SECONDS: float = 240.0
 
 ## Short lore per biome, in Director Hale's voice.
 const ISLAND_LORE: Dictionary = {
@@ -50,6 +53,60 @@ var island_lore: String:
 var advice: String:
 	get:
 		return ADVICE.get(context.mission, "Don't die.")
+
+## Conditions the dialogue can test (`if briefing.threat >= 3`): the run's
+## threat, the expedition and part being played, and how the previous
+## island of this run went.
+var threat: int:
+	get:
+		return context.threat
+
+var is_expedition: bool:
+	get:
+		return context.is_expedition()
+
+## Expedition id ("berlenga"), "" on the archipelago.
+var expedition: String:
+	get:
+		return String(context.expedition)
+
+## 1-based part number in an expedition (0 on the archipelago).
+var part_index: int:
+	get:
+		return context.island_index + 1 if context.is_expedition() else 0
+
+var part_name: String:
+	get:
+		return context.part_name()
+
+## 1-based island (or part) number in this run.
+var island_number: int:
+	get:
+		return context.island_index + 1
+
+## Islands (or parts) already played in this run.
+var islands_done: int:
+	get:
+		return context.island_log.size()
+
+## How the previous island went: "none" (first island), "hurt" (left with
+## under HURT_RATIO of max HP), "fast" (cleared in under FAST_SECONDS) or
+## "cleared".
+var last_result: String:
+	get:
+		if context.island_log.is_empty():
+			return "none"
+		var last: Dictionary = context.island_log[-1]
+		if float(last.get("hp_left", context.max_hp)) < context.max_hp * HURT_RATIO:
+			return "hurt"
+		if float(last.get("seconds", 9999.0)) < FAST_SECONDS:
+			return "fast"
+		return "cleared"
+
+## Current health in percent of max (what the run carries to this island).
+var hp_percent: int:
+	get:
+		return roundi(100.0 * context.hp / maxf(1.0, context.max_hp))
 
 
 ## "Deal": the next island pays more and spawns more enemies.

@@ -1,0 +1,89 @@
+# Combat radio (HUD subtitles) and loading-screen tips.
+# Story.radio_line(cue) picks one line of a cue at random; every line has a
+# stable [ID:] so translations survive edits to the English text.
+# The speaker name picks the portrait (game/ui/portrait.gd).
+
+~ land_activate
+Director Hale: Three generators, contractor. Turn them on, don't turn into one of them. [ID:RADIO_LAND_ACTIVATE_1]
+Director Hale: Power's out on this rock. Fix that. Overtime is not authorised. [ID:RADIO_LAND_ACTIVATE_2]
+=> END
+
+~ land_defend
+Director Hale: The uplink needs seventy-five seconds of uninterrupted transmission. Interrupt nothing. [ID:RADIO_LAND_DEFEND_1]
+Director Hale: Plant yourself in the antenna zone. Think of it as a very aggressive meeting. [ID:RADIO_LAND_DEFEND_2]
+=> END
+
+~ land_rescue
+Director Hale: One of our surveyors is still alive. Probably. Bring them back, they owe us a report. [ID:RADIO_LAND_RESCUE_1]
+Director Hale: Survivor signal detected. Retrieval is billable, so let's do it right. [ID:RADIO_LAND_RESCUE_2]
+=> END
+
+~ land_holdout
+Director Hale: The fort's yours until the boat gets there. Hold the courtyard, then get on board. [ID:RADIO_LAND_HOLDOUT_1]
+Director Hale: Rescue boat is on its way. Keep the courtyard clear. And the pier. Especially the pier. [ID:RADIO_LAND_HOLDOUT_2]
+=> END
+
+~ land_boss
+Director Hale: Thermal readings on the volcano are... large. Do the job, then leave before it notices. [ID:RADIO_LAND_BOSS_1]
+=> END
+
+~ generator
+Director Hale: Generator online. Accounting thanks you. [ID:RADIO_GENERATOR_1]
+Director Hale: That's one. The other two won't switch themselves on. [ID:RADIO_GENERATOR_2]
+Director Hale: Power restored. Try not to stand in it. [ID:RADIO_GENERATOR_3]
+=> END
+
+~ objective_done
+Director Hale: Objective complete. Get to the boat, the meter's running. [ID:RADIO_OBJECTIVE_DONE_1]
+Director Hale: Good work. Now leave, quickly, with all your limbs. [ID:RADIO_OBJECTIVE_DONE_2]
+=> END
+
+~ objective_done_on_foot
+Director Hale: Objective complete. Follow the path out, the next stretch won't clear itself. [ID:RADIO_OBJECTIVE_DONE_ON_FOOT_1]
+Director Hale: Done here. Keep moving along the trail, no sightseeing. [ID:RADIO_OBJECTIVE_DONE_ON_FOOT_2]
+=> END
+
+~ survivor_found
+Director Hale: Survivor located. Keep them breathing, the paperwork for the other outcome is awful. [ID:RADIO_SURVIVOR_FOUND_1]
+Surveyor: You're from the company? Of course you are. Just get me out of here. [ID:RADIO_SURVIVOR_FOUND_2]
+=> END
+
+~ survivor_lost
+Director Hale: Survivor lost. I'll file it under 'acceptable'. You won't. [ID:RADIO_SURVIVOR_LOST_1]
+=> END
+
+~ boss
+Director Hale: That is the Behemoth. Company policy is: shoot it until it stops. [ID:RADIO_BOSS_1]
+Director Hale: Large specimen inbound. Its rocks are not covered by your insurance. [ID:RADIO_BOSS_2]
+=> END
+
+~ boss_down
+Director Hale: Behemoth down. Legal says we can now call this a 'successful outcome'. [ID:RADIO_BOSS_DOWN_1]
+=> END
+
+~ low_hp
+Director Hale: Your vitals are trending towards 'former employee'. [ID:RADIO_LOW_HP_1]
+Director Hale: Medical says you're leaking. Stop that. [ID:RADIO_LOW_HP_2]
+=> END
+
+~ screamer
+Director Hale: That noise was a Screamer. Everything heard it. Everything. [ID:RADIO_SCREAMER_1]
+=> END
+
+~ cache
+Director Hale: Supply cache cracked. Look, free stuff. Don't get used to it. [ID:RADIO_CACHE_1]
+=> END
+
+~ extract
+Director Hale: On the boat. Nicely done, contractor. [ID:RADIO_EXTRACT_1]
+=> END
+
+# Loading-screen tips (one at random when the briefing has nothing specific).
+~ tips
+Director Hale: The breaker pushes them back. It is a door, not a weapon. Use it to make room. [ID:TIP_BREAKER]
+Director Hale: Ammo is finite, contractor. Headshots are cheaper. [ID:TIP_HEADSHOTS]
+Director Hale: Supply caches hide Intel files. Curiosity is billable. [ID:TIP_CACHES]
+Director Hale: If they surround you, you stood still. Keep moving. [ID:TIP_MOVE]
+Director Hale: Cards stack. Two of the same is rarely a mistake. [ID:TIP_CARDS]
+Director Hale: Dying keeps your Intel. Extracting multiplies it. Do the maths. [ID:TIP_EXTRACT]
+=> END

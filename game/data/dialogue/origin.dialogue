@@ -1,21 +1,21 @@
 ~ start
-Director Hale: You're back. All three islands, and... you read the core logs. All ten files.
-Director Hale: Then you know. TIDE wasn't an accident. The archipelago is a test site, and you were the test.
-- Why tell me now? => why
-- What happens to the logs? => choice
+Director Hale: You're back. All three islands, and... you read the core logs. All ten files. [ID:ORIGIN_START_1]
+Director Hale: Then you know. TIDE wasn't an accident. The archipelago is a test site, and you were the test. [ID:ORIGIN_START_2]
+- Why tell me now? [ID:ORIGIN_R_WHY] => why
+- What happens to the logs? [ID:ORIGIN_R_LOGS] => choice
 
 ~ why
-Director Hale: Because the board wants a decision, and for once they asked the contractor. Congratulations.
+Director Hale: Because the board wants a decision, and for once they asked the contractor. Congratulations. [ID:ORIGIN_WHY]
 => choice
 
 ~ choice
-Director Hale: Hand me the core logs and you get the promotion. Corner office, no more islands. Or... you do something stupid.
-- Hand over the logs. (Salvage & Co. ending)
+Director Hale: Hand me the core logs and you get the promotion. Corner office, no more islands. Or... you do something stupid. [ID:ORIGIN_CHOICE]
+- Hand over the logs. (Salvage & Co. ending) [ID:ORIGIN_R_LOYAL]
 	do origin.choose("loyal")
-	Director Hale: Wise. Welcome to management. Your first task: hire more contractors.
-	Director Hale: [i]Ending: The Corner Office.[/i] Salvage & Co. keeps its secret. The test continues.
-- Broadcast the logs to everyone. (Whistleblower ending)
+	Director Hale: Wise. Welcome to management. Your first task: hire more contractors. [ID:ORIGIN_LOYAL_1]
+	Director Hale: [i]Ending: The Corner Office.[/i] Salvage & Co. keeps its secret. The test continues. [ID:ORIGIN_LOYAL_2]
+- Broadcast the logs to everyone. (Whistleblower ending) [ID:ORIGIN_R_LEAK]
 	do origin.choose("leak")
-	Director Hale: ...You'll never work in salvage again. You might never work anywhere again.
-	Director Hale: [i]Ending: Open Channel.[/i] The world hears about TIDE. Salvage & Co. stock does not recover.
+	Director Hale: ...You'll never work in salvage again. You might never work anywhere again. [ID:ORIGIN_LEAK_1]
+	Director Hale: [i]Ending: Open Channel.[/i] The world hears about TIDE. Salvage & Co. stock does not recover. [ID:ORIGIN_LEAK_2]
 => END
