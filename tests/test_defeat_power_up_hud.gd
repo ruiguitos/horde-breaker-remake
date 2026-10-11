@@ -57,7 +57,7 @@ func _run_tests() -> void:
 	island.connect("finished", func(won: bool) -> void:
 		_check(not won, "defeat continues as a lost run")
 		_continued += 1)
-	run.apply_power_up(&"max_armor")
+	run.apply_power_up(&"max_shield")
 	run.apply_power_up(&"insta_kill")
 	run.apply_power_up(&"double_rewards")
 	run.power_ups.ground_kind = &"full_power"
@@ -66,7 +66,7 @@ func _run_tests() -> void:
 	await _settle(5)
 	_check(hud._shield_bar.value == 100 and hud._shield_text.text.contains("100 / 100"), "field HUD shows shield bar and numbers")
 	_check(hud._power_up_timers.text.contains("INSTA-KILL  25s") and hud._power_up_timers.text.contains("XP / INTEL  25s"), "both timed buffs show icons and seconds")
-	_check(hud._messages.text.contains("MAX ARMOR!"), "collection toast reaches the HUD")
+	_check(hud._messages.text.contains("MAX SHIELD!"), "collection toast reaches the HUD")
 	_check(hud._messages.get_global_rect().position.y >= hud._power_up_timers.get_global_rect().end.y, "toasts sit below active timers")
 	var keys: Array = hud._legend.entries().map(func(e: Array) -> StringName: return e[0])
 	_check(hud._minimap.drawn_kinds.has(&"power_up") and keys.has(&"power_up"), "ground pickup has a matching minimap marker and key")

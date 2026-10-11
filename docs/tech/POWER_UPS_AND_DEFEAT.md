@@ -14,19 +14,37 @@ O jogador apanha-o ao aproximar-se; não precisa de premir uma tecla.
 
 | Power-up | Efeito atual |
 |---|---|
-| Insta-Kill | 25 s: tiros diretos matam Walkers e Runners; especiais e chefe recebem dano ×2, sujeito à armadura. Não transforma breaker ou dano secundário em abates instantâneos. |
+| Insta-Kill | 25 s: qualquer tiro direto mata qualquer inimigo, elites, especiais e chefe incluídos (aplica-se depois da armadura frontal, que já não o trava). Não transforma breaker ou dano secundário em abates instantâneos. |
 | Double XP / Intel | 25 s: XP duplica ao apanhar orbes; duplica o Intel novo de abates, caixas e objetivos. O bónus já ganho fica após o efeito terminar. |
-| Nuke | Num raio de 40 m e com linha de visão: mata Walkers/Runners, causa 35% da vida máxima base escalada aos fortes e ao chefe. Suspende spawns do diretor e invocações do chefe por 5 s. |
+| Nuke | Mata todos os inimigos vivos em todo o mapa, chefe incluído, sem raio nem linha de visão. Cada abate conta (abates, orbe de XP, Intel); o objetivo do chefe vê-o morto na atualização seguinte e segue para a extração, como num abate normal. Os abates da Nuke **não** sorteiam novos power-ups (nem gastam RNG ou mexem na garantia) e os Bloaters não explodem sobre o jogador. Suspende spawns do diretor e invocações do chefe por 5 s. |
 | Full Power | Breaker e habilidade de classe ficam prontos. |
-| Max Armor | Enche o escudo até ao máximo. |
-| Fire Sale | +1 reroll, até ao máximo existente de 3. |
+| Max Shield | Enche o escudo até ao máximo. (Antes chamava-se Max Armor.) |
+| Extra Reroll | +1 reroll, até ao máximo existente de 3. (Antes chamava-se Fire Sale.) |
 | Max Ammo | Repõe as armas especiais que a run tem, até à capacidade modificada por cartas/perks/rota. A arma infinita mantém-se infinita. Não entra no sorteio sem armas de munição finita. |
 
-Há avisos curtos ao apanhar (`MAX ARMOR!`, etc.) e temporizadores com
+Há avisos curtos ao apanhar (`MAX SHIELD!`, `EXTRA REROLL!`, etc.) e temporizadores com
 ícone e segundos para os dois efeitos de duração. O escudo começa vazio,
 tem capacidade base de 100 e absorve dano antes da vida; o excedente
 passa para a vida. A barra e o valor numérico seguem o HUD sem painéis escuros.
 Não regenera automaticamente; `add_shield()` prepara as futuras cartas.
+
+Os ids internos passaram a `max_shield` e `extra_reroll`. Os antigos
+(`max_armor`, `fire_sale`) só existiam na telemetria das runs; o
+`GameData.POWER_UP_LEGACY_IDS` traduz-nos, por isso saves antigos não partem.
+
+### Carregador da Assault Rifle (2026-10-11)
+
+A espingarda continua com munição total infinita, mas tem um carregador de
+**30 balas** (`magazine = 30` em `game/data/weapons/rifle.tres`). O HUD
+mostra `30 / ∞` (carregador / reserva) e desce a cada tiro. Por agora
+**não há recarga**: ao chegar a 0 o carregador volta a 30 no mesmo tiro,
+sem pausa nem animação. O gancho já existe: `GameData.RELOAD_SECONDS`
+(0 por agora) e `IslandRun._reload()` com um `TODO(reload)`; com um valor
+maior que 0, o `_auto_fire` espera `reload_left` e o HUD mostra
+`RELOADING`. O tamanho vem de `IslandRun.magazine_size()`, o único sítio
+que uma futura carta mudaria. A Bigger Mags só aumenta a reserva das armas
+finitas e não toca no carregador. As outras armas mostram a munição como
+antes.
 
 O novo ecrã **CONTRACT TERMINATED** apresenta abates, headshots e tempo
 total da run, local/classe/nível, Intel conservado (ilhas anteriores +

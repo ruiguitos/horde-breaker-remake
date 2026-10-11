@@ -13,5 +13,6 @@ extends Resource
 @export var pierce: int = 1  ## enemies hit per pellet
 @export var max_ammo: int = -1  ## -1 = infinite
 @export var knockback: float = 0.0  ## metres pushed per hit
+@export var magazine: int = 0  ## rounds per magazine; 0 = no magazine (fires straight from the reserve)
 @export var unlock_cost: int = 0  ## Intel in the Armory; 0 = starting weapon
 @export var order: int = 0  ## slot order (keys 1-5)

@@ -134,16 +134,20 @@ func _test_effects() -> void:
 	run.apply_power_up(&"insta_kill")
 	run.horde.add(Vector3(35, 0, 30), GameData.EnemyKind.WALKER, run.rng)
 	run.horde.add(Vector3(35, 0, 32), GameData.EnemyKind.BRUTE, run.rng)
+	run.horde.add(Vector3(35, 0, 34), GameData.EnemyKind.BOSS, run.rng)
 	run._damage(0, 1.0, run.player_pos, false, false)
-	var strong_hp: float = run.horde.hp[1]
-	run._damage(1, 10.0, run.player_pos, false, false)
-	_check(run.kills == 1 and run.horde.hp[1] == strong_hp - 20.0, "Insta-Kill kills a normal in one shot and doubles strong-enemy damage")
-	run.horde.add(Vector3(35, 0, 33), GameData.EnemyKind.RUNNER, run.rng)
-	run._damage(2, 1.0, run.player_pos, false, true)
-	_check(run.horde.hp[2] > 0.0, "Insta-Kill applies to shots, not breaker or secondary damage")
-	run.power_ups.tick(26.0)
+	run._damage(1, 1.0, run.player_pos, false, false)
+	_check(run.kills == 2, "Insta-Kill kills normals and elites in one shot")
 	run._damage(2, 1.0, run.player_pos, false, false)
-	_check(run.horde.hp[2] > 0.0 and run.power_ups.insta_time == 0.0, "Insta-Kill expires")
+	_check(run.kills == 3 and run.horde.hp[2] <= 0.0, "Insta-Kill one-shots the boss")
+	run._flush_dead()
+	run.horde.add(Vector3(35, 0, 33), GameData.EnemyKind.RUNNER, run.rng)
+	run._damage(0, 1.0, run.player_pos, false, true)
+	_check(run.horde.hp[0] > 0.0, "Insta-Kill applies to shots, not breaker or secondary damage")
+	run.power_ups.tick(26.0)
+	run._damage(0, 1.0, run.player_pos, false, false)
+	_check(run.horde.hp[0] > 0.0 and run.power_ups.insta_time == 0.0, "Insta-Kill expires")
+	_test_insta_boss_objective()
 	run = _open_run()
 	run.field.set_blocked_rect(40, 0, 40, 99)
 	run.field.compute_now(run.field.world_to_cell(run.player_pos))
@@ -151,12 +155,18 @@ func _test_effects() -> void:
 			[Vector3(35, 0, 34), GameData.EnemyKind.BOSS], [Vector3(45, 0, 30), GameData.EnemyKind.WALKER],
 			[Vector3(30, 0, 80), GameData.EnemyKind.WALKER]]:
 		run.horde.add(entry[0], entry[1], run.rng)
-	var brute: float = run.horde.hp[1]
-	var boss: float = run.horde.hp[2]
+	run.horde.add(run.player_pos + Vector3(1, 0, 0), GameData.EnemyKind.BLOATER, run.rng)
+	run.time_alive = 40.0
+	run.power_ups.next_drop_at = 0.0
+	run.power_ups.kills_without_drop = GameData.POWER_UP_PITY_KILLS
+	var pity_rng: int = run.power_ups.rng.state
+	var hp_before: float = run.hp
 	run.apply_power_up(&"nuke")
-	_check(run.kills == 1 and run.horde.hp[1] > 0.0 and run.horde.hp[1] < brute and run.horde.hp[2] > 0.0 and run.horde.hp[2] < boss,
-		"Nuke kills nearby normals and damages strong enemies and the boss")
-	_check(run.horde.hp[3] > 0.0 and run.horde.hp[4] > 0.0, "Nuke respects walls and its 40 m radius")
+	run._flush_dead()
+	_check(run.kills == 6 and run.horde.count == 0, "Nuke kills every enemy on the map, boss, elites and those behind walls included")
+	_check(run.power_ups.ground_kind == &"" and run.power_ups.rng.state == pity_rng
+		and run.power_ups.kills_without_drop == GameData.POWER_UP_PITY_KILLS, "Nuke kills roll no new power-up drop (even at full pity)")
+	_check(run.orbs.size() == 6 and run.hp == hp_before, "Nuke kills still leave XP orbs and no bloater blast hurts the player")
 	var count: int = run.horde.count
 	run._spawn_enemy()
 	_check(run.horde.count == count and run.power_ups.spawn_delay == 5.0, "Nuke blocks director spawns for five seconds")
@@ -168,26 +178,52 @@ func _test_effects() -> void:
 		run.grenade_cd = 6.0
 		run.apply_power_up(&"full_power")
 		_check(run.breaker_cd == 0.0 and run.grenade_cd == 0.0, "Full Power readies breaker and %s ability" % player_class)
-	run.apply_power_up(&"max_armor")
-	_check(run.shield == run.max_shield, "Max Armor fills the shield")
+	run.apply_power_up(&"max_shield")
+	_check(run.shield == run.max_shield and run.messages.has("MAX SHIELD!"), "Max Shield fills the shield")
 	run.rerolls = 0
-	run.apply_power_up(&"fire_sale")
-	_check(run.rerolls == 1, "Fire Sale grants one reroll")
+	run.apply_power_up(&"extra_reroll")
+	_check(run.rerolls == 1 and run.messages.has("EXTRA REROLL!"), "Extra Reroll grants one reroll")
 	run.rerolls = GameData.REROLLS_MAX
+	run.apply_power_up(&"extra_reroll")
+	_check(run.rerolls == GameData.REROLLS_MAX, "Extra Reroll respects the reroll cap")
+	run.rerolls = 0
+	run.shield = 0.0
 	run.apply_power_up(&"fire_sale")
-	_check(run.rerolls == GameData.REROLLS_MAX, "Fire Sale respects the reroll cap")
+	run.apply_power_up(&"max_armor")
+	_check(run.rerolls == 1 and run.shield == run.max_shield and run.power_ups_picked.slice(-2) == [&"extra_reroll", &"max_shield"],
+		"old ids (fire_sale, max_armor) map to the renamed power-ups")
+	_check(not GameData.POWER_UP_NAMES.values().has("FIRE SALE") and not GameData.POWER_UP_NAMES.values().has("MAX ARMOR"), "old display names are gone")
 	run.card_stacks[&"bigger_mags"] = 2
 	run.ammo[1] = 0
 	var locked_ammo: int = run.ammo[4]
 	run.apply_power_up(&"max_ammo")
 	_check(run.ammo[0] == -1 and run.ammo[1] == run.max_ammo(1) and run.ammo[4] == locked_ammo, "Max Ammo refills owned specials to their modified capacity; infinite and locked weapons stay unchanged")
 	run = _open_run()
-	run.power_ups.ground_kind = &"max_armor"
+	run.power_ups.ground_kind = &"max_shield"
 	run.power_ups.ground_time = 25.0
 	run.power_ups.ground_pos = run.player_pos
 	run._collect_power_up()
 	run._collect_power_up()
-	_check(run.shield == 100.0 and run.power_ups_picked == [&"max_armor"] and run.messages.has("MAX ARMOR!"), "walking onto a drop collects once and produces a toast event")
+	_check(run.shield == 100.0 and run.power_ups_picked == [&"max_shield"] and run.messages.has("MAX SHIELD!"), "walking onto a drop collects once and produces a toast event")
+
+
+## The boss objective sees an Insta-Kill (or Nuke) boss kill like any other.
+func _test_insta_boss_objective() -> void:
+	for case in [[&"insta_kill", &"activate"], [&"nuke", &"activate"], [&"nuke", &"rescue"]]:
+		var power_up: StringName = case[0]
+		var run := _open_run()
+		run.set_mission(case[1])
+		run.has_boss = true
+		run.objective = IslandRun.Objective.BOSS
+		run._spawn_boss()
+		var b: int = run.boss_index()
+		run.apply_power_up(power_up)
+		if power_up == &"insta_kill":
+			run._damage(b, 1.0, run.player_pos, false, false)
+		run._flush_dead()
+		run._update_mission(0.1)
+		_check(run.boss_killed and run.objective == IslandRun.Objective.RETURN_TO_BOAT and run.lore_found == 1,
+			"%s boss kill in %s completes the boss objective and starts extraction" % case)
 
 
 func _test_rewards() -> void:
@@ -234,7 +270,7 @@ func _test_carry() -> void:
 	var ctx := RunContext.new(71)
 	var run := _open_run()
 	run.load_context(ctx)
-	run.apply_power_up(&"max_armor")
+	run.apply_power_up(&"max_shield")
 	run.apply_power_up(&"insta_kill")
 	run.apply_power_up(&"double_rewards")
 	run.power_ups.tick(3.0)

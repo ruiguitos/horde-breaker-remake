@@ -1245,7 +1245,7 @@ func _fill_pause(run: IslandRun) -> void:
 		if not run.weapon_unlocked[i]:
 			continue
 		var w: GameData.Weapon = run.weapons[i]
-		var ammo: String = "∞" if w.max_ammo < 0 else str(run.ammo[i])
+		var ammo: String = ammo_text(run, i)
 		var chip := MenuDialog.glass_box(_pause_weapons, 0.6)
 		var s := chip.get_theme_stylebox("panel") as StyleBoxFlat
 		s.bg_color = Color(UiTheme.PANEL_RAISED, 0.6)
@@ -1533,9 +1533,9 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_sprint_row.modulate.a = 1.0 if run.sprinting or run.stamina < GameData.STAMINA_MAX - 0.01 else 0.0
 
 	var w: GameData.Weapon = run.weapons[run.weapon_index]
-	_ammo_text.text = "∞" if w.max_ammo < 0 else str(run.ammo[run.weapon_index])
+	_ammo_text.text = ammo_text(run, run.weapon_index)
 	_weapon_name.text = w.display_name.to_upper()
-	_fire_status.text = "SPRINTING" if run.sprinting else "NO AMMO" if w.max_ammo >= 0 and run.ammo[run.weapon_index] == 0 else "AUTO-FIRE"
+	_fire_status.text = "SPRINTING" if run.sprinting else "NO AMMO" if w.max_ammo >= 0 and run.ammo[run.weapon_index] == 0 		else "RELOADING" if run.reload_left > 0.0 else "AUTO-FIRE"
 	_fire_status.add_theme_color_override("font_color", UiTheme.DANGER if _fire_status.text == "NO AMMO" else UiTheme.TEXT_MUTED if run.sprinting else UiTheme.ACCENT)
 	_update_weapon_slots(run)
 
@@ -1597,6 +1597,15 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 func _cooldown_label(label: Label, seconds: float) -> void:
 	label.text = "READY" if seconds <= 0.0 else "COOLDOWN"
 	label.add_theme_color_override("font_color", UiTheme.ACCENT if seconds <= 0.0 else UiTheme.TEXT_MUTED)
+
+
+## "30 / ∞" for a weapon with a magazine (rounds in it / reserve); the
+## reserve alone ("∞" or a count) for the others.
+static func ammo_text(run: IslandRun, i: int) -> String:
+	var reserve: String = "∞" if run.weapons[i].max_ammo < 0 else str(run.ammo[i])
+	if run.magazine_size(i) > 0:
+		return "%d / %s" % [run.mag[i], reserve]
+	return reserve
 
 
 func _update_weapon_slots(run: IslandRun) -> void:

@@ -415,7 +415,7 @@ ganho sem esse prémio. Estes valores modificam recompensas, não o dano.
 Os sete power-ups já implementados também alteram combate/recursos.
 Valores, probabilidades e limites estão documentados em
 [POWER_UPS_AND_DEFEAT.md](POWER_UPS_AND_DEFEAT.md): Insta-Kill, Double
-XP/Intel, Nuke, Full Power, Max Armor, Fire Sale e Max Ammo.
+XP/Intel, Nuke, Full Power, Max Shield, Extra Reroll e Max Ammo.
 
 ## 6. Pontos para decidir na revisão
 

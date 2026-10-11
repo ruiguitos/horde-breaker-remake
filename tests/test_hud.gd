@@ -25,12 +25,39 @@ func _initialize() -> void:
 	call_deferred("_test")
 
 
+## 30-round magazine, infinite reserve: counts down per shot, refills at 0
+## at once (RELOAD_SECONDS = 0), and Bigger Mags does not touch it.
+func _test_rifle_magazine() -> void:
+	var run := IslandRun.new(7)
+	run.director.max_alive = 0
+	run.horde.add(run.player_pos + Vector3(0, 0, -6), GameData.EnemyKind.BRUTE, run.rng)
+	run.horde.hp[0] = 1e9
+	var rifle: GameData.Weapon = run.weapons[0]
+	_check(rifle.id == &"rifle" and run.magazine_size(0) == 30 and run.mag[0] == 30 and GameData.RELOAD_SECONDS == 0.0, "rifle starts with a full 30-round magazine; reload time is 0 for now")
+	run._fire(rifle, 0)
+	_check(run.mag[0] == 29 and run.ammo[0] == -1 and Hud.ammo_text(run, 0) == "29 / ∞", "one shot takes one round; the reserve stays infinite")
+	for i in 28:
+		run._fire(rifle, 0)
+	_check(Hud.ammo_text(run, 0) == "1 / ∞", "magazine counts down to its last round")
+	run._fire(rifle, 0)
+	_check(run.mag[0] == 30 and run.reload_left == 0.0, "an empty magazine refills at once with no pause")
+	var shots: int = run.get("_shots")
+	run.facing = Vector3(0, 0, -1)
+	run.set("_fire_cd", 0.0)
+	run._auto_fire(40.0 / rifle.fire_rate)
+	var fired: int = int(run.get("_shots")) - shots
+	_check(fired > 30 and run.mag[0] == 30 - fired % 30 and run.reload_left == 0.0, "auto-fire keeps shooting through a magazine change in one frame (%d shots)" % fired)
+	run.card_stacks[&"bigger_mags"] = 3
+	_check(run.magazine_size(0) == 30 and run.max_ammo(0) == -1 and Hud.ammo_text(run, 1) == str(run.ammo[1]), "Bigger Mags leaves the rifle magazine alone; other weapons keep their plain ammo count")
+
+
 func _test() -> void:
 	await process_frame
 	await process_frame
 	_hud.refresh(_run, null, 0, false, "Island 1/3")
 	_check(not _hud._debug.visible, "debug is hidden until F3")
-	_check(_hud._ammo_text.text == "∞" and _hud._breaker_status.text == "READY", "infinite rifle ammo and ready breaker")
+	_check(_hud._ammo_text.text == "30 / ∞" and _hud._breaker_status.text == "READY", "rifle shows a full 30-round magazine over an infinite reserve and ready breaker")
+	_test_rifle_magazine()
 	_run.hp = 23
 	_run.breaker_cd = 4.2
 	_run.grenade_cd = 9.5

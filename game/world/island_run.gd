@@ -79,6 +79,13 @@ var weapon_index: int = 0
 ## Which weapons can be used this run (locked ones are skipped).
 var weapon_unlocked: Array[bool] = []
 var ammo: PackedInt32Array = PackedInt32Array()
+## Rounds left in each weapon's magazine (only weapons with a magazine, see
+## magazine_size; the others read 0). Every island starts with full magazines.
+var mag: PackedInt32Array = PackedInt32Array()
+## Seconds left of a magazine reload (always 0 while RELOAD_SECONDS is 0).
+var reload_left: float = 0.0
+## True while a Nuke resolves: its kills credit XP/Intel but roll no new drop.
+var _nuking: bool = false
 var _fire_cd: float = 0.0
 var _shots: int = 0
 
@@ -192,6 +199,7 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMa
 	horde.set_target(player_pos)
 	for w in weapons:
 		ammo.append(w.max_ammo)
+		mag.append(w.magazine)
 		weapon_unlocked.append(GameData.starting_weapons().has(w.id))
 	_build_sight()
 	for c in map.caches:
@@ -345,6 +353,20 @@ static func set_context_rerolls(ctx: RunContext, n: int) -> void:
 		ctx.set(&"rerolls", n)
 	else:
 		ctx.set_meta(&"rerolls", n)
+
+
+## Magazine capacity of weapon `w` (0 = no magazine). The one place a
+## future card ("Extended Mags") would change it; Bigger Mags only raises
+## the finite reserve (max_ammo), so the rifle's 30 stays as it is.
+func magazine_size(w: int) -> int:
+	return weapons[w].magazine
+
+
+## Refill the magazine. TODO(reload): with RELOAD_SECONDS > 0 this starts a
+## timed reload (firing waits in _auto_fire); at 0 it is instant.
+func _reload(w: int) -> void:
+	mag[w] = magazine_size(w)
+	reload_left = GameData.RELOAD_SECONDS
 
 
 func max_ammo(w: int) -> int:
@@ -760,6 +782,10 @@ func _auto_fire(dt: float) -> void:
 	var w: GameData.Weapon = weapons[weapon_index]
 	var rate: float = fire_rate()
 	_fire_cd -= dt
+	if reload_left > 0.0:
+		reload_left = maxf(0.0, reload_left - dt)
+		_fire_cd = maxf(_fire_cd, 0.0)
+		return
 	if _fire_cd > 0.0:
 		return
 	var target: int = _pick_target(w.range_m)
@@ -773,7 +799,7 @@ func _auto_fire(dt: float) -> void:
 			messages.append(w.display_name + " out of ammo")
 			weapon_index = 0
 			break
-		if target in _dead or target >= horde.count:
+		if reload_left > 0.0 or target in _dead or target >= horde.count:
 			break
 
 
@@ -824,6 +850,7 @@ func _collect_power_up() -> void:
 
 
 func apply_power_up(kind: StringName) -> void:
+	kind = GameData.power_up_id(kind)
 	if not GameData.POWER_UP_IDS.has(kind):
 		return
 	_sync_intel_bonus()
@@ -835,26 +862,32 @@ func apply_power_up(kind: StringName) -> void:
 		&"double_rewards":
 			power_ups.double_time = GameData.POWER_UP_ACTIVE_SECONDS
 		&"nuke":
-			power_ups.spawn_delay = GameData.POWER_UP_SPAWN_DELAY
-			explosions.append(player_pos)
-			for i in horde.query_radius(player_pos, GameData.POWER_UP_NUKE_RADIUS):
-				if _dead.has(i) or not _line_of_sight(player_pos, horde.positions[i]):
-					continue
-				var kind_id: int = horde.kinds[i]
-				var max_health: float = boss_max_hp if kind_id == GameData.EnemyKind.BOSS and boss_max_hp > 0.0 else horde.types[kind_id].hp * horde.hp_scale
-				var amount: float = horde.hp[i] if GameData.power_up_normal(kind_id) else max_health * GameData.POWER_UP_NUKE_HP_SHARE
-				_damage(i, amount, player_pos, false, true, true)
+			_nuke()
 		&"full_power":
 			breaker_cd = 0.0
 			grenade_cd = 0.0
-		&"max_armor":
+		&"max_shield":
 			add_shield(max_shield)
-		&"fire_sale":
+		&"extra_reroll":
 			rerolls = mini(GameData.REROLLS_MAX, rerolls + 1)
 		&"max_ammo":
 			for i in weapons.size():
 				if weapon_unlocked[i] and weapons[i].max_ammo > 0:
 					ammo[i] = max_ammo(i)
+
+
+## Every living enemy on the island dies, boss included, wherever it is.
+## Kills, XP orbs and Intel are credited as usual (the boss objective sees
+## the boss gone on the next mission update), but Nuke kills roll no new
+## power-up drop and bloaters do not chain-explode on the player.
+func _nuke() -> void:
+	power_ups.spawn_delay = GameData.POWER_UP_SPAWN_DELAY
+	explosions.append(player_pos)
+	_nuking = true
+	for i in horde.count:
+		if not _dead.has(i):
+			_damage(i, horde.hp[i], player_pos, false, true, true)
+	_nuking = false
 
 
 func _regenerate(dt: float) -> void:
@@ -1080,6 +1113,10 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 		_shots += 1
 	if w.max_ammo > 0:
 		ammo[weapon_index] -= 1
+	if magazine_size(weapon_index) > 0:
+		mag[weapon_index] -= 1
+		if mag[weapon_index] <= 0:
+			_reload(weapon_index)
 	# Fixed camera: a flat ray from the player (horde.hitscan). First / third
 	# person: a 3D ray from the camera to the picked body point
 	# (_crosshair_hits), so an enemy above or below the shot on the same
@@ -1247,8 +1284,6 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 	if _dead.has(i):
 		return
 	var t: GameData.EnemyType = horde.types[horde.kinds[i]]
-	if power_ups.insta_time > 0.0 and not breaker and not secondary:
-		amount = maxf(amount, horde.hp[i]) if GameData.power_up_normal(horde.kinds[i]) else amount * GameData.POWER_UP_STRONG_DAMAGE_MULT
 	if t.front_armor > 0.0 and not breaker:
 		# Armoured enemies take reduced damage from the front (where they walk to).
 		var v: Vector3 = horde.velocities[i]
@@ -1257,6 +1292,10 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 			amount *= 1.0 - t.front_armor
 	if stacks(&"executioner") > 0 and (horde.stun[i] > 0.0 or horde.freeze_time[i] > 0.0):
 		amount *= 1.0 + 0.2 * stacks(&"executioner")
+	# Insta-Kill: any shot kills any enemy (elites, specials, the boss), after
+	# front armour so a shield cannot save it. Not breaker or secondary damage.
+	if power_ups.insta_time > 0.0 and not breaker and not secondary:
+		amount = maxf(amount, horde.hp[i])
 	horde.hp[i] -= amount
 	if not secondary:
 		horde.flash[i] = 0.1  # DOT must not hide the status tint with a constant flash
@@ -1264,7 +1303,8 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 		_dead[i] = true
 		kills += 1
 		_sync_intel_bonus()
-		power_ups.on_kill(horde.kinds[i], horde.positions[i], time_alive, field, play_area, _has_finite_weapon())
+		if not _nuking:
+			power_ups.on_kill(horde.kinds[i], horde.positions[i], time_alive, field, play_area, _has_finite_weapon())
 		if stacks(&"adrenaline") > 0:
 			breaker_cd = maxf(0.0, breaker_cd - 0.1 * stacks(&"adrenaline"))
 		if kills % 10 == 0:
@@ -1274,7 +1314,7 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 		var p: Vector3 = horde.positions[i]
 		deaths.append(Vector4(p.x, p.z, horde.kinds[i], 1.0 if headshot else 0.0))
 		popups.append(Vector4(p.x, p.z, amount, 1.0 if headshot else 0.0))
-		if t.explodes:
+		if t.explodes and not _nuking:
 			explosions.append(p)
 			if player_pos.distance_to(p) <= GameData.BLOATER_RADIUS and dash_time <= 0.0:
 				_take_player_damage(GameData.BLOATER_PLAYER_DAMAGE)

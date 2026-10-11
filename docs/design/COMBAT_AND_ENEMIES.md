@@ -317,12 +317,12 @@ que **aparecem em todas as missões**. Se a quiser fechar, regista-a em
 
 | Power-up | Efeito | Duração |
 |---|---|---|
-| Insta-Kill | Os inimigos normais morrem num tiro; as elites e o chefe levam dano extra | ~20–30 s |
+| Insta-Kill | Qualquer tiro mata qualquer inimigo: normais, elites, especiais e o chefe (pedido do utilizador a 2026-10-11) | ~20–30 s |
 | Double XP / Intel | Duplica a XP e o Intel ganhos | ~20–30 s |
-| Nuke | Mata os normais visíveis, fere os fortes e atrasa os spawns uns segundos | instantâneo |
+| Nuke | Mata **todos** os inimigos vivos no mapa, chefe incluído, e atrasa os spawns uns segundos. Os abates da Nuke não largam novos power-ups | instantâneo |
 | Full Power | O breaker e a habilidade de classe ficam prontos | instantâneo |
-| Max Armor | Enche o escudo (liga às cartas de escudo) | instantâneo |
-| Fire Sale | Um reroll grátis ou uma carta extra | instantâneo |
+| Max Shield | Enche o escudo (liga às cartas de escudo) | instantâneo |
+| Extra Reroll | Um reroll grátis | instantâneo |
 | Max Ammo | Enche as armas especiais. **Depende da decisão sobre as armas** | instantâneo |
 
 Ficam para mais tarde, porque pedem sistemas novos: Death Machine (arma

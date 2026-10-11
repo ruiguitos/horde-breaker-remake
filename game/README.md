@@ -120,11 +120,13 @@ gráficos):
   Ver [implementação das cartas](../docs/tech/CARDS_IMPLEMENTATION.md).
 - **Power-ups de abate**: sete ajudas ocasionais, em todas as missões e
   partes das expedições. Apanha o ícone luminoso antes de desaparecer
-  (25 s). Há Insta-Kill, Double XP/Intel, Nuke, Full Power, Max Armor,
-  Fire Sale (+1 reroll) e Max Ammo. O escudo absorve dano antes da vida;
+  (25 s). Há Insta-Kill (qualquer tiro mata qualquer inimigo, chefe
+  incluído), Double XP/Intel, Nuke (mata todos os inimigos do mapa),
+  Full Power, Max Shield, Extra Reroll (+1 reroll) e Max Ammo. O escudo absorve dano antes da vida;
   os efeitos temporários mostram segundos no HUD. Valores e regras em
   [power-ups e derrota](../docs/tech/POWER_UPS_AND_DEFEAT.md).
-- Armas: Assault Rifle (infinita), Shotgun e Heavy Pistol (munição limitada,
+- Armas: Assault Rifle (infinita, carregador de 30 que por agora se
+  repõe logo ao esvaziar; o HUD mostra `30 / ∞`), Shotgun e Heavy Pistol (munição limitada,
   atravessam inimigos). Cada gerador ligado repõe metade da munição.
 - **Missão**: segue o marcador amarelo até cada gerador e fica dentro do anel
   8 s. Ao começares, a horda entra em pico. Com os 3 ligados, volta ao barco

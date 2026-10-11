@@ -10,3 +10,4 @@ fire_rate = 9.0
 range_m = 30.0
 spread_deg = 2.0
 knockback = 0.05
+magazine = 30

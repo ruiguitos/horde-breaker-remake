@@ -52,9 +52,11 @@ class Weapon:
 	var pierce: int         ## enemies hit per pellet
 	var max_ammo: int       ## -1 = infinite
 	var knockback: float    ## metres pushed per hit
+	var magazine: int       ## rounds per magazine; 0 = none (shots come straight from the reserve)
 
 	func _init(p_id: StringName, p_name: String, p_damage: float, p_rate: float, p_range: float,
-			p_pellets: int, p_spread: float, p_pierce: int, p_ammo: int, p_knockback: float) -> void:
+			p_pellets: int, p_spread: float, p_pierce: int, p_ammo: int, p_knockback: float,
+			p_magazine: int = 0) -> void:
 		id = p_id
 		display_name = p_name
 		damage = p_damage
@@ -65,6 +67,7 @@ class Weapon:
 		pierce = p_pierce
 		max_ammo = p_ammo
 		knockback = p_knockback
+		magazine = p_magazine
 
 
 class Card:
@@ -246,22 +249,32 @@ const POWER_UP_GROUND_SECONDS: float = 25.0
 const POWER_UP_BLINK_SECONDS: float = 10.0
 const POWER_UP_ACTIVE_SECONDS: float = 25.0
 const POWER_UP_PICKUP_RADIUS: float = 1.4
-const POWER_UP_STRONG_DAMAGE_MULT: float = 2.0
-const POWER_UP_NUKE_RADIUS: float = 40.0
-const POWER_UP_NUKE_HP_SHARE: float = 0.35
 const POWER_UP_SPAWN_DELAY: float = 5.0
 const PLAYER_MAX_SHIELD: float = 100.0
 const POWER_UP_IDS: Array[StringName] = [
-	&"insta_kill", &"double_rewards", &"nuke", &"full_power", &"max_armor", &"fire_sale", &"max_ammo",
+	&"insta_kill", &"double_rewards", &"nuke", &"full_power", &"max_shield", &"extra_reroll", &"max_ammo",
 ]
+## Ids used before the renames (Max Armor -> Max Shield, Fire Sale -> Extra
+## Reroll). Only run telemetry ever stored them; old ids are mapped on use.
+const POWER_UP_LEGACY_IDS: Dictionary = {&"max_armor": &"max_shield", &"fire_sale": &"extra_reroll"}
 const POWER_UP_NAMES: Dictionary = {
 	&"insta_kill": "INSTA-KILL", &"double_rewards": "DOUBLE XP / INTEL", &"nuke": "NUKE",
-	&"full_power": "FULL POWER", &"max_armor": "MAX ARMOR", &"fire_sale": "FIRE SALE", &"max_ammo": "MAX AMMO",
+	&"full_power": "FULL POWER", &"max_shield": "MAX SHIELD", &"extra_reroll": "EXTRA REROLL", &"max_ammo": "MAX AMMO",
 }
 const POWER_UP_ICONS: Dictionary = {
 	&"insta_kill": "✕", &"double_rewards": "×2", &"nuke": "✦", &"full_power": "ϟ",
-	&"max_armor": "◇", &"fire_sale": "↻", &"max_ammo": "▥",
+	&"max_shield": "◇", &"extra_reroll": "↻", &"max_ammo": "▥",
 }
+
+
+## Magazine refill time in seconds. 0 = instant, no reload yet.
+## TODO(reload): give it a value (e.g. 1.8) once there is a reload animation
+## and sound; IslandRun already blocks firing while `reload_left` > 0.
+const RELOAD_SECONDS: float = 0.0
+
+
+static func power_up_id(id: StringName) -> StringName:
+	return POWER_UP_LEGACY_IDS.get(id, id)
 
 
 static func power_up_normal(kind: int) -> bool:
@@ -355,7 +368,7 @@ static func weapons() -> Array[Weapon]:
 	for e: Array in _weapon_entries():
 		var d: WeaponData = e[1]
 		list.append(Weapon.new(e[0], d.display_name, d.damage, d.fire_rate, d.range_m,
-			d.pellets, d.spread_deg, d.pierce, d.max_ammo, d.knockback))
+			d.pellets, d.spread_deg, d.pierce, d.max_ammo, d.knockback, d.magazine))
 	return list
 
 
