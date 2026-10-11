@@ -10,6 +10,7 @@ var _main: Node
 var _frames: int = 0
 var _screen: String = "title"
 var _out: String
+var _elapsed: float = 0.0
 
 
 func _initialize() -> void:
@@ -25,14 +26,18 @@ func _initialize() -> void:
 	root.add_child(_main)
 
 
-func _process(_delta: float) -> bool:
+func _process(delta: float) -> bool:
+	_elapsed += delta
 	_frames += 1
 	if _frames == 1:
 		var profile := PreviewProfile.new()
-		profile.intel = 1240
+		profile.intel = 3716
 		profile.slots = 3
-		profile.owned_perks = [&"thick_skin", &"long_breaker"]
-		profile.equipped_perks = [&"thick_skin", &"long_breaker"]
+		profile.perk_ranks = {&"combat_1": 2, &"survival_1": 1}
+		profile.equipped_perks = [&"head_hunter", &"thick_skin"]
+		profile.selected_primary = &"machine_gun"
+		profile.selected_secondary = &"marksman"
+		profile.unlocked_weapons = [&"machine_gun", &"marksman"]
 		profile.unlocked_classes = [&"recruit", &"vanguard"]
 		profile.selected_class = &"vanguard"
 		profile.max_threat = 2
@@ -58,7 +63,8 @@ func _process(_delta: float) -> bool:
 			"pause": current.set("paused", true)
 			"settings": current.call("_settings")
 			"archive": current.call("_archive")
-	if _frames >= 12:
+	# BootSplashPlus stays visible for at least 2.3 s, irrespective of FPS.
+	if _frames >= 12 and _elapsed >= 3.0:
 		var screenshot := root.get_texture().get_image()
 		var error: Error = screenshot.save_png(_out)
 		print("PREVIEW: %s %dx%d / save %d" % [_screen, screenshot.get_width(), screenshot.get_height(), error])

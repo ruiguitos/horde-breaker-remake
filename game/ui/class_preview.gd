@@ -5,6 +5,7 @@ extends SubViewportContainer
 ## rotating. Shows the same model the player controls on the island.
 
 var class_id: StringName = &"recruit"
+var face_only: bool = false  ## Compact class selector portrait.
 var _model: SoldierModel
 
 
@@ -45,6 +46,9 @@ func _ready() -> void:
 	cam.position = Vector3(0, 1.15, 4.6)
 	vp.add_child(cam)
 	cam.look_at(Vector3(0, 1.0, 0))
+	if face_only:
+		cam.position = Vector3(0, 1.7, 1.6)
+		cam.look_at(Vector3(0, 1.65, 0))
 	_model = SoldierModel.create(class_id)
 	_model.rotation_degrees.y = 200.0  # three-quarter view to start
 	vp.add_child(_model)
@@ -52,5 +56,6 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if _model != null:
-		_model.rotation.y += delta * 0.5
+		if not face_only:
+			_model.rotation.y += delta * 0.5
 		_model.animate(0.0, 0.0, false, delta)

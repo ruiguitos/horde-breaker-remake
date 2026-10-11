@@ -11,7 +11,7 @@ O texto do jogo continua em inglês.
 | Título | Deploy → Armory | Estatísticas do perfil; definições, créditos e arquivo |
 | Armory | Start Run | Classes, armas, Intel, Threat e slots/perks |
 | Barco / rotas | Confirm Route | Mantimento, bioma, missão e modificador sorteados |
-| Pausa | Resume | Jogo atual desfocado; definições, controlos e abandono |
+| Pausa | Resume | Jogo atual desfocado; definições e abandono |
 
 Os botões são Control/Button do Godot: funcionam com rato, teclado e ações
 de comando registadas no InputMap. Os estados indisponíveis ficam desativados;
@@ -25,16 +25,16 @@ mantém a simulação parada e bloqueia os atalhos por baixo, incluindo Q.
 
 ## Apresentação e limites
 
-A base lógica é 1152 × 648, com canvas_items e proporção preservada. Os
-ecrãs foram vistos em Forward+ a 1152 × 648 e 960 × 540. Listas de armas,
-perks e ficheiros têm scroll; o botão Start Run fica sempre fora do scroll.
+A base lógica é 1152 × 648, com canvas_items e proporção preservada. O
+Armory atual foi visto em Forward+ a 1152 × 648 e 1920 × 1080. Os restantes
+ecrãs tinham sido verificados também a 960 × 540. Listas de armas e ficheiros
+têm scroll; o resumo do equipamento, a árvore de perks e Start Run são fixos.
 
-O porto do título, o logótipo e o retrato são imagens estáticas geradas para
-esta referência, em game/ui/art. O retrato é comum às três classes; a classe
-e os efeitos apresentados mudam com o perfil. Não representa um modelo 3D
-equipável. O mapa é um esquema decorativo das duas rotas, sem coordenadas
-reais do terreno. As miniaturas dos biomas são ilustrações simples desenhadas
-em Godot. A pausa desfoca o jogo real em vez de usar uma imagem de fundo.
+O porto do título e o logótipo são imagens estáticas em game/ui/art. O
+Armory mostra um abrigo em 3D com o modelo jogável e retratos 3D do Recruit
+e do Vanguard. O mapa é um esquema decorativo das rotas, sem coordenadas
+reais do terreno. As miniaturas dos biomas são ilustrações desenhadas em
+Godot. A pausa desfoca o jogo real em vez de usar uma imagem de fundo.
 
 O tema está em game/ui/ui_theme.gd; os modais em game/ui/menu_dialog.gd.
 SettingsPanel herda o comportamento modal e conserva os três volumes em
@@ -263,17 +263,21 @@ godot --path . --script res://tools/dev/menu_preview.gd -- C:/Temp/armory.png ar
 Capturas disponíveis: title, armory, routes, supplies, pause, settings,
 archive, weapons e perks.
 
-## Próximo redesenho — escolha visual de 2026-10-11
+## Armory e perks — redesenho implementado em 2026-10-11
 
 O utilizador escolheu as maquetas **Armory — Abrigo 3D** e **Perks — Três
-ramos** apresentadas pelo Codex. Preferência registada para implementação
-depois da integração do Vanguard; não descreve o estado atual dos menus.
+ramos** apresentadas pelo Codex. Ambos estão implementados depois da
+integração do Vanguard; detalhes e validação em
+[ARMORY_REDESIGN.md](../tech/ARMORY_REDESIGN.md).
 
 Referências PNG geradas por IA, guardadas no projeto como maquetas:
 [Armory — Abrigo 3D](menu_references/armory_abrigo_3d.png) e
 [Perks — Três ramos](menu_references/perks_tres_ramos.png). São referências
 de composição; os modelos, ícones e textos finais vêm dos dados do jogo.
 A pasta tem `.gdignore` e não é usada como assets de runtime.
+
+Capturas do jogo real no mesmo diretório: [Armory implementado](menu_references/armory_implemented.png)
+e [Perks implementados](menu_references/perks_implemented.png).
 
 - **Armory:** abrigo costeiro em 3D, personagem maior, iluminação quente
   interior e fria do Atlântico. Resumo fixo com as duas armas, três slots,

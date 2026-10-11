@@ -104,9 +104,24 @@ Vanguard v01 com rig e Idle/Walk/Sprint aplicado ao Armory e ao jogo,
 sem Blender. Estado, assets, testes e continuação:
 [VANGUARD_MODEL.md](VANGUARD_MODEL.md).
 
-Etapa seguinte escolhida pelo utilizador: Armory **Abrigo 3D** e perks
-**Três ramos**, mantendo as regras atuais. Ver a escolha em
-[MENUS.md](../design/MENUS.md).
+Etapa escolhida pelo utilizador e entretanto implementada: Armory
+**Abrigo 3D** e perks **Três ramos**, mantendo as regras atuais.
+Ver [ARMORY_REDESIGN.md](ARMORY_REDESIGN.md).
+
+## Armory e perks — redesenho visual (Codex, 2026-10-11)
+
+Abrigo costeiro em 3D, rig jogável e retratos das classes, resumo fixo com
+armas/slots/Threat, três ramos de perks com A/B lado a lado, detalhe do
+efeito atual e do próximo rank, fila de perks equipados. Navegação e
+compras continuam a usar Profile e InputIcons. Não altera saves ou valores.
+
+Validação: **36/36 scripts** do jogo e dos spikes, incluindo 96 verificações
+do novo layout; duas runs do bot extraídas nas seis ilhas. Capturas reais
+em Forward+ a 1152×648 e Full HD e eventos de comando simulados verificados.
+
+Ficheiros, capturas reais, testes e prompt de continuação para o Claude:
+[ARMORY_REDESIGN.md](ARMORY_REDESIGN.md). Mostrar alterações antes de commit;
+commit/push só quando o utilizador pedir.
 
 ## Recruit v03 — integração adicional (2026-10-11)
 
