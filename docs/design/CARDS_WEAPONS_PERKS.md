@@ -138,6 +138,33 @@ Recomendo AR principal; Shotgun, Pistol e Marksman secundárias. SMG é candidat
 
 Hoje, desbloquear incorpora a arma automaticamente; não existe seleção principal/secundária (`game/states/armory.gd:158`; `game/main.gd:72`). Opções: **AR fixa + secundária escolhida**, ou principais intercambiáveis. Na segunda, escolher AR troca atomicamente com a SMG selecionada, sem perder propriedade. Não remover armas nesta fase.
 
+**E2. Escolha do utilizador (2026-10-11)**
+
+O utilizador escolheu a **opção B** (armas principais trocáveis) e este
+arsenal. Se a quiser fechar, regista-a em `DECISIONS.md`.
+
+| Espaço | Arma | Como se obtém | Papel |
+|---|---|---|---|
+| Principal | Assault Rifle | Inicial | Equilibrada, média distância; pente de 30, reserva infinita |
+| Principal | SMG | Desbloqueável | Perto e com mobilidade: mais cadência e dano de perto, menos alcance, mais velocidade a andar |
+| Principal | **Machine Gun (nova)** | Desbloqueável | Fogo pesado e contínuo: pente grande e muito dano, mas anda mais devagar e recarrega devagar |
+| Secundária | Shotgun | Inicial | Leque curto para quando a horda chega perto |
+| Secundária | Marksman Rifle | Desbloqueável | Perfuração e elites |
+| — | ~~Heavy Pistol~~ | **Removida** | A Marksman cobre o papel de perfuração |
+
+Consequências a tratar na implementação:
+- **Escolha da principal:** escolher uma principal troca-a pela que estava
+  selecionada, sem perder a propriedade (por exemplo, AR ↔ SMG).
+- **Cartas:** as cartas "Assault Rifle" passam a ser cartas da **arma
+  principal**, para funcionarem com a SMG e a Machine Gun.
+- **Munição:** Max Ammo, Bigger Mags e o "Ammo Crate" continuam a servir as
+  secundárias, que têm munição limitada.
+- **Saves antigos:** perfis que tenham a Heavy Pistol desbloqueada ou
+  selecionada têm de carregar sem erro. Proposta: reembolsar o Intel, ou
+  passar para a Shotgun se a pistola estava equipada.
+- **Números:** os valores da SMG e da Machine Gun são hipóteses para
+  playtest.
+
 **F. Perks em árvore**
 
 | Atual | Efeito | Intel | Evidência |
