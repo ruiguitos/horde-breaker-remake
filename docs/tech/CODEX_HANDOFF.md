@@ -111,7 +111,29 @@ Especificação: `docs/design/COMBAT_AND_ENEMIES.md` §6b. Aparecem em
 
    `test_soak_run` tem de continuar a extrair.
 
-## 3. Erros da câmara e da mira (encontrados pelo Codex, por corrigir)
+## 3. Erros da câmara e da mira (encontrados pelo Codex)
+
+**Concluída em 2026-10-11 (Claude), sem commit.** Os cinco erros estão
+corrigidos: a câmara→inimigo também tem de estar livre de edifícios
+(`_crosshair_visible`, que ignora as células bloqueadas onde a câmara
+começa); em 1.ª/3.ª pessoa o tiro é um raio 3D da câmara para o alvo
+(`_crosshair_hits`), o piercing só atravessa corpos que passam o mesmo
+teste e a câmara fixa mantém o hitscan plano; o raio da mira calcula-se do
+yaw/pitch atuais (já não lê a câmara do frame anterior); a granada aos pés
+cai a 1,5 m, e sem chão (céu) 12 m à frente; os objetivos a menos de 12 m
+atrás da câmara ficam presos à borda do ecrã. Afinação: arma da 1.ª pessoa
+a 60 %, mais baixa, clarão e luz muito mais fracos; ombro da 3.ª pessoa de
+1,0 para 1,6 m (encolhe junto a paredes). Testes novos em
+`tests/test_camera_aim.gd`, incluindo Piercing, Ricochet, Fire Rounds e
+Insta-Kill com a mira.
+
+Revisão do Codex, corrigida: cada bago pára no primeiro obstáculo do seu
+próprio caminho (`_ray_block`); a vista só é tapada por edifícios, rochas
+e árvores (`sight_blocked`), não pelo mar nem por encostas (essas contam
+pela altura do terreno); o Phantom Camera deixou de ter amortecimento e
+transição, para a câmara mostrada ser a mesma de onde a simulação aponta.
+Custo de um tiro de caçadeira com 150 inimigos: 0,26 ms (espalhados) a
+0,60 ms (todos num cone de 30° à frente; o hitscan plano custa 0,47 ms aí).
 
 Commit `9b10cf3`.
 
@@ -133,6 +155,16 @@ Afinação a fazer:
 - a câmara de 3.ª pessoa precisa de se afastar para o lado, sobre o ombro.
 
 ## 4. Spawns sempre do mesmo lado
+
+**Concluída em 2026-10-11 (Claude), sem commit.** `_ring_spot` junta os
+pontos válidos de todos os raios em 8 setores e sorteia um setor (os que
+têm menos de 4 pontos pesam menos, para uma nesga junto a uma parede não
+receber uma parte inteira) e depois um ponto, com RNG próprio
+(`_spawn_rng`, da seed). Na Beach 01 o setor mais usado pelo fallback
+passou de 40–58 % para 16–25 %. O caminho normal (12 tentativas ao acaso)
+não tinha este viés: é uniforme pela área livre (num mapa aberto, 12–13 %
+por setor); só passou a usar o mesmo RNG próprio. Teste em
+`tests/test_island_run.gd` (`_test_spawn_sectors`).
 
 Diagnóstico do Codex: `_ring_spot` em `island_run.gd` (~1240–1246) aceita o
 primeiro ângulo e o primeiro raio válidos.

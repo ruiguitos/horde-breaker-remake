@@ -5,8 +5,11 @@ extends Node3D
 ## under it and a muzzle flash at the tip. A child of the camera (local -Z is
 ## forward). Real gun models replace it later.
 
-## Rest position in camera space: lower right, close to the eye.
-const REST: Vector3 = Vector3(0.22, -0.2, -0.42)
+## Rest position in camera space: lower right, a little ahead of the eye.
+const REST: Vector3 = Vector3(0.2, -0.22, -0.45)
+## The boxes are modelled at real size; at the eye that filled a third of
+## the screen. Drawn at 60 % it reads as a gun in the hands, not a wall.
+const GUN_SCALE: float = 0.6
 ## Largest pull towards the eye (metres); at it the gun is also lowered.
 const MAX_PULL: float = 0.3
 ## Barrel length per weapon id (metres); unknown ids use the rifle.
@@ -26,6 +29,7 @@ static func create(id: StringName) -> ViewModel:
 	var v := ViewModel.new()
 	v.class_id = id if SoldierModel.PALETTES.has(id) else &"recruit"
 	v.position = REST
+	v.scale = Vector3.ONE * GUN_SCALE
 	v.set_weapon(&"rifle")
 	return v
 
@@ -63,12 +67,15 @@ func set_weapon(id: StringName) -> void:
 	_gun.add_child(tip)
 	_flash = MeshInstance3D.new()
 	var s := SphereMesh.new()
-	s.radius = 0.05
-	s.height = 0.1
+	s.radius = 0.035
+	s.height = 0.07
 	_flash.mesh = s
-	_flash.scale = Vector3(1.0, 1.0, 2.2)
+	_flash.scale = Vector3(1.0, 1.0, 1.8)
+	# A faint, half-transparent puff: the shot is read from the tracer and
+	# the sound; a bright flash right at the eye hid the target every shot.
 	var fm := StandardMaterial3D.new()
-	fm.albedo_color = Color(1.0, 0.85, 0.45)
+	fm.albedo_color = Color(1.0, 0.8, 0.5, 0.35)
+	fm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	fm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_flash.material_override = fm
 	_flash.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -95,7 +102,7 @@ func _box(size: Vector3, pos: Vector3, key: String, rot_deg: Vector3 = Vector3.Z
 
 ## A shot: flash at the tip and a small recoil kick.
 func fire() -> void:
-	_flash_time = 0.05
+	_flash_time = 0.035
 	_kick = 1.0
 
 

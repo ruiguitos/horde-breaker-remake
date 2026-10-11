@@ -1788,7 +1788,9 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 		_marker.text = ""
 		return
 	var world: Vector3 = goal + Vector3(0, run.map.ground_y(goal) + 2.5, 0)
-	var wanted: bool = marker_in_view(run, goal) and not camera.is_position_behind(world)
+	# A near goal (MARKER_NEAR_M) behind the camera stays: on the screen edge.
+	var near: bool = Vector2(goal.x - run.player_pos.x, goal.z - run.player_pos.z).length() < MARKER_NEAR_M
+	var wanted: bool = marker_in_view(run, goal) and (near or not camera.is_position_behind(world))
 	_marker_alpha = move_toward(_marker_alpha, 1.0 if wanted else 0.0, get_process_delta_time() / MARKER_FADE_S)
 	_marker_pill.modulate.a = _marker_alpha
 	_marker_pill.visible = _marker_alpha > 0.01
@@ -1801,10 +1803,9 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	var view: Vector2 = get_viewport().get_visible_rect().size
 	var pill: Vector2 = _marker_pill.get_combined_minimum_size()
 	_marker_pill.size = pill
-	var screen: Vector2 = view * 0.5
-	if not camera.is_position_behind(world):
-		screen = camera.unproject_position(world)
-	# Keep the pill inside a margin that avoids the HUD corners.
+	var screen: Vector2 = marker_screen_point(camera, world, view)
+	# Keep the pill inside a margin that avoids the HUD corners (a point
+	# off screen or behind the camera ends up on that margin's edge).
 	screen.x = clampf(screen.x, 20.0 + pill.x * 0.5, view.x - 20.0 - pill.x * 0.5)
 	screen.y = clampf(screen.y, 150.0, view.y - 150.0)
 	if screen.x + pill.x * 0.5 > view.x - 200.0:
@@ -1812,6 +1813,18 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	if _radio_panel.visible and screen.x - pill.x * 0.5 < 360.0:
 		screen.y = minf(screen.y, _radio_panel.get_global_rect().position.y - 30.0)
 	_marker_pill.position = screen - Vector2(pill.x * 0.5, pill.y)
+
+
+## Where a world marker goes on screen: its projection when it is in front
+## of the camera; when it is behind, a point far outside the view towards
+## it (to the side it is on, and down: "behind you"), which the caller
+## clamps onto the screen margin.
+static func marker_screen_point(camera: Camera3D, world: Vector3, view: Vector2) -> Vector2:
+	if not camera.is_position_behind(world):
+		return camera.unproject_position(world)
+	var local: Vector3 = camera.global_transform.affine_inverse() * world
+	var d := Vector2(local.x, absf(local.z) * 0.5)
+	return view * 0.5 + d.normalized() * view.length()
 
 
 ## Edge arrows for specials and the boss that are out of view.

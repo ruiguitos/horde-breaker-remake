@@ -27,7 +27,10 @@ var _handmade: HandmadeIsland
 ## Pivot height (chest). The pivot sits at the screen centre, so the soldier
 ## is framed above the bottom HUD panels and left of the crosshair.
 @export var tp_height: float = 1.2
-@export var tp_shoulder: float = 1.0  ## sideways offset (over the right shoulder)
+## Sideways offset of the pivot (over the right shoulder). 1.6 m at 5.6 m
+## puts the soldier in the left part of the view, clear of the crosshair;
+## it shrinks when a building is right beside the soldier (_tp_pivot_pos).
+@export var tp_shoulder: float = 1.6
 @export var tp_pitch_min: float = -10.0
 @export var tp_pitch_max: float = 45.0
 @export_group("First-person camera")
@@ -66,9 +69,9 @@ var _tp_yaw: float = 0.0
 var _tp_pitch: float = deg_to_rad(8.0)
 var _crosshair: Control
 var _view_model: ViewModel  ## first-person placeholder gun (child of the camera)
-var _camera_placed: bool = false  ## the camera has been positioned once
 ## Phantom Camera (addon) drives the third-person camera: a SpringArm3D
-## follows `_tp_pivot` with damping. Null when the addon is missing.
+## follows `_tp_pivot` (without damping, see _setup_phantom_camera).
+## Null when the addon is missing.
 var _pcam: Node3D
 var _pcam_host: Node
 var _tp_pivot: Node3D
@@ -809,6 +812,8 @@ func _physics_process(delta: float) -> void:
 		var m3 := Vector3(move.x, 0, move.y).rotated(Vector3.UP, _tp_yaw)
 		move = Vector2(m3.x, m3.z)
 		aim = _tp_forward() * 12.0
+		# This frame's yaw / pitch (crosshair_ray does not read the camera,
+		# which is only placed in _process, after the simulation step).
 		var ray: Array[Vector3] = crosshair_ray()
 		run.set_crosshair(ray[0], ray[1])
 	else:
@@ -821,10 +826,13 @@ func _physics_process(delta: float) -> void:
 	var sprint: bool = Input.is_action_pressed(&"sprint")
 	run.step(delta, move, aim, _breaker_held, sprint)
 	if _grenade_held:
-		# First / third person: where the crosshair meets the ground. Without
-		# a mouse (gamepad, fixed camera) throw 8 m ahead.
-		var throw: Vector3 = _crosshair_ground_aim() if _free_look() else aim
-		run.use_ability(throw if throw.length() > 1.0 else run.facing * 8.0)
+		# First / third person: where the crosshair meets the ground (a spot
+		# near the feet stays near the feet). Fixed camera without a mouse
+		# aim (gamepad): 8 m ahead.
+		var throw: Vector3 = grenade_throw() if _free_look() else aim
+		if not _free_look() and throw.length() <= 1.0:
+			throw = run.facing * 8.0
+		run.use_ability(throw)
 		_grenade_held = false
 	_sim_ms = lerpf(_sim_ms, (Time.get_ticks_usec() - t0) / 1000.0, 0.05)
 	_breaker_held = false
@@ -966,28 +974,51 @@ func _pitch_limits() -> Vector2:
 
 
 ## The crosshair ray [origin, direction] in world metres: from the camera
-## through the screen centre, as seen. Before the camera is first placed it
-## is derived from yaw/pitch (the eye, or the shoulder pivot).
+## through the screen centre. Computed from the current yaw / pitch and the
+## eye (first person) or the shoulder camera (third person: pivot + arm, as
+## _update_third_person_camera places it), never from the camera node, whose
+## transform is last frame's until _process runs.
 func crosshair_ray() -> Array[Vector3]:
-	if _camera_placed:
-		return [_camera.global_position, -_camera.global_basis.z]
 	if camera_mode == Profile.CameraMode.FIRST_PERSON:
 		return [_view_pos() + Vector3(0, fp_eye_height, 0), _look_dir()]
-	var right: Vector3 = _tp_forward().cross(Vector3.UP).normalized()
-	return [_view_pos() + Vector3(0, tp_height, 0) + right * tp_shoulder, _look_dir()]
+	var pivot: Vector3 = _tp_pivot_pos()
+	var back: Vector3 = _tp_back()
+	return [pivot + back * _tp_arm(pivot, back), _look_dir()]
 
 
-## Where the crosshair ray meets the ground, as a flat vector from the player
-## (for the grenade); 12 m ahead when it points at the sky or too far.
-func _crosshair_ground_aim() -> Vector3:
+## Shortest grenade throw (metres) when the crosshair is on the ground at
+## the soldier's feet: it lands just in front instead of on his boots.
+const GRENADE_MIN_THROW: float = 1.5
+
+
+## Grenade aim for the first / third-person cameras, as a flat vector from
+## the player: where the crosshair ray meets the ground (at least
+## GRENADE_MIN_THROW ahead; a spot right at the feet stays close), or 12 m
+## along the look direction when the ray meets no ground in reach (sky).
+func grenade_throw() -> Vector3:
+	var hit: Variant = _crosshair_ground_hit()
+	var fwd: Vector3 = _tp_forward()
+	if hit == null:
+		return fwd * 12.0
+	var v: Vector3 = hit
+	if v.length() >= GRENADE_MIN_THROW:
+		return v
+	# Close hit: keep its side when it is ahead, else just ahead.
+	var dir: Vector3 = v.normalized() if v.dot(fwd) > 0.05 * v.length() and v.length() > 0.05 else fwd
+	return dir * GRENADE_MIN_THROW
+
+
+## Where the crosshair ray meets the ground, as a flat vector from the
+## player; null when it meets none within reach (sky, or too far).
+func _crosshair_ground_hit() -> Variant:
 	var ray: Array[Vector3] = crosshair_ray()
-	var d: float = 0.5
+	var d: float = 0.0
 	while d <= GameData.GRENADE_RANGE + tp_distance + 2.0:
 		var p: Vector3 = ray[0] + ray[1] * d
 		if p.y <= run.map.ground_y(p):
 			return Vector3(p.x - run.player_pos.x, 0, p.z - run.player_pos.z)
-		d += 0.5
-	return _tp_forward() * 12.0
+		d += 0.25
+	return null
 
 
 ## Switches the island camera (V cycles; Settings > Controls sets it too).
@@ -1011,7 +1042,6 @@ func _set_camera_mode(mode: int, save: bool = true) -> void:
 	_camera.near = 0.03 if first else 0.05  # the gun sits close to the eye
 	(_player as SoldierModel).set_shadow_only(first)
 	_view_model.visible = first
-	_camera_placed = false  # the new camera is placed on the next frame
 	if not _free_look():
 		run.clear_crosshair()
 	if save and profile != null:
@@ -1032,7 +1062,7 @@ func _update_first_person_camera(jitter: Vector3, delta: float) -> void:
 	var eye: Vector3 = _view_pos() + Vector3(0, fp_eye_height, 0)
 	var look: Vector3 = _look_dir()
 	_camera.global_transform = Transform3D(Basis.from_euler(Vector3(-_tp_pitch, _tp_yaw, 0)), eye + jitter * 0.3)
-	const REACH: float = 1.1  # a bit more than the barrel's reach from the eye
+	const REACH: float = 0.95  # a bit more than the barrel's reach from the eye (~0.85 m)
 	var free: float = REACH
 	for box in _building_boxes:
 		var hit: Variant = _segment_hits_box(eye, eye + look * REACH, box)
@@ -1084,8 +1114,13 @@ func _setup_phantom_camera() -> void:
 	_pcam.set("follow_target", _tp_pivot)
 	_pcam.set("spring_length", tp_distance)
 	_pcam.set("collision_mask", 0)  # buildings are not physics bodies; see below
-	_pcam.set("follow_damping", true)
-	_pcam.set("follow_damping_value", Vector3(0.08, 0.08, 0.08))
+	# No follow damping: the camera the player sees must be the one the
+	# simulation aims from (crosshair_ray, same pivot + arm, this frame).
+	# With 0.08 s of damping the view lagged behind while strafing and the
+	# crosshair sat on one enemy while the shot went to another.
+	_pcam.set("follow_damping", false)
+	_pcam.set("tween_on_load", false)  # no 1 s glide either (on load or on V)
+	_pcam.set("tween_duration", 0.0)
 	_pcam.set("priority", 10)
 	add_child(_pcam)
 	_set_pcam_active(camera_mode == Profile.CameraMode.THIRD_PERSON)
@@ -1096,22 +1131,40 @@ func _set_pcam_active(on: bool) -> void:
 		_pcam_host.process_mode = Node.PROCESS_MODE_INHERIT if on else Node.PROCESS_MODE_DISABLED
 
 
+## The third-person pivot: chest height, tp_shoulder to the right (less when
+## a building is right beside the soldier, so the view stays outside it).
+func _tp_pivot_pos() -> Vector3:
+	var chest: Vector3 = _view_pos() + Vector3(0, tp_height, 0)
+	var right: Vector3 = _tp_forward().cross(Vector3.UP).normalized()
+	var side: float = tp_shoulder
+	for box in _building_boxes:
+		var hit: Variant = _segment_hits_box(chest, chest + right * tp_shoulder, box)
+		if hit != null:
+			side = minf(side, maxf(0.0, float(hit) - 0.3))
+	return chest + right * side
+
+
+## From the pivot back to the third-person camera (the opposite of _look_dir).
+func _tp_back() -> Vector3:
+	return (-_tp_forward() * cos(_tp_pitch) + Vector3.UP * sin(_tp_pitch)).normalized()
+
+
+## Arm length from the pivot to the camera: tp_distance, shorter when a
+## building or a hill is in the way (the spring arm has no physics).
+func _tp_arm(pivot: Vector3, back: Vector3) -> float:
+	var dist: float = tp_distance
+	for box in _building_boxes:
+		var hit: Variant = _segment_hits_box(pivot, pivot + back * tp_distance, box)
+		if hit != null:
+			dist = minf(dist, maxf(0.8, float(hit) - 0.3))
+	return _terrain_limit(pivot, back, dist)
+
+
 func _update_third_person_camera(jitter: Vector3) -> void:
 	if _pcam != null and is_instance_valid(_pcam) and bool(_pcam.get("_has_follow_spring_arm")):
-		var fwd: Vector3 = _tp_forward()
-		var right: Vector3 = fwd.cross(Vector3.UP).normalized()
-		_tp_pivot.global_position = _view_pos() + Vector3(0, tp_height, 0) + right * tp_shoulder
+		_tp_pivot.global_position = _tp_pivot_pos()
 		_pcam.call("set_third_person_rotation", Vector3(-_tp_pitch, _tp_yaw, 0))
-		# Spring arm without physics: shorten it ourselves when a building is
-		# between the pivot and the camera.
-		var back: Vector3 = (-fwd * cos(_tp_pitch) + Vector3.UP * sin(_tp_pitch)).normalized()
-		var dist: float = tp_distance
-		for box in _building_boxes:
-			var hit: Variant = _segment_hits_box(_tp_pivot.global_position, _tp_pivot.global_position + back * tp_distance, box)
-			if hit != null:
-				dist = minf(dist, maxf(0.8, float(hit) - 0.3))
-		dist = _terrain_limit(_tp_pivot.global_position, back, dist)
-		_pcam.call("set_spring_length", dist)
+		_pcam.call("set_spring_length", _tp_arm(_tp_pivot.global_position, _tp_back()))
 		# Shake through the camera's offsets (Phantom Camera owns its transform).
 		_camera.h_offset = jitter.x
 		_camera.v_offset = jitter.y
@@ -1121,17 +1174,9 @@ func _update_third_person_camera(jitter: Vector3) -> void:
 
 ## Fallback without Phantom Camera (same framing, no damping).
 func _update_manual_third_person_camera(jitter: Vector3) -> void:
-	var fwd: Vector3 = _tp_forward()
-	var right: Vector3 = fwd.cross(Vector3.UP).normalized()
-	var pivot: Vector3 = _view_pos() + Vector3(0, tp_height, 0) + right * tp_shoulder
-	var back: Vector3 = (-fwd * cos(_tp_pitch) + Vector3.UP * sin(_tp_pitch)).normalized()
-	var dist: float = tp_distance
-	for box in _building_boxes:
-		var hit: Variant = _segment_hits_box(pivot, pivot + back * tp_distance, box)
-		if hit != null:
-			dist = minf(dist, maxf(0.8, float(hit) - 0.3))
-	dist = _terrain_limit(pivot, back, dist)
-	_camera.position = pivot + back * dist + jitter
+	var pivot: Vector3 = _tp_pivot_pos()
+	var back: Vector3 = _tp_back()
+	_camera.position = pivot + back * _tp_arm(pivot, back) + jitter
 	_camera.look_at(pivot + jitter * 0.5)
 
 
@@ -1206,7 +1251,6 @@ func _draw_player_and_camera() -> void:
 			var offset := Vector3(0, sin(pitch), cos(pitch)) * camera_distance
 			_camera.position = _view_pos() + Vector3(0, 1, 0) + offset + jitter
 			_camera.look_at(_view_pos() + Vector3(0, 1, 0) + jitter * 0.5)
-	_camera_placed = not showcase
 	# Muzzle flash: a short-lived light at the gun.
 	_muzzle.light_energy = maxf(0.0, _muzzle.light_energy - delta * 40.0)
 
@@ -1411,7 +1455,9 @@ func _draw_effects(delta: float) -> void:
 			var seg: PackedVector3Array = run.tracers[k]
 			fx.emit(&"spark", _on_ground(seg[1]) + Vector3(0, 1.2, 0), seg[0] - seg[1])
 		_tracers = run.tracers.duplicate()
-		_muzzle.light_energy = 3.0
+		# First person: the light sits next to the eye and lit the whole gun
+		# (and the view) orange; a faint flicker is enough there.
+		_muzzle.light_energy = 0.25 if camera_mode == Profile.CameraMode.FIRST_PERSON else 3.0
 		if camera_mode == Profile.CameraMode.FIRST_PERSON:
 			_view_model.fire()
 		run.tracers.clear()

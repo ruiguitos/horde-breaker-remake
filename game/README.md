@@ -78,16 +78,21 @@ gráficos):
   - **1.ª pessoa** e **3.ª pessoa** (ombro, a de origem): dispara só contra
     o inimigo que está **debaixo da mira** (a cruz ao centro), com a
     inclinação incluída: o corpo dele tem de estar a menos de 6° do raio da
-    câmara, ao alcance e à vista. Ganha o de menor ângulo. Mira no chão ou
-    no céu sem ninguém = não dispara. Se o raio passar perto da cabeça, é
-    **headshot** (dano ×2,5). A granada cai onde a mira toca o chão.
+    câmara, ao alcance e à vista (do soldado **e** da câmara: um edifício
+    entre a câmara de ombro e o alvo esconde-o). Ganha o de menor ângulo.
+    Mira no chão ou no céu sem ninguém = não dispara. O tiro é um raio 3D
+    da câmara para o alvo: quem estiver mais acima ou mais abaixo na mesma
+    linha não é atingido e o piercing só atravessa corpos que o raio toca.
+    Se o raio passar perto da cabeça, é **headshot** (dano ×2,5). A granada
+    cai onde a mira toca o chão (aos pés fica a 1,5 m; para o céu, 12 m à
+    frente). Na 3.ª pessoa a câmara fica 1,6 m à direita, sobre o ombro.
   - **Fixa** (a câmara média de 2026-10-05): mira-se com o corpo, como antes.
     Cone de 50° à frente; ganha o menor "distância + 0,4 m por grau de
     desvio", quem estiver a menos de 2,5 m é alvejado primeiro e ±9° de
     onde olhas é headshot.
 - Os marcadores do objetivo (gerador, sobrevivente, saída…) só aparecem
-  quando olhas para eles (±35°) ou estão a menos de 12 m; o minimapa mostra
-  sempre tudo.
+  quando olhas para eles (±35°) ou estão a menos de 12 m (se estiverem
+  atrás de ti, ficam presos à borda do ecrã); o minimapa mostra sempre tudo.
 - **Breaker**: investida de 5 m que empurra e atordoa tudo no caminho, dá dano
   no fim e solta-te de um Grabber. Cooldown de 6 s (barra amarela).
 - Inimigos:

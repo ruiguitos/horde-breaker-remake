@@ -14,6 +14,9 @@ var director: Director
 var rng := RandomNumberGenerator.new()
 var card_offers: CardOffers
 var _element_rng := RandomNumberGenerator.new()
+## Spawn positions have their own RNG (derived from the run seed), so the
+## same seed gives the same spawn spots whatever else used `rng`.
+var _spawn_rng := RandomNumberGenerator.new()
 var power_ups: PowerUps
 var power_ups_picked: Array[StringName] = []
 var _intel_checkpoint: int = 0
@@ -59,6 +62,16 @@ var _stamina_delay: float = 0.0
 ## direction means no crosshair (fixed camera): auto-fire aims with the body.
 var crosshair_origin: Vector3 = Vector3.ZERO
 var crosshair_dir: Vector3 = Vector3.ZERO
+## Cells that block the VIEW (row-major, 1 = blocked): buildings, rocks and
+## trees. The flow field also blocks the sea, steep slopes and the outside
+## of a play area, which the camera and the bullets see / fly over (hills
+## are checked by height, _above_ground). Built in _init (_build_sight).
+var sight_blocked: PackedByteArray = PackedByteArray()
+# Per-shot caches of the crosshair broad phase (_shot_candidates).
+var _shot_low := PackedVector3Array()
+var _shot_seg := PackedVector3Array()
+var _shot_r := PackedFloat32Array()
+var _shot_los: Dictionary = {}  ## enemy index -> the soldier's line is clear
 
 # Weapons
 var weapons: Array[GameData.Weapon] = GameData.weapons()
@@ -167,6 +180,7 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMa
 	card_offers = CardOffers.new(rng_seed)
 	power_ups = PowerUps.new(rng_seed)
 	_element_rng.seed = rng_seed ^ 0x454c454d
+	_spawn_rng.seed = rng_seed ^ 0x5350574e
 	map = custom_map if custom_map != null else IslandMap.build(rng_seed, biome)
 	field = map.field
 	horde = Horde.new(field)
@@ -179,11 +193,37 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMa
 	for w in weapons:
 		ammo.append(w.max_ammo)
 		weapon_unlocked.append(GameData.starting_weapons().has(w.id))
+	_build_sight()
 	for c in map.caches:
 		cache_progress.append(0.0)
 	for i in GameData.GENERATOR_COUNT:
 		generator_progress.append(0.0)
 		generator_started.append(false)
+
+
+## sight_blocked from the map: the real wall cells of a hand-made island (or
+## the building rectangles of a generated one), plus rocks and trees.
+func _build_sight() -> void:
+	var w: int = field.width
+	sight_blocked.resize(w * field.height)
+	sight_blocked.fill(0)
+	if not map.wall_cells.is_empty():
+		for i in map.wall_cells:
+			sight_blocked[i] = 1
+	else:
+		for r in map.buildings:
+			for z in range(maxi(r.position.y, 0), mini(r.end.y, field.height)):
+				for x in range(maxi(r.position.x, 0), mini(r.end.x, w)):
+					sight_blocked[z * w + x] = 1
+	for c in map.rocks + map.trees:
+		if c.x >= 0 and c.y >= 0 and c.x < w and c.y < field.height:
+			sight_blocked[c.y * w + c.x] = 1
+
+
+func sight_is_blocked(x: int, z: int) -> bool:
+	if x < 0 or z < 0 or x >= field.width or z >= field.height:
+		return false
+	return sight_blocked[z * field.width + x] != 0
 
 
 ## Loads the run state carried from previous islands and scales difficulty.
@@ -881,8 +921,10 @@ func _pick_target(range_m: float) -> int:
 ## the head, as seen from the camera) is below GameData.CROSSHAIR_CONE_DEG.
 ## The smallest gap wins (the nearer one if the ray is on several bodies).
 ## Enemies behind the player (between a shoulder camera and the soldier) and
-## enemies hidden by a building or a hill are ignored. -1 = no target, so
-## aiming at the ground or the sky with nobody there fires nothing.
+## enemies hidden by a building or a hill are ignored: both the player's
+## line and the camera's line to the body must be clear (_crosshair_visible).
+## -1 = no target, so aiming at the ground or the sky with nobody there
+## fires nothing.
 func _pick_crosshair_target(range_m: float) -> int:
 	var best: int = -1
 	var best_score: float = deg_to_rad(GameData.CROSSHAIR_CONE_DEG)
@@ -905,7 +947,7 @@ func _pick_crosshair_target(range_m: float) -> int:
 		var score: float = gap + dist * 0.00001
 		if score >= best_score:
 			continue
-		if not _line_of_sight(player_pos, horde.positions[i]) or not _above_ground(crosshair_origin, aim):
+		if not _crosshair_visible(i, aim):
 			continue
 		best = i
 		best_score = score
@@ -930,8 +972,54 @@ func _crosshair_body_point(i: int) -> Vector3:
 	return low + seg * clampf(u, 0.0, 1.0)
 
 
+## Can the crosshair camera see enemy i's body point `aim`, and can the
+## player shoot it? The player's line and the camera's line must be clear of
+## visual obstacles (sight_blocked: a building between a shoulder camera and
+## the target hides it even when the soldier's own line is clear; the sea
+## and steep slopes do not), and the camera's line must stay above the
+## terrain.
+func _crosshair_visible(i: int, aim: Vector3) -> bool:
+	return _view_clear(player_pos, horde.positions[i]) and _view_clear(crosshair_origin, aim) \
+		and _above_ground(crosshair_origin, aim)
+
+
+## No visual obstacle (sight_blocked, every 0.5 m) between a and b. A view
+## that starts inside an obstacle (a camera pushed against a wall) sees out
+## of it: obstacle cells at the start of the line are skipped; any one after
+## the first free cell hides `b`.
+func _view_clear(a: Vector3, b: Vector3) -> bool:
+	var d: Vector3 = b - a
+	var n: int = ceili(Vector2(d.x, d.z).length() / 0.5)
+	var outside: bool = not sight_is_blocked(floori(a.x), floori(a.z))
+	for k in range(1, n):
+		var p: Vector3 = a + d * (float(k) / n)
+		var blocked: bool = sight_is_blocked(floori(p.x), floori(p.z))
+		if blocked and outside:
+			return false
+		outside = outside or not blocked
+	return true
+
+
+## Distance along the ray origin + s * dir (unit) to its first obstacle: a
+## visual obstacle cell (skipping those it starts in, as _view_clear) or the
+## terrain above it. `max_s` when nothing is in the way before it.
+func _ray_block(origin: Vector3, dir: Vector3, max_s: float) -> float:
+	var flat: float = Vector2(dir.x, dir.z).length()
+	var step: float = 0.5 / maxf(flat, 0.25)  # ~0.5 m across the grid
+	var outside: bool = not sight_is_blocked(floori(origin.x), floori(origin.z))
+	var s: float = step
+	while s < max_s:
+		var p: Vector3 = origin + dir * s
+		var blocked: bool = sight_is_blocked(floori(p.x), floori(p.z))
+		if (blocked and outside) or p.y < map.ground_y(p) - 0.1:
+			return s
+		outside = outside or not blocked
+		s += step
+	return max_s
+
+
 ## No terrain between a and b (sampled every metre; buildings are checked on
-## the grid by _line_of_sight).
+## the grid by _line_of_sight / _view_clear).
 func _above_ground(a: Vector3, b: Vector3) -> bool:
 	var n: int = ceili(a.distance_to(b))
 	for k in range(1, n):
@@ -992,24 +1080,43 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 		_shots += 1
 	if w.max_ammo > 0:
 		ammo[weapon_index] -= 1
-	var to: Vector3 = horde.positions[target] - player_pos
-	to.y = 0.0
-	var dir: Vector3 = to.normalized()
+	# Fixed camera: a flat ray from the player (horde.hitscan). First / third
+	# person: a 3D ray from the camera to the picked body point
+	# (_crosshair_hits), so an enemy above or below the shot on the same
+	# flat line is not hit, and nothing hidden from the camera is.
+	var crosshair: bool = uses_crosshair()
+	var origin: Vector3 = player_pos
+	var dir: Vector3
+	if crosshair:
+		origin = crosshair_origin
+		dir = (_crosshair_body_point(target) - origin).normalized()
+	else:
+		var to: Vector3 = horde.positions[target] - player_pos
+		to.y = 0.0
+		dir = to.normalized()
 	var headshot: bool = _is_headshot(target)
 	var rifle: bool = w.id == &"rifle"
 	var dmg: float = w.damage * (1.0 + 0.10 * stacks(&"hollow_points") if rifle else 1.0)
 	var pierce: int = w.pierce + (stacks(&"piercing_rounds") if rifle else 0)
 	var direct_hits: Array[int] = []
 	var ricochet_damage: float = dmg
+	var candidates := PackedInt32Array()
+	if crosshair:
+		candidates = _shot_candidates(origin, dir, w.range_m, w.spread_deg * 0.5)
 	for p in w.pellets:
 		var pellet_dir: Vector3 = dir
 		if w.spread_deg > 0.0:
 			pellet_dir = dir.rotated(Vector3.UP, deg_to_rad(rng.randf_range(-w.spread_deg, w.spread_deg) * 0.5))
-		var hits: Array[Vector2] = horde.hitscan(player_pos, pellet_dir, w.range_m, pierce)
-		var end: Vector3 = player_pos + pellet_dir * w.range_m
+		var hits: Array[Vector2] = _crosshair_hits(origin, pellet_dir, pierce, candidates) if crosshair \
+			else horde.hitscan(player_pos, pellet_dir, w.range_m, pierce)
+		var end: Vector3 = player_pos + Vector3(pellet_dir.x, 0, pellet_dir.z).normalized() * w.range_m
 		for h in hits:
 			var idx: int = int(h.y)
-			end = player_pos + pellet_dir * h.x
+			if crosshair:
+				var at: Vector3 = origin + pellet_dir * h.x
+				end = Vector3(at.x, 0, at.z)  # tracers are simulation points (y = 0)
+			else:
+				end = player_pos + pellet_dir * h.x
 			if _dead.has(idx):
 				continue
 			var is_head: bool = headshot and idx == target
@@ -1029,6 +1136,110 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 		tracers.append(PackedVector3Array([player_pos, end]))
 	if rifle and direct_hits.has(target) and stacks(&"ricochet") > 0 and _shots % 4 == 0:
 		_chain_hit(target, stacks(&"ricochet"), ricochet_damage * 0.6, direct_hits)
+
+
+## Broad phase of a crosshair shot (once per shot, not per pellet): live
+## enemies in range and in front of the player whose body can be within
+## reach of a pellet, i.e. near the shot's line on the ground (body radius
+## plus what `half_spread_deg` can add at that distance). Also caches, for
+## _crosshair_hits, each candidate's body axis and radius and (lazily) the
+## soldier's own line to it.
+func _shot_candidates(origin: Vector3, dir: Vector3, range_m: float, half_spread_deg: float) -> PackedInt32Array:
+	var out := PackedInt32Array()
+	_shot_low.clear()
+	_shot_seg.clear()
+	_shot_r.clear()
+	_shot_los.clear()
+	var d2 := Vector2(dir.x, dir.z)
+	if d2.length_squared() < 0.000001:
+		d2 = Vector2(facing.x, facing.z)
+	d2 = d2.normalized()
+	var o2 := Vector2(origin.x, origin.z)
+	var p0 := Vector2(player_pos.x, player_pos.z)
+	var widen: float = tan(deg_to_rad(half_spread_deg))
+	for i in horde.query_radius(player_pos, range_m):
+		if _dead.has(i):
+			continue
+		var p: Vector3 = horde.positions[i]
+		var q := Vector2(p.x, p.z)
+		if (q - p0).dot(d2) <= 0.0:
+			continue
+		var along: float = (q - o2).dot(d2)
+		var r: float = GameData.CROSSHAIR_BODY_RADIUS * horde.types[horde.kinds[i]].radius_scale
+		if absf((q - o2).cross(d2)) <= r + 0.05 + maxf(along, 0.0) * widen:
+			out.append(i)
+			var low := Vector3(p.x, p.y + map.ground_y(p) + 0.2, p.z)
+			_shot_low.append(low)
+			_shot_seg.append(enemy_head(i) - low)
+			_shot_r.append(r)
+	return out
+
+
+## Enemies a crosshair pellet hits, from the shot's `candidates` (call
+## _shot_candidates first: it fills the caches): the 3D ray origin + s * dir
+## (unit) passes within the body radius of the enemy's axis (feet to head,
+## as in _crosshair_body_point) before the pellet's first obstacle on its
+## own path (_ray_block: buildings, rocks, trees, terrain), and the
+## soldier's own line to the enemy is clear. Nearest first, at most
+## `max_hits` (the weapon's pierce). Returns Vector2(distance along the ray,
+## index), like Horde.hitscan.
+func _crosshair_hits(origin: Vector3, dir: Vector3, max_hits: int, candidates: PackedInt32Array) -> Array[Vector2]:
+	var hits: Array[Vector2] = []
+	var d2 := Vector2(dir.x, dir.z)
+	var flat: float = d2.length()
+	if flat > 0.000001:
+		d2 /= flat
+	var o2 := Vector2(origin.x, origin.z)
+	for k in candidates.size():
+		var i: int = candidates[k]
+		if _dead.has(i):
+			continue
+		var low: Vector3 = _shot_low[k]
+		var r: float = _shot_r[k]
+		# Cheap 2D reject: the pellet's line on the ground misses the body.
+		if flat > 0.000001 and absf((Vector2(low.x, low.z) - o2).cross(d2)) > r:
+			continue
+		var seg: Vector3 = _shot_seg[k]
+		# Closest points between the ray and the body axis (clamped to the
+		# segment, then the ray point re-projected onto it).
+		var w: Vector3 = origin - low
+		var b: float = dir.dot(seg)
+		var ss: float = maxf(seg.dot(seg), 0.000001)
+		var denom: float = ss - b * b
+		var u: float = 0.0
+		if denom > 0.000001:
+			u = clampf((seg.dot(w) - b * dir.dot(w)) / denom, 0.0, 1.0)
+		var s: float = maxf(0.0, dir.dot(low + seg * u - origin))
+		var on_ray: Vector3 = origin + dir * s
+		var on_axis: Vector3 = low + seg * clampf((on_ray - low).dot(seg) / ss, 0.0, 1.0)
+		if on_ray.distance_to(on_axis) > r:
+			continue
+		hits.append(Vector2(s, i))
+	if hits.is_empty():
+		return hits
+	hits.sort()
+	# The pellet stops at its first obstacle: march only as far as the hits
+	# it can still take (further only if the soldier cannot see one of them).
+	var out: Array[Vector2] = []
+	var marched: float = 0.0
+	var block: float = INF
+	for h in hits:
+		if out.size() >= max_hits:
+			break
+		if h.x >= marched and block == INF:
+			var upto: float = hits[mini(hits.size(), hits.find(h) + max_hits - out.size()) - 1].x + 0.01
+			var b: float = _ray_block(origin, dir, upto)
+			if b < upto:
+				block = b
+			marched = upto
+		if h.x >= block:
+			break
+		var i: int = int(h.y)
+		if not _shot_los.has(i):
+			_shot_los[i] = _view_clear(player_pos, horde.positions[i])
+		if _shot_los[i]:
+			out.append(h)
+	return out
 
 
 func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool,
@@ -1587,27 +1798,72 @@ func can_spawn_at(p: Vector3) -> bool:
 	return field.distance_at(p) < FlowField.UNREACHABLE
 
 
-## The first spot that can_spawn_at() on rings of these radii around
-## `center` (36 directions each, every ring from its own random angle, so a
-## narrow path missed on one ring is found on the next); INF when none.
+## Sectors (equal angles around the player) for the fallback spawn.
+const SPAWN_SECTORS: int = 8
+## A sector with at least this many valid spots counts in full when one is
+## drawn; one with fewer (a sliver at the edge of a wall or the play area)
+## counts in proportion, so it does not get a full share on two spots.
+const SPAWN_SECTOR_FULL: int = 4
+
+
+## A spot that can_spawn_at() on rings of these radii around `center` (36
+## directions each, every ring from its own random angle); INF when none.
+## Every valid spot of every ring is sorted into SPAWN_SECTORS sectors
+## around `center`; a sector is drawn uniformly among those with spots
+## (slivers with fewer than SPAWN_SECTOR_FULL spots weigh less), then a spot
+## inside it. The old rule (the first valid spot after a random angle)
+## piled the spawns on one edge of the free arc: always the same side.
 func _ring_spot(center: Vector3, radii: Array) -> Vector3:
+	var spots := PackedVector3Array()
+	var sectors := PackedInt32Array()
+	var per_sector := PackedInt32Array()
+	per_sector.resize(SPAWN_SECTORS)
 	for r: float in radii:
-		var start: float = rng.randf() * TAU
+		var start: float = _spawn_rng.randf() * TAU
 		for k in 36:
 			var ang: float = start + k * TAU / 36.0
 			var p: Vector3 = center + Vector3(cos(ang), 0, sin(ang)) * r
 			if can_spawn_at(p):
-				return p
-	return Vector3.INF
+				var sector: int = spawn_sector(center, p)
+				spots.append(p)
+				sectors.append(sector)
+				per_sector[sector] += 1
+	var total: int = 0
+	for sector in SPAWN_SECTORS:
+		total += mini(per_sector[sector], SPAWN_SECTOR_FULL)
+	if total == 0:
+		return Vector3.INF
+	var roll: int = _spawn_rng.randi_range(0, total - 1)
+	var chosen: int = 0
+	while roll >= mini(per_sector[chosen], SPAWN_SECTOR_FULL):
+		roll -= mini(per_sector[chosen], SPAWN_SECTOR_FULL)
+		chosen += 1
+	var nth: int = _spawn_rng.randi_range(0, per_sector[chosen] - 1)
+	for k in spots.size():
+		if sectors[k] == chosen:
+			if nth == 0:
+				return spots[k]
+			nth -= 1
+	return Vector3.INF  # not reached
+
+
+## Which of the SPAWN_SECTORS sectors around `center` `p` is in (sector 0
+## starts at +X and they go towards +Z).
+static func spawn_sector(center: Vector3, p: Vector3) -> int:
+	var ang: float = fposmod(atan2(p.z - center.z, p.x - center.x), TAU)
+	return mini(int(ang / (TAU / SPAWN_SECTORS)), SPAWN_SECTORS - 1)
 
 
 func _spawn_enemy() -> void:
 	if horde.count >= GameData.MAX_ALIVE or power_ups.spawn_delay > 0.0:
 		return
 	spawn_requests += 1
+	# Uniform over the free ground of the ring (rejection sampling): no side
+	# is favoured beyond how much free ground it has (measured: see
+	# test_island_run's spawn histogram).
 	for attempt in 12:
-		var ang: float = rng.randf() * TAU
-		var dist: float = rng.randf_range(GameData.SPAWN_MIN_DIST, GameData.SPAWN_MAX_DIST)
+		var ang: float = _spawn_rng.randf() * TAU
+		var dist: float = _spawn_rng.randf_range(GameData.SPAWN_MIN_DIST, GameData.SPAWN_MAX_DIST)
 		var p: Vector3 = player_pos + Vector3(cos(ang), 0, sin(ang)) * dist
 		if can_spawn_at(p):
 			horde.add(p, director.pick_kind(), rng)

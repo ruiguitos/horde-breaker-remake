@@ -30,6 +30,7 @@ func _initialize() -> void:
 	_test_input_actions()
 	_test_missions()
 	_test_story()
+	_test_spawn_sectors()
 	if _failures > 0:
 		print("TEST FAIL: %d failure(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -428,3 +429,85 @@ func _test_story() -> void:
 	for k in [&"generator", &"boss", &"survivor_found", &"low_hp", &"screamer", &"cache"]:
 		all_keys = all_keys and Story.RADIO.has(k)
 	_check(all_keys and Story.FILES.size() >= 10, "every radio event has lines; 10 Intel files exist")
+
+
+## An open 160 m map with the player in the middle (no walls in reach).
+func _open_run(rng_seed: int) -> IslandRun:
+	var map := IslandMap.new()
+	map.field = FlowField.new(160, 160)
+	map.player_start = Vector3(80.5, 0, 80.5)
+	map.boat = Vector3(80.5, 0, 84.5)
+	map.generators = [Vector3(100, 0, 100), Vector3(101, 0, 100), Vector3(100, 0, 101)]
+	var run := IslandRun.new(rng_seed, &"beach", map)
+	run.director.max_alive = 0
+	return run
+
+
+## Spawns come from every side: 4096 normal spawns and 4096 ring fallbacks
+## on an open map, none of the 8 sectors above 20 %; every spot valid and at
+## least SPAWN_MIN_DIST away; the same seed gives the same spots.
+func _test_spawn_sectors() -> void:
+	var mid: float = (GameData.SPAWN_MIN_DIST + GameData.SPAWN_MAX_DIST) * 0.5
+	var radii: Array = [mid, GameData.SPAWN_MIN_DIST, GameData.SPAWN_MAX_DIST, 52.0, 60.0]
+	for path in ["normal", "fallback"]:
+		var run: IslandRun = _open_run(4242)
+		var c: Vector3 = run.player_pos
+		var hist := PackedInt32Array()
+		hist.resize(IslandRun.SPAWN_SECTORS)
+		var valid: bool = true
+		var n: int = 0
+		for k in 4096:
+			var p := Vector3.INF
+			if path == "normal":
+				run._spawn_enemy()
+				if run.horde.count > 0:
+					p = run.horde.positions[run.horde.count - 1]
+					run.horde.remove(run.horde.count - 1)
+			else:
+				p = run._ring_spot(c, radii)
+			if p == Vector3.INF:
+				valid = false
+				continue
+			valid = valid and run.can_spawn_at(p) and Vector2(p.x - c.x, p.z - c.z).length() >= GameData.SPAWN_MIN_DIST - 0.01
+			hist[IslandRun.spawn_sector(c, p)] += 1
+			n += 1
+		var top: float = 0.0
+		var shares := PackedStringArray()
+		for v in hist:
+			top = maxf(top, float(v) / maxi(n, 1))
+			shares.append("%.1f" % (100.0 * v / maxi(n, 1)))
+		_check(n == 4096 and valid and top <= 0.20,
+			"spawns (%s) on an open map: 8 sectors %s %%, max %.1f %%, all valid" % [path, " ".join(shares), top * 100.0])
+	# Determinism: two runs with the same seed spawn on the same spots, and
+	# the gameplay RNG does not move them.
+	var a: IslandRun = _open_run(99)
+	var b: IslandRun = _open_run(99)
+	b.rng.randf()  # spawns have their own RNG
+	var same: bool = true
+	for k in 64:
+		a._spawn_enemy()
+		b._spawn_enemy()
+		var pa: Vector3 = a._ring_spot(a.player_pos, radii)
+		var pb: Vector3 = b._ring_spot(b.player_pos, radii)
+		same = same and pa == pb and a.horde.positions[a.horde.count - 1] == b.horde.positions[b.horde.count - 1]
+	_check(same and a.horde.count == 64, "same seed => same spawn spots (normal and fallback)")
+	# A ring with only one quarter free: the fallback no longer piles the
+	# spawns on one edge of the free arc.
+	var q: IslandRun = _open_run(4242)
+	for z in 160:
+		for x in 160:
+			if (x < 77 or z < 77) and (absi(x - 80) > 3 or absi(z - 80) > 3):
+				q.field.blocked[z * 160 + x] = 1
+	q.field.compute_now(q.field.world_to_cell(q.player_pos))
+	var qh := PackedInt32Array()
+	qh.resize(IslandRun.SPAWN_SECTORS)
+	var q_valid: bool = true
+	for k in 2048:
+		var p: Vector3 = q._ring_spot(q.player_pos, radii)
+		q_valid = q_valid and p != Vector3.INF and q.can_spawn_at(p)
+		if p != Vector3.INF:
+			qh[IslandRun.spawn_sector(q.player_pos, p)] += 1
+	var q_top: int = 0
+	for v in qh:
+		q_top = maxi(q_top, v)
+	_check(q_valid and q_top <= 2048 * 0.4, "quarter-open ring: no sector above 40 %% (max %.1f %%)" % (100.0 * q_top / 2048.0))
