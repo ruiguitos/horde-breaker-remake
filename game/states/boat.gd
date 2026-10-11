@@ -81,7 +81,9 @@ func _make_routes() -> void:
 	var b: int = (a + _rng.randi_range(1, mods.size() - 1)) % mods.size()
 	_routes = [mods[a], mods[b]]
 	var biomes: Array[StringName] = GameData.ISLAND_BIOMES.duplicate()
-	var missions: Array = GameData.ROUTE_MISSIONS  # not the expedition-only holdout
+	# Route missions (not the expedition-only holdout), never the mission
+	# just played again: context.mission still holds it after island 1.
+	var missions: Array[StringName] = GameData.route_missions_after(context.mission if context.island_index > 0 else &"")
 	for i in 2:
 		_route_missions.append(missions[_rng.randi_range(0, missions.size() - 1)])
 		if context.is_last_island():

@@ -369,7 +369,7 @@ só visual. A câmara de 3.ª pessoa encurta para não entrar nas colinas.
 | `Trees/` | Cada filho bloqueia só a célula do tronco (a copa não conta) |
 | `Bridges/` | Cada filho é o tabuleiro de uma ponte (`MeshInstance3D`): as células por baixo andam-se à altura do tabuleiro, mesmo sobre água; os filhos (guardas) são decoração |
 | `Decor/` | Nunca bloqueia: relva, flores, estradas, luzes, água de pré-visualização |
-| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..` (nós `Marker3D`) |
+| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed) (nós `Marker3D`) |
 
 A ilha ocupa o quadrado de 0 a `size` metros em X e Z (160 por omissão;
 muda no inspetor do nó raiz). Mantém tudo lá dentro.

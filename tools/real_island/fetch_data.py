@@ -10,7 +10,9 @@ Places are presets below (default: berlenga). Downloads, once:
   - the place's CC0 textures from Poly Haven (1k: colour, normal, roughness,
     displacement), each with a role: ground, cliff, shore and path for the
     terrain; facade (walls with windows), plaster, roof and stone for
-    buildings, steps and kerbs.
+    buildings, steps and kerbs; granite (the fort), wood (decks, the
+    shrine), metal (rails, the lantern, the conveyor), concrete (piers,
+    bridges, Hashima's roofs and galleries) and sheet (corrugated roofs).
 data/ is ignored by git: only the island built from it (build.gd) is kept.
 OSM data is ODbL: "(c) OpenStreetMap contributors" (see assets/LICENSES.md).
 Only the Python standard library is used.
@@ -35,12 +37,16 @@ PLACES = {
         "name": "Berlenga Grande", "lat": 39.4143, "lon": -9.5096, "size": 2048,
         "textures": {"aerial_grass_rock": "ground", "rock_face_03": "cliff",
                      "coast_sand_rocks_02": "shore", "rocky_trail": "path",
-                     "white_plaster_02": "plaster", "clay_roof_tiles_02": "roof", "stone_wall_02": "stone"},
+                     "white_plaster_02": "plaster", "clay_roof_tiles_02": "roof", "stone_wall_02": "stone",
+                     "stone_wall_04": "granite", "weathered_planks": "wood", "rusty_metal_04": "metal",
+                     "dirty_concrete": "concrete"},
     },
     "hashima": {
         "name": "Hashima (Gunkanjima)", "lat": 32.6278, "lon": 129.7386, "size": 1024,
         "textures": {"cracked_concrete": "ground", "concrete_wall_006": "cliff",
-                     "dark_rock": "shore", "concrete_pavement_03": "path", "concrete_wall_008": "facade"},
+                     "dark_rock": "shore", "concrete_pavement_03": "path", "concrete_wall_008": "facade",
+                     "dirty_concrete": "concrete", "weathered_planks": "wood", "rusty_metal_04": "metal",
+                     "rusty_corrugated_iron": "sheet"},
     },
 }
 OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter",

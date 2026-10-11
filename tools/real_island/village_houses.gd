@@ -212,9 +212,11 @@ func place(k: int, pts: PackedVector2Array, lo: float, hi: float) -> bool:
 	if fort:
 		# Bare masonry like the fort's walls: no whitewash, no painted band;
 		# stone surrounds and a darker plinth.
-		wall_m = _role("stone", 2.0, Color(1.3, 1.34, 1.36), false)  # cooler: the picture is warm
+		# The fort's granite (landmarks.gd), when the place has it.
+		var granite: bool = b._role_material("granite", 2.0) != null
+		wall_m = _role("granite", 2.0, Color(1.25, 1.32, 1.4), false) if granite else _role("stone", 2.0, Color(1.3, 1.34, 1.36), false)
 		band_m = wall_m
-		stone_m = _role("stone", STONE_METRES, Color(0.95, 0.92, 0.88), false)
+		stone_m = _role("granite", 2.0, Color(1.1, 1.17, 1.25), false) if granite else _role("stone", STONE_METRES, Color(0.95, 0.92, 0.88), false)
 		paint = Color(0.8, 0.78, 0.72)
 		door_paint = DOORS[1]
 
@@ -230,7 +232,10 @@ func place(k: int, pts: PackedVector2Array, lo: float, hi: float) -> bool:
 	if roof == null:
 		roof = _roof(plan, tags, style, shape, eaves)
 	# The fort's terrace: a plain lime-mortar grey, not the wall's stone.
-	var slab: Surf = Surf.new(_colour(Color(0.42, 0.41, 0.39), 0.95), o, false) if fort else null
+	var slab: Surf = null
+	if fort:
+		var mortar: bool = b._role_material("concrete", 3.0) != null
+		slab = Surf.new(_role("concrete", 3.0, Color(0.8, 0.81, 0.84), false) if mortar else _colour(Color(0.42, 0.41, 0.39), 0.95), o, false)
 	_walls(plan, turn, roof, lo - 0.5, ref, walls, band, stone, slab)
 	if roof.shape == "wings":
 		_wing_faces(roof, style, rng, roof_s, walls, roof_m, wall_m)

@@ -629,7 +629,8 @@ static func _load_missions() -> Dictionary:
 	var out: Dictionary = {}
 	for e: Array in _entries(MISSION_REGISTRY):
 		var d: MissionData = e[1]
-		out[e[0]] = {"name": d.display_name, "text": d.text, "on_route": d.on_route}
+		out[e[0]] = {"name": d.display_name, "text": d.text, "on_route": d.on_route,
+			"points": d.points, "seconds": d.seconds_per_point, "radius": d.radius}
 	return out
 
 
@@ -639,6 +640,31 @@ static func _route_missions() -> Array[StringName]:
 		if MISSIONS[id]["on_route"]:
 			ids.append(id)
 	return ids
+
+
+## Missions that feel the same (Defend and the expedition's Holdout both
+## hold one zone) share a family; the rest are their own family.
+static func mission_family(id: StringName) -> StringName:
+	return &"defend" if id == &"holdout" else id
+
+
+## The route missions the boat may draw after an island played with
+## `previous` (&"" = first island): never the same mission, or one of its
+## family, twice in a row (OBJECTIVES_PROPOSAL §4). Falls back to every
+## route mission if that would leave none.
+static func route_missions_after(previous: StringName) -> Array[StringName]:
+	var out: Array[StringName] = []
+	for id: StringName in ROUTE_MISSIONS:
+		if previous == &"" or mission_family(id) != mission_family(previous):
+			out.append(id)
+	return out if not out.is_empty() else ROUTE_MISSIONS.duplicate()
+
+
+## A number of a mission's data (e.g. &"hold_sequence", &"points"), or
+## `default` when the mission or the key is missing.
+static func mission_value(id: StringName, key: String, default: float) -> float:
+	var v: float = float(MISSIONS.get(id, {}).get(key, 0.0))
+	return v if v > 0.0 else default
 
 
 static func _load_classes() -> Dictionary:

@@ -196,6 +196,7 @@ func _expedition_checks() -> void:
 		for p: Vector3 in [map.exit, map.rescue_target, map.defend_zone]:
 			if p.x >= 0.0:
 				goals.append(p)
+		goals.append_array(map.hold_points)
 		_check(goals.all(func(g: Vector3) -> bool: return f.distance_at(g) < FlowField.UNREACHABLE),
 			"%s: its %d markers are reachable from the start" % [label, goals.size()])
 		# Each marker at most 10 m from where the design puts it (snapped to clear ground).
@@ -204,6 +205,10 @@ func _expedition_checks() -> void:
 			pairs.append(["RescueTarget", map.rescue_target, spec["rescue"]])
 		if spec.has("defend"):
 			pairs.append(["DefendZone", map.defend_zone, spec["defend"]])
+		var holds: Array = spec.get("holds", [])
+		_check(map.hold_points.size() == holds.size(), "%s: %d HoldPoint markers, in order" % [label, map.hold_points.size()])
+		for h in holds.size():
+			pairs.append(["HoldPoint_%d" % (h + 1), map.hold_points[h] if h < map.hold_points.size() else Vector3(-1000, 0, -1000), holds[h]])
 		var gens: Array = spec.get("generators", [])
 		for g in gens.size():
 			pairs.append(["Generator%d" % (g + 1), map.generators[g] if g < map.generators.size() else Vector3(-1000, 0, -1000), gens[g]])

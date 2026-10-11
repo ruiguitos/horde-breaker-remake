@@ -119,7 +119,9 @@ func finish() -> void:
 	stone = stone.duplicate() if stone != null else b._mat(Color(0.5, 0.48, 0.45))
 	for m: StandardMaterial3D in [concrete, stone]:
 		m.vertex_color_use_as_albedo = true  # joints, worn edges, tone per step
-	var metal: StandardMaterial3D = b._mat(Color(0.2, 0.24, 0.22), 0.45)
+	# Painted iron: the "metal" picture (rusty_metal_04) painted dark green.
+	var metal: StandardMaterial3D = b._role_material("metal", 1.0, Color(0.59, 0.93, 1.07))
+	metal = metal.duplicate() if metal != null else b._mat(Color(0.2, 0.24, 0.22), 0.45)
 	metal.metallic = 0.6
 	_commit(_concrete, "PathConcrete", concrete, true)
 	_commit(_stone, "PathStone", stone, true)

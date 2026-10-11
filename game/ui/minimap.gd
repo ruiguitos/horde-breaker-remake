@@ -137,6 +137,8 @@ func _draw() -> void:
 		_mark(&"boss" if boss else &"hostile", _px(run.horde.positions[i]))
 	if run.mission == &"defend" or run.mission == &"holdout":
 		_mark(&"site", _px(run.site))
+	elif run.mission == &"hold_sequence" and run.objective == IslandRun.Objective.GENERATORS:
+		_mark(&"site", _px(run.site))  # only the active point: one goal at a time
 	elif run.mission == &"rescue" and not run.survivor_lost:
 		_mark(&"survivor", _px(run.survivor_pos))
 	for g in GameData.GENERATOR_COUNT:
@@ -208,6 +210,9 @@ static func legend_entries(r: IslandRun) -> Array[Array]:
 			out.append([&"site", "UPLINK"])
 		&"holdout":
 			out.append([&"site", "COURTYARD"])
+		&"hold_sequence":
+			if r.objective == IslandRun.Objective.GENERATORS:
+				out.append([&"site", "POINT"])
 		&"rescue":
 			out.append([&"survivor", "SURVIVOR"])
 		&"activate":

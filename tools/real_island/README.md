@@ -184,8 +184,32 @@ depois de a construir, ou muda o script.
     - não se usa o `step_count` do OSM: os 63 degraus de `441503017` dariam
       espelhos de 4 cm no relevo escavado;
     - nas escadas mais íngremes os lanços parecem escadotes;
-    - a pedra do forte é clara e lisa, e puxa ligeiramente para o rosa;
     - as portas e janelas são painéis sobre a parede, sem recorte.
+- **Texturas das construções** (2026-10-11): tudo o que era cor lisa tem
+  agora uma textura CC0 do Poly Haven, com um papel em `fetch_data.py`:
+
+  | Papel | Textura | Onde |
+  |---|---|---|
+  | `granite` | stone_wall_04 | forte, edifício do ilhéu, muros dos limites, pontes de pedra |
+  | `wood` | weathered_planks | ponte de madeira (`surface=wood`), santuário e torii de Hashima |
+  | `metal` | rusty_metal_04 | gradeamentos, lanterna e cúpula dos faróis, tapete transportador |
+  | `concrete` | dirty_concrete | cais, pontes de betão, lajes, galerias e paredão de Hashima |
+  | `sheet` | rusty_corrugated_iron | telhado de duas águas do Poço 4 e cobertura do tapete |
+
+  - **Porquê assim:** a cor de cada peça passa a ser um *tint* sobre a
+    textura (a cor pretendida a dividir pela cor média da imagem). A paleta
+    low-poly fica igual e a textura junta grão, manchas e relevo.
+  - **Escala:** um metro de jogo é um metro da fotografia (o tamanho real
+    que o Poly Haven indica), para as tábuas e as pedras terem o tamanho
+    certo.
+  - **Projeção:** triplanar. Nas caixas rodadas (tabuleiros, blocos do cais,
+    pilares) é no espaço do próprio objeto, para as tábuas seguirem a
+    ponte; no resto é no espaço do mundo.
+  - **Desempenho:** os materiais ficam em cache (`_role_material`,
+    `_role_or`): uma combinação de textura e *tint* é um só material. São
+    5 texturas novas (3 mapas cada, 1k, DXT), partilhadas pelas duas ilhas.
+  - O ferro e o vermelho pintado usam a mesma textura de metal com outro
+    *tint*. O vidro da lanterna continua a ser um material transparente.
 - **Praças:** os passeios com `area=yes` no OSM (o percurso turístico de
   Hashima) são pavimento por inteiro, e não um caminho ao longo do contorno.
 - **Gargalos e arenas** (`chokes`, `arenas` no preset): são marcadores
@@ -265,7 +289,7 @@ fronteira) e os objetivos. O construtor grava, na pasta da expedição:
   dentro alcançável, por fora chão livre na ilha inteira), há muros de pedra
   solta e faixas de penedos, um pouco por fora do polígono. Ficam em
   `Decor/Boundary` e são só decoração, porque a `play_area` já bloqueia.
-  - **Muros:** núcleo com a textura "stone" e fiadas de pedras chatas
+  - **Muros:** núcleo com a textura "granite" e fiadas de pedras chatas
     (`Pebble_Square_*`).
   - **Penedos:** `Rock_Medium_*`, encostados uns aos outros.
   - Cada troço começa e acaba em penedos e entra 3 m na falésia. Nunca

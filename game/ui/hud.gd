@@ -1324,6 +1324,8 @@ func _mission_progress(run: IslandRun) -> String:
 					return "%d/%d s" % [int(run.defend_time), int(run.hold_time())]
 				&"rescue":
 					return "searching"
+				&"hold_sequence":
+					return "%d/%d" % [run.holds_done(), run.hold_points.size()]
 				_:
 					return "%d/%d" % [_generators_done(run), GameData.GENERATOR_COUNT]
 		IslandRun.Objective.BOSS:
@@ -1659,6 +1661,7 @@ func _update_weapon_slots(run: IslandRun) -> void:
 func _update_objective(run: IslandRun, island_text: String) -> void:
 	var detail: String = island_text.to_upper() if island_text != "" else "HALVARD OPERATIONS"
 	var pips: int = 0
+	var pips_done: int = _generators_done(run)
 	match run.objective:
 		IslandRun.Objective.GENERATORS:
 			match run.mission:
@@ -1670,6 +1673,12 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 					detail += " · %d OF %d s" % [int(run.defend_time), int(run.hold_time())]
 				&"rescue":
 					_objective.text = "LOCATE THE SURVIVOR"
+				&"hold_sequence":
+					var n: int = run.hold_points.size()
+					_objective.text = "HOLD POINT %d / %d" % [mini(run.hold_index + 1, n), n]
+					detail += " · %d OF %d s" % [int(run.hold_progress), int(IslandRun.hold_seconds())]
+					pips = n
+					pips_done = run.holds_done()
 				_:
 					_objective.text = "ACTIVATE THE GENERATORS"
 					detail += " · %d OF %d ONLINE" % [_generators_done(run), GameData.GENERATOR_COUNT]
@@ -1692,7 +1701,7 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 		IslandRun.Objective.LOST:
 			_objective.text = "CONTRACT TERMINATED"
 	_objective_detail.text = detail
-	_objective_pips.set_state(pips, _generators_done(run), UiTheme.INFO)
+	_objective_pips.set_state(pips, pips_done, UiTheme.INFO)
 	_objective_pips.visible = pips > 0
 	_survivor_row.visible = run.mission == &"rescue" and run.survivor_found and not run.survivor_lost and not run.is_over()
 	_survivor_text.text = "SURVIVOR %d" % ceili(run.survivor_hp)
@@ -1806,6 +1815,9 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"holdout":
 		goal = run.site
 		goal_name = "Courtyard"
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"hold_sequence":
+		goal = run.site
+		goal_name = "Point %d" % (run.hold_index + 1)
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"rescue":
 		goal = run.survivor_pos
 		goal_name = "Survivor"

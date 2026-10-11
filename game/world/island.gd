@@ -90,6 +90,10 @@ var _boat: MeshInstance3D
 ## Expedition parts: a post with a ring at the Exit (the path to the next part).
 var _exit_post: MeshInstance3D
 var _defend_ring: MeshInstance3D
+## Hold Sequence: the ring and the beacon of the active point (they move on
+## to the next point once one is held).
+var _hold_ring: MeshInstance3D
+var _hold_beacon: MeshInstance3D
 var _survivor: MeshInstance3D
 var _caches: Array[MeshInstance3D] = []
 var _buildings: Array[MeshInstance3D] = []
@@ -247,6 +251,18 @@ func _build_world() -> void:
 		mast.position = _on_ground(run.site) + Vector3(0, 3, 0)
 		mast.material_override = _mat(Color(0.6, 0.65, 0.7))
 		add_child(mast)
+	_hold_ring = _ring(run.site, IslandRun.hold_radius(), Color(0.3, 0.8, 1.0))
+	_hold_ring.visible = run.mission == &"hold_sequence"
+	_hold_beacon = MeshInstance3D.new()
+	var bm := CylinderMesh.new()
+	bm.top_radius = 0.1
+	bm.bottom_radius = 0.3
+	bm.height = 4.0
+	_hold_beacon.mesh = bm
+	_hold_beacon.material_override = _mat(Color(0.3, 0.8, 1.0))
+	_hold_beacon.position = _on_ground(run.site) + Vector3(0, 2, 0)
+	_hold_beacon.visible = run.mission == &"hold_sequence"
+	add_child(_hold_beacon)
 	_survivor = MeshInstance3D.new()
 	_survivor.mesh = _capsule(0.35, 1.7)
 	_survivor.material_override = _mat(Color(1.0, 0.55, 0.1))
@@ -1681,6 +1697,18 @@ func _draw_mission() -> void:
 		var inside: bool = run.player_pos.distance_to(run.site) <= GameData.DEFEND_RADIUS
 		m2.albedo_color = Color(0.3, 1.0, 0.5) if inside else Color(0.3, 0.8, 1.0)
 		_defend_ring.visible = run.objective == IslandRun.Objective.GENERATORS
+	if run.mission == &"hold_sequence":
+		var active: bool = run.objective == IslandRun.Objective.GENERATORS
+		_hold_ring.visible = active
+		_hold_beacon.visible = active
+		if active:
+			_hold_ring.position = _on_ground(run.site) + Vector3(0, 0.05, 0)
+			_hold_beacon.position = _on_ground(run.site) + Vector3(0, 2, 0)
+			var inside: bool = run.player_pos.distance_to(run.site) <= IslandRun.hold_radius()
+			var hm: StandardMaterial3D = _hold_ring.material_override
+			hm.albedo_color = Color(0.3, 1.0, 0.5) if inside else Color(0.3, 0.8, 1.0)
+			var bmat: StandardMaterial3D = _hold_beacon.material_override
+			bmat.albedo_color = Color(0.3, 0.8, 1.0).lerp(Color(0.3, 1.0, 0.5), run.hold_progress / IslandRun.hold_seconds())
 	for g in _generators.size():
 		var p: float = run.generator_progress[g] / GameData.GENERATOR_HOLD_SECONDS
 		var m: StandardMaterial3D = _generators[g].material_override

@@ -23,6 +23,11 @@ Director Hale: The fort's yours until the boat gets there. Hold the courtyard, t
 Director Hale: Rescue boat is on its way. Keep the courtyard clear. And the pier. Especially the pier. [ID:RADIO_LAND_HOLDOUT_2]
 => END
 
+~ land_hold_sequence
+Director Hale: Survey points are marked, in order. Hold each one until the readings stick, then move. [ID:RADIO_LAND_HOLD_SEQUENCE_1]
+Director Hale: One point at a time, contractor. The horde in between is not on the schedule. [ID:RADIO_LAND_HOLD_SEQUENCE_2]
+=> END
+
 ~ land_boss
 Director Hale: Thermal readings on the volcano are... large. Do the job, then leave before it notices. [ID:RADIO_LAND_BOSS_1]
 => END
@@ -31,6 +36,16 @@ Director Hale: Thermal readings on the volcano are... large. Do the job, then le
 Director Hale: Generator online. Accounting thanks you. [ID:RADIO_GENERATOR_1]
 Director Hale: That's one. The other two won't switch themselves on. [ID:RADIO_GENERATOR_2]
 Director Hale: Power restored. Try not to stand in it. [ID:RADIO_GENERATOR_3]
+=> END
+
+~ hold_point
+Director Hale: Point secured. Next one's marked. Don't stop to admire it. [ID:RADIO_HOLD_POINT_1]
+Director Hale: Readings logged. Move to the next point before they log you. [ID:RADIO_HOLD_POINT_2]
+=> END
+
+~ hold_done
+Director Hale: All points held. Survey complete. Get to the boat. [ID:RADIO_HOLD_DONE_1]
+Director Hale: That's the last point. Now the hard part: leaving. [ID:RADIO_HOLD_DONE_2]
 => END
 
 ~ objective_done

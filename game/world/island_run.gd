@@ -137,6 +137,15 @@ var exit_label: String = ""
 ## Only the minimap uses it: the grid already blocks the cells outside.
 var play_area: PackedVector2Array = PackedVector2Array()
 var _defend_peak_cd: float = 0.0
+## Hold Sequence: the points to hold, in order (the map's HoldPoint_*
+## markers, else picked per seed), the one being held (== size: all held),
+## seconds spent in it (leaving pauses it) and whether its spike fired.
+var hold_points: Array[Vector3] = []
+var hold_index: int = 0
+var hold_progress: float = 0.0
+var hold_started: bool = false
+## The seed this island was built with (fallback hold points).
+var run_seed: int = 7
 var survivor_pos: Vector3 = Vector3.ZERO
 var survivor_hp: float = GameData.SURVIVOR_HP
 var survivor_found: bool = false
@@ -194,6 +203,7 @@ var _dead: Dictionary = {}  ## enemy index -> true, removed at the end of step()
 ## generating one from the seed.
 func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMap = null) -> void:
 	rng.seed = rng_seed
+	run_seed = rng_seed
 	card_offers = CardOffers.new(rng_seed)
 	power_ups = PowerUps.new(rng_seed)
 	_element_rng.seed = rng_seed ^ 0x454c454d
@@ -557,6 +567,35 @@ func set_mission(id: StringName) -> void:
 	else:
 		site = map.exit if has_exit() else map.boat
 	survivor_pos = site
+	hold_points.clear()
+	hold_index = 0
+	hold_progress = 0.0
+	hold_started = false
+	if mission == &"hold_sequence":
+		hold_points = map.hold_points.duplicate()
+		if hold_points.is_empty():
+			hold_points = IslandMap.pick_hold_points(map, hold_count_wanted(), run_seed, hold_radius())
+		if hold_points.is_empty():
+			hold_points.append(site)  # a map too small to pick from: one point
+		site = hold_points[0]
+
+
+## Hold Sequence numbers, from the mission's data (hold_sequence.tres).
+static func hold_count_wanted() -> int:
+	return int(GameData.mission_value(&"hold_sequence", "points", 3.0))
+
+
+static func hold_seconds() -> float:
+	return GameData.mission_value(&"hold_sequence", "seconds", 20.0)
+
+
+static func hold_radius() -> float:
+	return GameData.mission_value(&"hold_sequence", "radius", 5.0)
+
+
+## Points held so far (Hold Sequence).
+func holds_done() -> int:
+	return mini(hold_index, hold_points.size())
 
 
 ## Expedition parts: true when the map has an Exit marker (the way on to the
@@ -614,6 +653,8 @@ func _main_task_done() -> bool:
 			return defend_time >= hold_time()
 		&"rescue":
 			return survivor_found or survivor_lost
+		&"hold_sequence":
+			return hold_index >= hold_points.size()
 	for p in generator_progress:
 		if p < GameData.GENERATOR_HOLD_SECONDS:
 			return false
@@ -689,6 +730,8 @@ func _intel_base() -> int:
 			base += 45 if defend_time >= hold_time() else int(defend_time / hold_time() * 30.0)
 		&"rescue":
 			base += 40 if survivor_found and not survivor_lost and extracted else 0
+		&"hold_sequence":
+			base += holds_done() * 15
 		_:
 			base += done * 15
 	base += 20 if boss_killed else 0
@@ -1739,6 +1782,8 @@ func _update_mission(dt: float) -> void:
 					_update_defend(dt)
 				&"rescue":
 					_update_rescue(dt)
+				&"hold_sequence":
+					_update_hold_sequence(dt)
 				_:
 					_update_generators(dt)
 			if _main_task_done() and has_boss:
@@ -1749,7 +1794,9 @@ func _update_mission(dt: float) -> void:
 			elif _main_task_done():
 				_start_extraction()
 				director.trigger_peak(25.0)
-				if mission != &"rescue":
+				if mission == &"hold_sequence" and not has_exit():
+					radio.append(&"hold_done")
+				elif mission != &"rescue":
 					radio.append(&"objective_done_on_foot" if has_exit() else &"objective_done")
 		Objective.BOSS:
 			_update_rescue(dt)
@@ -1807,6 +1854,33 @@ func _update_defend(dt: float) -> void:
 		if _defend_peak_cd <= 0.0:
 			_defend_peak_cd = 25.0
 			director.trigger_peak(18.0)
+
+
+## Hold Sequence: stand in the active point for hold_seconds(); leaving
+## pauses it. Each point's first step in calls a spike of the horde; once
+## held, the next point becomes the site (the extraction waits for all).
+func _update_hold_sequence(dt: float) -> void:
+	if hold_index >= hold_points.size():
+		return
+	if player_pos.distance_to(hold_points[hold_index]) > hold_radius():
+		return
+	if not hold_started:
+		hold_started = true
+		director.trigger_peak(hold_seconds() + 10.0)
+		messages.append("Point %d of %d: hold it!" % [hold_index + 1, hold_points.size()])
+	hold_progress += dt
+	if hold_progress < hold_seconds():
+		return
+	hold_index += 1
+	hold_progress = 0.0
+	hold_started = false
+	for w in weapons.size():
+		if weapons[w].max_ammo > 0:
+			ammo[w] = mini(max_ammo(w), ammo[w] + max_ammo(w) / 3)
+	if hold_index < hold_points.size():
+		site = hold_points[hold_index]
+		messages.append("Point secured. Move to point %d!" % (hold_index + 1))
+		radio.append(&"hold_point")
 
 
 ## The survivor waits at the site, then follows the player and can be hurt.
@@ -2105,6 +2179,9 @@ func objective_text() -> String:
 				return "Hold the fort courtyard (%d / %d s)" % [int(defend_time), int(hold_time())]
 			if mission == &"rescue":
 				return "Find the survivor"
+			if mission == &"hold_sequence":
+				return "Hold point %d / %d (%d / %d s)" % [mini(hold_index + 1, hold_points.size()), hold_points.size(),
+					int(hold_progress), int(hold_seconds())]
 			var done: int = 0
 			for p in generator_progress:
 				if p >= GameData.GENERATOR_HOLD_SECONDS:

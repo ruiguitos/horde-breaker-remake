@@ -221,7 +221,7 @@ func _test_markers() -> void:
 
 func _test_holdout() -> void:
 	_check(GameData.MISSIONS.has(&"holdout") and GameData.MISSIONS[&"holdout"]["name"] == "Holdout"
-		and not GameData.ROUTE_MISSIONS.has(&"holdout") and GameData.ROUTE_MISSIONS.size() == 3,
+		and not GameData.ROUTE_MISSIONS.has(&"holdout") and GameData.ROUTE_MISSIONS.size() == 4,
 		"holdout mission exists and is not offered on boat routes")
 	var ctx := RunContext.new(3)
 	ctx.island_index = RunContext.ISLAND_COUNT - 1  # the last island
@@ -328,23 +328,30 @@ func _test_spawns_in_play_area() -> void:
 	_check(outside == 0, "boss summons stay inside (%d summoned, %d outside)" % [run.horde.count - before, outside])
 
 
-## The real fort part (Berlenga, part 4) with the play area set in code.
+## The real fort part (Berlenga, part 4: Expeditions.ALL), with its own
+## play area (FORT only if the scene has none). Spawns are sampled at the
+## part's start, its courtyard (DefendZone) and its pier (Boat).
 func _test_berlenga_fort() -> void:
-	var path: String = HandmadeIsland.ISLANDS_DIR + "beach_berlenga.scn"
+	var path: String = String(Expeditions.ALL[&"berlenga"][3]["scene"])
+	_check(ResourceLoader.exists(path), "Berlenga part 4 scene exists (%s)" % path)
 	if not ResourceLoader.exists(path):
-		print("TEST: (skipped) no Berlenga scene")
 		return
 	var island: HandmadeIsland = (load(path) as PackedScene).instantiate()
 	root.add_child(island)
-	var poly := PackedVector2Array()
-	for v: Array in FORT:
-		poly.append(Vector2(v[0], v[1]))
-	island.play_area = poly
+	var poly: PackedVector2Array = island.play_area
+	if poly.is_empty():
+		for v: Array in FORT:
+			poly.append(Vector2(v[0], v[1]))
+		island.play_area = poly
 	island.horde_radius = 0  # parts are Hashima-sized: whole-part flow field
 	var map: IslandMap = island.build_map([])
 	var bad: int = 0
 	var report := PackedStringArray()
-	for s: Vector2 in [Vector2(523, 822), Vector2(610, 1019), Vector2(637, 1045)]:
+	var samples: Array[Vector2] = []
+	for q: Vector3 in [map.player_start, map.defend_zone, map.boat]:
+		if q.x >= 0.0:
+			samples.append(Vector2(floorf(q.x), floorf(q.z)))
+	for s: Vector2 in samples:
 		var p: Vector3 = _free_near(map.field, Vector3(s.x + 0.5, 0, s.y + 0.5))
 		var run := IslandRun.new(3, &"beach", map)
 		run.player_pos = p

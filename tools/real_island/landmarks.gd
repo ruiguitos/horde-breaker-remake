@@ -28,12 +28,19 @@ extends RefCounted
 ## Decor/, which never blocks: a lintel in Buildings/ would close the gate.
 
 const PLASTER_METRES: float = 2.5
-const STONE_METRES: float = 1.8
 const WHITEWASH := Color(1.85, 1.85, 1.8)  ## x the mid-grey plaster picture (see village_houses.gd)
-const STONE_TINT := Color(1.75, 1.72, 1.66)  ## x the dark brown ashlar picture: warm grey granite
-const QUOIN_TINT := Color(2.2, 2.17, 2.1)  ## lighter dressed stone: quoins, cordon, surrounds
+## Masonry is the "granite" picture (stone_wall_04, rough grey blocks), cooled
+## a little: the old "stone" picture (stone_wall_02) read warm and smooth.
+const STONE_TINT := Color(1.25, 1.32, 1.4)  ## x the granite picture: cool light grey
+const QUOIN_TINT := Color(1.5, 1.6, 1.7)  ## lighter dressed stone: quoins, cordon, surrounds
+const GRANITE_METRES: float = 2.0  ## one granite picture (stones about 0.4 m)
+## Ironwork is the "metal" picture (rusty_metal_04, painted and pitted),
+## painted over: the target colour over the picture's mean colour.
+const METAL_METRES: float = 1.0
 const DOME_RED := Color(0.6, 0.11, 0.08)
+const DOME_TINT := Color(1.75, 0.45, 0.4)
 const IRON := Color(0.13, 0.14, 0.15)
+const IRON_TINT := Color(0.4, 0.55, 0.75)
 const SLOT := Color(0.06, 0.065, 0.07)  ## window and door openings
 
 # Lighthouse. Plan sizes in metres, heights as fractions of the OSM height.
@@ -133,9 +140,9 @@ func lighthouse(p: Vector2, k: int, height: float) -> bool:
 	var body: Dictionary = {}
 	var detail: Dictionary = {}
 	var plaster: Material = _role("plaster", PLASTER_METRES, WHITEWASH, Color(0.95, 0.95, 0.92))
-	var stone: Material = _role("stone", STONE_METRES, QUOIN_TINT, Color(0.7, 0.68, 0.63))
-	var red: Material = _plain(DOME_RED, 0.45)
-	var iron: Material = _plain(IRON, 0.5)
+	var stone: Material = _role("granite", GRANITE_METRES, QUOIN_TINT, Color(0.7, 0.68, 0.63))
+	var red: Material = _role("metal", METAL_METRES, DOME_TINT, DOME_RED)
+	var iron: Material = _role("metal", METAL_METRES, IRON_TINT, IRON)
 
 	# Shaft: four faces leaning in, its top closed (the grid reads that cap).
 	var bottom: PackedVector3Array = _square(p, axis, TOWER_HALF_BASE, base)
@@ -348,8 +355,8 @@ func fort(islet: Vector2) -> void:
 
 	var walls: Dictionary = {}
 	var detail: Dictionary = {}
-	var stone: Material = _role("stone", STONE_METRES, STONE_TINT, Color(0.6, 0.58, 0.54))
-	var dressed: Material = _role("stone", STONE_METRES, QUOIN_TINT, Color(0.7, 0.68, 0.63))
+	var stone: Material = _role("granite", GRANITE_METRES, STONE_TINT, Color(0.6, 0.58, 0.54))
+	var dressed: Material = _role("granite", GRANITE_METRES, QUOIN_TINT, Color(0.7, 0.68, 0.63))
 	var plaster: Material = _role("plaster", PLASTER_METRES, WHITEWASH, Color(0.95, 0.95, 0.92))
 	var slot: Material = _plain(SLOT, 0.5)
 	var front_edge: int = -1
@@ -538,7 +545,7 @@ func _parapet(s: Surf, lines: Array[PackedVector2Array], i: int, j: int, f0: Arr
 
 ## A round stone sentry box corbelled out over a corner, with slits and a dome.
 func _guarita(detail: Dictionary, p: Vector2, walk: float, out: Vector2) -> void:
-	var s: Surf = _surf(detail, _role("stone", STONE_METRES, QUOIN_TINT, Color(0.7, 0.68, 0.63)))
+	var s: Surf = _surf(detail, _role("granite", GRANITE_METRES, QUOIN_TINT, Color(0.7, 0.68, 0.63)))
 	var c := Vector3(p.x, 0, p.y)
 	_loft(s, _ngon(c, 0.2, 12, walk - 1.3, 0.0), _ngon(c, 0.85, 12, walk, 0.0), c)
 	_loft(s, _ngon(c, 0.8, 12, walk, 0.0), _ngon(c, 0.8, 12, walk + 2.1, 0.0), c)

@@ -22,6 +22,7 @@ const ADVICE: Dictionary = {
 	&"activate": "Generators need you standing next to them. Clear a space first, then hold.",
 	&"defend": "The uplink zone is a circle. Stay inside it. Use the breaker to push them out, not to leave.",
 	&"rescue": "The surveyor follows you, slowly, and they don't heal. Take the short way back.",
+	&"hold_sequence": "The points come one at a time. Leave a point and its clock stops. Clear a space, then hold.",
 	&"holdout": "Hold the courtyard until I can send the boat. When it comes, run for the pier. It won't wait.",
 }
 

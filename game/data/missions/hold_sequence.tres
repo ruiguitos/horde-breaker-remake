@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://uj1nc8fvgrvo"]
+
+[ext_resource type="Script" path="res://game/data/resources/mission_data.gd" id="1_hseq"]
+
+[resource]
+script = ExtResource("1_hseq")
+display_name = "Hold Sequence"
+text = "Hold three points in order, then get out."
+order = 4
+points = 3
+seconds_per_point = 20.0
+radius = 5.0

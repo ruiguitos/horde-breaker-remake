@@ -28,6 +28,9 @@ var rocks: Array[Vector2i] = []
 var exit := Vector3(-1, 0, -1)
 var rescue_target := Vector3(-1, 0, -1)
 var defend_zone := Vector3(-1, 0, -1)
+## Hold Sequence points (HoldPoint_* markers), in the order to hold them.
+## Empty = the run picks them (pick_hold_points).
+var hold_points: Array[Vector3] = []
 ## Optional supply caches (detours with a reward).
 var caches: Array[Vector3] = []
 ## Biome id: beach, town, jungle, port or volcano (see GameData.BIOMES).
@@ -140,6 +143,89 @@ static func build(rng_seed: int = 7, biome: StringName = &"beach") -> IslandMap:
 	if biome == &"volcano":
 		_lava_pools(map, rng, keep_free)
 	return map
+
+
+## Hold Sequence on a map without HoldPoint_* markers: up to `count` spots
+## the player can walk to from the start, with `radius` metres of open
+## ground around them, at least HOLD_MIN_FROM_BOAT from the boat and well
+## apart from each other (spacing relaxes only when the map is too small).
+## Same map and seed, same points. Ordered by walking distance from the
+## start, so the sequence leads across the island, through the horde.
+const HOLD_MIN_FROM_BOAT: float = 30.0
+const HOLD_SPACING: float = 40.0
+const HOLD_MIN_SPACING: float = 12.0
+## Walking distance searched from the start (m): bounds the search on big
+## hand-made islands (a 1.5 km Berlenga has two million cells).
+const HOLD_MAX_WALK: int = 240
+
+static func pick_hold_points(map: IslandMap, count: int, rng_seed: int, radius: float = 5.0) -> Array[Vector3]:
+	var out: Array[Vector3] = []
+	var f: FlowField = map.field
+	var w: int = f.width
+	var start: Vector2i = f.world_to_cell(map.player_start)
+	if count <= 0 or f.is_blocked(start.x, start.y):
+		return out
+	# Breadth-first walk (4 neighbours: what it reaches, the player reaches).
+	var dist := {}  # cell index -> metres walked
+	dist[start.y * w + start.x] = 0
+	var queue: Array[Vector2i] = [start]
+	var head: int = 0
+	while head < queue.size():
+		var c: Vector2i = queue[head]
+		head += 1
+		var d: int = dist[c.y * w + c.x]
+		if d >= HOLD_MAX_WALK:
+			continue
+		for n: Vector2i in [Vector2i(c.x + 1, c.y), Vector2i(c.x - 1, c.y), Vector2i(c.x, c.y + 1), Vector2i(c.x, c.y - 1)]:
+			if f.is_blocked(n.x, n.y) or dist.has(n.y * w + n.x):
+				continue
+			dist[n.y * w + n.x] = d + 1
+			queue.append(n)
+	# Candidates: every third cell, open around, away from the boat and lava.
+	var open_r: int = ceili(radius * 0.5)
+	var candidates: Array[Vector3] = []
+	for c: Vector2i in queue:
+		if c.x % 3 != 0 or c.y % 3 != 0:
+			continue
+		var p := Vector3(c.x + 0.5, 0, c.y + 0.5)
+		if Vector2(p.x - map.boat.x, p.z - map.boat.z).length() < HOLD_MIN_FROM_BOAT:
+			continue
+		if not _free_around(f, c, open_r):
+			continue
+		var in_lava: bool = false
+		for k in map.lava.size():
+			if Vector2(p.x - map.lava[k].x, p.z - map.lava[k].z).length() < map.lava_radius[k] + radius + 2.0:
+				in_lava = true
+				break
+		if not in_lava:
+			candidates.append(p)
+	# Deterministic shuffle, then greedy picks with the widest spacing that fits.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = rng_seed ^ 0x484f4c44
+	for i in range(candidates.size() - 1, 0, -1):
+		var j: int = rng.randi_range(0, i)
+		var t: Vector3 = candidates[i]
+		candidates[i] = candidates[j]
+		candidates[j] = t
+	var spacing: float = HOLD_SPACING
+	while true:
+		out.clear()
+		for p in candidates:
+			var ok: bool = true
+			for q in out:
+				if Vector2(p.x - q.x, p.z - q.z).length() < spacing:
+					ok = false
+					break
+			if ok:
+				out.append(p)
+				if out.size() == count:
+					break
+		if out.size() == count or spacing <= HOLD_MIN_SPACING:
+			break
+		spacing = maxf(HOLD_MIN_SPACING, spacing * 0.75)
+	out.sort_custom(func(a: Vector3, b: Vector3) -> bool:
+		return int(dist[int(a.z) * w + int(a.x)]) < int(dist[int(b.z) * w + int(b.x)]))
+	return out
 
 
 static func _blocked_near(f: FlowField, c: Vector2i, r: int) -> bool:

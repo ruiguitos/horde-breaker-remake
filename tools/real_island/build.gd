@@ -41,6 +41,24 @@ const PATH_SLOPE: float = 0.55
 const SHOULDER: float = 2.0  ## metres beside a path carved with it
 const BLEND: float = 4.0  ## metres over which a carved path meets the natural ground
 const LIGHTHOUSE_HEIGHT: float = 22.0  ## a lighthouse mapped as a point, without a height
+## Tints of the construction textures (fetch_data.py roles), as the target
+## colour over the picture's mean colour: the low-poly palette stays, the
+## picture adds grain, stains and relief. Metres per picture follow the
+## real size Poly Haven gives for each scan.
+const CONCRETE_M: float = 3.0  ## dirty_concrete: 3 x 3 m
+const CONCRETE_TINT := Color(0.95, 0.97, 1.0)  ## weathered grey (piers, galleries, steps)
+const SLAB_TINT := Color(0.8, 0.82, 0.86)  ## Hashima's flat roofs: darker, rain-stained
+const WHITE_CONCRETE := Color(1.75, 1.8, 1.9)  ## painted concrete (Hashima's lighthouse)
+const WOOD_M: float = 2.0  ## weathered_planks: 2 x 2 m
+const WOOD_TINT := Color(1.25, 1.25, 1.25)  ## grey, sun-bleached planks
+const TORII_RED := Color(1.75, 0.75, 0.65)  ## the planks painted red
+const METAL_M: float = 2.0  ## rusty_metal_04: 2 x 2 m
+const METAL_TINT := Color(0.9, 0.9, 0.9)  ## rusty steel (conveyor)
+const IRON_TINT := Color(0.45, 0.6, 0.8)  ## dark painted iron
+const RED_METAL := Color(1.75, 0.45, 0.4)  ## red painted iron (lighthouse caps)
+const SHEET_M: float = 2.0  ## rusty_corrugated_iron: 2 x 2 m
+const GRANITE_M: float = 2.0  ## stone_wall_04 (1.7 m scan): stones about 0.4 m
+const GRANITE_TINT := Color(1.25, 1.32, 1.4)  ## cool light grey granite, as the fort's
 const WIDTHS: Dictionary = {"footway": 2.0, "path": 1.6, "steps": 2.2, "track": 3.0, "service": 4.0, "pedestrian": 3.0}
 
 ## What differs between places. Scatter rows: [Quaternius model, count,
@@ -93,10 +111,13 @@ const PLACES: Dictionary = {
 				"polygon": [Vector2(0, 0), Vector2(650, 0), Vector2(650, 400), Vector2(800, 540), Vector2(865, 630), Vector2(880, 800), Vector2(523, 800), Vector2(0, 800)],
 				"exit": [Vector2(521, 800), 233892909],
 				"generators": [Vector2(710, 633), Vector2(675, 674), Vector2(745, 665)], "caches": [Vector2(621, 642)]},
-			{"mission": &"defend", "horde_radius": -1,
+			# Hold Sequence: three lookouts held in order, out from the start
+			# and back to the Exit beside it (the last one is the old
+			# DefendZone spot).
+			{"mission": &"hold_sequence", "horde_radius": -1,
 				"polygon": [Vector2(0, 800), Vector2(523, 800), Vector2(523, 850), Vector2(500, 880), Vector2(500, 1466), Vector2(0, 1466)],
 				"exit": [Vector2(523, 822), 38298331],
-				"defend": Vector2(431, 983), "caches": [Vector2(301, 1052)]},
+				"holds": [Vector2(447, 837), Vector2(408, 918), Vector2(431, 983)], "caches": [Vector2(301, 1052)]},
 			{"mission": &"holdout", "horde_radius": -1,
 				"polygon": [Vector2(523, 800), Vector2(880, 800), Vector2(880, 1466), Vector2(500, 1466), Vector2(500, 880), Vector2(523, 850)],
 				"exit": "pier",
@@ -1223,10 +1244,13 @@ func _mat(c: Color, rough: float = 0.9) -> StandardMaterial3D:
 ## (plaster, roof, stone...): colour, normal and roughness maps, tinted,
 ## one picture every `metres`. Projected from the sides in world space
 ## (triplanar) unless `uv` is true: then the mesh's own UVs, in metres
-## (UV 1 = 1 m). Null when the place has no texture with that role.
-func _role_material(role: String, metres: float, tint: Color = Color.WHITE, uv: bool = false) -> StandardMaterial3D:
+## (UV 1 = 1 m). `local` projects in the object's own space instead of the
+## world's: planks and blocks then follow a turned box (bridge decks, pier
+## blocks, posts), and the box must not be scaled. Null when the place has
+## no texture with that role. Cached: one material per combination.
+func _role_material(role: String, metres: float, tint: Color = Color.WHITE, uv: bool = false, local: bool = false) -> StandardMaterial3D:
 	assert(metres > 0.0)
-	var key: String = "mat/%s/%s/%s/%s" % [role, metres, tint, uv]
+	var key: String = "mat/%s/%s/%s/%s/%s" % [role, metres, tint, uv, local]
 	if _materials.has(key):
 		return _materials[key]
 	var m: StandardMaterial3D = null
@@ -1243,10 +1267,22 @@ func _role_material(role: String, metres: float, tint: Color = Color.WHITE, uv: 
 			m.uv1_scale = Vector3.ONE / metres
 		else:
 			m.uv1_triplanar = true
-			m.uv1_world_triplanar = true
+			m.uv1_world_triplanar = not local
 			m.uv1_scale = Vector3.ONE / metres
 	_materials[key] = m
 	return m
+
+
+## _role_material, or a plain `fallback` colour when the place has no
+## texture with that role (cached too, so boxes share one material).
+func _role_or(role: String, metres: float, tint: Color, fallback: Color, local: bool = false) -> StandardMaterial3D:
+	var m: StandardMaterial3D = _role_material(role, metres, tint, false, local)
+	if m != null:
+		return m
+	var key: String = "plain/%s" % fallback
+	if not _materials.has(key):
+		_materials[key] = _mat(fallback, 0.8)
+	return _materials[key]
 
 
 ## One map of a texture as a compressed resource in TEX, made once per build.
@@ -1301,7 +1337,7 @@ func _place_paths() -> void:
 		var inst := MeshInstance3D.new()
 		inst.name = item[1]
 		inst.mesh = mesh
-		inst.material_override = _mat(item[2])
+		inst.material_override = _role_or("concrete", CONCRETE_M, CONCRETE_TINT, item[2])
 		_add(inst, "Decor")
 
 
@@ -1326,15 +1362,16 @@ func _ribbon(st: SurfaceTool, pts: PackedVector2Array, w: float, lift: float) ->
 		prev = row
 
 
-## Stone bridges: one deck per straight span (HandmadeIsland walks the grid
+## Bridges: one deck per straight span (HandmadeIsland walks the grid
 ## over Bridges/ at the deck's top), from the path height at one end to the
-## other, with low parapets as decoration.
+## other, with low parapets as decoration. The OSM surface picks the
+## texture: wood planks, concrete, or granite (pebblestone and the rest).
 func _place_bridges() -> void:
-	var deck_mat: StandardMaterial3D = _mat(Color(0.55, 0.52, 0.47))
 	var count: int = 0
 	for path in _paths:
 		if not path[3]:
 			continue
+		var deck_mat: StandardMaterial3D = _bridge_material(String((path[4] as Dictionary).get("surface", "")))
 		var pts: PackedVector2Array = path[0]
 		var w: float = path[1] + 0.6
 		for i in pts.size() - 1:
@@ -1370,6 +1407,18 @@ func _place_bridges() -> void:
 				rail.owner = _root
 
 
+## A bridge deck's material from its OSM surface. Projected in the deck's
+## own space, so planks and stones follow a turned deck.
+func _bridge_material(surface: String) -> StandardMaterial3D:
+	var plain := Color(0.55, 0.52, 0.47)
+	if surface == "wood":
+		return _role_or("wood", WOOD_M, WOOD_TINT, plain, true)
+	if surface in ["concrete", "paved", "asphalt"]:
+		return _role_or("concrete", CONCRETE_M, CONCRETE_TINT, plain, true)
+	var m: StandardMaterial3D = _role_material("granite", GRANITE_M, GRANITE_TINT, false, true)
+	return m if m != null else _role_or("concrete", CONCRETE_M, CONCRETE_TINT, plain, true)
+
+
 ## Buildings from their real footprints and heights, one node each (the grid
 ## blocks their footprint): walls from below the lowest ground up to the
 ## eaves, and the place's roof: "hip" (tiled, a fan to the centre) or "flat"
@@ -1382,7 +1431,17 @@ func _place_buildings() -> void:
 		wall_mat.albedo_texture = facade
 		wall_mat.uv1_triplanar = true
 		wall_mat.uv1_scale = Vector3.ONE / 3.0  # one picture (a floor with its window) every 3 m
+		for asset: String in meta["textures"]:
+			if meta["textures"][asset] == "facade":  # the scan's relief: cracks, formwork, stains
+				wall_mat.normal_enabled = true
+				wall_mat.normal_texture = _cached_texture(asset, "nor_gl.jpg")
+				wall_mat.roughness = 1.0
+				wall_mat.roughness_texture = _cached_texture(asset, "rough.jpg")
+				wall_mat.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_GREEN
 	var roof_mat: StandardMaterial3D = _mat(P["roof_color"], 0.85)
+	# Hashima: concrete slabs, and corrugated iron on the gabled pit 4.
+	var slab_mat: StandardMaterial3D = _role_or("concrete", CONCRETE_M, SLAB_TINT, P["roof_color"])
+	var sheet_mat: StandardMaterial3D = _role_or("sheet", SHEET_M, Color.WHITE, P["roof_color"])
 	var balconies := SurfaceTool.new()
 	balconies.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for k in _houses.size():
@@ -1455,7 +1514,7 @@ func _place_buildings() -> void:
 		var mesh: ArrayMesh = walls.commit()
 		roof.commit(mesh)
 		mesh.surface_set_material(0, wall_mat)
-		mesh.surface_set_material(1, roof_mat)
+		mesh.surface_set_material(1, slab_mat if flat else (sheet_mat if shape in ["gabled", "pitched"] else roof_mat))
 		var inst := MeshInstance3D.new()
 		inst.name = "House_%d" % k
 		inst.mesh = mesh
@@ -1472,7 +1531,7 @@ func _place_buildings() -> void:
 		var inst := MeshInstance3D.new()
 		inst.name = "Balconies"
 		inst.mesh = gallery
-		inst.material_override = _mat(Color(0.62, 0.61, 0.58), 0.9)
+		inst.material_override = _role_or("concrete", CONCRETE_M, CONCRETE_TINT, Color(0.62, 0.61, 0.58))
 		_add(inst, "Decor")
 	for name: String in P.get("special", {}):
 		if P["special"][name] == "shrine" and _named.has(name):
@@ -1488,14 +1547,15 @@ func _place_buildings() -> void:
 
 
 ## A box mesh instance (size, centre in island space, colour, turned `yaw`
-## around Y) added to `group`.
-func _box(group: String, name: String, size: Vector3, centre: Vector3, color: Color, yaw: float = 0.0) -> MeshInstance3D:
+## around Y) added to `group`; `mat` (a texture material) replaces the
+## plain colour.
+func _box(group: String, name: String, size: Vector3, centre: Vector3, color: Color, yaw: float = 0.0, mat: Material = null) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	mi.name = name
 	var bm := BoxMesh.new()
 	bm.size = size
 	mi.mesh = bm
-	mi.material_override = _mat(color, 0.8)
+	mi.material_override = mat if mat != null else _mat(color, 0.8)
 	mi.transform = Transform3D(Basis(Vector3.UP, yaw), centre)
 	_add(mi, group)
 	return mi
@@ -1528,8 +1588,10 @@ func _shrine(p: Vector2) -> void:
 	var fwd := Vector3(sin(yaw), 0, cos(yaw))
 	var side := Vector3(cos(yaw), 0, -sin(yaw))
 	var c := Vector3(p.x, y, p.y)
-	_box("Buildings", "ShrineBase", Vector3(4.5, 0.8, 5.5), c + Vector3(0, 0.1, 0), Color(0.5, 0.49, 0.46), yaw)
-	var hall := _box("Buildings", "ShrineHall", Vector3(3.2, 2.6, 4.0), c + Vector3(0, 1.8, 0), Color(0.36, 0.24, 0.17), yaw)
+	var stone_c := Color(0.5, 0.49, 0.46)
+	_box("Buildings", "ShrineBase", Vector3(4.5, 0.8, 5.5), c + Vector3(0, 0.1, 0), stone_c, yaw, _role_or("concrete", CONCRETE_M, Color(0.95, 0.96, 0.98), stone_c, true))
+	var wood_c := Color(0.36, 0.24, 0.17)
+	var hall := _box("Buildings", "ShrineHall", Vector3(3.2, 2.6, 4.0), c + Vector3(0, 1.8, 0), wood_c, yaw, _role_or("wood", WOOD_M, Color(1.15, 0.95, 0.8), wood_c, true))
 	var roof := SurfaceTool.new()
 	roof.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var plan := PackedVector2Array([Vector2(-2.1, -2.6), Vector2(2.1, -2.6), Vector2(2.1, 2.6), Vector2(-2.1, 2.6)])
@@ -1537,17 +1599,18 @@ func _shrine(p: Vector2) -> void:
 	var rm := MeshInstance3D.new()
 	rm.name = "Roof"
 	rm.mesh = roof.commit()
-	rm.material_override = _mat(Color(0.22, 0.22, 0.24), 0.7)
+	rm.material_override = _role_or("concrete", CONCRETE_M, Color(0.45, 0.45, 0.48), Color(0.22, 0.22, 0.24))  # dark grey roof
 	hall.add_child(rm)
 	rm.owner = _root
 	var gate: Vector3 = c + fwd * 7.0
 	gate.y = height_at(gate.x, gate.z)
 	var red := Color(0.55, 0.2, 0.15)
+	var red_m: StandardMaterial3D = _role_or("wood", WOOD_M, TORII_RED, red, true)
 	for s: float in [-1.4, 1.4]:
 		var post: Vector3 = gate + side * s
-		_box("Buildings", "ToriiPillar", Vector3(0.35, 3.6, 0.35), post + Vector3(0, 1.8, 0), red, yaw)
-	_box("Decor", "ToriiTop", Vector3(4.2, 0.3, 0.45), gate + Vector3(0, 3.75, 0), red, yaw)
-	_box("Decor", "ToriiTie", Vector3(3.4, 0.2, 0.25), gate + Vector3(0, 3.1, 0), red, yaw)
+		_box("Buildings", "ToriiPillar", Vector3(0.35, 3.6, 0.35), post + Vector3(0, 1.8, 0), red, yaw, red_m)
+	_box("Decor", "ToriiTop", Vector3(4.2, 0.3, 0.45), gate + Vector3(0, 3.75, 0), red, yaw, red_m)
+	_box("Decor", "ToriiTie", Vector3(3.4, 0.2, 0.25), gate + Vector3(0, 3.1, 0), red, yaw, red_m)
 
 
 ## Hashima's conveyor belt (ベルトコンベアー): an open belt on a frame 5 m
@@ -1571,13 +1634,15 @@ func _conveyor(pts: PackedVector2Array, ground: float, k: int) -> void:
 	var length: float = umax - umin
 	var yaw: float = atan2(u.x, u.y)
 	var belt_y: float = ground + 5.0
-	_box("Decor", "Conveyor_%d" % k, Vector3(1.6, 0.5, length), Vector3(mid.x, belt_y, mid.y), Color(0.3, 0.27, 0.24), yaw)
-	_box("Decor", "ConveyorRoof_%d" % k, Vector3(2.2, 0.15, length), Vector3(mid.x, belt_y + 1.6, mid.y), Color(0.42, 0.3, 0.22), yaw)
+	var steel: StandardMaterial3D = _role_or("metal", METAL_M, METAL_TINT, Color(0.3, 0.27, 0.24), true)
+	_box("Decor", "Conveyor_%d" % k, Vector3(1.6, 0.5, length), Vector3(mid.x, belt_y, mid.y), Color(0.3, 0.27, 0.24), yaw, steel)
+	_box("Decor", "ConveyorRoof_%d" % k, Vector3(2.2, 0.15, length), Vector3(mid.x, belt_y + 1.6, mid.y), Color(0.42, 0.3, 0.22), yaw,
+		_role_or("sheet", SHEET_M, Color.WHITE, Color(0.42, 0.3, 0.22), true))
 	var n: int = maxi(2, int(length / 4.0) + 1)
 	for j in n:
 		var q: Vector2 = mid + u * lerpf(-length * 0.5 + 0.5, length * 0.5 - 0.5, float(j) / (n - 1))
 		var gy: float = height_at(q.x, q.y)
-		_box("Buildings", "ConveyorPost_%d_%d" % [k, j], Vector3(0.5, belt_y - gy, 0.5), Vector3(q.x, (belt_y + gy) * 0.5, q.y), Color(0.35, 0.3, 0.26), yaw)
+		_box("Buildings", "ConveyorPost_%d_%d" % [k, j], Vector3(0.5, belt_y - gy, 0.5), Vector3(q.x, (belt_y + gy) * 0.5, q.y), Color(0.35, 0.3, 0.26), yaw, steel)
 
 
 ## A gabled roof: the ridge runs along the longest wall, through the middle
@@ -1683,9 +1748,9 @@ func _lighthouse(p: Vector2, k: int, height: float) -> void:
 	_add(node, "Buildings")
 	var s: float = height / 22.2  # the parts below are for a 22.2 m lighthouse
 	var parts: Array = [
-		[BoxMesh.new(), Vector3(4.5, 18.0, 4.5) * s, Vector3(0, 9.0, 0) * s, Color(0.95, 0.94, 0.9)],
-		[CylinderMesh.new(), Vector3(2.0, 3.0, 2.0) * s, Vector3(0, 19.5, 0) * s, Color(0.15, 0.17, 0.2)],
-		[CylinderMesh.new(), Vector3(2.4, 1.2, 2.4) * s, Vector3(0, 21.6, 0) * s, Color(0.7, 0.15, 0.12)],
+		[BoxMesh.new(), Vector3(4.5, 18.0, 4.5) * s, Vector3(0, 9.0, 0) * s, _role_or("concrete", CONCRETE_M, WHITE_CONCRETE, Color(0.95, 0.94, 0.9), true)],
+		[CylinderMesh.new(), Vector3(2.0, 3.0, 2.0) * s, Vector3(0, 19.5, 0) * s, _role_or("metal", METAL_M, IRON_TINT, Color(0.15, 0.17, 0.2), true)],
+		[CylinderMesh.new(), Vector3(2.4, 1.2, 2.4) * s, Vector3(0, 21.6, 0) * s, _role_or("metal", METAL_M, RED_METAL, Color(0.7, 0.15, 0.12), true)],
 	]
 	for part in parts:
 		var mi := MeshInstance3D.new()
@@ -1698,7 +1763,7 @@ func _lighthouse(p: Vector2, k: int, height: float) -> void:
 			(mesh as CylinderMesh).height = part[1].y
 		mi.mesh = mesh
 		mi.position = part[2]
-		mi.material_override = _mat(part[3], 0.6)
+		mi.material_override = part[3]
 		node.add_child(mi)
 		mi.owner = _root
 
@@ -1729,7 +1794,7 @@ func _pier(pts: PackedVector2Array, k: int) -> void:
 		var tall: float = top + 4.0 if deck else 2.5
 		bm.size = Vector3(4.0, tall, a.distance_to(b) + 2.0)
 		mi.mesh = bm
-		mi.material_override = _mat(Color(0.6, 0.58, 0.54))
+		mi.material_override = _role_or("concrete", CONCRETE_M, CONCRETE_TINT, Color(0.6, 0.58, 0.54), true)
 		var dir := Vector3(b.x - a.x, 0, b.y - a.y).normalized()
 		mi.transform = Transform3D(Basis.looking_at(dir, Vector3.UP), Vector3((a.x + b.x) * 0.5, top - tall * 0.5, (a.y + b.y) * 0.5))
 		_add(mi, "Bridges" if deck else "Decor")
@@ -1943,7 +2008,7 @@ func _place_walls() -> void:
 	var inst := MeshInstance3D.new()
 	inst.name = "SeaWall"
 	inst.mesh = st.commit()
-	inst.material_override = _mat(Color(0.6, 0.59, 0.56))
+	inst.material_override = _role_or("concrete", CONCRETE_M, CONCRETE_TINT, Color(0.6, 0.59, 0.56))
 	_add(inst, "Decor")
 
 
@@ -2413,6 +2478,9 @@ func _build_part(k: int, whole: IslandMap) -> Dictionary:
 		_marker("Generator%d" % (g + 1), _cell3(_reachable_near(f, reach, gens[g], 0.0, 30.0)))
 	if spec.has("defend"):
 		_marker("DefendZone", _cell3(_reachable_near(f, reach, spec["defend"], 0.0, 30.0)))
+	var holds: Array = spec.get("holds", [])
+	for h in holds.size():
+		_marker("HoldPoint_%d" % (h + 1), _cell3(_reachable_near(f, reach, holds[h], 0.0, 30.0)))
 	var caches: Array = spec.get("caches", [])
 	for c in caches.size():
 		_marker("Cache%d" % (c + 1), _cell3(_reachable_near(f, reach, caches[c], 0.0, 30.0)))
@@ -2504,6 +2572,8 @@ func _route(map: IslandMap) -> Array:
 		stops.append(["RescueTarget", map.rescue_target])
 	if map.defend_zone.x >= 0.0:
 		stops.append(["DefendZone", map.defend_zone])
+	for h in map.hold_points.size():
+		stops.append(["HoldPoint_%d" % (h + 1), map.hold_points[h]])
 	stops.append(["Exit", map.exit] if map.exit.x >= 0.0 else ["Boat", map.boat])
 	cur = map.player_start
 	for s: Array in stops:
@@ -2663,7 +2733,9 @@ func _boundary(k: int, poly: PackedVector2Array, f: FlowField, reach: PackedInt3
 			q0 = q1
 	var node := Node3D.new()
 	node.name = "Boundary"
-	var stone: Material = _role_material("stone", 1.8, WALL_TINT)
+	var stone: Material = _role_material("granite", GRANITE_M, GRANITE_TINT)  # the fort's granite
+	if stone == null:
+		stone = _role_material("stone", 1.8, WALL_TINT)
 	if stone == null:
 		stone = _mat(Color(0.62, 0.6, 0.56))
 	var mesh: ArrayMesh = core.commit()
