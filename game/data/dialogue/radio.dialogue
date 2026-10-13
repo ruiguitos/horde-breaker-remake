@@ -38,6 +38,11 @@ Director Hale: Three nests on this rock, feeding the horde. Burn them out, in wh
 Director Hale: Nest removal, contractor. Every one you leave standing keeps making more of them. [ID:RADIO_LAND_NESTS_2]
 => END
 
+~ land_intel_search
+Director Hale: Our last survey team left their notes on this rock. Five places to look, three worth finding. The clock is running. [ID:RADIO_LAND_INTEL_SEARCH_1]
+Director Hale: Intel recovery, contractor. Search fast, transmit what you find, and don't read it. [ID:RADIO_LAND_INTEL_SEARCH_2]
+=> END
+
 ~ land_boss
 Director Hale: Thermal readings on the volcano are... large. Do the job, then leave before it notices. [ID:RADIO_LAND_BOSS_1]
 => END
@@ -81,6 +86,25 @@ Director Hale: One less nursery. Pest control would charge double for that. [ID:
 ~ nests_done
 Director Hale: Last nest's gone. The ones still walking didn't get the memo. Get to the boat. [ID:RADIO_NESTS_DONE_1]
 Director Hale: Infestation cleared, mostly. Leave before the leftovers catch up. [ID:RADIO_NESTS_DONE_2]
+=> END
+
+~ intel_found
+Director Hale: That's a file. Keep looking, the rest won't search themselves. [ID:RADIO_INTEL_FOUND_1]
+Director Hale: Intel recovered. Legal says it's ours now. Next spot. [ID:RADIO_INTEL_FOUND_2]
+=> END
+
+~ intel_transmit
+Director Hale: Get to the uplink and send what you have. Paper burns, signals don't. [ID:RADIO_INTEL_TRANSMIT_1]
+Director Hale: Uplink's marked. Hold it while it sends. The horde hates good reception. [ID:RADIO_INTEL_TRANSMIT_2]
+=> END
+
+~ intel_done
+Director Hale: Transmission received. Accounting is very excited. Get to the boat. [ID:RADIO_INTEL_DONE_1]
+Director Hale: Data's in. You're now optional. Please extract anyway. [ID:RADIO_INTEL_DONE_2]
+=> END
+
+~ intel_none
+Director Hale: Nothing to send? Then nothing to bill. Get to the boat. [ID:RADIO_INTEL_NONE_1]
 => END
 
 ~ objective_done

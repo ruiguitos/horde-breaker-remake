@@ -370,7 +370,7 @@ só visual. A câmara de 3.ª pessoa encurta para não entrar nas colinas.
 | `Trees/` | Cada filho bloqueia só a célula do tronco (a copa não conta) |
 | `Bridges/` | Cada filho é o tabuleiro de uma ponte (`MeshInstance3D`): as células por baixo andam-se à altura do tabuleiro, mesmo sobre água; os filhos (guardas) são decoração |
 | `Decor/` | Nunca bloqueia: relva, flores, estradas, luzes, água de pré-visualização |
-| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed), `Cargo_1..` e `Delivery` (missão Fuel Run: onde estão os bidões e onde se entregam; sem `Cargo_*` o jogo escolhe sítios como os do Hold Sequence, sem `Delivery` entrega-se no barco/Exit), `Nest_1..` (missão Nests: onde estão os ninhos; sem eles o jogo escolhe sítios como os do Hold Sequence, com 4 m livres à volta) (nós `Marker3D`) |
+| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed), `Cargo_1..` e `Delivery` (missão Fuel Run: onde estão os bidões e onde se entregam; sem `Cargo_*` o jogo escolhe sítios como os do Hold Sequence, sem `Delivery` entrega-se no barco/Exit), `Nest_1..` (missão Nests: onde estão os ninhos; sem eles o jogo escolhe sítios como os do Hold Sequence, com 4 m livres à volta), `Search_1..` e `Uplink` (missão Intel Search: os sítios a procurar, de preferência à porta das casas, e onde se transmite; sem `Search_*` o jogo escolhe sítios alcançáveis a menos de 3 m de um edifício ou rocha, ou em qualquer lado se não houver; sem `Uplink` escolhe o ponto aberto mais perto do meio dos sítios, a 10 m ou mais de cada um) (nós `Marker3D`) |
 
 A ilha ocupa o quadrado de 0 a `size` metros em X e Z (160 por omissão;
 muda no inspetor do nó raiz). Mantém tudo lá dentro.
@@ -516,6 +516,16 @@ Cada rota mostra também a missão da ilha:
   destruído chama um pico curto e deixa cair um power-up. A barra de vida
   aparece por cima do ninho ferido e no marcador (`NEST 64 %`). É a missão
   "da casa" da Jungle e do Vulcão (peso 3 no sorteio).
+- **Intel Search**: há cinco sítios marcados (caixotes com um farol violeta,
+  junto a edifícios quando a ilha os tem) e só três têm intel; quais são é
+  sorteado e só se sabe ao procurar. Ficar a menos de 2,5 m de um sítio
+  procura-o (4 s; sair pausa, levar dano não); cada procura começa com um
+  pico curto. Sítio vazio: `Nothing here` e o caixote fica cinzento. Tens
+  2 min desde o desembarque (`INTEL 1 / 3 · 1:42` no HUD): quando acaba,
+  ficas com o que encontraste. Depois transmites na antena (`Uplink`, 15 s a
+  menos de 5 m, com pico) e só então a saída abre. Sem intel nenhuma quando
+  o tempo acaba, não há transmissão: vais logo para o barco, sem bónus.
+  Cada intel vale 15 de Intel. É a missão "da casa" da Coastal Town (peso 3).
 
 No Vulcão, o boss aparece depois de cumprires a missão.
 

@@ -365,10 +365,10 @@ func _test_draw() -> void:
 			town += 1
 		if GameData.pick_route_mission(rng, &"fuel_run", &"beach") == &"fuel_run":
 			repeats += 1
-	# Fuel Run weighs 3, every other route mission 1.
-	var routes: int = GameData.ROUTE_MISSIONS.size()
-	var want_beach: float = 3.0 / (routes + 2)
-	var want_town: float = 1.0 / routes
+	# Fuel Run weighs 3 on the Beach; on the Town it weighs 1 next to the
+	# Town's own signature (Intel Search, 3): weight over the pool's total.
+	var want_beach: float = GameData.mission_share(&"fuel_run", &"beach")
+	var want_town: float = GameData.mission_share(&"fuel_run", &"town")
 	_check(absf(beach / float(n) - want_beach) < 0.03 and absf(town / float(n) - want_town) < 0.03,
 		"draw shares: Beach %.0f%% (expected %.0f%%), Town %.0f%% (expected %.0f%%)" % [100.0 * beach / n, 100.0 * want_beach, 100.0 * town / n, 100.0 * want_town])
 	_check(repeats == 0, "no repeat even on the Beach")

@@ -635,6 +635,8 @@ static func _load_missions() -> Dictionary:
 			"carry_speed_mult": d.carry_speed_mult, "spike_seconds": d.spike_seconds,
 			"nest_hp": d.nest_hp, "spawn_interval": d.spawn_interval, "spawn_count": d.spawn_count,
 			"brood_cap": d.brood_cap, "wake_range": d.wake_range, "priority_range": d.priority_range,
+			"search_spots": d.search_spots, "time_limit": d.time_limit, "transmit_seconds": d.transmit_seconds,
+			"transmit_radius": d.transmit_radius, "intel_reward": d.intel_reward,
 			"preferred_biomes": d.preferred_biomes.duplicate(), "preferred_weight": d.preferred_weight}
 	return out
 
@@ -690,6 +692,19 @@ static func pick_route_mission(rng: RandomNumberGenerator, previous: StringName,
 		if roll < 0:
 			return id
 	return pool[-1]
+
+
+## The chance (0..1) that pick_route_mission() returns `id` for an island
+## of `biome` after `previous`: its weight over the pool's total weight
+## (tests and the design doc quote these shares).
+static func mission_share(id: StringName, biome: StringName, previous: StringName = &"") -> float:
+	var pool: Array[StringName] = route_missions_after(previous)
+	if not pool.has(id):
+		return 0.0
+	var total: int = 0
+	for m: StringName in pool:
+		total += mission_weight(m, biome)
+	return mission_weight(id, biome) / float(total)
 
 
 ## A number of a mission's data (e.g. &"hold_sequence", &"points"), or

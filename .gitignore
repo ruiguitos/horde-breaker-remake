@@ -19,3 +19,6 @@ addons/GD-Sync/keys.cfg
 # The user's own hand-made test scene (never commit)
 game/world/handmade/world_test_handmade.tscn
 game/world/handmade/world_test_handmade_data/
+
+# Godot's temporary copies of loaded GDExtension libraries (recreated by the editor)
+addons/**/~*.dll

@@ -186,4 +186,42 @@ Também: na Fuel Run, com o bidão nas mãos o espaço da habilidade no HUD diz
 `DROP CAN` (com o ícone esbatido) em vez de `READY`, porque a tecla só pousa
 o bidão.
 
-Próximo passo (do catálogo): pesquisa/sinais.
+**Passo 4 feito: Intel Search** (`game/data/missions/intel_search.tres`;
+no catálogo, "Procurar Intel"). Números (todos no `.tres`, para afinar em
+playtest):
+
+| Valor | Número | Porquê |
+|---|---|---|
+| Sítios / intel | 5 sítios, 3 com intel | Oferecer mais sítios do que os precisos é o que torna a procura uma escolha: quais têm intel é sorteado pela seed e só se sabe ao procurar. Em média, encontrar as três pede 4,5 procuras. |
+| Procura | 4 s a menos de 2,5 m | Curta como um gerador pequeno: dá para procurar no meio da horda, mas não a correr. Sair pausa (o progresso fica); levar dano não interrompe, como no Activate. |
+| Pico ao procurar | 8 s, um por sítio | Curto, para não encadear cinco picos longos; só a primeira entrada em cada sítio chama a horda. |
+| Tempo | 120 s desde o desembarque | O bot (invencível, ameaça 2) procura os cinco sítios em 85–88 s; 120 s dá cerca de 1,4× isso a quem tem de combater. Ao acabar, fica-se com a intel encontrada (recompensa parcial). |
+| Transmissão | 15 s a menos de 5 m da antena, pico de 25 s | Uma segunda fase curta, ao estilo do Hold Sequence; sair pausa. A saída só abre depois. |
+| Zero intel | sem transmissão | Se o tempo acaba sem nada, a saída abre logo, sem bónus: falha recuperável, nunca fica bloqueado. |
+| Recompensa | 15 de Intel por intel encontrada | Igual a cada passo das outras missões (3 × 15 = 45). Conta logo ao encontrar; o painel do fim da ilha mostra-a no total `INTEL EARNED` (não tem linhas por recompensa). |
+| Sorteio | peso 3 na Coastal Town, 1 nas outras | Com sete missões nas rotas, cada "casa" sai em cerca de 33 % das suas rotas (3 em 9) e 11 % nas outras; no Industrial Port, sem missão "da casa", cada uma sai em 14 % (1 em 7). Isto também baixa a Fuel Run e os Nests na Coastal Town (de 17 % para 11 %). |
+
+Regras: o tempo só corre na fase de procura (pausa com as cartas, como
+tudo); encontrar as três antes do fim passa logo à transmissão. Marcadores
+`Search_1..` (ordem pelo número; idealmente à porta das casas/mercado) e
+`Uplink` (praça ou igreja). Sem `Search_*`, o jogo escolhe sítios como no
+Hold Sequence (alcançáveis, a 30 m ou mais do barco, afastados, fixos por
+seed, outra "sal", 2 m livres) mas só a menos de 3 m de um edifício ou
+rocha (os retângulos `map.buildings`, ignorando os de mais de 60 m, que são
+terreno); numa ilha sem edifícios suficientes, em qualquer lado. Sem
+`Uplink`, o ponto aberto (5 m livres) mais perto do meio dos sítios, a pelo
+menos 10 m de cada um. Morrer termina a ilha como sempre; um Quick Redeploy
+(ou outra missão no mesmo `IslandRun`) repõe tudo, com os mesmos sítios e a
+mesma intel escondida. Visual: caixote Poly Haven (ou caixa castanha) com
+farol violeta e anel do raio; um disco cresce com a procura; sítio vazio
+fica cinzento, sítio com intel fica com disco verde; antena com prato e luz
+a piscar, anel e disco de progresso na transmissão. HUD
+`INTEL 1 / 3 · 1:42` (depois `TRANSMIT INTEL 2 / 3`), marcador no sítio
+por procurar mais perto (`SEARCHING · 63 %` dentro dele) ou na antena
+(`TRANSMITTING · 40 %`), minimapa `SEARCH` e `UPLINK`. Ainda nenhuma ilha
+tem marcadores `Search_*`/`Uplink`. Testes: `tests/test_intel_search.gd`
+(inclui um bot na Coastal Town e na Beach, ameaça 2: extração em 132–137 s;
+a horda chega ao limite de 150 vivos durante a transmissão, a confirmar em
+playtest).
+
+Próximo passo (do catálogo): sinais.

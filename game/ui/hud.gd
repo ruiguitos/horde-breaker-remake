@@ -1330,6 +1330,10 @@ func _mission_progress(run: IslandRun) -> String:
 					return "%d/%d" % [run.cargo_delivered(), run.cargo_pos.size()]
 				&"nests":
 					return "%d/%d" % [run.nests_destroyed(), run.nest_pos.size()]
+				&"intel_search":
+					if run.intel_phase == IslandRun.INTEL_TRANSMIT:
+						return "sending %d/%d s" % [int(run.transmit_progress), int(IslandRun.transmit_seconds())]
+					return "%d/%d, %s" % [run.intel_found(), run.intel_total(), IslandRun.clock_text(run.intel_time_left)]
 				_:
 					return "%d/%d" % [_generators_done(run), GameData.GENERATOR_COUNT]
 		IslandRun.Objective.BOSS:
@@ -1705,6 +1709,16 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 					detail += " · DESTROY THEM, ANY ORDER"
 					pips = nests
 					pips_done = run.nests_destroyed()
+				&"intel_search":
+					var total: int = run.intel_total()
+					if run.intel_phase == IslandRun.INTEL_TRANSMIT:
+						_objective.text = "TRANSMIT INTEL %d / %d" % [run.intel_found(), total]
+						detail += " · %d OF %d s AT THE UPLINK" % [int(run.transmit_progress), int(IslandRun.transmit_seconds())]
+					else:
+						_objective.text = "INTEL %d / %d · %s" % [run.intel_found(), total, IslandRun.clock_text(run.intel_time_left)]
+						detail += " · SEARCH THE MARKED SPOTS"
+					pips = total
+					pips_done = run.intel_found()
 				_:
 					_objective.text = "ACTIVATE THE GENERATORS"
 					detail += " · %d OF %d ONLINE" % [_generators_done(run), GameData.GENERATOR_COUNT]
@@ -1853,6 +1867,9 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 		# The nest's HP on the marker: the damage feedback that reads in
 		# every camera, next to the bar over the mound itself.
 		goal_name = "Nest %d%%" % ceili(100.0 * run.nest_hp[n] / maxf(1.0, run.nest_max_hp))
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"intel_search":
+		goal = run.intel_goal()  # the nearest unsearched spot, or the uplink
+		goal_name = "Uplink" if run.intel_phase != IslandRun.INTEL_SEARCH or run.nearest_unsearched() == -1 else "Search"
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"rescue":
 		goal = run.survivor_pos
 		goal_name = "Survivor"
@@ -1884,9 +1901,14 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	_marker_pill.modulate.a = _marker_alpha
 	_marker_pill.visible = _marker_alpha > 0.01
 	var dist: float = run.player_pos.distance_to(goal)
+	var intel: bool = run.objective == IslandRun.Objective.GENERATORS and run.mission == &"intel_search"
 	if run.objective == IslandRun.Objective.GENERATORS and run.mission == &"activate" and dist <= GameData.GENERATOR_RADIUS:
 		var g_idx: int = run.map.generators.find(goal)
 		_marker.text = "HOLDING · %d%%" % int(100.0 * run.generator_progress[g_idx] / GameData.GENERATOR_HOLD_SECONDS)
+	elif intel and run.intel_phase == IslandRun.INTEL_SEARCH and run.nearest_unsearched() != -1 and dist <= IslandRun.search_radius():
+		_marker.text = "SEARCHING · %d%%" % int(100.0 * run.search_progress[run.nearest_unsearched()] / IslandRun.search_seconds())
+	elif intel and run.intel_phase == IslandRun.INTEL_TRANSMIT and dist <= IslandRun.transmit_radius():
+		_marker.text = "TRANSMITTING · %d%%" % int(100.0 * run.transmit_progress / IslandRun.transmit_seconds())
 	else:
 		_marker.text = "%s · %d m" % [goal_name.to_upper(), int(dist)]
 	var view: Vector2 = get_viewport().get_visible_rect().size

@@ -46,6 +46,23 @@ extends Resource
 ## Nests: auto-fire shoots any enemy within this many metres before a nest
 ## (enemies keep priority; see IslandRun._pick_target).
 @export var priority_range: float = 0.0
+@export_group("Intel search")
+## Intel Search (`points` = how many search spots hold intel,
+## `seconds_per_point` = seconds to search one spot, `radius` = metres from
+## a spot to search it, `spike_seconds` = the horde spike when a search
+## starts): how many spots the island offers (the map's Search_* markers win
+## when it has them). Which spots hold the intel is seeded and hidden.
+@export var search_spots: int = 0
+## Intel Search: seconds from the landing to find the intel. When it runs
+## out the search ends with what was found (zero: straight to extraction).
+@export var time_limit: float = 0.0
+## Intel Search: seconds the player must stand at the uplink to transmit
+## the intel found (leaving pauses it), and the uplink's radius in metres.
+@export var transmit_seconds: float = 0.0
+@export var transmit_radius: float = 0.0
+## Intel Search: Intel paid per intel item found (before the threat,
+## route and hazard multipliers, like every mission's Intel).
+@export var intel_reward: int = 0
 @export_group("Boat draw")
 ## Biomes where the boat offers this mission more often: its "signature"
 ## islands (it can still be drawn anywhere).

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://cintel0srch0"]
+
+[ext_resource type="Script" path="res://game/data/resources/mission_data.gd" id="1_intel"]
+
+[resource]
+script = ExtResource("1_intel")
+display_name = "Intel Search"
+text = "Search the marked spots for intel before time runs out, transmit it, then get out."
+order = 7
+points = 3
+seconds_per_point = 4.0
+radius = 2.5
+spike_seconds = 8.0
+search_spots = 5
+time_limit = 120.0
+transmit_seconds = 15.0
+transmit_radius = 5.0
+intel_reward = 15
+preferred_biomes = Array[StringName]([&"town"])
+preferred_weight = 3

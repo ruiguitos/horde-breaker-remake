@@ -54,6 +54,10 @@ const NEST_FLESH_COLOR := Color(0.33, 0.2, 0.24)
 const NEST_SCORCH_COLOR := Color(0.09, 0.07, 0.07)
 ## The HP bar over a damaged nest shows within this distance (metres).
 const NEST_BAR_RANGE: float = 40.0
+## Intel Search: spot beacons, rings and the uplink (same colour as the
+## minimap); a searched spot without intel turns this grey.
+const INTEL_COLOR := Minimap.INTEL_COLOR
+const SEARCHED_COLOR := Color(0.45, 0.45, 0.45)
 
 var run: IslandRun
 var hud: Hud
@@ -122,6 +126,18 @@ var _nest_bars: Array[Node3D] = []
 var _nest_fills: Array[MeshInstance3D] = []
 var _nest_scorches: Array[MeshInstance3D] = []
 var _nest_dead: Array[bool] = []
+## Intel Search: one root per spot (a crate, a beacon above it, a ring of
+## the search radius and a disc that grows with the search), the uplink
+## (an antenna with its ring and progress disc).
+var _search_spots: Array[Node3D] = []
+var _search_beacons: Array[MeshInstance3D] = []
+var _search_rings: Array[MeshInstance3D] = []
+var _search_fills: Array[MeshInstance3D] = []
+var _search_crates: Array[Node3D] = []
+var _search_greyed: Array[bool] = []
+var _uplink: Node3D
+var _uplink_ring: MeshInstance3D
+var _uplink_fill: MeshInstance3D
 var _survivor: MeshInstance3D
 var _caches: Array[MeshInstance3D] = []
 var _buildings: Array[MeshInstance3D] = []
@@ -319,6 +335,10 @@ func _build_world() -> void:
 	if run.mission == &"nests":
 		for n in run.nest_pos.size():
 			_build_nest(run.nest_pos[n])
+	if run.mission == &"intel_search":
+		for k in run.search_pos.size():
+			_build_search_spot(run.search_pos[k])
+		_build_uplink(run.uplink_pos)
 	_survivor = MeshInstance3D.new()
 	_survivor.mesh = _capsule(0.35, 1.7)
 	_survivor.material_override = _mat(Color(1.0, 0.55, 0.1))
@@ -900,6 +920,156 @@ func _build_nest(at: Vector3) -> void:
 	_nest_dead.append(false)
 
 
+## One Intel Search spot: a crate (the CC0 IslandProps model, or a brown
+## box without it), a thin beacon over it while it is unsearched, a ring of
+## the search radius and a flat disc inside it that grows with the search.
+## Searched empty: the crate greys out; searched with intel: a green disc.
+func _build_search_spot(at: Vector3) -> void:
+	var root := Node3D.new()
+	root.name = "SearchSpot%d" % _search_spots.size()
+	root.position = _on_ground(at)
+	var crate: Node3D = IslandProps.create(&"crate", 0.7) if realistic_props else null
+	if crate == null:
+		var box := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(0.7, 0.7, 0.7)
+		box.mesh = bm
+		box.position.y = 0.35
+		box.material_override = _mat(Color(0.45, 0.32, 0.2))
+		crate = box
+	root.add_child(crate)
+	var beacon := MeshInstance3D.new()
+	var cm := CylinderMesh.new()
+	cm.top_radius = 0.04
+	cm.bottom_radius = 0.12
+	cm.height = 3.0
+	beacon.mesh = cm
+	beacon.position.y = 2.3
+	beacon.material_override = _mat(INTEL_COLOR, true)
+	root.add_child(beacon)
+	var fill := MeshInstance3D.new()
+	var fm := CylinderMesh.new()
+	fm.top_radius = IslandRun.search_radius()
+	fm.bottom_radius = IslandRun.search_radius()
+	fm.height = 0.03
+	fill.mesh = fm
+	fill.position.y = 0.04
+	var fmat := _mat(Color(INTEL_COLOR, 0.35), true)
+	fmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	fill.material_override = fmat
+	fill.scale = Vector3(0.001, 1, 0.001)
+	root.add_child(fill)
+	add_child(root)
+	_search_spots.append(root)
+	_search_beacons.append(beacon)
+	_search_fills.append(fill)
+	_search_crates.append(crate)
+	_search_greyed.append(false)
+	_search_rings.append(_ring(at, IslandRun.search_radius(), INTEL_COLOR))
+
+
+## The Intel Search uplink: a mast with a dish and a blinking tip, a ring of
+## the transmit radius and a disc that grows with the transmission (the ring
+## and disc show in the transmit phase only).
+func _build_uplink(at: Vector3) -> void:
+	_uplink = Node3D.new()
+	_uplink.name = "Uplink"
+	_uplink.position = _on_ground(at)
+	var mast := MeshInstance3D.new()
+	var mm := CylinderMesh.new()
+	mm.top_radius = 0.06
+	mm.bottom_radius = 0.22
+	mm.height = 6.0
+	mast.mesh = mm
+	mast.position.y = 3.0
+	mast.material_override = _mat(Color(0.6, 0.65, 0.7))
+	_uplink.add_child(mast)
+	var dish := MeshInstance3D.new()
+	var dm := CylinderMesh.new()
+	dm.top_radius = 0.9
+	dm.bottom_radius = 0.2
+	dm.height = 0.35
+	dish.mesh = dm
+	dish.position = Vector3(0, 4.2, 0)
+	dish.rotation_degrees = Vector3(-35, 0, 0)
+	dish.material_override = _mat(Color(0.8, 0.82, 0.85))
+	_uplink.add_child(dish)
+	var tip := MeshInstance3D.new()
+	tip.name = "Tip"
+	tip.mesh = _sphere(0.18)
+	tip.position.y = 6.1
+	tip.material_override = _mat(INTEL_COLOR, true)
+	_uplink.add_child(tip)
+	_uplink_fill = MeshInstance3D.new()
+	var fm := CylinderMesh.new()
+	fm.top_radius = IslandRun.transmit_radius()
+	fm.bottom_radius = IslandRun.transmit_radius()
+	fm.height = 0.03
+	_uplink_fill.mesh = fm
+	_uplink_fill.position.y = 0.04
+	var fmat := _mat(Color(INTEL_COLOR, 0.3), true)
+	fmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_uplink_fill.material_override = fmat
+	_uplink_fill.scale = Vector3(0.001, 1, 0.001)
+	_uplink.add_child(_uplink_fill)
+	add_child(_uplink)
+	_uplink_ring = _ring(at, IslandRun.transmit_radius(), INTEL_COLOR)
+	_uplink_ring.visible = false
+
+
+## Greys every mesh of a searched-empty spot's crate (an overlay, so the
+## model's own materials stay untouched).
+func _grey_out(node: Node) -> void:
+	if node is GeometryInstance3D:
+		var m := _mat(Color(SEARCHED_COLOR, 0.65), true)
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		(node as GeometryInstance3D).material_overlay = m
+	for child in node.get_children():
+		_grey_out(child)
+
+
+func _draw_intel_search() -> void:
+	var searching: bool = run.objective == IslandRun.Objective.GENERATORS and run.intel_phase == IslandRun.INTEL_SEARCH
+	for k in mini(_search_spots.size(), run.search_pos.size()):
+		var state: int = run.search_state[k]
+		var open: bool = state == IslandRun.SPOT_UNSEARCHED
+		_search_beacons[k].visible = open and searching
+		_search_rings[k].visible = open and searching
+		var frac: float = clampf(run.search_progress[k] / IslandRun.search_seconds(), 0.0, 1.0)
+		var fm: StandardMaterial3D = _search_fills[k].material_override
+		if state == IslandRun.SPOT_FOUND:
+			_search_fills[k].visible = true
+			_search_fills[k].scale = Vector3.ONE
+			fm.albedo_color = Color(UiTheme.SUCCESS, 0.35)
+		elif state == IslandRun.SPOT_EMPTY:
+			_search_fills[k].visible = true
+			_search_fills[k].scale = Vector3.ONE
+			fm.albedo_color = Color(SEARCHED_COLOR, 0.3)
+			if not _search_greyed[k]:
+				_search_greyed[k] = true
+				_grey_out(_search_crates[k])
+		else:
+			_search_fills[k].visible = frac > 0.0 and searching
+			_search_fills[k].scale = Vector3(maxf(0.001, frac), 1, maxf(0.001, frac))
+			var inside: bool = run.player_pos.distance_to(run.search_pos[k]) <= IslandRun.search_radius()
+			var rm: StandardMaterial3D = _search_rings[k].material_override
+			rm.albedo_color = Color(0.3, 1.0, 0.5) if inside else INTEL_COLOR
+	if _uplink == null:
+		return
+	var transmitting: bool = run.objective == IslandRun.Objective.GENERATORS and run.intel_phase == IslandRun.INTEL_TRANSMIT
+	_uplink_ring.visible = transmitting
+	_uplink_fill.visible = transmitting and run.transmit_progress > 0.0
+	var t: float = clampf(run.transmit_progress / IslandRun.transmit_seconds(), 0.0, 1.0)
+	_uplink_fill.scale = Vector3(maxf(0.001, t), 1, maxf(0.001, t))
+	if transmitting:
+		var inside_up: bool = run.player_pos.distance_to(run.uplink_pos) <= IslandRun.transmit_radius()
+		var um: StandardMaterial3D = _uplink_ring.material_override
+		um.albedo_color = Color(0.3, 1.0, 0.5) if inside_up else INTEL_COLOR
+	# The tip blinks while the uplink waits or sends; it stays lit once done.
+	var tip: MeshInstance3D = _uplink.get_node("Tip")
+	tip.visible = not transmitting or fmod(Time.get_ticks_msec() * 0.001, 0.6 if run.transmit_progress > 0.0 else 1.2) < 0.4
+
+
 func _ring(center: Vector3, radius: float, color: Color) -> MeshInstance3D:
 	var ring := MeshInstance3D.new()
 	var torus := TorusMesh.new()
@@ -1093,6 +1263,8 @@ func _play_audio() -> void:
 				sfx.play(&"cache", -6.0, 0.05)
 			&"survivor_found":
 				sfx.play(&"survivor", -6.0, 0.0)
+			&"intel_found", &"intel_transmit":
+				sfx.play(&"cache", -6.0, 0.05)
 			&"low_hp":
 				sfx.play(&"low_hp", -4.0, 0.0)
 	if _audio_slam and run.slam_time <= 0.0:
@@ -1941,6 +2113,8 @@ func _draw_mission() -> void:
 		_delivery_ring.visible = run.objective == IslandRun.Objective.GENERATORS
 	if run.mission == &"nests":
 		_draw_nests()
+	if run.mission == &"intel_search":
+		_draw_intel_search()
 	for g in _generators.size():
 		var p: float = run.generator_progress[g] / GameData.GENERATOR_HOLD_SECONDS
 		var m: StandardMaterial3D = _generators[g].material_override

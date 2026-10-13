@@ -511,7 +511,6 @@ func _test_draw() -> void:
 	_check(GameData.mission_weight(&"nests", &"jungle") == 3 and GameData.mission_weight(&"nests", &"volcano") == 3
 		and GameData.mission_weight(&"nests", &"beach") == 1, "weights: Nests x3 on Jungle and Volcano, 1 elsewhere")
 	_check(not GameData.route_missions_after(&"nests").has(&"nests"), "never Nests twice in a row")
-	var routes: int = GameData.ROUTE_MISSIONS.size()
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 2468
 	var jungle: int = 0
@@ -525,8 +524,8 @@ func _test_draw() -> void:
 			town += 1
 		if GameData.pick_route_mission(rng, &"nests", &"volcano") == &"nests":
 			repeats += 1
-	var want_jungle: float = 3.0 / (routes + 2)
-	var want_town: float = 1.0 / routes
+	var want_jungle: float = GameData.mission_share(&"nests", &"jungle")
+	var want_town: float = GameData.mission_share(&"nests", &"town")  # the Town favours Intel Search
 	_check(absf(jungle / float(n) - want_jungle) < 0.03 and absf(town / float(n) - want_town) < 0.03,
 		"draw shares: Jungle %.0f%% (expected %.0f%%), Town %.0f%% (expected %.0f%%)" % [100.0 * jungle / n, 100.0 * want_jungle, 100.0 * town / n, 100.0 * want_town])
 	_check(repeats == 0, "no repeat even on the Volcano")

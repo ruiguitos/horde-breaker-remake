@@ -184,7 +184,29 @@ const NEST_BROOD_RADIUS: float = 12.0
 ## Fixed camera: metres added to a nest's aim score, so a nest only wins
 ## over an enemy at a similar spot when the player clearly faces it.
 const NEST_SCORE_PENALTY: float = 4.0
-## The seed this island was built with (fallback hold points, fuel cans, nests).
+## Intel Search: one entry per search spot. Its position, its state
+## (SPOT_*), whether it holds intel (seeded, hidden from the player until
+## searched), the seconds searched (leaving pauses it) and whether its
+## search spike fired. Then the phase (INTEL_*), the seconds left to search,
+## the uplink and the transmission's progress.
+const SPOT_UNSEARCHED: int = 0
+const SPOT_EMPTY: int = 1
+const SPOT_FOUND: int = 2
+const INTEL_SEARCH: int = 0
+const INTEL_TRANSMIT: int = 1
+const INTEL_DONE: int = 2
+var search_pos: Array[Vector3] = []
+var search_state: PackedInt32Array = PackedInt32Array()
+var search_has_intel: Array[bool] = []
+var search_progress: PackedFloat32Array = PackedFloat32Array()
+var search_started: Array[bool] = []
+var intel_phase: int = INTEL_SEARCH
+var intel_time_left: float = 0.0
+var uplink_pos: Vector3 = Vector3.ZERO
+var transmit_progress: float = 0.0
+var transmit_started: bool = false
+## The seed this island was built with (fallback hold points, fuel cans,
+## nests, search spots).
 var run_seed: int = 7
 var survivor_pos: Vector3 = Vector3.ZERO
 var survivor_hp: float = GameData.SURVIVOR_HP
@@ -662,6 +684,122 @@ func set_mission(id: StringName) -> void:
 			nest_flash.append(0.0)
 		_reset_nest_hp()
 		site = nest_goal()
+	search_pos.clear()
+	search_state.clear()
+	search_has_intel.clear()
+	search_progress.clear()
+	search_started.clear()
+	intel_phase = INTEL_SEARCH
+	intel_time_left = 0.0
+	transmit_progress = 0.0
+	transmit_started = false
+	uplink_pos = site
+	if mission == &"intel_search":
+		search_pos = map.search_points.duplicate()
+		if search_pos.is_empty():
+			search_pos = IslandMap.pick_search_points(map, search_spots_wanted(), run_seed)
+		if search_pos.is_empty():
+			search_pos.append(site)  # a map too small to pick from: one spot
+		for k in search_pos.size():
+			search_state.append(SPOT_UNSEARCHED)
+			search_has_intel.append(false)
+			search_progress.append(0.0)
+			search_started.append(false)
+		# Which spots hold the intel: a seeded shuffle, the first ones win.
+		var order: Array[int] = []
+		for k in search_pos.size():
+			order.append(k)
+		var srng := RandomNumberGenerator.new()
+		srng.seed = run_seed ^ 0x494e544c
+		for i in range(order.size() - 1, 0, -1):
+			var j: int = srng.randi_range(0, i)
+			var t: int = order[i]
+			order[i] = order[j]
+			order[j] = t
+		for i in mini(intel_count_wanted(), order.size()):
+			search_has_intel[order[i]] = true
+		uplink_pos = map.uplink
+		if uplink_pos.x < 0.0:
+			uplink_pos = IslandMap.pick_uplink_point(map, search_pos, run_seed)
+		if uplink_pos.x < 0.0:
+			uplink_pos = site  # a map too small to pick from
+		intel_time_left = search_time_limit()
+		site = intel_goal()
+
+
+## Intel Search numbers, from the mission's data (intel_search.tres).
+static func search_spots_wanted() -> int:
+	return int(GameData.mission_value(&"intel_search", "search_spots", 5.0))
+
+
+static func intel_count_wanted() -> int:
+	return int(GameData.mission_value(&"intel_search", "points", 3.0))
+
+
+static func search_seconds() -> float:
+	return GameData.mission_value(&"intel_search", "seconds", 4.0)
+
+
+static func search_radius() -> float:
+	return GameData.mission_value(&"intel_search", "radius", 2.5)
+
+
+static func search_spike_seconds() -> float:
+	return GameData.mission_value(&"intel_search", "spike_seconds", 8.0)
+
+
+static func search_time_limit() -> float:
+	return GameData.mission_value(&"intel_search", "time_limit", 120.0)
+
+
+static func transmit_seconds() -> float:
+	return GameData.mission_value(&"intel_search", "transmit_seconds", 15.0)
+
+
+static func transmit_radius() -> float:
+	return GameData.mission_value(&"intel_search", "transmit_radius", 5.0)
+
+
+static func intel_reward() -> int:
+	return int(GameData.mission_value(&"intel_search", "intel_reward", 15.0))
+
+
+## Intel items on this island (spots that hold one, found or not).
+func intel_total() -> int:
+	return search_has_intel.count(true)
+
+
+## Intel items found so far.
+func intel_found() -> int:
+	var n: int = 0
+	for st in search_state:
+		if st == SPOT_FOUND:
+			n += 1
+	return n
+
+
+## The unsearched spot nearest to the player (-1 = none left).
+func nearest_unsearched() -> int:
+	var best: int = -1
+	var best_d: float = INF
+	for k in search_pos.size():
+		if search_state[k] != SPOT_UNSEARCHED:
+			continue
+		var d: float = _flat_dist(search_pos[k], player_pos)
+		if d < best_d:
+			best_d = d
+			best = k
+	return best
+
+
+## Where the player should go next in an Intel Search: the nearest spot
+## not searched yet while searching, the uplink while transmitting.
+func intel_goal() -> Vector3:
+	if intel_phase == INTEL_SEARCH:
+		var k: int = nearest_unsearched()
+		if k >= 0:
+			return search_pos[k]
+	return uplink_pos
 
 
 ## Nests numbers, from the mission's data (nests.tres).
@@ -966,6 +1104,8 @@ func _main_task_done() -> bool:
 			return cargo_delivered() >= cargo_pos.size()
 		&"nests":
 			return nests_destroyed() >= nest_pos.size()
+		&"intel_search":
+			return intel_phase == INTEL_DONE
 	for p in generator_progress:
 		if p < GameData.GENERATOR_HOLD_SECONDS:
 			return false
@@ -1047,6 +1187,8 @@ func _intel_base() -> int:
 			base += cargo_delivered() * 15
 		&"nests":
 			base += nests_destroyed() * 15
+		&"intel_search":
+			base += intel_found() * intel_reward()
 		_:
 			base += done * 15
 	base += 20 if boss_killed else 0
@@ -2317,6 +2459,8 @@ func _update_mission(dt: float) -> void:
 					_update_fuel_run()
 				&"nests":
 					_update_nests(dt)
+				&"intel_search":
+					_update_intel_search(dt)
 				_:
 					_update_generators(dt)
 			if _main_task_done() and has_boss:
@@ -2333,6 +2477,8 @@ func _update_mission(dt: float) -> void:
 					radio.append(&"fuel_done")
 				elif mission == &"nests" and not has_exit():
 					radio.append(&"nests_done")
+				elif mission == &"intel_search" and not has_exit():
+					radio.append(&"intel_done" if intel_found() > 0 else &"intel_none")
 				elif mission != &"rescue":
 					radio.append(&"objective_done_on_foot" if has_exit() else &"objective_done")
 		Objective.BOSS:
@@ -2374,6 +2520,8 @@ func _start_extraction() -> void:
 		messages.append("The rescue boat is coming! Make for the pier!")
 	elif has_exit():
 		messages.append("Objective complete. %s!" % _exit_order())
+	elif mission == &"intel_search" and intel_found() == 0:
+		messages.append("No intel to send. Get back to the boat!")
 	else:
 		messages.append("Objective complete. Get back to the boat!")
 
@@ -2418,6 +2566,70 @@ func _update_hold_sequence(dt: float) -> void:
 		site = hold_points[hold_index]
 		messages.append("Point secured. Move to point %d!" % (hold_index + 1))
 		radio.append(&"hold_point")
+
+
+## Intel Search. Search phase: standing within search_radius() of an
+## unsearched spot searches it (leaving pauses it; damage does not, like
+## Activate); the first step in calls a short spike. After search_seconds()
+## the spot gives its intel or reads "nothing here". The phase ends when
+## every intel is found or the time limit runs out (partial reward: the
+## intel found so far is kept). Transmit phase: hold the uplink for
+## transmit_seconds() (leaving pauses it, a spike on the first step in).
+## No intel found when time runs out: no transmission, the extraction opens
+## at once (a recoverable failure: never a softlock).
+func _update_intel_search(dt: float) -> void:
+	match intel_phase:
+		INTEL_SEARCH:
+			intel_time_left = maxf(0.0, intel_time_left - dt)
+			var k: int = -1
+			var best: float = search_radius()
+			for i in search_pos.size():
+				var d: float = _flat_dist(search_pos[i], player_pos)
+				if search_state[i] == SPOT_UNSEARCHED and d <= best:
+					best = d
+					k = i
+			if k >= 0:
+				if not search_started[k]:
+					search_started[k] = true
+					director.trigger_peak(search_spike_seconds())
+					messages.append("Searching...")
+				search_progress[k] += dt
+				if search_progress[k] >= search_seconds():
+					search_progress[k] = search_seconds()
+					if search_has_intel[k]:
+						search_state[k] = SPOT_FOUND
+						messages.append("Intel found (%d / %d)!" % [intel_found(), intel_total()])
+						if intel_found() < intel_total():
+							radio.append(&"intel_found")  # the last one gets the uplink line
+					else:
+						search_state[k] = SPOT_EMPTY
+						messages.append("Nothing here")
+			if intel_found() >= intel_total():
+				_start_transmit("All intel found. Get to the uplink and transmit!")
+			elif intel_time_left <= 0.0:
+				if intel_found() > 0:
+					_start_transmit("Time's up: transmit the %d intel you have!" % intel_found())
+				else:
+					intel_phase = INTEL_DONE
+					messages.append("Time's up. No intel found.")
+		INTEL_TRANSMIT:
+			if _flat_dist(uplink_pos, player_pos) <= transmit_radius():
+				if not transmit_started:
+					transmit_started = true
+					director.trigger_peak(transmit_seconds() + 10.0)
+					messages.append("Transmitting: hold the uplink!")
+				transmit_progress += dt
+				if transmit_progress >= transmit_seconds():
+					transmit_progress = transmit_seconds()
+					intel_phase = INTEL_DONE
+					messages.append("Intel transmitted (%d / %d)" % [intel_found(), intel_total()])
+	site = intel_goal()
+
+
+func _start_transmit(text: String) -> void:
+	intel_phase = INTEL_TRANSMIT
+	messages.append(text)
+	radio.append(&"intel_transmit")
 
 
 ## Fuel Run: walking over a waiting can picks it up (one at a time); the
@@ -2783,6 +2995,12 @@ func _spawn_enemy() -> void:
 	horde.add(spot, director.pick_kind(), rng)
 
 
+## "m:ss" for a number of seconds (rounded up: 0:01 until it is over).
+static func clock_text(seconds: float) -> String:
+	var t: int = ceili(maxf(0.0, seconds))
+	return "%d:%02d" % [t / 60, t % 60]
+
+
 ## Objective text for the HUD.
 func objective_text() -> String:
 	match objective:
@@ -2802,6 +3020,10 @@ func objective_text() -> String:
 				return "Fuel %d / %d: find a fuel can" % [cargo_delivered(), cargo_pos.size()]
 			if mission == &"nests":
 				return "Destroy the nests (%d / %d)" % [nests_destroyed(), nest_pos.size()]
+			if mission == &"intel_search":
+				if intel_phase == INTEL_TRANSMIT:
+					return "Transmit the intel (%d / %d s)" % [int(transmit_progress), int(transmit_seconds())]
+				return "Search for intel (%d / %d, %s left)" % [intel_found(), intel_total(), clock_text(intel_time_left)]
 			var done: int = 0
 			for p in generator_progress:
 				if p >= GameData.GENERATOR_HOLD_SECONDS:

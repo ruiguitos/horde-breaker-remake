@@ -17,7 +17,10 @@ extends Node3D
 ##                     order of their number suffix), and for Fuel Run:
 ##                     Cargo_1, Cargo_2... (where the cans start) and
 ##                     Delivery (where they go; default: the boat/Exit),
-##                     and for Nests: Nest_1, Nest_2... (horde nests)
+##                     and for Nests: Nest_1, Nest_2... (horde nests),
+##                     and for Intel Search: Search_1, Search_2... (spots
+##                     to search, ideally at doorways) and Uplink (where
+##                     the intel is transmitted)
 ## The island covers x, z in [0, size): keep everything inside that square.
 ## How to build one: game/README.md, "Ilhas feitas à mão".
 
@@ -154,6 +157,7 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	var holds: Array = []  # [suffix number, position]
 	var cargo: Array = []  # same, for the Cargo_* markers
 	var nests: Array = []  # same, for the Nest_* markers
+	var searches: Array = []  # same, for the Search_* markers
 	for node in _children_of("Markers"):
 		if node.name.begins_with("Generator"):
 			map.generators.append(_flat(_local(node).origin))
@@ -165,6 +169,8 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 			cargo.append([marker_number(String(node.name), "Cargo"), _flat(_local(node).origin)])
 		elif node.name.begins_with("Nest"):
 			nests.append([marker_number(String(node.name), "Nest"), _flat(_local(node).origin)])
+		elif node.name.begins_with("Search"):
+			searches.append([marker_number(String(node.name), "Search"), _flat(_local(node).origin)])
 	holds.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	for h: Array in holds:
 		map.hold_points.append(h[1])
@@ -174,7 +180,10 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	nests.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	for n: Array in nests:
 		map.nest_points.append(n[1])
-	for spot: Array in [["Exit", "exit"], ["RescueTarget", "rescue_target"], ["DefendZone", "defend_zone"], ["Delivery", "delivery"]]:
+	searches.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	for sp: Array in searches:
+		map.search_points.append(sp[1])
+	for spot: Array in [["Exit", "exit"], ["RescueTarget", "rescue_target"], ["DefendZone", "defend_zone"], ["Delivery", "delivery"], ["Uplink", "uplink"]]:
 		var node: Node3D = get_node_or_null("Markers/" + spot[0])
 		if node != null:
 			map.set(spot[1], _flat(_local(node).origin))
@@ -187,10 +196,10 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	else:
 		f.compute_now(start_cell)
 		var spots: Array[Vector3] = []
-		for p: Vector3 in [map.exit, map.rescue_target, map.defend_zone, map.delivery]:
+		for p: Vector3 in [map.exit, map.rescue_target, map.defend_zone, map.delivery, map.uplink]:
 			if p.x >= 0.0:
 				spots.append(p)
-		for list: Array in [["Boat", [map.boat]], ["Generator", map.generators], ["Cache", map.caches], ["Exit/RescueTarget/DefendZone/Delivery", spots], ["HoldPoint", map.hold_points], ["Cargo", map.cargo_points], ["Nest", map.nest_points]]:
+		for list: Array in [["Boat", [map.boat]], ["Generator", map.generators], ["Cache", map.caches], ["Exit/RescueTarget/DefendZone/Delivery/Uplink", spots], ["HoldPoint", map.hold_points], ["Cargo", map.cargo_points], ["Nest", map.nest_points], ["Search", map.search_points]]:
 			for p: Vector3 in list[1]:
 				if f.distance_at(p) >= FlowField.UNREACHABLE:
 					problems.append("%s at (%d, %d) cannot be reached from the start." % [list[0], int(p.x), int(p.z)])

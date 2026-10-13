@@ -26,6 +26,8 @@ const CACHE_COLOR := Color(0.4, 0.95, 1.0)
 const FUEL_COLOR := Color(1.0, 0.6, 0.15)
 ## Horde nests (the glowing core in the world uses the same colour).
 const NEST_COLOR := Color(0.72, 1.0, 0.25)
+## Intel Search spots and the uplink (the world uses the same colour).
+const INTEL_COLOR := Color(0.78, 0.55, 1.0)
 
 var run: IslandRun
 var _texture: ImageTexture
@@ -155,6 +157,13 @@ func _draw() -> void:
 		for n in run.nest_pos.size():
 			if run.nest_alive(n):
 				_mark(&"nest", _px(run.nest_pos[n]))
+	elif run.mission == &"intel_search" and run.objective == IslandRun.Objective.GENERATORS:
+		# Every spot not searched yet (the player picks), and the uplink.
+		if run.intel_phase == IslandRun.INTEL_SEARCH:
+			for k in run.search_pos.size():
+				if run.search_state[k] == IslandRun.SPOT_UNSEARCHED:
+					_mark(&"search", _px(run.search_pos[k]))
+		_mark(&"uplink", _px(run.uplink_pos))
 	elif run.mission == &"rescue" and not run.survivor_lost:
 		_mark(&"survivor", _px(run.survivor_pos))
 	for g in GameData.GENERATOR_COUNT:
@@ -208,6 +217,14 @@ static func draw_marker(item: CanvasItem, kind: StringName, p: Vector2, s: float
 			# A horde nest: a green-yellow blob with a dark centre.
 			item.draw_circle(p, 4.5 * s, NEST_COLOR)
 			item.draw_circle(p, 1.8 * s, Color(0.15, 0.1, 0.12))
+		&"search":
+			# A spot to search: a violet square with a dark centre (a box).
+			item.draw_rect(Rect2(p - Vector2(3, 3) * s, Vector2(6, 6) * s), INTEL_COLOR)
+			item.draw_rect(Rect2(p - Vector2(1, 1) * s, Vector2(2, 2) * s), Color(0.12, 0.08, 0.16))
+		&"uplink":
+			# The uplink: a violet mast (triangle) under a ring.
+			item.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -2) * s, p + Vector2(3, 4) * s, p + Vector2(-3, 4) * s]), INTEL_COLOR)
+			item.draw_arc(p + Vector2(0, -2) * s, 3.5 * s, PI * 1.1, PI * 1.9, 10, INTEL_COLOR, 1.2 * s, true)
 		&"exit":
 			# The Exit: a green chevron pointing up (the way on).
 			item.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -5) * s, p + Vector2(5, 3) * s, p + Vector2(0, 0.5) * s, p + Vector2(-5, 3) * s]), UiTheme.SUCCESS)
@@ -246,6 +263,11 @@ static func legend_entries(r: IslandRun) -> Array[Array]:
 		&"nests":
 			if r.objective == IslandRun.Objective.GENERATORS:
 				out.append([&"nest", "NEST"])
+		&"intel_search":
+			if r.objective == IslandRun.Objective.GENERATORS:
+				if r.intel_phase == IslandRun.INTEL_SEARCH and r.nearest_unsearched() != -1:
+					out.append([&"search", "SEARCH"])
+				out.append([&"uplink", "UPLINK"])
 		&"rescue":
 			out.append([&"survivor", "SURVIVOR"])
 		&"activate":

@@ -25,6 +25,7 @@ const ADVICE: Dictionary = {
 	&"hold_sequence": "The points come one at a time. Leave a point and its clock stops. Clear a space, then hold.",
 	&"fuel_run": "One can at a time, and you can't shoot with your hands full. Put it down to fight, pick it up after.",
 	&"nests": "Nests keep breeding while they stand. Pick your order, thin the crowd, then put everything you have into the mound.",
+	&"intel_search": "Not every marked spot has something. Search, don't linger: when the clock runs out you send what you have.",
 	&"holdout": "Hold the courtyard until I can send the boat. When it comes, run for the pier. It won't wait.",
 }
 
