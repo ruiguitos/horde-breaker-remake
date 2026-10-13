@@ -109,7 +109,7 @@ Testes: `tests/test_hold_sequence.gd`.
 | Raio de entrega | 6 m | Maior do que o anel do barco (4 m): entrega-se ao chegar, a extração pede mais um passo. |
 | Velocidade com bidão | ×0,8, sem sprint | Penalização ligeira: a horda apanha-te se não limpares o caminho. |
 | Pico ao pegar | 20 s | Só na primeira vez de cada bidão; pegar de novo não chama a horda. |
-| Sorteio | peso 3 na Beach, 1 nas outras | Na Beach sai em cerca de 43 % das rotas (3 em 7), nas outras 20 %. |
+| Sorteio | peso 3 na Beach, 1 nas outras | Na Beach sai em cerca de 43 % das rotas (3 em 7), nas outras 20 % (com os Nests no sorteio: 38 %, 3 em 8, e 17 %). |
 
 Regras: um bidão de cada vez; com ele não se dispara, não se corre e não se
 usa a habilidade da classe (o Breaker continua: é a fuga). A tecla nova
@@ -131,4 +131,59 @@ soldado nas três câmaras; anel laranja no ponto de entrega; minimapa com
 (inclui um bot que completa a missão; na Beach a T2 precisou de 499 s e de
 70 pousos para combater: vale a pena confirmar o ritmo em playtest).
 
-Próximo passo: destruir ninhos na Jungle.
+**Passo 3 feito: Nests** (`game/data/missions/nests.tres`). Números (todos
+no `.tres`, para afinar em playtest):
+
+| Valor | Número | Porquê |
+|---|---|---|
+| Ninhos | 3 | Igual aos geradores, pontos e bidões. |
+| Vida | 600 × escala de vida dos inimigos | Escala com a ameaça e o número da ilha como todos os inimigos (ilha 1, ameaça 1: 600; ilha 3, ameaça 3: 1344). Com a espingarda são cerca de 6 s de fogo contínuo (108 de dano/s), mais recargas. |
+| Raio | 1,4 m (altura 1,8 m) | Um alvo grande, fácil de acertar nas três câmaras; é sólido para o jogador. |
+| Ninhada | 2 inimigos a cada 7 s | Pressão local pequena: obriga a escolher a ordem, não inunda o mapa. |
+| Limite por ninho | 6 inimigos a menos de 12 m | Um ninho ignorado não cria um exército. |
+| Raio de acordar | 45 m | Só os ninhos perto de ti soltam inimigos (os de longe perder-se-iam no caminho ou seriam reciclados nas ilhas grandes). |
+| Prioridade dos inimigos | 8 m | Um inimigo a menos de 8 m é sempre o alvo antes do ninho. |
+| Pico ao destruir | 12 s | Curto: a ninhada à volta "entra em pânico". |
+| Recompensa | um power-up | Sai sempre ao destruir um ninho, se não houver já um no chão (não substitui). Mais 15 de Intel por ninho, como cada passo das outras missões. |
+| Sorteio | peso 3 na Jungle e no Vulcão, 1 nas outras | Na Jungle e no Vulcão sai em cerca de 38 % das rotas (3 em 8), nas outras 17 % (1 em 6). |
+
+Regras: os ninhos entram no mesmo caminho de dano dos inimigos, sem um
+sistema à parte. A escolha de alvo (`_pick_target`) pode devolver um ninho
+(um id negativo, `nest_target(n)`); cada chumbo verifica se tem um ninho na
+linha (`_pellet_nest_hit`) e pára nele se ainda lhe restar perfuração (a
+espingarda, perfuração 1, acerta no inimigo à frente do ninho; a marksman,
+perfuração 6, atravessa-o e acerta no ninho); a granada e o impacto do
+Breaker ferem os ninhos no seu raio. Os ninhos não sofrem headshots,
+elementos (fogo, gelo, veneno, choque), Insta-Kill nem Nuke: são montes, não
+corpos.
+
+Regra de prioridade (para não ficar a disparar contra o ninho enquanto te
+comem): na câmara fixa, um inimigo a menos de 8 m ganha sempre; mais longe,
+o ninho só ganha se tiver melhor pontuação que o melhor inimigo, com +4 m de
+penalização (é preciso estar mesmo virado para ele). Nas câmaras com mira, o
+ninho é o alvo quando a mira está nele, a não ser que um inimigo debaixo da
+mira esteja a menos de 8 m ou à frente do ninho na mesma linha.
+
+A ninhada usa `director.pick_kind()` e os limites globais
+(`director.max_alive` e `GameData.MAX_ALIVE`), nada durante o atraso de
+spawn de um Nuke, e não passa pelos spawns em anel à volta do jogador (a
+regra dos sectores fica igual). O jogador não atravessa um ninho vivo. A
+extração só abre com os três destruídos; morrer termina a ilha como sempre;
+um Quick Redeploy (ou outra missão no mesmo `IslandRun`) repõe tudo.
+Marcadores `Nest_1..`; sem eles, o jogo escolhe sítios como no Hold Sequence
+(alcançáveis, a 30 m ou mais do barco, afastados, fixos por seed, outra
+"sal", 4 m livres à volta, fora da lava). Visual: monte escuro com cinco
+caroços e um núcleo emissivo que pulsa (mais depressa com menos vida) e
+pisca a branco quando leva tiros; o monte encolhe com o dano; barra de vida
+virada para a câmara (só a menos de 40 m e depois de ferido); ao morrer,
+estoira em pedaços e deixa uma mancha queimada. HUD `NESTS 1 / 3`, marcador
+no ninho mais próximo com a vida (`NEST 72 % · 9 m`), minimapa `NEST`.
+Ainda nenhuma ilha tem marcadores `Nest_*`. Testes: `tests/test_nests.gd`
+(inclui um bot que completa a missão na Jungle e no Vulcão, ameaça 2: 118 s
+e 95 s).
+
+Também: na Fuel Run, com o bidão nas mãos o espaço da habilidade no HUD diz
+`DROP CAN` (com o ícone esbatido) em vez de `READY`, porque a tecla só pousa
+o bidão.
+
+Próximo passo (do catálogo): pesquisa/sinais.

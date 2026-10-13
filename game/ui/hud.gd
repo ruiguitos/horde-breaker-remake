@@ -1328,6 +1328,8 @@ func _mission_progress(run: IslandRun) -> String:
 					return "%d/%d" % [run.holds_done(), run.hold_points.size()]
 				&"fuel_run":
 					return "%d/%d" % [run.cargo_delivered(), run.cargo_pos.size()]
+				&"nests":
+					return "%d/%d" % [run.nests_destroyed(), run.nest_pos.size()]
 				_:
 					return "%d/%d" % [_generators_done(run), GameData.GENERATOR_COUNT]
 		IslandRun.Objective.BOSS:
@@ -1556,6 +1558,13 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	var ability_total: float = run.ability_cooldown_total()
 	_ability_ring.set_state(1.0 - run.grenade_cd / ability_total if ability_total > 0.0 else 1.0, run.grenade_cd)
 	_cooldown_label(_ability_status, run.grenade_cd)
+	if run.is_carrying():
+		# Fuel Run: with a can in the hands the ability button only puts it
+		# down (IslandRun.use_ability), so the slot says that instead of READY.
+		_ability_status.text = "DROP CAN"
+		_ability_status.add_theme_color_override("font_color", UiTheme.INFO)
+	# The grenade / War Cry icon dims while it cannot be used.
+	_ability_ring.modulate.a = 0.4 if run.is_carrying() else 1.0
 	match run.player_class:
 		&"vanguard":
 			_ability_name.text = "WAR CRY"
@@ -1690,6 +1699,12 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 						detail += " · FIND A CAN"
 					pips = cans
 					pips_done = run.cargo_delivered()
+				&"nests":
+					var nests: int = run.nest_pos.size()
+					_objective.text = "NESTS %d / %d" % [run.nests_destroyed(), nests]
+					detail += " · DESTROY THEM, ANY ORDER"
+					pips = nests
+					pips_done = run.nests_destroyed()
 				_:
 					_objective.text = "ACTIVATE THE GENERATORS"
 					detail += " · %d OF %d ONLINE" % [_generators_done(run), GameData.GENERATOR_COUNT]
@@ -1832,6 +1847,12 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"fuel_run":
 		goal = run.fuel_goal()  # the nearest can, or the delivery point while carrying
 		goal_name = run.delivery_name() if run.is_carrying() or run.nearest_waiting_can() == -1 else "Fuel can"
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"nests" and run.nearest_nest() != -1:
+		var n: int = run.nearest_nest()
+		goal = run.nest_pos[n]
+		# The nest's HP on the marker: the damage feedback that reads in
+		# every camera, next to the bar over the mound itself.
+		goal_name = "Nest %d%%" % ceili(100.0 * run.nest_hp[n] / maxf(1.0, run.nest_max_hp))
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"rescue":
 		goal = run.survivor_pos
 		goal_name = "Survivor"

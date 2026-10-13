@@ -47,6 +47,13 @@ const DEBRIS_MAX: int = 600
 const FUEL_COLOR := Minimap.FUEL_COLOR
 ## Where a carried can hangs (its base), in the soldier's space: right hand.
 const CARRY_OFFSET := Vector3(0.38, 0.25, 0.05)
+## Nests: the glowing core (same colour as the minimap marker), the mound's
+## flesh and the scorch left behind.
+const NEST_CORE_COLOR := Minimap.NEST_COLOR
+const NEST_FLESH_COLOR := Color(0.33, 0.2, 0.24)
+const NEST_SCORCH_COLOR := Color(0.09, 0.07, 0.07)
+## The HP bar over a damaged nest shows within this distance (metres).
+const NEST_BAR_RANGE: float = 40.0
 
 var run: IslandRun
 var hud: Hud
@@ -106,6 +113,15 @@ var _hold_beacon: MeshInstance3D
 var _cans: Array[Node3D] = []
 var _can_beacons: Array[MeshInstance3D] = []
 var _delivery_ring: MeshInstance3D
+## Nests: one root per nest (mound, lumps, pulsing core, HP bar) and the
+## scorch shown once it is destroyed. _nest_dead remembers which ones
+## already burst (debris once).
+var _nests: Array[Node3D] = []
+var _nest_cores: Array[MeshInstance3D] = []
+var _nest_bars: Array[Node3D] = []
+var _nest_fills: Array[MeshInstance3D] = []
+var _nest_scorches: Array[MeshInstance3D] = []
+var _nest_dead: Array[bool] = []
 var _survivor: MeshInstance3D
 var _caches: Array[MeshInstance3D] = []
 var _buildings: Array[MeshInstance3D] = []
@@ -300,6 +316,9 @@ func _build_world() -> void:
 		for c in run.cargo_pos.size():
 			_build_fuel_can()
 		_delivery_ring = _ring(run.delivery_point(), IslandRun.cargo_delivery_radius(), FUEL_COLOR)
+	if run.mission == &"nests":
+		for n in run.nest_pos.size():
+			_build_nest(run.nest_pos[n])
 	_survivor = MeshInstance3D.new()
 	_survivor.mesh = _capsule(0.35, 1.7)
 	_survivor.material_override = _mat(Color(1.0, 0.55, 0.1))
@@ -805,6 +824,80 @@ func _build_fuel_can() -> void:
 	add_child(can)
 	_cans.append(can)
 	_can_beacons.append(beacon)
+
+
+## One horde nest, from primitives: a squat mound of dark flesh with lumps
+## around it, a glowing core on top (it pulses, faster as the nest weakens,
+## and flashes white when hit) and an HP bar that faces the camera (shown
+## once damaged). Sized from IslandRun.nest_radius() and NEST_HEIGHT so the
+## model matches what the bullets hit. A scorch replaces it when destroyed.
+func _build_nest(at: Vector3) -> void:
+	var r: float = IslandRun.nest_radius()
+	var root := Node3D.new()
+	root.name = "Nest%d" % _nests.size()
+	root.position = _on_ground(at)
+	var mound := MeshInstance3D.new()
+	var dome := SphereMesh.new()
+	dome.radius = r
+	dome.height = IslandRun.NEST_HEIGHT * 1.1
+	mound.mesh = dome
+	mound.position.y = IslandRun.NEST_HEIGHT * 0.3
+	mound.material_override = _mat(NEST_FLESH_COLOR)
+	root.add_child(mound)
+	for k in 5:
+		var lump := MeshInstance3D.new()
+		lump.mesh = _sphere(r * (0.32 + 0.06 * (k % 3)))
+		var ang: float = k * TAU / 5.0 + 0.4
+		lump.position = Vector3(cos(ang) * r * 0.85, r * 0.15, sin(ang) * r * 0.85)
+		lump.material_override = _mat(NEST_FLESH_COLOR.lightened(0.08 * (k % 2)))
+		root.add_child(lump)
+	var core := MeshInstance3D.new()
+	core.mesh = _sphere(0.42)
+	core.position.y = IslandRun.NEST_HEIGHT - 0.4
+	var cm := _mat(NEST_CORE_COLOR)
+	cm.emission_enabled = true
+	cm.emission = NEST_CORE_COLOR
+	cm.emission_energy_multiplier = 2.0
+	core.material_override = cm
+	root.add_child(core)
+	# HP bar: a dark back and a fill, both billboards (they face every
+	# camera); the fill shrinks towards the middle as the HP drops.
+	var bar := Node3D.new()
+	bar.position.y = IslandRun.NEST_HEIGHT + 0.6
+	bar.visible = false
+	for k in 2:
+		var q := MeshInstance3D.new()
+		var qm := QuadMesh.new()
+		qm.size = Vector2(1.6, 0.16) if k == 0 else Vector2(1.5, 0.1)
+		q.mesh = qm
+		var bm := _mat(Color(0.05, 0.05, 0.05, 0.75) if k == 0 else UiTheme.DANGER, true)
+		bm.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+		bm.billboard_keep_scale = true
+		bm.no_depth_test = true
+		bm.render_priority = k + 1
+		if k == 0:
+			bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		q.material_override = bm
+		bar.add_child(q)
+		if k == 1:
+			_nest_fills.append(q)
+	root.add_child(bar)
+	add_child(root)
+	var scorch := MeshInstance3D.new()
+	var sm := CylinderMesh.new()
+	sm.top_radius = r * 1.2
+	sm.bottom_radius = r * 1.3
+	sm.height = 0.06
+	scorch.mesh = sm
+	scorch.position = _on_ground(at) + Vector3(0, 0.03, 0)
+	scorch.material_override = _mat(NEST_SCORCH_COLOR)
+	scorch.visible = false
+	add_child(scorch)
+	_nests.append(root)
+	_nest_cores.append(core)
+	_nest_bars.append(bar)
+	_nest_scorches.append(scorch)
+	_nest_dead.append(false)
 
 
 func _ring(center: Vector3, radius: float, color: Color) -> MeshInstance3D:
@@ -1762,6 +1855,41 @@ func _fade_occluders(delta: float) -> void:
 			detail.transparency = m.transparency
 
 
+## Nests: the core pulses (faster as the HP drops) and flashes white when
+## hit, the mound sinks a little with damage, the HP bar shows once the nest
+## is hurt and near, and a destroyed nest bursts into debris and leaves a
+## scorch.
+func _draw_nests() -> void:
+	var t: float = Time.get_ticks_msec() * 0.001
+	for n in mini(_nests.size(), run.nest_pos.size()):
+		var alive: bool = run.nest_alive(n)
+		if not alive and not _nest_dead[n]:
+			_nest_dead[n] = true
+			var at: Vector3 = _on_ground(run.nest_pos[n]) + Vector3(0, 0.8, 0)
+			for k in 24:
+				var ang: float = k * TAU / 24.0
+				var v := Vector3(cos(ang) * randf_range(2.0, 5.0), randf_range(3.0, 7.0), sin(ang) * randf_range(2.0, 5.0))
+				_add_debris(at, v, NEST_FLESH_COLOR if k % 3 != 0 else NEST_CORE_COLOR, 1.4)
+		_nests[n].visible = alive
+		_nest_scorches[n].visible = not alive
+		if not alive:
+			continue
+		var frac: float = clampf(run.nest_hp[n] / maxf(1.0, run.nest_max_hp), 0.0, 1.0)
+		var s: float = lerpf(0.75, 1.0, frac)
+		_nests[n].scale = Vector3(1.0, s, 1.0)
+		var cm: StandardMaterial3D = _nest_cores[n].material_override
+		var hit: bool = run.nest_flash[n] > 0.0
+		var pulse: float = 0.5 + 0.5 * sin(t * lerpf(9.0, 3.0, frac))
+		cm.albedo_color = Color.WHITE if hit else NEST_CORE_COLOR
+		cm.emission = Color.WHITE if hit else NEST_CORE_COLOR
+		cm.emission_energy_multiplier = 4.0 if hit else 1.2 + 1.8 * pulse
+		_nest_cores[n].scale = Vector3.ONE * (1.0 + 0.12 * pulse)
+		var near: bool = run.player_pos.distance_to(run.nest_pos[n]) <= NEST_BAR_RANGE
+		_nest_bars[n].visible = near and frac < 1.0
+		_nest_bars[n].scale = Vector3(1.0, 1.0 / s, 1.0)  # the mound's squash must not squash the bar
+		_nest_fills[n].scale = Vector3(maxf(0.001, frac), 1.0, 1.0)
+
+
 ## Where the boat model floats: moored 3 m out from the Boat marker; the
 ## holdout's rescue boat starts 90 m out to sea and glides in as it arrives.
 func _boat_spot() -> Vector3:
@@ -1811,6 +1939,8 @@ func _draw_mission() -> void:
 		var ring: StandardMaterial3D = _delivery_ring.material_override
 		ring.albedo_color = Color(0.3, 1.0, 0.5) if run.is_carrying() else FUEL_COLOR
 		_delivery_ring.visible = run.objective == IslandRun.Objective.GENERATORS
+	if run.mission == &"nests":
+		_draw_nests()
 	for g in _generators.size():
 		var p: float = run.generator_progress[g] / GameData.GENERATOR_HOLD_SECONDS
 		var m: StandardMaterial3D = _generators[g].material_override

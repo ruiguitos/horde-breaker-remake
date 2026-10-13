@@ -24,6 +24,7 @@ const ADVICE: Dictionary = {
 	&"rescue": "The surveyor follows you, slowly, and they don't heal. Take the short way back.",
 	&"hold_sequence": "The points come one at a time. Leave a point and its clock stops. Clear a space, then hold.",
 	&"fuel_run": "One can at a time, and you can't shoot with your hands full. Put it down to fight, pick it up after.",
+	&"nests": "Nests keep breeding while they stand. Pick your order, thin the crowd, then put everything you have into the mound.",
 	&"holdout": "Hold the courtyard until I can send the boat. When it comes, run for the pier. It won't wait.",
 }
 

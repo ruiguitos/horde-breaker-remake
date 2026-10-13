@@ -633,6 +633,8 @@ static func _load_missions() -> Dictionary:
 			"points": d.points, "seconds": d.seconds_per_point, "radius": d.radius,
 			"pickup_radius": d.pickup_radius, "delivery_radius": d.delivery_radius,
 			"carry_speed_mult": d.carry_speed_mult, "spike_seconds": d.spike_seconds,
+			"nest_hp": d.nest_hp, "spawn_interval": d.spawn_interval, "spawn_count": d.spawn_count,
+			"brood_cap": d.brood_cap, "wake_range": d.wake_range, "priority_range": d.priority_range,
 			"preferred_biomes": d.preferred_biomes.duplicate(), "preferred_weight": d.preferred_weight}
 	return out
 

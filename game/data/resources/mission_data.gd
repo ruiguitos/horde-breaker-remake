@@ -27,6 +27,25 @@ extends Resource
 @export var carry_speed_mult: float = 0.0
 ## Fuel Run: seconds of horde spike when a can is picked up the first time.
 @export var spike_seconds: float = 0.0
+@export_group("Nests")
+## Nests (`points` = how many nests, `radius` = a nest's radius in metres,
+## `spike_seconds` = the horde spike when one is destroyed): hit points of
+## a nest before the island's enemy HP scaling (threat and island number
+## multiply it like they multiply every enemy's HP).
+@export var nest_hp: float = 0.0
+## Nests: seconds between two broods of a living nest.
+@export var spawn_interval: float = 0.0
+## Nests: enemies per brood.
+@export var spawn_count: int = 0
+## Nests: a nest stops spawning while this many enemies are already within
+## 12 m of it (its own trickle is capped; the global caps still apply).
+@export var brood_cap: int = 0
+## Nests: only nests within this many metres of the player spawn (a far
+## nest's brood would be lost on the way, or recycled on big islands).
+@export var wake_range: float = 0.0
+## Nests: auto-fire shoots any enemy within this many metres before a nest
+## (enemies keep priority; see IslandRun._pick_target).
+@export var priority_range: float = 0.0
 @export_group("Boat draw")
 ## Biomes where the boat offers this mission more often: its "signature"
 ## islands (it can still be drawn anywhere).

@@ -51,6 +51,26 @@ func on_kill(kind: int, at: Vector3, now: float, field: FlowField,
 	return true
 
 
+## A drop that skips the chance roll and the drop interval (a destroyed
+## horde nest pays one). False when one already lies on the ground (it is
+## not replaced) or there is no safe spot near `at`.
+func force_drop(at: Vector3, now: float, field: FlowField, play_area: PackedVector2Array, finite_weapon: bool) -> bool:
+	if ground_kind != &"":
+		return false
+	var spot: Vector3 = drop_position(at, field, play_area)
+	if not spot.is_finite():
+		return false
+	var kind: StringName = pick_kind(finite_weapon)
+	if kind == &"":
+		return false
+	ground_kind = kind
+	ground_pos = spot
+	ground_time = GameData.POWER_UP_GROUND_SECONDS
+	next_drop_at = now + GameData.POWER_UP_DROP_INTERVAL
+	kills_without_drop = 0
+	return true
+
+
 ## Which power-up drops, by the `weight` of each .tres. All weights equal
 ## keeps the uniform draw (and the same random sequence as before weights).
 func pick_kind(finite_weapon: bool) -> StringName:

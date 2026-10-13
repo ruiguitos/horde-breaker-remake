@@ -33,6 +33,11 @@ Director Hale: The boat's running on fumes. Fuel cans on this rock, all marked. 
 Director Hale: Fuel run, contractor. No fuel, no ride home. I'd hate to bill you for the swim. [ID:RADIO_LAND_FUEL_RUN_2]
 => END
 
+~ land_nests
+Director Hale: Three nests on this rock, feeding the horde. Burn them out, in whatever order you like. [ID:RADIO_LAND_NESTS_1]
+Director Hale: Nest removal, contractor. Every one you leave standing keeps making more of them. [ID:RADIO_LAND_NESTS_2]
+=> END
+
 ~ land_boss
 Director Hale: Thermal readings on the volcano are... large. Do the job, then leave before it notices. [ID:RADIO_LAND_BOSS_1]
 => END
@@ -66,6 +71,16 @@ Director Hale: Delivered. Accounting wants a receipt. Go get another. [ID:RADIO_
 ~ fuel_done
 Director Hale: Tanks are full. Get on the boat before the horde does. [ID:RADIO_FUEL_DONE_1]
 Director Hale: That's the last can. Engine's warm. Climb aboard. [ID:RADIO_FUEL_DONE_2]
+=> END
+
+~ nest_destroyed
+Director Hale: Nest down. Its friends are upset. Keep moving. [ID:RADIO_NEST_DESTROYED_1]
+Director Hale: One less nursery. Pest control would charge double for that. [ID:RADIO_NEST_DESTROYED_2]
+=> END
+
+~ nests_done
+Director Hale: Last nest's gone. The ones still walking didn't get the memo. Get to the boat. [ID:RADIO_NESTS_DONE_1]
+Director Hale: Infestation cleared, mostly. Leave before the leftovers catch up. [ID:RADIO_NESTS_DONE_2]
 => END
 
 ~ objective_done

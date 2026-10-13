@@ -36,6 +36,9 @@ var hold_points: Array[Vector3] = []
 ## delivered (Delivery marker; x < 0 = the extraction point).
 var cargo_points: Array[Vector3] = []
 var delivery := Vector3(-1, 0, -1)
+## Nests: where the horde nests stand (Nest_* markers, in number order;
+## empty = the run picks spots, pick_nest_points).
+var nest_points: Array[Vector3] = []
 ## Optional supply caches (detours with a reward).
 var caches: Array[Vector3] = []
 ## Biome id: beach, town, jungle, port or volcano (see GameData.BIOMES).
@@ -170,6 +173,14 @@ const HOLD_MAX_WALK: int = 240
 ## smaller open area (3 m: room to put a can down and fight beside it).
 static func pick_cargo_points(map: IslandMap, count: int, rng_seed: int) -> Array[Vector3]:
 	return pick_hold_points(map, count, rng_seed ^ 0x4655454c, 3.0)
+
+
+## Nests on a map without Nest_* markers: the same search again (reachable,
+## at least HOLD_MIN_FROM_BOAT from the boat, spread apart, fixed per seed)
+## with its own salt, and 4 m of open ground around each nest so the mound
+## does not touch a wall and there is room to fight around it.
+static func pick_nest_points(map: IslandMap, count: int, rng_seed: int) -> Array[Vector3]:
+	return pick_hold_points(map, count, rng_seed ^ 0x4e455354, 4.0)
 
 
 static func pick_hold_points(map: IslandMap, count: int, rng_seed: int, radius: float = 5.0) -> Array[Vector3]:

@@ -162,7 +162,29 @@ var _cargo_dropped: int = -1
 ## Last spot the player stood on walkable ground (not in noclip): a can
 ## dropped while flying over a wall lands here instead, so it can't be lost.
 var _last_walkable: Vector3 = Vector3.ZERO
-## The seed this island was built with (fallback hold points, fuel cans).
+## Nests: one entry per horde nest. Its position, hit points left (0 =
+## destroyed), seconds until its next brood and a short hit flash (drawn by
+## the scene). Nests take damage through the enemies' own pipeline:
+## _pick_target can return a nest (nest_target(n), a negative id), every
+## pellet checks the nests on its line (_pellet_nest_hit), and grenades and
+## the Breaker impact hit nests in their radius (_damage_nests_in).
+var nest_pos: Array[Vector3] = []
+var nest_hp: PackedFloat32Array = PackedFloat32Array()
+var nest_max_hp: float = 0.0
+var nest_spawn_cd: PackedFloat32Array = PackedFloat32Array()
+var nest_flash: PackedFloat32Array = PackedFloat32Array()
+## Enemies the nests have spawned on this island (tests, F3).
+var nest_spawns: int = 0
+## Nest broods have their own RNG: they do not shift the director's spawns.
+var _nest_rng := RandomNumberGenerator.new()
+## Height of a nest (ground to the top of its core) and the radius around a
+## nest in which its brood counts towards brood_cap.
+const NEST_HEIGHT: float = 1.8
+const NEST_BROOD_RADIUS: float = 12.0
+## Fixed camera: metres added to a nest's aim score, so a nest only wins
+## over an enemy at a similar spot when the player clearly faces it.
+const NEST_SCORE_PENALTY: float = 4.0
+## The seed this island was built with (fallback hold points, fuel cans, nests).
 var run_seed: int = 7
 var survivor_pos: Vector3 = Vector3.ZERO
 var survivor_hp: float = GameData.SURVIVOR_HP
@@ -323,6 +345,7 @@ func load_context(ctx: RunContext) -> void:
 	landed_time = time_alive
 	rerolls = context_rerolls(ctx)
 	horde.hp_scale = (1.0 + 0.3 * ctx.island_index) * GameData.threat_hp(threat)
+	_reset_nest_hp()  # nests scale like every enemy
 	director.max_alive = GameData.MAX_ALIVE + GameData.threat_extra_alive(threat)
 	modifier = ctx.modifier
 	hazard_pay = ctx.hazard_pay
@@ -573,6 +596,7 @@ func _update_grenades(dt: float) -> void:
 				_damage(j, grenade_damage(), p, false, true)
 				horde.stun[j] = maxf(horde.stun[j], 0.6 + 0.25 * stacks(&"concussion") + perk_value(&"concussion_blast"))
 				horde.knock_back(j, p, 2.0)
+			_damage_nests_in(p, radius, grenade_damage())
 			grenades.remove_at(i)
 			grenade_fuses.remove_at(i)
 		i -= 1
@@ -619,6 +643,129 @@ func set_mission(id: StringName) -> void:
 			cargo_state.append(CAN_WAITING)
 			cargo_touched.append(false)
 		site = fuel_goal()
+	nest_pos.clear()
+	nest_hp.clear()
+	nest_spawn_cd.clear()
+	nest_flash.clear()
+	nest_spawns = 0
+	if mission == &"nests":
+		nest_pos = map.nest_points.duplicate()
+		if nest_pos.is_empty():
+			nest_pos = IslandMap.pick_nest_points(map, nest_count_wanted(), run_seed)
+		if nest_pos.is_empty():
+			nest_pos.append(site)  # a map too small to pick from: one nest
+		_nest_rng.seed = run_seed ^ 0x42524f4f
+		for n in nest_pos.size():
+			nest_hp.append(0.0)
+			# Staggered: the nests do not all spawn on the same frame.
+			nest_spawn_cd.append(nest_spawn_interval() * (0.5 + 0.25 * n))
+			nest_flash.append(0.0)
+		_reset_nest_hp()
+		site = nest_goal()
+
+
+## Nests numbers, from the mission's data (nests.tres).
+static func nest_count_wanted() -> int:
+	return int(GameData.mission_value(&"nests", "points", 3.0))
+
+
+static func nest_radius() -> float:
+	return GameData.mission_value(&"nests", "radius", 1.4)
+
+
+static func nest_base_hp() -> float:
+	return GameData.mission_value(&"nests", "nest_hp", 600.0)
+
+
+static func nest_spawn_interval() -> float:
+	return GameData.mission_value(&"nests", "spawn_interval", 7.0)
+
+
+static func nest_spawn_count() -> int:
+	return int(GameData.mission_value(&"nests", "spawn_count", 2.0))
+
+
+static func nest_brood_cap() -> int:
+	return int(GameData.mission_value(&"nests", "brood_cap", 6.0))
+
+
+static func nest_wake_range() -> float:
+	return GameData.mission_value(&"nests", "wake_range", 45.0)
+
+
+static func nest_priority_range() -> float:
+	return GameData.mission_value(&"nests", "priority_range", 8.0)
+
+
+static func nest_spike_seconds() -> float:
+	return GameData.mission_value(&"nests", "spike_seconds", 12.0)
+
+
+## Every living nest back to full HP: nest_base_hp() times the island's
+## enemy HP scale (threat and island number, as for every enemy).
+func _reset_nest_hp() -> void:
+	nest_max_hp = nest_base_hp() * horde.hp_scale
+	for n in nest_hp.size():
+		nest_hp[n] = nest_max_hp
+
+
+## Auto-fire targets: >= 0 is an enemy (horde index), -1 nothing, and
+## nest_target(n) (-2, -3...) is nest n.
+static func nest_target(n: int) -> int:
+	return -2 - n
+
+
+## The nest a target id points at, or -1 when it is an enemy (or nothing).
+static func target_nest(target: int) -> int:
+	return -2 - target if target <= -2 else -1
+
+
+func nest_alive(n: int) -> bool:
+	return n >= 0 and n < nest_hp.size() and nest_hp[n] > 0.0
+
+
+func nests_destroyed() -> int:
+	var k: int = 0
+	for n in nest_hp.size():
+		if nest_hp[n] <= 0.0:
+			k += 1
+	return k
+
+
+## The living nest nearest to the player (-1 = none left).
+func nearest_nest() -> int:
+	var best: int = -1
+	var best_d: float = INF
+	for n in nest_pos.size():
+		if not nest_alive(n):
+			continue
+		var d: float = _flat_dist(nest_pos[n], player_pos)
+		if d < best_d:
+			best_d = d
+			best = n
+	return best
+
+
+## Where the player should go next in Nests: the nearest living nest (the
+## HUD marker, the minimap and the test bots read `site`).
+func nest_goal() -> Vector3:
+	var n: int = nearest_nest()
+	return nest_pos[n] if n >= 0 else extraction_point()
+
+
+static func _flat_dist(a: Vector3, b: Vector3) -> float:
+	return Vector2(a.x - b.x, a.z - b.z).length()
+
+
+## Lower and upper end of nest n's body axis (ground + 0.2 m to the top of
+## its core), in world metres: the crosshair aims at it like at an enemy.
+func _nest_low(n: int) -> Vector3:
+	var p: Vector3 = nest_pos[n]
+	return Vector3(p.x, map.ground_y(p) + 0.2, p.z)
+
+
+func _nest_seg() -> Vector3:
+	return Vector3(0, NEST_HEIGHT - 0.2, 0)
 
 
 ## Fuel Run numbers, from the mission's data (fuel_run.tres).
@@ -817,6 +964,8 @@ func _main_task_done() -> bool:
 			return hold_index >= hold_points.size()
 		&"fuel_run":
 			return cargo_delivered() >= cargo_pos.size()
+		&"nests":
+			return nests_destroyed() >= nest_pos.size()
 	for p in generator_progress:
 		if p < GameData.GENERATOR_HOLD_SECONDS:
 			return false
@@ -896,6 +1045,8 @@ func _intel_base() -> int:
 			base += holds_done() * 15
 		&"fuel_run":
 			base += cargo_delivered() * 15
+		&"nests":
+			base += nests_destroyed() * 15
 		_:
 			base += done * 15
 	base += 20 if boss_killed else 0
@@ -986,6 +1137,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	_update_stamina(dt, sprint and move.length_squared() > 0.01 and carrying < 0)
 	var before_move: Vector3 = player_pos
 	_update_player(dt, move, breaker)
+	_push_out_of_nests()
 	if not noclip:
 		var cell: Vector2i = field.world_to_cell(player_pos)
 		if not field.is_blocked(cell.x, cell.y):
@@ -1103,6 +1255,7 @@ func _breaker_impact(radius: float) -> void:
 		_damage(i, dmg, player_pos, false, true)
 		if pulse > 0.0 and not _dead.has(i):
 			horde.knock_back(i, player_pos, pulse)
+	_damage_nests_in(player_pos, radius, dmg)
 	if has_perk(&"opening_volley"):
 		opening_volley_time = GameData.OPENING_VOLLEY_SECONDS
 	_flush_dead()
@@ -1128,7 +1281,7 @@ func _auto_fire(dt: float) -> void:
 			messages.append(w.display_name + " out of ammo")
 			weapon_index = 0
 			break
-		if reload_left > 0.0 or target in _dead or target >= horde.count:
+		if reload_left > 0.0 or target in _dead or target >= horde.count 				or (target <= -2 and not nest_alive(target_nest(target))):
 			break
 
 
@@ -1272,11 +1425,16 @@ func uses_crosshair() -> bool:
 ## an enemy (a special, the boss) makes it the target ("aim with your body").
 ## Enemies within 2.5 m always win: whoever is biting you gets shot first.
 ## First / third person: the enemy under the crosshair (_pick_crosshair_target).
+## Nests (the Nests mission) compete too, but enemies keep priority: an
+## enemy target within nest_priority_range() always wins, and beyond it a
+## nest needs a better score than the best enemy, NEST_SCORE_PENALTY
+## included (_pick_nest_fixed); the returned id is then nest_target(n).
 func _pick_target(range_m: float) -> int:
 	if uses_crosshair():
 		return _pick_crosshair_target(range_m)
 	var best: int = -1
 	var best_score: float = INF
+	var best_d: float = INF
 	var cos_cone: float = cos(deg_to_rad(GameData.AIM_CONE_DEG))
 	for i in horde.query_radius(player_pos, range_m):
 		if _dead.has(i):
@@ -1297,6 +1455,41 @@ func _pick_target(range_m: float) -> int:
 			continue
 		best = i
 		best_score = score
+		best_d = d
+	if nest_pos.is_empty() or (best != -1 and best_d < nest_priority_range()):
+		return best
+	var nest: int = _pick_nest_fixed(range_m, cos_cone, best_score)
+	return nest_target(nest) if nest >= 0 else best
+
+
+## Fixed camera: the living nest in the body's aim cone with the best score
+## below `beat` (same score as enemies: metres to its surface + 0.4 m per
+## degree off the facing, plus NEST_SCORE_PENALTY), visible; -1 = none.
+func _pick_nest_fixed(range_m: float, cos_cone: float, beat: float) -> int:
+	var best: int = -1
+	var r: float = nest_radius()
+	var cone: float = acos(cos_cone)
+	for n in nest_pos.size():
+		if not nest_alive(n):
+			continue
+		var to: Vector3 = nest_pos[n] - player_pos
+		var dc: float = Vector2(to.x, to.z).length()
+		if dc - r > range_m:
+			continue
+		# Off-axis angle to the nest's edge (0 when facing any part of it).
+		var off: float = 0.0
+		if dc > r:
+			var c: float = facing.dot(Vector3(to.x, 0, to.z) / dc)
+			off = maxf(0.0, acos(clampf(c, -1.0, 1.0)) - asin(r / dc))
+		if off > cone:
+			continue
+		var score: float = maxf(0.01, dc - r) + rad_to_deg(off) * 0.4 + NEST_SCORE_PENALTY
+		if score >= beat:
+			continue
+		if not _line_of_sight(player_pos, nest_pos[n]):
+			continue
+		best = n
+		beat = score
 	return best
 
 
@@ -1335,16 +1528,48 @@ func _pick_crosshair_target(range_m: float) -> int:
 			continue
 		best = i
 		best_score = score
+	# Nests: the crosshair on a nest targets it, unless an enemy under the
+	# crosshair is within nest_priority_range() or nearer on the same line.
+	if nest_pos.is_empty() or (best != -1 and _flat_dist(horde.positions[best], player_pos) < nest_priority_range()):
+		return best
+	var r: float = nest_radius()
+	for n in nest_pos.size():
+		if not nest_alive(n):
+			continue
+		var to: Vector3 = nest_pos[n] - player_pos
+		if Vector2(to.x, to.z).length() - r > range_m or Vector3(to.x, 0, to.z).dot(ahead) <= 0.0:
+			continue
+		var aim: Vector3 = _nest_aim_point(n)
+		var v: Vector3 = aim - crosshair_origin
+		var dist: float = v.length()
+		if dist < 0.01:
+			continue
+		var gap: float = maxf(0.0, crosshair_dir.angle_to(v) - atan(r / dist))
+		var score: float = gap + dist * 0.00001
+		if score >= best_score:
+			continue
+		if not (_view_clear(player_pos, nest_pos[n]) and _view_clear(crosshair_origin, aim) and _above_ground(crosshair_origin, aim)):
+			continue
+		best = nest_target(n)
+		best_score = score
 	return best
+
+
+## Point of nest n's axis closest to the crosshair ray (as for an enemy).
+func _nest_aim_point(n: int) -> Vector3:
+	return _axis_point(_nest_low(n), _nest_seg())
 
 
 ## Point of enemy i's vertical axis (feet + 0.2 m up to the head centre)
 ## closest to the crosshair ray.
 func _crosshair_body_point(i: int) -> Vector3:
 	var p: Vector3 = horde.positions[i]
-	var head: Vector3 = enemy_head(i)
 	var low := Vector3(p.x, p.y + map.ground_y(p) + 0.2, p.z)
-	var seg: Vector3 = head - low
+	return _axis_point(low, enemy_head(i) - low)
+
+
+## Point of the segment low .. low + seg closest to the crosshair ray.
+func _axis_point(low: Vector3, seg: Vector3) -> Vector3:
 	# Closest points between the lines origin + s * dir (dir is unit length)
 	# and low + u * seg: u = (seg.w - b * dir.w) / (seg.seg - b * b).
 	var w: Vector3 = crosshair_origin - low
@@ -1483,14 +1708,16 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 	var crosshair: bool = uses_crosshair()
 	var origin: Vector3 = player_pos
 	var dir: Vector3
+	var aimed_nest: int = target_nest(target)
 	if crosshair:
 		origin = crosshair_origin
-		dir = (_crosshair_body_point(target) - origin).normalized()
+		var point: Vector3 = _nest_aim_point(aimed_nest) if aimed_nest >= 0 else _crosshair_body_point(target)
+		dir = (point - origin).normalized()
 	else:
-		var to: Vector3 = horde.positions[target] - player_pos
+		var to: Vector3 = (nest_pos[aimed_nest] if aimed_nest >= 0 else horde.positions[target]) - player_pos
 		to.y = 0.0
 		dir = to.normalized()
-	var headshot: bool = _is_headshot(target)
+	var headshot: bool = aimed_nest < 0 and _is_headshot(target)
 	var rifle: bool = w.primary
 	var dmg: float = w.damage * (1.0 + 0.10 * stacks(&"hollow_points") if rifle else 1.0)
 	if rifle:  # perks multiply after the cards
@@ -1509,6 +1736,21 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 		var hits: Array[Vector2] = _crosshair_hits(origin, pellet_dir, pierce, candidates) if crosshair \
 			else horde.hitscan(player_pos, pellet_dir, w.range_m, pierce)
 		var end: Vector3 = player_pos + Vector3(pellet_dir.x, 0, pellet_dir.z).normalized() * w.range_m
+		# A nest on the pellet's line takes the hit if the pellet still has
+		# pierce left when it gets there, and stops it (enemies beyond it are
+		# not hit). Distances are along the same ray as the enemy hits.
+		var nest_hit := Vector2(INF, -1)
+		if not nest_pos.is_empty():
+			nest_hit = _pellet_nest_hit(origin, pellet_dir, w.range_m, crosshair)
+			if nest_hit.y >= 0.0:
+				var before: Array[Vector2] = []
+				for h in hits:
+					if h.x < nest_hit.x:
+						before.append(h)
+				if before.size() < pierce:
+					hits = before
+				else:
+					nest_hit = Vector2(INF, -1)
 		for h in hits:
 			var idx: int = int(h.y)
 			if crosshair:
@@ -1534,9 +1776,125 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 			if idx == target:
 				ricochet_damage = hit_damage
 			horde.knock_back(idx, player_pos, w.knockback + (0.15 * stacks(&"wind_rounds") if rifle else 0.0))
+		if nest_hit.y >= 0.0:
+			var n: int = int(nest_hit.y)
+			var at: Vector3 = origin + pellet_dir * nest_hit.x
+			end = Vector3(at.x, 0, at.z)
+			# Body damage (no head, no elements); close range and Point Blank
+			# count from the nest's surface.
+			var near: float = maxf(0.0, _flat_dist(nest_pos[n], player_pos) - nest_radius())
+			var nest_damage: float = dmg * body_damage_mult()
+			if w.close_range > 0.0 and near <= w.close_range:
+				nest_damage *= w.close_damage_mult
+			if rifle and near <= 4.0:
+				nest_damage *= 1.0 + 0.10 * stacks(&"point_blank")
+			_damage_nest(n, nest_damage)
 		tracers.append(PackedVector3Array([player_pos, end]))
 	if rifle and direct_hits.has(target) and stacks(&"ricochet") > 0 and _shots % 4 == 0:
 		_chain_hit(target, stacks(&"ricochet"), ricochet_damage * 0.6, direct_hits)
+
+
+## The first living nest a pellet hits: Vector2(distance along the ray,
+## nest index), or (INF, -1). Fixed camera: the flat ray from the player
+## against the nest's circle, with a clear line on the grid. Crosshair: the
+## 3D ray against the nest's axis (radius nest_radius()), stopped by the
+## pellet's first obstacle (_ray_block) and only if the soldier sees it.
+func _pellet_nest_hit(origin: Vector3, dir: Vector3, range_m: float, crosshair: bool) -> Vector2:
+	var best := Vector2(INF, -1)
+	var r: float = nest_radius()
+	var d2 := Vector2(dir.x, dir.z)
+	if d2.length_squared() < 0.000001:
+		return best
+	d2 = d2.normalized()
+	for n in nest_pos.size():
+		if not nest_alive(n) or _flat_dist(nest_pos[n], player_pos) - r > range_m:
+			continue
+		var s: float = -1.0
+		if crosshair:
+			s = _ray_axis_hit(origin, dir, _nest_low(n), _nest_seg(), r)
+		else:
+			var m := Vector2(origin.x - nest_pos[n].x, origin.z - nest_pos[n].z)
+			var b: float = m.dot(d2)
+			var c: float = m.dot(m) - r * r
+			if c <= 0.0:
+				s = 0.0
+			elif b < 0.0 and b * b - c >= 0.0:
+				s = -b - sqrt(b * b - c)
+		if s < 0.0 or s >= best.x:
+			continue
+		if crosshair:
+			if _ray_block(origin, dir, s) < s or not _view_clear(player_pos, nest_pos[n]):
+				continue
+		elif s > range_m or not _line_of_sight(player_pos, origin + Vector3(d2.x, 0, d2.y) * s):
+			continue
+		best = Vector2(s, n)
+	return best
+
+
+## Distance along the ray origin + s * dir (unit) where it passes within `r`
+## of the segment low .. low + seg; -1 when it misses (as _crosshair_hits).
+static func _ray_axis_hit(origin: Vector3, dir: Vector3, low: Vector3, seg: Vector3, r: float) -> float:
+	var w: Vector3 = origin - low
+	var b: float = dir.dot(seg)
+	var ss: float = maxf(seg.dot(seg), 0.000001)
+	var denom: float = ss - b * b
+	var u: float = 0.0
+	if denom > 0.000001:
+		u = clampf((seg.dot(w) - b * dir.dot(w)) / denom, 0.0, 1.0)
+	var s: float = maxf(0.0, dir.dot(low + seg * u - origin))
+	var on_ray: Vector3 = origin + dir * s
+	var on_axis: Vector3 = low + seg * clampf((on_ray - low).dot(seg) / ss, 0.0, 1.0)
+	return s if on_ray.distance_to(on_axis) <= r else -1.0
+
+
+## Area damage (grenade, Breaker impact) to every living nest whose edge is
+## within `radius` of `at`.
+func _damage_nests_in(at: Vector3, radius: float, amount: float) -> void:
+	for n in nest_pos.size():
+		if nest_alive(n) and _flat_dist(at, nest_pos[n]) <= radius + nest_radius():
+			_damage_nest(n, amount)
+
+
+## Damage to nest n. Nests ignore Insta-Kill, elements and burning: they are
+## mounds, not bodies. At 0 HP the nest is destroyed (_destroy_nest).
+func _damage_nest(n: int, amount: float) -> void:
+	if not nest_alive(n) or amount <= 0.0:
+		return
+	nest_hp[n] = maxf(0.0, nest_hp[n] - amount)
+	nest_flash[n] = 0.12
+	if nest_hp[n] <= 0.0:
+		_destroy_nest(n)
+
+
+## A destroyed nest bursts: a short horde spike (the brood around it
+## panics) and a power-up drop (PowerUps.force_drop, if none is on the
+## ground already). The extraction opens with the last one (_update_mission).
+func _destroy_nest(n: int) -> void:
+	var p: Vector3 = nest_pos[n]
+	explosions.append(p)
+	director.trigger_peak(nest_spike_seconds())
+	if power_ups.force_drop(p, time_alive, field, play_area, _has_finite_weapon()):
+		messages.append("The nest left something behind!")
+	site = nest_goal()
+	if nests_destroyed() < nest_pos.size():
+		messages.append("Nest destroyed (%d / %d)!" % [nests_destroyed(), nest_pos.size()])
+		radio.append(&"nest_destroyed")
+
+
+## Living nests are solid: the player is pushed out of their mound.
+func _push_out_of_nests() -> void:
+	if noclip or nest_pos.is_empty():
+		return
+	var min_d: float = nest_radius() + GameData.PLAYER_RADIUS
+	for n in nest_pos.size():
+		if not nest_alive(n):
+			continue
+		var d := Vector2(player_pos.x - nest_pos[n].x, player_pos.z - nest_pos[n].z)
+		var dist: float = d.length()
+		if dist >= min_d:
+			continue
+		var out: Vector2 = (d / dist if dist > 0.001 else Vector2(0, 1)) * (min_d - dist)
+		player_pos = Horde.move_against_walls(field, player_pos, out.x, out.y, GameData.PLAYER_RADIUS)
 
 
 ## Broad phase of a crosshair shot (once per shot, not per pellet): live
@@ -1957,6 +2315,8 @@ func _update_mission(dt: float) -> void:
 					_update_hold_sequence(dt)
 				&"fuel_run":
 					_update_fuel_run()
+				&"nests":
+					_update_nests(dt)
 				_:
 					_update_generators(dt)
 			if _main_task_done() and has_boss:
@@ -1971,6 +2331,8 @@ func _update_mission(dt: float) -> void:
 					radio.append(&"hold_done")
 				elif mission == &"fuel_run" and not has_exit():
 					radio.append(&"fuel_done")
+				elif mission == &"nests" and not has_exit():
+					radio.append(&"nests_done")
 				elif mission != &"rescue":
 					radio.append(&"objective_done_on_foot" if has_exit() else &"objective_done")
 		Objective.BOSS:
@@ -2084,6 +2446,55 @@ func _update_fuel_run() -> void:
 		if c >= 0:
 			_pick_up_can(c)
 	site = fuel_goal()
+
+
+## Nests: each living nest near the player (nest_wake_range()) spawns a
+## brood of nest_spawn_count() enemies every nest_spawn_interval() seconds,
+## right beside its mound. The trickle is capped twice: per nest (no brood
+## while nest_brood_cap() enemies are within NEST_BROOD_RADIUS of it) and
+## globally (the director's max_alive and GameData.MAX_ALIVE, like every
+## spawn; none during a Nuke's spawn delay). The director's own spawns
+## around the player (and their sector rule) are untouched.
+func _update_nests(dt: float) -> void:
+	for n in nest_pos.size():
+		nest_flash[n] = maxf(0.0, nest_flash[n] - dt)
+		if not nest_alive(n):
+			continue
+		nest_spawn_cd[n] -= dt
+		if nest_spawn_cd[n] > 0.0:
+			continue
+		nest_spawn_cd[n] = nest_spawn_interval()
+		_nest_brood(n)
+	site = nest_goal()
+
+
+func _nest_brood(n: int) -> void:
+	var p: Vector3 = nest_pos[n]
+	if power_ups.spawn_delay > 0.0 or _flat_dist(p, player_pos) > nest_wake_range():
+		return
+	var cap: int = mini(director.max_alive, GameData.MAX_ALIVE)
+	var near: int = horde.query_radius(p, NEST_BROOD_RADIUS).size()
+	for k in nest_spawn_count():
+		if horde.count >= cap or near >= nest_brood_cap():
+			return
+		var spot: Vector3 = _nest_spawn_spot(p)
+		if spot == Vector3.INF:
+			return
+		horde.add(spot, director.pick_kind(), rng)
+		near += 1
+		nest_spawns += 1
+
+
+## A free, reachable spot just outside nest `p`'s mound (1 to 3 m from its
+## edge), at least 3 m from the player; INF when none of 10 tries fits.
+func _nest_spawn_spot(p: Vector3) -> Vector3:
+	for attempt in 10:
+		var ang: float = _nest_rng.randf() * TAU
+		var dist: float = nest_radius() + _nest_rng.randf_range(1.0, 3.0)
+		var q: Vector3 = p + Vector3(cos(ang), 0, sin(ang)) * dist
+		if can_spawn_at(q) and _flat_dist(q, player_pos) >= 3.0:
+			return q
+	return Vector3.INF
 
 
 ## The survivor waits at the site, then follows the player and can be hurt.
@@ -2389,6 +2800,8 @@ func objective_text() -> String:
 				if carrying >= 0:
 					return "Fuel %d / %d: carry the can to the %s" % [cargo_delivered(), cargo_pos.size(), delivery_name().to_lower()]
 				return "Fuel %d / %d: find a fuel can" % [cargo_delivered(), cargo_pos.size()]
+			if mission == &"nests":
+				return "Destroy the nests (%d / %d)" % [nests_destroyed(), nest_pos.size()]
 			var done: int = 0
 			for p in generator_progress:
 				if p >= GameData.GENERATOR_HOLD_SECONDS:

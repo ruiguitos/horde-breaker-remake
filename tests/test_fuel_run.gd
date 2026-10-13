@@ -365,8 +365,10 @@ func _test_draw() -> void:
 			town += 1
 		if GameData.pick_route_mission(rng, &"fuel_run", &"beach") == &"fuel_run":
 			repeats += 1
-	var want_beach: float = 3.0 / 7.0
-	var want_town: float = 1.0 / 5.0
+	# Fuel Run weighs 3, every other route mission 1.
+	var routes: int = GameData.ROUTE_MISSIONS.size()
+	var want_beach: float = 3.0 / (routes + 2)
+	var want_town: float = 1.0 / routes
 	_check(absf(beach / float(n) - want_beach) < 0.03 and absf(town / float(n) - want_town) < 0.03,
 		"draw shares: Beach %.0f%% (expected %.0f%%), Town %.0f%% (expected %.0f%%)" % [100.0 * beach / n, 100.0 * want_beach, 100.0 * town / n, 100.0 * want_town])
 	_check(repeats == 0, "no repeat even on the Beach")
@@ -513,6 +515,11 @@ func _test_scene() -> void:
 			and objective.text.begins_with("FUEL 0 / 3"),
 			"%s: the can is carried at the soldier's side (%.2f m), HUD '%s'" % [Profile.CAMERA_MODE_NAMES[mode],
 			can.position.distance_to(player.position), objective.text])
+		# The ability slot tells the truth: with a can, the button drops it.
+		var ability: Label = hud.get("_ability_status")
+		var ring: Control = hud.get("_ability_ring")
+		_check(ability.text == "DROP CAN" and ring.modulate.a < 0.5,
+			"%s: carrying, the ability slot reads '%s' (dimmed icon)" % [Profile.CAMERA_MODE_NAMES[mode], ability.text])
 		run.drop_cargo()
 		run.player_pos = run.cargo_pos[0] + Vector3(IslandRun.cargo_pickup_radius() + 3.0, 0, 0)
 		for i in 2:
@@ -520,6 +527,9 @@ func _test_scene() -> void:
 			await process_frame
 		_check(not run.is_carrying() and (island.get("_can_beacons") as Array)[0].visible,
 			"%s: dropped can on the ground with its beacon" % Profile.CAMERA_MODE_NAMES[mode])
+		var after: Label = hud.get("_ability_status")
+		_check(after.text in ["READY", "COOLDOWN"] and (hud.get("_ability_ring") as Control).modulate.a == 1.0,
+			"%s: hands free, the ability slot is back to '%s'" % [Profile.CAMERA_MODE_NAMES[mode], after.text])
 		# Back on it next loop: stepping away above re-enabled walking pickup.
 	island.queue_free()
 	await process_frame

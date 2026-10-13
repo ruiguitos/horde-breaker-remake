@@ -370,7 +370,7 @@ só visual. A câmara de 3.ª pessoa encurta para não entrar nas colinas.
 | `Trees/` | Cada filho bloqueia só a célula do tronco (a copa não conta) |
 | `Bridges/` | Cada filho é o tabuleiro de uma ponte (`MeshInstance3D`): as células por baixo andam-se à altura do tabuleiro, mesmo sobre água; os filhos (guardas) são decoração |
 | `Decor/` | Nunca bloqueia: relva, flores, estradas, luzes, água de pré-visualização |
-| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed), `Cargo_1..` e `Delivery` (missão Fuel Run: onde estão os bidões e onde se entregam; sem `Cargo_*` o jogo escolhe sítios como os do Hold Sequence, sem `Delivery` entrega-se no barco/Exit) (nós `Marker3D`) |
+| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed), `Cargo_1..` e `Delivery` (missão Fuel Run: onde estão os bidões e onde se entregam; sem `Cargo_*` o jogo escolhe sítios como os do Hold Sequence, sem `Delivery` entrega-se no barco/Exit), `Nest_1..` (missão Nests: onde estão os ninhos; sem eles o jogo escolhe sítios como os do Hold Sequence, com 4 m livres à volta) (nós `Marker3D`) |
 
 A ilha ocupa o quadrado de 0 a `size` metros em X e Z (160 por omissão;
 muda no inspetor do nó raiz). Mantém tudo lá dentro.
@@ -507,6 +507,15 @@ Cada rota mostra também a missão da ilha:
   apanhá-lo depois. A primeira vez que pegas em cada bidão, a horda entra em
   pico. Entrega a menos de 6 m do barco; a saída só abre com os três
   entregues. É a missão "da casa" da Beach: lá sai com peso 3 no sorteio.
+- **Nests**: destrói os três ninhos da horda (montes escuros com um núcleo
+  verde-amarelo que pulsa), pela ordem que quiseres. Cada ninho vivo a menos
+  de 45 m de ti solta 2 inimigos a cada 7 s ao lado do monte (no máximo 6 à
+  volta de cada ninho). O tiro automático, a mira, os chumbos da shotgun, a
+  marksman (atravessa), a granada e o impacto do Breaker ferem os ninhos;
+  um inimigo a menos de 8 m tem sempre prioridade sobre o ninho. Cada ninho
+  destruído chama um pico curto e deixa cair um power-up. A barra de vida
+  aparece por cima do ninho ferido e no marcador (`NEST 64 %`). É a missão
+  "da casa" da Jungle e do Vulcão (peso 3 no sorteio).
 
 No Vulcão, o boss aparece depois de cumprires a missão.
 

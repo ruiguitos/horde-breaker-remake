@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://cnests0hive0"]
+
+[ext_resource type="Script" path="res://game/data/resources/mission_data.gd" id="1_nest"]
+
+[resource]
+script = ExtResource("1_nest")
+display_name = "Nests"
+text = "Destroy three horde nests, then get out."
+order = 6
+points = 3
+radius = 1.4
+spike_seconds = 12.0
+nest_hp = 600.0
+spawn_interval = 7.0
+spawn_count = 2
+brood_cap = 6
+wake_range = 45.0
+priority_range = 8.0
+preferred_biomes = Array[StringName]([&"jungle", &"volcano"])
+preferred_weight = 3

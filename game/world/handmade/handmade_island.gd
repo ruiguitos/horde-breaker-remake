@@ -16,7 +16,8 @@ extends Node3D
 ##                     Sequence: HoldPoint_1, HoldPoint_2... (held in the
 ##                     order of their number suffix), and for Fuel Run:
 ##                     Cargo_1, Cargo_2... (where the cans start) and
-##                     Delivery (where they go; default: the boat/Exit)
+##                     Delivery (where they go; default: the boat/Exit),
+##                     and for Nests: Nest_1, Nest_2... (horde nests)
 ## The island covers x, z in [0, size): keep everything inside that square.
 ## How to build one: game/README.md, "Ilhas feitas à mão".
 
@@ -152,6 +153,7 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	map.player_start = _flat(_local(start).origin) if start != null else map.boat + Vector3(0, 0, -5)
 	var holds: Array = []  # [suffix number, position]
 	var cargo: Array = []  # same, for the Cargo_* markers
+	var nests: Array = []  # same, for the Nest_* markers
 	for node in _children_of("Markers"):
 		if node.name.begins_with("Generator"):
 			map.generators.append(_flat(_local(node).origin))
@@ -161,12 +163,17 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 			holds.append([hold_point_number(String(node.name)), _flat(_local(node).origin)])
 		elif node.name.begins_with("Cargo"):
 			cargo.append([marker_number(String(node.name), "Cargo"), _flat(_local(node).origin)])
+		elif node.name.begins_with("Nest"):
+			nests.append([marker_number(String(node.name), "Nest"), _flat(_local(node).origin)])
 	holds.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	for h: Array in holds:
 		map.hold_points.append(h[1])
 	cargo.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	for c: Array in cargo:
 		map.cargo_points.append(c[1])
+	nests.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	for n: Array in nests:
+		map.nest_points.append(n[1])
 	for spot: Array in [["Exit", "exit"], ["RescueTarget", "rescue_target"], ["DefendZone", "defend_zone"], ["Delivery", "delivery"]]:
 		var node: Node3D = get_node_or_null("Markers/" + spot[0])
 		if node != null:
@@ -183,7 +190,7 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 		for p: Vector3 in [map.exit, map.rescue_target, map.defend_zone, map.delivery]:
 			if p.x >= 0.0:
 				spots.append(p)
-		for list: Array in [["Boat", [map.boat]], ["Generator", map.generators], ["Cache", map.caches], ["Exit/RescueTarget/DefendZone/Delivery", spots], ["HoldPoint", map.hold_points], ["Cargo", map.cargo_points]]:
+		for list: Array in [["Boat", [map.boat]], ["Generator", map.generators], ["Cache", map.caches], ["Exit/RescueTarget/DefendZone/Delivery", spots], ["HoldPoint", map.hold_points], ["Cargo", map.cargo_points], ["Nest", map.nest_points]]:
 			for p: Vector3 in list[1]:
 				if f.distance_at(p) >= FlowField.UNREACHABLE:
 					problems.append("%s at (%d, %d) cannot be reached from the start." % [list[0], int(p.x), int(p.z)])
