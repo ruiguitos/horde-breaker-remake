@@ -197,6 +197,8 @@ func _expedition_checks() -> void:
 			if p.x >= 0.0:
 				goals.append(p)
 		goals.append_array(map.hold_points)
+		goals.append_array(map.signal_points)
+		goals.append_array(map.signal_fuel)
 		_check(goals.all(func(g: Vector3) -> bool: return f.distance_at(g) < FlowField.UNREACHABLE),
 			"%s: its %d markers are reachable from the start" % [label, goals.size()])
 		# Each marker at most 10 m from where the design puts it (snapped to clear ground).
@@ -209,6 +211,18 @@ func _expedition_checks() -> void:
 		_check(map.hold_points.size() == holds.size(), "%s: %d HoldPoint markers, in order" % [label, map.hold_points.size()])
 		for h in holds.size():
 			pairs.append(["HoldPoint_%d" % (h + 1), map.hold_points[h] if h < map.hold_points.size() else Vector3(-1000, 0, -1000), holds[h]])
+		# Light the Signals: Signal_* then the Lighthouse, and one Fuel_* each.
+		var sigs: Array = spec.get("signals", []).duplicate()
+		if spec.has("lighthouse"):
+			sigs.append(spec["lighthouse"])
+		var fuel: Array = spec.get("fuel", [])
+		_check(map.signal_points.size() == sigs.size() and map.signal_fuel.size() == fuel.size() and map.signal_lighthouse == spec.has("lighthouse"),
+			"%s: %d signal markers (lighthouse: %s), %d Fuel markers" % [label, map.signal_points.size(), map.signal_lighthouse, map.signal_fuel.size()])
+		for s in sigs.size():
+			var sname: String = "Lighthouse" if spec.has("lighthouse") and s == sigs.size() - 1 else "Signal_%d" % (s + 1)
+			pairs.append([sname, map.signal_points[s] if s < map.signal_points.size() else Vector3(-1000, 0, -1000), sigs[s]])
+		for u in fuel.size():
+			pairs.append(["Fuel_%d" % (u + 1), map.signal_fuel[u] if u < map.signal_fuel.size() else Vector3(-1000, 0, -1000), fuel[u]])
 		var gens: Array = spec.get("generators", [])
 		for g in gens.size():
 			pairs.append(["Generator%d" % (g + 1), map.generators[g] if g < map.generators.size() else Vector3(-1000, 0, -1000), gens[g]])

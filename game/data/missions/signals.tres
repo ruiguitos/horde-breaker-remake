@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://csignal0lite"]
+
+[ext_resource type="Script" path="res://game/data/resources/mission_data.gd" id="1_sign"]
+
+[resource]
+script = ExtResource("1_sign")
+display_name = "Light the Signals"
+text = "Fuel and light three signal beacons, one after the other, then get out."
+order = 8
+points = 3
+seconds_per_point = 6.0
+radius = 4.0
+spike_seconds = 15.0

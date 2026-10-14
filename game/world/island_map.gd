@@ -44,6 +44,15 @@ var nest_points: Array[Vector3] = []
 ## transmitted (Uplink marker; x < 0 = the run picks it, pick_uplink_point).
 var search_points: Array[Vector3] = []
 var uplink := Vector3(-1, 0, -1)
+## Light the Signals: the signal beacons, in the order to light them
+## (Signal_* markers in number order, then the Lighthouse marker last;
+## empty = the run picks spots, pick_signal_points), whether the last one is
+## a lighthouse (a Lighthouse marker), and the fuel for each signal (Fuel_*
+## markers in number order: Fuel_1 feeds the first signal; missing ones are
+## picked near their signal, pick_signal_fuel_points).
+var signal_points: Array[Vector3] = []
+var signal_lighthouse: bool = false
+var signal_fuel: Array[Vector3] = []
 ## Optional supply caches (detours with a reward).
 var caches: Array[Vector3] = []
 ## Biome id: beach, town, jungle, port or volcano (see GameData.BIOMES).
@@ -237,16 +246,142 @@ static func pick_uplink_point(map: IslandMap, spots: Array[Vector3], rng_seed: i
 	return best
 
 
+## Light the Signals on a map without Signal_* markers: the same search as
+## the hold points (reachable, at least HOLD_MIN_FROM_BOAT from the boat,
+## spread apart, fixed per seed) with its own salt and 3 m of open ground.
+## pick_hold_points orders them by walking distance from the start, so each
+## signal is farther in than the one before: lighting one leads on.
+static func pick_signal_points(map: IslandMap, count: int, rng_seed: int) -> Array[Vector3]:
+	return pick_hold_points(map, count, rng_seed ^ 0x5349474e, 3.0)
+
+
+## Where the fuel for a signal waits: this many metres from it (flat), and
+## at most SIGNAL_FUEL_WALK metres of walking away, so the can is "near the
+## signal" for the legs too, not across a wall. A can keeps
+## SIGNAL_FUEL_MIN from every other signal (it must not sit on one) and
+## SIGNAL_FUEL_APART from the other cans.
+const SIGNAL_FUEL_MIN: float = 15.0
+const SIGNAL_FUEL_MAX: float = 30.0
+const SIGNAL_FUEL_WALK: int = 60
+const SIGNAL_FUEL_APART: float = 8.0
+
+## Light the Signals: one fuel spot per signal, for the signals without a
+## Fuel_* marker (`given[i]` with x >= 0 is kept as it is). Candidates are
+## the hold-point candidates (reachable from the start, off the boat, 2 m
+## open, shuffled per seed); the first one within the distance band of its
+## signal wins. None in the band: the reachable candidate (walking) closest
+## to the middle of the band; none at all: the signal itself (the can is
+## then delivered as soon as it is picked up: never a softlock).
+static func pick_signal_fuel_points(map: IslandMap, signals: Array[Vector3], rng_seed: int,
+		given: Array[Vector3] = []) -> Array[Vector3]:
+	var out: Array[Vector3] = []
+	var candidates: Array[Vector3] = []
+	var searched: bool = false
+	for i in signals.size():
+		if i < given.size() and given[i].x >= 0.0:
+			out.append(given[i])
+			continue
+		if not searched:  # only when a signal has no Fuel_* marker
+			searched = true
+			candidates = _hold_candidates(map, rng_seed ^ 0x46554c53, 2.0)[0]
+		var s: Vector3 = signals[i]
+		var walk: Dictionary = _walk_from(map.field, s, SIGNAL_FUEL_WALK)
+		var best := Vector3(-1, 0, -1)
+		var best_off: float = INF
+		for p in candidates:
+			if not walk.has(int(p.z) * map.field.width + int(p.x)):
+				continue
+			var d: float = Vector2(p.x - s.x, p.z - s.z).length()
+			var ok: bool = true
+			for j in signals.size():
+				if j != i and Vector2(p.x - signals[j].x, p.z - signals[j].z).length() < SIGNAL_FUEL_MIN:
+					ok = false
+			for q in out:
+				if Vector2(p.x - q.x, p.z - q.z).length() < SIGNAL_FUEL_APART:
+					ok = false
+			if not ok:
+				continue
+			if d >= SIGNAL_FUEL_MIN and d <= SIGNAL_FUEL_MAX:
+				best = p
+				break
+			var off: float = absf(d - (SIGNAL_FUEL_MIN + SIGNAL_FUEL_MAX) * 0.5)
+			if off < best_off:
+				best_off = off
+				best = p
+		out.append(best if best.x >= 0.0 else s)
+	return out
+
+
+## Breadth-first walk (4 neighbours) from `from` over open cells, up to
+## `max_walk` metres: cell index -> metres walked.
+static func _walk_from(f: FlowField, from: Vector3, max_walk: int) -> Dictionary:
+	var w: int = f.width
+	var c0: Vector2i = f.world_to_cell(from)
+	var dist := {}
+	if f.is_blocked(c0.x, c0.y):
+		return dist
+	dist[c0.y * w + c0.x] = 0
+	var queue: Array[Vector2i] = [c0]
+	var head: int = 0
+	while head < queue.size():
+		var c: Vector2i = queue[head]
+		head += 1
+		var d: int = dist[c.y * w + c.x]
+		if d >= max_walk:
+			continue
+		for n: Vector2i in [Vector2i(c.x + 1, c.y), Vector2i(c.x - 1, c.y), Vector2i(c.x, c.y + 1), Vector2i(c.x, c.y - 1)]:
+			if f.is_blocked(n.x, n.y) or dist.has(n.y * w + n.x):
+				continue
+			dist[n.y * w + n.x] = d + 1
+			queue.append(n)
+	return dist
+
+
 ## `near_building` > 0: only candidates within that many cells of one of
 ## map.buildings (rectangles up to 60 m across: bigger ones are terrain
 ## pieces, not buildings).
 static func pick_hold_points(map: IslandMap, count: int, rng_seed: int, radius: float = 5.0, near_building: int = 0) -> Array[Vector3]:
 	var out: Array[Vector3] = []
+	if count <= 0:
+		return out
+	var cands: Array = _hold_candidates(map, rng_seed, radius, near_building)
+	var candidates: Array[Vector3] = cands[0]
+	var dist: Dictionary = cands[1]
+	var w: int = map.field.width
+	if candidates.is_empty():
+		return out
+	var spacing: float = HOLD_SPACING
+	while true:
+		out.clear()
+		for p in candidates:
+			var ok: bool = true
+			for q in out:
+				if Vector2(p.x - q.x, p.z - q.z).length() < spacing:
+					ok = false
+					break
+			if ok:
+				out.append(p)
+				if out.size() == count:
+					break
+		if out.size() == count or spacing <= HOLD_MIN_SPACING:
+			break
+		spacing = maxf(HOLD_MIN_SPACING, spacing * 0.75)
+	out.sort_custom(func(a: Vector3, b: Vector3) -> bool:
+		return int(dist[int(a.z) * w + int(a.x)]) < int(dist[int(b.z) * w + int(b.x)]))
+	return out
+
+
+## The hold-point candidates: every third cell the player can walk to from
+## the start (within HOLD_MAX_WALK), with `radius` metres of open ground,
+## at least HOLD_MIN_FROM_BOAT from the boat and clear of lava, shuffled
+## with the seed. Returns [candidates, walking distance per cell index].
+static func _hold_candidates(map: IslandMap, rng_seed: int, radius: float, near_building: int = 0) -> Array:
 	var f: FlowField = map.field
 	var w: int = f.width
 	var start: Vector2i = f.world_to_cell(map.player_start)
-	if count <= 0 or f.is_blocked(start.x, start.y):
-		return out
+	var none: Array[Vector3] = []
+	if f.is_blocked(start.x, start.y):
+		return [none, {}]
 	# Breadth-first walk (4 neighbours: what it reaches, the player reaches).
 	var dist := {}  # cell index -> metres walked
 	dist[start.y * w + start.x] = 0
@@ -293,7 +428,7 @@ static func pick_hold_points(map: IslandMap, count: int, rng_seed: int, radius: 
 				break
 		if not in_lava:
 			candidates.append(p)
-	# Deterministic shuffle, then greedy picks with the widest spacing that fits.
+	# Deterministic shuffle (the callers then pick in this order).
 	var rng := RandomNumberGenerator.new()
 	rng.seed = rng_seed ^ 0x484f4c44
 	for i in range(candidates.size() - 1, 0, -1):
@@ -301,25 +436,7 @@ static func pick_hold_points(map: IslandMap, count: int, rng_seed: int, radius: 
 		var t: Vector3 = candidates[i]
 		candidates[i] = candidates[j]
 		candidates[j] = t
-	var spacing: float = HOLD_SPACING
-	while true:
-		out.clear()
-		for p in candidates:
-			var ok: bool = true
-			for q in out:
-				if Vector2(p.x - q.x, p.z - q.z).length() < spacing:
-					ok = false
-					break
-			if ok:
-				out.append(p)
-				if out.size() == count:
-					break
-		if out.size() == count or spacing <= HOLD_MIN_SPACING:
-			break
-		spacing = maxf(HOLD_MIN_SPACING, spacing * 0.75)
-	out.sort_custom(func(a: Vector3, b: Vector3) -> bool:
-		return int(dist[int(a.z) * w + int(a.x)]) < int(dist[int(b.z) * w + int(b.x)]))
-	return out
+	return [candidates, dist]
 
 
 static func _blocked_near(f: FlowField, c: Vector2i, r: int) -> bool:

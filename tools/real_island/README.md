@@ -301,6 +301,12 @@ fronteira) e os objetivos. O construtor grava, na pasta da expedição:
 - **Horda:** as partes 1 a 3 mantêm `horde_radius` 120. A parte 4 tem
   42 mil células alcançáveis, abaixo das 60 mil (a Hashima tem 51 mil), e
   fica com 0.
+- **Objetivos no preset:** cada parte tem os seus pontos (`rescue`,
+  `defend`, `holds`, `signals`, `lighthouse`, `fuel`, `caches`) e o
+  construtor põe o marcador no sítio alcançável mais perto, com 4 m livres
+  (o `Lighthouse` com 2 m, no pátio estreito da casa dos faroleiros; os
+  `Fuel_*` com 1 m, à porta das casas). Mudar a missão de uma parte é mudar
+  o preset, o `game/data/expeditions.gd` e voltar a construir.
 - **Imagens:** `data/berlenga/reach_part_<n>.png` mostra o que se alcança.
   Os limites aparecem a magenta (muro) e a branco (penedos), e os
   marcadores a vermelho.
@@ -308,8 +314,8 @@ fronteira) e os objetivos. O construtor grava, na pasta da expedição:
 | Parte | Missão | Transitáveis / alcançáveis | Percurso na grelha | Limites |
 |---|---|---|---|---|
 | 1 | rescue | 253 mil / 238 mil | 229 + 307 = 536 m | 114 m |
-| 2 | activate | 276 mil / 256 mil | 155 + 67 + 76 + 285 = 583 m | 939 m |
-| 3 | defend | 171 mil / 171 mil | 262 + 254 = 516 m | 719 m |
+| 2 | signals | 276 mil / 256 mil | 138 + 97 + 75 + 46 + 67 + 41 + 394 = 858 m (combustível e sinal, três vezes, e a saída) | 939 m |
+| 3 | hold_sequence | 171 mil / 171 mil | 100 + 120 + 88 + 254 = 562 m | 719 m |
 | 4 | holdout | 44 mil / 43 mil | 363 + 48 = 411 m (até ao barco) | 685 m |
 
 `tests/test_handmade.gd -- --berlenga-dir res://tools/real_island/test_out/<nome>/`

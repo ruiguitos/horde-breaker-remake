@@ -20,7 +20,12 @@ extends Node3D
 ##                     and for Nests: Nest_1, Nest_2... (horde nests),
 ##                     and for Intel Search: Search_1, Search_2... (spots
 ##                     to search, ideally at doorways) and Uplink (where
-##                     the intel is transmitted)
+##                     the intel is transmitted), and for Light the
+##                     Signals: Signal_1, Signal_2... (lit in number
+##                     order), Lighthouse (optional: the last signal, a
+##                     lighthouse) and Fuel_1, Fuel_2... (the fuel for the
+##                     signal of the same rank; the Lighthouse's is the
+##                     last one)
 ## The island covers x, z in [0, size): keep everything inside that square.
 ## How to build one: game/README.md, "Ilhas feitas à mão".
 
@@ -158,6 +163,8 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	var cargo: Array = []  # same, for the Cargo_* markers
 	var nests: Array = []  # same, for the Nest_* markers
 	var searches: Array = []  # same, for the Search_* markers
+	var signals: Array = []  # same, for the Signal_* markers
+	var fuels: Array = []  # same, for the Fuel_* markers
 	for node in _children_of("Markers"):
 		if node.name.begins_with("Generator"):
 			map.generators.append(_flat(_local(node).origin))
@@ -171,6 +178,10 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 			nests.append([marker_number(String(node.name), "Nest"), _flat(_local(node).origin)])
 		elif node.name.begins_with("Search"):
 			searches.append([marker_number(String(node.name), "Search"), _flat(_local(node).origin)])
+		elif node.name.begins_with("Signal"):
+			signals.append([marker_number(String(node.name), "Signal"), _flat(_local(node).origin)])
+		elif node.name.begins_with("Fuel"):
+			fuels.append([marker_number(String(node.name), "Fuel"), _flat(_local(node).origin)])
 	holds.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	for h: Array in holds:
 		map.hold_points.append(h[1])
@@ -183,6 +194,16 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	searches.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	for sp: Array in searches:
 		map.search_points.append(sp[1])
+	signals.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	for sg: Array in signals:
+		map.signal_points.append(sg[1])
+	var lighthouse: Node3D = get_node_or_null("Markers/Lighthouse")
+	if lighthouse != null:
+		map.signal_points.append(_flat(_local(lighthouse).origin))
+		map.signal_lighthouse = true
+	fuels.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	for fu: Array in fuels:
+		map.signal_fuel.append(fu[1])
 	for spot: Array in [["Exit", "exit"], ["RescueTarget", "rescue_target"], ["DefendZone", "defend_zone"], ["Delivery", "delivery"], ["Uplink", "uplink"]]:
 		var node: Node3D = get_node_or_null("Markers/" + spot[0])
 		if node != null:
@@ -199,7 +220,7 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 		for p: Vector3 in [map.exit, map.rescue_target, map.defend_zone, map.delivery, map.uplink]:
 			if p.x >= 0.0:
 				spots.append(p)
-		for list: Array in [["Boat", [map.boat]], ["Generator", map.generators], ["Cache", map.caches], ["Exit/RescueTarget/DefendZone/Delivery/Uplink", spots], ["HoldPoint", map.hold_points], ["Cargo", map.cargo_points], ["Nest", map.nest_points], ["Search", map.search_points]]:
+		for list: Array in [["Boat", [map.boat]], ["Generator", map.generators], ["Cache", map.caches], ["Exit/RescueTarget/DefendZone/Delivery/Uplink", spots], ["HoldPoint", map.hold_points], ["Cargo", map.cargo_points], ["Nest", map.nest_points], ["Search", map.search_points], ["Signal/Lighthouse", map.signal_points], ["Fuel", map.signal_fuel]]:
 			for p: Vector3 in list[1]:
 				if f.distance_at(p) >= FlowField.UNREACHABLE:
 					problems.append("%s at (%d, %d) cannot be reached from the start." % [list[0], int(p.x), int(p.z)])

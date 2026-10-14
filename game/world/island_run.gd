@@ -159,6 +159,18 @@ var cargo_state: PackedInt32Array = PackedInt32Array()
 var cargo_touched: Array[bool] = []
 var carrying: int = -1
 var _cargo_dropped: int = -1
+## Light the Signals: the beacons, in the order to light them (the map's
+## Signal_*/Lighthouse markers, else picked per seed), the one to light next
+## (== size: all lit), seconds spent lighting it (leaving pauses it), whether
+## its lighting spike fired, and whether the last one is a lighthouse. Each
+## signal's fuel is a can of the Fuel Run carry system (cargo_pos[i] feeds
+## signal i): only the can of the next signal can be picked up, and a can
+## delivered to its signal means that signal is fuelled.
+var signal_pos: Array[Vector3] = []
+var signal_index: int = 0
+var signal_progress: float = 0.0
+var signal_started: bool = false
+var signal_lighthouse: bool = false
 ## Last spot the player stood on walkable ground (not in noclip): a can
 ## dropped while flying over a wall lands here instead, so it can't be lost.
 var _last_walkable: Vector3 = Vector3.ZERO
@@ -665,6 +677,24 @@ func set_mission(id: StringName) -> void:
 			cargo_state.append(CAN_WAITING)
 			cargo_touched.append(false)
 		site = fuel_goal()
+	signal_pos.clear()
+	signal_index = 0
+	signal_progress = 0.0
+	signal_started = false
+	signal_lighthouse = false
+	if mission == &"signals":
+		signal_pos = map.signal_points.duplicate()
+		signal_lighthouse = map.signal_lighthouse and not signal_pos.is_empty()
+		if signal_pos.is_empty():
+			signal_pos = IslandMap.pick_signal_points(map, signal_count_wanted(), run_seed)
+		if signal_pos.is_empty():
+			signal_pos.append(site)  # a map too small to pick from: one signal
+		# One can per signal, from the Carry system: Fuel_* markers first.
+		cargo_pos = IslandMap.pick_signal_fuel_points(map, signal_pos, run_seed, map.signal_fuel)
+		for c in cargo_pos.size():
+			cargo_state.append(CAN_WAITING)
+			cargo_touched.append(false)
+		site = signals_goal()
 	nest_pos.clear()
 	nest_hp.clear()
 	nest_spawn_cd.clear()
@@ -963,13 +993,35 @@ func fuel_goal() -> Vector3:
 	return cargo_pos[c] if c >= 0 else delivery_point()
 
 
+## True on missions that use the fuel-can carry system (Fuel Run, and Light
+## the Signals for each signal's fuel): the interact action, drops, the
+## carry penalties.
+func uses_cargo() -> bool:
+	return mission == &"fuel_run" or mission == &"signals"
+
+
+## Whether can `c` can be picked up now. Fuel Run: any can. Light the
+## Signals: only the next signal's fuel (the later ones are hidden).
+func can_available(c: int) -> bool:
+	if mission == &"signals":
+		return c == signal_index
+	return true
+
+
+## Where the player should go next with the carry system: fuel_goal() in a
+## Fuel Run, signals_goal() in Light the Signals.
+func _carry_goal() -> Vector3:
+	return signals_goal() if mission == &"signals" else fuel_goal()
+
+
 ## The waiting can nearest to the player (-1 = none). `reach` > 0: only
-## cans within that many metres; `skip`: a can to leave out.
+## cans within that many metres; `skip`: a can to leave out. Only cans that
+## can be picked up now (can_available).
 func nearest_waiting_can(reach: float = INF, skip: int = -1) -> int:
 	var best: int = -1
 	var best_d: float = reach
 	for c in cargo_pos.size():
-		if cargo_state[c] != CAN_WAITING or c == skip:
+		if cargo_state[c] != CAN_WAITING or c == skip or not can_available(c):
 			continue
 		var d: float = Vector2(cargo_pos[c].x - player_pos.x, cargo_pos[c].z - player_pos.z).length()
 		if d <= best_d:
@@ -981,7 +1033,7 @@ func nearest_waiting_can(reach: float = INF, skip: int = -1) -> int:
 ## The interact action (E / pad X): drops the can being carried, else picks
 ## up a can within reach (even the one just dropped).
 func interact() -> bool:
-	if mission != &"fuel_run" or is_paused():
+	if not uses_cargo() or is_paused():
 		return false
 	if carrying >= 0:
 		return drop_cargo()
@@ -1005,7 +1057,7 @@ func drop_cargo() -> bool:
 	cargo_state[carrying] = CAN_WAITING
 	_cargo_dropped = carrying
 	carrying = -1
-	site = fuel_goal()
+	site = _carry_goal()
 	messages.append("Fuel can dropped")
 	return true
 
@@ -1016,13 +1068,98 @@ func _pick_up_can(c: int) -> void:
 	_cargo_dropped = -1
 	if not cargo_touched[c]:
 		cargo_touched[c] = true
-		director.trigger_peak(cargo_spike_seconds())
-		var where: String = "fuel drop" if map.delivery.x >= 0.0 else ("exit" if has_exit() else "boat")
-		messages.append("Fuel can %d of %d: get it to the %s!" % [cargo_delivered() + 1, cargo_pos.size(), where])
-		radio.append(&"fuel_pickup")
+		if mission == &"signals":
+			# No spike here: the signal calls the horde when it is lit.
+			messages.append("Fuel found: carry it to %s!" % signal_name(c).to_lower())
+			radio.append(&"signal_fuel")
+		else:
+			director.trigger_peak(cargo_spike_seconds())
+			var where: String = "fuel drop" if map.delivery.x >= 0.0 else ("exit" if has_exit() else "boat")
+			messages.append("Fuel can %d of %d: get it to the %s!" % [cargo_delivered() + 1, cargo_pos.size(), where])
+			radio.append(&"fuel_pickup")
 	else:
 		messages.append("Fuel can picked up")
-	site = fuel_goal()
+	site = _carry_goal()
+
+
+## The carry system's frame (Fuel Run and Light the Signals): the carried
+## can moves with the player and is delivered within `radius` of `to`
+## (it then stays there); empty-handed, walking over an available can picks
+## it up (not the one just dropped until the player has stepped away).
+## Returns the can delivered this frame (-1 = none).
+func _update_carry(to: Vector3, radius: float) -> int:
+	if carrying >= 0:
+		cargo_pos[carrying] = Vector3(player_pos.x, 0, player_pos.z)
+		if Vector2(to.x - player_pos.x, to.z - player_pos.z).length() <= radius:
+			var c: int = carrying
+			cargo_state[c] = CAN_DELIVERED
+			cargo_pos[c] = to
+			carrying = -1
+			return c
+	else:
+		if _cargo_dropped >= 0 and Vector2(cargo_pos[_cargo_dropped].x - player_pos.x,
+				cargo_pos[_cargo_dropped].z - player_pos.z).length() > cargo_pickup_radius() + 1.0:
+			_cargo_dropped = -1  # stepped away: walking over it picks it up again
+		var c: int = nearest_waiting_can(cargo_pickup_radius(), _cargo_dropped)
+		if c >= 0:
+			_pick_up_can(c)
+	return -1
+
+
+## A third of every finite weapon's ammo back (a delivery, a held point, a
+## lit signal).
+func _refill_third() -> void:
+	for w in weapons.size():
+		if weapons[w].max_ammo > 0:
+			ammo[w] = mini(max_ammo(w), ammo[w] + max_ammo(w) / 3)
+
+
+## Light the Signals numbers, from the mission's data (signals.tres).
+static func signal_count_wanted() -> int:
+	return int(GameData.mission_value(&"signals", "points", 3.0))
+
+
+static func signal_seconds() -> float:
+	return GameData.mission_value(&"signals", "seconds", 6.0)
+
+
+static func signal_radius() -> float:
+	return GameData.mission_value(&"signals", "radius", 4.0)
+
+
+static func signal_spike_seconds() -> float:
+	return GameData.mission_value(&"signals", "spike_seconds", 15.0)
+
+
+## Signals lit so far.
+func signals_lit() -> int:
+	return mini(signal_index, signal_pos.size())
+
+
+## True when the next signal has its fuel (its can delivered to it).
+func signal_fuelled() -> bool:
+	return signal_index < signal_pos.size() and signal_index < cargo_state.size() \
+		and cargo_state[signal_index] == CAN_DELIVERED
+
+
+## "Signal 2", or "Lighthouse" for the last one when it is a lighthouse.
+func signal_name(i: int) -> String:
+	if signal_lighthouse and i == signal_pos.size() - 1:
+		return "Lighthouse"
+	return "Signal %d" % (i + 1)
+
+
+## Where the player should go next in Light the Signals: the next signal
+## while carrying its fuel or once it is fuelled, else its fuel can (the
+## last signal when all are lit).
+func signals_goal() -> Vector3:
+	if signal_pos.is_empty():
+		return site
+	if signal_index >= signal_pos.size():
+		return signal_pos[-1]
+	if carrying >= 0 or signal_fuelled() or signal_index >= cargo_pos.size():
+		return signal_pos[signal_index]
+	return cargo_pos[signal_index]
 
 
 ## Hold Sequence numbers, from the mission's data (hold_sequence.tres).
@@ -1106,6 +1243,8 @@ func _main_task_done() -> bool:
 			return nests_destroyed() >= nest_pos.size()
 		&"intel_search":
 			return intel_phase == INTEL_DONE
+		&"signals":
+			return signal_index >= signal_pos.size()
 	for p in generator_progress:
 		if p < GameData.GENERATOR_HOLD_SECONDS:
 			return false
@@ -1189,6 +1328,8 @@ func _intel_base() -> int:
 			base += nests_destroyed() * 15
 		&"intel_search":
 			base += intel_found() * intel_reward()
+		&"signals":
+			base += signals_lit() * 15
 		_:
 			base += done * 15
 	base += 20 if boss_killed else 0
@@ -2461,6 +2602,8 @@ func _update_mission(dt: float) -> void:
 					_update_nests(dt)
 				&"intel_search":
 					_update_intel_search(dt)
+				&"signals":
+					_update_signals(dt)
 				_:
 					_update_generators(dt)
 			if _main_task_done() and has_boss:
@@ -2479,6 +2622,8 @@ func _update_mission(dt: float) -> void:
 					radio.append(&"nests_done")
 				elif mission == &"intel_search" and not has_exit():
 					radio.append(&"intel_done" if intel_found() > 0 else &"intel_none")
+				elif mission == &"signals" and (signal_lighthouse or not has_exit()):
+					radio.append(&"lighthouse_lit" if signal_lighthouse else &"signals_done")
 				elif mission != &"rescue":
 					radio.append(&"objective_done_on_foot" if has_exit() else &"objective_done")
 		Objective.BOSS:
@@ -2559,9 +2704,7 @@ func _update_hold_sequence(dt: float) -> void:
 	hold_index += 1
 	hold_progress = 0.0
 	hold_started = false
-	for w in weapons.size():
-		if weapons[w].max_ammo > 0:
-			ammo[w] = mini(max_ammo(w), ammo[w] + max_ammo(w) / 3)
+	_refill_third()
 	if hold_index < hold_points.size():
 		site = hold_points[hold_index]
 		messages.append("Point secured. Move to point %d!" % (hold_index + 1))
@@ -2637,27 +2780,41 @@ func _start_transmit(text: String) -> void:
 ## cargo_delivery_radius() of delivery_point(). `site` follows the next
 ## goal (the HUD marker, the minimap and the test bots read it).
 func _update_fuel_run() -> void:
-	if carrying >= 0:
-		cargo_pos[carrying] = Vector3(player_pos.x, 0, player_pos.z)
-		var to: Vector3 = delivery_point()
-		if Vector2(to.x - player_pos.x, to.z - player_pos.z).length() <= cargo_delivery_radius():
-			cargo_state[carrying] = CAN_DELIVERED
-			cargo_pos[carrying] = to
-			carrying = -1
-			for w in weapons.size():
-				if weapons[w].max_ammo > 0:
-					ammo[w] = mini(max_ammo(w), ammo[w] + max_ammo(w) / 3)
-			if cargo_delivered() < cargo_pos.size():
-				messages.append("Fuel delivered (%d / %d). Go get the next can!" % [cargo_delivered(), cargo_pos.size()])
-				radio.append(&"fuel_delivered")
-	else:
-		if _cargo_dropped >= 0 and Vector2(cargo_pos[_cargo_dropped].x - player_pos.x,
-				cargo_pos[_cargo_dropped].z - player_pos.z).length() > cargo_pickup_radius() + 1.0:
-			_cargo_dropped = -1  # stepped away: walking over it picks it up again
-		var c: int = nearest_waiting_can(cargo_pickup_radius(), _cargo_dropped)
-		if c >= 0:
-			_pick_up_can(c)
+	if _update_carry(delivery_point(), cargo_delivery_radius()) >= 0:
+		_refill_third()
+		if cargo_delivered() < cargo_pos.size():
+			messages.append("Fuel delivered (%d / %d). Go get the next can!" % [cargo_delivered(), cargo_pos.size()])
+			radio.append(&"fuel_delivered")
 	site = fuel_goal()
+
+
+## Light the Signals: only the next signal is in play. Its fuel can is
+## carried with the Fuel Run rules and poured in within signal_radius() of
+## the signal; then standing there for signal_seconds() lights it (leaving
+## pauses it, damage does not; the first step in calls a spike). A lit
+## signal stays lit, gives a third of the ammo back and reveals the next
+## one, and its fuel can. The extraction waits for the last.
+func _update_signals(dt: float) -> void:
+	if signal_index >= signal_pos.size():
+		return
+	var at: Vector3 = signal_pos[signal_index]
+	if _update_carry(at, signal_radius()) >= 0:
+		messages.append("%s fuelled: stay close to light it!" % signal_name(signal_index))
+	if signal_fuelled() and _flat_dist(at, player_pos) <= signal_radius():
+		if not signal_started:
+			signal_started = true
+			director.trigger_peak(signal_spike_seconds())
+			messages.append("Lighting %s: hold on!" % signal_name(signal_index).to_lower())
+		signal_progress += dt
+		if signal_progress >= signal_seconds():
+			signal_index += 1
+			signal_progress = 0.0
+			signal_started = false
+			_refill_third()
+			if signal_index < signal_pos.size():
+				messages.append("%s lit. %s is marked: find its fuel!" % [signal_name(signal_index - 1), signal_name(signal_index)])
+				radio.append(&"signal_lit")
+	site = signals_goal()
 
 
 ## Nests: each living nest near the player (nest_wake_range()) spawns a
@@ -3024,6 +3181,14 @@ func objective_text() -> String:
 				if intel_phase == INTEL_TRANSMIT:
 					return "Transmit the intel (%d / %d s)" % [int(transmit_progress), int(transmit_seconds())]
 				return "Search for intel (%d / %d, %s left)" % [intel_found(), intel_total(), clock_text(intel_time_left)]
+			if mission == &"signals":
+				var lit: String = "Signals %d / %d: " % [signals_lit(), signal_pos.size()]
+				var sname: String = signal_name(signal_index).to_lower()
+				if carrying >= 0:
+					return lit + "carry the fuel to %s" % sname
+				if signal_fuelled():
+					return lit + "light %s (%d / %d s)" % [sname, int(signal_progress), int(signal_seconds())]
+				return lit + "find the fuel for %s" % sname
 			var done: int = 0
 			for p in generator_progress:
 				if p >= GameData.GENERATOR_HOLD_SECONDS:

@@ -58,6 +58,21 @@ const NEST_BAR_RANGE: float = 40.0
 ## minimap); a searched spot without intel turns this grey.
 const INTEL_COLOR := Minimap.INTEL_COLOR
 const SEARCHED_COLOR := Color(0.45, 0.45, 0.45)
+## Light the Signals: the beacon of the next signal and the fire of a lit
+## one (same colours as the minimap). The light is one OmniLight3D per
+## signal, without shadows, off until the signal is lit.
+const SIGNAL_COLOR := Minimap.SIGNAL_COLOR
+const SIGNAL_FIRE_COLOR := Minimap.SIGNAL_LIT_COLOR
+const SIGNAL_LIGHT_RANGE: float = 14.0
+const LIGHTHOUSE_LIGHT_RANGE: float = 45.0
+## A lighthouse signal looks for the hand-made scene's tower
+## (Buildings/Lighthouse_*) this close to its marker; without one it builds
+## a stone tower this tall.
+const LIGHTHOUSE_SEARCH_M: float = 40.0
+const LIGHTHOUSE_TOWER_M: float = 9.0
+## The lighthouse beam: length (m) and turns per second once lit.
+const LIGHTHOUSE_BEAM_M: float = 36.0
+const LIGHTHOUSE_BEAM_SPEED: float = 0.12
 
 var run: IslandRun
 var hud: Hud
@@ -138,6 +153,17 @@ var _search_greyed: Array[bool] = []
 var _uplink: Node3D
 var _uplink_ring: MeshInstance3D
 var _uplink_fill: MeshInstance3D
+## Light the Signals: one root per signal (a stone brazier; hidden until it
+## is the next one), its beacon and ring while it waits, a disc that grows
+## with the lighting, and its fire (flame meshes + light, shown once lit).
+## The lighthouse adds a turning beam at the top of its tower.
+var _signals: Array[Node3D] = []
+var _signal_beacons: Array[MeshInstance3D] = []
+var _signal_rings: Array[MeshInstance3D] = []
+var _signal_fills: Array[MeshInstance3D] = []
+var _signal_fires: Array[Node3D] = []
+var _signal_lights: Array[OmniLight3D] = []
+var _signal_beam: Node3D
 var _survivor: MeshInstance3D
 var _caches: Array[MeshInstance3D] = []
 var _buildings: Array[MeshInstance3D] = []
@@ -339,6 +365,11 @@ func _build_world() -> void:
 		for k in run.search_pos.size():
 			_build_search_spot(run.search_pos[k])
 		_build_uplink(run.uplink_pos)
+	if run.mission == &"signals":
+		for i in run.signal_pos.size():
+			_build_signal(run.signal_pos[i], run.signal_lighthouse and i == run.signal_pos.size() - 1)
+		for c in run.cargo_pos.size():
+			_build_fuel_can()
 	_survivor = MeshInstance3D.new()
 	_survivor.mesh = _capsule(0.35, 1.7)
 	_survivor.material_override = _mat(Color(1.0, 0.55, 0.1))
@@ -1070,6 +1101,216 @@ func _draw_intel_search() -> void:
 	tip.visible = not transmitting or fmod(Time.get_ticks_msec() * 0.001, 0.6 if run.transmit_progress > 0.0 else 1.2) < 0.4
 
 
+## One Light the Signals beacon, from primitives: a stone plinth with an
+## iron bowl of firewood (the spot where the fuel is poured and the player
+## stands), a thin pale beacon over it while it waits, a ring of the
+## lighting radius and a disc that grows with the lighting. Its fire (two
+## emissive flames and an OmniLight3D without shadows) shows once lit. The
+## lighthouse variant puts the fire at the top of the scene's lighthouse
+## tower (or of a stone tower it builds) with a long turning beam.
+func _build_signal(at: Vector3, lighthouse: bool) -> void:
+	var root := Node3D.new()
+	root.name = "Signal%d" % _signals.size()
+	root.position = _on_ground(at)
+	var plinth := MeshInstance3D.new()
+	var pm := CylinderMesh.new()
+	pm.top_radius = 0.5
+	pm.bottom_radius = 0.65
+	pm.height = 0.9
+	plinth.mesh = pm
+	plinth.position.y = 0.45
+	plinth.material_override = _mat(Color(0.42, 0.4, 0.38))
+	root.add_child(plinth)
+	var bowl := MeshInstance3D.new()
+	var bwm := CylinderMesh.new()
+	bwm.top_radius = 0.85
+	bwm.bottom_radius = 0.45
+	bwm.height = 0.4
+	bowl.mesh = bwm
+	bowl.position.y = 1.1
+	bowl.material_override = _mat(Color(0.18, 0.17, 0.17))
+	root.add_child(bowl)
+	var wood := MeshInstance3D.new()
+	var wm := BoxMesh.new()
+	wm.size = Vector3(0.9, 0.18, 0.25)
+	wood.mesh = wm
+	wood.position.y = 1.32
+	wood.rotation_degrees.y = 35.0
+	wood.material_override = _mat(Color(0.32, 0.22, 0.14))
+	root.add_child(wood)
+	var beacon := MeshInstance3D.new()
+	var cm := CylinderMesh.new()
+	cm.top_radius = 0.05
+	cm.bottom_radius = 0.14
+	cm.height = 3.5
+	beacon.mesh = cm
+	beacon.position.y = 3.3
+	beacon.material_override = _mat(SIGNAL_COLOR, true)
+	root.add_child(beacon)
+	var fill := MeshInstance3D.new()
+	var fm := CylinderMesh.new()
+	fm.top_radius = IslandRun.signal_radius()
+	fm.bottom_radius = IslandRun.signal_radius()
+	fm.height = 0.03
+	fill.mesh = fm
+	fill.position.y = 0.04
+	var fmat := _mat(Color(SIGNAL_FIRE_COLOR, 0.3), true)
+	fmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	fill.material_override = fmat
+	fill.scale = Vector3(0.001, 1, 0.001)
+	root.add_child(fill)
+	# The fire: in the bowl, or at the top of the lighthouse.
+	var fire := Node3D.new()
+	fire.name = "Fire"
+	fire.position.y = 1.35
+	var light_range: float = SIGNAL_LIGHT_RANGE
+	if lighthouse:
+		light_range = LIGHTHOUSE_LIGHT_RANGE
+		var top: Vector3 = _lighthouse_top(at)
+		if top == Vector3.INF:
+			var tower := MeshInstance3D.new()
+			var tm := BoxMesh.new()
+			tm.size = Vector3(1.8, LIGHTHOUSE_TOWER_M, 1.8)
+			tower.mesh = tm
+			tower.position = Vector3(0, LIGHTHOUSE_TOWER_M * 0.5, -2.5)
+			tower.material_override = _mat(Color(0.85, 0.84, 0.8))
+			root.add_child(tower)
+			top = root.position + Vector3(0, LIGHTHOUSE_TOWER_M + 0.4, -2.5)
+		fire.position = top - root.position
+	var flame := MeshInstance3D.new()
+	var flm := CylinderMesh.new()
+	flm.top_radius = 0.0
+	flm.bottom_radius = 0.5 if not lighthouse else 0.8
+	flm.height = 1.3 if not lighthouse else 1.6
+	flame.mesh = flm
+	flame.position.y = flm.height * 0.5
+	flame.material_override = _mat(SIGNAL_FIRE_COLOR, true)
+	fire.add_child(flame)
+	var core := MeshInstance3D.new()
+	core.mesh = _sphere(0.3 if not lighthouse else 0.5)
+	core.position.y = 0.35
+	core.material_override = _mat(SIGNAL_COLOR, true)
+	fire.add_child(core)
+	var light := OmniLight3D.new()
+	light.light_color = Color(1.0, 0.6, 0.3)
+	light.omni_range = light_range
+	light.light_energy = 2.5
+	light.shadow_enabled = false
+	light.position.y = 0.8
+	fire.add_child(light)
+	fire.visible = false
+	root.add_child(fire)
+	if lighthouse:
+		# The beam: a long, thin, see-through bar turning around the lamp.
+		_signal_beam = Node3D.new()
+		_signal_beam.name = "Beam"
+		_signal_beam.position.y = 0.8
+		var bar := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(0.9, 0.9, LIGHTHOUSE_BEAM_M)
+		bar.mesh = bm
+		bar.position.z = LIGHTHOUSE_BEAM_M * 0.5
+		var beam_mat := _mat(Color(SIGNAL_COLOR, 0.22), true)
+		beam_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		bar.material_override = beam_mat
+		_signal_beam.add_child(bar)
+		fire.add_child(_signal_beam)
+	add_child(root)
+	root.visible = false
+	_signals.append(root)
+	_signal_beacons.append(beacon)
+	_signal_fills.append(fill)
+	_signal_fires.append(fire)
+	_signal_lights.append(light)
+	var ring := _ring(at, IslandRun.signal_radius(), SIGNAL_COLOR)
+	ring.visible = false
+	_signal_rings.append(ring)
+
+
+## The top of the hand-made scene's lighthouse tower (a Buildings/Lighthouse_*
+## node within LIGHTHOUSE_SEARCH_M of `at`), 2 m under the top of its box
+## (the lantern), in island space; Vector3.INF when there is none.
+func _lighthouse_top(at: Vector3) -> Vector3:
+	if _handmade == null or not _handmade.is_inside_tree():
+		return Vector3.INF
+	var buildings: Node = _handmade.get_node_or_null("Buildings")
+	if buildings == null:
+		return Vector3.INF
+	var to_island: Transform3D = _handmade.global_transform.affine_inverse()
+	for n in buildings.get_children():
+		if not String(n.name).begins_with("Lighthouse"):
+			continue
+		var box := AABB()
+		var any: bool = false
+		for mi in [n] + n.find_children("*", "MeshInstance3D", true, false):
+			if mi is MeshInstance3D and (mi as MeshInstance3D).mesh != null:
+				var a: AABB = (to_island * (mi as MeshInstance3D).global_transform) * (mi as MeshInstance3D).mesh.get_aabb()
+				box = a if not any else box.merge(a)
+				any = true
+		if not any:
+			continue
+		var c: Vector3 = box.get_center()
+		if Vector2(c.x - at.x, c.z - at.z).length() <= LIGHTHOUSE_SEARCH_M:
+			return Vector3(c.x, box.end.y - 2.0, c.z)
+	return Vector3.INF
+
+
+func _draw_signals() -> void:
+	var active: bool = run.objective == IslandRun.Objective.GENERATORS
+	var t: float = Time.get_ticks_msec() * 0.001
+	for i in mini(_signals.size(), run.signal_pos.size()):
+		var lit: bool = i < run.signal_index
+		var next: bool = i == run.signal_index and active
+		_signals[i].visible = lit or next
+		_signal_fires[i].visible = lit
+		_signal_beacons[i].visible = next
+		_signal_rings[i].visible = next
+		var frac: float = clampf(run.signal_progress / IslandRun.signal_seconds(), 0.0, 1.0) if next else 0.0
+		_signal_fills[i].visible = next and frac > 0.0
+		_signal_fills[i].scale = Vector3(maxf(0.001, frac), 1, maxf(0.001, frac))
+		if next:
+			# The beacon turns warm once the fuel is in; the ring green inside.
+			var bm: StandardMaterial3D = _signal_beacons[i].material_override
+			bm.albedo_color = SIGNAL_FIRE_COLOR if run.signal_fuelled() else SIGNAL_COLOR
+			var inside: bool = _flat(run.player_pos).distance_to(_flat(run.signal_pos[i])) <= IslandRun.signal_radius()
+			var rm: StandardMaterial3D = _signal_rings[i].material_override
+			rm.albedo_color = Color(0.3, 1.0, 0.5) if inside and run.signal_fuelled() else SIGNAL_COLOR
+		if lit:
+			# A cheap flicker: the flames breathe, the light wavers.
+			var fl: float = sin(t * 9.0 + i * 1.7) * 0.5 + sin(t * 23.0 + i) * 0.5
+			_signal_fires[i].scale = Vector3(1.0 - 0.05 * fl, 1.0 + 0.12 * fl, 1.0 - 0.05 * fl)
+			_signal_lights[i].light_energy = 2.5 + 0.5 * fl
+	if _signal_beam != null:
+		_signal_beam.rotation.y = fmod(t * TAU * LIGHTHOUSE_BEAM_SPEED, TAU)
+
+
+## Flat (x, z) of a point, for distances on the ground.
+func _flat(p: Vector3) -> Vector2:
+	return Vector2(p.x, p.z)
+
+
+## The fuel cans of the carry system, drawn each frame. Fuel Run: every
+## can; delivered ones wait in a row beside the delivery point. Light the
+## Signals: only the next signal's can; once poured in it is gone.
+func _draw_cans() -> void:
+	var signals: bool = run.mission == &"signals"
+	for c in mini(_cans.size(), run.cargo_pos.size()):
+		var state: int = run.cargo_state[c]
+		var shown: bool = not signals or (run.can_available(c) and state != IslandRun.CAN_DELIVERED)
+		_cans[c].visible = shown
+		_can_beacons[c].visible = shown and state == IslandRun.CAN_WAITING
+		if state == IslandRun.CAN_CARRIED:
+			# In the right hand, turning with the soldier (all camera modes:
+			# in first person it shows at the hip when looking down).
+			_cans[c].position = _player.position + _player.basis.orthonormalized() * CARRY_OFFSET
+			_cans[c].basis = _player.basis.orthonormalized()
+		elif state == IslandRun.CAN_DELIVERED:
+			# Delivered cans wait in a row beside the delivery point.
+			_cans[c].position = _on_ground(run.delivery_point() + Vector3(-1.0 + 0.5 * c, 0, 1.5))
+		else:
+			_cans[c].position = _on_ground(run.cargo_pos[c])
+
+
 func _ring(center: Vector3, radius: float, color: Color) -> MeshInstance3D:
 	var ring := MeshInstance3D.new()
 	var torus := TorusMesh.new()
@@ -1263,7 +1504,7 @@ func _play_audio() -> void:
 				sfx.play(&"cache", -6.0, 0.05)
 			&"survivor_found":
 				sfx.play(&"survivor", -6.0, 0.0)
-			&"intel_found", &"intel_transmit":
+			&"intel_found", &"intel_transmit", &"signal_lit", &"signals_done", &"lighthouse_lit":
 				sfx.play(&"cache", -6.0, 0.05)
 			&"low_hp":
 				sfx.play(&"low_hp", -4.0, 0.0)
@@ -2094,20 +2335,11 @@ func _draw_mission() -> void:
 			hm.albedo_color = Color(0.3, 1.0, 0.5) if inside else Color(0.3, 0.8, 1.0)
 			var bmat: StandardMaterial3D = _hold_beacon.material_override
 			bmat.albedo_color = Color(0.3, 0.8, 1.0).lerp(Color(0.3, 1.0, 0.5), run.hold_progress / IslandRun.hold_seconds())
+	if run.uses_cargo():
+		_draw_cans()
+	if run.mission == &"signals":
+		_draw_signals()
 	if run.mission == &"fuel_run":
-		for c in mini(_cans.size(), run.cargo_pos.size()):
-			var state: int = run.cargo_state[c]
-			_can_beacons[c].visible = state == IslandRun.CAN_WAITING
-			if state == IslandRun.CAN_CARRIED:
-				# In the right hand, turning with the soldier (all camera modes:
-				# in first person it shows at the hip when looking down).
-				_cans[c].position = _player.position + _player.basis.orthonormalized() * CARRY_OFFSET
-				_cans[c].basis = _player.basis.orthonormalized()
-			elif state == IslandRun.CAN_DELIVERED:
-				# Delivered cans wait in a row beside the delivery point.
-				_cans[c].position = _on_ground(run.delivery_point() + Vector3(-1.0 + 0.5 * c, 0, 1.5))
-			else:
-				_cans[c].position = _on_ground(run.cargo_pos[c])
 		var ring: StandardMaterial3D = _delivery_ring.material_override
 		ring.albedo_color = Color(0.3, 1.0, 0.5) if run.is_carrying() else FUEL_COLOR
 		_delivery_ring.visible = run.objective == IslandRun.Objective.GENERATORS

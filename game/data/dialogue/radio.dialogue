@@ -43,6 +43,11 @@ Director Hale: Our last survey team left their notes on this rock. Five places t
 Director Hale: Intel recovery, contractor. Search fast, transmit what you find, and don't read it. [ID:RADIO_LAND_INTEL_SEARCH_2]
 => END
 
+~ land_signals
+Director Hale: The signal beacons on this rock are dark. Find their fuel, light them in order, and mind the queue that forms. [ID:RADIO_LAND_SIGNALS_1]
+Director Hale: Beacon duty, contractor. One fire at a time, each one shows you the next. [ID:RADIO_LAND_SIGNALS_2]
+=> END
+
 ~ land_boss
 Director Hale: Thermal readings on the volcano are... large. Do the job, then leave before it notices. [ID:RADIO_LAND_BOSS_1]
 => END
@@ -105,6 +110,25 @@ Director Hale: Data's in. You're now optional. Please extract anyway. [ID:RADIO_
 
 ~ intel_none
 Director Hale: Nothing to send? Then nothing to bill. Get to the boat. [ID:RADIO_INTEL_NONE_1]
+=> END
+
+~ signal_fuel
+Director Hale: That's the fuel. Get it into the beacon before something gets it into you. [ID:RADIO_SIGNAL_FUEL_1]
+Director Hale: Fuel acquired. No shooting with your hands full, so walk with purpose. [ID:RADIO_SIGNAL_FUEL_2]
+=> END
+
+~ signal_lit
+Director Hale: Signal's burning. The next one's marked, a bit further in. They saw that too. [ID:RADIO_SIGNAL_LIT_1]
+Director Hale: One fire lit. Follow the line, contractor, the next beacon is waiting. [ID:RADIO_SIGNAL_LIT_2]
+=> END
+
+~ signals_done
+Director Hale: Every beacon's lit. Lovely view. Admire it from the boat. [ID:RADIO_SIGNALS_DONE_1]
+Director Hale: Signals up, route marked. Now get yourself off this rock. [ID:RADIO_SIGNALS_DONE_2]
+=> END
+
+~ lighthouse_lit
+Director Hale: The lighthouse is burning again. Every ship for miles can see it. So can they. Move. [ID:RADIO_LIGHTHOUSE_LIT_1]
 => END
 
 ~ objective_done

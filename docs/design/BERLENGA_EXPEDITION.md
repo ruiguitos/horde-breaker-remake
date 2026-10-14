@@ -39,7 +39,7 @@ P4 [(523,800),(880,800),(880,1466),(500,1466),(500,880),(523,850)]
 | # | Parte | Entrada → saída (em caminhos do OSM) | Área transitável | Percurso obrigatório | Objetivo |
 |---|---|---|---|---|---|
 | 1 | **Carreiro do Mosteiro**: o desembarque, o Bairro dos Pescadores e o planalto nordeste | a praia (880, 652) → a estrada 441503021 em (835, 589) | cerca de 240 mil m² | cerca de 540 m | **Rescue**: o sobrevivente no bairro (1011, 720), levado até à saída |
-| 2 | **Planalto do Farol**, mais o planalto noroeste | (835, 589) → o caminho 233892909 em (521, 800) | cerca de 256 mil m² | 600 a 700 m | **Activate**: geradores em (710, 633), (675, 674) e (745, 665) |
+| 2 | **Planalto do Farol**, mais o planalto noroeste | (835, 589) → o caminho 233892909 em (521, 800) | cerca de 256 mil m² | 600 a 700 m (com os sinais: 858 m) | **Light the Signals**: `Signal_1` (745, 665), `Signal_2` (675, 674) e o `Lighthouse` ao pé do farol (706, 624); o combustível (`Fuel_1..3`) à porta das casas do farol, (717, 616), (686, 645) e (688, 616) |
 | 3 | **Costa Sudoeste** | (521, 800) → a ligação 38298331 em (523, 822) | cerca de 171 mil m² | cerca de 420 m | **Hold Sequence**: três miradouros por ordem, `HoldPoint_1` (447, 837), `HoldPoint_2` (408, 918) e `HoldPoint_3` no afloramento (431, 983); depois volta-se à saída, junto ao início |
 | 4 | **Forte de São João Baptista** | (523, 822) → o cais do forte (610, 1019) | cerca de 43 mil m² | 300 a 350 m | **Final (holdout)**: defender o pátio (637, 1045) até chegar o barco de resgate, e depois embarcar no cais |
 
@@ -66,7 +66,12 @@ P4 [(523,800),(880,800),(880,1466),(500,1466),(500,880),(523,850)]
   gerador mais longe do barco. Passa a usar os marcadores `RescueTarget`,
   `DefendZone` e `Exit`. A parte 3 usa `HoldPoint_1..3` (2026-10-11): a
   ida e a volta entre os três pontos obriga a atravessar a horda, em vez de
-  ficar parado num só círculo como no Defend.
+  ficar parado num só círculo como no Defend. A parte 2 usa
+  `Signal_1..2`, `Lighthouse` e `Fuel_1..3` (2026-10-13; antes era Activate
+  com os geradores): leva-se o combustível das casas dos faroleiros a dois
+  sinais e depois ao farol, como no catálogo do
+  `docs/design/OBJECTIVES_PROPOSAL.md`. Cada sinal só aparece quando o
+  anterior acende; o fogo do farol fica no topo da torre real.
 
 Estes são os objetivos com os tipos de missão de hoje, mais o final novo.
 A nota do utilizador sobre objetivos diferentes em cada mapa pode

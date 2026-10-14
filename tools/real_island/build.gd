@@ -107,10 +107,16 @@ const PLACES: Dictionary = {
 				"polygon": [Vector2(650, 0), Vector2(1466, 0), Vector2(1466, 1466), Vector2(880, 1466), Vector2(880, 800), Vector2(865, 630), Vector2(800, 540), Vector2(650, 400)],
 				"exit": [Vector2(835, 589), 441503021],
 				"rescue": Vector2(1011, 720), "caches": [Vector2(1059, 768), Vector2(909, 560)]},
-			{"mission": &"activate", "horde_radius": 120,
+			# Light the Signals: two beacons on the plateau's edges (the old
+			# generator spots east and southwest of the lighthouse), then the
+			# lighthouse itself (Farol da Berlenga, OSM; its tower centre).
+			# Each fuel waits at the door of a house of the lighthouse
+			# compound (the keepers' houses), so every leg crosses it.
+			{"mission": &"signals", "horde_radius": 120,
 				"polygon": [Vector2(0, 0), Vector2(650, 0), Vector2(650, 400), Vector2(800, 540), Vector2(865, 630), Vector2(880, 800), Vector2(523, 800), Vector2(0, 800)],
 				"exit": [Vector2(521, 800), 233892909],
-				"generators": [Vector2(710, 633), Vector2(675, 674), Vector2(745, 665)], "caches": [Vector2(621, 642)]},
+				"signals": [Vector2(745, 665), Vector2(675, 674)], "lighthouse": Vector2(706, 624),
+				"fuel": [Vector2(717, 616), Vector2(686, 645), Vector2(688, 616)], "caches": [Vector2(621, 642)]},
 			# Hold Sequence: three lookouts held in order, out from the start
 			# and back to the Exit beside it (the last one is the old
 			# DefendZone spot).
@@ -2481,6 +2487,17 @@ func _build_part(k: int, whole: IslandMap) -> Dictionary:
 	var holds: Array = spec.get("holds", [])
 	for h in holds.size():
 		_marker("HoldPoint_%d" % (h + 1), _cell3(_reachable_near(f, reach, holds[h], 0.0, 30.0)))
+	# Light the Signals: the signals (4 m clear), the lighthouse beside its
+	# tower (2 m clear: the courtyard of the keepers' house is narrow), and
+	# each signal's fuel at a house door (1 m clear).
+	var signals: Array = spec.get("signals", [])
+	for s in signals.size():
+		_marker("Signal_%d" % (s + 1), _cell3(_reachable_near(f, reach, signals[s], 0.0, 30.0)))
+	if spec.has("lighthouse"):
+		_marker("Lighthouse", _cell3(_reachable_near(f, reach, spec["lighthouse"], 0.0, 30.0, 2)))
+	var fuel: Array = spec.get("fuel", [])
+	for u in fuel.size():
+		_marker("Fuel_%d" % (u + 1), _cell3(_reachable_near(f, reach, fuel[u], 0.0, 30.0, 1)))
 	var caches: Array = spec.get("caches", [])
 	for c in caches.size():
 		_marker("Cache%d" % (c + 1), _cell3(_reachable_near(f, reach, caches[c], 0.0, 30.0)))
@@ -2574,6 +2591,11 @@ func _route(map: IslandMap) -> Array:
 		stops.append(["DefendZone", map.defend_zone])
 	for h in map.hold_points.size():
 		stops.append(["HoldPoint_%d" % (h + 1), map.hold_points[h]])
+	for s in map.signal_points.size():  # each signal's fuel, then the signal
+		if s < map.signal_fuel.size():
+			stops.append(["Fuel_%d" % (s + 1), map.signal_fuel[s]])
+		var last: bool = map.signal_lighthouse and s == map.signal_points.size() - 1
+		stops.append(["Lighthouse" if last else "Signal_%d" % (s + 1), map.signal_points[s]])
 	stops.append(["Exit", map.exit] if map.exit.x >= 0.0 else ["Boat", map.boat])
 	cur = map.player_start
 	for s: Array in stops:

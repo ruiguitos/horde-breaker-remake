@@ -256,8 +256,8 @@ A Berlenga é a ilha real, com 1,5 km, feita a partir de dados abertos:
 relevo, a costa e os caminhos do OpenStreetMap e texturas do Poly Haven.
 Já não sai no sorteio da rota Beach.
 - **Expedição Berlenga:** é uma viagem própria, que se escolhe no Armory.
-  São 4 partes seguidas, ligadas a pé: Rescue, Activate, Defend e o final
-  no forte. Ver "Berlenga Expedition" mais abaixo e
+  São 4 partes seguidas, ligadas a pé: Rescue, Light the Signals (dois
+  sinais e o farol), Hold Sequence e o final no forte. Ver "Berlenga Expedition" mais abaixo e
   `docs/design/BERLENGA_EXPEDITION.md`.
 - **Cenas:** estão em `world/handmade/expeditions/berlenga/`:
   - `base.scn`, a ilha sem marcadores;
@@ -370,7 +370,7 @@ só visual. A câmara de 3.ª pessoa encurta para não entrar nas colinas.
 | `Trees/` | Cada filho bloqueia só a célula do tronco (a copa não conta) |
 | `Bridges/` | Cada filho é o tabuleiro de uma ponte (`MeshInstance3D`): as células por baixo andam-se à altura do tabuleiro, mesmo sobre água; os filhos (guardas) são decoração |
 | `Decor/` | Nunca bloqueia: relva, flores, estradas, luzes, água de pré-visualização |
-| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed), `Cargo_1..` e `Delivery` (missão Fuel Run: onde estão os bidões e onde se entregam; sem `Cargo_*` o jogo escolhe sítios como os do Hold Sequence, sem `Delivery` entrega-se no barco/Exit), `Nest_1..` (missão Nests: onde estão os ninhos; sem eles o jogo escolhe sítios como os do Hold Sequence, com 4 m livres à volta), `Search_1..` e `Uplink` (missão Intel Search: os sítios a procurar, de preferência à porta das casas, e onde se transmite; sem `Search_*` o jogo escolhe sítios alcançáveis a menos de 3 m de um edifício ou rocha, ou em qualquer lado se não houver; sem `Uplink` escolhe o ponto aberto mais perto do meio dos sítios, a 10 m ou mais de cada um) (nós `Marker3D`) |
+| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed), `Cargo_1..` e `Delivery` (missão Fuel Run: onde estão os bidões e onde se entregam; sem `Cargo_*` o jogo escolhe sítios como os do Hold Sequence, sem `Delivery` entrega-se no barco/Exit), `Nest_1..` (missão Nests: onde estão os ninhos; sem eles o jogo escolhe sítios como os do Hold Sequence, com 4 m livres à volta), `Search_1..` e `Uplink` (missão Intel Search: os sítios a procurar, de preferência à porta das casas, e onde se transmite; sem `Search_*` o jogo escolhe sítios alcançáveis a menos de 3 m de um edifício ou rocha, ou em qualquer lado se não houver; sem `Uplink` escolhe o ponto aberto mais perto do meio dos sítios, a 10 m ou mais de cada um), `Signal_1..`, `Lighthouse` e `Fuel_1..` (missão Light the Signals: os sinais por ordem do número, o farol opcional como último sinal, e o combustível de cada sinal pelo mesmo número, o do farol a seguir aos outros; sem `Signal_*` o jogo escolhe sítios como os do Hold Sequence, cada um mais para dentro; sem `Fuel_*` põe o bidão a 15–30 m do seu sinal) (nós `Marker3D`) |
 
 A ilha ocupa o quadrado de 0 a `size` metros em X e Z (160 por omissão;
 muda no inspetor do nó raiz). Mantém tudo lá dentro.
@@ -526,6 +526,17 @@ Cada rota mostra também a missão da ilha:
   menos de 5 m, com pico) e só então a saída abre. Sem intel nenhuma quando
   o tempo acaba, não há transmissão: vais logo para o barco, sem bónus.
   Cada intel vale 15 de Intel. É a missão "da casa" da Coastal Town (peso 3).
+- **Light the Signals**: três sinais (pedestais de pedra com uma taça de
+  lenha) para acender por ordem, e só o próximo aparece (HUD, minimapa e
+  mundo): os outros ficam escondidos até o anterior acender. O combustível
+  de cada sinal é um bidão a 15–30 m dele, levado com as regras da Fuel Run
+  (um de cada vez, ×0,8, sem disparar; E ou a habilidade pousam-no,
+  `DROP CAN`). A menos de 4 m do sinal o bidão é despejado; ficar lá 6 s
+  acende-o (sair pausa, levar dano não; começar chama um pico de 15 s). Um
+  sinal aceso fica com fogo e luz e devolve um terço da munição; o último
+  abre a saída. 15 de Intel por sinal. O último pode ser um farol (marcador
+  `Lighthouse`): o fogo vai para o topo da torre e um feixe roda. Peso 1 em
+  todos os biomas. A Berlenga parte 2 joga-a com o farol real.
 
 No Vulcão, o boss aparece depois de cumprires a missão.
 

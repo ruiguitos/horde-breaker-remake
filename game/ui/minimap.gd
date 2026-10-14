@@ -28,6 +28,10 @@ const FUEL_COLOR := Color(1.0, 0.6, 0.15)
 const NEST_COLOR := Color(0.72, 1.0, 0.25)
 ## Intel Search spots and the uplink (the world uses the same colour).
 const INTEL_COLOR := Color(0.78, 0.55, 1.0)
+## Light the Signals: the next signal (unlit) and the fire of a lit one (the
+## world uses the same colours; the fuel can uses FUEL_COLOR).
+const SIGNAL_COLOR := Color(1.0, 0.92, 0.55)
+const SIGNAL_LIT_COLOR := Color(1.0, 0.45, 0.12)
 
 var run: IslandRun
 var _texture: ImageTexture
@@ -164,6 +168,16 @@ func _draw() -> void:
 				if run.search_state[k] == IslandRun.SPOT_UNSEARCHED:
 					_mark(&"search", _px(run.search_pos[k]))
 		_mark(&"uplink", _px(run.uplink_pos))
+	elif run.mission == &"signals":
+		# The lit signals stay on the map (the trail so far); only the next
+		# one and its fuel show, the later ones stay hidden until it is lit.
+		for i in run.signals_lit():
+			_mark(&"signal_lit", _px(run.signal_pos[i]))
+		if run.objective == IslandRun.Objective.GENERATORS and run.signal_index < run.signal_pos.size():
+			_mark(&"signal", _px(run.signal_pos[run.signal_index]))
+			var c: int = run.signal_index
+			if c < run.cargo_pos.size() and run.cargo_state[c] == IslandRun.CAN_WAITING:
+				_mark(&"fuel", _px(run.cargo_pos[c]))
 	elif run.mission == &"rescue" and not run.survivor_lost:
 		_mark(&"survivor", _px(run.survivor_pos))
 	for g in GameData.GENERATOR_COUNT:
@@ -225,6 +239,15 @@ static func draw_marker(item: CanvasItem, kind: StringName, p: Vector2, s: float
 			# The uplink: a violet mast (triangle) under a ring.
 			item.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -2) * s, p + Vector2(3, 4) * s, p + Vector2(-3, 4) * s]), INTEL_COLOR)
 			item.draw_arc(p + Vector2(0, -2) * s, 3.5 * s, PI * 1.1, PI * 1.9, 10, INTEL_COLOR, 1.2 * s, true)
+		&"signal":
+			# The next signal: a pale yellow diamond with a dark centre (unlit).
+			item.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -5) * s, p + Vector2(4, 0) * s, p + Vector2(0, 5) * s, p + Vector2(-4, 0) * s]), SIGNAL_COLOR)
+			item.draw_circle(p, 1.5 * s, Color(0.15, 0.12, 0.08))
+		&"signal_lit":
+			# A lit signal: an orange flame (a drop pointing up).
+			item.draw_circle(p + Vector2(0, 1) * s, 3.0 * s, SIGNAL_LIT_COLOR)
+			item.draw_colored_polygon(PackedVector2Array([p + Vector2(-2.6, 0) * s, p + Vector2(0, -5) * s, p + Vector2(2.6, 0) * s]), SIGNAL_LIT_COLOR)
+			item.draw_circle(p + Vector2(0, 1) * s, 1.3 * s, SIGNAL_COLOR)
 		&"exit":
 			# The Exit: a green chevron pointing up (the way on).
 			item.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -5) * s, p + Vector2(5, 3) * s, p + Vector2(0, 0.5) * s, p + Vector2(-5, 3) * s]), UiTheme.SUCCESS)
@@ -268,6 +291,13 @@ static func legend_entries(r: IslandRun) -> Array[Array]:
 				if r.intel_phase == IslandRun.INTEL_SEARCH and r.nearest_unsearched() != -1:
 					out.append([&"search", "SEARCH"])
 				out.append([&"uplink", "UPLINK"])
+		&"signals":
+			if r.objective == IslandRun.Objective.GENERATORS and r.signal_index < r.signal_pos.size():
+				out.append([&"signal", "LIGHTHOUSE" if r.signal_name(r.signal_index) == "Lighthouse" else "SIGNAL"])
+				if r.signal_index < r.cargo_state.size() and r.cargo_state[r.signal_index] == IslandRun.CAN_WAITING:
+					out.append([&"fuel", "FUEL"])
+			if r.signals_lit() > 0:
+				out.append([&"signal_lit", "LIT"])
 		&"rescue":
 			out.append([&"survivor", "SURVIVOR"])
 		&"activate":

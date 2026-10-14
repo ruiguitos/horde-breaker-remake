@@ -224,4 +224,67 @@ tem marcadores `Search_*`/`Uplink`. Testes: `tests/test_intel_search.gd`
 a horda chega ao limite de 150 vivos durante a transmissão, a confirmar em
 playtest).
 
-Próximo passo (do catálogo): sinais.
+**Passo 5 feito: Light the Signals** (`game/data/missions/signals.tres`,
+id `signals`; no catálogo, "Acender sinais/farol"). Números (no `.tres` e,
+os do transporte, no `fuel_run.tres`, para afinar em playtest):
+
+| Valor | Número | Porquê |
+|---|---|---|
+| Sinais | 3, acesos por ordem | Igual às outras missões. Só o **próximo** sinal (e o seu combustível) aparece no HUD, no minimapa e no mundo; os seguintes ficam escondidos até o anterior acender. É isto que faz o sinal "orientar para a zona seguinte". |
+| Combustível | 1 bidão por sinal, a 15–30 m dele | Perto o bastante para ser "o combustível daquele sinal", longe o bastante para obrigar a uma ida e volta carregado. Também a no máximo 60 m a pé (não do outro lado de uma parede) e a 15 m ou mais de qualquer outro sinal. |
+| Transporte | as regras da Fuel Run | O mesmo código: um bidão de cada vez, ×0,8, sem disparar, sem sprint, sem habilidade; `interact` (E / X) ou a tecla da habilidade pousam-no; o HUD diz `DROP CAN`. Só o bidão do próximo sinal se pode apanhar. |
+| Acender | 6 s a menos de 4 m, com o combustível lá dentro | Curto: o esforço está no transporte. Sair pausa (o progresso fica); levar dano não interrompe, como no Activate. Sem combustível, ficar no sinal não faz nada. O bidão é despejado ao chegar a 4 m do sinal. |
+| Pico | 15 s, ao começar a acender | Apanhar o bidão não chama a horda (ao contrário da Fuel Run); acender sim: é o fogo que a atrai. Um pico por sinal. |
+| Recompensa | 15 de Intel por sinal e ⅓ da munição | Como cada passo das outras missões. |
+| Sorteio | peso 1 em todo o lado | Não tem bioma "da casa". Com oito missões nas rotas, sai em 10 % das primeiras ilhas nas Beach, Coastal Town, Jungle e Vulcão (onde a missão da casa tem 30 %) e em 12,5 % no Industrial Port. Baixa as outras de 11 % para 10 % (14 % para 12,5 % no Port). |
+
+Regras: um sinal aceso fica aceso (fogo e luz), devolve um terço da munição
+e revela o seguinte; a extração só abre depois do último. Morrer termina a
+ilha como sempre; um Quick Redeploy (ou outra missão no mesmo `IslandRun`)
+repõe tudo, com os mesmos sinais e bidões. Marcadores `Signal_1..` (ordem
+pelo número), `Lighthouse` (opcional: é o último sinal, versão farol) e
+`Fuel_1..` (o combustível do sinal com o mesmo número; o do farol é o
+último); sem `Signal_*`, o jogo escolhe sítios como no Hold Sequence
+(alcançáveis, a 30 m ou mais do barco, afastados, fixos por seed, outra
+"sal", 3 m livres), ordenados pela distância a pé desde o desembarque, por
+isso cada sinal fica mais para dentro do que o anterior; sem `Fuel_*`, o
+bidão de cada sinal vai para o primeiro sítio da lista (alcançável, 2 m
+livres) dentro da faixa de 15–30 m. Se não houver nenhum, fica o sítio mais
+perto do meio da faixa; se nem isso, o próprio sinal (nunca bloqueia).
+
+Código partilhado com a Fuel Run (refatorado, não duplicado): os bidões são
+os mesmos `cargo_pos`/`cargo_state`/`carrying` do `IslandRun`;
+`_update_carry()` faz o transporte e a entrega das duas missões,
+`can_available()` diz que bidão se pode apanhar e `uses_cargo()` liga o
+`interact`. No `IslandMap`, a procura dos candidatos dos pontos passou para
+`_hold_candidates()`, usada pelo `pick_hold_points` (mesmos resultados) e
+pelo `pick_signal_fuel_points`.
+
+Visual: pedestal de pedra com uma taça de ferro e lenha; enquanto é o
+próximo, um farol amarelo-claro por cima (fica cor de fogo quando tem o
+combustível), o anel do raio e um disco que cresce ao acender. Aceso: duas
+chamas emissivas que tremeluzem e uma `OmniLight3D` sem sombras (14 m de
+alcance; uma por sinal, desligada até acender). O farol põe o fogo no topo
+da torre do cenário (`Buildings/Lighthouse_*` a menos de 40 m do marcador)
+ou, se não houver, numa torre de pedra de 9 m, com uma luz de 45 m e um
+feixe de 36 m que roda. HUD `SIGNALS 1 / 3` (`FUEL TO SIGNAL 2 · [E] DROP`,
+`LIGHT SIGNAL 2 · 3 OF 6 s`, `FIND THE FUEL FOR SIGNAL 2`), marcador no
+bidão ou no sinal (`LIGHTING · 40 %` dentro dele), minimapa `SIGNAL`,
+`FUEL` e `LIT` (os sinais acesos ficam no mapa, como um rasto).
+
+**Berlenga P2 (Planalto do Farol) passou de Activate para Light the
+Signals**, como no catálogo ("transportar alimentação das casas dos
+faroleiros → acender o farol"): `Signal_1` a leste (745, 665) e `Signal_2`
+a sudoeste (675, 674), onde estavam os geradores 3 e 2, e depois o
+`Lighthouse` ao pé da torre real (4,6 m do centro dela; o fogo vai para o
+topo da torre, 27 m acima do chão). Os três `Fuel_*` ficam à porta das casas
+do conjunto do farol (4 a 5 m de cada casa), por isso cada ida atravessa o
+pátio. O percurso na grelha passou de 583 m para 858 m (138 + 97 + 75 + 46 +
+67 + 41 + 394): mais longo, a confirmar em playtest.
+
+Testes: `tests/test_signals.gd` (inclui um bot na Beach, Coastal Town e
+Jungle, ameaça 2: extração em 89–118 s, sinais acesos aos 19–29 s, 40–58 s e
+67–83 s, sem precisar de pousar o bidão; a horda chega ao limite de 150 vivos,
+a confirmar em playtest).
+
+Próximo passo (do catálogo): sabotagem Hashima.

@@ -39,9 +39,9 @@ func _initialize() -> void:
 	_check(GameData.ISLAND_BIOMES == ([&"beach", &"town", &"jungle", &"port"] as Array[StringName]) and GameData.BIOMES.has(&"volcano"),
 		"4 route biomes + the volcano")
 	_check(GameData.BIOMES[&"jungle"]["palms"] and is_equal_approx(GameData.BIOMES[&"jungle"]["fog"], 0.006), "biome look values")
-	_check(GameData.MISSIONS.size() == 8 and GameData.MISSIONS[&"defend"]["name"] == "Defend"
-		and GameData.ROUTE_MISSIONS == ([&"activate", &"defend", &"rescue", &"hold_sequence", &"fuel_run", &"nests", &"intel_search"] as Array[StringName]),
-		"8 missions, 7 on the boat routes (holdout is expedition-only)")
+	_check(GameData.MISSIONS.size() == 9 and GameData.MISSIONS[&"defend"]["name"] == "Defend"
+		and GameData.ROUTE_MISSIONS == ([&"activate", &"defend", &"rescue", &"hold_sequence", &"fuel_run", &"nests", &"intel_search", &"signals"] as Array[StringName]),
+		"9 missions, 8 on the boat routes (holdout is expedition-only)")
 	_check(GameData.CLASSES == ([&"recruit", &"vanguard"] as Array[StringName]) and GameData.CLASS_INFO[&"vanguard"]["cost"] == 150, "2 classes with costs")
 	_check(GameData.modifiers().size() == 5 and is_equal_approx(GameData.modifier(&"swarm").intel_mult, 1.3), "5 route modifiers")
 	_test_xp_scale(enemies)

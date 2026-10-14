@@ -1334,6 +1334,8 @@ func _mission_progress(run: IslandRun) -> String:
 					if run.intel_phase == IslandRun.INTEL_TRANSMIT:
 						return "sending %d/%d s" % [int(run.transmit_progress), int(IslandRun.transmit_seconds())]
 					return "%d/%d, %s" % [run.intel_found(), run.intel_total(), IslandRun.clock_text(run.intel_time_left)]
+				&"signals":
+					return "%d/%d" % [run.signals_lit(), run.signal_pos.size()]
 				_:
 					return "%d/%d" % [_generators_done(run), GameData.GENERATOR_COUNT]
 		IslandRun.Objective.BOSS:
@@ -1563,7 +1565,7 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_ability_ring.set_state(1.0 - run.grenade_cd / ability_total if ability_total > 0.0 else 1.0, run.grenade_cd)
 	_cooldown_label(_ability_status, run.grenade_cd)
 	if run.is_carrying():
-		# Fuel Run: with a can in the hands the ability button only puts it
+		# Fuel Run / Light the Signals: with a can in the hands the ability button only puts it
 		# down (IslandRun.use_ability), so the slot says that instead of READY.
 		_ability_status.text = "DROP CAN"
 		_ability_status.add_theme_color_override("font_color", UiTheme.INFO)
@@ -1719,6 +1721,18 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 						detail += " · SEARCH THE MARKED SPOTS"
 					pips = total
 					pips_done = run.intel_found()
+				&"signals":
+					var count: int = run.signal_pos.size()
+					var sname: String = run.signal_name(run.signal_index).to_upper()
+					_objective.text = "SIGNALS %d / %d" % [run.signals_lit(), count]
+					if run.is_carrying():
+						detail += " · FUEL TO %s · [%s] DROP" % [sname, GameInput.prompt(&"interact", _gamepad)]
+					elif run.signal_fuelled():
+						detail += " · LIGHT %s · %d OF %d s" % [sname, int(run.signal_progress), int(IslandRun.signal_seconds())]
+					else:
+						detail += " · FIND THE FUEL FOR %s" % sname
+					pips = count
+					pips_done = run.signals_lit()
 				_:
 					_objective.text = "ACTIVATE THE GENERATORS"
 					detail += " · %d OF %d ONLINE" % [_generators_done(run), GameData.GENERATOR_COUNT]
@@ -1870,6 +1884,9 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"intel_search":
 		goal = run.intel_goal()  # the nearest unsearched spot, or the uplink
 		goal_name = "Uplink" if run.intel_phase != IslandRun.INTEL_SEARCH or run.nearest_unsearched() == -1 else "Search"
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"signals":
+		goal = run.signals_goal()  # the next signal's fuel, or the signal itself
+		goal_name = run.signal_name(run.signal_index) if run.is_carrying() or run.signal_fuelled() else "Fuel"
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"rescue":
 		goal = run.survivor_pos
 		goal_name = "Survivor"
@@ -1909,6 +1926,9 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 		_marker.text = "SEARCHING · %d%%" % int(100.0 * run.search_progress[run.nearest_unsearched()] / IslandRun.search_seconds())
 	elif intel and run.intel_phase == IslandRun.INTEL_TRANSMIT and dist <= IslandRun.transmit_radius():
 		_marker.text = "TRANSMITTING · %d%%" % int(100.0 * run.transmit_progress / IslandRun.transmit_seconds())
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"signals" and run.signal_fuelled() \
+			and dist <= IslandRun.signal_radius():
+		_marker.text = "LIGHTING · %d%%" % int(100.0 * run.signal_progress / IslandRun.signal_seconds())
 	else:
 		_marker.text = "%s · %d m" % [goal_name.to_upper(), int(dist)]
 	var view: Vector2 = get_viewport().get_visible_rect().size

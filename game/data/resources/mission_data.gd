@@ -63,6 +63,13 @@ extends Resource
 ## Intel Search: Intel paid per intel item found (before the threat,
 ## route and hazard multipliers, like every mission's Intel).
 @export var intel_reward: int = 0
+# Light the Signals uses the shared fields only: `points` = how many signals
+# (the map's Signal_*/Lighthouse markers win when it has them),
+# `seconds_per_point` = seconds standing at a fuelled signal to light it
+# (leaving pauses it), `radius` = metres from a signal at which the carried
+# fuel is poured in and the lighting counts, `spike_seconds` = the horde
+# spike when the lighting starts. The fuel cans follow the Fuel Run carry
+# rules (fuel_run.tres: pickup radius, speed, no firing).
 @export_group("Boat draw")
 ## Biomes where the boat offers this mission more often: its "signature"
 ## islands (it can still be drawn anywhere).

@@ -11,7 +11,7 @@ const DIR: String = "res://game/world/handmade/expeditions/"
 const ALL: Dictionary = {
 	&"berlenga": [
 		{"name": "Carreiro do Mosteiro", "scene": DIR + "berlenga/part_1.scn", "mission": &"rescue"},
-		{"name": "Lighthouse Plateau", "scene": DIR + "berlenga/part_2.scn", "mission": &"activate"},
+		{"name": "Lighthouse Plateau", "scene": DIR + "berlenga/part_2.scn", "mission": &"signals"},
 		{"name": "Southwest Coast", "scene": DIR + "berlenga/part_3.scn", "mission": &"hold_sequence"},
 		{"name": "Fort of Sao Joao Baptista", "scene": DIR + "berlenga/part_4.scn", "mission": &"holdout"},
 	],
@@ -22,7 +22,7 @@ const ALL: Dictionary = {
 const INFO: Dictionary = {
 	&"berlenga": {
 		"name": "Berlenga Expedition",
-		"text": "One real island, four parts on foot: rescue, activate, hold three points, then hold the fort until the boat comes.",
+		"text": "One real island, four parts on foot: rescue, light the lighthouse, hold three points, then hold the fort until the boat comes.",
 		"biome": &"beach",
 		"whole": DIR + "berlenga/whole.scn",
 	},
