@@ -349,11 +349,14 @@ func _test_sprint() -> void:
 	var start: Vector3 = run.player_pos
 	run.horde.add(start + Vector3(0, 0, -8), GameData.EnemyKind.WALKER, run.rng)
 	run.horde.stun[0] = 10.0
+	run.horde.hp[0] = 100000.0
+	var mag_before: int = run.mag[0]
 	for t in 30:
 		run.step(DT, Vector2(1, 0), Vector3(0, 0, -1), false, true)
 	var sprint_dist: float = run.player_pos.distance_to(start)
-	_check(run.kills == 0 and sprint_dist > 0.5 * GameData.PLAYER_SPEED * GameData.SPRINT_MULTIPLIER * 0.9,
-		"sprinting is faster and the gun stays silent (%.2f m in 0.5 s)" % sprint_dist)
+	var shots: int = mag_before - run.mag[0]
+	_check(shots > 0 and sprint_dist > 0.5 * GameData.PLAYER_SPEED * GameData.SPRINT_MULTIPLIER * 0.9,
+		"sprinting is faster and the gun keeps firing (%.2f m in 0.5 s, %d shots)" % [sprint_dist, shots])
 	for t in int(GameData.STAMINA_MAX / DT) + 10:
 		run.step(DT, Vector2(-1, 0), Vector3(0, 0, -1), false, true)
 	_check(run.stamina == 0.0 and not run.sprinting, "stamina runs out and sprint stops")

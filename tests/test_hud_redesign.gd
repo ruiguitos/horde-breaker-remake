@@ -177,13 +177,15 @@ func _test_cards() -> void:
 	await _pad(JOY_BUTTON_X)
 	await _pad(JOY_BUTTON_B)
 	_check(chosen.is_empty() and not _run.card_choices.is_empty() and _run.cards_picked.is_empty(), "1/2/3 and X/B no longer pick a card")
-	# Reroll: R / Y redraws the offer and spends one of the run's rerolls.
+	# Reroll: R / Y redraws the offer and spends the screen's free reroll.
+	_check(_run.rerolls == GameData.REROLLS_PER_SCREEN, "a level-up screen opens with %d free reroll" % GameData.REROLLS_PER_SCREEN)
 	var before: String = ",".join(_run.card_choices.map(func(c: GameData.Card) -> String: return String(c.id)))
 	await _tap(KEY_R)
 	var after: String = ",".join(_run.card_choices.map(func(c: GameData.Card) -> String: return String(c.id)))
-	_check(_run.rerolls == GameData.REROLLS_START - 1 and after != before, "REROLL spends one and redraws (%s -> %s)" % [before, after])
+	_check(_run.rerolls == 0 and after != before, "REROLL spends it and redraws (%s -> %s)" % [before, after])
+	_run.rerolls = 1  # as if an Extra Reroll had been waiting for this screen
 	await _tap(KEY_R)
-	_check(_run.rerolls == GameData.REROLLS_START - 1, "a reroll right after another waits for the 0.4 s lock")
+	_check(_run.rerolls == 1, "a reroll right after another waits for the 0.4 s lock")
 	await _wait(0.45)
 	await _pad(JOY_BUTTON_Y)
 	_check(_run.rerolls == 0, "gamepad Y rerolls too")
@@ -272,30 +274,47 @@ func _test_hazard_split() -> void:
 	debrief.free()
 
 
+## Rerolls (decided 2026-10-14): 1 free per level-up screen, never banked;
+## Extra Reroll adds +1 to the next screen only, even on the next island.
 func _test_reroll_rules() -> void:
 	var ctx := RunContext.new(11)
 	var run := IslandRun.new(7)
 	run.load_context(ctx)
-	_check(run.rerolls == GameData.REROLLS_START, "a run starts with %d rerolls" % GameData.REROLLS_START)
-	run.rerolls = 1
+	_check(run.rerolls == 0 and run.bonus_rerolls == 0 and not run.reroll_cards(), "no card screen: no rerolls, reroll does nothing")
+	run.set("_pending_levels", 1)
+	run.call("_roll_cards_if_needed")
+	_check(run.rerolls == GameData.REROLLS_PER_SCREEN, "a level-up screen grants exactly 1 reroll")
+	_check(run.reroll_cards() and run.rerolls == 0 and not run.reroll_cards(), "one reroll, then none on that screen")
+	run.choose_card(0)
+	_check(run.rerolls == 0, "picking a card closes the screen and its rerolls")
+	# An unused reroll does not carry over: the next screen still has 1.
+	run.set("_pending_levels", 1)
+	run.call("_roll_cards_if_needed")
+	run.choose_card(0)
+	run.set("_pending_levels", 1)
+	run.call("_roll_cards_if_needed")
+	_check(run.rerolls == GameData.REROLLS_PER_SCREEN, "an unused reroll is lost: the next screen has 1, not 2 (%d)" % run.rerolls)
+	# Two level-ups at once: each screen gets its own one.
+	run.choose_card(0)
+	run.set("_pending_levels", 2)
+	run.call("_roll_cards_if_needed")
+	run.reroll_cards()
+	run.choose_card(0)
+	_check(not run.card_choices.is_empty() and run.rerolls == GameData.REROLLS_PER_SCREEN, "back-to-back level-ups: the second screen has its own reroll")
+	run.choose_card(0)
+	# Extra Reroll picked up between screens and carried across islands.
+	run.apply_power_up(&"extra_reroll")
 	run.objective = IslandRun.Objective.WON
 	run.save_to_context(ctx)
+	_check(ctx.bonus_rerolls == 1, "an Extra Reroll not yet used is carried to the next island")
 	var next := IslandRun.new(8)
 	next.load_context(ctx)
-	_check(next.rerolls == 1 + GameData.REROLLS_PER_ISLAND, "rerolls carry to the next island, +1 for clearing one")
-	next.rerolls = GameData.REROLLS_MAX
+	next.set("_pending_levels", 1)
+	next.call("_roll_cards_if_needed")
+	_check(next.rerolls == GameData.REROLLS_PER_SCREEN + 1 and next.bonus_rerolls == 0, "the next island's first screen has 1 + 1 rerolls")
 	next.objective = IslandRun.Objective.WON
 	next.save_to_context(ctx)
-	_check(IslandRun.context_rerolls(ctx) == GameData.REROLLS_MAX, "banked rerolls never exceed %d" % GameData.REROLLS_MAX)
-	ctx.island_index = ctx.island_count() - 1
-	var final := IslandRun.new(9)
-	final.load_context(ctx)
-	final.rerolls = 0
-	final.objective = IslandRun.Objective.WON
-	final.save_to_context(ctx)
-	_check(IslandRun.context_rerolls(ctx) == 0, "clearing the last island earns no reroll")
-	run.card_choices.clear()
-	_check(not run.reroll_cards(), "no offer: reroll does nothing")
+	_check(ctx.bonus_rerolls == 0, "rerolls left on an open screen are not banked")
 
 
 func _test_pause() -> void:

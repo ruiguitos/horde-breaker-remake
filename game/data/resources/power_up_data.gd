@@ -20,7 +20,7 @@ extends Resource
 @export var duration: float = 0.0
 ## Nuke: seconds without new spawns after the blast.
 @export var spawn_delay: float = 0.0
-## Extra Reroll: rerolls added (still capped by REROLLS_MAX).
+## Extra Reroll: extra rerolls on the next level-up card screen only.
 @export var reroll_amount: int = 0
 ## Max Shield: fraction of the max shield filled (1 = full).
 @export_range(0.0, 1.0, 0.05) var shield_fill: float = 0.0

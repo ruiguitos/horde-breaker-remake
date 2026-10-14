@@ -59,8 +59,11 @@ Testes: `extends SceneTree`, lógica em `_initialize()`, imprimem `TEST: ...` ou
 - **Uma só sessão de desenvolvimento**: o utilizador trabalha numa conversa,
   sem tarefas paralelas. Commit e push direto para `master`, sem PR; antes
   de cada push, `git pull --rebase origin master`.
-- **Não editar `docs/DECISIONS.md`.** Propor decisões numa secção
-  "Decisões propostas" do teu próprio documento; o utilizador decide.
+- **`docs/DECISIONS.md` só regista decisões do utilizador.** Propor
+  decisões numa secção "Decisões propostas" do teu próprio documento; o
+  utilizador decide. Quando ele decide (desde 2026-10-14), registar a
+  decisão com a data em `DECISIONS.md` e atualizar todos os documentos
+  afetados (GDD, design, tech), marcando o texto antigo como substituído.
 - **Assets externos só com licença livre** (CC0, MIT, OFL ou royalty-free
   comercial) e registados em `assets/LICENSES.md`. Exceção aceite pelo
   utilizador: dados do OpenStreetMap (ODbL), com atribuição. Também aceite:

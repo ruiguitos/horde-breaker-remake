@@ -547,7 +547,8 @@ func _test_supplies() -> void:
 		await process_frame
 		var options: Array = menu.get("_options")
 		_check(options.size() == 3 and (options[2]["card"] as GameData.Card).id == &"thick_hide", screen + " supply uses class, weapon and rank filters")
-		_check(menu.call("reroll_supply") and ctx.rerolls == 1 and ctx.card_stacks.get(&"thick_hide", 0) == 0, screen + " reroll shares bank and does not grant a card")
+		_check(menu.call("reroll_supply") and int(menu.get("_supply_rerolls")) == 0 and not menu.call("reroll_supply") and ctx.card_stacks.get(&"thick_hide", 0) == 0,
+			screen + " has its own single free reroll (not a bank) and it does not grant a card")
 		menu.call("_pick", 2)
 		menu.call("_apply_supply")
 		menu.call("_apply_supply")

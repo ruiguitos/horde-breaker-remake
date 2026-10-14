@@ -188,7 +188,8 @@ const CROSSHAIR_HEAD_RADIUS: float = 0.4
 ## not capped).
 const MAX_MELEE_PER_FRAME: float = 25.0
 
-## Sprint: faster, but the gun stays silent while running.
+## Sprint: faster for a few seconds of stamina; the gun keeps firing (run and
+## gun is a base rule).
 const SPRINT_MULTIPLIER: float = 1.6
 const STAMINA_MAX: float = 3.0       ## seconds of sprint
 const STAMINA_REGEN: float = 0.75    ## per second
@@ -280,14 +281,17 @@ const QUICK_DRAW_COOLDOWN: float = 8.0
 const SKIRMISHER_FIRING_WINDOW: float = 0.3
 const MAX_THREAT: int = 3
 const EXTRACTION_INTEL_MULTIPLIER: float = 1.5
+## Between islands (and expedition parts) the boat / camp leaves on its own
+## after this many seconds (decided by the user on 2026-10-14; boat.gd).
+const NEXT_ISLAND_COUNTDOWN: float = 5.0
 
-## Level-up cards: rerolls (PROVISIONAL: the user still has to decide,
-## docs/design/PROGRESSION_AND_ECONOMY.md §1.6 P9). A reroll redraws the
-## offer. The run starts with REROLLS_START; every island cleared that is
-## not the last adds REROLLS_PER_ISLAND, never above REROLLS_MAX banked.
-const REROLLS_START: int = 2
-const REROLLS_PER_ISLAND: int = 1
-const REROLLS_MAX: int = 3
+## Level-up cards: rerolls (decided by the user on 2026-10-14,
+## docs/design/PROGRESSION_AND_ECONOMY.md §1.6). A reroll redraws the
+## offer. Every level-up card screen opens with REROLLS_PER_SCREEN free
+## rerolls; unused ones are lost when the card is picked (no bank). Extra
+## Reroll adds bonus rerolls to the NEXT screen only. The boat / camp card
+## supply is its own screen, with the same one free reroll.
+const REROLLS_PER_SCREEN: int = 1
 
 # Kill power-ups: provisional playtest values, independent of cards/weapons.
 const POWER_UP_CHANCE: float = 0.015

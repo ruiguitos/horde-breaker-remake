@@ -1,8 +1,18 @@
 extends Control
-## The boat between islands, on one screen: the chart (left), the two routes
-## and the quartermaster's supplies (right), and DEPLOY (bottom right), which
-## names where you go and with what. Cards use the shared filtered offers.
-## The expedition camp (camp.gd) extends this script: same supplies, no routes.
+## The boat before the first island, on one screen: the chart (left), the
+## two routes and the quartermaster's supplies (right), and DEPLOY (bottom
+## right), which names where you go and with what. Cards use the shared
+## filtered offers. The expedition camp (camp.gd) extends this script: same
+## supplies, no routes.
+##
+## Between islands (island_index > 0, decided by the user on 2026-10-14)
+## there is no route choice: the boat draws ONE route with the same draw
+## (draw_routes: seeded by the run, no mission twice in a row, biome
+## signature weights), shows "NEXT ISLAND IN 5…" and departs on its own.
+## The supplies stay (the first useful one is preselected and can be changed
+## while the clock runs), hazard pay is a toggle instead of the briefing,
+## DEPLOY (or confirm) leaves at once, and Esc / B (leave the run?) holds
+## the clock. The camp counts down the same way ("NEXT PART IN 5…").
 ##
 ## Selection and focus are separate: LB/RB (or 4/5) pick a route from
 ## anywhere; up/down move focus between the route row, the supply row and
@@ -16,6 +26,8 @@ signal exit_requested(to_title: bool)
 ## Supply tile height and route picture height, at the 1152x648 base size.
 const SUPPLY_HEIGHT: float = 104.0
 const PICTURE_HEIGHT: float = 56.0
+## Between islands: seconds before the boat leaves on its own.
+const COUNTDOWN_SECONDS: float = GameData.NEXT_ISLAND_COUNTDOWN
 
 var context: RunContext
 var _rng := RandomNumberGenerator.new()
@@ -41,6 +53,15 @@ var _map: RouteMap
 var _briefing: DialogueBox
 var _exit_dialog: MenuDialog
 var _exit_sent: bool = false
+## The card supply's rerolls: like a level-up screen, one free reroll per
+## boat / camp screen (GameData.REROLLS_PER_SCREEN), not banked.
+var _supply_rerolls: int = GameData.REROLLS_PER_SCREEN
+## Seconds left before departing on its own (-1 = no countdown: the first
+## boat waits for DEPLOY).
+var countdown_left: float = -1.0
+var _countdown_word: String = "ISLAND"
+var _heading: Label
+var _hazard: Button  ## between islands: hazard pay toggle (the briefing's offer)
 
 
 func _ready() -> void:
@@ -50,6 +71,12 @@ func _ready() -> void:
 	UiTheme.backdrop(self)
 	_make_options()
 	_make_routes()
+	var transit: bool = in_transit()
+	if transit:
+		# One route, drawn for the player (route A of the same draw).
+		_routes.resize(1)
+		_route_biomes.resize(1)
+		_route_missions.resize(1)
 	var screen := _screen()
 	_header(screen, "SALVAGE & CO. / BOAT", "NEXT LANDING / ISLAND %d OF %d" % [context.island_index + 1, RunContext.ISLAND_COUNT])
 	var body := _body(screen)
@@ -64,22 +91,49 @@ func _ready() -> void:
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override("separation", 18)
 	right.add_child(row)
-	for i in 2:
-		row.add_child(_route_card(i))
+	for i in _routes.size():
+		var card: Button = _route_card(i)
+		if transit:
+			card.focus_mode = Control.FOCUS_NONE  # nothing to choose
+		row.add_child(card)
+	if transit:
+		right.add_child(_hazard_toggle())
 	_supply_row(right)
-	_footer(screen, true)
+	_footer(screen, not transit)
 	_select_route(0)
 	_select_supply(_first_useful())
-	_route_buttons[0].grab_focus()
+	if transit:
+		_start_countdown("ISLAND")
+		_supply_target().grab_focus()
+	else:
+		_route_buttons[0].grab_focus()
 	add_child(UiSfx.new())
 	add_child(Ambience.create(&"menu", -12.0))
 
 
 func _make_routes() -> void:
+	for route: Dictionary in draw_routes(context, _rng):
+		_routes.append(route["modifier"])
+		_route_biomes.append(route["biome"])
+		_route_missions.append(route["mission"])
+
+
+## Between islands: the boat chooses the route and leaves on its own.
+func in_transit() -> bool:
+	return context.island_index > 0
+
+
+## The two routes A and B: {modifier: Modifier, biome, mission}. `rng`
+## defaults to the boat's own seed (island_seed + 1), so the same run seed
+## always draws the same routes. Between islands the boat takes route A.
+static func draw_routes(ctx: RunContext, rng: RandomNumberGenerator = null) -> Array[Dictionary]:
+	if rng == null:
+		rng = RandomNumberGenerator.new()
+		rng.seed = ctx.island_seed() + 1
 	var mods: Array[GameData.Modifier] = GameData.modifiers()
-	var a: int = _rng.randi_range(0, mods.size() - 1)
-	var b: int = (a + _rng.randi_range(1, mods.size() - 1)) % mods.size()
-	_routes = [mods[a], mods[b]]
+	var a: int = rng.randi_range(0, mods.size() - 1)
+	var b: int = (a + rng.randi_range(1, mods.size() - 1)) % mods.size()
+	var picked: Array[GameData.Modifier] = [mods[a], mods[b]]
 	var biomes: Array[StringName] = GameData.ISLAND_BIOMES.duplicate()
 	# Route missions (not the expedition-only holdout), never the mission
 	# just played again: context.mission still holds it after island 1.
@@ -88,15 +142,97 @@ func _make_routes() -> void:
 	# Nests in the Jungle and the Volcano, Intel Search in the Town,
 	# Sabotage in the Industrial Port; Light the Signals has no signature
 	# biome: weight 1 everywhere).
-	var previous: StringName = context.mission if context.island_index > 0 else &""
+	var previous: StringName = ctx.mission if ctx.island_index > 0 else &""
+	var out: Array[Dictionary] = []
 	for i in 2:
-		if context.is_last_island():
-			_route_biomes.append(&"volcano")
-		else:
-			var pick: int = _rng.randi_range(0, biomes.size() - 1)
-			_route_biomes.append(biomes[pick])
+		var biome: StringName = &"volcano"
+		if not ctx.is_last_island():
+			var pick: int = rng.randi_range(0, biomes.size() - 1)
+			biome = biomes[pick]
 			biomes.remove_at(pick)
-		_route_missions.append(GameData.pick_route_mission(_rng, previous, _route_biomes[i]))
+		out.append({"modifier": picked[i], "biome": biome,
+			"mission": GameData.pick_route_mission(rng, previous, biome)})
+	return out
+
+
+## Starts "NEXT <word> IN 5…" (word: ISLAND, PART).
+func _start_countdown(word: String) -> void:
+	_countdown_word = word
+	countdown_left = COUNTDOWN_SECONDS
+	if _heading == null:
+		_heading = find_child("Heading", true, false) as Label
+	_refresh_countdown()
+
+
+## "NEXT ISLAND IN 5…": whole seconds, rounded up (5, 4, 3, 2, 1).
+func countdown_text() -> String:
+	return "NEXT %s IN %d…" % [_countdown_word, maxi(1, ceili(countdown_left))]
+
+
+func _refresh_countdown() -> void:
+	if _heading != null and countdown_left >= 0.0:
+		_heading.text = countdown_text()
+
+
+## True while the clock holds: the leave-the-run dialog is open (the boat's
+## pause), or the boat is already leaving.
+func countdown_held() -> bool:
+	return is_instance_valid(_exit_dialog) or _exit_sent or _applied
+
+
+## Advances the clock; at zero the boat departs as if DEPLOY was pressed.
+func tick_countdown(delta: float) -> void:
+	if countdown_left < 0.0 or countdown_held():
+		return
+	countdown_left = maxf(0.0, countdown_left - delta)
+	_refresh_countdown()
+	if countdown_left <= 0.0:
+		_depart()
+
+
+func _process(delta: float) -> void:
+	tick_countdown(delta)
+
+
+## Countdown at zero: leave with what is selected (the preselected supply
+## if the player picked nothing else).
+func _depart() -> void:
+	if _applied or _exit_sent:
+		return
+	if _supply < 0 and _first_useful() >= 0:
+		_select_supply(_first_useful())
+	_land_now()
+
+
+## Hazard pay without the briefing: +25% Intel, more enemies, this island
+## only (as Briefing.take_hazard_pay; IslandRun clears it when the island ends).
+func _hazard_toggle() -> Button:
+	_hazard = Button.new()
+	_hazard.name = "HazardPay"
+	_hazard.toggle_mode = true
+	_hazard.button_pressed = context.hazard_pay
+	_hazard.add_theme_font_size_override("font_size", 13)
+	_hazard.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_hazard.toggled.connect(_set_hazard_pay)
+	_refresh_hazard()
+	return _hazard
+
+
+func _set_hazard_pay(on: bool) -> void:
+	if _applied or _exit_sent or is_instance_valid(_exit_dialog):
+		_hazard.set_pressed_no_signal(context.hazard_pay)
+		return
+	context.hazard_pay = on
+	_refresh_hazard()
+	_update_land()
+
+
+func _refresh_hazard() -> void:
+	if _hazard == null:
+		return
+	_hazard.text = "HAZARD PAY · %s  (+%d%% INTEL, MORE ENEMIES)" % ["ON" if context.hazard_pay else "OFF",
+		roundi((GameData.HAZARD_INTEL_MULT - 1.0) * 100.0)]
+	_hazard.tooltip_text = "Director Hale's offer: more Intel on this island, and the island knows you are coming."
 
 
 func _make_options() -> void:
@@ -131,13 +267,14 @@ func _card_option(avoid: Array[StringName] = []) -> Dictionary:
 		"apply": func() -> void: context.grant_card(card)}
 
 
-## Shares the level-up reroll bank; changing supplies never spends a card.
+## One free reroll per screen (its own, not the level-up's, not banked);
+## changing supplies never spends a card.
 func reroll_supply() -> bool:
-	if _applied or _exit_sent or is_instance_valid(_exit_dialog) or context.rerolls <= 0 or not _options[2].has("card"):
+	if _applied or _exit_sent or is_instance_valid(_exit_dialog) or _supply_rerolls <= 0 or not _options[2].has("card"):
 		return false
 	var old: GameData.Card = _options[2]["card"]
 	_options[2] = _card_option([old.id])
-	context.rerolls -= 1
+	_supply_rerolls -= 1
 	context.card_rng_state = _card_offers.rng.state
 	var b: Button = _buttons[2]
 	(b.find_child("SupplyTitle", true, false) as Label).text = _options[2]["title"]
@@ -155,10 +292,10 @@ func reroll_supply() -> bool:
 func _refresh_card_reroll() -> void:
 	if _card_reroll == null:
 		return
-	_card_reroll.text = "REROLL CARD · %d · %s" % [context.rerolls,
+	_card_reroll.text = "REROLL CARD · %d · %s" % [_supply_rerolls,
 		GameInput.prompt(&"card_reroll", not Input.get_connected_joypads().is_empty())]
-	_card_reroll.disabled = _applied or context.rerolls <= 0 or not _options[2].has("card")
-	_card_reroll.tooltip_text = "No rerolls left." if context.rerolls <= 0 else "Redraw the card supply using one run reroll."
+	_card_reroll.disabled = _applied or _supply_rerolls <= 0 or not _options[2].has("card")
+	_card_reroll.tooltip_text = "Reroll used." if _supply_rerolls <= 0 else "Redraw the card supply (one free reroll here)."
 
 
 ## True when an Ammo Crate would change nothing: every owned weapon that
@@ -684,12 +821,20 @@ func _wire_focus() -> void:
 	for b in _route_buttons:
 		b.focus_neighbor_top = b.get_path_to(b)
 		b.focus_neighbor_bottom = b.get_path_to(_supply_target())
+	var below_supplies: Control = _hazard if _hazard != null else _land
 	for b in supplies:
 		b.focus_neighbor_top = b.get_path_to(up_from_supplies if up_from_supplies != null else b)
-		b.focus_neighbor_bottom = b.get_path_to(_land)
+		b.focus_neighbor_bottom = b.get_path_to(below_supplies)
 	var above: Control = _supply_target()
 	if above == _land:
 		above = up_from_supplies if up_from_supplies != null else _land
+	if _hazard != null:
+		order.insert(order.size() - 1, _hazard)
+		_hazard.focus_neighbor_top = _hazard.get_path_to(above)
+		_hazard.focus_neighbor_bottom = _hazard.get_path_to(_land)
+		_hazard.focus_neighbor_left = _hazard.get_path_to(_hazard)
+		_hazard.focus_neighbor_right = _hazard.get_path_to(_hazard)
+		above = _hazard
 	_land.focus_neighbor_top = _land.get_path_to(above)
 	_land.focus_neighbor_bottom = _land.get_path_to(_land)
 	_land.focus_neighbor_left = _land.get_path_to(_land)
@@ -755,12 +900,15 @@ func _can_land() -> bool:
 func _land_text() -> String:
 	if _route < 0:
 		return "CHOOSE A ROUTE"
-	return "DEPLOY TO " + String(GameData.BIOMES[_route_biomes[_route]]["name"]).to_upper()
+	var place: String = String(GameData.BIOMES[_route_biomes[_route]]["name"]).to_upper()
+	return ("DEPART NOW TO " if in_transit() else "DEPLOY TO ") + place
 
 
 ## "<mission> · with <supply>".
 func _land_detail() -> String:
 	var what: String = Expeditions.mission_name(context.mission) if _route >= 0 or _routes.is_empty() else "Pick a route"
+	if context.hazard_pay and _hazard != null:
+		what += " · hazard pay"
 	if _supply >= 0:
 		return "%s · with %s" % [what, _options[_supply]["short"]]
 	return "%s · %s" % [what, "no supply needed" if _supply_ready() else "choose a supply"]
@@ -778,11 +926,15 @@ func _apply_supply() -> void:
 
 
 ## DEPLOY: apply the supply, then Director Hale's briefing (Dialogue
-## Manager), then land.
+## Manager), then land. Between islands there is no briefing (the boat
+## leaves on a clock; hazard pay is the toggle): it lands straight away.
 func _land_now() -> void:
 	if not _can_land() or _applied or _exit_sent or is_instance_valid(_exit_dialog):
 		return  # also stops a second press while the briefing is open
 	_apply_supply()
+	if in_transit():
+		land_requested.emit()
+		return
 	var dialogue: Resource = load(Briefing.RESOURCE) if ResourceLoader.exists(Briefing.RESOURCE) else null
 	if dialogue == null or get_node_or_null("/root/DialogueManager") == null:
 		land_requested.emit()  # addon missing: land straight away
@@ -815,7 +967,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				_pick(i)
 				get_viewport().set_input_as_handled()
 				return
-	for i in 2:
+	for i in _routes.size():
 		if event.is_action_pressed(StringName("menu_route_%d" % (i + 1))):
 			_pick_route(i)
 			get_viewport().set_input_as_handled()

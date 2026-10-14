@@ -202,16 +202,23 @@ func _test_effects() -> void:
 	run.apply_power_up(&"max_shield")
 	_check(run.shield == run.max_shield and run.messages.has("MAX SHIELD!"), "Max Shield fills the shield")
 	run.rerolls = 0
+	run.bonus_rerolls = 0
 	run.apply_power_up(&"extra_reroll")
-	_check(run.rerolls == 1 and run.messages.has("EXTRA REROLL!"), "Extra Reroll grants one reroll")
-	run.rerolls = GameData.REROLLS_MAX
-	run.apply_power_up(&"extra_reroll")
-	_check(run.rerolls == GameData.REROLLS_MAX, "Extra Reroll respects the reroll cap")
+	_check(run.rerolls == 0 and run.bonus_rerolls == 1 and run.messages.has("EXTRA REROLL!"), "Extra Reroll grants +1 reroll for the next level-up screen")
+	run.set("_pending_levels", 1)
+	run.call("_roll_cards_if_needed")
+	_check(run.rerolls == GameData.REROLLS_PER_SCREEN + 1 and run.bonus_rerolls == 0, "the next level-up screen opens with 1 + 1 rerolls (%d)" % run.rerolls)
+	run.choose_card(0)
+	run.set("_pending_levels", 1)
+	run.call("_roll_cards_if_needed")
+	_check(run.rerolls == GameData.REROLLS_PER_SCREEN, "the screen after that is back to 1 reroll (the bonus does not carry on)")
+	run.card_choices.clear()
 	run.rerolls = 0
+	run.bonus_rerolls = 0
 	run.shield = 0.0
 	run.apply_power_up(&"fire_sale")
 	run.apply_power_up(&"max_armor")
-	_check(run.rerolls == 1 and run.shield == run.max_shield and run.power_ups_picked.slice(-2) == [&"extra_reroll", &"max_shield"],
+	_check(run.bonus_rerolls == 1 and run.shield == run.max_shield and run.power_ups_picked.slice(-2) == [&"extra_reroll", &"max_shield"],
 		"old ids (fire_sale, max_armor) map to the renamed power-ups")
 	_check(not GameData.power_up_name(&"extra_reroll").contains("FIRE SALE") and not GameData.power_up_name(&"max_shield").contains("MAX ARMOR"), "old display names are gone")
 	run.card_stacks[&"bigger_mags"] = 2
@@ -253,7 +260,7 @@ func _test_pickup_required() -> void:
 		next.load_context(ctx)
 		_check(next.power_ups.ground_kind == &"" and next.power_ups.insta_time == 0.0
 			and next.power_ups.double_time == 0.0 and next.power_ups.spawn_delay == 0.0
-			and next.shield == 7.0 and next.ammo[1] == 0 and next.rerolls == 0 and next.kills == 0
+			and next.shield == 7.0 and next.ammo[1] == 0 and next.bonus_rerolls == 0 and next.kills == 0
 			and ctx.island_log[0]["power_ups"].is_empty(), "%s left behind is not used or carried to the next island" % kind)
 		run.power_ups.tick(GameData.POWER_UP_GROUND_SECONDS)
 		run.player_pos = run.power_ups.ground_pos
@@ -296,7 +303,7 @@ func _power_effect_state(run: IslandRun) -> Dictionary:
 	return {"insta": run.power_ups.insta_time, "double": run.power_ups.double_time,
 		"spawn_delay": run.power_ups.spawn_delay, "shield": run.shield, "hp": run.hp,
 		"breaker": run.breaker_cd, "ability": run.grenade_cd, "ammo": run.ammo.duplicate(),
-		"rerolls": run.rerolls, "kills": run.kills, "xp": run.xp_progress(), "orbs": run.orbs.size(),
+		"rerolls": run.rerolls, "bonus_rerolls": run.bonus_rerolls, "kills": run.kills, "xp": run.xp_progress(), "orbs": run.orbs.size(),
 		"intel": run.intel_earned(), "pickups": run.power_ups_picked.duplicate(), "messages": run.messages.duplicate()}
 
 

@@ -203,7 +203,7 @@ mínimo 35 s, item no chão 25 s, aviso intermitente nos últimos 10 s.
 | Nuke | Mata todos os inimigos vivos da ilha, incluindo boss; atrasa spawns 5 s; não gera novos drops nem explosões de Bloater contra o jogador. | Medir frequência e utilidade; feedback visual deve comunicar o alcance global. |
 | Full Power | Repõe Breaker e habilidade. | Definir o que acontece quando ambos já estão prontos. |
 | Max Shield | Enche o escudo até 100. | Definir utilidade com escudo cheio. |
-| Extra Reroll | +1 reroll, máximo três. | Reproduzido: com três, continua com três mas a recolha é registada. |
+| Extra Reroll | +1 reroll, máximo três. | Reproduzido: com três, continua com três mas a recolha é registada. *(Resolvido a 2026-10-14: 1 reroll por ecrã de level-up; o Extra Reroll dá +1 no ecrã seguinte, sem reserva.)* |
 | Max Ammo | Enche munição das armas finitas desbloqueadas. | Já é filtrado quando não há arma finita; falta decidir o caso de reservas cheias. |
 
 **Recarga:** o carregador de 30 da AR está implementado; a reposição é
@@ -385,7 +385,7 @@ resolver divergências; propor mudanças ao utilizador.
 | Perks | Manter slots atuais ou desenvolver a árvore proposta, respeitando perks equipados. A árvore ainda não é uma tarefa aprovada. |
 | Cartas de escudo | Kinetic Barrier, Shield Capacitor e Quick Recharge continuam propostas. O escudo-base já existe. |
 | Outras cartas propostas | Deadeye, Critical Mass, Last Stand, Blood Draw e Lucky Find não estão no catálogo atual. Aprovar utilidade e valores antes de criar sistemas novos. |
-| Run and Gun | A versão que dispara durante sprint contradiz a decisão fechada de sprint sem disparo; requer alteração explícita dessa decisão. |
+| Run and Gun | A versão que dispara durante sprint contradiz a decisão fechada de sprint sem disparo; requer alteração explícita dessa decisão. *(Resolvido a 2026-10-14: o sprint dispara para todos; carta retirada.)* |
 | Evoluções | Evoluções que transformam armas/cartas não estão implementadas. As três combinações elementais automáticas já estão; são sistemas diferentes. |
 | Progressão | Cartas desbloqueadas por Intel, mais classes/armas e planeamento de várias paragens da rota são expansões possíveis, não pendentes obrigatórios. |
 | Origin | Expansão jogável e duração/posição na campanha. O final narrativo já existe. |

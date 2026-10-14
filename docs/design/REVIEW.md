@@ -29,7 +29,8 @@ viável. O `CAMERA_CONTROLS_HUD.md` deve passar a usar esse modelo.
 - **Sem Scrap / "escolhe 1 de 3"** no barco: GDD, PROGRESSION (§2.1,
   recomendação A) e WORLD (§5) concordam.
 - **Breaker comum, sem sprint/salto/agachar**: GDD, COMBAT (D9), PROGRESSION
-  e CAMERA concordam.
+  e CAMERA concordam. *(Desatualizado: o sprint foi aceite a 2026-10-05 e
+  dispara desde 2026-10-14; ver `DECISIONS.md`.)*
 - **Intel conserva-se ao morrer**, extração dá bónus: GDD, PROGRESSION (P6,
   ×1,5) e WORLD (§1) concordam.
 - **Perks em slots, sem skill tree**: GDD e PROGRESSION concordam.

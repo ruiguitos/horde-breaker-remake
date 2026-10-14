@@ -66,7 +66,7 @@ func _test() -> void:
 	_hud.refresh(_run, null, 0)
 	_check(_hud._hp_text.text == "23" and _hud._hp_max.text == "/ 100" and _hud._alerts.text.contains("LOW HEALTH"), "low health remains readable numerically and as a warning")
 	_check(_hud._breaker_status.text == "COOLDOWN" and is_equal_approx(_hud._breaker_ring.seconds, 4.2) and is_equal_approx(_hud._ability_ring.seconds, 9.5), "cooldowns show state and remaining seconds in the ring")
-	_check(_hud._fire_status.text == "SPRINTING" and is_equal_approx(_hud._stamina_bar.value, 1.5), "sprint explains suppressed auto-fire and shows stamina")
+	_check(_hud._fire_status.text == "AUTO-FIRE" and is_equal_approx(_hud._stamina_bar.value, 1.5), "sprint keeps auto-fire (run and gun) and shows stamina")
 	_run.sprinting = false
 	_run.weapon_index = 1
 	_run.ammo[1] = 0

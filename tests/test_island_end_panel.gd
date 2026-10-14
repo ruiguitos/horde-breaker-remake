@@ -72,8 +72,8 @@ func _run_tests() -> void:
 func _test_texts() -> void:
 	_check(IslandEndPanel.next_text(null) == "RESTART FIELD TEST", "lone island (F6): NEXT restarts the field test")
 	var arch := RunContext.new(5)
-	_check(IslandEndPanel.next_text(arch).begins_with("BACK TO THE BOAT") and IslandEndPanel.next_text(arch).contains("ISLAND 2 OF 3"),
-		"archipelago island 1: NEXT is the boat, island 2 of 3 (%s)" % IslandEndPanel.next_text(arch))
+	_check(IslandEndPanel.next_text(arch).begins_with("BOAT") and IslandEndPanel.next_text(arch).contains("NEXT ISLAND 2 OF 3 IN 5 S"),
+		"archipelago island 1: NEXT is the boat's countdown to island 2 of 3 (%s)" % IslandEndPanel.next_text(arch))
 	arch.island_index = 2
 	_check(IslandEndPanel.next_text(arch).begins_with("DEBRIEF"), "archipelago last island: NEXT is the debrief")
 	var part_ctx := RunContext.new(5)
@@ -133,7 +133,7 @@ func _test_island_report() -> void:
 		and panel.run_totals.text.contains("INTEL BANKED %d" % (300 + run.intel_earned())),
 		"run totals are labelled RUN TOTAL (%s)" % panel.run_totals.text)
 	_check(panel.cards.text.contains(card.title) and panel.power_ups.text.contains("NUKE ×2"), "cards and power-ups taken on this island")
-	_check(panel.next_step.text.contains("BACK TO THE BOAT"), "NEXT: back to the boat")
+	_check(panel.next_step.text.contains("NEXT ISLAND 2 OF 3 IN 5 S"), "NEXT: the boat's countdown to the next island")
 	_check(panel.continue_button.has_focus(), "CONTINUE has the focus")
 	_check(panel.hint.text == "[ %s ] CONTINUE" % GameInput.prompt(&"ui_accept", false), "hint uses the real binding (%s)" % panel.hint.text)
 	var frame := Rect2(Vector2.ZERO, root.get_visible_rect().size)

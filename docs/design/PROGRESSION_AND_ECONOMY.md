@@ -112,9 +112,13 @@ Princípios:
 | Second Wind | abates reduzem o cooldown do breaker em 0,2 s | abate | comum |
 | Chain Pop | inimigos mortos por headshot explodem (dano pequeno, sem cadeia infinita) | headshot | raro |
 | Overwatch | parado ≥ 1 s: +40% cadência até te mexeres | posição | incomum |
-| Run and Gun | em movimento: balas abrandam o alvo 30% durante 1 s | posição | incomum |
+| Run and Gun ‡ | em movimento: balas abrandam o alvo 30% durante 1 s | posição | incomum |
 | Scavenger | orbes de XP têm 5% de largar munição especial | recolha | comum |
 | Last Stand | abaixo de 25% de vida: breaker sem cooldown durante 4 s (1× por ilha) | ser atingido | raro |
+
+‡ O nome "Run and Gun" é agora a regra base (disparar em sprint, decidido
+pelo utilizador em 2026-10-14). Se esta ideia avançar, precisa de outro
+nome (p. ex. "Moving Target").
 
 Notas de implementação (para o código, mais tarde):
 
@@ -230,10 +234,15 @@ novo.
   com a build ×1,25.
 - As cartas são filtradas pela classe (o Grenadier só para o Recruit).
 - Por agora não há raridades nem banish.
-- Começas com 2 rerolls e ganhas 1 por cada ilha concluída que não seja a
-  última. A reserva máxima é 3.
+- **Rerolls (decidido pelo utilizador em 2026-10-14):** cada ecrã de cartas
+  de level-up dá **1 reroll grátis**; os que não usares **não passam** para
+  o ecrã seguinte. Substitui a regra provisória anterior (2 no início, +1
+  por ilha, reserva 3).
+- O power-up **Extra Reroll** dá **+1 reroll no próximo ecrã de level-up**
+  (mesmo que seja na ilha seguinte); usado ou não, acaba com esse ecrã.
 - O "Card:" dos mantimentos passa a mostrar a carta com o mesmo aspeto e
-  também se pode trocar com um reroll.
+  também se pode trocar: o ecrã do barco/acampamento tem o seu próprio
+  reroll grátis, que não mexe nos rerolls dos level-ups.
 
 **Ordem de implementação:**
 1. Dados das cartas: categoria, ícone, etiquetas e classe.
@@ -398,7 +407,9 @@ desbloqueio que torne o jogo mais fácil sem escolha.
 9. **P9 — Expansão de cartas e reroll** (§1.6):
    - 24 cartas novas, 36 no total, em 5 categorias;
    - cada oferta garante uma carta nova e uma melhoria;
-   - 2 rerolls no início e +1 por ilha, com reserva máxima de 3.
+   - ~~2 rerolls no início e +1 por ilha, com reserva máxima de 3~~ →
+     **1 reroll grátis por ecrã de level-up, sem reserva** (decidido pelo
+     utilizador em 2026-10-14).
    - Substitui a P4 se for aceite.
 
 ### Perguntas para o utilizador

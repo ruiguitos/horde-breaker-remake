@@ -45,6 +45,12 @@ headshots que não importavam. A resposta aqui:
 Sem sprint, sem salto, sem agachar (cortes intencionais: menos animação,
 menos estados, o breaker é o único verbo de mobilidade).
 
+> Atualização: o sprint entrou a 2026-10-05 (Shift / L3, ×1,6, 3 s de
+> estamina). **Desde 2026-10-14 (decidido pelo utilizador) o sprint
+> dispara**: "run and gun" é regra base para todas as classes, nas três
+> câmaras, sem penalização de cadência ou dispersão. Exceção: com um bidão
+> nas mãos (Fuel Run, Light the Signals) não se dispara nem se corre.
+
 ### 1.3 Seleção de alvo
 
 Cada arma base tem um **alcance** e um **cone de foco** (por defeito 70°,
@@ -322,7 +328,7 @@ que **aparecem em todas as missões**. Se a quiser fechar, regista-a em
 | Nuke | Mata **todos** os inimigos vivos no mapa, chefe incluído, e atrasa os spawns uns segundos. Os abates da Nuke não largam novos power-ups | instantâneo |
 | Full Power | O breaker e a habilidade de classe ficam prontos | instantâneo |
 | Max Shield | Enche o escudo (liga às cartas de escudo) | instantâneo |
-| Extra Reroll | Um reroll grátis | instantâneo |
+| Extra Reroll | +1 reroll no próximo ecrã de level-up (não se acumula para além dele; decidido pelo utilizador em 2026-10-14) | instantâneo |
 | Max Ammo | Enche as armas especiais. **Depende da decisão sobre as armas** | instantâneo |
 
 Ficam para mais tarde, porque pedem sistemas novos: Death Machine (arma

@@ -1,11 +1,17 @@
 # Decisões
 
-Registo das decisões **fechadas pelo utilizador**. Agentes não editam este
-ficheiro: propõem decisões nos seus documentos e o utilizador decide.
+Registo das decisões **fechadas pelo utilizador**. Os agentes propõem
+decisões nos seus documentos e o utilizador decide; desde 2026-10-14, quando
+ele decide, o agente regista aqui a decisão com a data (só o que o
+utilizador escolheu).
 
 Exceção nesta atualização: a 2026-10-11, o utilizador pediu explicitamente
 ao agente para registar as seis decisões abaixo. A data do registo não
 implica que toda a implementação esteja concluída.
+
+A 2026-10-14, o utilizador pediu que, em mudanças decididas por ele, todos
+os documentos afetados sejam atualizados, incluindo este; por isso foram
+registadas as decisões dessa data.
 
 ## Fechadas
 
@@ -18,9 +24,9 @@ implica que toda a implementação esteja concluída.
 | 2026-10-05 | Direção: **A+B "Expedition Breaker"** — horde shooter de expedição por ilhas, single-player. | BRAINSTORM §10; GDD.md. |
 | 2026-10-05 | Mira: **auto-fire é o modo normal**, com prioridade pela orientação do personagem (cone para onde olha). Headshots mantêm-se. | O jogador "mira com o corpo"; comando natural. |
 | 2026-10-05 | **Breaker**: investida comum a todas as classes (~5 m, empurra/atordoa, solta Grabbers, ~6 s cooldown). | Verbo de movimento principal. |
-| 2026-10-05 | **Sprint** (pedido do utilizador; substitui o "sem sprint" anterior): Shift / L3, ×1,6, estamina de 3 s, **sem disparar** enquanto corre. | Fugir ou lutar é uma escolha; não substitui o breaker. |
+| 2026-10-05 | **Sprint** (pedido do utilizador; substitui o "sem sprint" anterior): Shift / L3, ×1,6, estamina de 3 s, **sem disparar** enquanto corre. | Fugir ou lutar é uma escolha; não substitui o breaker. **"Sem disparar" substituído a 2026-10-14: o sprint dispara (run and gun).** |
 | 2026-10-05 | Horda: **~150 inimigos ativos, teto de 300** simulados. Flow field + agentes como dados + MultiMesh. | Spike `horde_flowfield`: 150 ≈ 1,3 ms/tick em GDScript. |
-| 2026-10-05 | Base: **barco como ecrã de serviços** entre ilhas ("escolhe 1 de 3"), sem construção. **Sem Scrap** no slice. | Lição do original (sistemas órfãos). |
+| 2026-10-05 | Base: **barco como ecrã de serviços** entre ilhas ("escolhe 1 de 3"), sem construção. **Sem Scrap** no slice. | Lição do original (sistemas órfãos). **Atualizada a 2026-10-14:** os serviços mantêm-se, mas entre ilhas há uma contagem e a rota é sorteada (ver abaixo). |
 | 2026-10-05 | Progressão: cartas na run (maioria de comportamento), **perks em slots** e meta em **Intel** (morrer conserva o Intel). | Duas camadas claras. |
 | 2026-10-05 | Pilares: **Romper a horda · Cada ilha é uma decisão · Builds que mudam a forma de jogar**. | GDD.md §2. |
 | 2026-10-05 | Contexto: projeto a solo, por diversão e aprendizagem, sem prazo. Começar já o **vertical slice em grey-box** em `game/`. | Fim da pré-produção. |
@@ -29,9 +35,14 @@ implica que toda a implementação esteja concluída.
 | 2026-10-11 | Câmara: **três modos selecionáveis — 1.ª pessoa, 3.ª pessoa e fixa**. | Substitui a câmara média com yaw fixo como única opção. Modos presentes em `game/core/profile.gd` e `game/world/island.gd`; preferência guardada no perfil. |
 | 2026-10-11 | Menus: **redesenho com a paleta B, «Atlântico e azulejo»**. | Escolha feita a 2026-10-10 e registada agora. Basalto, painéis azul-petróleo e texto cal; âmbar para ações e foco. As sete propostas e os estados visuais estão em [MENUS.md](design/MENUS.md). |
 | 2026-10-11 | **Power-ups de abate em todas as missões**, incluindo as partes da Berlenga. | Abrange Activate, Defend, Rescue e Holdout. Só têm efeito quando recolhidos; expirar ou sair sem os apanhar significa perdê-los. Implementação descrita em [POWER_UPS_AND_DEFEAT.md](tech/POWER_UPS_AND_DEFEAT.md). |
-| 2026-10-11 | Armas: **opção B, com principais trocáveis**. Principais: Assault Rifle, SMG e a nova **Machine Gun**. Secundárias: Shotgun e Marksman Rifle. **Heavy Pistol removida do arsenal aprovado.** | A Marksman cobre a perfuração; a Machine Gun acrescenta fogo pesado e contínuo. Escolher outra principal não perde a propriedade da anterior. **Implementação pendente:** a Machine Gun e a seleção principal/secundária ainda não existem; a Heavy Pistol continua no código atual. Detalhes e consequências em [CARDS_WEAPONS_PERKS.md §E2](design/CARDS_WEAPONS_PERKS.md). |
+| 2026-10-11 | Armas: **opção B, com principais trocáveis**. Principais: Assault Rifle, SMG e a nova **Machine Gun**. Secundárias: Shotgun e Marksman Rifle. **Heavy Pistol removida do arsenal aprovado.** | A Marksman cobre a perfuração; a Machine Gun acrescenta fogo pesado e contínuo. Escolher outra principal não perde a propriedade da anterior. Implementado (Machine Gun e seleção principal/secundária no jogo). Detalhes e consequências em [CARDS_WEAPONS_PERKS.md §E2](design/CARDS_WEAPONS_PERKS.md). |
 | 2026-10-11 | **Expedição Berlenga em quatro partes, com transições a pé** e acampamentos entre partes. | Escolha feita a 2026-10-08 e registada agora. Viagem própria, fora do sorteio Beach: Carreiro do Mosteiro → Planalto do Farol → Costa Sudoeste → Forte de São João Baptista. Vida, armas e cartas transitam; o barco de resgate surge no final. Escala e percurso em [BERLENGA_EXPEDITION.md](design/BERLENGA_EXPEDITION.md). |
 | 2026-10-11 | Licenças: **aceite a exceção CC BY 4.0 para as texturas do céu noturno do Sky3D**, com atribuição obrigatória nos créditos. | Aplica-se a `Milkyway.jpg` e `StarField.jpg`, de ESO/S. Brunier; não autoriza indiscriminadamente outros assets CC BY. Crédito: «The Milky Way panorama by ESO/S. Brunier, licensed under CC BY 4.0 and used in original and modified forms.» Registo em [LICENSES.md](../assets/LICENSES.md); regra já presente em `CLAUDE.md`. |
+| 2026-10-14 | **Run and gun sempre ativo**: o sprint passa a disparar, para todos. | Substitui o "sem disparar" de 2026-10-05. Carregar um bidão continua a impedir disparar e correr. A carta proposta "Run and Gun" fica retirada. |
+| 2026-10-14 | Rerolls: **1 reroll grátis por ecrã de level-up**, sem acumular. | Substitui a regra provisória (2 no início, +1 por ilha, máx. 3). O power-up Extra Reroll dá +1 no ecrã seguinte. |
+| 2026-10-14 | Fim de ilha: **contagem direta "NEXT ISLAND IN 5…"** e partida automática para uma rota sorteada. | Sem escolha de rota entre ilhas; o 1.º barco da run mantém duas rotas e o briefing. Os mantimentos mantêm-se. O acampamento da Berlenga usa a mesma contagem. |
+| 2026-10-14 | Arte: **zombies e armas em blocos, como o Recruit e o Vanguard, com materiais realistas** (texturas CC0) e **gore forte**. | Começa pelos zombies comuns; inimigos especiais, Behemoth e sobrevivente depois. Atualiza o "estilo alvo low-poly" de 2026-10-05. |
+| 2026-10-14 | Plugins: **remover o Orchestrator**. | Não usado. Remoção a fazer com o editor fechado (a DLL fica bloqueada enquanto está aberto). NAP Map Generator: não usado e sem licença, remoção recomendada. |
 
 ## Em aberto
 

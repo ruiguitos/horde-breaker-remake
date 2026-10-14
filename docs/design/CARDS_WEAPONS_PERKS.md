@@ -67,7 +67,7 @@ Categoria/filtro: **AR** Assault Rifle; **E** Elements, apenas AR; **D** Defense
 | AR | Steady Aim | Parado: +8% cadência | 3 |
 | AR | Point Blank | +10% dano até 4 m | 3 |
 | AR | Finish the Job | +15% dano contra HP <30% | 3 |
-| AR | Run and Gun † | Sprint permite disparar a 60% cadência | 1 |
+| AR | ~~Run and Gun †~~ | **Retirada** (2026-10-14): disparar em sprint passou a regra base para todos | — |
 | E | Fire Rounds † | +5 pp de queimadura: 8 dano/s, 3 s | 5 |
 | E | Frost Rounds † | +5 pp de aplicação de frio | 5 |
 | E | Storm Rounds † | +5 pp de descarga: 60% dano, vizinho ≤6 m | 5 |
@@ -110,13 +110,17 @@ Estados: fogo/veneno renovam duração, sem acumular dano. Frio dura 4 s: cada a
 
 Duos automáticos †: **Thermal Shock**, fogo sobre congelado causa 30 dano e descongela; **Conductive Frost**, descarga ganha um salto contra alvo com frio; **Toxic Combustion**, fogo detona nuvem tóxica por 25 dano/3 m e consome-a. Efeitos secundários não geram novos efeitos secundários.
 
-**Run and Gun contradiz `docs/DECISIONS.md:17`; exige decisão explícita antes de implementação.**
+**Run and Gun retirada** (decidido pelo utilizador em 2026-10-14): disparar
+durante o sprint passou a ser **regra base para todas as classes**, com a
+cadência normal e sem penalização de dispersão. A carta deixou de fazer
+sentido e sai do catálogo proposto (nunca chegou ao código). O nome fica
+livre; se um dia voltar, terá de ser outro efeito.
 
 **D. Regras**
 
 Manter P9: oferta com uma carta nova, uma melhoria e terceira ponderada; melhorias ×1,5, etiqueta partilhada ×1,25. Aplicar filtros de classe, loadout, pré-requisitos e ranks **antes** do sorteio, incluindo barco/acampamento. Sem duplicados na oferta.
 
-Manter 2 rerolls iniciais, +1 por etapa intermédia, reserva 3; valores já implementados em `game/data/game_data.gd:225`. Sem elegíveis: conservar cura de 20 HP.
+Rerolls (decidido pelo utilizador em 2026-10-14; substitui os 2 iniciais, +1 por etapa e reserva 3): **cada ecrã de cartas de level-up dá exatamente 1 reroll grátis**; o que não se usar perde-se ao escolher a carta (não há reserva). O power-up **Extra Reroll** dá +1 reroll **só no ecrã de level-up seguinte** (pode ser já na ilha seguinte) e não se acumula para além dele. O mantimento de carta do barco/acampamento é um ecrã próprio, com o seu reroll grátis. Constante: `GameData.REROLLS_PER_SCREEN`. Sem elegíveis: conservar cura de 20 HP.
 
 Evoluções numa fase posterior: Fire Rounds V + Wildfire III → **Inferno Rounds**, queimadura transmite-se uma vez por segundo. Substitui a carta-base; não soma duplicadamente.
 
@@ -229,7 +233,7 @@ Valores separados por `/` correspondem a **I/II/III**, totais, não incrementos.
 | **Breaker II** | **Recovery:** cooldown −5/10/15%; distância −10/20/30%. Investidas curtas frequentes. | **Heavy Impact:** dano do breaker +30/60/90%; cooldown +1/2/3 s. Investidas ofensivas ocasionais. | Hair Trigger, Adrenaline, Executioner; Full Power. |
 | **Breaker III** | **Recruit — Demolitions:** cooldown da granada −12/24/35%, raio +0,3/0,6/1 m; dano −10/20/30%. Cobertura frequente. **Vanguard — Bulwark:** War Cry dura +0,5/1/1,5 s; velocidade durante o efeito −10/20/30%. Resistência. | **Recruit — Concussion†:** granada acrescenta 1/2/3 s de atordoamento; dano −25/50/75%. Controlo. **Vanguard — Intimidating Cry:** empurrão adicional 1/2/3 m; proteção dura −1/2/3 s. Dispersar ameaças. | Grenadier, Wide Blast, Concussion; Rally, Intimidation; Full Power. |
 
-Head Hunter conserva a equivalência nas câmaras com mira: multiplicador do raio de cabeça = cone/9. Skirmisher não permite disparar durante sprint.
+Head Hunter conserva a equivalência nas câmaras com mira: multiplicador do raio de cabeça = cone/9. Skirmisher: o bónus de velocidade não se aplica em sprint (o sprint já dispara para todos desde 2026-10-14).
 
 ### 2. Intel, ranks e slots
 
@@ -284,7 +288,9 @@ Escolhas pequenas tomadas na implementação, onde o texto deixava margem:
 - **Thick Skin**: a redução de cura aplica-se a toda a cura, incluindo as
   reparações do barco/acampamento.
 - **Skirmisher**: conta como «a disparar» durante 0,3 s após cada tiro;
-  o bónus nunca se aplica em sprint, e o sprint continua sem disparar.
+  o bónus nunca se aplica em sprint. Desde 2026-10-14 (decidido pelo
+  utilizador) o sprint dispara para todos; o Skirmisher continua sem somar
+  velocidade ao sprint, para não acumular dois bónus de corrida.
 - **Opening Volley** começa no impacto do Breaker.
 - **Kill Chain** não repõe balas durante uma recarga (SMG/MG).
 - **Velocidade** (Fleet Footed, Pack Rat, Bulwark) multiplica também o sprint.

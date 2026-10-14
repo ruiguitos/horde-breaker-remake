@@ -30,8 +30,9 @@ aparece nas versões de desenvolvimento (o editor e as exportações de debug).
   sempre a sua própria missão e conta como essa parte (a 4.ª é a última).
 - No fim voltas ao ecrã inicial, e o teste não conta como viagem no perfil.
 
-Sem ele, só se chega a uma ilha por sorte. O barco oferece 2 rotas ao
-acaso e, dentro da rota, a ilha sai pela seed.
+Sem ele, só se chega a uma ilha por sorte. O barco da 1.ª ilha oferece 2
+rotas ao acaso e, dentro da rota, a ilha sai pela seed; entre ilhas o barco
+sorteia uma rota sozinho (mesma seed, mesmas regras).
 
 ## Controlos
 
@@ -41,7 +42,7 @@ acaso e, dentro da rota, a ilha sai pela seed.
 | Olhar / apontar (o auto-fire dispara para a mira) | rato | stick direito |
 | Câmara: 1.ª pessoa → 3.ª pessoa → fixa (também em Settings > Controls) | V | Back / Select |
 | Breaker (investida) | Espaço ou botão direito | A ou RB |
-| Sprint (não dispara enquanto corre) | Shift | L3 (clicar stick esquerdo) |
+| Sprint (continua a disparar; não com um bidão nas mãos) | Shift | L3 (clicar stick esquerdo) |
 | Granada (lança para o rato) | G ou botão do meio | LB |
 | Apanhar / pousar (bidões da Fuel Run) | E | X |
 | Trocar arma | 1 principal / 2 secundária | D-pad ← principal / ↑ secundária, ↓ roda |
@@ -122,7 +123,9 @@ run. Antes da primeira ilha, voltar cancela só a preparação.
   escolhes 1 de 3 cartas, de um catálogo de **39**. A oferta garante uma
   carta nova e uma melhoria quando ambas existem; respeita a classe,
   armas da run, pré-requisitos e ranks. O barco e o acampamento usam os
-  mesmos filtros, com reroll em **R / Y** da mesma reserva. Sem cartas
+  mesmos filtros, com o seu próprio reroll em **R / Y**. Cada ecrã de
+  level-up dá **1 reroll** grátis (não se guarda); o power-up Extra Reroll
+  dá +1 no ecrã seguinte. Sem cartas
   elegíveis, a recompensa é cura de 20 HP.
   Cartas no rank máximo ficam excluídas de todas as ofertas. A partir do
   **nível 30**, toda a XP no chão da ilha/parte é apanhada automaticamente,
@@ -164,7 +167,8 @@ run. Antes da primeira ilha, voltar cancela só a preparação.
 Depois de escolher a rota, o Director Hale faz o briefing (Dialogue Manager,
 `data/dialogue/briefing.dialogue`). Podes perguntar pela ilha ou pedir
 conselhos, ou aceitar **hazard pay**: +25 % de Intel e +25 % de inimigos, só
-na ilha seguinte.
+na ilha seguinte. O briefing só acontece no barco da 1.ª ilha: entre ilhas o
+barco parte sozinho e o hazard pay é um botão (`HAZARD PAY · ON/OFF`).
 
 ## HUD tático
 
@@ -173,7 +177,8 @@ a combinar com os menus. O centro fica disponível para o combate.
 
 - **Em baixo**: vida, escudo numérico e XP à esquerda; Breaker, habilidade da classe e
   estamina ao centro; arma e munição à direita. Recargas mostram segundos ou
-  `READY`; correr mostra `SPRINTING` e uma arma vazia mostra `NO AMMO`.
+  `READY`; correr continua em `AUTO-FIRE`, um bidão nas mãos mostra
+  `HANDS FULL` e uma arma vazia mostra `NO AMMO`.
 - **Em cima**: objetivo, progresso e modificador da rota; vida do sobrevivente
   durante a escolta ou barra do Behemoth com indicação da fase 2. Minimapa à
   direita, com grelha discreta e barco em forma de losango âmbar.
@@ -437,13 +442,17 @@ em `tests/test_handmade.gd`.
 **Título** → **Armory** (gastar Intel, equipar perks, escolher Threat) →
 **START RUN**, que pergunta qual das viagens:
 
-- **Archipelago:** barco (1 de 3: cura, munição ou carta) → ilha → ilha
-  limpa → barco → … → 3.ª ilha limpa ou morte → debrief → Armory.
+- **Archipelago:** barco (2 rotas; 1 de 3: cura, munição ou carta) → ilha →
+  ilha limpa → barco com contagem **"NEXT ISLAND IN 5…"** (rota sorteada
+  pela seed da run, sem repetir a missão; o mantimento pré-escolhido pode
+  trocar-se durante a contagem; ENTER / START / DEPART NOW salta a espera;
+  Esc / B suspende-a) → … → 3.ª ilha limpa ou morte → debrief → Armory.
 - **Berlenga Expedition** (`docs/design/BERLENGA_EXPEDITION.md`): a ilha
   real em 4 partes, a pé, sem barco nem escolha de rota. Começa logo na
   parte 1 → parte limpa → **acampamento** → parte seguinte → … → 4.ª parte
   limpa ou morte → debrief. O acampamento (`states/camp.gd`) dá o mesmo
-  "escolhe 1 de 3" do barco e mostra a parte seguinte e o seu objetivo.
+  "escolhe 1 de 3" do barco e mostra a parte seguinte e o seu objetivo;
+  conta "NEXT PART IN 5…" e segue sozinho, pela ordem fixa das partes.
   O botão fica desligado enquanto as cenas das partes não existirem.
 
 Extrair (ganhar a última ilha ou parte) multiplica o Intel da run por 1,5.

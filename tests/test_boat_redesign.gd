@@ -3,7 +3,10 @@ extends SceneTree
 ## modal over the routes, useless supplies disabled with a reason, DEPLOY
 ## names the destination, LB/RB pick routes, focus goes routes -> supplies
 ## -> DEPLOY, B opens the exit choices and never picks a supply, the supply is applied
-## on DEPLOY, and the camp shows the next expedition part.
+## on DEPLOY, and the camp shows the next expedition part. Between islands
+## (decided 2026-10-14): one drawn route (deterministic per run seed, no
+## mission twice in a row), "NEXT ISLAND IN 5…", auto-departure, skip with
+## DEPLOY / confirm, the exit dialog holds the clock, hazard pay toggle.
 
 var _failures: int = 0
 var _checks: int = 0
@@ -62,6 +65,8 @@ func _text(screen: Node, node_name: String) -> String:
 func _run_tests() -> void:
 	await _fresh_boat()
 	await _hurt_boat()
+	await _transit_boat()
+	_route_draw_rules()
 	await _camp()
 	await create_timer(0.1).timeout  # let the audio mixer release UI playbacks
 	print("TEST: boat redesign %d checks / %d failures" % [_checks, _failures])
@@ -167,6 +172,113 @@ func _hurt_boat() -> void:
 	await _settle()
 
 
+## Between islands: one route, drawn; countdown; auto-departure.
+func _transit_boat() -> void:
+	var first := RunContext.new(31)
+	var start: Control = await _open("res://game/states/boat.gd", first)
+	_check(float(start.get("countdown_left")) < 0.0 and (start.get("_route_buttons") as Array).size() == 2
+		and start.find_child("HazardPay", true, false) == null, "the first boat still offers two routes and waits (no countdown)")
+	start.queue_free()
+	await _settle()
+
+	var context := RunContext.new(31)
+	context.island_index = 1
+	context.mission = &"fuel_run"
+	context.hp = 40.0
+	var expected: Dictionary = (load("res://game/states/boat.gd") as GDScript).call("draw_routes", context)[0]
+	var boat: Control = await _open("res://game/states/boat.gd", context)
+	boat.set_process(false)  # the test drives the clock (tick_countdown)
+	boat.set("countdown_left", GameData.NEXT_ISLAND_COUNTDOWN)  # undo the frames _open waited
+	var departed: Array = []
+	boat.connect("land_requested", func() -> void: departed.append(true))
+	var routes: Array = boat.get("_route_buttons")
+	_check(routes.size() == 1 and boat.find_child("Route_2", true, false) == null and routes[0].focus_mode == Control.FOCUS_NONE,
+		"between islands: one route, nothing to choose")
+	_check(context.biome == expected["biome"] and context.mission == expected["mission"] and context.modifier == (expected["modifier"] as GameData.Modifier).id,
+		"the route is route A of the seeded draw (%s, %s, %s)" % [context.biome, context.mission, context.modifier])
+	_check(context.mission != &"fuel_run", "the drawn mission is not the one just played")
+	_check(_text(boat, "Heading") == "NEXT ISLAND IN 5…", "heading counts down: %s" % _text(boat, "Heading"))
+	_check(_text(boat, "DeployTitle").begins_with("DEPART NOW TO "), "DEPLOY skips the wait (%s)" % _text(boat, "DeployTitle"))
+	_check(int(boat.get("_supply")) == 0, "supplies stay: Field Repairs preselected when hurt")
+	boat.call("tick_countdown", 2.2)
+	_check(_text(boat, "Heading") == "NEXT ISLAND IN 3…" and departed.is_empty(), "the clock runs (%s)" % _text(boat, "Heading"))
+	# Hazard pay (the briefing's offer) is a toggle here.
+	var hazard: Button = boat.find_child("HazardPay", true, false)
+	_check(hazard != null and not context.hazard_pay, "hazard pay toggle offered, off by default")
+	hazard.button_pressed = true
+	_check(context.hazard_pay and _text(boat, "DeploySub").contains("hazard pay"), "hazard pay toggled on (%s)" % _text(boat, "DeploySub"))
+	hazard.button_pressed = false
+	_check(not context.hazard_pay, "and off again")
+	# Esc: leave-the-run dialog holds the clock (the boat's pause).
+	await _press(_key(KEY_ESCAPE))
+	_check(is_instance_valid(boat.get("_exit_dialog")), "Escape opens the exit choices")
+	boat.call("tick_countdown", 10.0)
+	_check(departed.is_empty() and is_equal_approx(float(boat.get("countdown_left")), 2.8), "the clock holds while the dialog is open (%d, %.2f)" % [departed.size(), float(boat.get("countdown_left"))])
+	await _press(_key(KEY_ESCAPE))
+	boat.call("_pick", 1)  # changed mind while the clock runs: Ammo Crate is full -> ignored
+	boat.call("tick_countdown", 2.79)
+	_check(departed.is_empty() and context.hp == 40.0, "not yet")
+	boat.call("tick_countdown", 0.5)
+	_check(departed.size() == 1 and context.hp == 90.0, "at zero it departs on its own with the selected supply (HP %d)" % int(context.hp))
+	boat.call("tick_countdown", 5.0)
+	boat.call("_land_now")
+	_check(departed.size() == 1, "it departs only once")
+	boat.queue_free()
+	await _settle()
+
+	# Skip: confirm (pad START is confirm, not ui_accept) leaves at once.
+	var again := RunContext.new(31)
+	again.island_index = 1
+	again.mission = &"fuel_run"
+	var skip: Control = await _open("res://game/states/boat.gd", again)
+	_check(again.biome == expected["biome"] and again.mission == expected["mission"], "same run seed, same island: same drawn route")
+	var skipped: Array = []
+	skip.connect("land_requested", func() -> void: skipped.append(true))
+	await _press(_pad(JOY_BUTTON_START))
+	_check(skipped.size() == 1 and float(skip.get("countdown_left")) > 1.0, "confirm skips the countdown")
+	skip.queue_free()
+	await _settle()
+	var click := RunContext.new(32)
+	click.island_index = 1
+	var skip2: Control = await _open("res://game/states/boat.gd", click)
+	var clicked: Array = []
+	skip2.connect("land_requested", func() -> void: clicked.append(true))
+	(skip2.get("_land") as Button).pressed.emit()
+	_check(clicked.size() == 1, "DEPART NOW skips the countdown")
+	skip2.queue_free()
+	await _settle()
+
+
+## The draw itself: deterministic, no mission twice in a row, last island
+## on the volcano, biome signature weights still apply.
+func _route_draw_rules() -> void:
+	var boat_script: GDScript = load("res://game/states/boat.gd")
+	var repeats: int = 0
+	var differs: int = 0
+	var beach_fuel: int = 0
+	var beach: int = 0
+	for s in range(1, 301):
+		var ctx := RunContext.new(s)
+		ctx.island_index = 1
+		ctx.mission = GameData.ROUTE_MISSIONS[s % GameData.ROUTE_MISSIONS.size()]
+		var a: Dictionary = boat_script.call("draw_routes", ctx)[0]
+		var b: Dictionary = boat_script.call("draw_routes", ctx)[0]
+		if a["biome"] != b["biome"] or a["mission"] != b["mission"] or a["modifier"] != b["modifier"]:
+			differs += 1
+		if GameData.mission_family(a["mission"]) == GameData.mission_family(ctx.mission):
+			repeats += 1
+		if a["biome"] == &"beach":
+			beach += 1
+			if a["mission"] == &"fuel_run":
+				beach_fuel += 1
+	_check(differs == 0, "the draw is deterministic per run seed")
+	_check(repeats == 0, "300 draws: the mission never repeats the previous one")
+	_check(beach > 0 and beach_fuel * 6 > beach, "the Beach still favours Fuel Run (%d of %d)" % [beach_fuel, beach])
+	var last := RunContext.new(9)
+	last.island_index = RunContext.ISLAND_COUNT - 1
+	_check(boat_script.call("draw_routes", last)[0]["biome"] == &"volcano", "the last island is the volcano")
+
+
 ## Camp between expedition parts: same layout, the next part instead of routes.
 func _camp() -> void:
 	var context := RunContext.new(5)
@@ -180,6 +292,7 @@ func _camp() -> void:
 	_check(camp.find_child("Trail_1", true, false) != null and camp.find_child("Trail_4", true, false) != null, "the chart lists the 4 parts")
 	_check(camp.find_child("Route_1", true, false) == null, "the camp has no routes")
 	_check(_text(camp, "DeployTitle") == "CONTINUE TO " + part.to_upper(), "the button names the next part (%s)" % _text(camp, "DeployTitle"))
+	_check(_text(camp, "Heading") == "NEXT PART IN 5…", "the camp counts down too (%s)" % _text(camp, "Heading"))
 	var supplies: Array = camp.get("_buttons")
 	_check(root.gui_get_focus_owner() == supplies[0], "focus opens on the preselected supply")
 	await _press(_key(KEY_DOWN))
@@ -192,10 +305,10 @@ func _camp() -> void:
 		_check(root.gui_get_focus_owner() == keep, "keep playing is focused when exit choices open")
 		_check(dialog.find_child("ReturnToArmory", true, false) != null
 			and dialog.find_child("ReturnToTitle", true, false) != null, "camp offers both classes and the main menu")
-		var before: int = context.rerolls
+		var before: int = int(camp.get("_supply_rerolls"))
 		await _press(_key(KEY_R))
 		await _press(_key(KEY_3))
-		_check(context.rerolls == before and context.hp == 50.0 and not bool(camp.get("_applied")),
+		_check(int(camp.get("_supply_rerolls")) == before and context.hp == 50.0 and not bool(camp.get("_applied")),
 			"exit choices block rerolls, supply selection and deployment behind the dialog")
 		await _press(_key(KEY_ESCAPE))
 		_check(root.gui_get_focus_owner() == camp.get("_land") and not is_instance_valid(camp.get("_exit_dialog")),

@@ -142,7 +142,7 @@ func _run_tests() -> void:
 	await _settle()
 	_check((boat.get("_buttons") as Array).size() == 3 and (boat.get("_buttons") as Array)[2].disabled, "maxed cards at full HP disable the healing fallback")
 	biomes = boat.get("_route_biomes")
-	_check(biomes[0] == &"volcano" and biomes[1] == &"volcano", "last island routes remain volcano")
+	_check(biomes.size() == 1 and biomes[0] == &"volcano", "last island: one drawn route, on the volcano")
 	boat.call("_pick", 1)
 	boat.call("_pick_route", 0)
 	_check(boat.call("_can_land"), "exhausted supply state can land")

@@ -39,7 +39,7 @@ quando se perde, desaparece sem aviso de recolha.
 | Nuke | Mata todos os inimigos vivos em todo o mapa, chefe incluído, sem raio nem linha de visão. Cada abate conta (abates, orbe de XP, Intel); o objetivo do chefe vê-o morto na atualização seguinte e segue para a extração, como num abate normal. Os abates da Nuke **não** sorteiam novos power-ups (nem gastam RNG ou mexem na garantia) e os Bloaters não explodem sobre o jogador. Suspende spawns do diretor e invocações do chefe por 5 s. |
 | Full Power | Breaker e habilidade de classe ficam prontos. |
 | Max Shield | Enche o escudo até ao máximo. (Antes chamava-se Max Armor.) |
-| Extra Reroll | +1 reroll, até ao máximo existente de 3. (Antes chamava-se Fire Sale.) |
+| Extra Reroll | +1 reroll no **próximo** ecrã de cartas de level-up (que abre com 1 + 1); não se acumula para além desse ecrã e passa para a ilha seguinte se ainda não houve level-up (`bonus_rerolls`; regra decidida pelo utilizador em 2026-10-14). (Antes chamava-se Fire Sale.) |
 | Max Ammo | Repõe as armas especiais que a run tem, até à capacidade modificada por cartas/perks/rota. A arma infinita mantém-se infinita. Não entra no sorteio sem armas de munição finita. |
 
 Há avisos curtos ao apanhar (`MAX SHIELD!`, `EXTRA REROLL!`, etc.) e temporizadores com
@@ -124,7 +124,7 @@ O que cada coluna faz:
 | `requires_finite_weapon` | Só cai com uma arma de munição finita (Max Ammo). |
 | `duration` | Segundos ativos (Insta-Kill, Double XP / Intel). |
 | `spawn_delay` | Segundos sem novos inimigos depois da Nuke. |
-| `reroll_amount` | Rerolls dados pelo Extra Reroll (o máximo continua a ser `REROLLS_MAX`). |
+| `reroll_amount` | Rerolls extra que o Extra Reroll dá ao próximo ecrã de level-up. |
 | `shield_fill` | Fração do escudo máximo que o Max Shield enche (1 = cheio). |
 | `legacy_ids` | Ids antigos que apontam para este power-up. |
 | `order` | Ordem no registo (e no sorteio). |

@@ -10,7 +10,7 @@ O texto do jogo continua em inglês.
 |---|---|---|
 | Título | Deploy → Armory | Estatísticas do perfil; definições, créditos e arquivo |
 | Armory | Start Run | Classes, armas, Intel, Threat e slots/perks |
-| Barco / rotas | Confirm Route | Mantimento, bioma, missão e modificador sorteados |
+| Barco / rotas | Confirm Route | Mantimento, bioma, missão e modificador sorteados. Só antes da 1.ª ilha; entre ilhas o barco sorteia a rota e parte sozinho ao fim de 5 s (decidido pelo utilizador em 2026-10-14) |
 | Pausa | Resume | Jogo atual desfocado; definições e abandono |
 
 Os botões são Control/Button do Godot: funcionam com rato, teclado e ações
@@ -97,7 +97,8 @@ Breaker UI Proposals", as 7 propostas abaixo. A decisão foi registada em
      que também trocam de arma;
    - os botões só respondem 0,4 s depois de as cartas abrirem;
    - a build atual aparece em baixo;
-   - há REROLL. A quantidade de rerolls é uma proposta por decidir.
+   - há REROLL: 1 grátis por ecrã de level-up, sem reserva; o Extra
+     Reroll dá +1 no ecrã seguinte (decidido pelo utilizador em 2026-10-14).
    - O baralho tem de crescer muito ("mais e mais cartas"). Fica para uma
      proposta de design própria.
 5. **HUD sem fundos escuros:**
@@ -146,7 +147,7 @@ O que se afasta das maquetes, ou o que elas não diziam:
 - **Cartas:**
   - a categoria é provisória, tirada do id da carta
     (`GameData.CARD_CATEGORIES`), até haver dados de categoria (P9);
-  - as regras do reroll são as constantes provisórias `GameData.REROLLS_*`;
+  - as regras do reroll estão em `GameData.REROLLS_PER_SCREEN` (1 por ecrã);
   - R ou Y troca as cartas.
 - **Título:** o lema não está em itálico, porque não incluímos a fonte
   itálica.

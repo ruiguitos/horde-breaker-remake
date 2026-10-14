@@ -106,8 +106,13 @@ var card_choices: Array[GameData.Card] = []
 ## Bumps on every new card offer (level-up or reroll), even when the cards
 ## drawn are the same: the HUD refreshes and locks input per offer.
 var card_offer: int = 0
-## Card rerolls left in the run (carried between islands, see GameData.REROLLS_*).
-var rerolls: int = GameData.REROLLS_START
+## Rerolls left on the card screen that is open (0 without one): each
+## level-up screen opens with GameData.REROLLS_PER_SCREEN + bonus_rerolls,
+## and what is not used is lost when the card is picked.
+var rerolls: int = 0
+## Extra Reroll power-ups waiting for the next level-up screen (carried
+## to the next island in RunContext.bonus_rerolls).
+var bonus_rerolls: int = 0
 var _pending_levels: int = 0
 var _recycle_cd: float = 0.0
 
@@ -402,7 +407,7 @@ func load_context(ctx: RunContext) -> void:
 	time_alive = ctx.time_alive
 	_last_damage_time = time_alive
 	landed_time = time_alive
-	rerolls = context_rerolls(ctx)
+	bonus_rerolls = ctx.bonus_rerolls
 	horde.hp_scale = (1.0 + 0.3 * ctx.island_index) * GameData.threat_hp(threat)
 	_reset_nest_hp()  # nests scale like every enemy
 	director.max_alive = GameData.MAX_ALIVE + GameData.threat_extra_alive(threat)
@@ -466,26 +471,8 @@ func save_to_context(ctx: RunContext) -> void:
 	ctx.kills = kills
 	ctx.headshots = headshots
 	ctx.time_alive = time_alive
-	# A cleared island that is not the last earns a reroll (capped).
-	var banked: int = rerolls
-	if objective == Objective.WON and not ctx.is_last_island():
-		banked = mini(GameData.REROLLS_MAX, banked + GameData.REROLLS_PER_ISLAND)
-	set_context_rerolls(ctx, banked)
-
-
-## Rerolls left in a run context. RunContext has no field for them yet, so
-## they ride along as metadata until it gets one (`rerolls`).
-static func context_rerolls(ctx: RunContext) -> int:
-	if &"rerolls" in ctx:
-		return int(ctx.get(&"rerolls"))
-	return int(ctx.get_meta(&"rerolls", GameData.REROLLS_START))
-
-
-static func set_context_rerolls(ctx: RunContext, n: int) -> void:
-	if &"rerolls" in ctx:
-		ctx.set(&"rerolls", n)
-	else:
-		ctx.set_meta(&"rerolls", n)
+	# Only an Extra Reroll not yet used carries over (to the next screen).
+	ctx.bonus_rerolls = bonus_rerolls
 
 
 ## Magazine capacity of weapon `w` (0 = no magazine). The one place a
@@ -1540,6 +1527,7 @@ func choose_card(i: int) -> void:
 	cards_picked.append(c.id)
 	messages.append("Card: " + c.title)
 	card_choices.clear()
+	rerolls = 0  # unused rerolls do not carry over to the next screen
 	_roll_cards_if_needed()
 
 
@@ -1590,7 +1578,9 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	_quick_draw_cd = maxf(0.0, _quick_draw_cd - dt)
 	_firing_time = maxf(0.0, _firing_time - dt)
 	invulnerable = maxf(0.0, invulnerable - dt)
-	if not sprinting and carrying < 0:
+	# Run and gun: sprinting fires too (base rule, decided 2026-10-14); only a
+	# fuel can in the hands keeps the gun silent.
+	if carrying < 0:
 		_auto_fire(dt)
 	_update_grenades(dt)
 	_update_screamers(dt)
@@ -1805,7 +1795,7 @@ func apply_power_up(kind: StringName) -> void:
 		&"max_shield":
 			add_shield(max_shield * data.shield_fill)
 		&"extra_reroll":
-			rerolls = mini(GameData.REROLLS_MAX, rerolls + data.reroll_amount)
+			bonus_rerolls += data.reroll_amount  # for the next level-up screen
 		&"max_ammo":
 			for i in weapons.size():
 				if weapon_unlocked[i] and weapons[i].max_ammo > 0:
@@ -2713,7 +2703,11 @@ func _roll_cards_if_needed() -> void:
 	if _pending_levels <= 0 or not card_choices.is_empty():
 		return
 	_pending_levels -= 1
-	if not _draw_cards([]):
+	if _draw_cards([]):
+		# A new level-up screen: one free reroll, plus any Extra Reroll.
+		rerolls = GameData.REROLLS_PER_SCREEN + bonus_rerolls
+		bonus_rerolls = 0
+	else:
 		# Every card maxed: levelling up still heals.
 		_heal_player(20.0)
 		messages.append("Level up: +20 HP")

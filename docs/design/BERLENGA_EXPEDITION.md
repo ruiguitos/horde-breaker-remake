@@ -99,6 +99,9 @@ substituí-los mais tarde.
 - **Entre partes:**
   - um ecrã de acampamento substitui o barco, com os mesmos serviços
     (curar, munições, cartas) mas sem escolha de rota;
+  - como o barco entre ilhas, conta "NEXT PART IN 5…" e segue sozinho para
+    a parte seguinte, pela ordem fixa (decidido pelo utilizador em
+    2026-10-14); CONTINUE / confirmar salta a espera e Esc / B suspende-a;
   - reutiliza o `boat.gd` com outro fundo.
 - **Escolha da viagem:** no Armory, START RUN pergunta "Archipelago"
   (a viagem atual) ou "Berlenga Expedition".

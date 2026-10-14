@@ -3,7 +3,7 @@ extends SceneTree
 ## ranks shared by A/B, free switching, slots, only equipped perks act,
 ## save migration (v6 and older, run twice), class variants, Quick Redeploy,
 ## every perk's benefit and trade-off, the Body Count card filter, Kill
-## Chain (direct primary kills only), Skirmisher (no fire while sprinting)
+## Chain (direct primary kills only), Skirmisher (no speed bonus while sprinting)
 ## and the Armory screen (focus, LB/RB, icon hints, layout).
 ## Run: godot --headless --path . --script res://tests/test_perk_tree.gd
 
@@ -37,7 +37,7 @@ func _run_all() -> void:
 	_test_breaker_effects()
 	_test_body_count_cards()
 	_test_kill_chain_direct_only()
-	_test_skirmisher_no_sprint_fire()
+	_test_skirmisher_sprint_fire()
 	await _test_armory_screen()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
 	if _failures == 0:
@@ -542,16 +542,17 @@ func _test_kill_chain_direct_only() -> void:
 	_check(smg.reload_left > 0.0 and smg.mag[0] == 0, "an emptied magazine still reloads (no refill mid-reload)")
 
 
-func _test_skirmisher_no_sprint_fire() -> void:
+func _test_skirmisher_sprint_fire() -> void:
 	var run := _run({&"skirmisher": 3})
 	var i: int = _enemy(run, 6.0, 0.0, 1000.0)
 	var mag_before: int = run.mag[0]
 	for t in 20:
 		run.step(DT, Vector2(1, 0), Vector3(0, 0, -1), false, true)
-	_check(run.sprinting and run.mag[0] == mag_before and run.horde.hp[i] == 1000.0, "Skirmisher: no shots while sprinting")
+	_check(run.sprinting and run.mag[0] < mag_before and run.horde.hp[i] < 1000.0 and is_equal_approx(run.perk_speed_mult(), 1.0),
+		"Skirmisher: sprinting fires (run and gun) but gets no speed bonus")
 	for t in 20:
 		run.step(DT, Vector2(1, 0), Vector3(0, 0, -1), false, false)
-	_check(run.mag[0] < mag_before and is_equal_approx(run.perk_speed_mult(), 1.12), "walking it fires and gets +12% speed")
+	_check(not run.sprinting and is_equal_approx(run.perk_speed_mult(), 1.12), "walking and firing gets +12% speed")
 
 
 # --- Armory screen ------------------------------------------------------------

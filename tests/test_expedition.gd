@@ -269,10 +269,13 @@ func _expedition_run(parts: Array) -> void:
 	var run2: IslandRun = _current().get("run")
 	_check(run2.level == 4 and run2.kills == 33 and run2.card_stacks.get(&"carry_test", 0) == 2, "part 2 starts with part 1's level, kills and cards")
 	await _finish_island(true)
-	_current().call("_pick", 1)
-	_current().call("_land_now")
+	# The camp counts down and goes on by itself, to the fixed next part.
+	var camp3: Node = _current()
+	_check(_state() == Flow.CAMP and (camp3.find_child("Heading", true, false) as Label).text == "NEXT PART IN 5…",
+		"the camp counts down to the next part (%s)" % (camp3.find_child("Heading", true, false) as Label).text)
+	camp3.call("tick_countdown", GameData.NEXT_ISLAND_COUNTDOWN)
 	await _settle()
-	_check(_state() == Flow.ISLAND and _scene_path() == STAND_INS[2] and ctx.mission == &"defend", "part 3 plays with its mission")
+	_check(_state() == Flow.ISLAND and _scene_path() == STAND_INS[2] and ctx.mission == &"defend", "part 3 plays with its mission (auto-departed, fixed order)")
 	await _finish_island(true)
 	_check(_state() == Flow.CAMP and ctx.is_last_island(), "the camp before the last part")
 	_check(String((_current().find_child("PartName", true, false) as Label).text) == "STAND-IN 4", "the last camp names the fort stand-in")
@@ -318,9 +321,16 @@ func _archipelago_run() -> void:
 	_check(_state() == Flow.ISLAND and _current().get("handmade_scene") == null, "the archipelago island is picked by the run, as before")
 	await _finish_island(true)
 	_check(_state() == Flow.BOAT and ctx.island_index == 1, "a cleared island returns to the boat")
-	_current().call("_pick", 0)
-	_current().emit_signal("land_requested")
+	# Between islands: no route choice, a countdown, then it departs alone.
+	var boat2: Node = _current()
+	var route_biome: StringName = (boat2.get("_route_biomes") as Array)[0]
+	var route_mission: StringName = (boat2.get("_route_missions") as Array)[0]
+	_check(boat2.find_child("Route_2", true, false) == null and (boat2.find_child("Heading", true, false) as Label).text == "NEXT ISLAND IN 5…",
+		"island 2: one drawn route and NEXT ISLAND IN 5…")
+	boat2.call("tick_countdown", GameData.NEXT_ISLAND_COUNTDOWN)
 	await _settle()
+	_check(_state() == Flow.ISLAND and ctx.biome == route_biome and ctx.mission == route_mission,
+		"the countdown departs to the drawn route through the loading screen (%s, %s)" % [route_biome, route_mission])
 	await _finish_island(false)
 	_check(_state() == Flow.DEBRIEF, "death on the archipelago ends in the debrief")
 

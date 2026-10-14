@@ -236,7 +236,9 @@ static func next_text(ctx: RunContext) -> String:
 	if ctx.is_expedition():
 		var next_name: String = IslandRun.next_part_name(ctx)
 		return "CAMP, THEN %s" % (next_name.to_upper() if next_name != "" else "PART %d" % (ctx.island_index + 2))
-	return "BACK TO THE BOAT  ·  ISLAND %d OF %d" % [ctx.island_index + 2, ctx.island_count()]
+	# The boat no longer offers routes between islands: it draws one and
+	# leaves on a countdown (boat.gd).
+	return "BOAT  ·  NEXT ISLAND %d OF %d IN %d S" % [ctx.island_index + 2, ctx.island_count(), int(GameData.NEXT_ISLAND_COUNTDOWN)]
 
 
 ## Cards taken here, in pick order, each once with the rank it ended at.

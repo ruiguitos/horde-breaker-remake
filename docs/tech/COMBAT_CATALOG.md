@@ -82,7 +82,7 @@ As diferenças base do Vanguard são **+40 HP** e cooldown do Breaker
 |---|---|
 | Escudo | Começa em 0; capacidade 100; absorve antes da vida; sem regeneração automática |
 | Estamina | 3 s de sprint; recuperação de 0,75 s de estamina/s após 0,8 s de espera |
-| Sprint | Velocidade ×1,6; impede disparos; indisponível enquanto agarrado |
+| Sprint | Velocidade ×1,6; **dispara** (run and gun, regra base desde 2026-10-14); indisponível enquanto agarrado ou com um bidão |
 | Raio de colisão | 0,4 m |
 | Breaker | 5 m em 0,18 s; 15 dano no impacto final; raio 2,2 m; atordoa 1 s |
 | Empurrão durante Breaker | 0,6 m por aplicação aos inimigos próximos; repetido durante a investida, não um total único |
@@ -263,8 +263,8 @@ Nenhuma destas três altera o cooldown de 16 s do War Cry.
   lugar ponderado. Melhorias têm peso ×1,5; uma etiqueta partilhada com a
   build dá ×1,25. Sem duplicados; com poucas elegíveis aparecem só uma ou
   duas opções. Mantimento de carta oferece uma única elegível.
-- Sem elegíveis: cura de 20 HP. Rerolls: dois iniciais, +1 por ilha
-  intermédia concluída, reserva máxima três.
+- Sem elegíveis: cura de 20 HP. Rerolls: 1 grátis por ecrã de level-up,
+  sem reserva; Extra Reroll dá +1 no ecrã seguinte (2026-10-14).
 - XP do nível `n` para `n+1`: **`10 × (8 + 6n + n²)`**. Exemplos: 1→2 = 150;
   10→11 = 1680; 29→30 = 10 230; 30→31 = 10 880.
 - Do nível 1 ao 30 são necessários **113 970 XP de progressão**. Fast Learner

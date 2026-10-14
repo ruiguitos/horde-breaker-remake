@@ -24,8 +24,8 @@ pedaços de cápsula.
 
 | Pilar | O que significa | O que exclui |
 |---|---|---|
-| **1. Romper a horda** | A horda (~80–150 ativos) é terreno que se move. O jogador lê a massa, procura o ângulo e abre caminho com o breaker. Posicionamento > pontaria fina. | Sprint e esquiva genérica (o breaker é o único movimento especial); mira manual de precisão como requisito; corredores apertados onde não há para onde ir. |
-| **2. Cada ilha é uma decisão** | Entre ilhas escolhe-se rota, risco e recompensa num mapa em grafo. Dentro da ilha decide-se ir ao objetivo, explorar ou extrair cedo. | Mundo aberto grande; viagens vazias; ilhas sem objetivo; base fixa a defender. |
+| **1. Romper a horda** | A horda (~80–150 ativos) é terreno que se move. O jogador lê a massa, procura o ângulo e abre caminho com o breaker. Posicionamento > pontaria fina. | Esquiva genérica (o breaker é o único movimento especial; o sprint existe desde 2026-10-05 e dispara desde 2026-10-14); mira manual de precisão como requisito; corredores apertados onde não há para onde ir. |
+| **2. Cada ilha é uma decisão** | No 1.º barco escolhe-se a rota inicial (risco e recompensa); entre ilhas, desde 2026-10-14, há uma contagem e a rota seguinte é sorteada, e a decisão passa para os mantimentos e o hazard pay. Dentro da ilha decide-se ir ao objetivo, explorar ou extrair cedo. | Mundo aberto grande; viagens vazias; ilhas sem objetivo; base fixa a defender. |
 | **3. Builds que mudam a forma de jogar** | Cartas e perks alteram *comportamentos* ("o breaker deixa fogo", "cada 5.º tiro ricocheteia"). Poucas, legíveis, combináveis. | Árvores de 50+ nós; dezenas de "+5 %"; várias moedas; mastery/variantes que só mudam números. |
 
 ## 3. Core loops
@@ -34,7 +34,7 @@ pedaços de cápsula.
 |---|---|---|---|
 | **30 s — combate** | Mover; auto-fire contra o alvo mais próximo; recarregar; breaker (cooldown); apanhar orbes de XP. | Para onde andar para manter a horda à frente; que especial matar primeiro (virar-se para ele muda o alvo); gastar o breaker para fugir, soltar-se de um Grabber ou abrir um grupo. | Feedback físico (hit-stop, desmembramento, headshot audível); XP; sobreviver ao pico. |
 | **5 min — ilha** | Desembarcar → explorar → ativar objetivo (dispara um evento de horda) → voltar ao barco. | Seguir direto ao objetivo ou explorar por caches; quando ativar o evento; ficar mais tempo (mais XP, mais risco) ou partir. | Nível de run → escolher 1 de 3 cartas; caches; acesso à ilha seguinte. |
-| **25 min — run** | Dawn Beach → 2–3 ilhas escolhidas num grafo → Volcano (boss) → extração. No barco, entre ilhas: "escolhe 1 de 3" (carta, arma ou cura). | Rota (ilhas com modificador e recompensa anunciados); o que levar no barco; extrair mais cedo com menos Intel ou arriscar o vulcão. | Intel ganho (conserva-se ao morrer, bónus ao extrair); build que cresceu durante a run. |
+| **25 min — run** | Dawn Beach → 2–3 ilhas (a 1.ª escolhida no barco, as seguintes sorteadas com contagem de 5 s desde 2026-10-14) → Volcano (boss) → extração. No barco, entre ilhas: mantimentos (cura, munições ou carta). | Rota (ilhas com modificador e recompensa anunciados); o que levar no barco; extrair mais cedo com menos Intel ou arriscar o vulcão. | Intel ganho (conserva-se ao morrer, bónus ao extrair); build que cresceu durante a run. |
 | **Meta** | Gastar Intel fora da run. | Que perks/slots, armas ou ilhas desbloquear; subir a dificuldade (níveis à Hazard). | Opções novas (horizontais), não números maiores; novos desafios. |
 
 O diretor de horda alterna **crescer → pico → alívio** (Left 4 Dead) em vez
@@ -73,7 +73,7 @@ de só escalar com o tempo, para que o loop de 5 min tenha respiração.
 | Mundo aberto / 768 × 768 m / streaming | Mapa grande para pouco conteúdo; ilhas compactas são viáveis a solo. |
 | Skill tree grande, mastery, variantes, várias moedas | Camadas de "+X %" difíceis de equilibrar; perks em slots + Intel chegam. |
 | Scrap (no slice) | O "1 de 3" no barco dá a decisão sem uma moeda a explicar. Reavaliar só se o playtest pedir gastos na run. |
-| Sprint, salto, agachar | O breaker é o único verbo de movimento; menos inputs, mais legível. |
+| Salto, agachar | O breaker é o verbo de movimento especial; menos inputs, mais legível. (O sprint saiu desta lista a 2026-10-05 e dispara desde 2026-10-14.) |
 | Co-op / online | Rede é cara e o autor não tem experiência; single-player primeiro. |
 | Assets externos, animação complexa, arte final | Primitivas e desmembramento por partes da cápsula; arte só após o jogo ser divertido. |
 | Barco controlável / física naval | A viagem é um ecrã; não serve nenhum pilar. |

@@ -1080,8 +1080,8 @@ func _update_cards(run: IslandRun) -> void:
 	var left: int = run.rerolls
 	var key: String = GameInput.prompt(&"card_reroll", _gamepad)
 	_reroll_button.text = "[ %s ]  REROLL ×%d" % [key, left]
-	UiTheme.set_locked(_reroll_button, left <= 0, "No rerolls left: clear an island to earn one.")
-	_reroll_reason.text = "NONE LEFT · CLEAR AN ISLAND FOR +1" if left <= 0 else ""
+	UiTheme.set_locked(_reroll_button, left <= 0, "Reroll used: every level-up brings a new free one.")
+	_reroll_reason.text = "USED · NEXT LEVEL-UP BRINGS A NEW ONE" if left <= 0 else ""
 	_reroll_reason.visible = left <= 0
 	# The lock shows as a quick fade-in of the cards.
 	var t: float = clampf(float(Time.get_ticks_msec() - _cards_opened_ms) / CARD_LOCK_MS, 0.0, 1.0)
@@ -1589,8 +1589,8 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	var w: GameData.Weapon = run.weapons[run.weapon_index]
 	_ammo_text.text = ammo_text(run, run.weapon_index)
 	_weapon_name.text = w.display_name.to_upper()
-	_fire_status.text = "SPRINTING" if run.sprinting else "NO AMMO" if w.max_ammo >= 0 and run.ammo[run.weapon_index] == 0 		else "RELOADING" if run.reload_left > 0.0 else "AUTO-FIRE"
-	_fire_status.add_theme_color_override("font_color", UiTheme.DANGER if _fire_status.text == "NO AMMO" else UiTheme.TEXT_MUTED if run.sprinting else UiTheme.ACCENT)
+	_fire_status.text = "HANDS FULL" if run.is_carrying() else "NO AMMO" if w.max_ammo >= 0 and run.ammo[run.weapon_index] == 0 		else "RELOADING" if run.reload_left > 0.0 else "AUTO-FIRE"
+	_fire_status.add_theme_color_override("font_color", UiTheme.DANGER if _fire_status.text == "NO AMMO" else UiTheme.TEXT_MUTED if run.is_carrying() else UiTheme.ACCENT)
 	_update_weapon_slots(run)
 
 	var warnings := PackedStringArray()

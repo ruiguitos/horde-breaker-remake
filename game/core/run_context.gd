@@ -17,8 +17,9 @@ var xp_fraction: float = 0.0
 ## Dedicated card RNG carries between level-ups, supplies and islands.
 var card_rng_state: int = 0
 var card_stacks: Dictionary = {}
-## Level-up card rerolls left (carried between islands, see GameData.REROLLS_*).
-var rerolls: int = GameData.REROLLS_START
+## Extra rerolls (Extra Reroll power-up) waiting for the next level-up
+## card screen; it may be on the next island. Spent when that screen opens.
+var bonus_rerolls: int = 0
 var ammo: PackedInt32Array = PackedInt32Array()
 var kills: int = 0
 var headshots: int = 0

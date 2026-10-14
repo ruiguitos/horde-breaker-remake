@@ -1,7 +1,9 @@
 extends "res://game/states/boat.gd"
 ## Expedition camp, between two parts of the same island (on foot, no boat):
 ## the boat's screen and supplies (Field Repairs, Ammo Crate, a card, with
-## their RNG order), but no route choice and no briefing. The context
+## their RNG order), but no route choice and no briefing. Like the boat
+## between islands, it counts down ("NEXT PART IN 5…") and goes on by
+## itself; the parts keep their fixed order. The context
 ## already points at the next part (RunContext.advance), so the left panel
 ## shows the expedition's parts and the right one the part ahead.
 ## It extends boat.gd so the supply rules and the layout live in one place;
@@ -31,6 +33,7 @@ func _ready() -> void:
 	_supply_row(right, "SUPPLY CACHE / ONE PER CAMP")
 	_footer(screen, false)
 	_select_supply(_first_useful())
+	_start_countdown("PART")
 	_supply_target().grab_focus()
 	add_child(UiSfx.new())
 	add_child(Ambience.create(&"town", -14.0))  # wind on the plateau, not the boat's sea

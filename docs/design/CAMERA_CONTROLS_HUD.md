@@ -10,8 +10,9 @@ Restrições assumidas:
   cabeça ou corpo de forma intencional — isto condiciona câmara, retícula e
   auto-fire.
 - **Breaker** = investida/empurrão com cooldown, **comum a todas as classes**,
-  que abre caminho na horda. **Não há sprint**: o breaker é o verbo de
-  mobilidade rápida.
+  que abre caminho na horda. ~~Não há sprint~~ — desatualizado: o sprint
+  existe desde 2026-10-05 (Shift / L3) e dispara desde 2026-10-14 (ver
+  `DECISIONS.md`). O breaker continua a ser o verbo de mobilidade especial.
 - Cada classe tem **uma habilidade ativa** (granada, torreta, cura em área…).
 - Lição do original: a interface compensava uma câmara que não mostrava a
   horda (radar, arcos, alertas). Aqui a câmara faz o trabalho primeiro e o HUD
@@ -197,7 +198,8 @@ os bindings são remapeáveis (Input Map do Godot + ecrã de remapeamento).
 | Mapa da ilha | M | Botão View / Touchpad | não pausa (como o original) |
 | Pausa | Esc | Menu / Options | |
 | Recentrar câmara atrás do jogador | C | Clique stick direito (R3) | |
-| (livre) | Shift, Ctrl, F | Clique stick esquerdo (L3), D-pad | reservado: sem sprint, sem agachar, sem salto por agora |
+| Sprint (dispara desde 2026-10-14) | Shift | Clique stick esquerdo (L3) | |
+| (livre) | Ctrl, F | D-pad | reservado: sem agachar, sem salto por agora |
 
 Porquê Espaço para o breaker: é o maior botão e o mais rápido de premir
 sem tirar os dedos de WASD; num jogo sem salto, é natural. No comando, A/✕ é
@@ -406,7 +408,7 @@ cumprem, decide a preferência (9). Se nenhum cumprir 1, testar um meio-termo
 2. **Preset "Média" (35°, 10 m, 0,4 m, 60°)** como ponto de partida; escolha
    final pelos critérios do §5.
 3. **Mira fina** no botão direito/LT como aproximação da câmara, não ADS.
-4. **Breaker no Espaço / A**; sem sprint, sem salto, sem agachar.
+4. **Breaker no Espaço / A**; sprint em Shift / L3 (dispara, desde 2026-10-14); sem salto, sem agachar.
 5. **Tab para trocar arma**, M para mapa.
 6. **Sem radar por omissão**: câmara + indicadores de borda + som; radar como
    opção.

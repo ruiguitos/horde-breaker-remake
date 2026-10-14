@@ -2,6 +2,8 @@ extends Node
 ## Root of the game: a small run state machine.
 ##   TITLE -> ARMORY -> BOAT -> ISLAND -> (cleared and more islands) BOAT
 ##                  -> (last island cleared, or death) DEBRIEF -> ARMORY
+## The first BOAT offers two routes; a BOAT between islands draws one route
+## and departs on a 5 s countdown (boat.gd), like the expedition CAMP.
 ## An expedition (one real island in parts, on foot) has no boat:
 ##   ARMORY -> ISLAND (part 1) -> (cleared and more parts) CAMP -> ISLAND
 ##          -> (last part cleared, or death) DEBRIEF

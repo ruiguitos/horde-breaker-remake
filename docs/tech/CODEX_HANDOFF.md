@@ -9,7 +9,8 @@ fazer commit quando ele pedir. Regras do projeto: `AGENTS.md` e `CLAUDE.md`.
 - remover armas;
 - a escolha de arma principal ou secundária;
 - a árvore de perks;
-- a carta "Run and Gun" (contradiz o `DECISIONS.md`: o sprint não dispara).
+- ~~a carta "Run and Gun" (contradiz o `DECISIONS.md`: o sprint não dispara).~~
+  Resolvido a 2026-10-14: o sprint dispara para todos e a carta foi retirada.
 
 **Atualização de 2026-10-11:** o utilizador aprovou a opção B das armas,
 entretanto implementada: principal/secundária escolhidas, Machine Gun,
