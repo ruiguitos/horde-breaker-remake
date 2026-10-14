@@ -97,8 +97,8 @@ func _test_data() -> void:
 		and float(m["radius"]) > 0.0 and float(m["spike_seconds"]) > 0.0,
 		"signals.tres: %d signals, light %.0f s at %.1f m, spike %.0f s" % [int(m.get("points", 0)), float(m.get("seconds", 0)),
 		float(m.get("radius", 0)), float(m.get("spike_seconds", 0))])
-	_check(GameData.ROUTE_MISSIONS.has(&"signals") and GameData.ROUTE_MISSIONS[-1] == &"signals",
-		"Light the Signals is offered on archipelago routes (last in order)")
+	_check(GameData.ROUTE_MISSIONS.has(&"signals") and GameData.ROUTE_MISSIONS.find(&"signals") == GameData.ROUTE_MISSIONS.find(&"intel_search") + 1,
+		"Light the Signals is offered on archipelago routes (after Intel Search)")
 	_check(IslandRun.signal_count_wanted() == 3 and IslandRun.signal_seconds() == float(m.get("seconds", 0))
 		and IslandRun.signal_radius() == float(m.get("radius", 0)) and IslandRun.signal_spike_seconds() == float(m.get("spike_seconds", 0)),
 		"the run reads its numbers from the data")

@@ -48,6 +48,11 @@ Director Hale: The signal beacons on this rock are dark. Find their fuel, light 
 Director Hale: Beacon duty, contractor. One fire at a time, each one shows you the next. [ID:RADIO_LAND_SIGNALS_2]
 => END
 
+~ land_sabotage
+Director Hale: That conveyor still feeds them. Cut its power at the switch, wire the drive, then don't be near it. [ID:RADIO_LAND_SABOTAGE_1]
+Director Hale: Demolition contract, contractor. Power first, charges second, distance third. [ID:RADIO_LAND_SABOTAGE_2]
+=> END
+
 ~ land_boss
 Director Hale: Thermal readings on the volcano are... large. Do the job, then leave before it notices. [ID:RADIO_LAND_BOSS_1]
 => END
@@ -129,6 +134,26 @@ Director Hale: Signals up, route marked. Now get yourself off this rock. [ID:RAD
 
 ~ lighthouse_lit
 Director Hale: The lighthouse is burning again. Every ship for miles can see it. So can they. Move. [ID:RADIO_LIGHTHOUSE_LIT_1]
+=> END
+
+~ power_cut
+Director Hale: Power's dead. Everything with ears heard that. Get to the machine. [ID:RADIO_POWER_CUT_1]
+Director Hale: Lights out on the line. Now the charges, while it's quiet. It won't be. [ID:RADIO_POWER_CUT_2]
+=> END
+
+~ charge_planted
+Director Hale: One charge set. Don't drop the other one. [ID:RADIO_CHARGE_PLANTED_1]
+Director Hale: That's one. Keep your fingers away from the red bits. [ID:RADIO_CHARGE_PLANTED_2]
+=> END
+
+~ charges_set
+Director Hale: Charges armed. The fuse is short and so is my patience. Run. [ID:RADIO_CHARGES_SET_1]
+Director Hale: Timer's running. Be somewhere else when it stops. [ID:RADIO_CHARGES_SET_2]
+=> END
+
+~ sabotage_blast
+Director Hale: And there goes the machine. Lovely. Now get yourself out of the smoke. [ID:RADIO_SABOTAGE_BLAST_1]
+Director Hale: Target destroyed. Paperwork says you were clear. Make it true. [ID:RADIO_SABOTAGE_BLAST_2]
 => END
 
 ~ objective_done

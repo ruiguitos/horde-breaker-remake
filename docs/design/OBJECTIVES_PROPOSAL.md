@@ -287,4 +287,82 @@ Jungle, ameaça 2: extração em 89–118 s, sinais acesos aos 19–29 s, 40–5
 67–83 s, sem precisar de pousar o bidão; a horda chega ao limite de 150 vivos,
 a confirmar em playtest).
 
-Próximo passo (do catálogo): sabotagem Hashima.
+**Passo 6 feito: Sabotage** (`game/data/missions/sabotage.tres`, id
+`sabotage`; no catálogo, "Sabotar/reparar indústria", a assinatura da
+Hashima). Números (todos no `.tres`, para afinar em playtest):
+
+| Valor | Número | Porquê |
+|---|---|---|
+| Fase 1: cortar a energia | 8 s a menos de 4 m do quadro, pico de 20 s | Como um gerador do Activate: o primeiro passo é ir ao quadro e aguentar lá. Sair pausa (o progresso fica); levar dano não interrompe. O pico cobre o corte e o caminho para as máquinas. |
+| Fase 2: armar as cargas | 2 cargas, 5 s cada a menos de 3 m, pico de 12 s por carga | Só depois do corte (com a energia ligada, ficar na máquina não faz nada). Pela ordem que quiseres; cada uma guarda o seu progresso. Duas chegam: "alimentação e motor", como no catálogo. |
+| Fase 3: rastilho | 20 s | Curto o bastante para obrigar a sair a correr, longo o bastante para sair dos 15 m mesmo com a horda à volta (a 6 m/s são 2,5 s). A saída abre logo ao armar a última carga. |
+| Explosão | 15 m de cada carga, 60 % da vida máxima | Dano pesado, não morte instantânea: de vida cheia nunca mata (o escudo absorve primeiro), mas com menos de 60 % mata, e morrer termina a ilha como sempre. Mata os inimigos dentro do raio (não o Behemoth). |
+| Fuga antes do fim | ganha logo | Chegar à saída antes de o rastilho acabar ganha a ilha; as cargas rebentam atrás de ti, sem dano. Nunca fica bloqueado: depois da explosão a saída continua aberta. |
+| Recompensa | 15 de Intel pelo corte e 15 por carga (45), ⅓ da munição em cada passo | Igual às outras missões. |
+| Sorteio | peso 3 no Industrial Port, 1 nas outras | O Port passa a ter missão "da casa". Com nove missões nas rotas todos os biomas somam 11: a missão da casa sai em 27,3 % das primeiras ilhas (3 em 11) e cada uma das outras em 9,1 % (1 em 11). Antes era 30 % / 10 %, e 12,5 % para cada missão no Port. |
+
+Regras: as três fases correm no `IslandRun` (`sabotage_phase`: `SAB_POWER`,
+`SAB_CHARGES`, `SAB_FUSE`, `SAB_BLOWN`). O rastilho conta em qualquer
+objetivo (também durante o Behemoth, na última ilha). Morrer termina a ilha
+como sempre; um Quick Redeploy (ou outra missão no mesmo `IslandRun`) repõe
+tudo, rastilho incluído, com o mesmo quadro e as mesmas máquinas.
+Marcadores `PowerSwitch`, `Machine_1..` (ordem pelo número) e `ExfilPoint`
+(opcional: a saída da Sabotage; um `Exit` de expedição ganha-lhe). Sem
+`PowerSwitch`, o jogo escolhe um candidato dos pontos do Hold Sequence
+(alcançável, a 30 m ou mais do barco, 4 m livres, outra "sal") a pelo menos
+60 % da maior distância a pé desde o desembarque: fundo na ilha, mas não
+sempre o mesmo sítio. Sem `Machine_*`, as máquinas ficam a 30–60 m do quadro
+e a 12 m ou mais uma da outra (se não houver, as mais perto do meio da
+faixa; se nem isso, o próprio quadro). Sem `ExfilPoint`, sai-se pelo barco.
+Nas ilhas geradas e nas quatro ilhas manuais de teste, as 20 + 8 máquinas
+de teste ficaram todas na faixa.
+
+**Hashima escolhida pela missão (decisão de implementação).** A missão é
+sorteada no barco antes de se saber a ilha (aparece no cartão da rota e no
+briefing), por isso não se muda depois. Em vez de a ilha declarar a missão
+(o que obrigava a carregar todas as cenas do bioma para decidir), é a
+missão que declara as ilhas: `preferred_islands = ["port_hashima"]` no
+`sabotage.tres`. `HandmadeIsland.pick(bioma, seed, missão)` só escolhe entre
+essas quando existem no bioma; as outras missões continuam a sortear entre
+`port_01` e Hashima. Assim, uma rota Port com Sabotage leva sempre à
+Hashima (cerca de 3 em cada 10 rotas Port: 72 de 234 no teste do barco,
+que já exclui a missão anterior), e a Hashima continua a jogar as
+outras missões (e mantém os 3 geradores do Activate).
+
+**Hashima reconstruída** (`tools/real_island/build.gd`, preset `sabotage`):
+`PowerSwitch` na subestação (変電所) junto ao poço 4, no extremo norte da
+zona do carvão; `Machine_1` no chão depois do último pilar do tapete
+transportador elevado; `Machine_2` à porta da sala de carregamento (詰込室).
+Sem `ExfilPoint`: o `Boat` já está no cais Dolphin, e a retirada pelo
+percurso junto ao paredão é o caminho natural das cargas ao barco. Percurso
+na grelha: 239 m do desembarque ao quadro, 101–106 m do quadro às máquinas,
+14 m entre elas, 131–136 m das máquinas ao barco. A reconstrução só alterou
+o `port_hashima.scn` (mais 3 marcadores); terreno, texturas e grelha ficaram
+iguais byte a byte.
+
+Visual (primitivas): armário cinzento com alavanca e luz (verde com
+energia, vermelha depois do corte), farol ciano, anel do raio e disco que
+cresce. Cada máquina: caixa do motor com tambor, luz âmbar com uma
+`OmniLight3D` sem sombras (9 m) que se apaga com o corte, farol vermelho,
+anel e disco; a carga (bloco vermelho) aparece ao ser armada e pisca cada vez
+mais depressa no rastilho, com um anel vermelho de 15 m à volta de cada
+carga. Na explosão: esferas de explosão em cada carga, estilhaços, pó, as
+máquinas desaparecem e fica uma mancha queimada; a câmara treme a até 60 m.
+Som: o do gerador no corte e o da explosão; não há zumbido contínuo das
+máquinas (não existe som para isso). HUD `CUT THE POWER` (`AT THE SWITCH ·
+3 OF 8 s`), `CHARGES 1 / 2` (`PLANT ON THE MACHINE`), `GET CLEAR · 14 s`
+(`BLAST 15 m · YOU ARE IN THE BLAST` / `CLEAR`), marcador
+`CUTTING POWER · 40 %`, `PLANTING · 60 %` e, no rastilho, `BOAT · 80 m ·
+14 s`; minimapa `SWITCH`, `MACHINE`, `CHARGE` e `EXFIL`.
+
+Testes: `tests/test_sabotage.gd` (inclui bots invencíveis, ameaça 2:
+Hashima 81 s, Port gerado 69 s, Beach 92 s, Town 88 s; energia cortada aos
+28–40 s, cargas armadas aos 56–65 s; o bot nunca foi apanhado pela
+explosão; a horda chega ao limite de 150 vivos, a confirmar em playtest).
+
+Para testar no editor (Windows): TEST ISLAND → `PORT_HASHIMA` com
+`MISSION: SABOTAGE`, nas três câmaras; confirmar que se vê o quadro e as
+máquinas no meio dos prédios, que as luzes se apagam no corte, e se o
+rastilho de 20 s e o raio de 15 m são justos com a horda a sério.
+
+Próximo passo (do catálogo): escolta por percurso.

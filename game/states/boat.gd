@@ -85,8 +85,9 @@ func _make_routes() -> void:
 	# just played again: context.mission still holds it after island 1.
 	# The biome is drawn first so the mission draw can favour the biome's
 	# signature mission (GameData.pick_route_mission: Fuel Run on the Beach,
-	# Nests in the Jungle and the Volcano, Intel Search in the Town; Light
-	# the Signals has no signature biome: weight 1 everywhere).
+	# Nests in the Jungle and the Volcano, Intel Search in the Town,
+	# Sabotage in the Industrial Port; Light the Signals has no signature
+	# biome: weight 1 everywhere).
 	var previous: StringName = context.mission if context.island_index > 0 else &""
 	for i in 2:
 		if context.is_last_island():

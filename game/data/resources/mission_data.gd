@@ -70,6 +70,30 @@ extends Resource
 # fuel is poured in and the lighting counts, `spike_seconds` = the horde
 # spike when the lighting starts. The fuel cans follow the Fuel Run carry
 # rules (fuel_run.tres: pickup radius, speed, no firing).
+@export_group("Sabotage")
+# Sabotage also uses the shared fields: `points` = how many charges (the
+# map's Machine_* markers win when it has them), `seconds_per_point` =
+# seconds to plant one charge (leaving pauses it), `radius` = metres from a
+# machine to plant there, `spike_seconds` = the horde spike when a charge
+# starts.
+## Sabotage: seconds standing at the power switch to cut the power (leaving
+## pauses it, damage does not), the switch's radius in metres and the horde
+## spike when the cut starts. The charges can only be planted after it.
+@export var power_seconds: float = 0.0
+@export var power_radius: float = 0.0
+@export var power_spike_seconds: float = 0.0
+## Sabotage: seconds from the last charge planted to the blast, the blast's
+## radius in metres (from each charge) and the damage it deals to a player
+## still inside it, as a share of max HP (0.6 = 60 %: heavy, not a kill
+## from full health; shield absorbs it first).
+@export var fuse_seconds: float = 0.0
+@export var blast_radius: float = 0.0
+@export var blast_damage: float = 0.0
+## Hand-made islands made for this mission (file names without extension,
+## e.g. "port_hashima"): when the mission is drawn on their biome, the run
+## lands on one of them instead of any island of the biome
+## (HandmadeIsland.pick).
+@export var preferred_islands: Array[String] = []
 @export_group("Boat draw")
 ## Biomes where the boat offers this mission more often: its "signature"
 ## islands (it can still be drawn anywhere).

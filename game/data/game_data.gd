@@ -637,6 +637,10 @@ static func _load_missions() -> Dictionary:
 			"brood_cap": d.brood_cap, "wake_range": d.wake_range, "priority_range": d.priority_range,
 			"search_spots": d.search_spots, "time_limit": d.time_limit, "transmit_seconds": d.transmit_seconds,
 			"transmit_radius": d.transmit_radius, "intel_reward": d.intel_reward,
+			"power_seconds": d.power_seconds, "power_radius": d.power_radius,
+			"power_spike_seconds": d.power_spike_seconds, "fuse_seconds": d.fuse_seconds,
+			"blast_radius": d.blast_radius, "blast_damage": d.blast_damage,
+			"preferred_islands": d.preferred_islands.duplicate(),
 			"preferred_biomes": d.preferred_biomes.duplicate(), "preferred_weight": d.preferred_weight}
 	return out
 

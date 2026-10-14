@@ -30,7 +30,7 @@ func _soak(run_seed: int) -> void:
 		ctx.mission = GameData.MISSIONS.keys()[(run_seed + island) % 3]
 		# Same island choice as the game: hand-made when one exists.
 		var custom: IslandMap = null
-		var scene: PackedScene = HandmadeIsland.pick(ctx.biome, ctx.island_seed())
+		var scene: PackedScene = HandmadeIsland.pick(ctx.biome, ctx.island_seed(), ctx.mission)
 		if scene != null:
 			var hm: HandmadeIsland = scene.instantiate()
 			root.add_child(hm)
@@ -83,7 +83,7 @@ func _soak(run_seed: int) -> void:
 ## then the boat.
 func _goal(run: IslandRun) -> Vector3:
 	match run.objective:
-		IslandRun.Objective.GENERATORS when run.mission in [&"defend", &"hold_sequence", &"fuel_run", &"nests", &"intel_search", &"signals"]:
+		IslandRun.Objective.GENERATORS when run.mission in [&"defend", &"hold_sequence", &"fuel_run", &"nests", &"intel_search", &"signals", &"sabotage"]:
 			return run.site
 		IslandRun.Objective.GENERATORS when run.mission == &"rescue":
 			return run.survivor_pos

@@ -1336,6 +1336,10 @@ func _mission_progress(run: IslandRun) -> String:
 					return "%d/%d, %s" % [run.intel_found(), run.intel_total(), IslandRun.clock_text(run.intel_time_left)]
 				&"signals":
 					return "%d/%d" % [run.signals_lit(), run.signal_pos.size()]
+				&"sabotage":
+					if not run.power_cut():
+						return "power %d/%d s" % [int(run.power_progress), int(IslandRun.power_seconds())]
+					return "%d/%d" % [run.charges_planted(), run.charge_pos.size()]
 				_:
 					return "%d/%d" % [_generators_done(run), GameData.GENERATOR_COUNT]
 		IslandRun.Objective.BOSS:
@@ -1733,12 +1737,27 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 						detail += " · FIND THE FUEL FOR %s" % sname
 					pips = count
 					pips_done = run.signals_lit()
+				&"sabotage":
+					var charges: int = run.charge_pos.size()
+					if not run.power_cut():
+						_objective.text = "CUT THE POWER"
+						detail += " · AT THE SWITCH · %d OF %d s" % [int(run.power_progress), int(IslandRun.power_seconds())]
+					else:
+						_objective.text = "CHARGES %d / %d" % [run.charges_planted(), charges]
+						var k: int = run.nearest_unplanted()
+						var held: float = run.charge_progress[k] if k >= 0 else 0.0
+						detail += " · PLANT ON THE MACHINE · %d OF %d s" % [int(held), int(IslandRun.charge_seconds())]
+					# Pips: the switch, then each charge.
+					pips = charges + 1
+					pips_done = (1 if run.power_cut() else 0) + run.charges_planted()
 				_:
 					_objective.text = "ACTIVATE THE GENERATORS"
 					detail += " · %d OF %d ONLINE" % [_generators_done(run), GameData.GENERATOR_COUNT]
 					pips = GameData.GENERATOR_COUNT
 		IslandRun.Objective.BOSS:
 			_objective.text = "ELIMINATE THE BEHEMOTH"
+			if run.mission == &"sabotage" and run.sabotage_phase == IslandRun.SAB_FUSE:
+				detail += " · CHARGES BLOW IN %d s" % ceili(run.fuse_left)
 		IslandRun.Objective.RETURN_TO_BOAT:
 			if run.mission == &"rescue" and run.survivor_found and not run.survivor_lost:
 				_objective.text = "EXTRACT THE SURVIVOR"
@@ -1746,8 +1765,15 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 				_objective.text = "BOAT INBOUND" if run.boat_eta > 0.0 else "BOARD THE BOAT"
 				if run.boat_eta > 0.0:
 					detail += " · DOCKING IN %d s" % ceili(run.boat_eta)
+			elif run.mission == &"sabotage" and run.sabotage_phase == IslandRun.SAB_FUSE:
+				# The fuse countdown: get clear of the blast, then out.
+				_objective.text = "GET CLEAR · %d s" % ceili(run.fuse_left)
+				detail += " · BLAST %d m · %s" % [int(IslandRun.blast_radius()),
+					"YOU ARE IN THE BLAST" if run.in_blast(run.player_pos) else "CLEAR"]
 			elif run.has_exit():
 				_objective.text = ("HEAD TO " + run.exit_label).to_upper() if run.exit_label != "" else "LEAVE ALONG THE PATH"
+			elif run.has_exfil():
+				_objective.text = "GET TO THE EXFIL POINT"
 			else:
 				_objective.text = "RETURN TO THE BOAT"
 		IslandRun.Objective.WON:
@@ -1887,6 +1913,9 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"signals":
 		goal = run.signals_goal()  # the next signal's fuel, or the signal itself
 		goal_name = run.signal_name(run.signal_index) if run.is_carrying() or run.signal_fuelled() else "Fuel"
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"sabotage":
+		goal = run.sabotage_goal()  # the switch, then the nearest unplanted charge
+		goal_name = "Machine" if run.power_cut() else "Power switch"
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"rescue":
 		goal = run.survivor_pos
 		goal_name = "Survivor"
@@ -1929,6 +1958,12 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"signals" and run.signal_fuelled() \
 			and dist <= IslandRun.signal_radius():
 		_marker.text = "LIGHTING · %d%%" % int(100.0 * run.signal_progress / IslandRun.signal_seconds())
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"sabotage" and not run.power_cut() 			and dist <= IslandRun.power_radius():
+		_marker.text = "CUTTING POWER · %d%%" % int(100.0 * run.power_progress / IslandRun.power_seconds())
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"sabotage" and run.power_cut() 			and run.nearest_unplanted() != -1 and dist <= IslandRun.charge_radius():
+		_marker.text = "PLANTING · %d%%" % int(100.0 * run.charge_progress[run.nearest_unplanted()] / IslandRun.charge_seconds())
+	elif run.objective == IslandRun.Objective.RETURN_TO_BOAT and run.mission == &"sabotage" and run.sabotage_phase == IslandRun.SAB_FUSE:
+		_marker.text = "%s · %d m · %d s" % [goal_name.to_upper(), int(dist), ceili(run.fuse_left)]
 	else:
 		_marker.text = "%s · %d m" % [goal_name.to_upper(), int(dist)]
 	var view: Vector2 = get_viewport().get_visible_rect().size

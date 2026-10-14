@@ -288,6 +288,14 @@ abandonada do Japão, com 0,5 km.
   rochedo central.
 - **Desembarque:** no cais Dolphin.
 - **Geradores:** no poço 2 da mina, no Bloco 65 (o maior prédio) e no poço 4.
+- **Sabotage:** a missão "da casa". Uma rota Port com Sabotage leva sempre à
+  Hashima (o `sabotage.tres` diz `preferred_islands = ["port_hashima"]` e
+  `HandmadeIsland.pick` só escolhe entre essas, quando existem no bioma); as
+  outras missões continuam a sortear entre as duas ilhas do Port. O quadro
+  (`PowerSwitch`) fica na subestação junto ao poço 4, as cargas
+  (`Machine_1`, `Machine_2`) na ponta do tapete transportador e à porta da
+  sala de carregamento; a saída é o barco no cais Dolphin, pelo caminho
+  junto ao paredão (cerca de 135 m a pé).
 - **Construção:** foi feita pela mesma ferramenta da Berlenga
   (`tools/real_island/`, sítio `hashima`).
 
@@ -370,7 +378,7 @@ só visual. A câmara de 3.ª pessoa encurta para não entrar nas colinas.
 | `Trees/` | Cada filho bloqueia só a célula do tronco (a copa não conta) |
 | `Bridges/` | Cada filho é o tabuleiro de uma ponte (`MeshInstance3D`): as células por baixo andam-se à altura do tabuleiro, mesmo sobre água; os filhos (guardas) são decoração |
 | `Decor/` | Nunca bloqueia: relva, flores, estradas, luzes, água de pré-visualização |
-| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed), `Cargo_1..` e `Delivery` (missão Fuel Run: onde estão os bidões e onde se entregam; sem `Cargo_*` o jogo escolhe sítios como os do Hold Sequence, sem `Delivery` entrega-se no barco/Exit), `Nest_1..` (missão Nests: onde estão os ninhos; sem eles o jogo escolhe sítios como os do Hold Sequence, com 4 m livres à volta), `Search_1..` e `Uplink` (missão Intel Search: os sítios a procurar, de preferência à porta das casas, e onde se transmite; sem `Search_*` o jogo escolhe sítios alcançáveis a menos de 3 m de um edifício ou rocha, ou em qualquer lado se não houver; sem `Uplink` escolhe o ponto aberto mais perto do meio dos sítios, a 10 m ou mais de cada um), `Signal_1..`, `Lighthouse` e `Fuel_1..` (missão Light the Signals: os sinais por ordem do número, o farol opcional como último sinal, e o combustível de cada sinal pelo mesmo número, o do farol a seguir aos outros; sem `Signal_*` o jogo escolhe sítios como os do Hold Sequence, cada um mais para dentro; sem `Fuel_*` põe o bidão a 15–30 m do seu sinal) (nós `Marker3D`) |
+| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed), `Cargo_1..` e `Delivery` (missão Fuel Run: onde estão os bidões e onde se entregam; sem `Cargo_*` o jogo escolhe sítios como os do Hold Sequence, sem `Delivery` entrega-se no barco/Exit), `Nest_1..` (missão Nests: onde estão os ninhos; sem eles o jogo escolhe sítios como os do Hold Sequence, com 4 m livres à volta), `Search_1..` e `Uplink` (missão Intel Search: os sítios a procurar, de preferência à porta das casas, e onde se transmite; sem `Search_*` o jogo escolhe sítios alcançáveis a menos de 3 m de um edifício ou rocha, ou em qualquer lado se não houver; sem `Uplink` escolhe o ponto aberto mais perto do meio dos sítios, a 10 m ou mais de cada um), `Signal_1..`, `Lighthouse` e `Fuel_1..` (missão Light the Signals: os sinais por ordem do número, o farol opcional como último sinal, e o combustível de cada sinal pelo mesmo número, o do farol a seguir aos outros; sem `Signal_*` o jogo escolhe sítios como os do Hold Sequence, cada um mais para dentro; sem `Fuel_*` põe o bidão a 15–30 m do seu sinal), `PowerSwitch`, `Machine_1..` e `ExfilPoint` (missão Sabotage: o quadro a cortar, as máquinas onde se armam as cargas e, opcional, o ponto de saída; sem `PowerSwitch` o jogo escolhe um sítio fundo na ilha, longe do barco; sem `Machine_*` põe as máquinas a 30–60 m do quadro, afastadas entre si; sem `ExfilPoint` sai-se pelo barco) (nós `Marker3D`) |
 
 A ilha ocupa o quadrado de 0 a `size` metros em X e Z (160 por omissão;
 muda no inspetor do nó raiz). Mantém tudo lá dentro.
@@ -537,6 +545,21 @@ Cada rota mostra também a missão da ilha:
   abre a saída. 15 de Intel por sinal. O último pode ser um farol (marcador
   `Lighthouse`): o fogo vai para o topo da torre e um feixe roda. Peso 1 em
   todos os biomas. A Berlenga parte 2 joga-a com o farol real.
+- **Sabotage**: três fases. Primeiro corta a energia no quadro elétrico
+  (armário cinzento com farol ciano): 8 s a menos de 4 m (sair pausa, levar
+  dano não; começar chama um pico de 20 s). As máquinas apagam-se (a luz
+  âmbar de cada uma desliga). Só depois se armam as cargas: 5 s a menos de
+  3 m de cada máquina (motor com tambor e farol vermelho), pela ordem que
+  quiseres, com um pico de 12 s em cada. A última carga acende o rastilho:
+  20 s (`GET CLEAR · 14 s` no HUD, anéis vermelhos de 15 m à volta das
+  cargas) e a saída abre logo. Quem ainda estiver a menos de 15 m de uma
+  carga quando rebenta perde 60 % da vida máxima (o escudo absorve
+  primeiro; de vida cheia não mata, com pouca vida pode matar). A explosão
+  mata os inimigos à volta (não o Behemoth), as máquinas desaparecem e a
+  câmara treme. Se chegares à saída antes, rebenta atrás de ti, sem dano.
+  15 de Intel pelo corte e 15 por carga. A saída é o marcador `ExfilPoint`
+  quando a ilha o tem, senão o barco. É a missão "da casa" do Industrial
+  Port (peso 3 no sorteio) e, no Port, leva sempre a Hashima.
 
 No Vulcão, o boss aparece depois de cumprires a missão.
 

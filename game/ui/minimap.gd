@@ -32,6 +32,10 @@ const INTEL_COLOR := Color(0.78, 0.55, 1.0)
 ## world uses the same colours; the fuel can uses FUEL_COLOR).
 const SIGNAL_COLOR := Color(1.0, 0.92, 0.55)
 const SIGNAL_LIT_COLOR := Color(1.0, 0.45, 0.12)
+## Sabotage: the power switch and the machines' charges (the world uses the
+## same colours); a planted charge gets a ring on the map until it blows.
+const POWER_COLOR := Color(0.35, 0.85, 1.0)
+const CHARGE_COLOR := Color(1.0, 0.3, 0.2)
 
 var run: IslandRun
 var _texture: ImageTexture
@@ -178,8 +182,17 @@ func _draw() -> void:
 			var c: int = run.signal_index
 			if c < run.cargo_pos.size() and run.cargo_state[c] == IslandRun.CAN_WAITING:
 				_mark(&"fuel", _px(run.cargo_pos[c]))
+	elif run.mission == &"sabotage" and run.sabotage_phase < IslandRun.SAB_BLOWN:
+		# The switch until the power is cut, the machines all along (the
+		# player sees where the job leads), planted charges until they blow.
+		if not run.power_cut():
+			_mark(&"power", _px(run.power_pos))
+		for k in run.charge_pos.size():
+			_mark(&"charge_set" if run.charge_planted[k] else &"charge", _px(run.charge_pos[k]))
 	elif run.mission == &"rescue" and not run.survivor_lost:
 		_mark(&"survivor", _px(run.survivor_pos))
+	if run.has_exfil():
+		_mark(&"exfil", _px(run.exfil_pos))
 	for g in GameData.GENERATOR_COUNT:
 		if run.mission != &"activate":
 			break
@@ -248,6 +261,22 @@ static func draw_marker(item: CanvasItem, kind: StringName, p: Vector2, s: float
 			item.draw_circle(p + Vector2(0, 1) * s, 3.0 * s, SIGNAL_LIT_COLOR)
 			item.draw_colored_polygon(PackedVector2Array([p + Vector2(-2.6, 0) * s, p + Vector2(0, -5) * s, p + Vector2(2.6, 0) * s]), SIGNAL_LIT_COLOR)
 			item.draw_circle(p + Vector2(0, 1) * s, 1.3 * s, SIGNAL_COLOR)
+		&"power":
+			# The power switch: a cyan lightning bolt.
+			item.draw_colored_polygon(PackedVector2Array([p + Vector2(1, -5) * s, p + Vector2(-3, 1) * s, p + Vector2(0, 1) * s,
+				p + Vector2(-1, 5) * s, p + Vector2(3, -1) * s, p + Vector2(0, -1) * s]), POWER_COLOR)
+		&"charge":
+			# A machine to wire: a red square with a dark centre.
+			item.draw_rect(Rect2(p - Vector2(3.5, 3.5) * s, Vector2(7, 7) * s), CHARGE_COLOR)
+			item.draw_rect(Rect2(p - Vector2(1.5, 1.5) * s, Vector2(3, 3) * s), Color(0.12, 0.08, 0.08))
+		&"charge_set":
+			# A planted charge: a solid red square under a ring.
+			item.draw_rect(Rect2(p - Vector2(3, 3) * s, Vector2(6, 6) * s), CHARGE_COLOR)
+			item.draw_arc(p, 5.5 * s, 0, TAU, 16, CHARGE_COLOR, 1.0 * s, true)
+		&"exfil":
+			# The exfil point: a green ring with a dot.
+			item.draw_arc(p, 4.5 * s, 0, TAU, 16, UiTheme.SUCCESS, 1.5 * s, true)
+			item.draw_circle(p, 1.5 * s, UiTheme.SUCCESS)
 		&"exit":
 			# The Exit: a green chevron pointing up (the way on).
 			item.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -5) * s, p + Vector2(5, 3) * s, p + Vector2(0, 0.5) * s, p + Vector2(-5, 3) * s]), UiTheme.SUCCESS)
@@ -298,6 +327,14 @@ static func legend_entries(r: IslandRun) -> Array[Array]:
 					out.append([&"fuel", "FUEL"])
 			if r.signals_lit() > 0:
 				out.append([&"signal_lit", "LIT"])
+		&"sabotage":
+			if r.sabotage_phase < IslandRun.SAB_BLOWN:
+				if not r.power_cut():
+					out.append([&"power", "SWITCH"])
+				if r.charges_planted() < r.charge_pos.size():
+					out.append([&"charge", "MACHINE"])
+				if r.charges_planted() > 0:
+					out.append([&"charge_set", "CHARGE"])
 		&"rescue":
 			out.append([&"survivor", "SURVIVOR"])
 		&"activate":
@@ -307,6 +344,8 @@ static func legend_entries(r: IslandRun) -> Array[Array]:
 		out.append([&"cache", "CACHE"])
 	if r.has_exit():
 		out.append([&"exit", "EXIT"])
+	if r.has_exfil():
+		out.append([&"exfil", "EXFIL"])
 	if r.power_ups.ground_kind != &"":
 		out.append([&"power_up", "POWER-UP"])
 	if r.shows_boat() or r.mission == &"holdout":

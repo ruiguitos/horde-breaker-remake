@@ -73,6 +73,14 @@ const LIGHTHOUSE_TOWER_M: float = 9.0
 ## The lighthouse beam: length (m) and turns per second once lit.
 const LIGHTHOUSE_BEAM_M: float = 36.0
 const LIGHTHOUSE_BEAM_SPEED: float = 0.12
+## Sabotage: the switch and the charges (same colours as the minimap), the
+## machines' lamps while the line is live (an OmniLight3D each, no shadows,
+## off once the power is cut) and the blast's camera trauma near it.
+const POWER_COLOR := Minimap.POWER_COLOR
+const CHARGE_COLOR := Minimap.CHARGE_COLOR
+const MACHINE_LAMP_COLOR := Color(1.0, 0.72, 0.25)
+const MACHINE_LIGHT_RANGE: float = 9.0
+const BLAST_SHAKE_RANGE: float = 60.0
 
 var run: IslandRun
 var hud: Hud
@@ -164,6 +172,27 @@ var _signal_fills: Array[MeshInstance3D] = []
 var _signal_fires: Array[Node3D] = []
 var _signal_lights: Array[OmniLight3D] = []
 var _signal_beam: Node3D
+## Sabotage: the switch cabinet (its lamp, ring, beacon, disc), one root per
+## machine (motor housing with a live lamp and light, the charge block that
+## shows once planted), their rings, beacons and discs, the blast rings
+## shown during the fuse, the scorches left after it, and whether the scene
+## has played the power cut and the blast yet.
+var _power_switch: Node3D
+var _power_lamp: MeshInstance3D
+var _power_ring: MeshInstance3D
+var _power_beacon: MeshInstance3D
+var _power_fill: MeshInstance3D
+var _machines: Array[Node3D] = []
+var _machine_lamps: Array[MeshInstance3D] = []
+var _machine_lights: Array[OmniLight3D] = []
+var _charges: Array[MeshInstance3D] = []
+var _charge_rings: Array[MeshInstance3D] = []
+var _charge_beacons: Array[MeshInstance3D] = []
+var _charge_fills: Array[MeshInstance3D] = []
+var _blast_rings: Array[MeshInstance3D] = []
+var _machine_scorches: Array[MeshInstance3D] = []
+var _sabotage_seen_cut: bool = false
+var _sabotage_seen_blast: bool = false
 var _survivor: MeshInstance3D
 var _caches: Array[MeshInstance3D] = []
 var _buildings: Array[MeshInstance3D] = []
@@ -204,7 +233,7 @@ func _ready() -> void:
 	var custom: IslandMap = null
 	var scene: PackedScene = handmade_scene
 	if scene == null and not showcase:
-		scene = HandmadeIsland.pick(biome, island_seed)
+		scene = HandmadeIsland.pick(biome, island_seed, context.mission if context != null else &"")
 	if scene != null:
 		_handmade = scene.instantiate() as HandmadeIsland
 		add_child(_handmade)
@@ -370,6 +399,8 @@ func _build_world() -> void:
 			_build_signal(run.signal_pos[i], run.signal_lighthouse and i == run.signal_pos.size() - 1)
 		for c in run.cargo_pos.size():
 			_build_fuel_can()
+	if run.mission == &"sabotage":
+		_build_sabotage()
 	_survivor = MeshInstance3D.new()
 	_survivor.mesh = _capsule(0.35, 1.7)
 	_survivor.material_override = _mat(Color(1.0, 0.55, 0.1))
@@ -1284,6 +1315,207 @@ func _draw_signals() -> void:
 		_signal_beam.rotation.y = fmod(t * TAU * LIGHTHOUSE_BEAM_SPEED, TAU)
 
 
+## Sabotage, from primitives. The power switch: a grey cabinet with a lever
+## and a lamp (green while the line is live, red once cut), a cyan beacon,
+## the ring of power_radius() and a disc that grows with the cut. Each
+## machine: a motor housing with a drive drum and an amber lamp with an
+## OmniLight3D (the machine "running"; both die with the power), a red
+## beacon, the ring of charge_radius(), a disc that grows with the planting
+## and the charge block (shown once planted, blinking during the fuse).
+## During the fuse a red ring shows each charge's blast radius; after the
+## blast the machines are gone and a scorch stays.
+func _build_sabotage() -> void:
+	_power_switch = Node3D.new()
+	_power_switch.name = "PowerSwitch"
+	_power_switch.position = _on_ground(run.power_pos)
+	var cab := MeshInstance3D.new()
+	var cm := BoxMesh.new()
+	cm.size = Vector3(1.2, 1.8, 0.6)
+	cab.mesh = cm
+	cab.position = Vector3(0, 0.9, -1.2)
+	cab.material_override = _mat(Color(0.5, 0.52, 0.5))
+	_power_switch.add_child(cab)
+	var lever := MeshInstance3D.new()
+	var lm := BoxMesh.new()
+	lm.size = Vector3(0.12, 0.6, 0.12)
+	lever.mesh = lm
+	lever.name = "Lever"
+	lever.position = Vector3(0.35, 1.1, -0.85)
+	lever.rotation_degrees.x = -35.0
+	lever.material_override = _mat(Color(0.75, 0.15, 0.1))
+	_power_switch.add_child(lever)
+	_power_lamp = MeshInstance3D.new()
+	_power_lamp.mesh = _sphere(0.14)
+	_power_lamp.position = Vector3(-0.3, 1.55, -0.88)
+	_power_lamp.material_override = _mat(Color(0.3, 1.0, 0.4), true)
+	_power_switch.add_child(_power_lamp)
+	_power_beacon = _beacon_mesh(POWER_COLOR)
+	_power_switch.add_child(_power_beacon)
+	_power_fill = _fill_disc(IslandRun.power_radius(), POWER_COLOR)
+	_power_switch.add_child(_power_fill)
+	add_child(_power_switch)
+	_power_ring = _ring(run.power_pos, IslandRun.power_radius(), POWER_COLOR)
+	for k in run.charge_pos.size():
+		var at: Vector3 = run.charge_pos[k]
+		var root := Node3D.new()
+		root.name = "Machine%d" % k
+		root.position = _on_ground(at)
+		var housing := MeshInstance3D.new()
+		var hm := BoxMesh.new()
+		hm.size = Vector3(2.2, 1.4, 1.4)
+		housing.mesh = hm
+		housing.position = Vector3(0, 0.7, -1.6)
+		housing.material_override = _mat(Color(0.32, 0.36, 0.3))
+		root.add_child(housing)
+		var drum := MeshInstance3D.new()
+		var dm := CylinderMesh.new()
+		dm.top_radius = 0.55
+		dm.bottom_radius = 0.55
+		dm.height = 1.6
+		drum.mesh = dm
+		drum.position = Vector3(0, 1.0, -2.6)
+		drum.rotation_degrees.z = 90.0
+		drum.material_override = _mat(Color(0.22, 0.2, 0.19))
+		root.add_child(drum)
+		var lamp := MeshInstance3D.new()
+		lamp.mesh = _sphere(0.18)
+		lamp.position = Vector3(0.8, 1.55, -1.6)
+		lamp.material_override = _mat(MACHINE_LAMP_COLOR, true)
+		root.add_child(lamp)
+		var light := OmniLight3D.new()
+		light.light_color = MACHINE_LAMP_COLOR
+		light.omni_range = MACHINE_LIGHT_RANGE
+		light.light_energy = 1.6
+		light.shadow_enabled = false
+		light.position = Vector3(0.8, 2.0, -1.6)
+		root.add_child(light)
+		var charge := MeshInstance3D.new()
+		var chm := BoxMesh.new()
+		chm.size = Vector3(0.5, 0.35, 0.3)
+		charge.mesh = chm
+		charge.position = Vector3(-0.5, 1.55, -1.6)
+		charge.material_override = _mat(CHARGE_COLOR, true)
+		charge.visible = false
+		root.add_child(charge)
+		var beacon := _beacon_mesh(CHARGE_COLOR)
+		root.add_child(beacon)
+		var fill := _fill_disc(IslandRun.charge_radius(), CHARGE_COLOR)
+		root.add_child(fill)
+		add_child(root)
+		_machines.append(root)
+		_machine_lamps.append(lamp)
+		_machine_lights.append(light)
+		_charges.append(charge)
+		_charge_beacons.append(beacon)
+		_charge_fills.append(fill)
+		_charge_rings.append(_ring(at, IslandRun.charge_radius(), CHARGE_COLOR))
+		var blast := _ring(at, IslandRun.blast_radius(), CHARGE_COLOR)
+		blast.visible = false
+		_blast_rings.append(blast)
+		var scorch := MeshInstance3D.new()
+		var sm := CylinderMesh.new()
+		sm.top_radius = 3.0
+		sm.bottom_radius = 3.0
+		sm.height = 0.02
+		scorch.mesh = sm
+		scorch.position = _on_ground(at) + Vector3(0, 0.03, -1.6)
+		scorch.material_override = _mat(NEST_SCORCH_COLOR)
+		scorch.visible = false
+		add_child(scorch)
+		_machine_scorches.append(scorch)
+
+
+## A thin beacon over an objective (power switch, machines).
+func _beacon_mesh(color: Color) -> MeshInstance3D:
+	var beacon := MeshInstance3D.new()
+	var bm := CylinderMesh.new()
+	bm.top_radius = 0.05
+	bm.bottom_radius = 0.14
+	bm.height = 3.5
+	beacon.mesh = bm
+	beacon.position.y = 3.3
+	beacon.material_override = _mat(color, true)
+	return beacon
+
+
+## A flat see-through disc that grows (its scale) with an objective's progress.
+func _fill_disc(radius: float, color: Color) -> MeshInstance3D:
+	var fill := MeshInstance3D.new()
+	var fm := CylinderMesh.new()
+	fm.top_radius = radius
+	fm.bottom_radius = radius
+	fm.height = 0.03
+	fill.mesh = fm
+	fill.position.y = 0.04
+	var mat := _mat(Color(color, 0.3), true)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	fill.material_override = mat
+	fill.scale = Vector3(0.001, 1, 0.001)
+	fill.visible = false
+	return fill
+
+
+func _draw_sabotage() -> void:
+	var t: float = Time.get_ticks_msec() * 0.001
+	var active: bool = run.objective == IslandRun.Objective.GENERATORS
+	var cut: bool = run.power_cut()
+	var blown: bool = run.sabotage_phase == IslandRun.SAB_BLOWN
+	var fuse: bool = run.sabotage_phase == IslandRun.SAB_FUSE
+	if cut and not _sabotage_seen_cut:
+		# The line dies: the switch lamp turns red, the machines go dark.
+		_sabotage_seen_cut = true
+		(_power_lamp.material_override as StandardMaterial3D).albedo_color = Color(1.0, 0.2, 0.15)
+		(_power_switch.get_node("Lever") as Node3D).rotation_degrees.x = 35.0
+		for k in _machines.size():
+			_machine_lights[k].visible = false
+			(_machine_lamps[k].material_override as StandardMaterial3D).albedo_color = Color(0.2, 0.17, 0.12)
+	if blown and not _sabotage_seen_blast:
+		_sabotage_seen_blast = true
+		for k in _machines.size():
+			var at: Vector3 = _on_ground(run.charge_pos[k]) + Vector3(0, 1.0, -1.6)
+			for j in 30:
+				var ang: float = j * TAU / 30.0
+				var v := Vector3(cos(ang) * randf_range(3.0, 8.0), randf_range(4.0, 10.0), sin(ang) * randf_range(3.0, 8.0))
+				_add_debris(at, v, Color(0.3, 0.32, 0.28) if j % 3 != 0 else CHARGE_COLOR, 1.6)
+			if fx != null:
+				fx.emit(&"dust", at)
+			_machines[k].visible = false
+			_machine_scorches[k].visible = true
+		var near: bool = false
+		for c in run.charge_pos:
+			near = near or _flat(run.player_pos).distance_to(_flat(c)) <= BLAST_SHAKE_RANGE
+		if near:
+			_trauma = 1.0
+	# The switch: its beacon, ring and disc until the power is cut.
+	var on_switch: bool = active and not cut
+	_power_beacon.visible = on_switch
+	_power_ring.visible = on_switch
+	var pf: float = clampf(run.power_progress / IslandRun.power_seconds(), 0.0, 1.0)
+	_power_fill.visible = on_switch and pf > 0.0
+	_power_fill.scale = Vector3(maxf(0.001, pf), 1, maxf(0.001, pf))
+	if on_switch:
+		var inside: bool = _flat(run.player_pos).distance_to(_flat(run.power_pos)) <= IslandRun.power_radius()
+		(_power_ring.material_override as StandardMaterial3D).albedo_color = Color(0.3, 1.0, 0.5) if inside else POWER_COLOR
+	for k in mini(_machines.size(), run.charge_pos.size()):
+		var planted: bool = run.charge_planted[k]
+		var open: bool = active and cut and not planted
+		_charge_beacons[k].visible = active and not planted
+		(_charge_beacons[k].material_override as StandardMaterial3D).albedo_color = CHARGE_COLOR if cut else CHARGE_COLOR.darkened(0.5)
+		_charge_rings[k].visible = open
+		var f: float = clampf(run.charge_progress[k] / IslandRun.charge_seconds(), 0.0, 1.0)
+		_charge_fills[k].visible = open and f > 0.0
+		_charge_fills[k].scale = Vector3(maxf(0.001, f), 1, maxf(0.001, f))
+		if open:
+			var inside: bool = _flat(run.player_pos).distance_to(_flat(run.charge_pos[k])) <= IslandRun.charge_radius()
+			(_charge_rings[k].material_override as StandardMaterial3D).albedo_color = Color(0.3, 1.0, 0.5) if inside else CHARGE_COLOR
+		_charges[k].visible = planted and not blown
+		if planted and fuse:
+			# Blinks faster as the fuse runs out.
+			var rate: float = lerpf(1.0, 6.0, 1.0 - run.fuse_left / IslandRun.fuse_seconds())
+			_charges[k].visible = fmod(t * rate, 1.0) < 0.6
+		_blast_rings[k].visible = fuse
+
+
 ## Flat (x, z) of a point, for distances on the ground.
 func _flat(p: Vector3) -> Vector2:
 	return Vector2(p.x, p.z)
@@ -1504,8 +1736,10 @@ func _play_audio() -> void:
 				sfx.play(&"cache", -6.0, 0.05)
 			&"survivor_found":
 				sfx.play(&"survivor", -6.0, 0.0)
-			&"intel_found", &"intel_transmit", &"signal_lit", &"signals_done", &"lighthouse_lit":
+			&"intel_found", &"intel_transmit", &"signal_lit", &"signals_done", &"lighthouse_lit", &"charge_planted", &"charges_set":
 				sfx.play(&"cache", -6.0, 0.05)
+			&"power_cut":
+				sfx.play(&"generator", -4.0, 0.0)  # the line powering down
 			&"low_hp":
 				sfx.play(&"low_hp", -4.0, 0.0)
 	if _audio_slam and run.slam_time <= 0.0:
@@ -2347,6 +2581,8 @@ func _draw_mission() -> void:
 		_draw_nests()
 	if run.mission == &"intel_search":
 		_draw_intel_search()
+	if run.mission == &"sabotage":
+		_draw_sabotage()
 	for g in _generators.size():
 		var p: float = run.generator_progress[g] / GameData.GENERATOR_HOLD_SECONDS
 		var m: StandardMaterial3D = _generators[g].material_override

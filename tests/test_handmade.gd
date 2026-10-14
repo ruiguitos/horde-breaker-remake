@@ -381,6 +381,11 @@ func _hashima_checks() -> void:
 		if not picked.has(scene.resource_path):
 			picked.append(scene.resource_path)
 	_check(picked.has(path) and picked.size() == 2, "Port routes pick port_01 or Hashima %s" % [picked])
+	# Sabotage (Hashima's signature) lands on Hashima: its switch and charges.
+	var sabotage: bool = map.power_switch.x >= 0.0 and map.machine_points.size() == 2
+	for s in 4:
+		sabotage = sabotage and HandmadeIsland.pick(&"port", s, &"sabotage").resource_path == path
+	_check(sabotage, "a Port Sabotage always lands on Hashima, which has PowerSwitch and 2 Machine markers")
 	island.queue_free()
 
 

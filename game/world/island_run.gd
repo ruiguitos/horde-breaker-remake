@@ -217,6 +217,31 @@ var intel_time_left: float = 0.0
 var uplink_pos: Vector3 = Vector3.ZERO
 var transmit_progress: float = 0.0
 var transmit_started: bool = false
+## Sabotage: three stages (SAB_*). Cut the power at the switch (seconds
+## held, leaving pauses it; a spike on the first step in), then plant one
+## charge per machine (any order; seconds held each, leaving pauses it; a
+## spike per charge), then the fuse burns down (fuse_left seconds) while
+## the player gets out, and the charges blow: a player still within
+## blast_radius() of a charge takes blast_damage() of max HP. The
+## extraction opens when the last charge is planted, at the map's
+## ExfilPoint when it has one (exfil_pos), else the usual point.
+const SAB_POWER: int = 0
+const SAB_CHARGES: int = 1
+const SAB_FUSE: int = 2
+const SAB_BLOWN: int = 3
+var sabotage_phase: int = SAB_POWER
+var power_pos: Vector3 = Vector3.ZERO
+var power_progress: float = 0.0
+var power_started: bool = false
+var charge_pos: Array[Vector3] = []
+var charge_progress: PackedFloat32Array = PackedFloat32Array()
+var charge_started: Array[bool] = []
+var charge_planted: Array[bool] = []
+var fuse_left: float = 0.0
+## True once the blast caught the player (the HUD and tests read it).
+var blast_hit: bool = false
+## Where the run ends after a Sabotage (x < 0: the usual extraction point).
+var exfil_pos: Vector3 = Vector3(-1, 0, -1)
 ## The seed this island was built with (fallback hold points, fuel cans,
 ## nests, search spots).
 var run_seed: int = 7
@@ -755,6 +780,34 @@ func set_mission(id: StringName) -> void:
 			uplink_pos = site  # a map too small to pick from
 		intel_time_left = search_time_limit()
 		site = intel_goal()
+	sabotage_phase = SAB_POWER
+	power_pos = site
+	power_progress = 0.0
+	power_started = false
+	charge_pos.clear()
+	charge_progress.clear()
+	charge_started.clear()
+	charge_planted.clear()
+	fuse_left = 0.0
+	blast_hit = false
+	exfil_pos = Vector3(-1, 0, -1)
+	if mission == &"sabotage":
+		power_pos = map.power_switch
+		if power_pos.x < 0.0:
+			power_pos = IslandMap.pick_power_switch(map, run_seed)
+		if power_pos.x < 0.0:
+			power_pos = site  # a map too small to pick from
+		charge_pos = map.machine_points.duplicate()
+		if charge_pos.is_empty():
+			charge_pos = IslandMap.pick_machine_points(map, power_pos, charge_count_wanted(), run_seed)
+		if charge_pos.is_empty():
+			charge_pos.append(power_pos)
+		for k in charge_pos.size():
+			charge_progress.append(0.0)
+			charge_started.append(false)
+			charge_planted.append(false)
+		exfil_pos = map.exfil
+		site = sabotage_goal()
 
 
 ## Intel Search numbers, from the mission's data (intel_search.tres).
@@ -1162,6 +1215,90 @@ func signals_goal() -> Vector3:
 	return cargo_pos[signal_index]
 
 
+## Sabotage numbers, from the mission's data (sabotage.tres).
+static func charge_count_wanted() -> int:
+	return int(GameData.mission_value(&"sabotage", "points", 2.0))
+
+
+static func charge_seconds() -> float:
+	return GameData.mission_value(&"sabotage", "seconds", 5.0)
+
+
+static func charge_radius() -> float:
+	return GameData.mission_value(&"sabotage", "radius", 3.0)
+
+
+static func charge_spike_seconds() -> float:
+	return GameData.mission_value(&"sabotage", "spike_seconds", 12.0)
+
+
+static func power_seconds() -> float:
+	return GameData.mission_value(&"sabotage", "power_seconds", 8.0)
+
+
+static func power_radius() -> float:
+	return GameData.mission_value(&"sabotage", "power_radius", 4.0)
+
+
+static func power_spike_seconds() -> float:
+	return GameData.mission_value(&"sabotage", "power_spike_seconds", 20.0)
+
+
+static func fuse_seconds() -> float:
+	return GameData.mission_value(&"sabotage", "fuse_seconds", 20.0)
+
+
+static func blast_radius() -> float:
+	return GameData.mission_value(&"sabotage", "blast_radius", 15.0)
+
+
+static func blast_damage() -> float:
+	return GameData.mission_value(&"sabotage", "blast_damage", 0.6)
+
+
+## True once the power is cut (the charges can be planted).
+func power_cut() -> bool:
+	return sabotage_phase >= SAB_CHARGES
+
+
+func charges_planted() -> int:
+	var n: int = 0
+	for p in charge_planted:
+		n += 1 if p else 0
+	return n
+
+
+## The unplanted charge nearest to the player (-1 = all planted).
+func nearest_unplanted() -> int:
+	var best: int = -1
+	var best_d: float = INF
+	for k in charge_pos.size():
+		if charge_planted[k]:
+			continue
+		var d: float = _flat_dist(charge_pos[k], player_pos)
+		if d < best_d:
+			best_d = d
+			best = k
+	return best
+
+
+## True while the player stands within blast_radius() of any charge.
+func in_blast(p: Vector3) -> bool:
+	for c in charge_pos:
+		if _flat_dist(c, p) <= blast_radius():
+			return true
+	return false
+
+
+## Where the player should go next in a Sabotage: the switch, then the
+## nearest unplanted charge, then the way out.
+func sabotage_goal() -> Vector3:
+	if sabotage_phase == SAB_POWER:
+		return power_pos
+	var k: int = nearest_unplanted()
+	return charge_pos[k] if k >= 0 else extraction_point()
+
+
 ## Hold Sequence numbers, from the mission's data (hold_sequence.tres).
 static func hold_count_wanted() -> int:
 	return int(GameData.mission_value(&"hold_sequence", "points", 3.0))
@@ -1190,13 +1327,23 @@ func has_exit() -> bool:
 ## Where the island ends: the Exit on expedition parts, else the boat (the
 ## holdout's rescue boat docks at the Boat marker, the fort pier).
 func extraction_point() -> Vector3:
-	return map.exit if has_exit() else map.boat
+	if has_exit():
+		return map.exit
+	return exfil_pos if has_exfil() else map.boat
+
+
+## Sabotage with an ExfilPoint marker: the run ends there, not at the boat
+## (an expedition's Exit still wins: the way on to the next part).
+func has_exfil() -> bool:
+	return mission == &"sabotage" and exfil_pos.x >= 0.0 and not has_exit()
 
 
 ## Short name of the extraction point (HUD marker).
 func extraction_name() -> String:
 	if has_exit():
 		return exit_label if exit_label != "" else "Exit"
+	if has_exfil():
+		return "Exfil"
 	return "Pier" if mission == &"holdout" else "Boat"
 
 
@@ -1245,6 +1392,8 @@ func _main_task_done() -> bool:
 			return intel_phase == INTEL_DONE
 		&"signals":
 			return signal_index >= signal_pos.size()
+		&"sabotage":
+			return sabotage_phase >= SAB_FUSE
 	for p in generator_progress:
 		if p < GameData.GENERATOR_HOLD_SECONDS:
 			return false
@@ -1330,6 +1479,8 @@ func _intel_base() -> int:
 			base += intel_found() * intel_reward()
 		&"signals":
 			base += signals_lit() * 15
+		&"sabotage":
+			base += (15 if power_cut() else 0) + charges_planted() * 15
 		_:
 			base += done * 15
 	base += 20 if boss_killed else 0
@@ -2587,6 +2738,8 @@ func _draw_cards(avoid: Array[GameData.Card]) -> bool:
 
 
 func _update_mission(dt: float) -> void:
+	if mission == &"sabotage" and sabotage_phase == SAB_FUSE:
+		_update_fuse(dt)  # burns on through the boss fight and the way out
 	match objective:
 		Objective.GENERATORS:
 			match mission:
@@ -2604,6 +2757,8 @@ func _update_mission(dt: float) -> void:
 					_update_intel_search(dt)
 				&"signals":
 					_update_signals(dt)
+				&"sabotage":
+					_update_sabotage(dt)
 				_:
 					_update_generators(dt)
 			if _main_task_done() and has_boss:
@@ -2624,6 +2779,8 @@ func _update_mission(dt: float) -> void:
 					radio.append(&"intel_done" if intel_found() > 0 else &"intel_none")
 				elif mission == &"signals" and (signal_lighthouse or not has_exit()):
 					radio.append(&"lighthouse_lit" if signal_lighthouse else &"signals_done")
+				elif mission == &"sabotage":
+					radio.append(&"charges_set")
 				elif mission != &"rescue":
 					radio.append(&"objective_done_on_foot" if has_exit() else &"objective_done")
 		Objective.BOSS:
@@ -2654,6 +2811,8 @@ func _update_mission(dt: float) -> void:
 			var survivor_ok: bool = mission != &"rescue" or survivor_lost or survivor_pos.distance_to(out) <= GameData.BOAT_RADIUS + 2.0
 			if player_pos.distance_to(out) <= GameData.BOAT_RADIUS and survivor_ok:
 				objective = Objective.WON
+				if mission == &"sabotage" and sabotage_phase == SAB_FUSE:
+					_detonate(false)  # out before the blast: it goes off behind you
 
 
 ## The main task (and the boss) is done: head for the extraction point. The
@@ -2667,6 +2826,8 @@ func _start_extraction() -> void:
 		messages.append("Objective complete. %s!" % _exit_order())
 	elif mission == &"intel_search" and intel_found() == 0:
 		messages.append("No intel to send. Get back to the boat!")
+	elif mission == &"sabotage":
+		messages.append("Charges set: %d s. Get clear and make for the %s!" % [ceili(fuse_left), extraction_name().to_lower()])
 	else:
 		messages.append("Objective complete. Get back to the boat!")
 
@@ -2815,6 +2976,80 @@ func _update_signals(dt: float) -> void:
 				messages.append("%s lit. %s is marked: find its fuel!" % [signal_name(signal_index - 1), signal_name(signal_index)])
 				radio.append(&"signal_lit")
 	site = signals_goal()
+
+
+## Sabotage, stages 1 and 2. Power: stand within power_radius() of the
+## switch for power_seconds() (leaving pauses it, damage does not; the first
+## step in calls a spike). Charges: only once the power is cut; stand within
+## charge_radius() of a machine for charge_seconds() (any order, leaving
+## pauses that charge; a spike on each charge's first step in). Each stage
+## step gives a third of the ammo back. The last charge lights the fuse:
+## _main_task_done() opens the extraction and _update_fuse() takes over.
+func _update_sabotage(dt: float) -> void:
+	if sabotage_phase == SAB_POWER:
+		if _flat_dist(power_pos, player_pos) <= power_radius():
+			if not power_started:
+				power_started = true
+				director.trigger_peak(power_spike_seconds())
+				messages.append("Cutting the power: hold the switch!")
+			power_progress += dt
+			if power_progress >= power_seconds():
+				power_progress = power_seconds()
+				sabotage_phase = SAB_CHARGES
+				_refill_third()
+				messages.append("Power cut. Plant the charges on the machine!")
+				radio.append(&"power_cut")
+	elif sabotage_phase == SAB_CHARGES:
+		var k: int = nearest_unplanted()
+		if k >= 0 and _flat_dist(charge_pos[k], player_pos) <= charge_radius():
+			if not charge_started[k]:
+				charge_started[k] = true
+				director.trigger_peak(charge_spike_seconds())
+				messages.append("Planting charge %d of %d: hold on!" % [charges_planted() + 1, charge_pos.size()])
+			charge_progress[k] += dt
+			if charge_progress[k] >= charge_seconds():
+				charge_progress[k] = charge_seconds()
+				charge_planted[k] = true
+				_refill_third()
+				if charges_planted() < charge_pos.size():
+					messages.append("Charge planted (%d / %d). Next one!" % [charges_planted(), charge_pos.size()])
+					radio.append(&"charge_planted")
+				else:
+					sabotage_phase = SAB_FUSE
+					fuse_left = fuse_seconds()
+	site = sabotage_goal()
+
+
+## Sabotage, stage 3: the fuse burns down whatever the objective (the boss
+## fight, the way out), then the charges blow.
+func _update_fuse(dt: float) -> void:
+	fuse_left = maxf(0.0, fuse_left - dt)
+	if fuse_left <= 0.0:
+		_detonate()
+
+
+## The charges blow: an explosion at each one; every enemy (not the boss)
+## within blast_radius() dies, and a player still inside takes
+## blast_damage() of max HP (shield first; heavy, never a kill from full
+## health). `hurt_player` false: the player already left the island.
+func _detonate(hurt_player: bool = true) -> void:
+	if sabotage_phase != SAB_FUSE:
+		return
+	sabotage_phase = SAB_BLOWN
+	fuse_left = 0.0
+	var b: int = boss_index()
+	for c in charge_pos:
+		explosions.append(c)
+		for j in horde.query_radius(c, blast_radius()):
+			if j != b:
+				_damage(j, 100000.0, c, false, true)
+	if hurt_player and in_blast(player_pos) and not is_over():
+		blast_hit = true
+		_take_player_damage(max_hp * blast_damage())
+		messages.append("Caught in the blast!")
+	elif not is_over():
+		messages.append("The machine is gone. Get out!")
+	radio.append(&"sabotage_blast")
 
 
 ## Nests: each living nest near the player (nest_wake_range()) spawns a
@@ -3189,6 +3424,12 @@ func objective_text() -> String:
 				if signal_fuelled():
 					return lit + "light %s (%d / %d s)" % [sname, int(signal_progress), int(signal_seconds())]
 				return lit + "find the fuel for %s" % sname
+			if mission == &"sabotage":
+				if sabotage_phase == SAB_POWER:
+					return "Cut the power (%d / %d s)" % [int(power_progress), int(power_seconds())]
+				var k: int = nearest_unplanted()
+				return "Plant the charges (%d / %d, %d / %d s)" % [charges_planted(), charge_pos.size(),
+					int(charge_progress[k]) if k >= 0 else 0, int(charge_seconds())]
 			var done: int = 0
 			for p in generator_progress:
 				if p >= GameData.GENERATOR_HOLD_SECONDS:
@@ -3206,8 +3447,12 @@ func objective_text() -> String:
 				where = "to " + exit_label if exit_label != "" else "out along the path"
 			if mission == &"rescue" and survivor_found and not survivor_lost:
 				return "Escort the survivor %s! (HP %d)" % [where, int(survivor_hp)]
+			if mission == &"sabotage" and sabotage_phase == SAB_FUSE:
+				return "Get clear: the charges blow in %d s!" % ceili(fuse_left)
 			if has_exit():
 				return _exit_order() + "!"
+			if has_exfil():
+				return "Get to the exfil point!"
 			return "Return to the boat!"
 		Objective.WON:
 			return "Extracted!"

@@ -151,6 +151,14 @@ const PLACES: Dictionary = {
 		"chokes": {"FiftySteps": Vector2(254, 149), "WestSteps": Vector2(225, 156), "BlockAlleys": Vector2(210, 180),
 			"MineSteps": Vector2(197, 286)},
 		"arenas": {"NorthEast": Vector2(330, 95), "EastTerrace": Vector2(310, 255), "South": Vector2(65, 400)},
+		# Sabotage (Hashima's signature mission; island metres, from the OSM
+		# plans): the power switch at the substation (変電所) by pit 4, at
+		# the north end of the coal handling area; the charges on the
+		# conveyor's drive at its other end, at ground level beyond the last
+		# post of the elevated belt (ベルトコンベアー), and at the door of
+		# the loading room (詰込室) it fed. No ExfilPoint: the Boat marker
+		# is already the Dolphin Pier, reached along the sea wall.
+		"sabotage": {"switch": Vector2(283, 180), "machines": [Vector2(284, 246), Vector2(291, 257)]},
 		"scatter": [["Grass_Wispy_Short", 7000, 0.35, 3.0, 120.0, "green"], ["Grass_Common_Short", 3000, 0.3, 3.0, 100.0, "green"],
 			["Grass_Wispy_Tall", 1500, 0.7, 3.0, 160.0, "green"], ["Fern_1", 400, 0.8, 4.0, 200.0, "green"],
 			["Plant_1", 300, 0.6, 3.0, 160.0, "green"],
@@ -2123,6 +2131,21 @@ func _place_markers(map: IslandMap) -> bool:
 		var c: Vector2 = _farthest(f, reach, goals, walk / 10, walk, 12.0 if walk > 800 else 4.0)
 		_marker("Cache%d" % (k + 1), Vector3(c.x + 0.5, 0, c.y + 0.5))
 		goals.append(c)
+	# Sabotage markers (PLACES "sabotage"): the nearest clear, reachable
+	# cell to each spot (2 m clear: the charge ring is 3 m). After the
+	# caches, so the caches stay where they were.
+	var sab: Dictionary = P.get("sabotage", {})
+	if not sab.is_empty():
+		var sw: Vector2 = _reachable_near(f, reach, sab["switch"], 0.0, 30.0, 2)
+		_marker("PowerSwitch", Vector3(sw.x + 0.5, 0, sw.y + 0.5))
+		var machines: Array = sab["machines"]
+		for k in machines.size():
+			var m: Vector2 = _reachable_near(f, reach, machines[k], 0.0, 30.0, 2)
+			_marker("Machine_%d" % (k + 1), Vector3(m.x + 0.5, 0, m.y + 0.5))
+		if sab.has("exfil"):
+			var ex: Vector2 = _reachable_near(f, reach, sab["exfil"], 0.0, 30.0, 2)
+			_marker("ExfilPoint", Vector3(ex.x + 0.5, 0, ex.y + 0.5))
+		print("  sabotage: switch (%d, %d), %d machines" % [int(sw.x), int(sw.y), machines.size()])
 	# Choke points and arenas: markers for the level design (they do not
 	# change the game; screenshot.gd takes a close view of each).
 	for kind: String in ["chokes", "arenas"]:

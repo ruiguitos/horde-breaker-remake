@@ -25,7 +25,10 @@ extends Node3D
 ##                     order), Lighthouse (optional: the last signal, a
 ##                     lighthouse) and Fuel_1, Fuel_2... (the fuel for the
 ##                     signal of the same rank; the Lighthouse's is the
-##                     last one)
+##                     last one), and for Sabotage: PowerSwitch (cut
+##                     first), Machine_1, Machine_2... (the charges) and
+##                     ExfilPoint (optional: where to get out after the
+##                     charges are set; default: the boat/Exit)
 ## The island covers x, z in [0, size): keep everything inside that square.
 ## How to build one: game/README.md, "Ilhas feitas à mão".
 
@@ -165,6 +168,7 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	var searches: Array = []  # same, for the Search_* markers
 	var signals: Array = []  # same, for the Signal_* markers
 	var fuels: Array = []  # same, for the Fuel_* markers
+	var machines: Array = []  # same, for the Machine_* markers
 	for node in _children_of("Markers"):
 		if node.name.begins_with("Generator"):
 			map.generators.append(_flat(_local(node).origin))
@@ -182,6 +186,8 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 			signals.append([marker_number(String(node.name), "Signal"), _flat(_local(node).origin)])
 		elif node.name.begins_with("Fuel"):
 			fuels.append([marker_number(String(node.name), "Fuel"), _flat(_local(node).origin)])
+		elif node.name.begins_with("Machine"):
+			machines.append([marker_number(String(node.name), "Machine"), _flat(_local(node).origin)])
 	holds.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	for h: Array in holds:
 		map.hold_points.append(h[1])
@@ -204,7 +210,11 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	fuels.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	for fu: Array in fuels:
 		map.signal_fuel.append(fu[1])
-	for spot: Array in [["Exit", "exit"], ["RescueTarget", "rescue_target"], ["DefendZone", "defend_zone"], ["Delivery", "delivery"], ["Uplink", "uplink"]]:
+	machines.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	for mc: Array in machines:
+		map.machine_points.append(mc[1])
+	for spot: Array in [["Exit", "exit"], ["RescueTarget", "rescue_target"], ["DefendZone", "defend_zone"], ["Delivery", "delivery"], ["Uplink", "uplink"],
+			["PowerSwitch", "power_switch"], ["ExfilPoint", "exfil"]]:
 		var node: Node3D = get_node_or_null("Markers/" + spot[0])
 		if node != null:
 			map.set(spot[1], _flat(_local(node).origin))
@@ -217,10 +227,10 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	else:
 		f.compute_now(start_cell)
 		var spots: Array[Vector3] = []
-		for p: Vector3 in [map.exit, map.rescue_target, map.defend_zone, map.delivery, map.uplink]:
+		for p: Vector3 in [map.exit, map.rescue_target, map.defend_zone, map.delivery, map.uplink, map.power_switch, map.exfil]:
 			if p.x >= 0.0:
 				spots.append(p)
-		for list: Array in [["Boat", [map.boat]], ["Generator", map.generators], ["Cache", map.caches], ["Exit/RescueTarget/DefendZone/Delivery/Uplink", spots], ["HoldPoint", map.hold_points], ["Cargo", map.cargo_points], ["Nest", map.nest_points], ["Search", map.search_points], ["Signal/Lighthouse", map.signal_points], ["Fuel", map.signal_fuel]]:
+		for list: Array in [["Boat", [map.boat]], ["Generator", map.generators], ["Cache", map.caches], ["Exit/RescueTarget/DefendZone/Delivery/Uplink/PowerSwitch/ExfilPoint", spots], ["HoldPoint", map.hold_points], ["Cargo", map.cargo_points], ["Nest", map.nest_points], ["Search", map.search_points], ["Signal/Lighthouse", map.signal_points], ["Fuel", map.signal_fuel], ["Machine", map.machine_points]]:
 			for p: Vector3 in list[1]:
 				if f.distance_at(p) >= FlowField.UNREACHABLE:
 					problems.append("%s at (%d, %d) cannot be reached from the start." % [list[0], int(p.x), int(p.z)])
@@ -270,12 +280,30 @@ func _block_outside(f: FlowField) -> void:
 			x += 1
 
 
-## A hand-made island for this biome (stable per seed), or null.
-static func pick(biome_id: StringName, seed_value: int) -> PackedScene:
-	var found: PackedStringArray = island_paths(biome_id)
+## A hand-made island for this biome (stable per seed), or null. With a
+## `mission` whose data names preferred_islands (Sabotage: port_hashima),
+## only those of this biome's islands are used when there is one: the
+## mission was drawn on the boat, so the island follows it (the mission is
+## never changed after the briefing). Otherwise any island of the biome.
+static func pick(biome_id: StringName, seed_value: int, mission_id: StringName = &"") -> PackedScene:
+	var found: PackedStringArray = preferred_paths(island_paths(biome_id), mission_id)
 	if found.is_empty():
 		return null
 	return load(found[absi(seed_value) % found.size()]) as PackedScene
+
+
+## The paths in `paths` that `mission_id` prefers (its preferred_islands,
+## by file name without extension); all of `paths` when it prefers none of
+## them. Reads only the mission data: no scene is loaded to decide.
+static func preferred_paths(paths: PackedStringArray, mission_id: StringName) -> PackedStringArray:
+	var wanted: Array = GameData.MISSIONS.get(mission_id, {}).get("preferred_islands", [])
+	if wanted.is_empty():
+		return paths
+	var out: PackedStringArray = []
+	for path in paths:
+		if path.get_file().get_basename() in wanted:
+			out.append(path)
+	return out if not out.is_empty() else paths
 
 
 ## Paths of the islands in ISLANDS_DIR, sorted; only that biome's when

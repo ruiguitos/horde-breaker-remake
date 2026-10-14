@@ -238,6 +238,19 @@ depois de a construir, ou muda o script.
     - **Hashima:** no poço 2 da mina (第二坑捲), no Bloco 65 e no poço 4
       (四坑上家).
   - **Caixas:** nas pontas da ilha, o mais longe possível de tudo.
+  - **Sabotage (Hashima, `sabotage` no preset):** o `PowerSwitch` na
+    subestação (変電所) junto ao poço 4, no extremo norte da zona do carvão;
+    o `Machine_1` no chão, depois do último pilar do tapete transportador
+    (ベルトコンベアー, elevado: os marcadores ficam nas pontas, não por
+    baixo da passadeira), e o `Machine_2` à porta da sala de carregamento
+    (詰込室). Cada um vai para a célula livre (2 m) e alcançável mais perto
+    do ponto do preset; ficaram a 9 m, 3 m e 9 m do sítio real (as plantas
+    dos edifícios bloqueiam). Não há `ExfilPoint`: o `Boat` já é o cais
+    Dolphin, e a retirada faz-se pelo caminho junto ao paredão (135 m a pé
+    das cargas ao barco; 239 m do desembarque ao quadro). São colocados
+    depois das caixas, por isso o resto da ilha não muda: a reconstrução de
+    2026-10-14 só alterou o `port_hashima.scn` (mais 3 marcadores); o
+    terreno, as texturas e a grelha ficaram iguais byte a byte.
 
 ## Expedição Berlenga
 
@@ -334,7 +347,7 @@ Ambiente: Windows 11, Godot 4.7.2, AMD Ryzen 5 5600, NVIDIA RTX 5060.
 | Rota Activate pela grelha (troços) | cerca de 2,4 km: 229 + 414 + 737 + 1056 m | cerca de 1,3 km: 142 + 642 + 281 + 221 m |
 | Passo da simulação (bot) | 1,1 a 1,3 ms em média, pior 8 ms | 1,6 a 1,8 ms em média (até 150 vivos), pior 8,5 ms |
 | Frame em jogo a 1920 × 1080 (Ultra, horda a chegar) | 4,6 a 6,2 ms | 3,4 a 4,3 ms |
-| Bot invencível, Threat 2 | Activate 6 min, Defend 4,5 min, Rescue 3,5 min | Activate 2,5 min, Defend 2,5 min, Rescue 1,5 min |
+| Bot invencível, Threat 2 | Activate 6 min, Defend 4,5 min, Rescue 3,5 min | Activate 2,5 min, Defend 2,5 min, Rescue 1,5 min, Sabotage 1,5 min (81 s) |
 
 ## Limites
 

@@ -53,6 +53,14 @@ var uplink := Vector3(-1, 0, -1)
 var signal_points: Array[Vector3] = []
 var signal_lighthouse: bool = false
 var signal_fuel: Array[Vector3] = []
+## Sabotage: the power switch to cut first (PowerSwitch marker; x < 0 = the
+## run picks it, pick_power_switch), the machines to plant the charges on
+## (Machine_* markers in number order; empty = picked near the switch,
+## pick_machine_points) and where to get out after (ExfilPoint marker;
+## x < 0 = the usual extraction point, the boat).
+var power_switch := Vector3(-1, 0, -1)
+var machine_points: Array[Vector3] = []
+var exfil := Vector3(-1, 0, -1)
 ## Optional supply caches (detours with a reward).
 var caches: Array[Vector3] = []
 ## Biome id: beach, town, jungle, port or volcano (see GameData.BIOMES).
@@ -309,6 +317,70 @@ static func pick_signal_fuel_points(map: IslandMap, signals: Array[Vector3], rng
 				best_off = off
 				best = p
 		out.append(best if best.x >= 0.0 else s)
+	return out
+
+
+## Sabotage on a map without a PowerSwitch marker: a hold-point candidate
+## (reachable, HOLD_MIN_FROM_BOAT off the boat, 4 m of open ground) at
+## least POWER_FAR_SHARE of the farthest candidate's walk from the start,
+## the first in the seeded shuffle: deep in the island, but not always the
+## same spot. x < 0 = none (a map too small to pick from).
+const POWER_FAR_SHARE: float = 0.6
+
+static func pick_power_switch(map: IslandMap, rng_seed: int) -> Vector3:
+	var cands: Array = _hold_candidates(map, rng_seed ^ 0x504f5752, 4.0)
+	var candidates: Array[Vector3] = cands[0]
+	var dist: Dictionary = cands[1]
+	var w: int = map.field.width
+	var far: int = 0
+	for p in candidates:
+		far = maxi(far, int(dist[int(p.z) * w + int(p.x)]))
+	for p in candidates:
+		if int(dist[int(p.z) * w + int(p.x)]) >= int(far * POWER_FAR_SHARE):
+			return p
+	return Vector3(-1, 0, -1)
+
+
+## Sabotage: where the machines stand (the charges) on a map without
+## Machine_* markers: this many metres (flat) from the power switch, so the
+## cut and the charges are two places, and MACHINE_APART from each other
+## (spread: one blast does not cover the other's approach). Candidates are
+## the hold-point candidates (reachable from the start, off the boat, 3 m
+## open, shuffled per seed); the first ones in the band win. Too few in the
+## band: the remaining candidates closest to the middle of the band; none
+## at all: the switch itself (never a softlock).
+const MACHINE_MIN: float = 30.0
+const MACHINE_MAX: float = 60.0
+const MACHINE_APART: float = 12.0
+
+static func pick_machine_points(map: IslandMap, switch: Vector3, count: int, rng_seed: int) -> Array[Vector3]:
+	var out: Array[Vector3] = []
+	if count <= 0:
+		return out
+	var candidates: Array[Vector3] = _hold_candidates(map, rng_seed ^ 0x4d414348, 3.0)[0]
+	var apart := func(p: Vector3, spacing: float) -> bool:
+		for q in out:
+			if Vector2(p.x - q.x, p.z - q.z).length() < spacing:
+				return false
+		return true
+	for p in candidates:
+		var d: float = Vector2(p.x - switch.x, p.z - switch.z).length()
+		if d >= MACHINE_MIN and d <= MACHINE_MAX and apart.call(p, MACHINE_APART):
+			out.append(p)
+			if out.size() == count:
+				return out
+	# Not enough in the band: the closest to its middle, still apart.
+	var mid: float = (MACHINE_MIN + MACHINE_MAX) * 0.5
+	var rest: Array[Vector3] = candidates.duplicate()
+	rest.sort_custom(func(a: Vector3, b: Vector3) -> bool:
+		return absf(Vector2(a.x - switch.x, a.z - switch.z).length() - mid) < absf(Vector2(b.x - switch.x, b.z - switch.z).length() - mid))
+	for p in rest:
+		if out.size() == count:
+			break
+		if Vector2(p.x - switch.x, p.z - switch.z).length() >= HOLD_MIN_SPACING and apart.call(p, MACHINE_APART * 0.5):
+			out.append(p)
+	while out.size() < count:
+		out.append(switch)
 	return out
 
 
