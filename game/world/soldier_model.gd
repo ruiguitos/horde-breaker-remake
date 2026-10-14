@@ -164,7 +164,9 @@ func _leg(hip: Vector3, pad: float) -> Node3D:
 	return pivot
 
 
-## The equipped weapon, held diagonally across the chest.
+## The equipped weapon (WeaponModel). On the delivered rigs it sits on the
+## right hand at the GLB rifle's grip; the GLB rifle itself stays hidden
+## (WeaponModel's rifle copies its parts with real materials).
 func set_weapon(id: StringName) -> void:
 	if weapon_id == id:
 		return
@@ -173,38 +175,19 @@ func set_weapon(id: StringName) -> void:
 		_gun_node.get_parent().remove_child(_gun_node)
 		_gun_node.queue_free()
 		_gun_node = null
-	if _skeleton != null:
-		for part in _rifle_parts:
-			part.visible = id == &"rifle"
-		if id == &"rifle":
-			muzzle = _rifle_muzzle
-			return
-	var shotgun: bool = id == &"shotgun"
-	var gun := Node3D.new()
+	for part in _rifle_parts:
+		part.visible = false
+	var gun := WeaponModel.build(id)
 	_gun_node = gun
 	if _skeleton != null:
-		# Mount's -Z follows the delivered rifle's barrel on the animated hand.
-		gun.position = Vector3(0, 0, 0.32)
+		gun.position = WeaponModel.GRIP_FROM_MUZZLE
 		_gun_mount.add_child(gun)
 	else:
-		gun.position = Vector3(0.08, -0.26, -0.38)
+		gun.position = Vector3(0.18, -0.24, -0.34)  # grip in the right glove
 		gun.rotation_degrees = Vector3(0, -8, 0)
 		_arm_pivot.add_child(gun)
-	var length: float = {&"shotgun": 0.62, &"smg": 0.48, &"machine_gun": 0.9, &"marksman": 0.92}.get(id, 0.78)
-	_box(gun, Vector3(0.07, 0.11, length), Vector3(0, 0, 0), "gun")  # receiver + barrel
-	_box(gun, Vector3(0.06, 0.12, 0.24), Vector3(0, -0.02, length * 0.5 + 0.1), "gun")  # stock
-	if shotgun:
-		_box(gun, Vector3(0.09, 0.08, 0.3), Vector3(0, -0.08, -0.12), "dark")  # pump
-	elif id == &"machine_gun":
-		_box(gun, Vector3(0.18, 0.18, 0.15), Vector3(0.06, -0.14, -0.08), "gun")
-	else:
-		_box(gun, Vector3(0.05, 0.16, 0.08), Vector3(0, -0.12, -0.04), "gun")  # magazine
-		_box(gun, Vector3(0.05, 0.05, 0.14), Vector3(0, 0.08, 0.02), "dark")  # sight
-	if id == &"marksman":
-		_box(gun, Vector3(0.06, 0.06, 0.23), Vector3(0, 0.12, 0), "dark")
-	muzzle = Node3D.new()
-	muzzle.position = Vector3(0, 0, -length * 0.5 - 0.05)
-	gun.add_child(muzzle)
+	# The rifle's tip is exactly the GLB's Muzzle (animated with the hand).
+	muzzle = _rifle_muzzle if _rifle_muzzle != null and gun.weapon_id == &"rifle" else gun.muzzle
 	if _shadow_only:
 		set_shadow_only(true)
 

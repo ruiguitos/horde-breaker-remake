@@ -209,6 +209,7 @@ var _debris_color := PackedColorArray()
 ## Debris size; a negative value marks a severed head (drawn as a sphere).
 var _debris_size := PackedFloat32Array()
 var _head_debris_mm := MultiMesh.new()
+var _zombies := ZombieHordeView.new()  ## common zombies (ZombieModel); others stay capsules
 var _breaker_held: bool = false
 var _trauma: float = 0.0
 var _last_hp: float = -1.0
@@ -461,6 +462,7 @@ func _build_world() -> void:
 	chunk.size = Vector3(0.25, 0.25, 0.25)
 	_setup_multimesh(_debris_mm, chunk, true)
 	_setup_multimesh(_head_debris_mm, _sphere(0.24), true)
+	add_child(_zombies)
 
 	var tracer := MeshInstance3D.new()
 	tracer.mesh = _tracer_mesh
@@ -1622,7 +1624,7 @@ func _physics_process(delta: float) -> void:
 		run.hp = run.max_hp
 		run.card_choices.clear()
 		run.clear_crosshair()
-		run.step(delta, Vector2.ZERO, Vector3(1, 0, 0), false, true)  # sprint = gun silent
+		run.step(delta, Vector2.ZERO, Vector3(1, 0, 0), false)
 		return
 	if paused:
 		return
@@ -2168,7 +2170,14 @@ func _draw_enemies() -> void:
 	_enemy_mm.instance_count = h.count
 	_head_mm.instance_count = h.count
 	_arm_mm.instance_count = h.count * 2
+	_zombies.draw(h, run.map, now, 0.0 if paused else get_process_delta_time())
 	for i in h.count:
+		if _zombies.handles(h.kinds[i]):  # drawn by ZombieHordeView instead
+			_enemy_mm.set_instance_transform(i, ZombieHordeView.HIDDEN)
+			_head_mm.set_instance_transform(i, ZombieHordeView.HIDDEN)
+			_arm_mm.set_instance_transform(i * 2, ZombieHordeView.HIDDEN)
+			_arm_mm.set_instance_transform(i * 2 + 1, ZombieHordeView.HIDDEN)
+			continue
 		var t: GameData.EnemyType = h.types[h.kinds[i]]
 		var v: Vector3 = h.velocities[i]
 		var speed: float = Vector2(v.x, v.z).length()
@@ -2398,18 +2407,20 @@ func _draw_effects(delta: float) -> void:
 			_trauma = minf(1.0, _trauma + 0.3)
 		var origin := Vector3(d.x, gy + 1.0, d.y)
 		var sx: float = t.radius_scale
+		_zombies.on_death(d, Vector3(d.x, gy, d.y), run.player_pos)  # the body falls (common zombies)
+		var chunk: Color = ZombieHordeView.DEBRIS_COLOR if _zombies.handles(int(d.z)) else t.color
 		for k in 3:
 			var vel := Vector3(randf_range(-3, 3), randf_range(3, 7), randf_range(-3, 3))
-			_add_debris(origin + Vector3(0, t.height * 0.4, 0), vel, t.color, sx)
+			_add_debris(origin + Vector3(0, t.height * 0.4, 0), vel, chunk, sx)
 		if d.w > 0.5:
 			# Headshot: the head pops off, upwards, with a spray of red bits.
-			var head_col: Color = t.color.lerp(Color(0.85, 0.8, 0.7), 0.45)
+			var head_col: Color = ZombieModel.SKIN_TINT.darkened(0.3) if _zombies.handles(int(d.z)) else t.color.lerp(Color(0.85, 0.8, 0.7), 0.45)
 			_add_debris(Vector3(d.x, gy + t.height + 0.1, d.y), Vector3(randf_range(-2, 2), 9.0, randf_range(-2, 2)), head_col, -sx)
 			for k in 4:
 				_add_debris(Vector3(d.x, gy + t.height, d.y), Vector3(randf_range(-4, 4), randf_range(4, 8), randf_range(-4, 4)), Color(0.75, 0.05, 0.05), 0.4)
 		else:
 			# Body shot: an arm comes off.
-			_add_debris(origin + Vector3(0, t.height * 0.3, 0), Vector3(randf_range(-4, 4), 5.0, randf_range(-4, 4)), t.color, sx * 1.6)
+			_add_debris(origin + Vector3(0, t.height * 0.3, 0), Vector3(randf_range(-4, 4), 5.0, randf_range(-4, 4)), chunk, sx * 1.6)
 	run.deaths.clear()
 	var i: int = _debris_pos.size() - 1
 	while i >= 0:

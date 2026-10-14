@@ -44,7 +44,8 @@ func _test_soldier(class_id: StringName) -> void:
 		soldier.free()
 		return
 	_check(player.current_animation == "UAL/Idle_Loop", String(class_id) + " starts in the rifle-hold idle pose")
-	_check(player.get_animation_list().size() == 46 and (soldier.get("_model") as Node).find_children("*", "MeshInstance3D", true, false).size() == 104,
+	_check(player.get_animation_list().size() == 46 and (soldier.get("_model") as Node).find_children("*", "MeshInstance3D", true, false).filter(func(n: Node) -> bool:
+		return not String(n.get_path()).contains("WeaponMount")).size() == 104,
 		"Delivered 46 clips and 104 rigid pieces remain intact")
 	soldier.call("animate", 1.0, 0.1, false, 0.1)
 	_check(player.current_animation == "UAL/Walk_Loop", "Movement selects Walk")
@@ -59,8 +60,10 @@ func _test_soldier(class_id: StringName) -> void:
 		soldier.set_weapon(id)
 		await process_frame
 		_check(soldier.muzzle != null and soldier.muzzle.is_inside_tree(), String(id) + " has a live muzzle on the animated hand")
+		# WeaponModel replaces the delivered rifle (its rifle copies the GLB's parts).
 		var rifle_visible: bool = (soldier.find_child("Rifle_Barrel", true, false) as MeshInstance3D).visible
-		_check(rifle_visible == (id == &"rifle"), String(id) + " shows only its equipped weapon")
+		var guns: Array[Node] = soldier.find_children("Weapon_*", "Node3D", true, false)
+		_check(not rifle_visible and guns.size() == 1 and guns[0].name == "Weapon_" + String(id), String(id) + " shows only its equipped weapon")
 		soldier.set_shadow_only(true)
 		_check(soldier.find_children("*", "MeshInstance3D", true, false).all(func(n: Node) -> bool:
 			return (n as MeshInstance3D).cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY), String(id) + " stays shadow-only in first person")
