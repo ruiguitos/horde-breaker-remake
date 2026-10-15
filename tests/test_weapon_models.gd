@@ -1,6 +1,6 @@
 extends SceneTree
-## Weapon art (WeaponModel): the five guns build headless with Poly Haven
-## materials at sane sizes; SoldierModel (third person, Armory) and
+## Weapon art (WeaponModel): the five original GLBs retain their geometry,
+## PBR materials and muzzle in game; SoldierModel (third person, Armory) and
 ## ViewModel (first person) show the equipped one; in the island every
 ## camera mode shows the right gun, and common zombies are drawn by
 ## ZombieHordeView instead of capsules.
@@ -13,6 +13,8 @@ class MemoryProfile extends Profile:
 ## Muzzle to butt, metres: real guns are ~0.6 (SMG) to ~1.15 m (marksman).
 const LENGTHS: Dictionary = {&"rifle": Vector2(0.9, 1.0), &"smg": Vector2(0.6, 0.8), &"machine_gun": Vector2(0.95, 1.1),
 	&"shotgun": Vector2(0.95, 1.1), &"marksman": Vector2(1.05, 1.2)}
+const GLB_TRIANGLES: Dictionary = {&"rifle": 7482, &"smg": 6292, &"machine_gun": 7940, &"shotgun": 4550, &"marksman": 7708}
+const GLB_LENGTHS: Dictionary = {&"rifle": 0.96, &"smg": 0.74, &"machine_gun": 1.04, &"shotgun": 1.04, &"marksman": 1.12}
 
 var _failures: int = 0
 var _done: bool = false
@@ -45,19 +47,35 @@ func _test_models() -> void:
 	for id: StringName in WeaponModel.IDS:
 		var w := WeaponModel.build(id)
 		var range_ok: Vector2 = LENGTHS[id]
-		_check(w.weapon_id == id and w.muzzle != null and w.muzzle.position.z < -0.45 and absf(w.muzzle.position.y) < 0.12,
+		_check(w.weapon_id == id and w.muzzle != null and w.muzzle.position.z < -0.4 and absf(w.muzzle.position.y) < 0.16,
 			"%s: muzzle ahead of the grip (%.2f m)" % [id, -w.muzzle.position.z])
 		_check(w.length >= range_ok.x and w.length <= range_ok.y, "%s: %.2f m long" % [id, w.length])
-		var textured: bool = true
-		var parts: int = 0
-		for c in w.get_children():
-			if c is MeshInstance3D:
-				parts += 1
-				var m := (c as MeshInstance3D).material_override as StandardMaterial3D
-				textured = textured and m != null and (m.albedo_texture != null or m.albedo_color.v < 0.05)
-		_check(textured and parts >= 9, "%s: %d blocky parts, all with Poly Haven textures (bore excepted)" % [id, parts])
+		_check(absf(w.length - float(GLB_LENGTHS[id])) <= 0.02, "%s: GLB real-world length within 2 cm" % id)
+		var triangles: int = 0
+		var surfaces: int = 0
+		var attributes_ok: bool = true
+		var materials_ok: bool = true
+		for part: MeshInstance3D in w.find_children("*", "MeshInstance3D", true, false):
+			_check(part.mesh is ArrayMesh, "%s: imported geometry, not a primitive" % id)
+			for surface: int in part.mesh.get_surface_count():
+				surfaces += 1
+				var arrays: Array = part.mesh.surface_get_arrays(surface)
+				var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+				var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
+				triangles += int(indices.size() / 3) if not indices.is_empty() else int(vertices.size() / 3)
+				attributes_ok = attributes_ok and arrays[Mesh.ARRAY_NORMAL] != null and arrays[Mesh.ARRAY_TANGENT] != null and arrays[Mesh.ARRAY_TEX_UV] != null
+				if attributes_ok:
+					attributes_ok = arrays[Mesh.ARRAY_NORMAL].size() == vertices.size() and arrays[Mesh.ARRAY_TANGENT].size() == vertices.size() * 4 and arrays[Mesh.ARRAY_TEX_UV].size() == vertices.size()
+				var material := part.get_active_material(surface) as StandardMaterial3D
+				materials_ok = materials_ok and material != null and material.resource_name in ["gunmetal", "steel", "polymer", "wood", "rust", "bore"]
+		_check(triangles == int(GLB_TRIANGLES[id]), "%s: all %d source GLB triangles retained (%d)" % [id, GLB_TRIANGLES[id], triangles])
+		_check(surfaces >= 4 and surfaces <= 6 and materials_ok, "%s: batched by the original PBR materials (%d surfaces)" % [id, surfaces])
+		_check(attributes_ok, "%s: exported normals, tangents and UVs retained" % id)
+		_check(w.muzzle.get_parent() == w and w.muzzle.basis.is_equal_approx(Basis.IDENTITY), "%s: muzzle in grip space, -Z forward" % id)
 		w.free()
-	_check(WeaponModel.build(&"pistol").weapon_id == &"rifle", "unknown ids fall back to the rifle")
+	var fallback := WeaponModel.build(&"pistol")
+	_check(fallback.weapon_id == &"rifle", "unknown ids fall back to the rifle")
+	fallback.free()
 	_check(WeaponModel.material("gunmetal") == WeaponModel.material("gunmetal"), "materials are shared between guns")
 
 
@@ -71,11 +89,8 @@ func _test_soldiers() -> void:
 			var on_hand: bool = guns.size() == 1 and guns[0].get_parent().name == "WeaponMount"
 			_check(on_hand and guns[0].name == "Weapon_" + String(id) and s.muzzle != null and s.muzzle.get_parent() != null,
 				"%s holds the %s on the right hand, muzzle live" % [class_id, id])
-		# The rifle's muzzle is the GLB's own Muzzle node (WeaponModel copies it).
-		s.set_weapon(&"rifle")
-		var gun := s.find_child("Weapon_rifle", true, false) as WeaponModel
-		var tip: Vector3 = gun.muzzle.global_position
-		_check(tip.distance_to(s.muzzle.global_position) < 0.005, "%s: the rifle copy's tip sits on the GLB Muzzle (%.4f m)" % [class_id, tip.distance_to(s.muzzle.global_position)])
+			var gun := guns[0] as WeaponModel
+			_check(s.muzzle == gun.muzzle, "%s %s: shots use the equipped GLB muzzle" % [class_id, id])
 		s.free()
 
 
@@ -132,7 +147,7 @@ func _scene_tests() -> void:
 			var shown: bool = view_model.visible == fp and (not fp or view_model.weapon_id == id)
 			_check(held and shown, "%s camera: %s in the soldier's hands%s" % [Profile.CAMERA_MODE_NAMES[mode], id, " and in first person" if fp else ""])
 	slot.id = original
-	# Common zombies: drawn by ZombieHordeView, their capsules hidden.
+	# All enemy kinds use ZombieHordeView; walkers and brutes have distinct meshes.
 	var p: Vector3 = run.player_pos
 	for k in 6:
 		run.horde.add(p + Vector3(-5 + k * 2, 0, -12), GameData.EnemyKind.WALKER if k < 4 else GameData.EnemyKind.BRUTE, run.rng)
@@ -143,14 +158,15 @@ func _scene_tests() -> void:
 	island.set("paused", true)
 	await _settle(2)
 	var drawn: int = 0
-	for v in ZombieModel.VARIANTS:
+	for v in ZombieHordeView.VARIANTS:
 		drawn += zombies.instance_count(v)
 	var walkers: int = 0
 	for k in run.horde.count:
 		if run.horde.kinds[k] == GameData.EnemyKind.WALKER:
 			walkers += 1
-	_check(walkers + zombies.corpse_count() == 4 and drawn == 4,
-		"island draws the 4 walkers with ZombieModel (%d alive + %d corpses), the 2 brutes stay capsules" % [walkers, zombies.corpse_count()])
+	_check(walkers + zombies.corpse_count() == 4 and drawn == 6
+		and zombies.instance_count(ZombieHordeView.variant_for(GameData.EnemyKind.BRUTE, 0.0)) == 2,
+		"island draws 4 walkers (%d alive + %d corpses) and 2 distinct brute models" % [walkers, zombies.corpse_count()])
 	island.queue_free()
 	await _settle(2)
 	_finish()

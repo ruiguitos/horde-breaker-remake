@@ -1,0 +1,61 @@
+{
+  "status": "integrated",
+  "godot_version": "4.7.2",
+  "source_assets_unchanged": true,
+  "runtime_material_surfaces": {
+    "rifle": 4,
+    "smg": 4,
+    "machine_gun": 5,
+    "shotgun": 5,
+    "marksman": 5
+  },
+  "support_palm_error_limit_m": 0.002,
+  "tested_classes": [
+    "recruit",
+    "vanguard"
+  ],
+  "focused_tests": {
+    "tests/test_weapon_models.gd": true,
+    "tests/test_weapon_grips.gd": true,
+    "tests/test_recruit_animation.gd": true,
+    "tests/test_camera_aim.gd": true,
+    "tests/test_weapon_loadout.gd": true,
+    "tests/test_soak_run.gd": true
+  },
+  "suite": {
+    "passed": 45,
+    "attempted": 47,
+    "total": 47,
+    "failures": [
+      {
+        "test": "tests/test_escort.gd",
+        "passed": false,
+        "failures": [
+          "TEST FAIL: bot seed 505 (beach): Repair the cart (0 / 5 s) in 900 s; at the cart at 29 s, stops at 70 s, delivered at -1 s; 45 s blocked, 0 s waiting, 1 breakdowns; 4074 kills, up to 150 enemies alive, Intel 1116 (85.2 s of CPU)",
+          "180 second timeout"
+        ],
+        "seconds": 180.03
+      },
+      {
+        "test": "tests/test_intel_search.gd",
+        "passed": false,
+        "exit_code": 3221225477,
+        "failures": [
+          "TEST FAIL: boat routes: Intel Search on 14% of Town routes, 10% elsewhere (still possible)"
+        ],
+        "seconds": 87.73
+      }
+    ]
+  },
+  "visual_checks": [
+    "in_game_hands.png",
+    "in_game_hands_vanguard.png",
+    "in_game_fp_rifle.png",
+    "in_game_fp_smg.png",
+    "in_game_fp_machine_gun.png",
+    "in_game_fp_shotgun.png",
+    "in_game_fp_marksman.png"
+  ],
+  "jev_code_review": "blocked_by_automatic_approval_review; not executed",
+  "existing_locomotion_preserved": true
+}

@@ -1,0 +1,738 @@
+{
+  "topology": [
+    {
+      "part": "Walnut thumbhole stock",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.0016187558396325737
+    },
+    {
+      "part": "Walnut grip web",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.00023601057082727256
+    },
+    {
+      "part": "DMR recoil pad",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.036231725011156e-05
+    },
+    {
+      "part": "Raised cheek rest",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.0001991241690543414
+    },
+    {
+      "part": "Cheek rest screw",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.656141356516061e-08
+    },
+    {
+      "part": "Stock through bolt",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.606406780970312e-08
+    },
+    {
+      "part": "Cheek rest screw.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.656141667406431e-08
+    },
+    {
+      "part": "Stock through bolt.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.606406852471582e-08
+    },
+    {
+      "part": "DMR milled receiver",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.001239494372180553
+    },
+    {
+      "part": "DMR receiver cover",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.0002441216027863517
+    },
+    {
+      "part": "DMR bolt carrier",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.8394787979330546e-06
+    },
+    {
+      "part": "DMR bolt handle",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.5072310354592045e-06
+    },
+    {
+      "part": "DMR cocking knob",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 7.318241783588158e-07
+    },
+    {
+      "part": "Trigger guard",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.413201435333784e-05
+    },
+    {
+      "part": "Curved trigger",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.7691507834333005e-06
+    },
+    {
+      "part": "Ten round DMR magazine",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.00020259352020410493
+    },
+    {
+      "part": "Magazine floor plate",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 9.788653935208928e-06
+    },
+    {
+      "part": "Magazine pressed stiffener",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.251071081956404e-07
+    },
+    {
+      "part": "Magazine pressed stiffener.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.251071119451506e-07
+    },
+    {
+      "part": "Magazine pressed stiffener.002",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.251071107231514e-07
+    },
+    {
+      "part": "Magazine pressed stiffener.003",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.251071081956401e-07
+    },
+    {
+      "part": "Magazine pressed stiffener.004",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.2510711194515059e-07
+    },
+    {
+      "part": "Magazine pressed stiffener.005",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.2510711072315188e-07
+    },
+    {
+      "part": "Walnut ventilated handguard",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.0002963863192670587
+    },
+    {
+      "part": "DMR barrel",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 7.39004249314731e-05
+    },
+    {
+      "part": "DMR gas tube",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.282476747876747e-05
+    },
+    {
+      "part": "Gas block",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.802970105334014e-05
+    },
+    {
+      "part": "Handguard retaining band",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.4117213128506847e-05
+    },
+    {
+      "part": "DMR muzzle brake",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.0231539889672106e-05
+    },
+    {
+      "part": "Bore shadow",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.694605409311763e-08
+    },
+    {
+      "part": "Scope side dovetail",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4935348545424185e-05
+    },
+    {
+      "part": "Scope support",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.1438072784148046e-05
+    },
+    {
+      "part": "Scope mounting ring",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.921092761955246e-06
+    },
+    {
+      "part": "Scope ring screw",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.131025174692685e-08
+    },
+    {
+      "part": "Scope ring screw.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.1310250547345584e-08
+    },
+    {
+      "part": "Scope support.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.1438072783501977e-05
+    },
+    {
+      "part": "Scope mounting ring.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.921091943540154e-06
+    },
+    {
+      "part": "Scope ring screw.002",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.131024725350926e-08
+    },
+    {
+      "part": "Scope ring screw.003",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.131024626382141e-08
+    },
+    {
+      "part": "Scope optical housing",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.0003556046461307042
+    },
+    {
+      "part": "Objective lens",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.347201182784855e-06
+    },
+    {
+      "part": "Eyepiece lens",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.638529470891282e-07
+    },
+    {
+      "part": "Ocular rubber collar",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.2911403378517717e-05
+    },
+    {
+      "part": "Elevation turret",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.853277517591647e-06
+    },
+    {
+      "part": "Windage turret",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 7.0618457333701785e-06
+    },
+    {
+      "part": "Turret knurl",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.911350012918515e-09
+    },
+    {
+      "part": "Turret knurl.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.911350012918462e-09
+    },
+    {
+      "part": "Turret knurl.002",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.911356858103113e-09
+    },
+    {
+      "part": "Turret knurl.003",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.911355146807191e-09
+    },
+    {
+      "part": "Turret knurl.004",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.911356858102663e-09
+    },
+    {
+      "part": "Turret knurl.005",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.91135001291776e-09
+    },
+    {
+      "part": "Turret knurl.006",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.911350012918025e-09
+    },
+    {
+      "part": "Turret knurl.007",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.911365821199673e-09
+    },
+    {
+      "part": "Turret knurl.008",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.911372666398227e-09
+    },
+    {
+      "part": "Turret knurl.009",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.911370955098349e-09
+    },
+    {
+      "part": "Turret knurl.010",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.911372666398406e-09
+    },
+    {
+      "part": "Turret knurl.011",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.911365821199839e-09
+    },
+    {
+      "part": "DMR receiver pin",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.656150942530403e-08
+    },
+    {
+      "part": "DMR receiver pin.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.6561509100989445e-08
+    },
+    {
+      "part": "DMR selector lever",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.696170080988242e-06
+    }
+  ],
+  "intersections": {
+    "self_intersection_candidates": [],
+    "interpenetration_samples": [
+      {
+        "parts": [
+          "Walnut thumbhole stock",
+          "DMR milled receiver"
+        ],
+        "surface_crossings": 38,
+        "maximum_sampled_depth_m": 0.01666666753590107
+      },
+      {
+        "parts": [
+          "Walnut grip web",
+          "DMR milled receiver"
+        ],
+        "surface_crossings": 50,
+        "maximum_sampled_depth_m": 0.01646188646554947
+      },
+      {
+        "parts": [
+          "Walnut thumbhole stock",
+          "Walnut grip web"
+        ],
+        "surface_crossings": 38,
+        "maximum_sampled_depth_m": 0.01600000075995922
+      },
+      {
+        "parts": [
+          "Scope optical housing",
+          "Ocular rubber collar"
+        ],
+        "surface_crossings": 194,
+        "maximum_sampled_depth_m": 0.014529688283801079
+      },
+      {
+        "parts": [
+          "DMR receiver cover",
+          "Scope support"
+        ],
+        "surface_crossings": 48,
+        "maximum_sampled_depth_m": 0.006109958048909903
+      },
+      {
+        "parts": [
+          "DMR milled receiver",
+          "Curved trigger"
+        ],
+        "surface_crossings": 18,
+        "maximum_sampled_depth_m": 0.005955822765827179
+      },
+      {
+        "parts": [
+          "DMR barrel",
+          "Gas block"
+        ],
+        "surface_crossings": 94,
+        "maximum_sampled_depth_m": 0.005213743541389704
+      },
+      {
+        "parts": [
+          "DMR barrel",
+          "Handguard retaining band"
+        ],
+        "surface_crossings": 62,
+        "maximum_sampled_depth_m": 0.004500001668930054
+      },
+      {
+        "parts": [
+          "Scope side dovetail",
+          "Scope support"
+        ],
+        "surface_crossings": 31,
+        "maximum_sampled_depth_m": 0.0040000006556510925
+      },
+      {
+        "parts": [
+          "Walnut ventilated handguard",
+          "Handguard retaining band"
+        ],
+        "surface_crossings": 153,
+        "maximum_sampled_depth_m": 0.0036215363070368767
+      },
+      {
+        "parts": [
+          "DMR bolt handle",
+          "DMR cocking knob"
+        ],
+        "surface_crossings": 43,
+        "maximum_sampled_depth_m": 0.0035581772681325674
+      },
+      {
+        "parts": [
+          "DMR receiver cover",
+          "Scope support.001"
+        ],
+        "surface_crossings": 48,
+        "maximum_sampled_depth_m": 0.0032458349596709013
+      },
+      {
+        "parts": [
+          "DMR milled receiver",
+          "Scope support"
+        ],
+        "surface_crossings": 33,
+        "maximum_sampled_depth_m": 0.003000006079673767
+      },
+      {
+        "parts": [
+          "DMR milled receiver",
+          "Scope support.001"
+        ],
+        "surface_crossings": 33,
+        "maximum_sampled_depth_m": 0.003000006079673767
+      },
+      {
+        "parts": [
+          "Walnut thumbhole stock",
+          "Trigger guard"
+        ],
+        "surface_crossings": 26,
+        "maximum_sampled_depth_m": 0.0024715662002563477
+      },
+      {
+        "parts": [
+          "DMR milled receiver",
+          "Trigger guard"
+        ],
+        "surface_crossings": 32,
+        "maximum_sampled_depth_m": 0.0020000003278255463
+      },
+      {
+        "parts": [
+          "Walnut thumbhole stock",
+          "Raised cheek rest"
+        ],
+        "surface_crossings": 20,
+        "maximum_sampled_depth_m": 0.0017360521014779806
+      },
+      {
+        "parts": [
+          "Scope support",
+          "Scope mounting ring"
+        ],
+        "surface_crossings": 20,
+        "maximum_sampled_depth_m": 0.0017101531848311424
+      },
+      {
+        "parts": [
+          "Scope support.001",
+          "Scope mounting ring.001"
+        ],
+        "surface_crossings": 20,
+        "maximum_sampled_depth_m": 0.0017101531848311424
+      },
+      {
+        "parts": [
+          "Scope optical housing",
+          "Windage turret"
+        ],
+        "surface_crossings": 51,
+        "maximum_sampled_depth_m": 0.0014927787706255913
+      },
+      {
+        "parts": [
+          "Walnut grip web",
+          "Trigger guard"
+        ],
+        "surface_crossings": 26,
+        "maximum_sampled_depth_m": 0.0012022631708532572
+      },
+      {
+        "parts": [
+          "DMR muzzle brake",
+          "Bore shadow"
+        ],
+        "surface_crossings": 40,
+        "maximum_sampled_depth_m": 0.0009999871253967285
+      },
+      {
+        "parts": [
+          "Scope optical housing",
+          "Elevation turret"
+        ],
+        "surface_crossings": 42,
+        "maximum_sampled_depth_m": 0.0009951831307262182
+      },
+      {
+        "parts": [
+          "Walnut ventilated handguard",
+          "DMR gas tube"
+        ],
+        "surface_crossings": 16,
+        "maximum_sampled_depth_m": 0.0009876894764602184
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.003"
+        ],
+        "surface_crossings": 12,
+        "maximum_sampled_depth_m": 0.0006913838442414999
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.009"
+        ],
+        "surface_crossings": 12,
+        "maximum_sampled_depth_m": 0.0006913820398040116
+      },
+      {
+        "parts": [
+          "DMR gas tube",
+          "Gas block"
+        ],
+        "surface_crossings": 84,
+        "maximum_sampled_depth_m": 0.0006467855419032276
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl"
+        ],
+        "surface_crossings": 13,
+        "maximum_sampled_depth_m": 0.0005805027903988957
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.006"
+        ],
+        "surface_crossings": 13,
+        "maximum_sampled_depth_m": 0.0005805018590763211
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.005"
+        ],
+        "surface_crossings": 12,
+        "maximum_sampled_depth_m": 0.0005677459994331002
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.007"
+        ],
+        "surface_crossings": 12,
+        "maximum_sampled_depth_m": 0.0005677459994331002
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.011"
+        ],
+        "surface_crossings": 12,
+        "maximum_sampled_depth_m": 0.0005677459994331002
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.001"
+        ],
+        "surface_crossings": 12,
+        "maximum_sampled_depth_m": 0.0005677451263181865
+      },
+      {
+        "parts": [
+          "DMR milled receiver",
+          "Scope side dovetail"
+        ],
+        "surface_crossings": 15,
+        "maximum_sampled_depth_m": 0.0005000010132789612
+      },
+      {
+        "parts": [
+          "Scope optical housing",
+          "Eyepiece lens"
+        ],
+        "surface_crossings": 61,
+        "maximum_sampled_depth_m": 0.0005000010132789612
+      },
+      {
+        "parts": [
+          "Ten round DMR magazine",
+          "Magazine pressed stiffener"
+        ],
+        "surface_crossings": 45,
+        "maximum_sampled_depth_m": 0.0004999660886824131
+      },
+      {
+        "parts": [
+          "Ten round DMR magazine",
+          "Magazine pressed stiffener.004"
+        ],
+        "surface_crossings": 46,
+        "maximum_sampled_depth_m": 0.0004999660886824131
+      },
+      {
+        "parts": [
+          "Ten round DMR magazine",
+          "Magazine pressed stiffener.005"
+        ],
+        "surface_crossings": 46,
+        "maximum_sampled_depth_m": 0.0004999660886824131
+      },
+      {
+        "parts": [
+          "Ten round DMR magazine",
+          "Magazine pressed stiffener.001"
+        ],
+        "surface_crossings": 46,
+        "maximum_sampled_depth_m": 0.0004999660304747522
+      },
+      {
+        "parts": [
+          "Ten round DMR magazine",
+          "Magazine pressed stiffener.002"
+        ],
+        "surface_crossings": 46,
+        "maximum_sampled_depth_m": 0.0004999660304747522
+      },
+      {
+        "parts": [
+          "Ten round DMR magazine",
+          "Magazine pressed stiffener.003"
+        ],
+        "surface_crossings": 45,
+        "maximum_sampled_depth_m": 0.0004999660304747522
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.004"
+        ],
+        "surface_crossings": 8,
+        "maximum_sampled_depth_m": 0.000492412073072046
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.002"
+        ],
+        "surface_crossings": 13,
+        "maximum_sampled_depth_m": 0.0004924116656184196
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.008"
+        ],
+        "surface_crossings": 13,
+        "maximum_sampled_depth_m": 0.0004924116656184196
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.010"
+        ],
+        "surface_crossings": 8,
+        "maximum_sampled_depth_m": 0.0004924108507111669
+      },
+      {
+        "parts": [
+          "DMR milled receiver",
+          "DMR gas tube"
+        ],
+        "surface_crossings": 3,
+        "maximum_sampled_depth_m": 1.4817253941146191e-05
+      }
+    ],
+    "method": "BVH surface crossings; signed nearest-surface vertex and triangle-centre penetration samples. Mounts require explicit inspection; this is not exact intersection-volume proof."
+  }
+}

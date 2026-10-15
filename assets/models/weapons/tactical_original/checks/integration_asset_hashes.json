@@ -1,0 +1,15 @@
+{
+  "original_glb_and_blend_unchanged": true,
+  "files": {
+    "assault_rifle.glb": true,
+    "machine_gun.glb": true,
+    "marksman.glb": true,
+    "shotgun.glb": true,
+    "smg.glb": true,
+    "sources/assault_rifle.blend": true,
+    "sources/machine_gun.blend": true,
+    "sources/marksman.blend": true,
+    "sources/shotgun.blend": true,
+    "sources/smg.blend": true
+  }
+}

@@ -1,0 +1,232 @@
+{
+  "date": "2026-10-15",
+  "engine": "Godot 4.7.2 stable",
+  "preview_renderer": "Forward+ / NVIDIA GeForce RTX 5060",
+  "measurement": "Horizontal speed of final heel/toe sole landmarks, weighted by proximity within 4 cm of ground; not whole-boot collision proof.",
+  "comparison_rig": "recruit",
+  "scenarios": {
+    "idle": {
+      "before": {
+        "body_m_s": 0.0,
+        "slide_m_s": 0.01,
+        "min_sole_height_m": 0.002
+      },
+      "after": {
+        "body_m_s": 0.0,
+        "slide_m_s": 0.01,
+        "min_sole_height_m": 0.002
+      }
+    },
+    "walk_fwd": {
+      "before": {
+        "body_m_s": 6.0,
+        "slide_m_s": 0.53,
+        "min_sole_height_m": -0.047
+      },
+      "after": {
+        "body_m_s": 6.0,
+        "slide_m_s": 0.04,
+        "min_sole_height_m": 0.002
+      }
+    },
+    "walk_back": {
+      "before": {
+        "body_m_s": 6.0,
+        "slide_m_s": 0.57,
+        "min_sole_height_m": -0.05
+      },
+      "after": {
+        "body_m_s": 6.0,
+        "slide_m_s": 0.09,
+        "min_sole_height_m": 0.002
+      }
+    },
+    "strafe_left": {
+      "before": {
+        "body_m_s": 6.0,
+        "slide_m_s": 0.57,
+        "min_sole_height_m": -0.047
+      },
+      "after": {
+        "body_m_s": 6.0,
+        "slide_m_s": 0.04,
+        "min_sole_height_m": 0.002
+      }
+    },
+    "strafe_right": {
+      "before": {
+        "body_m_s": 6.0,
+        "slide_m_s": 0.55,
+        "min_sole_height_m": -0.047
+      },
+      "after": {
+        "body_m_s": 6.0,
+        "slide_m_s": 0.04,
+        "min_sole_height_m": 0.002
+      }
+    },
+    "diag_fwd_left": {
+      "before": {
+        "body_m_s": 6.0,
+        "slide_m_s": 0.54,
+        "min_sole_height_m": -0.047
+      },
+      "after": {
+        "body_m_s": 6.0,
+        "slide_m_s": 0.04,
+        "min_sole_height_m": 0.002
+      }
+    },
+    "diag_back_right": {
+      "before": {
+        "body_m_s": 6.0,
+        "slide_m_s": 0.57,
+        "min_sole_height_m": -0.05
+      },
+      "after": {
+        "body_m_s": 6.0,
+        "slide_m_s": 0.1,
+        "min_sole_height_m": 0.002
+      }
+    },
+    "sprint_fwd": {
+      "before": {
+        "body_m_s": 9.6,
+        "slide_m_s": 0.89,
+        "min_sole_height_m": -0.031
+      },
+      "after": {
+        "body_m_s": 9.6,
+        "slide_m_s": 0.21,
+        "min_sole_height_m": 0.002
+      }
+    },
+    "sprint_strafe": {
+      "before": {
+        "body_m_s": 9.6,
+        "slide_m_s": 0.84,
+        "min_sole_height_m": -0.031
+      },
+      "after": {
+        "body_m_s": 9.6,
+        "slide_m_s": 0.23,
+        "min_sole_height_m": 0.002
+      }
+    },
+    "carry_fwd": {
+      "before": {
+        "body_m_s": 4.8,
+        "slide_m_s": 0.56,
+        "min_sole_height_m": -0.055
+      },
+      "after": {
+        "body_m_s": 4.8,
+        "slide_m_s": 0.19,
+        "min_sole_height_m": 0.002
+      }
+    },
+    "turn_in_place": {
+      "before": {
+        "body_m_s": 0.0,
+        "slide_m_s": 0.85,
+        "min_sole_height_m": 0.002
+      },
+      "after": {
+        "body_m_s": 0.0,
+        "slide_m_s": 0.84,
+        "min_sole_height_m": 0.002
+      }
+    },
+    "start_stop": {
+      "before": {
+        "body_m_s": 2.6,
+        "slide_m_s": 0.87,
+        "min_sole_height_m": -0.059
+      },
+      "after": {
+        "body_m_s": 2.6,
+        "slide_m_s": 0.78,
+        "min_sole_height_m": 0.002
+      }
+    }
+  },
+  "regression_rigs": [
+    "recruit",
+    "vanguard"
+  ],
+  "foot_contact_checks": 60,
+  "external_code_review": "After explicit authorization, only weapon-loader and support-arm excerpts were sent to JEV. Result: advisory escalate with low confidence and no concrete defect diagnosis. Foot-contact code and tests were not sent. See weapon checks/jev_loader_arm_review.json.",
+  "suite": {
+    "passed": 46,
+    "total": 48,
+    "failed": [
+      {
+        "test": "tests/test_escort.gd",
+        "passed": false,
+        "failures": [
+          "TEST FAIL: bot seed 505 (beach): Repair the cart (0 / 5 s) in 900 s; at the cart at 29 s, stops at 70 s, delivered at -1 s; 45 s blocked, 0 s waiting, 1 breakdowns; 4074 kills, up to 150 enemies alive, Intel 1116 (92.9 s of CPU)",
+          "180 second timeout"
+        ],
+        "seconds": 180.03
+      },
+      {
+        "test": "tests/test_intel_search.gd",
+        "passed": false,
+        "exit_code": 3221225477,
+        "failures": [
+          "TEST FAIL: boat routes: Intel Search on 14% of Town routes, 10% elsewhere (still possible)"
+        ],
+        "seconds": 77.83
+      }
+    ],
+    "passed_scripts": [
+      "tests/test_briefing.gd",
+      "tests/test_boat_redesign.gd",
+      "tests/test_armory_layout.gd",
+      "tests/test_cards_catalog.gd",
+      "tests/test_credits.gd",
+      "tests/test_camera_aim.gd",
+      "tests/test_data.gd",
+      "tests/test_dialogue.gd",
+      "tests/test_defeat_power_up_hud.gd",
+      "tests/test_expedition_missions.gd",
+      "tests/test_expedition.gd",
+      "tests/test_fov.gd",
+      "tests/test_foot_contact.gd",
+      "tests/test_game_scene.gd",
+      "tests/test_handmade.gd",
+      "tests/test_fuel_run.gd",
+      "tests/test_hud.gd",
+      "tests/test_hud_redesign.gd",
+      "tests/test_hold_sequence.gd",
+      "tests/test_island_end_panel.gd",
+      "tests/test_island_props.gd",
+      "tests/test_loading_screen.gd",
+      "tests/test_island_run.gd",
+      "tests/test_menus.gd",
+      "tests/test_noclip.gd",
+      "tests/test_perk_tree.gd",
+      "tests/test_power_ups.gd",
+      "tests/test_run_and_gun.gd",
+      "tests/test_recruit_animation.gd",
+      "tests/test_settings.gd",
+      "tests/test_sfx.gd",
+      "tests/test_nests.gd",
+      "tests/test_smoke.gd",
+      "tests/test_sabotage.gd",
+      "tests/test_test_island.gd",
+      "tests/test_signals.gd",
+      "tests/test_title_debrief_redesign.gd",
+      "tests/test_weapon_grips.gd",
+      "tests/test_weapon_loadout.gd",
+      "tests/test_weapon_models.gd",
+      "tests/test_zombie_model.gd",
+      "tests/test_world_dressing.gd",
+      "spikes/camera_medium/tests/test_camera_medium.gd",
+      "spikes/director/tests/test_director.gd",
+      "spikes/horde_flowfield/tests/test_horde.gd",
+      "tests/test_soak_run.gd"
+    ]
+  },
+  "soak_runs": "Both seeds (101, 202) extracted on all three islands."
+}

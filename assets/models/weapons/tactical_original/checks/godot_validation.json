@@ -1,0 +1,56 @@
+{
+	"godot_version": "4.7.2-stable (official)",
+	"passed": true,
+	"weapons": {
+		"assault_rifle": {
+			"length_m": 0.960800051689148,
+			"mesh_count": 86,
+			"muzzle_position": [
+				0.0,
+				0.104999996721745,
+				-0.620000004768372
+			],
+			"triangles": 7482
+		},
+		"machine_gun": {
+			"length_m": 1.03999996185303,
+			"mesh_count": 96,
+			"muzzle_position": [
+				0.0,
+				0.138999998569489,
+				-0.689999997615814
+			],
+			"triangles": 7940
+		},
+		"marksman": {
+			"length_m": 1.12000000476837,
+			"mesh_count": 60,
+			"muzzle_position": [
+				0.0,
+				0.123000003397465,
+				-0.759999990463257
+			],
+			"triangles": 7708
+		},
+		"shotgun": {
+			"length_m": 1.03999996185303,
+			"mesh_count": 34,
+			"muzzle_position": [
+				0.0,
+				0.068000003695488,
+				-0.660000026226044
+			],
+			"triangles": 4550
+		},
+		"smg": {
+			"length_m": 0.740000009536743,
+			"mesh_count": 70,
+			"muzzle_position": [
+				0.0,
+				0.105999998748302,
+				-0.439999997615814
+			],
+			"triangles": 6292
+		}
+	}
+}

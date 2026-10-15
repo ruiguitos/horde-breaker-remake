@@ -1,0 +1,854 @@
+{
+  "topology": [
+    {
+      "part": "Fixed polymer shoulder stock",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.0007627095136941406
+    },
+    {
+      "part": "SMG recoil pad",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 6.850822436116788e-05
+    },
+    {
+      "part": "Stock retaining pin",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.606401926860628e-08
+    },
+    {
+      "part": "Stock retaining pin.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.606402074133593e-08
+    },
+    {
+      "part": "Stamped upper receiver",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.0005452130155102834
+    },
+    {
+      "part": "Visible bolt",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.492011664827582e-07
+    },
+    {
+      "part": "SMG lower trigger housing",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.0005377214297436946
+    },
+    {
+      "part": "Pistol grip",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.00019338448274988144
+    },
+    {
+      "part": "Grip moulded insert",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.7691891154639698e-06
+    },
+    {
+      "part": "Grip traction rib",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.672791014726915e-08
+    },
+    {
+      "part": "Grip traction rib.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.672794949382631e-08
+    },
+    {
+      "part": "Grip traction rib.002",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.672794335711621e-08
+    },
+    {
+      "part": "Grip traction rib.003",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.672795958337812e-08
+    },
+    {
+      "part": "Grip traction rib.004",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.6727986694501056e-08
+    },
+    {
+      "part": "Grip traction rib.005",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.6727992777329624e-08
+    },
+    {
+      "part": "Grip moulded insert.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.76918911546387e-06
+    },
+    {
+      "part": "Grip traction rib.006",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.672791126247369e-08
+    },
+    {
+      "part": "Grip traction rib.007",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.672794949382599e-08
+    },
+    {
+      "part": "Grip traction rib.008",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.672795347931271e-08
+    },
+    {
+      "part": "Grip traction rib.009",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.67279503333937e-08
+    },
+    {
+      "part": "Grip traction rib.010",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.6728003446198134e-08
+    },
+    {
+      "part": "Grip traction rib.011",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.6728007192270026e-08
+    },
+    {
+      "part": "Trigger guard",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.4132015904892138e-05
+    },
+    {
+      "part": "Curved trigger",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.769150835846732e-06
+    },
+    {
+      "part": "Curved 9mm magazine",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.00013272505819642648
+    },
+    {
+      "part": "Magazine floor plate",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.4452997457038054e-06
+    },
+    {
+      "part": "Magazine pressed stiffener",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.0003180318842992e-07
+    },
+    {
+      "part": "Magazine pressed stiffener.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.0003234281415375e-07
+    },
+    {
+      "part": "Magazine pressed stiffener.002",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.0003275964945934e-07
+    },
+    {
+      "part": "Magazine pressed stiffener.003",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.0003180318842992e-07
+    },
+    {
+      "part": "Magazine pressed stiffener.004",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.000323428141533e-07
+    },
+    {
+      "part": "Magazine pressed stiffener.005",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.0003275964945846e-07
+    },
+    {
+      "part": "Wide polymer forearm",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.00026972565713988847
+    },
+    {
+      "part": "Short exposed barrel",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.5122495845181948e-05
+    },
+    {
+      "part": "Cocking tube",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.226677267571207e-05
+    },
+    {
+      "part": "Cocking lever",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.1539720791557197e-06
+    },
+    {
+      "part": "Cocking lever grip",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 9.56825237158388e-07
+    },
+    {
+      "part": "Front trunnion",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4177276081180215e-05
+    },
+    {
+      "part": "Front sight support",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 9.07930421708057e-06
+    },
+    {
+      "part": "Front sight protective hood",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.9665609869094832e-06
+    },
+    {
+      "part": "Front sight blade",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 9.413004578220367e-08
+    },
+    {
+      "part": "Three lug muzzle",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.2816360544536806e-05
+    },
+    {
+      "part": "Bore shadow",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 5.949086864569992e-08
+    },
+    {
+      "part": "Muzzle mounting lug",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4522068042917537e-07
+    },
+    {
+      "part": "Muzzle mounting lug.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4522069702529663e-07
+    },
+    {
+      "part": "Muzzle mounting lug.002",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4522069702529641e-07
+    },
+    {
+      "part": "Rail dovetail",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.6397890373599714e-05
+    },
+    {
+      "part": "Rail cross lug 00",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.060604498733085e-07
+    },
+    {
+      "part": "Rail cross lug 01",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.0606044987331354e-07
+    },
+    {
+      "part": "Rail cross lug 02",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.0606021637283073e-07
+    },
+    {
+      "part": "Rail cross lug 03",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.0606020782937537e-07
+    },
+    {
+      "part": "Rail cross lug 04",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.0606026406863337e-07
+    },
+    {
+      "part": "Rail cross lug 05",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.060602327452085e-07
+    },
+    {
+      "part": "Rail cross lug 06",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.0606021637282993e-07
+    },
+    {
+      "part": "Rail cross lug 07",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.060603331230711e-07
+    },
+    {
+      "part": "Rail cross lug 08",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.0606044987331507e-07
+    },
+    {
+      "part": "Rail cross lug 09",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.060604498733086e-07
+    },
+    {
+      "part": "Rail cross lug 10",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.0605998287234956e-07
+    },
+    {
+      "part": "Rail cross lug 11",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.060599828723447e-07
+    },
+    {
+      "part": "Rail cross lug 12",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.0605998287234543e-07
+    },
+    {
+      "part": "Rail cross lug 13",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.060599828723541e-07
+    },
+    {
+      "part": "Diopter sight pedestal",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4915592984593222e-05
+    },
+    {
+      "part": "Diopter sight drum",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 5.68508623919846e-06
+    },
+    {
+      "part": "SMG receiver pin",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.2110738552419487e-06
+    },
+    {
+      "part": "SMG receiver pin.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.2110739248054254e-06
+    },
+    {
+      "part": "Selector axle",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.606401024986508e-08
+    },
+    {
+      "part": "SMG selector",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.56748502247783e-07
+    },
+    {
+      "part": "Selector axle.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 8.606401016775963e-08
+    },
+    {
+      "part": "SMG selector.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.5674848989855954e-07
+    },
+    {
+      "part": "Magazine release paddle",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.323333375602943e-06
+    }
+  ],
+  "intersections": {
+    "self_intersection_candidates": [],
+    "interpenetration_samples": [
+      {
+        "parts": [
+          "SMG lower trigger housing",
+          "Trigger guard"
+        ],
+        "surface_crossings": 36,
+        "maximum_sampled_depth_m": 0.014856447465717793
+      },
+      {
+        "parts": [
+          "SMG lower trigger housing",
+          "SMG receiver pin"
+        ],
+        "surface_crossings": 48,
+        "maximum_sampled_depth_m": 0.013160000555217266
+      },
+      {
+        "parts": [
+          "SMG lower trigger housing",
+          "SMG receiver pin.001"
+        ],
+        "surface_crossings": 48,
+        "maximum_sampled_depth_m": 0.013160000555217266
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Trigger guard"
+        ],
+        "surface_crossings": 32,
+        "maximum_sampled_depth_m": 0.013155755586922169
+      },
+      {
+        "parts": [
+          "Fixed polymer shoulder stock",
+          "Stamped upper receiver"
+        ],
+        "surface_crossings": 61,
+        "maximum_sampled_depth_m": 0.01083391159772873
+      },
+      {
+        "parts": [
+          "SMG lower trigger housing",
+          "Pistol grip"
+        ],
+        "surface_crossings": 26,
+        "maximum_sampled_depth_m": 0.00960256066173315
+      },
+      {
+        "parts": [
+          "Short exposed barrel",
+          "Three lug muzzle"
+        ],
+        "surface_crossings": 76,
+        "maximum_sampled_depth_m": 0.008922995999455452
+      },
+      {
+        "parts": [
+          "SMG lower trigger housing",
+          "Curved trigger"
+        ],
+        "surface_crossings": 22,
+        "maximum_sampled_depth_m": 0.006336059886962175
+      },
+      {
+        "parts": [
+          "Front sight support",
+          "Front sight blade"
+        ],
+        "surface_crossings": 18,
+        "maximum_sampled_depth_m": 0.006031662691384554
+      },
+      {
+        "parts": [
+          "Front sight support",
+          "Front sight protective hood"
+        ],
+        "surface_crossings": 39,
+        "maximum_sampled_depth_m": 0.005469943396747112
+      },
+      {
+        "parts": [
+          "Stamped upper receiver",
+          "SMG lower trigger housing"
+        ],
+        "surface_crossings": 44,
+        "maximum_sampled_depth_m": 0.004693321883678436
+      },
+      {
+        "parts": [
+          "Short exposed barrel",
+          "Front trunnion"
+        ],
+        "surface_crossings": 110,
+        "maximum_sampled_depth_m": 0.0038996783550828695
+      },
+      {
+        "parts": [
+          "Cocking lever",
+          "Cocking lever grip"
+        ],
+        "surface_crossings": 34,
+        "maximum_sampled_depth_m": 0.0037046638317406178
+      },
+      {
+        "parts": [
+          "Trigger guard",
+          "Magazine release paddle"
+        ],
+        "surface_crossings": 29,
+        "maximum_sampled_depth_m": 0.003315488575026393
+      },
+      {
+        "parts": [
+          "Fixed polymer shoulder stock",
+          "SMG lower trigger housing"
+        ],
+        "surface_crossings": 32,
+        "maximum_sampled_depth_m": 0.0031502842903137207
+      },
+      {
+        "parts": [
+          "Cocking tube",
+          "Cocking lever"
+        ],
+        "surface_crossings": 34,
+        "maximum_sampled_depth_m": 0.0028078367467969656
+      },
+      {
+        "parts": [
+          "Short exposed barrel",
+          "Front sight support"
+        ],
+        "surface_crossings": 46,
+        "maximum_sampled_depth_m": 0.0026781288906931877
+      },
+      {
+        "parts": [
+          "Stamped upper receiver",
+          "Diopter sight pedestal"
+        ],
+        "surface_crossings": 40,
+        "maximum_sampled_depth_m": 0.0024739594664424658
+      },
+      {
+        "parts": [
+          "SMG lower trigger housing",
+          "Curved 9mm magazine"
+        ],
+        "surface_crossings": 24,
+        "maximum_sampled_depth_m": 0.0023788001853972673
+      },
+      {
+        "parts": [
+          "Front sight protective hood",
+          "Front sight blade"
+        ],
+        "surface_crossings": 20,
+        "maximum_sampled_depth_m": 0.0019753731321543455
+      },
+      {
+        "parts": [
+          "Front trunnion",
+          "Front sight support"
+        ],
+        "surface_crossings": 40,
+        "maximum_sampled_depth_m": 0.0019363164901733398
+      },
+      {
+        "parts": [
+          "Three lug muzzle",
+          "Muzzle mounting lug.001"
+        ],
+        "surface_crossings": 19,
+        "maximum_sampled_depth_m": 0.0015999674797058105
+      },
+      {
+        "parts": [
+          "Three lug muzzle",
+          "Muzzle mounting lug.002"
+        ],
+        "surface_crossings": 18,
+        "maximum_sampled_depth_m": 0.0015999674797058105
+      },
+      {
+        "parts": [
+          "Diopter sight pedestal",
+          "Diopter sight drum"
+        ],
+        "surface_crossings": 48,
+        "maximum_sampled_depth_m": 0.0015000104904174805
+      },
+      {
+        "parts": [
+          "Short exposed barrel",
+          "Muzzle mounting lug.002"
+        ],
+        "surface_crossings": 19,
+        "maximum_sampled_depth_m": 0.0011304428335279226
+      },
+      {
+        "parts": [
+          "Short exposed barrel",
+          "Muzzle mounting lug.001"
+        ],
+        "surface_crossings": 19,
+        "maximum_sampled_depth_m": 0.0011304413201287389
+      },
+      {
+        "parts": [
+          "Fixed polymer shoulder stock",
+          "SMG recoil pad"
+        ],
+        "surface_crossings": 18,
+        "maximum_sampled_depth_m": 0.0010000169277191162
+      },
+      {
+        "parts": [
+          "Wide polymer forearm",
+          "Short exposed barrel"
+        ],
+        "surface_crossings": 51,
+        "maximum_sampled_depth_m": 0.0010000169277191162
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Grip moulded insert"
+        ],
+        "surface_crossings": 26,
+        "maximum_sampled_depth_m": 0.0010000010952353477
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Grip moulded insert.001"
+        ],
+        "surface_crossings": 26,
+        "maximum_sampled_depth_m": 0.0010000010952353477
+      },
+      {
+        "parts": [
+          "Three lug muzzle",
+          "Bore shadow"
+        ],
+        "surface_crossings": 40,
+        "maximum_sampled_depth_m": 0.0009999871253967285
+      },
+      {
+        "parts": [
+          "Three lug muzzle",
+          "Muzzle mounting lug"
+        ],
+        "surface_crossings": 26,
+        "maximum_sampled_depth_m": 0.0009757555671967566
+      },
+      {
+        "parts": [
+          "Selector axle",
+          "SMG selector"
+        ],
+        "surface_crossings": 48,
+        "maximum_sampled_depth_m": 0.0009021125733852386
+      },
+      {
+        "parts": [
+          "Selector axle.001",
+          "SMG selector.001"
+        ],
+        "surface_crossings": 44,
+        "maximum_sampled_depth_m": 0.0009021125733852386
+      },
+      {
+        "parts": [
+          "Curved 9mm magazine",
+          "Magazine pressed stiffener"
+        ],
+        "surface_crossings": 48,
+        "maximum_sampled_depth_m": 0.0004999923403374851
+      },
+      {
+        "parts": [
+          "Curved 9mm magazine",
+          "Magazine pressed stiffener.002"
+        ],
+        "surface_crossings": 46,
+        "maximum_sampled_depth_m": 0.0004999923403374851
+      },
+      {
+        "parts": [
+          "Curved 9mm magazine",
+          "Magazine pressed stiffener.003"
+        ],
+        "surface_crossings": 48,
+        "maximum_sampled_depth_m": 0.0004999923403374851
+      },
+      {
+        "parts": [
+          "Curved 9mm magazine",
+          "Magazine pressed stiffener.004"
+        ],
+        "surface_crossings": 46,
+        "maximum_sampled_depth_m": 0.0004999923403374851
+      },
+      {
+        "parts": [
+          "Curved 9mm magazine",
+          "Magazine pressed stiffener.005"
+        ],
+        "surface_crossings": 46,
+        "maximum_sampled_depth_m": 0.0004999923403374851
+      },
+      {
+        "parts": [
+          "Curved 9mm magazine",
+          "Magazine pressed stiffener.001"
+        ],
+        "surface_crossings": 46,
+        "maximum_sampled_depth_m": 0.0004999922821298242
+      },
+      {
+        "parts": [
+          "Short exposed barrel",
+          "Muzzle mounting lug"
+        ],
+        "surface_crossings": 22,
+        "maximum_sampled_depth_m": 0.00040435470873489976
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib"
+        ],
+        "surface_crossings": 11,
+        "maximum_sampled_depth_m": 0.0004000011831521988
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.001"
+        ],
+        "surface_crossings": 15,
+        "maximum_sampled_depth_m": 0.0004000011831521988
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.002"
+        ],
+        "surface_crossings": 14,
+        "maximum_sampled_depth_m": 0.0004000011831521988
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.003"
+        ],
+        "surface_crossings": 15,
+        "maximum_sampled_depth_m": 0.0004000011831521988
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.004"
+        ],
+        "surface_crossings": 22,
+        "maximum_sampled_depth_m": 0.0004000011831521988
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.005"
+        ],
+        "surface_crossings": 23,
+        "maximum_sampled_depth_m": 0.0004000011831521988
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.006"
+        ],
+        "surface_crossings": 12,
+        "maximum_sampled_depth_m": 0.0004000011831521988
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.007"
+        ],
+        "surface_crossings": 15,
+        "maximum_sampled_depth_m": 0.0004000011831521988
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.008"
+        ],
+        "surface_crossings": 16,
+        "maximum_sampled_depth_m": 0.0004000011831521988
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.009"
+        ],
+        "surface_crossings": 16,
+        "maximum_sampled_depth_m": 0.0004000011831521988
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.010"
+        ],
+        "surface_crossings": 27,
+        "maximum_sampled_depth_m": 0.00039999932050704956
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.011"
+        ],
+        "surface_crossings": 27,
+        "maximum_sampled_depth_m": 0.00039999932050704956
+      }
+    ],
+    "method": "BVH surface crossings; signed nearest-surface vertex and triangle-centre penetration samples. Mounts require explicit inspection; this is not exact intersection-volume proof."
+  }
+}

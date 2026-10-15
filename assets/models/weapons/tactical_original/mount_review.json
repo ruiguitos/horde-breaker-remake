@@ -1,0 +1,1935 @@
+{
+  "scope": "Artist review of the enumerated mounting contacts. Exact pair names and sampled depth ceilings are checked on subsequent builds.",
+  "weapons": {
+    "assault_rifle": [
+      {
+        "parts": [
+          "Receiver extension",
+          "Extended stock"
+        ],
+        "maximum_depth_m": 0.01845,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Receiver extension",
+          "Upper receiver"
+        ],
+        "maximum_depth_m": 0.0182383,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Lower receiver",
+          "Pistol grip"
+        ],
+        "maximum_depth_m": 0.0165524,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Lower receiver",
+          "Trigger guard"
+        ],
+        "maximum_depth_m": 0.0156774,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Lower receiver",
+          "Receiver takedown pin"
+        ],
+        "maximum_depth_m": 0.0150033,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Lower receiver",
+          "Receiver takedown pin.001"
+        ],
+        "maximum_depth_m": 0.0150033,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Extended stock",
+          "Stock adjustment latch"
+        ],
+        "maximum_depth_m": 0.0129843,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Upper receiver",
+          "Forward assist housing"
+        ],
+        "maximum_depth_m": 0.0106852,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Trigger guard"
+        ],
+        "maximum_depth_m": 0.0080253,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Upper receiver",
+          "Port cover hinge"
+        ],
+        "maximum_depth_m": 0.0068616,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Barrel",
+          "Barrel collar"
+        ],
+        "maximum_depth_m": 0.0062707,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Gas block",
+          "Front sight tower"
+        ],
+        "maximum_depth_m": 0.0057421,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Gas tube",
+          "Front sight tower"
+        ],
+        "maximum_depth_m": 0.00565,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Lower receiver",
+          "Curved trigger"
+        ],
+        "maximum_depth_m": 0.0055538,
+        "reason": "Hidden upper trigger pivot seated into the trigger housing; exposed trigger clears the guard"
+      },
+      {
+        "parts": [
+          "Rear sight base",
+          "Rear sight aperture"
+        ],
+        "maximum_depth_m": 0.00515,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Barrel",
+          "Gas block"
+        ],
+        "maximum_depth_m": 0.0042149,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Barrel",
+          "Exposed barrel nose"
+        ],
+        "maximum_depth_m": 0.00415,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Charging handle stem",
+          "Charging handle T latch"
+        ],
+        "maximum_depth_m": 0.0036833,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Forward assist housing",
+          "Forward assist button"
+        ],
+        "maximum_depth_m": 0.0031889,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Selector pivot",
+          "Selector lever"
+        ],
+        "maximum_depth_m": 0.0023573,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Selector pivot.001",
+          "Selector lever.001"
+        ],
+        "maximum_depth_m": 0.0023573,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Receiver extension",
+          "Lower receiver"
+        ],
+        "maximum_depth_m": 0.00215,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Front sight tower",
+          "Front sight post"
+        ],
+        "maximum_depth_m": 0.0013404,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Flash hider",
+          "Bore shadow"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Extended stock",
+          "Butt recoil pad"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Upper receiver",
+          "Rail dovetail"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Upper receiver",
+          "Gas tube"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Port cover open",
+          "Port cover hinge"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Grip moulded insert"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Grip moulded insert.001"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Butt recoil pad",
+          "Butt pad traction"
+        ],
+        "maximum_depth_m": 0.00095,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Butt recoil pad",
+          "Butt pad traction.001"
+        ],
+        "maximum_depth_m": 0.00095,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Butt recoil pad",
+          "Butt pad traction.002"
+        ],
+        "maximum_depth_m": 0.00095,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Butt recoil pad",
+          "Butt pad traction.003"
+        ],
+        "maximum_depth_m": 0.00095,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Butt recoil pad",
+          "Butt pad traction.004"
+        ],
+        "maximum_depth_m": 0.00095,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Butt recoil pad",
+          "Butt pad traction.005"
+        ],
+        "maximum_depth_m": 0.00095,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Butt recoil pad",
+          "Butt pad traction.006"
+        ],
+        "maximum_depth_m": 0.00095,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Curved 5.56 magazine",
+          "Magazine pressed stiffener"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Curved 5.56 magazine",
+          "Magazine pressed stiffener.001"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Curved 5.56 magazine",
+          "Magazine pressed stiffener.002"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Curved 5.56 magazine",
+          "Magazine pressed stiffener.003"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Curved 5.56 magazine",
+          "Magazine pressed stiffener.004"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Curved 5.56 magazine",
+          "Magazine pressed stiffener.005"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.001"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.002"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.003"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.004"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.005"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.006"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.007"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.008"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.009"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.010"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.011"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Barrel",
+          "Front sight tower"
+        ],
+        "maximum_depth_m": 0.0004499,
+        "reason": "Fixed assembly interface / seated component"
+      }
+    ],
+    "machine_gun": [
+      {
+        "parts": [
+          "Formed receiver",
+          "Receiver rivet"
+        ],
+        "maximum_depth_m": 0.02431,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Formed receiver",
+          "Receiver rivet.001"
+        ],
+        "maximum_depth_m": 0.02431,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Formed receiver",
+          "Receiver rivet.002"
+        ],
+        "maximum_depth_m": 0.02431,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "LMG polymer stock",
+          "Recoil buffer"
+        ],
+        "maximum_depth_m": 0.0206167,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Trigger guard",
+          "Trigger housing"
+        ],
+        "maximum_depth_m": 0.01715,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Recoil buffer",
+          "Formed receiver"
+        ],
+        "maximum_depth_m": 0.0112163,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Quick change barrel",
+          "Flash hider"
+        ],
+        "maximum_depth_m": 0.0095687,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Trigger guard"
+        ],
+        "maximum_depth_m": 0.0092229,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Carry handle upright",
+          "Carry handle pivot"
+        ],
+        "maximum_depth_m": 0.0074833,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Quick change barrel",
+          "Muzzle collar"
+        ],
+        "maximum_depth_m": 0.0072685,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Cocking handle",
+          "Cocking knob"
+        ],
+        "maximum_depth_m": 0.00715,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Quick change barrel",
+          "Bipod collar"
+        ],
+        "maximum_depth_m": 0.006447,
+        "reason": "Bipod pivot, foot or telescoping assembly interface"
+      },
+      {
+        "parts": [
+          "Feed cover",
+          "Feed cover hinge"
+        ],
+        "maximum_depth_m": 0.0063701,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Quick change barrel",
+          "LMG front sight tower"
+        ],
+        "maximum_depth_m": 0.0061593,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Bipod collar",
+          "Bipod hinge"
+        ],
+        "maximum_depth_m": 0.0056097,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Partly deployed bipod leg.001",
+          "Bipod telescoping shaft.001"
+        ],
+        "maximum_depth_m": 0.0055896,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Curved trigger",
+          "Trigger housing"
+        ],
+        "maximum_depth_m": 0.0051985,
+        "reason": "Hidden upper trigger pivot seated into the trigger housing; exposed trigger clears the guard"
+      },
+      {
+        "parts": [
+          "Partly deployed bipod leg",
+          "Bipod telescoping shaft"
+        ],
+        "maximum_depth_m": 0.0051439,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Carry handle upright",
+          "Carry handle horizontal"
+        ],
+        "maximum_depth_m": 0.0041288,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Formed receiver",
+          "Gas piston tube"
+        ],
+        "maximum_depth_m": 0.0039254,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Partly deployed bipod leg.001",
+          "Bipod hinge"
+        ],
+        "maximum_depth_m": 0.0036335,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Perforated heat shield",
+          "Carry handle pivot"
+        ],
+        "maximum_depth_m": 0.0033665,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Trigger housing"
+        ],
+        "maximum_depth_m": 0.0032056,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Ammunition box",
+          "Ammo box lid"
+        ],
+        "maximum_depth_m": 0.00315,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Charging slide",
+          "Cocking handle"
+        ],
+        "maximum_depth_m": 0.00265,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Partly deployed bipod leg",
+          "Bipod foot"
+        ],
+        "maximum_depth_m": 0.0025839,
+        "reason": "Bipod pivot, foot or telescoping assembly interface"
+      },
+      {
+        "parts": [
+          "Partly deployed bipod leg.001",
+          "Bipod foot.001"
+        ],
+        "maximum_depth_m": 0.0025839,
+        "reason": "Bipod pivot, foot or telescoping assembly interface"
+      },
+      {
+        "parts": [
+          "Linked visual cartridge.002",
+          "Belt link.002"
+        ],
+        "maximum_depth_m": 0.0024563,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Linked visual cartridge.003",
+          "Belt link.003"
+        ],
+        "maximum_depth_m": 0.0024563,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Linked visual cartridge",
+          "Belt link"
+        ],
+        "maximum_depth_m": 0.0024563,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Linked visual cartridge.001",
+          "Belt link.001"
+        ],
+        "maximum_depth_m": 0.0024563,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Linked visual cartridge.004",
+          "Belt link.004"
+        ],
+        "maximum_depth_m": 0.0024563,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Partly deployed bipod leg",
+          "Bipod hinge"
+        ],
+        "maximum_depth_m": 0.002306,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "LMG polymer stock",
+          "Formed receiver"
+        ],
+        "maximum_depth_m": 0.0022367,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "LMG front sight tower",
+          "LMG front sight post"
+        ],
+        "maximum_depth_m": 0.00215,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Bipod telescoping shaft",
+          "Bipod foot"
+        ],
+        "maximum_depth_m": 0.0018169,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Bipod telescoping shaft.001",
+          "Bipod foot.001"
+        ],
+        "maximum_depth_m": 0.0018169,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Flash hider",
+          "Muzzle collar"
+        ],
+        "maximum_depth_m": 0.00165,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Flash hider",
+          "Bore shadow"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Grip moulded insert"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Grip moulded insert.001"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Formed receiver",
+          "Feed cover hinge"
+        ],
+        "maximum_depth_m": 0.0009267,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Formed receiver",
+          "Charging slide"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Worn feed latch",
+          "Small oxidised latch washer"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.001"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.002"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.003"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.004"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.005"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.006"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.007"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.008"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.009"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.010"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.011"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      }
+    ],
+    "marksman": [
+      {
+        "parts": [
+          "Walnut thumbhole stock",
+          "DMR milled receiver"
+        ],
+        "maximum_depth_m": 0.0168167,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Walnut grip web",
+          "DMR milled receiver"
+        ],
+        "maximum_depth_m": 0.0166119,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Walnut thumbhole stock",
+          "Walnut grip web"
+        ],
+        "maximum_depth_m": 0.01615,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Scope optical housing",
+          "Ocular rubber collar"
+        ],
+        "maximum_depth_m": 0.0146797,
+        "reason": "Optical housing, ring or support mounting interface"
+      },
+      {
+        "parts": [
+          "DMR receiver cover",
+          "Scope support"
+        ],
+        "maximum_depth_m": 0.00626,
+        "reason": "Optical housing, ring or support mounting interface"
+      },
+      {
+        "parts": [
+          "DMR milled receiver",
+          "Curved trigger"
+        ],
+        "maximum_depth_m": 0.0061058,
+        "reason": "Hidden upper trigger pivot seated into the trigger housing; exposed trigger clears the guard"
+      },
+      {
+        "parts": [
+          "DMR barrel",
+          "Gas block"
+        ],
+        "maximum_depth_m": 0.0053637,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "DMR barrel",
+          "Handguard retaining band"
+        ],
+        "maximum_depth_m": 0.00465,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Scope side dovetail",
+          "Scope support"
+        ],
+        "maximum_depth_m": 0.00415,
+        "reason": "Optical housing, ring or support mounting interface"
+      },
+      {
+        "parts": [
+          "Walnut ventilated handguard",
+          "Handguard retaining band"
+        ],
+        "maximum_depth_m": 0.0037715,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "DMR bolt handle",
+          "DMR cocking knob"
+        ],
+        "maximum_depth_m": 0.0037082,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "DMR receiver cover",
+          "Scope support.001"
+        ],
+        "maximum_depth_m": 0.0033958,
+        "reason": "Optical housing, ring or support mounting interface"
+      },
+      {
+        "parts": [
+          "DMR milled receiver",
+          "Scope support"
+        ],
+        "maximum_depth_m": 0.00315,
+        "reason": "Optical housing, ring or support mounting interface"
+      },
+      {
+        "parts": [
+          "DMR milled receiver",
+          "Scope support.001"
+        ],
+        "maximum_depth_m": 0.00315,
+        "reason": "Optical housing, ring or support mounting interface"
+      },
+      {
+        "parts": [
+          "Walnut thumbhole stock",
+          "Trigger guard"
+        ],
+        "maximum_depth_m": 0.0026216,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "DMR milled receiver",
+          "Trigger guard"
+        ],
+        "maximum_depth_m": 0.00215,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Walnut thumbhole stock",
+          "Raised cheek rest"
+        ],
+        "maximum_depth_m": 0.0018861,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Scope support",
+          "Scope mounting ring"
+        ],
+        "maximum_depth_m": 0.0018602,
+        "reason": "Optical housing, ring or support mounting interface"
+      },
+      {
+        "parts": [
+          "Scope support.001",
+          "Scope mounting ring.001"
+        ],
+        "maximum_depth_m": 0.0018602,
+        "reason": "Optical housing, ring or support mounting interface"
+      },
+      {
+        "parts": [
+          "Scope optical housing",
+          "Windage turret"
+        ],
+        "maximum_depth_m": 0.0016428,
+        "reason": "Optical housing, ring or support mounting interface"
+      },
+      {
+        "parts": [
+          "Walnut grip web",
+          "Trigger guard"
+        ],
+        "maximum_depth_m": 0.0013523,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "DMR muzzle brake",
+          "Bore shadow"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Scope optical housing",
+          "Elevation turret"
+        ],
+        "maximum_depth_m": 0.0011452,
+        "reason": "Optical housing, ring or support mounting interface"
+      },
+      {
+        "parts": [
+          "Walnut ventilated handguard",
+          "DMR gas tube"
+        ],
+        "maximum_depth_m": 0.0011377,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.003"
+        ],
+        "maximum_depth_m": 0.0008414,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.009"
+        ],
+        "maximum_depth_m": 0.0008414,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "DMR gas tube",
+          "Gas block"
+        ],
+        "maximum_depth_m": 0.0007968,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl"
+        ],
+        "maximum_depth_m": 0.0007305,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.006"
+        ],
+        "maximum_depth_m": 0.0007305,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.005"
+        ],
+        "maximum_depth_m": 0.0007177,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.007"
+        ],
+        "maximum_depth_m": 0.0007177,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.011"
+        ],
+        "maximum_depth_m": 0.0007177,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.001"
+        ],
+        "maximum_depth_m": 0.0007177,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "DMR milled receiver",
+          "Scope side dovetail"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Optical housing, ring or support mounting interface"
+      },
+      {
+        "parts": [
+          "Scope optical housing",
+          "Eyepiece lens"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Optical housing, ring or support mounting interface"
+      },
+      {
+        "parts": [
+          "Ten round DMR magazine",
+          "Magazine pressed stiffener"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Ten round DMR magazine",
+          "Magazine pressed stiffener.004"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Ten round DMR magazine",
+          "Magazine pressed stiffener.005"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Ten round DMR magazine",
+          "Magazine pressed stiffener.001"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Ten round DMR magazine",
+          "Magazine pressed stiffener.002"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Ten round DMR magazine",
+          "Magazine pressed stiffener.003"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.004"
+        ],
+        "maximum_depth_m": 0.0006424,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.002"
+        ],
+        "maximum_depth_m": 0.0006424,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.008"
+        ],
+        "maximum_depth_m": 0.0006424,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Elevation turret",
+          "Turret knurl.010"
+        ],
+        "maximum_depth_m": 0.0006424,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "DMR milled receiver",
+          "DMR gas tube"
+        ],
+        "maximum_depth_m": 0.0001648,
+        "reason": "Fixed assembly interface / seated component"
+      }
+    ],
+    "shotgun": [
+      {
+        "parts": [
+          "Walnut shoulder stock",
+          "870 class rounded receiver"
+        ],
+        "maximum_depth_m": 0.01465,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Shotgun trigger plate pin"
+        ],
+        "maximum_depth_m": 0.0146433,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Shotgun trigger plate pin.001"
+        ],
+        "maximum_depth_m": 0.0146433,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Shotgun barrel"
+        ],
+        "maximum_depth_m": 0.00715,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Grooved walnut pump slide",
+          "Pump action bar"
+        ],
+        "maximum_depth_m": 0.0063672,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Grooved walnut pump slide",
+          "Pump action bar.001"
+        ],
+        "maximum_depth_m": 0.0063436,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Curved trigger"
+        ],
+        "maximum_depth_m": 0.0061058,
+        "reason": "Hidden upper trigger pivot seated into the trigger housing; exposed trigger clears the guard"
+      },
+      {
+        "parts": [
+          "Walnut shoulder stock",
+          "Trigger guard"
+        ],
+        "maximum_depth_m": 0.0044532,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Cross bolt safety"
+        ],
+        "maximum_depth_m": 0.004016,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Shotgun recoil pad",
+          "Stock pad screw"
+        ],
+        "maximum_depth_m": 0.00395,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Shotgun recoil pad",
+          "Stock pad screw.001"
+        ],
+        "maximum_depth_m": 0.00395,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Tube magazine",
+          "Barrel magazine clamp"
+        ],
+        "maximum_depth_m": 0.0035588,
+        "reason": "Magazine/feed or tube mounting interface; exposed moving surfaces clear adjacent parts"
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Trigger guard"
+        ],
+        "maximum_depth_m": 0.00215,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Walnut shoulder stock",
+          "Walnut cheek panel"
+        ],
+        "maximum_depth_m": 0.00165,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Walnut shoulder stock",
+          "Walnut cheek panel.001"
+        ],
+        "maximum_depth_m": 0.00165,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Tube magazine"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Magazine/feed or tube mounting interface; exposed moving surfaces clear adjacent parts"
+      },
+      {
+        "parts": [
+          "Bead sight base",
+          "Brass class sight bead"
+        ],
+        "maximum_depth_m": 0.00095,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Shotgun barrel",
+          "Barrel magazine clamp"
+        ],
+        "maximum_depth_m": 0.0009246,
+        "reason": "Magazine/feed or tube mounting interface; exposed moving surfaces clear adjacent parts"
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.001"
+        ],
+        "maximum_depth_m": 0.0007373,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.006"
+        ],
+        "maximum_depth_m": 0.0007372,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.009"
+        ],
+        "maximum_depth_m": 0.0007372,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.004"
+        ],
+        "maximum_depth_m": 0.0007372,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl"
+        ],
+        "maximum_depth_m": 0.0007358,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.005"
+        ],
+        "maximum_depth_m": 0.0007358,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.007"
+        ],
+        "maximum_depth_m": 0.0007256,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.002"
+        ],
+        "maximum_depth_m": 0.0007256,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.003"
+        ],
+        "maximum_depth_m": 0.0007256,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.008"
+        ],
+        "maximum_depth_m": 0.0007256,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Walnut shoulder stock",
+          "Cross bolt safety"
+        ],
+        "maximum_depth_m": 0.0005494,
+        "reason": "Fixed assembly interface / seated component"
+      }
+    ],
+    "smg": [
+      {
+        "parts": [
+          "SMG lower trigger housing",
+          "Trigger guard"
+        ],
+        "maximum_depth_m": 0.0150064,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "SMG lower trigger housing",
+          "SMG receiver pin"
+        ],
+        "maximum_depth_m": 0.01331,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "SMG lower trigger housing",
+          "SMG receiver pin.001"
+        ],
+        "maximum_depth_m": 0.01331,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Trigger guard"
+        ],
+        "maximum_depth_m": 0.0133058,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Fixed polymer shoulder stock",
+          "Stamped upper receiver"
+        ],
+        "maximum_depth_m": 0.0109839,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "SMG lower trigger housing",
+          "Pistol grip"
+        ],
+        "maximum_depth_m": 0.0097526,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Short exposed barrel",
+          "Three lug muzzle"
+        ],
+        "maximum_depth_m": 0.009073,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "SMG lower trigger housing",
+          "Curved trigger"
+        ],
+        "maximum_depth_m": 0.0064861,
+        "reason": "Hidden upper trigger pivot seated into the trigger housing; exposed trigger clears the guard"
+      },
+      {
+        "parts": [
+          "Front sight support",
+          "Front sight blade"
+        ],
+        "maximum_depth_m": 0.0061817,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Front sight support",
+          "Front sight protective hood"
+        ],
+        "maximum_depth_m": 0.0056199,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Stamped upper receiver",
+          "SMG lower trigger housing"
+        ],
+        "maximum_depth_m": 0.0048433,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Short exposed barrel",
+          "Front trunnion"
+        ],
+        "maximum_depth_m": 0.0040497,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Cocking lever",
+          "Cocking lever grip"
+        ],
+        "maximum_depth_m": 0.0038547,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Trigger guard",
+          "Magazine release paddle"
+        ],
+        "maximum_depth_m": 0.0034655,
+        "reason": "Magazine/feed or tube mounting interface; exposed moving surfaces clear adjacent parts"
+      },
+      {
+        "parts": [
+          "Fixed polymer shoulder stock",
+          "SMG lower trigger housing"
+        ],
+        "maximum_depth_m": 0.0033003,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Cocking tube",
+          "Cocking lever"
+        ],
+        "maximum_depth_m": 0.0029578,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Short exposed barrel",
+          "Front sight support"
+        ],
+        "maximum_depth_m": 0.0028281,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Stamped upper receiver",
+          "Diopter sight pedestal"
+        ],
+        "maximum_depth_m": 0.002624,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "SMG lower trigger housing",
+          "Curved 9mm magazine"
+        ],
+        "maximum_depth_m": 0.0025288,
+        "reason": "Magazine/feed or tube mounting interface; exposed moving surfaces clear adjacent parts"
+      },
+      {
+        "parts": [
+          "Front sight protective hood",
+          "Front sight blade"
+        ],
+        "maximum_depth_m": 0.0021254,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Front trunnion",
+          "Front sight support"
+        ],
+        "maximum_depth_m": 0.0020863,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Three lug muzzle",
+          "Muzzle mounting lug.001"
+        ],
+        "maximum_depth_m": 0.00175,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Three lug muzzle",
+          "Muzzle mounting lug.002"
+        ],
+        "maximum_depth_m": 0.00175,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Diopter sight pedestal",
+          "Diopter sight drum"
+        ],
+        "maximum_depth_m": 0.00165,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Short exposed barrel",
+          "Muzzle mounting lug.002"
+        ],
+        "maximum_depth_m": 0.0012804,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Short exposed barrel",
+          "Muzzle mounting lug.001"
+        ],
+        "maximum_depth_m": 0.0012804,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Fixed polymer shoulder stock",
+          "SMG recoil pad"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Wide polymer forearm",
+          "Short exposed barrel"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Grip moulded insert"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Pistol grip",
+          "Grip moulded insert.001"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Three lug muzzle",
+          "Bore shadow"
+        ],
+        "maximum_depth_m": 0.00115,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Three lug muzzle",
+          "Muzzle mounting lug"
+        ],
+        "maximum_depth_m": 0.0011258,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Selector axle",
+          "SMG selector"
+        ],
+        "maximum_depth_m": 0.0010521,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Selector axle.001",
+          "SMG selector.001"
+        ],
+        "maximum_depth_m": 0.0010521,
+        "reason": "Fastener or hinge intentionally seats into the supported solid"
+      },
+      {
+        "parts": [
+          "Curved 9mm magazine",
+          "Magazine pressed stiffener"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Curved 9mm magazine",
+          "Magazine pressed stiffener.002"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Curved 9mm magazine",
+          "Magazine pressed stiffener.003"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Curved 9mm magazine",
+          "Magazine pressed stiffener.004"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Curved 9mm magazine",
+          "Magazine pressed stiffener.005"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Curved 9mm magazine",
+          "Magazine pressed stiffener.001"
+        ],
+        "maximum_depth_m": 0.00065,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Short exposed barrel",
+          "Muzzle mounting lug"
+        ],
+        "maximum_depth_m": 0.0005544,
+        "reason": "Fixed assembly interface / seated component"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.001"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.002"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.003"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.004"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert",
+          "Grip traction rib.005"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.006"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.007"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.008"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.009"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.010"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      },
+      {
+        "parts": [
+          "Grip moulded insert.001",
+          "Grip traction rib.011"
+        ],
+        "maximum_depth_m": 0.00055,
+        "reason": "Raised surface detail seats into its parent surface"
+      }
+    ]
+  }
+}

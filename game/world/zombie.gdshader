@@ -1,43 +1,66 @@
 shader_type spatial;
 // Common zombie (ZombieModel / ZombieHordeView). One shader for every
 // material layer (skin, jersey, denim, leather, linen): a Poly Haven PBR
-// texture set plus procedural gore on top.
+// texture set, recoloured per zombie, plus procedural gore on top.
 //
 // Vertex data (built by ZombieModel):
 //   CUSTOM0 = (part id, gore seed, gore amount 0..1, kind)
 //             kind: 0 surface, 1 raw flesh, 2 bone, 3 eye, 4 mouth
-//   CUSTOM1 = (tint r, g, b, arm style: 0 both arms reach, 1 left arm hangs)
+//   CUSTOM1 = (tint r, g, b, colour slot: ZombieModel.Slot)
+//   CUSTOM2 = (show condition a, show condition b): ZombieModel.Show bits
 // Per instance (MultiMesh):
 //   INSTANCE_CUSTOM = (walk phase, walk 0..1, lunge 0..1 or -stagger,
 //                      flinch 0..1 | 2 + death 0..1 | 4 + headless death)
-//   COLOR (instance colour) = status tint rgb, a = how much of it shows.
+//   COLOR (instance colour) = (status index, show mask, colours, wear): the
+//   last three are integers below 2^24 packed by ZombieModel.roll_look,
+//   exact in float32 (Forward+ keeps the multimesh buffer in float32).
+//     colours: shirt 5 bits | trousers 4 | skin 3 | hair 3 | pattern 2 |
+//              pattern colour 3 | shoes 2 | jacket 2
+//     wear:    gore 3 bits | blood 3 | torn 3 | fade 3 | build 3 | offset 8
 // The skeleton is procedural: each box belongs to a part that rotates about
-// a fixed joint (same joints as ZombieModel.JOINTS), like the old soldier
-// pivots, but on the GPU so 150 zombies cost one MultiMesh update.
+// a fixed joint (same joints as ZombieModel), like the old soldier pivots,
+// but on the GPU so 150 zombies cost one MultiMesh update.
 
 uniform sampler2D albedo_tex : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform sampler2D normal_tex : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform sampler2D rough_tex : hint_roughness_r, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform float uv_scale = 2.0;  // texture repeats per metre
-uniform float is_cloth = 0.0;  // 1: wounds tear the cloth and show skin
+uniform float is_cloth = 0.0;  // 1: wounds and rips tear the cloth and show skin
 uniform float rot = 0.0;       // 1: skin rot blotches and veins
 uniform float dirt = 0.35;     // grime strength
+uniform float tex_mean = 0.3;  // the albedo texture's average luminance (linear)
+uniform int creature_type = 0; // EnemyKind: 0 common, 1 runner .. 6 screamer
+// Palettes (sRGB), from ZombieModel.
+uniform vec4 skin_colors[8];
+uniform vec4 shirt_colors[32];
+uniform vec4 trouser_colors[16];
+uniform vec4 hair_colors[8];
+uniform vec4 shoe_colors[4];
+uniform vec4 jacket_colors[4];
+uniform vec4 pattern_colors[8];
+uniform vec4 status_tints[8];
 
 varying vec3 v_rest;
 varying flat vec4 v_info;
-varying vec3 v_tint;
-varying vec4 v_status;
+varying flat vec3 v_col;      // linear albedo: palette colour (recoloured) or the box tint
+varying flat vec4 v_look;     // recolour 0/1, pattern, slot, unused
+varying flat vec3 v_pat_col;
+varying flat vec3 v_skin;     // this zombie's skin (for torn cloth)
+varying flat vec4 v_wear;     // gore scale, blood -1..1, torn 0..1, noise offset
+varying flat vec4 v_status;
 
-const vec3 WAIST = vec3(0.0, 1.02, 0.0);
-const vec3 NECK = vec3(0.0, 1.58, 0.02);
-const vec3 SHOULDER_L = vec3(0.27, 1.49, 0.0);
-const vec3 SHOULDER_R = vec3(-0.27, 1.49, 0.0);
-const vec3 ELBOW_L = vec3(0.29, 1.19, 0.0);
-const vec3 ELBOW_R = vec3(-0.29, 1.19, 0.0);
-const vec3 HIP_L = vec3(0.12, 0.92, 0.0);
-const vec3 HIP_R = vec3(-0.12, 0.92, 0.0);
-const vec3 KNEE_L = vec3(0.12, 0.5, 0.0);
-const vec3 KNEE_R = vec3(-0.12, 0.5, 0.0);
+uniform vec3 WAIST = vec3(0.0, 1.02, 0.0);
+uniform vec3 NECK = vec3(0.0, 1.58, 0.02);
+uniform vec3 SHOULDER_L = vec3(0.27, 1.49, 0.0);
+uniform vec3 SHOULDER_R = vec3(-0.27, 1.49, 0.0);
+uniform vec3 ELBOW_L = vec3(0.29, 1.19, 0.0);
+uniform vec3 ELBOW_R = vec3(-0.29, 1.19, 0.0);
+uniform vec3 HIP_L = vec3(0.12, 0.92, 0.0);
+uniform vec3 HIP_R = vec3(-0.12, 0.92, 0.0);
+uniform vec3 KNEE_L = vec3(0.12, 0.5, 0.0);
+uniform vec3 KNEE_R = vec3(-0.12, 0.5, 0.0);
+const vec3 LUMA = vec3(0.3, 0.59, 0.11);
+const uint SHOW_STUMP_L = 2u;  // ZombieModel.Show.STUMP_L
 
 mat3 rot_x(float a) {
 	float c = cos(a);
@@ -63,12 +86,55 @@ void turn(inout vec3 p, inout vec3 n, inout vec3 t, mat3 r, vec3 pivot) {
 	t = r * t;
 }
 
+// Colours are written as sRGB (what a paint picker shows); ALBEDO is linear.
+vec3 srgb(vec3 c) {
+	return pow(c, vec3(2.2));
+}
+
+// Sun-bleached, dusty cloth: desaturate towards a warm grey and darken a
+// bit. Every garment gets some (0.15), the most worn ones much more.
+vec3 faded(vec3 c, float f) {
+	float l = dot(c, LUMA);
+	return mix(c, vec3(l) * vec3(1.04, 1.0, 0.9), 0.15 + 0.4 * f) * (1.0 - 0.12 * f);
+}
+
 void vertex() {
 	v_rest = VERTEX;
 	v_info = CUSTOM0;
-	v_tint = CUSTOM1.rgb;
-	v_status = COLOR;
 	int part = int(CUSTOM0.x + 0.5);
+	int slot = int(CUSTOM1.a + 0.5);
+	uint mask = uint(COLOR.g + 0.5);
+	uint cols = uint(COLOR.b + 0.5);
+	uint wear = uint(COLOR.a + 0.5);
+	v_status = status_tints[clamp(int(COLOR.r + 0.5), 0, 7)];
+	// This zombie's colours: the box takes its slot's palette colour.
+	float fade = float((wear >> 9u) & 7u) / 7.0;
+	vec3 skin = srgb(skin_colors[int((cols >> 9u) & 7u)].rgb);
+	v_skin = skin;
+	vec3 col = CUSTOM1.rgb;
+	float recolour = 1.0;
+	float pattern = 0.0;
+	if (slot == 1) {
+		col *= skin;
+	} else if (slot == 2) {
+		col *= srgb(faded(shirt_colors[int(cols & 31u)].rgb, fade));
+		pattern = float((cols >> 15u) & 3u);
+	} else if (slot == 3) {
+		col *= srgb(faded(trouser_colors[int((cols >> 5u) & 15u)].rgb, fade));
+	} else if (slot == 4) {
+		col *= srgb(shoe_colors[int((cols >> 20u) & 3u)].rgb);
+	} else if (slot == 5) {
+		col *= srgb(hair_colors[int((cols >> 12u) & 7u)].rgb);
+	} else if (slot == 6) {
+		col *= srgb(faded(jacket_colors[int((cols >> 22u) & 3u)].rgb, fade * 0.6));
+	} else {
+		recolour = 0.0;
+	}
+	v_col = col;
+	v_pat_col = srgb(faded(pattern_colors[int((cols >> 17u) & 7u)].rgb, fade));
+	v_look = vec4(recolour, pattern, float(slot), 0.0);
+	v_wear = vec4(mix(0.7, 1.2, float(wear & 7u) / 7.0), float((wear >> 3u) & 7u) / 3.5 - 1.0,
+			float((wear >> 6u) & 7u) / 7.0, float((wear >> 15u) & 255u));
 	vec4 ic = INSTANCE_CUSTOM;
 	float phase = ic.x;
 	float walk = ic.y;
@@ -90,44 +156,94 @@ void vertex() {
 	vec3 p = VERTEX;
 	vec3 n = NORMAL;
 	vec3 t = TANGENT;
+	// Optional boxes the look does not show collapse to a point (no pixels).
+	uint sa = uint(CUSTOM2.x + 0.5);
+	uint sb = uint(CUSTOM2.y + 0.5);
+	bool shown = (((mask >> sa) & (mask >> sb)) & 1u) == 1u;
+	if (!shown) {
+		p = vec3(0.0, 1.3, 0.0);
+	}
 	if (headless && part == 2) {
 		p = NECK;  // collapsed: the head popped off (debris in island.gd)
+	}
+	// Build, -1 thin .. +1 heavy: wider/narrower body and limbs and a belly,
+	// sideways and in depth only (the head and its height never change).
+	float build = creature_type == 0 ? float((wear >> 12u) & 7u) / 3.5 - 1.0 : 0.0;
+	float wx = 1.0 + 0.14 * build;
+	float wl = 1.0 + 0.12 * build;
+	float arm_shift = 0.23 * (wx - 1.0);
+	if (part <= 1) {
+		p.x *= wx;
+		float belly = 0.4 * max(build, 0.0) * clamp((1.55 - p.y) / 0.45, 0.0, 1.0) * clamp((p.y - 0.8) / 0.25, 0.0, 1.0);
+		p.z *= p.z > 0.0 ? 1.0 + belly + 0.06 * build : 1.0 + 0.08 * build;
+	} else if (part >= 3 && part <= 6) {
+		float cx = part <= 4 ? 0.29 : -0.29;
+		p.x = cx + (p.x - cx) * wl + sign(cx) * arm_shift;
+		p.z *= wl;
+	} else if (part >= 7) {
+		float cx = part <= 8 ? 0.12 : -0.12;
+		p.x = cx * wx + (p.x - cx) * wl;
+		p.z *= p.y > 0.11 ? wl : 1.0;
 	}
 	// Legs: thigh about the hip, shin about the knee. The right leg drags.
 	if (part >= 7) {
 		bool left = part <= 8;
 		float swing = (left ? -0.5 : 0.36) * walk * s;
 		float knee = 0.7 * walk * max(0.0, left ? c : -c) + 0.9 * fall;
-		if (part == 8 || part == 10) {
-			turn(p, n, t, rot_x(knee), left ? KNEE_L : KNEE_R);
+		if (creature_type > 0) {
+			float stride = creature_type == 1 ? 0.85 : (creature_type == 2 || creature_type == 4 ? 0.25 : 0.40);
+			if (creature_type == 5) { stride = 0.25; }
+			swing = (left ? -stride : stride) * walk * s;
+			knee = (creature_type == 1 ? 1.05 : 0.48) * walk * max(0.0, left ? c : -c) + 0.9 * fall;
 		}
-		turn(p, n, t, rot_x(swing - 0.35 * fall), left ? HIP_L : HIP_R);
+		vec3 hip = (left ? HIP_L : HIP_R) * vec3(wx, 1.0, 1.0);
+		if (part == 8 || part == 10) {
+			turn(p, n, t, rot_x(knee), (left ? KNEE_L : KNEE_R) * vec3(wx, 1.0, 1.0));
+		}
+		turn(p, n, t, rot_x(swing - 0.35 * fall), hip);
 	}
-	// Arms: forearm about the elbow, then the arm about the shoulder.
+	// Arms: forearm about the elbow, then the arm about the shoulder. With
+	// the left forearm gone, that arm hangs.
 	if (part >= 3 && part <= 6) {
 		bool left = part <= 4;
-		bool hangs = left && CUSTOM1.a > 0.5;
+		bool hangs = creature_type == 0 && left && ((mask >> SHOW_STUMP_L) & 1u) == 1u;
 		float reach = hangs ? 0.25 * walk * s : 1.15 + 0.12 * sin(phase + (left ? 0.0 : 1.7)) + 0.45 * lunge;
+		float elbow_bend = hangs ? 0.15 : 0.35;
+		if (creature_type == 1) { reach = 0.2 + (left ? 0.7 : -0.7) * walk * s + 0.35 * lunge; elbow_bend = 0.85; }
+		if (creature_type == 2 || creature_type == 4) { reach = 0.15 + 0.13 * walk * s + 0.75 * lunge; elbow_bend = 0.25; }
+		if (creature_type == 3) { reach = 0.85 + 0.08 * sin(phase) + 0.5 * lunge; elbow_bend = 0.15; }
+		if (creature_type == 5) { reach = -0.1 + 0.12 * walk * s; elbow_bend = 0.15; }
+		if (creature_type == 6) { reach = 1.7 + 0.08 * sin(phase); elbow_bend = 1.15; }
 		reach = reach * limp - 0.3 * flinch;
 		float spread = (left ? 1.0 : -1.0) * (0.1 + 0.15 * stagger + 0.5 * fall);
+		vec3 shift = vec3(left ? arm_shift : -arm_shift, 0.0, 0.0);
 		if (part == 4 || part == 6) {
-			turn(p, n, t, rot_x(-(hangs ? 0.15 : 0.35) * limp), left ? ELBOW_L : ELBOW_R);
+			turn(p, n, t, rot_x(-elbow_bend * limp), (left ? ELBOW_L : ELBOW_R) + shift);
 		}
-		turn(p, n, t, rot_z(spread) * rot_x(-reach), left ? SHOULDER_L : SHOULDER_R);
+		turn(p, n, t, rot_z(spread) * rot_x(-reach), (left ? SHOULDER_L : SHOULDER_R) + shift);
 	}
 	// Head lolls about the neck and snaps back on a hit.
 	if (part == 2) {
 		float loll = 0.22 * sin(phase * 0.5) + 0.1 + 0.4 * stagger * sin(phase * 3.0);
-		turn(p, n, t, rot_z(loll * limp) * rot_x(-0.18 - 0.55 * flinch + 0.2 * lunge), NECK);
+		if (creature_type > 0) { loll = 0.035 * sin(phase * 0.5) + 0.15 * stagger * sin(phase * 3.0); }
+		float nod = creature_type == 6 ? -0.30 : (creature_type > 0 ? -0.05 : -0.18);
+		turn(p, n, t, rot_z(loll * limp) * rot_x(nod - 0.55 * flinch + 0.2 * lunge), NECK);
 	}
 	// Torso: hunched, twisting with the steps, lunging and recoiling.
 	if (part >= 1 && part <= 6) {
 		float lean = 0.18 + 0.08 * walk + 0.4 * lunge - 0.5 * flinch - 0.2 * stagger;
-		turn(p, n, t, rot_x(lean * limp) * rot_y(0.14 * walk * s), WAIST);
+		float twist = 0.14;
+		if (creature_type > 0) {
+			lean = (creature_type == 1 ? 0.10 : 0.025) + 0.02 * walk + 0.12 * lunge - 0.3 * flinch - 0.15 * stagger;
+			twist = 0.04;
+		}
+		turn(p, n, t, rot_x(lean * limp) * rot_y(twist * walk * s), WAIST);
 	}
 	// Whole body: bob and sway with the steps, lunge forward, fall backwards.
 	vec3 root = vec3(0.0, 0.04 * walk * abs(s), 0.2 * lunge);
-	turn(p, n, t, rot_z(0.05 * walk * s + 0.12 * stagger * sin(phase * 3.0)), vec3(0.0));
+	float sway = 0.05;
+	if (creature_type > 0) { root = vec3(0.0, 0.02 * walk * abs(s), 0.08 * lunge); sway = creature_type == 5 ? 0.04 : 0.02; }
+	turn(p, n, t, rot_z(sway * walk * s + 0.12 * stagger * sin(phase * 3.0)), vec3(0.0));
 	p += root * limp;
 	if (death > 0.0) {
 		turn(p, n, t, rot_x(-1.5 * fall), vec3(0.0));
@@ -154,35 +270,63 @@ float vnoise(vec3 q) {
 		f.z);
 }
 
-// Colours below are written as sRGB (what a paint picker shows); ALBEDO is linear.
-vec3 srgb(vec3 c) {
-	return pow(c, vec3(2.2));
-}
-
 float fbm(vec3 q) {
 	return 0.5 * vnoise(q) + 0.3 * vnoise(q * 2.03 + 7.1) + 0.2 * vnoise(q * 4.1 + 3.3);
 }
 
+// Anti-aliased band of a repeating pattern: 1 where the triangle wave of x
+// is above `edge` (fwidth keeps distant stripes from shimmering).
+float band(float x, float edge) {
+	float tri = abs(fract(x) - 0.5) * 2.0;
+	float aa = fwidth(x) * 2.0 + 0.001;
+	return smoothstep(edge - aa, edge + aa, tri);
+}
+
 void fragment() {
 	vec2 uv = UV * uv_scale;
-	vec3 base = texture(albedo_tex, uv).rgb * v_tint;
+	vec3 tex = texture(albedo_tex, uv).rgb;
+	// Recoloured boxes keep the texture's detail (luminance over its mean),
+	// softened so high-contrast weaves (denim) do not darken the colour.
+	float detail = clamp(mix(1.0, dot(tex, LUMA) / tex_mean, 0.6), 0.35, 1.8);
+	vec3 base = v_look.x > 0.5 ? v_col * detail : tex * v_col;
+	// Shirt patterns, in rest space (they follow the body).
+	int pat = int(v_look.y + 0.5);
+	if (pat == 1) {
+		base = mix(base, v_pat_col * detail, band(v_rest.y * 12.0, 0.55));  // stripes
+	} else if (pat == 2) {
+		float a = band(v_rest.y * 6.0, 0.5);
+		float b = band((v_rest.x + v_rest.z) * 6.0, 0.5);
+		base = mix(base, v_pat_col * detail, 0.42 * (a + b));  // plaid: crossing bands
+		float thin = max(band(v_rest.y * 18.0, 0.9), band((v_rest.x + v_rest.z) * 18.0, 0.9));
+		base *= 1.0 - 0.35 * thin;
+	} else if (pat == 3 && v_rest.z > 0.12 && v_info.x > 0.5 && v_info.x < 1.5) {
+		// A cracked, faded print on the chest front.
+		vec2 d = vec2(v_rest.x, v_rest.y - 1.37);
+		float r = length(d * vec2(1.0, 1.15));
+		float logo = (1.0 - smoothstep(0.075, 0.08, r)) * (1.0 - (smoothstep(0.035, 0.04, r) - smoothstep(0.05, 0.055, r)));
+		logo *= smoothstep(0.3, 0.5, vnoise(v_rest * 60.0));
+		base = mix(base, v_pat_col, logo * 0.9);
+	}
 	float rough = texture(rough_tex, uv).r;
 	NORMAL_MAP = texture(normal_tex, uv).rgb;
 	float metal = 0.0;
 	float kind = v_info.w;
 	float seed = v_info.y;
-	float gore = v_info.z;
-	vec3 q = v_rest + vec3(seed * 1.37, seed * 0.71, seed * 2.13);
+	float gore = clamp(v_info.z * v_wear.x, 0.0, 1.0);
+	float bl = v_wear.y;
+	// Each zombie samples the noise somewhere else: wounds move around.
+	vec3 q = v_rest + vec3(seed * 1.37, seed * 0.71, seed * 2.13) + v_wear.w * vec3(0.731, 0.419, 0.577);
 	// Grime: low-frequency darkening, stronger towards the feet.
 	float grime = fbm(q * 3.0) * dirt * (1.2 - clamp(v_rest.y * 0.5, 0.0, 1.0));
 	base *= 1.0 - grime;
 	if (rot > 0.5) {
+		// Relative to the skin tone, so light and dark skins both rot.
 		float blotch = smoothstep(0.45, 0.75, fbm(q * 5.0 + 11.0));
-		base = mix(base, srgb(vec3(0.45, 0.48, 0.33)), blotch * 0.5);
+		base = mix(base, base * vec3(0.72, 0.82, 0.55), blotch * 0.6);
 		float bruise = smoothstep(0.55, 0.8, fbm(q * 3.5 + 23.0));
-		base = mix(base, srgb(vec3(0.4, 0.3, 0.38)), bruise * 0.45);
+		base = mix(base, base * vec3(0.66, 0.45, 0.66), bruise * 0.55);
 		float vein = 1.0 - smoothstep(0.0, 0.02, abs(fbm(q * 9.0) - 0.5));
-		base = mix(base, srgb(vec3(0.32, 0.3, 0.36)), vein * 0.18 * smoothstep(0.4, 0.6, vnoise(q * 2.0)));
+		base = mix(base, base * vec3(0.5, 0.5, 0.65), vein * 0.4 * smoothstep(0.4, 0.6, vnoise(q * 2.0)));
 	}
 	// Wounds: noise blobs whose size grows with the box's gore amount.
 	float w = fbm(q * 6.0);
@@ -192,20 +336,26 @@ void fragment() {
 	// Blood runs down: vertical streaks under wounds, plus a little spatter.
 	float streak = fbm(vec3(q.x * 14.0, q.y * 1.6, q.z * 14.0));
 	float below = fbm((q + vec3(0.0, 0.15, 0.0)) * 6.0);
-	float drip = gore > 0.01 ? smoothstep(0.55, 0.68, streak) * smoothstep(cut - 0.12, cut - 0.02, below) : 0.0;
-	float spatter = smoothstep(0.8, 0.83, vnoise(q * 28.0)) * gore;
+	float drip = gore > 0.01 ? smoothstep(0.57 - 0.04 * bl, 0.7 - 0.04 * bl, streak) * smoothstep(cut - 0.12, cut - 0.02, below) : 0.0;
+	float spatter = smoothstep(0.81 - 0.03 * bl, 0.84 - 0.03 * bl, vnoise(q * 28.0)) * gore;
 	float fresh = smoothstep(0.5, 0.65, fbm(q * 4.0 + 5.0));
 	vec3 dried = srgb(vec3(0.3, 0.07, 0.05));
 	vec3 wet = srgb(vec3(0.42, 0.02, 0.02));
-	// Large soaked stains (mostly dried) on the gorier boxes.
-	float soak = smoothstep(0.56, 0.64, fbm(q * 2.2 + 17.0)) * smoothstep(0.25, 0.7, gore);
+	// Large soaked stains (mostly dried); bloodier zombies soak more boxes.
+	float soak = smoothstep(0.58 - 0.05 * bl, 0.66 - 0.05 * bl, fbm(q * 2.2 + 17.0)) * smoothstep(0.25, 0.7, gore);
 	float blood = clamp(max(max(rim * 0.9, soak * 0.85), max(drip, spatter)), 0.0, 1.0);
 	vec3 blood_col = mix(dried, wet, fresh * (1.0 - soak * 0.6));
 	float blood_rough = mix(0.85, 0.15, fresh);
-	if (is_cloth > 0.5) {
-		// Torn cloth shows grey skin; the frayed edge is soaked dark.
-		vec3 skin = srgb(vec3(0.6, 0.62, 0.52)) * (0.8 + 0.4 * vnoise(q * 30.0));
+	if (is_cloth > 0.5 && v_look.z > 1.5) {
+		// Torn cloth shows this zombie's skin; the frayed edge is dark. Rips
+		// grow with the torn amount, wounds tear the cloth around them.
+		vec3 skin = v_skin * (0.8 + 0.4 * vnoise(q * 30.0));
 		float torn = gore > 0.01 ? smoothstep(cut - 0.035, cut - 0.015, w) : 0.0;
+		float rn = fbm(q * 3.3 + 41.0);
+		float rc = 0.88 - 0.1 * v_wear.z;
+		float rip = smoothstep(rc, rc + 0.015, rn);
+		base *= 1.0 - 0.55 * (smoothstep(rc - 0.03, rc - 0.005, rn) - rip);
+		torn = max(torn, rip);
 		base = mix(base, skin, torn);
 		rough = mix(rough, 0.6, torn);
 	}

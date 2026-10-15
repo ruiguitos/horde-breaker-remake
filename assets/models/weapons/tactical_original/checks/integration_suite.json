@@ -1,0 +1,340 @@
+{
+  "passed": 45,
+  "completed": 47,
+  "total": 47,
+  "results": [
+    {
+      "test": "tests/test_armory_layout.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 10.45
+    },
+    {
+      "test": "tests/test_boat_redesign.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 6.8
+    },
+    {
+      "test": "tests/test_briefing.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 5.44
+    },
+    {
+      "test": "tests/test_camera_aim.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 14.14
+    },
+    {
+      "test": "tests/test_cards_catalog.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 8.56
+    },
+    {
+      "test": "tests/test_credits.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 6.69
+    },
+    {
+      "test": "tests/test_data.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 4.81
+    },
+    {
+      "test": "tests/test_defeat_power_up_hud.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 10.17
+    },
+    {
+      "test": "tests/test_dialogue.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 5.42
+    },
+    {
+      "test": "tests/test_escort.gd",
+      "passed": false,
+      "failures": [
+        "TEST FAIL: bot seed 505 (beach): Repair the cart (0 / 5 s) in 900 s; at the cart at 29 s, stops at 70 s, delivered at -1 s; 45 s blocked, 0 s waiting, 1 breakdowns; 4074 kills, up to 150 enemies alive, Intel 1116 (85.2 s of CPU)",
+        "180 second timeout"
+      ],
+      "seconds": 180.03
+    },
+    {
+      "test": "tests/test_expedition.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 34.69
+    },
+    {
+      "test": "tests/test_expedition_missions.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 15.92
+    },
+    {
+      "test": "tests/test_fuel_run.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 95.45
+    },
+    {
+      "test": "tests/test_fov.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 6.12
+    },
+    {
+      "test": "tests/test_handmade.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 23.05
+    },
+    {
+      "test": "tests/test_game_scene.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 28.61
+    },
+    {
+      "test": "tests/test_hud.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 6.86
+    },
+    {
+      "test": "tests/test_hud_redesign.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 16.05
+    },
+    {
+      "test": "tests/test_island_end_panel.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 17.2
+    },
+    {
+      "test": "tests/test_island_props.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 11.66
+    },
+    {
+      "test": "tests/test_hold_sequence.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 74.36
+    },
+    {
+      "test": "tests/test_loading_screen.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 13.72
+    },
+    {
+      "test": "tests/test_island_run.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 26.53
+    },
+    {
+      "test": "tests/test_menus.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 12.92
+    },
+    {
+      "test": "tests/test_noclip.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 5.94
+    },
+    {
+      "test": "tests/test_intel_search.gd",
+      "passed": false,
+      "exit_code": 3221225477,
+      "failures": [
+        "TEST FAIL: boat routes: Intel Search on 14% of Town routes, 10% elsewhere (still possible)"
+      ],
+      "seconds": 87.73
+    },
+    {
+      "test": "tests/test_power_ups.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 8.25
+    },
+    {
+      "test": "tests/test_perk_tree.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 16.14
+    },
+    {
+      "test": "tests/test_recruit_animation.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 13.61
+    },
+    {
+      "test": "tests/test_run_and_gun.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 12.12
+    },
+    {
+      "test": "tests/test_settings.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 7.64
+    },
+    {
+      "test": "tests/test_sfx.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 6.97
+    },
+    {
+      "test": "tests/test_nests.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 59.02
+    },
+    {
+      "test": "tests/test_smoke.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 5.64
+    },
+    {
+      "test": "tests/test_sabotage.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 80.88
+    },
+    {
+      "test": "tests/test_test_island.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 10.3
+    },
+    {
+      "test": "tests/test_signals.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 84.23
+    },
+    {
+      "test": "tests/test_title_debrief_redesign.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 13.81
+    },
+    {
+      "test": "tests/test_weapon_grips.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 8.2
+    },
+    {
+      "test": "tests/test_weapon_loadout.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 10.11
+    },
+    {
+      "test": "tests/test_weapon_models.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 11.92
+    },
+    {
+      "test": "tests/test_world_dressing.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 10.19
+    },
+    {
+      "test": "tests/test_zombie_model.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 5.78
+    },
+    {
+      "test": "spikes/camera_medium/tests/test_camera_medium.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 4.89
+    },
+    {
+      "test": "spikes/director/tests/test_director.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 5.45
+    },
+    {
+      "test": "spikes/horde_flowfield/tests/test_horde.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 11.67
+    },
+    {
+      "test": "tests/test_soak_run.gd",
+      "passed": true,
+      "exit_code": 3221225477,
+      "failures": [],
+      "seconds": 147.08
+    }
+  ]
+}

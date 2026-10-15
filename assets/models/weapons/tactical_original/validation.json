@@ -1,0 +1,666 @@
+{
+  "weapons": {
+    "assault_rifle": {
+      "length_m": 0.9608000218868256,
+      "target_length_m": 0.96,
+      "triangles": 7482,
+      "mesh_count": 86,
+      "material_names": [
+        "gunmetal",
+        "steel",
+        "bore",
+        "polymer"
+      ],
+      "muzzle_position_godot_m": [
+        0,
+        0.10499999672174454,
+        -0.6200000047683716
+      ],
+      "muzzle_forward_local": [
+        0,
+        0,
+        -1
+      ],
+      "bounds_min_godot_m": [
+        -0.032999999821186066,
+        -0.164000004529953,
+        -0.6200000047683716
+      ],
+      "bounds_max_godot_m": [
+        0.048535242676734924,
+        0.2029999941587448,
+        0.340800017118454
+      ],
+      "origin_check": {
+        "passed": true,
+        "grip_point_godot_m": [
+          0,
+          0,
+          0
+        ],
+        "all_mesh_and_root_transforms_identity": true,
+        "definition": "Top of the right-hand pistol grip / shotgun wrist; artist placement"
+      },
+      "uv_check": {
+        "passed": true,
+        "layers": 1,
+        "min": 0.0016938447952270508,
+        "max": 0.998306155204773,
+        "overlapping_triangle_pairs": 0,
+        "degenerate_uv_triangles": 0,
+        "overlap_area_tolerance_uv2": 1e-10,
+        "overlap_examples": [],
+        "texel_density_p95_over_p05": 1.106689410731856,
+        "texel_density_min": 1.0441335956484845,
+        "texel_density_max": 1.3235934525844912
+      },
+      "normals_and_tangents_check": {
+        "passed": true,
+        "all_primitives_have_normals_and_tangents": true,
+        "max_normal_length_error": 1.2805644100666314e-07,
+        "max_tangent_length_error": 7.948287267955934e-05,
+        "max_normal_tangent_dot": 0.00012003348685940551
+      },
+      "minimum_triangle_area_m2": 2.710962046699145e-08,
+      "single_scene": true,
+      "embedded_textures": 0,
+      "cameras": 0,
+      "lights": 0,
+      "armatures": 0,
+      "animations": 0,
+      "material_pbr": {
+        "gunmetal": {
+          "baseColorFactor": [
+            0.02199999988079071,
+            0.02800000086426735,
+            0.03500000014901161,
+            1
+          ],
+          "metallicFactor": 0.8199999928474426,
+          "roughnessFactor": 0.41999998688697815
+        },
+        "steel": {
+          "baseColorFactor": [
+            0.3799999952316284,
+            0.41999998688697815,
+            0.46000000834465027,
+            1
+          ],
+          "metallicFactor": 0.9399999976158142,
+          "roughnessFactor": 0.23000000417232513
+        },
+        "bore": {
+          "baseColorFactor": [
+            0.004000000189989805,
+            0.004999999888241291,
+            0.006000000052154064,
+            1
+          ],
+          "metallicFactor": 0.10000000149011612,
+          "roughnessFactor": 0.9300000071525574
+        },
+        "polymer": {
+          "baseColorFactor": [
+            0.00800000037997961,
+            0.012000000104308128,
+            0.00800000037997961,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.6800000071525574
+        }
+      },
+      "source_topology_check": {
+        "passed": true,
+        "closed_manifold_solids": 86,
+        "positive_volumes": true,
+        "degenerate_faces": 0,
+        "self_intersection_candidates": 0
+      },
+      "interpenetration_check": {
+        "report": "checks/assault_rifle_geometry.json",
+        "method": "BVH surface crossings; signed nearest-surface vertex and triangle-centre penetration samples. Mounts require explicit inspection; this is not exact intersection-volume proof.",
+        "mounts_reviewed": true,
+        "approved_contact_pairs": 56,
+        "limitation": "Sampled containment and surface BVH, not an exact constructive-solid-geometry proof."
+      }
+    },
+    "smg": {
+      "length_m": 0.7399999797344208,
+      "target_length_m": 0.74,
+      "triangles": 6292,
+      "mesh_count": 70,
+      "material_names": [
+        "bore",
+        "steel",
+        "polymer",
+        "gunmetal"
+      ],
+      "muzzle_position_godot_m": [
+        0,
+        0.10599999874830246,
+        -0.4399999976158142
+      ],
+      "muzzle_forward_local": [
+        0,
+        0,
+        -1
+      ],
+      "bounds_min_godot_m": [
+        -0.045499999076128006,
+        -0.14800000190734863,
+        -0.4399999976158142
+      ],
+      "bounds_max_godot_m": [
+        0.03200000151991844,
+        0.1770000010728836,
+        0.29999998211860657
+      ],
+      "origin_check": {
+        "passed": true,
+        "grip_point_godot_m": [
+          0,
+          0,
+          0
+        ],
+        "all_mesh_and_root_transforms_identity": true,
+        "definition": "Top of the right-hand pistol grip / shotgun wrist; artist placement"
+      },
+      "uv_check": {
+        "passed": true,
+        "layers": 1,
+        "min": 0.0017301375046372414,
+        "max": 0.9983382821083069,
+        "overlapping_triangle_pairs": 0,
+        "degenerate_uv_triangles": 0,
+        "overlap_area_tolerance_uv2": 1e-10,
+        "overlap_examples": [],
+        "texel_density_p95_over_p05": 1.1087342556516218,
+        "texel_density_min": 1.2231604565209184,
+        "texel_density_max": 1.5113930310417802
+      },
+      "normals_and_tangents_check": {
+        "passed": true,
+        "all_primitives_have_normals_and_tangents": true,
+        "max_normal_length_error": 1.1416402578845464e-07,
+        "max_tangent_length_error": 7.948287267955934e-05,
+        "max_normal_tangent_dot": 0.00012481575225353758
+      },
+      "minimum_triangle_area_m2": 2.710962046699145e-08,
+      "single_scene": true,
+      "embedded_textures": 0,
+      "cameras": 0,
+      "lights": 0,
+      "armatures": 0,
+      "animations": 0,
+      "material_pbr": {
+        "bore": {
+          "baseColorFactor": [
+            0.004000000189989805,
+            0.004999999888241291,
+            0.006000000052154064,
+            1
+          ],
+          "metallicFactor": 0.10000000149011612,
+          "roughnessFactor": 0.9300000071525574
+        },
+        "steel": {
+          "baseColorFactor": [
+            0.3799999952316284,
+            0.41999998688697815,
+            0.46000000834465027,
+            1
+          ],
+          "metallicFactor": 0.9399999976158142,
+          "roughnessFactor": 0.23000000417232513
+        },
+        "polymer": {
+          "baseColorFactor": [
+            0.00800000037997961,
+            0.012000000104308128,
+            0.00800000037997961,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.6800000071525574
+        },
+        "gunmetal": {
+          "baseColorFactor": [
+            0.02199999988079071,
+            0.02800000086426735,
+            0.03500000014901161,
+            1
+          ],
+          "metallicFactor": 0.8199999928474426,
+          "roughnessFactor": 0.41999998688697815
+        }
+      },
+      "source_topology_check": {
+        "passed": true,
+        "closed_manifold_solids": 70,
+        "positive_volumes": true,
+        "degenerate_faces": 0,
+        "self_intersection_candidates": 0
+      },
+      "interpenetration_check": {
+        "report": "checks/smg_geometry.json",
+        "method": "BVH surface crossings; signed nearest-surface vertex and triangle-centre penetration samples. Mounts require explicit inspection; this is not exact intersection-volume proof.",
+        "mounts_reviewed": true,
+        "approved_contact_pairs": 53,
+        "limitation": "Sampled containment and surface BVH, not an exact constructive-solid-geometry proof."
+      }
+    },
+    "machine_gun": {
+      "length_m": 1.0400000214576721,
+      "target_length_m": 1.04,
+      "triangles": 7940,
+      "mesh_count": 96,
+      "material_names": [
+        "steel",
+        "polymer",
+        "gunmetal",
+        "bore",
+        "rust"
+      ],
+      "muzzle_position_godot_m": [
+        0,
+        0.13899999856948853,
+        -0.6899999976158142
+      ],
+      "muzzle_forward_local": [
+        0,
+        0,
+        -1
+      ],
+      "bounds_min_godot_m": [
+        -0.09099999815225601,
+        -0.15150000154972076,
+        -0.6899999976158142
+      ],
+      "bounds_max_godot_m": [
+        0.09000000357627869,
+        0.25699999928474426,
+        0.3500000238418579
+      ],
+      "origin_check": {
+        "passed": true,
+        "grip_point_godot_m": [
+          0,
+          0,
+          0
+        ],
+        "all_mesh_and_root_transforms_identity": true,
+        "definition": "Top of the right-hand pistol grip / shotgun wrist; artist placement"
+      },
+      "uv_check": {
+        "passed": true,
+        "layers": 1,
+        "min": 0.0016695141093805432,
+        "max": 0.9983304738998413,
+        "overlapping_triangle_pairs": 0,
+        "degenerate_uv_triangles": 0,
+        "overlap_area_tolerance_uv2": 1e-10,
+        "overlap_examples": [],
+        "texel_density_p95_over_p05": 1.126254359456051,
+        "texel_density_min": 0.7777181587796228,
+        "texel_density_max": 0.9900016414122644
+      },
+      "normals_and_tangents_check": {
+        "passed": true,
+        "all_primitives_have_normals_and_tangents": true,
+        "max_normal_length_error": 1.1416402578845464e-07,
+        "max_tangent_length_error": 8.16649365413813e-05,
+        "max_normal_tangent_dot": 0.00011997076116898597
+      },
+      "minimum_triangle_area_m2": 4.205885124989026e-09,
+      "single_scene": true,
+      "embedded_textures": 0,
+      "cameras": 0,
+      "lights": 0,
+      "armatures": 0,
+      "animations": 0,
+      "material_pbr": {
+        "steel": {
+          "baseColorFactor": [
+            0.3799999952316284,
+            0.41999998688697815,
+            0.46000000834465027,
+            1
+          ],
+          "metallicFactor": 0.9399999976158142,
+          "roughnessFactor": 0.23000000417232513
+        },
+        "polymer": {
+          "baseColorFactor": [
+            0.00800000037997961,
+            0.012000000104308128,
+            0.00800000037997961,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.6800000071525574
+        },
+        "gunmetal": {
+          "baseColorFactor": [
+            0.02199999988079071,
+            0.02800000086426735,
+            0.03500000014901161,
+            1
+          ],
+          "metallicFactor": 0.8199999928474426,
+          "roughnessFactor": 0.41999998688697815
+        },
+        "bore": {
+          "baseColorFactor": [
+            0.004000000189989805,
+            0.004999999888241291,
+            0.006000000052154064,
+            1
+          ],
+          "metallicFactor": 0.10000000149011612,
+          "roughnessFactor": 0.9300000071525574
+        },
+        "rust": {
+          "baseColorFactor": [
+            0.20999999344348907,
+            0.06300000101327896,
+            0.01899999938905239,
+            1
+          ],
+          "metallicFactor": 0.18000000715255737,
+          "roughnessFactor": 0.8799999952316284
+        }
+      },
+      "source_topology_check": {
+        "passed": true,
+        "closed_manifold_solids": 96,
+        "positive_volumes": true,
+        "degenerate_faces": 0,
+        "self_intersection_candidates": 0
+      },
+      "interpenetration_check": {
+        "report": "checks/machine_gun_geometry.json",
+        "method": "BVH surface crossings; signed nearest-surface vertex and triangle-centre penetration samples. Mounts require explicit inspection; this is not exact intersection-volume proof.",
+        "mounts_reviewed": true,
+        "approved_contact_pairs": 56,
+        "limitation": "Sampled containment and surface BVH, not an exact constructive-solid-geometry proof."
+      }
+    },
+    "shotgun": {
+      "length_m": 1.0400000214576721,
+      "target_length_m": 1.04,
+      "triangles": 4550,
+      "mesh_count": 34,
+      "material_names": [
+        "gunmetal",
+        "steel",
+        "wood",
+        "bore",
+        "polymer"
+      ],
+      "muzzle_position_godot_m": [
+        0,
+        0.06800000369548798,
+        -0.6600000262260437
+      ],
+      "muzzle_forward_local": [
+        0,
+        0,
+        -1
+      ],
+      "bounds_min_godot_m": [
+        -0.026499999687075615,
+        -0.1340000033378601,
+        -0.6600000262260437
+      ],
+      "bounds_max_godot_m": [
+        0.025499999523162842,
+        0.10699999332427979,
+        0.3799999952316284
+      ],
+      "origin_check": {
+        "passed": true,
+        "grip_point_godot_m": [
+          0,
+          0,
+          0
+        ],
+        "all_mesh_and_root_transforms_identity": true,
+        "definition": "Top of the right-hand pistol grip / shotgun wrist; artist placement"
+      },
+      "uv_check": {
+        "passed": true,
+        "layers": 1,
+        "min": 0.0012413864023983479,
+        "max": 0.9987586736679077,
+        "overlapping_triangle_pairs": 0,
+        "degenerate_uv_triangles": 0,
+        "overlap_area_tolerance_uv2": 1e-10,
+        "overlap_examples": [],
+        "texel_density_p95_over_p05": 1.0994480643715197,
+        "texel_density_min": 1.088227119402489,
+        "texel_density_max": 1.3473716012617107
+      },
+      "normals_and_tangents_check": {
+        "passed": true,
+        "all_primitives_have_normals_and_tangents": true,
+        "max_normal_length_error": 1.0858010712766486e-07,
+        "max_tangent_length_error": 7.286272938999971e-05,
+        "max_normal_tangent_dot": 0.00012634059841687417
+      },
+      "minimum_triangle_area_m2": 2.6240523534755898e-08,
+      "single_scene": true,
+      "embedded_textures": 0,
+      "cameras": 0,
+      "lights": 0,
+      "armatures": 0,
+      "animations": 0,
+      "material_pbr": {
+        "gunmetal": {
+          "baseColorFactor": [
+            0.02199999988079071,
+            0.02800000086426735,
+            0.03500000014901161,
+            1
+          ],
+          "metallicFactor": 0.8199999928474426,
+          "roughnessFactor": 0.41999998688697815
+        },
+        "steel": {
+          "baseColorFactor": [
+            0.3799999952316284,
+            0.41999998688697815,
+            0.46000000834465027,
+            1
+          ],
+          "metallicFactor": 0.9399999976158142,
+          "roughnessFactor": 0.23000000417232513
+        },
+        "wood": {
+          "baseColorFactor": [
+            0.06499999761581421,
+            0.017999999225139618,
+            0.006000000052154064,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.41999998688697815
+        },
+        "bore": {
+          "baseColorFactor": [
+            0.004000000189989805,
+            0.004999999888241291,
+            0.006000000052154064,
+            1
+          ],
+          "metallicFactor": 0.10000000149011612,
+          "roughnessFactor": 0.9300000071525574
+        },
+        "polymer": {
+          "baseColorFactor": [
+            0.00800000037997961,
+            0.012000000104308128,
+            0.00800000037997961,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.6800000071525574
+        }
+      },
+      "source_topology_check": {
+        "passed": true,
+        "closed_manifold_solids": 34,
+        "positive_volumes": true,
+        "degenerate_faces": 0,
+        "self_intersection_candidates": 0
+      },
+      "interpenetration_check": {
+        "report": "checks/shotgun_geometry.json",
+        "method": "BVH surface crossings; signed nearest-surface vertex and triangle-centre penetration samples. Mounts require explicit inspection; this is not exact intersection-volume proof.",
+        "mounts_reviewed": true,
+        "approved_contact_pairs": 29,
+        "limitation": "Sampled containment and surface BVH, not an exact constructive-solid-geometry proof."
+      }
+    },
+    "marksman": {
+      "length_m": 1.1199999749660492,
+      "target_length_m": 1.12,
+      "triangles": 7708,
+      "mesh_count": 60,
+      "material_names": [
+        "bore",
+        "steel",
+        "gunmetal",
+        "polymer",
+        "wood"
+      ],
+      "muzzle_position_godot_m": [
+        0,
+        0.12300000339746475,
+        -0.7599999904632568
+      ],
+      "muzzle_forward_local": [
+        0,
+        0,
+        -1
+      ],
+      "bounds_min_godot_m": [
+        -0.03200000151991844,
+        -0.08652230352163315,
+        -0.7599999904632568
+      ],
+      "bounds_max_godot_m": [
+        0.057999998331069946,
+        0.2639999985694885,
+        0.35999998450279236
+      ],
+      "origin_check": {
+        "passed": true,
+        "grip_point_godot_m": [
+          0,
+          0,
+          0
+        ],
+        "all_mesh_and_root_transforms_identity": true,
+        "definition": "Top of the right-hand pistol grip / shotgun wrist; artist placement"
+      },
+      "uv_check": {
+        "passed": true,
+        "layers": 1,
+        "min": 0.0016407370567321777,
+        "max": 0.9983593225479126,
+        "overlapping_triangle_pairs": 0,
+        "degenerate_uv_triangles": 0,
+        "overlap_area_tolerance_uv2": 1e-10,
+        "overlap_examples": [],
+        "texel_density_p95_over_p05": 1.0950201493178247,
+        "texel_density_min": 0.9277136405097854,
+        "texel_density_max": 1.1695673569291747
+      },
+      "normals_and_tangents_check": {
+        "passed": true,
+        "all_primitives_have_normals_and_tangents": true,
+        "max_normal_length_error": 1.2319771869329088e-07,
+        "max_tangent_length_error": 7.948287267955934e-05,
+        "max_normal_tangent_dot": 0.00012068961970435055
+      },
+      "minimum_triangle_area_m2": 8.039374802882466e-10,
+      "single_scene": true,
+      "embedded_textures": 0,
+      "cameras": 0,
+      "lights": 0,
+      "armatures": 0,
+      "animations": 0,
+      "material_pbr": {
+        "bore": {
+          "baseColorFactor": [
+            0.004000000189989805,
+            0.004999999888241291,
+            0.006000000052154064,
+            1
+          ],
+          "metallicFactor": 0.10000000149011612,
+          "roughnessFactor": 0.9300000071525574
+        },
+        "steel": {
+          "baseColorFactor": [
+            0.3799999952316284,
+            0.41999998688697815,
+            0.46000000834465027,
+            1
+          ],
+          "metallicFactor": 0.9399999976158142,
+          "roughnessFactor": 0.23000000417232513
+        },
+        "gunmetal": {
+          "baseColorFactor": [
+            0.02199999988079071,
+            0.02800000086426735,
+            0.03500000014901161,
+            1
+          ],
+          "metallicFactor": 0.8199999928474426,
+          "roughnessFactor": 0.41999998688697815
+        },
+        "polymer": {
+          "baseColorFactor": [
+            0.00800000037997961,
+            0.012000000104308128,
+            0.00800000037997961,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.6800000071525574
+        },
+        "wood": {
+          "baseColorFactor": [
+            0.06499999761581421,
+            0.017999999225139618,
+            0.006000000052154064,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.41999998688697815
+        }
+      },
+      "source_topology_check": {
+        "passed": true,
+        "closed_manifold_solids": 60,
+        "positive_volumes": true,
+        "degenerate_faces": 0,
+        "self_intersection_candidates": 0
+      },
+      "interpenetration_check": {
+        "report": "checks/marksman_geometry.json",
+        "method": "BVH surface crossings; signed nearest-surface vertex and triangle-centre penetration samples. Mounts require explicit inspection; this is not exact intersection-volume proof.",
+        "mounts_reviewed": true,
+        "approved_contact_pairs": 46,
+        "limitation": "Sampled containment and surface BVH, not an exact constructive-solid-geometry proof."
+      }
+    }
+  },
+  "blender_version": "5.2.2 LTS",
+  "validator": "Independent GLB accessors, float32 values; standard library only",
+  "export_contract_passed": true,
+  "geometry_validation_limits": "Grip placement is an artist landmark. BVH and sampled penetration checks do not constitute an exact volumetric-intersection proof."
+}

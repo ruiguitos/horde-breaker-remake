@@ -1,0 +1,11 @@
+{
+  "status": "completed_requires_review",
+  "requested_action": "External review of weapon loader and support-arm code excerpts",
+  "previous_attempt": "Blocked by automatic approval review before explicit authorization; user has now authorized this restricted scope",
+  "explicitly_authorized": true,
+  "review_executed": true,
+  "advisory_action": "escalate",
+  "result": "jev_loader_arm_review.json",
+  "local_tests_and_source_review_continued": true,
+  "separate_asset_claim_verification": "jev_validation.json"
+}

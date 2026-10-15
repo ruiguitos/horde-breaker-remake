@@ -1,0 +1,155 @@
+{
+  "engine": "Godot 4.7.2 stable",
+  "renderer": "Forward+",
+  "hardware": "NVIDIA GeForce RTX 5060",
+  "models": {
+    "runner": {
+      "triangles": 396,
+      "geometry": "original procedural cuboids and tapered prisms",
+      "integrated": true
+    },
+    "brute": {
+      "triangles": 432,
+      "geometry": "original procedural cuboids and tapered prisms",
+      "integrated": true
+    },
+    "grabber": {
+      "triangles": 468,
+      "geometry": "original procedural cuboids and tapered prisms",
+      "integrated": true
+    },
+    "behemoth": {
+      "triangles": 504,
+      "geometry": "original procedural cuboids and tapered prisms",
+      "integrated": true
+    },
+    "bloater": {
+      "triangles": 480,
+      "geometry": "original procedural cuboids and tapered prisms",
+      "integrated": true
+    },
+    "screamer": {
+      "triangles": 420,
+      "geometry": "original procedural cuboids and tapered prisms",
+      "integrated": true
+    }
+  },
+  "gpu_checks": 50,
+  "headless_checks": 49,
+  "all_seven_capsules_hidden_on_gpu": true,
+  "skull_target_alignment": {
+    "pose": "rest mesh",
+    "maximum_reported_error_m": 0.0,
+    "report_decimals": 4,
+    "tolerance_m": 0.002,
+    "source": "actual mesh skull vertices against IslandRun.enemy_head"
+  },
+  "overlapping_deaths": "All six specials retain their own mesh class even when overlapping the Walker at the exact same position.",
+  "benchmark": {
+    "resolution": [
+      1600,
+      900
+    ],
+    "mixed_enemies": 150,
+    "bosses": 1,
+    "measured_frames": 500,
+    "vsync": false,
+    "gpu_ms": 1.153,
+    "render_cpu_ms": 0.289,
+    "view_update_cpu_ms": 0.452,
+    "total_frame_ms": 1.717,
+    "scope": "art scene only; no island terrain, AI or HUD"
+  },
+  "initial_suite": {
+    "passed": 46,
+    "total": 49,
+    "failures": [
+      {
+        "test": "tests/test_escort.gd",
+        "passed": false,
+        "failures": [
+          "TEST FAIL: bot seed 505 (beach): Repair the cart (0 / 5 s) in 900 s; at the cart at 29 s, stops at 70 s, delivered at -1 s; 45 s blocked, 0 s waiting, 1 breakdowns; 4074 kills, up to 150 enemies alive, Intel 1116 (95.7 s of CPU)",
+          "180 second timeout"
+        ],
+        "seconds": 180.01
+      },
+      {
+        "test": "tests/test_fuel_run.gd",
+        "passed": false,
+        "failures": [
+          "SCRIPT ERROR: Parse Error: Static function \"field_of_view()\" not found in base \"Profile\".",
+          "SCRIPT ERROR: Invalid access to property or key 'director' on a base object of type 'Nil'.",
+          "180 second timeout"
+        ],
+        "seconds": 180.03
+      },
+      {
+        "test": "tests/test_intel_search.gd",
+        "passed": false,
+        "exit_code": 3221225477,
+        "failures": [
+          "TEST FAIL: boat routes: Intel Search on 14% of Town routes, 10% elsewhere (still possible)"
+        ],
+        "seconds": 72.09
+      }
+    ]
+  },
+  "rerun": {
+    "test": "tests/test_fuel_run.gd",
+    "passed": true,
+    "exit_code": 3221225477,
+    "failures": [],
+    "seconds": 97.5,
+    "camera_sources_unchanged_during_rerun": true
+  },
+  "latest_results": {
+    "passed": 47,
+    "total": 49,
+    "failures": [
+      {
+        "test": "tests/test_escort.gd",
+        "passed": false,
+        "failures": [
+          "TEST FAIL: bot seed 505 (beach): Repair the cart (0 / 5 s) in 900 s; at the cart at 29 s, stops at 70 s, delivered at -1 s; 45 s blocked, 0 s waiting, 1 breakdowns; 4074 kills, up to 150 enemies alive, Intel 1116 (95.7 s of CPU)",
+          "180 second timeout"
+        ],
+        "seconds": 180.01
+      },
+      {
+        "test": "tests/test_intel_search.gd",
+        "passed": false,
+        "exit_code": 3221225477,
+        "failures": [
+          "TEST FAIL: boat routes: Intel Search on 14% of Town routes, 10% elsewhere (still possible)"
+        ],
+        "seconds": 72.09
+      }
+    ]
+  },
+  "two_three_island_soak_runs": "Both seeds extracted in all six islands.",
+  "external_review": "Not sent to JEV. User authorization for source sharing covers only weapon-loader and support-arm excerpts. Local review and deterministic tests used.",
+  "source_sha256": {
+    "game/world/special_enemy_model.gd": "4669912d45c71d04633d79c04556e6d497586b579e2c4e4c8d5bc85a15792ff1",
+    "game/world/zombie_model.gd": "46edeb18ae4097c2e07a2252ed7530f378c6fe9272d9a91144898b409496e5c3",
+    "game/world/zombie_horde_view.gd": "be3fe74e07b3ed80604cbc4004d6ded62ef73bd69ef10b426d766a49e8a456b8",
+    "game/world/zombie.gdshader": "9f17221d59f32315323609dd22524d00d074610a199f8cb63a887edccf1f5ccb",
+    "tests/test_special_models.gd": "df0c6d90d9f1a21f4b6fb3d747478d95971cdbe31b891c3f7e59d4f52e7ce955"
+  },
+  "post_camera_change_checks": [
+    {
+      "test": "tests/test_fov.gd",
+      "passed": true,
+      "checks": 9
+    },
+    {
+      "test": "tests/test_camera_aim.gd",
+      "passed": true,
+      "checks": 62
+    },
+    {
+      "test": "tests/test_settings.gd",
+      "passed": true,
+      "checks": 34
+    }
+  ]
+}

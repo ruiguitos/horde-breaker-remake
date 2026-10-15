@@ -26,12 +26,12 @@ uma skin e zero clips internos: as animações vêm da biblioteca externa.
 ## Funcionamento
 
 `SoldierModel` escolhe o GLB e a biblioteca pela classe, conservando
-hierarquia, skins e attachments. O Vanguard usa `VanguardAnimationPlayer`,
+hierarquia, skins e attachments. O Vanguard usa `VanguardAnimationTree`,
 com avanço manual e canais relativos ao Skeleton3D, como o Recruit.
 
-- Parado: `Idle_Loop`; movimento: `Walk_Loop`; sprint/Breaker em movimento:
-  `Sprint_Loop`. Transições de 0,15 s; congela em pausa, level-up, hitstop
-  e fim de run. O Breaker não alonga o corpo com rig.
+- Locomoção igual à do Recruit ([LOCOMOTION.md](LOCOMOTION.md)): Idle e
+  Walk/Jog/Sprint em fase ao ritmo da velocidade, recuar e strafe; congela
+  em pausa, level-up, hitstop e fim de run. O Breaker não alonga o corpo com rig.
 - `recruit_rifle_hold.gd` é agora partilhado: recebe o caminho da pose
   de cada classe e prepara os oito offsets dos braços uma vez.
 - A AR usa as peças `Rifle_*` e o Muzzle da entrega. Shotgun, SMG,

@@ -30,12 +30,13 @@ validação como assets do jogo. Não é uma dependência do runtime.
 ## Funcionamento
 
 `SoldierModel` conserva a hierarquia, skins e attachments do GLB.
-`RecruitAnimationPlayer`, sob Skeleton3D, lê os canais `.:nome_do_osso`
+`RecruitAnimationTree`, sob Skeleton3D, lê os canais `.:nome_do_osso`
 da biblioteca externa. O código antigo que reparentava peças para pivots
 foi retirado do caminho do Recruit: destruiria o rig desta versão.
 
-- Parado → `Idle_Loop`; movimento → `Walk_Loop`; sprint/Breaker em
-  movimento → `Sprint_Loop`, com transições de 0,15 s.
+- Locomoção: Idle e Walk/Jog/Sprint em fase, ao ritmo da velocidade real,
+  com recuar, strafe e o tronco a apontar a arma; ver
+  [LOCOMOTION.md](LOCOMOTION.md) (substitui o antigo Idle/Walk/Sprint).
 - A animação recebe o delta do jogo e congela em pausa, level-up,
   hitstop e fim de run. Não acumula tempo de menus para saltar ao retomar.
 - `recruit_rifle_hold.gd` aplica a pose de duas mãos entregue sobre os

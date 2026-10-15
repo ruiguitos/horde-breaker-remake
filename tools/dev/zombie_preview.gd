@@ -2,8 +2,11 @@ extends SceneTree
 ## Windowed captures of the zombie and weapon art (needs a GPU; not a test).
 ##   godot --path . --script res://tools/dev/zombie_preview.gd -- <PNG path> <shot>
 ## Shots: lineup (Recruit + the 4 zombie variants), walk (mid-stride, side
-## view), closeup (faces and gore), back, corpses, weapons (the 5 guns),
-## hands (Recruit holding each gun), fp_<weapon id> (first person).
+## view), closeup (faces, gore and missing parts), back, corpses, variety
+## (24 random looks), crowd (48 random zombies), weapons (the 5 guns),
+## hands (Recruit holding each gun), hands_vanguard, fp_<weapon id> (first person),
+## specials / specials_back (all kinds), bench_specials (150 mixed enemies), bench
+## and bench_empty (GPU/CPU timings of 150 zombies).
 
 const CENTER := Vector3(20, 0, 20)
 
@@ -25,7 +28,7 @@ var _bench_draw: float = 0.0
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	if args.is_empty():
-		print("Usage: zombie_preview.gd -- <PNG path> [lineup|walk|closeup|back|corpses|weapons|hands|fp_<id>]")
+		print("Usage: zombie_preview.gd -- <PNG path> [lineup|walk|closeup|back|corpses|variety|crowd|weapons|hands|fp_<id>|bench|bench_empty]")
 		quit(1)
 		return
 	_out = args[0]
@@ -78,10 +81,33 @@ func _speed_for(variant: int, skip: int = 0) -> float:
 	return s
 
 
+## Soldier, weapon and view-model scripts are loaded only by the shots that
+## use them, so the zombie shots still run while those files are being
+## edited (no static dependency at compile time).
+func _script(file: String) -> GDScript:
+	return load("res://game/world/%s.gd" % file) as GDScript
+
+
+## A base speed whose rolled look (ZombieModel.roll_look) passes `test`.
+func _speed_where(test: Callable, skip: int = 0) -> float:
+	var s: float = 1.8
+	while s < 40.0:
+		if test.call(ZombieModel.roll_look(ZombieModel.seed_for(s))):
+			if skip == 0:
+				return s
+			skip -= 1
+		s += 0.0137
+	return s
+
+
 func _zombie(pos: Vector3, variant: int, velocity: Vector3 = Vector3.ZERO, skip: int = 0) -> int:
+	return _zombie_at(pos, _speed_for(variant, skip), velocity)
+
+
+func _zombie_at(pos: Vector3, speed: float, velocity: Vector3 = Vector3.ZERO) -> int:
 	var rng := RandomNumberGenerator.new()
 	var i: int = _horde.add(pos, GameData.EnemyKind.WALKER, rng)
-	_horde.speeds[i] = _speed_for(variant, skip)
+	_horde.speeds[i] = speed
 	_horde.velocities[i] = velocity
 	_horde.attack_cd[i] = 99.0
 	return i
@@ -90,8 +116,28 @@ func _zombie(pos: Vector3, variant: int, velocity: Vector3 = Vector3.ZERO, skip:
 func _setup() -> void:
 	_horde.target = CENTER + Vector3(0, 0, 40)
 	match _shot:
+		"specials", "specials_back":
+			var types: Array[GameData.EnemyType] = GameData.enemy_types()
+			var rng := RandomNumberGenerator.new()
+			rng.seed = 41
+			for kind in types.size():
+				var pos: Vector3 = CENTER + Vector3(-7.5 + kind * 2.5, 0, 0)
+				var i: int = _horde.add(pos, kind, rng)
+				_horde.velocities[i] = Vector3(0, 0, 0.3)
+				_horde.attack_cd[i] = 99.0
+				var label := Label3D.new()
+				label.text = types[kind].display_name
+				label.position = pos + Vector3(0, -0.01, 0.65)
+				label.pixel_size = 0.009
+				label.font_size = 48
+				label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+				label.no_depth_test = true
+				_world.add_child(label)
+			_camera.position = CENTER + Vector3(0.4, 4.5, -18.0 if _shot == "specials_back" else 18.0)
+			_camera.look_at(CENTER + Vector3(0, 1.7, 0))
+			_camera.fov = 56
 		"lineup", "back":
-			var soldier := SoldierModel.create(&"recruit")
+			var soldier: Variant = _script("soldier_model").create(&"recruit")
 			soldier.position = CENTER + Vector3(-3.2, 0, 0)
 			soldier.rotation_degrees.y = 180  # soldiers face -Z
 			_world.add_child(soldier)
@@ -106,10 +152,37 @@ func _setup() -> void:
 			_camera.position = CENTER + Vector3(7.5, 1.4, 2.5)
 			_camera.look_at(CENTER + Vector3(0, 1.0, 0))
 		"closeup":
+			# One per variant, each missing something: jaw, ear, fingers, forearm.
+			var missing: Array[int] = [ZombieModel.Missing.JAW, ZombieModel.Missing.EAR, ZombieModel.Missing.FINGERS, ZombieModel.Missing.FOREARM]
 			for v in ZombieModel.VARIANTS:
-				_zombie(CENTER + Vector3(-1.05 + v * 0.7, 0, 0), v, Vector3(0, 0, 0.2))
+				var m: int = missing[v]
+				var s: float = _speed_where(func(l: Dictionary) -> bool: return l["variant"] == v and l["missing"] == m and l["hair"] > 0)
+				_zombie_at(CENTER + Vector3(-1.05 + v * 0.7, 0, 0), s, Vector3(0, 0, 0.2))
 			_camera.position = CENTER + Vector3(0, 1.75, 2.6)
 			_camera.look_at(CENTER + Vector3(0, 1.45, 0))
+		"variety":
+			# 24 random zombies in three rows, facing the camera: the outfits.
+			var rng := RandomNumberGenerator.new()
+			rng.seed = 7
+			for k in 24:
+				var row: int = k / 8
+				var pos: Vector3 = CENTER + Vector3(-3.5 + (k % 8) * 1.0 + row * 0.33, 0, -row * 1.5)
+				_zombie_at(pos, rng.randf_range(1.8, 2.6), Vector3(0, 0, 0.3))
+			_camera.position = CENTER + Vector3(0, 1.9, 7.8)
+			_camera.look_at(CENTER + Vector3(0, 0.95, -1.5))
+			_camera.fov = 45
+		"crowd":
+			# 48 random zombies shambling at the camera, seen from the
+			# third-person camera height.
+			var rng := RandomNumberGenerator.new()
+			rng.seed = 3
+			for k in 48:
+				var pos: Vector3 = CENTER + Vector3(rng.randf_range(-5.5, 5.5), 0, rng.randf_range(-12.0, 1.5))
+				var dir := Vector3(rng.randf_range(-0.5, 0.5), 0, 1).normalized()
+				_zombie_at(pos, rng.randf_range(1.8, 2.6), dir * rng.randf_range(0.8, 2.4))
+			_camera.position = CENTER + Vector3(0, 2.6, 7.0)
+			_camera.look_at(CENTER + Vector3(0, 0.9, -3.0))
+			_camera.fov = 60
 		"corpses":
 			for v in ZombieModel.VARIANTS:
 				var p: Vector3 = CENTER + Vector3(-2.4 + v * 1.6, 0, 0)
@@ -118,18 +191,18 @@ func _setup() -> void:
 			_camera.look_at(CENTER + Vector3(0, 0.2, 0))
 		"weapons":
 			var y: float = 1.9
-			for id: StringName in WeaponModel.IDS:
-				var w := WeaponModel.build(id)
+			for id: StringName in _script("weapon_model").IDS:
+				var w: Variant = _script("weapon_model").build(id)
 				w.position = CENTER + Vector3(0, y, 0)
 				w.rotation_degrees.y = 90  # barrels to the left (-X)
 				_world.add_child(w)
 				y -= 0.36
 			_camera.position = CENTER + Vector3(0, 1.2, 2.7)
 			_camera.look_at(CENTER + Vector3(0, 1.18, 0))
-		"hands":
+		"hands", "hands_vanguard":
 			var x: float = -3.2
-			for id: StringName in WeaponModel.IDS:
-				var soldier := SoldierModel.create(&"vanguard" if id == &"machine_gun" else &"recruit")
+			for id: StringName in _script("weapon_model").IDS:
+				var soldier: Variant = _script("soldier_model").create(&"vanguard" if _shot == "hands_vanguard" or id == &"machine_gun" else &"recruit")
 				soldier.position = CENTER + Vector3(x, 0, 0)
 				soldier.rotation_degrees.y = 150
 				_world.add_child(soldier)
@@ -137,13 +210,20 @@ func _setup() -> void:
 				x += 1.6
 			_camera.position = CENTER + Vector3(0, 1.5, 6.5)
 			_camera.look_at(CENTER + Vector3(0, 1.2, 0))
-		"bench", "bench_empty":
+		"bench", "bench_empty", "bench_specials":
 			# 150 walking zombies (the alive cap) seen from the third-person
 			# height; "bench_empty" is the same scene without them.
-			if _shot == "bench":
+			if _shot != "bench_empty":
 				for k in 150:
 					var pos: Vector3 = CENTER + Vector3(-9.0 + (k % 15) * 1.3, 0, -12.0 + (k / 15) * 1.3)
-					_zombie(pos, k % ZombieModel.VARIANTS, Vector3(0, 0, 2.2), k / ZombieModel.VARIANTS)
+					if _shot == "bench_specials":
+						var kinds: Array[int] = [0, 0, 0, 1, 2, 3, 5, 6]
+						var rng := RandomNumberGenerator.new()
+						rng.seed = 100 + k
+						var i: int = _horde.add(pos, GameData.EnemyKind.BOSS if k == 149 else kinds[k % kinds.size()], rng)
+						_horde.velocities[i] = Vector3(0, 0, 2.2)
+					else:
+						_zombie(pos, k % ZombieModel.VARIANTS, Vector3(0, 0, 2.2), k / ZombieModel.VARIANTS)
 			_camera.position = CENTER + Vector3(0, 3.0, 9.0)
 			_camera.look_at(CENTER + Vector3(0, 1.0, -4.0))
 			_camera.fov = 70
@@ -156,7 +236,7 @@ func _setup() -> void:
 				_camera.look_at(CENTER + Vector3(0, 1.5, 0))
 				_camera.fov = 75
 				_camera.near = 0.03
-				var vm := ViewModel.create(&"recruit")
+				var vm: Variant = _script("view_model").create(&"recruit")
 				_camera.add_child(vm)
 				vm.set_weapon(id)
 				for v in ZombieModel.VARIANTS:
@@ -168,6 +248,9 @@ func _process(delta: float) -> bool:
 	_t += delta
 	if _frames == 1:
 		_setup()  # look_at needs the nodes in the tree
+	for child: Node in _world.get_children():
+		if child.has_method("animate"):
+			child.call("animate", 0.0, _t, false, delta)
 	var now: float = 0.35 if _shot != "walk" else 0.55
 	if _shot.begins_with("bench"):
 		now = _t

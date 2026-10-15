@@ -1,9 +1,11 @@
 extends SceneTree
 ## Common zombie art (ZombieModel + ZombieHordeView): the four variants
-## build headless with their Poly Haven materials, variants are stable per
-## enemy, the drawn head stays where IslandRun.enemy_head() aims, poses come
-## from the horde state, corpses fall and go away, and 150 zombies are cheap
-## to update (timed). Visual only: nothing here changes gameplay.
+## build headless with their Poly Haven materials, variants and rolled looks
+## (outfit colours, patterns, missing parts, build, blood) are stable per
+## enemy and varied across a horde, optional boxes hide cleanly, the drawn
+## head stays where IslandRun.enemy_head() aims, poses come from the horde
+## state, corpses keep their look, fall and go away, and 150 zombies are
+## cheap to update (timed). Visual only: nothing here changes gameplay.
 ## Run: godot --headless --path . --script res://tests/test_zombie_model.gd
 
 var _failures: int = 0
@@ -18,6 +20,8 @@ func _check(ok: bool, description: String) -> void:
 func _initialize() -> void:
 	_test_meshes()
 	_test_variants()
+	_test_looks()
+	_test_hiding()
 	_test_head()
 	_test_view()
 	_test_timing()
@@ -38,23 +42,44 @@ func _test_meshes() -> void:
 		_check(absf(box.position.y) < 0.01 and box.end.y > 1.9 and box.end.y < 2.0,
 			"%s stands on the ground, %.2f m tall (Recruit: 2.03 m with helmet)" % [ZombieModel.VARIANT_NAMES[v], box.end.y])
 		var arrays: Array = m.surface_get_arrays(0)
-		_check(arrays[Mesh.ARRAY_CUSTOM0] != null and arrays[Mesh.ARRAY_CUSTOM1] != null and arrays[Mesh.ARRAY_TANGENT] != null,
-			"%s carries part/gore (CUSTOM0), tint (CUSTOM1) and tangents for the normal maps" % ZombieModel.VARIANT_NAMES[v])
+		_check(arrays[Mesh.ARRAY_CUSTOM0] != null and arrays[Mesh.ARRAY_CUSTOM1] != null and arrays[Mesh.ARRAY_CUSTOM2] != null \
+			and arrays[Mesh.ARRAY_TANGENT] != null and arrays[Mesh.ARRAY_INDEX] != null,
+			"%s carries part/gore (CUSTOM0), tint+slot (CUSTOM1), show conditions (CUSTOM2), tangents, and is indexed" % ZombieModel.VARIANT_NAMES[v])
 	_check(ZombieModel.mesh(2) == ZombieModel.mesh(2), "meshes are built once and shared")
 
 
-func _parts(v: int) -> Dictionary:
-	var parts: Dictionary = {}
+## The boxes of variant v that a zombie with this mask shows.
+func _visible(v: int, mask: int) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
 	for b: Dictionary in ZombieModel.boxes(v):
-		parts[b["part"]] = true
+		if ZombieModel.shows(b, mask):
+			out.append(b)
+	return out
+
+
+func _kinds(boxes: Array[Dictionary]) -> Dictionary:
+	var kinds: Dictionary = {}
+	for b: Dictionary in boxes:
+		kinds[b["kind"]] = int(kinds.get(b["kind"], 0)) + 1
+	return kinds
+
+
+func _parts(boxes: Array[Dictionary]) -> Dictionary:
+	var parts: Dictionary = {}
+	for b: Dictionary in boxes:
+		parts[b["part"]] = int(parts.get(b["part"], 0)) + 1
 	return parts
 
 
-func _kinds(v: int) -> Dictionary:
-	var kinds: Dictionary = {}
-	for b: Dictionary in ZombieModel.boxes(v):
-		kinds[b["kind"]] = int(kinds.get(b["kind"], 0)) + 1
-	return kinds
+## The first rolled look (from walker-like speeds) that passes `test`.
+func _look_where(test: Callable) -> Dictionary:
+	var s: float = 1.8
+	while s < 60.0:
+		var l: Dictionary = ZombieModel.roll_look(ZombieModel.seed_for(s))
+		if test.call(l):
+			return l
+		s += 0.0137
+	return {}
 
 
 func _test_variants() -> void:
@@ -72,10 +97,9 @@ func _test_variants() -> void:
 	for v: int in seen:
 		spread = spread and int(seen[v]) > 40
 	_check(spread, "the Walker speed range spreads over all 4 variants %s" % [seen])
-	_check(not _parts(1).has(ZombieModel.Part.ARM_LOWER_L) and _kinds(1).get(ZombieModel.Kind.BONE, 0) > 0,
-		"worker: left forearm missing, bone sticking out of the stump")
-	_check(not _kinds(2).has(ZombieModel.Kind.MOUTH) or _kinds(2)[ZombieModel.Kind.MOUTH] == 1, "jacket: the lower jaw is gone (one throat box, no mouth slit)")
-	_check(_kinds(3).get(ZombieModel.Kind.FLESH, 0) >= 2 and _kinds(3).get(ZombieModel.Kind.BONE, 0) >= 3, "shirtless: torn-open flank with ribs")
+	var shirtless: Array[Dictionary] = _visible(3, 1)  # only the boxes every look shows
+	_check(_kinds(shirtless).get(ZombieModel.Kind.FLESH, 0) >= 2 and _kinds(shirtless).get(ZombieModel.Kind.BONE, 0) >= 3,
+		"shirtless: torn-open flank with ribs (on every shirtless zombie)")
 	var gore: int = 0
 	for v in ZombieModel.VARIANTS:
 		for b: Dictionary in ZombieModel.boxes(v):
@@ -84,11 +108,112 @@ func _test_variants() -> void:
 	_check(gore >= 8, "strong gore: %d heavy wound boxes across the variants" % gore)
 
 
+## Rolled looks: deterministic, packed exactly, and varied across a horde.
+func _test_looks() -> void:
+	var a: Dictionary = ZombieModel.roll_look(123456789)
+	var b: Dictionary = ZombieModel.roll_look(123456789)
+	_check(a == b and ZombieModel.instance_look(2.1234) == ZombieModel.instance_look(2.1234),
+		"roll_look / instance_look are deterministic (same seed, same zombie)")
+	_check(ZombieModel.instance_look(2.1234).x == ZombieModel.variant_for(2.1234), "the look's variant is the old variant_for (same key)")
+	# 150 Walkers as the horde rolls them.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 21
+	var outfits: Dictionary = {}
+	var fields: Dictionary = {}
+	var exact: bool = true
+	var round_trip: bool = true
+	for k in 150:
+		var l: Dictionary = ZombieModel.roll_look(ZombieModel.seed_for(rng.randf_range(1.8, 2.6)))
+		outfits[[l["variant"], l["colours"], l["mask"]]] = true
+		for f: String in ["shirt", "trousers", "skin", "hair", "pattern", "missing", "build", "sleeves"]:
+			if not fields.has(f):
+				fields[f] = {}
+			fields[f][l[f]] = true
+		var c: int = l["colours"]
+		var w: int = l["wear"]
+		exact = exact and c < 1 << 24 and w < 1 << 24 and int(l["mask"]) < 1 << 24 and int(float(c)) == c
+		# The shader's decoding (zombie.gdshader, vertex()).
+		round_trip = round_trip and c & 31 == l["shirt"] and (c >> 5) & 15 == l["trousers"] and (c >> 9) & 7 == l["skin"] \
+			and (c >> 12) & 7 == l["hair"] and (c >> 15) & 3 == l["pattern"] and (c >> 17) & 7 == l["pattern_color"] \
+			and (c >> 20) & 3 == l["shoes"] and (c >> 22) & 3 == l["jacket"] and w & 7 == l["gore"] and (w >> 3) & 7 == l["blood"] \
+			and (w >> 6) & 7 == l["torn"] and (w >> 9) & 7 == l["fade"] and (w >> 12) & 7 == l["build"] and (w >> 15) & 255 == l["offset"]
+	_check(exact, "looks pack into integers below 2^24 (exact in the float32 instance colour)")
+	_check(round_trip, "the shader's bit layout decodes every packed field back")
+	_check(outfits.size() >= 145, "150 zombies: %d distinct outfits (variant + colours + optional parts)" % outfits.size())
+	_check(fields["shirt"].size() >= 28 and fields["trousers"].size() == 16 and fields["skin"].size() == 8 and fields["hair"].size() == 8,
+		"palettes in use: %d shirt colours, %d trousers, %d skin tones, %d hair (incl. bald)" % [fields["shirt"].size(), fields["trousers"].size(), fields["skin"].size(), fields["hair"].size()])
+	_check(fields["pattern"].size() == 4 and fields["missing"].size() == 5 and fields["build"].size() == 8 and fields["sleeves"].size() == 3,
+		"every pattern, missing part, build and sleeve cut shows up in a horde of 150")
+
+
+## Optional boxes: alternatives show exactly one, missing parts are gone,
+## and the skull never hides (headshots).
+func _test_hiding() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 4
+	var clean: bool = true
+	var skull: bool = true
+	for k in 600:
+		var l: Dictionary = ZombieModel.roll_look(ZombieModel.seed_for(rng.randf_range(1.8, 2.6)))
+		var shown: Array[Dictionary] = _visible(l["variant"], l["mask"])
+		# Boxes sharing a centre and part are alternatives: exactly one shows.
+		var groups: Dictionary = {}
+		for bx: Dictionary in ZombieModel.boxes(l["variant"]):
+			var key: String = "%s/%d" % [(bx["c"] as Vector3).snapped(Vector3.ONE * 0.001), bx["part"]]
+			groups[key] = int(groups.get(key, 0)) + (1 << 8) + (1 if ZombieModel.shows(bx, l["mask"]) else 0)
+		for key: String in groups:
+			var total: int = groups[key] >> 8
+			var on: int = groups[key] & 255
+			# A missing left forearm hides both of its alternatives.
+			var want: int = 0 if l["missing"] == ZombieModel.Missing.FOREARM and key.ends_with("/%d" % ZombieModel.Part.ARM_LOWER_L) else 1
+			if total > 1 and on != want:
+				if clean:
+					print("  alternatives %s: %d of %d shown (variant %d, mask %d)" % [key, on, total, l["variant"], l["mask"]])
+				clean = false
+		var head: bool = false
+		for bx: Dictionary in shown:
+			if bx["part"] == ZombieModel.Part.HEAD and (bx["c"] as Vector3).is_equal_approx(ZombieModel.HEAD_CENTER):
+				head = true
+		skull = skull and head
+	_check(clean, "600 looks: every pair of alternative boxes (sleeve/bare arm, trouser/bare shin) shows exactly one")
+	_check(skull, "the skull box shows on every look (headshots unchanged)")
+	var arm: Dictionary = _look_where(func(l: Dictionary) -> bool: return l["missing"] == ZombieModel.Missing.FOREARM)
+	var parts: Dictionary = _parts(_visible(arm["variant"], arm["mask"]))
+	_check(not parts.has(ZombieModel.Part.ARM_LOWER_L) and (arm["mask"] >> ZombieModel.Show.STUMP_L) & 1 == 1,
+		"missing forearm: no left forearm/hand boxes, the stump shows (and the shader lets that arm hang)")
+	var jaw: Dictionary = _look_where(func(l: Dictionary) -> bool: return l["missing"] == ZombieModel.Missing.JAW)
+	var kinds: Dictionary = _kinds(_visible(jaw["variant"], jaw["mask"]))
+	_check(not kinds.has(ZombieModel.Kind.MOUTH) and kinds.get(ZombieModel.Kind.FLESH, 0) >= 2, "missing jaw: no mouth slit, raw underside and tongue show")
+	var whole: Dictionary = _look_where(func(l: Dictionary) -> bool: return l["missing"] == ZombieModel.Missing.NONE and l["variant"] == jaw["variant"])
+	var ear: Dictionary = _look_where(func(l: Dictionary) -> bool: return l["missing"] == ZombieModel.Missing.EAR and l["variant"] == jaw["variant"])
+	var fingers: Dictionary = _look_where(func(l: Dictionary) -> bool: return l["missing"] == ZombieModel.Missing.FINGERS and l["variant"] == jaw["variant"])
+	var ear_kinds: Dictionary = _kinds(_visible(ear["variant"], ear["mask"]))
+	var whole_kinds: Dictionary = _kinds(_visible(whole["variant"], whole["mask"]))
+	var ear_box: bool = false
+	for bx: Dictionary in _visible(ear["variant"], ear["mask"]):
+		ear_box = ear_box or (bx["c"] as Vector3).is_equal_approx(Vector3(0.143, 1.79, 0.02))
+	_check(not ear_box and ear_kinds.get(ZombieModel.Kind.FLESH, 0) == whole_kinds.get(ZombieModel.Kind.FLESH, 0) + 1,
+		"missing ear: the left ear box swaps for a raw patch")
+	var finger_kinds: Dictionary = _kinds(_visible(fingers["variant"], fingers["mask"]))
+	_check(finger_kinds.get(ZombieModel.Kind.BONE, 0) == whole_kinds.get(ZombieModel.Kind.BONE, 0) + 2, "missing fingers: bloody stubs with bone")
+	var bald: Dictionary = _look_where(func(l: Dictionary) -> bool: return l["hair"] == 0)
+	var hairy: bool = false
+	for bx: Dictionary in _visible(bald["variant"], bald["mask"]):
+		hairy = hairy or bx["slot"] == ZombieModel.Slot.HAIR
+	_check(not hairy, "bald zombies show no hair boxes")
+	var hood: Dictionary = _look_where(func(l: Dictionary) -> bool: return l["hood"])
+	var hood_boxes: int = 0
+	for bx: Dictionary in _visible(hood["variant"], hood["mask"]):
+		if bx["show_a"] == ZombieModel.Show.HOOD:
+			hood_boxes += 1
+	_check(hood["variant"] == 0 and hood["sleeves"] == ZombieModel.Sleeves.LONG and hood_boxes >= 3, "hoodies: hood, pocket and drawstrings, long sleeves")
+
+
 func _test_head() -> void:
 	var walker: GameData.EnemyType = GameData.enemy_types()[GameData.EnemyKind.WALKER]
 	var skull: Dictionary = {}
 	for b: Dictionary in ZombieModel.boxes(0):
-		if b["part"] == ZombieModel.Part.HEAD and (b["s"] as Vector3).y > 0.2:
+		if skull.is_empty() and b["part"] == ZombieModel.Part.HEAD and (b["s"] as Vector3).y > 0.2:
 			skull = b
 	_check(not skull.is_empty() and (skull["c"] as Vector3).is_equal_approx(ZombieModel.HEAD_CENTER), "HEAD_CENTER is the skull box centre")
 	# IslandRun.enemy_head(): ground + height + 0.08 * radius_scale.
@@ -147,8 +272,9 @@ func _test_view() -> void:
 	var total: int = 0
 	for v in ZombieModel.VARIANTS:
 		total += view.instance_count(v)
-	_check(total == 150 and view.handles(GameData.EnemyKind.WALKER) and not view.handles(GameData.EnemyKind.BRUTE),
-		"150 walkers drawn as zombies; the 10 brutes stay capsules (special enemies later)")
+	_check(total == 150 and view.handles(GameData.EnemyKind.WALKER)
+		and view.instance_count(ZombieHordeView.variant_for(GameData.EnemyKind.BRUTE, 0.0)) == 10,
+		"150 walkers and 10 brutes use their own model batches")
 	var v0: int = ZombieModel.variant_for(h.speeds[0])
 	var first: PackedFloat32Array = _instance(view, v0, 0)
 	var p: Vector3 = h.positions[0]
@@ -156,10 +282,13 @@ func _test_view() -> void:
 		"instance transform: on the enemy's position, Walker height scale 1")
 	_check(first[2] > 0.0 or is_equal_approx(first[10], 1.0), "walking +Z faces +Z (the model's front)")
 	_check(first[17] > 0.7 and first[19] == 0.0, "walking: walk amount %.2f, no flinch" % first[17])
+	var look0: Vector4 = ZombieModel.instance_look(h.speeds[0])
+	_check(first[12] == ZombieModel.Status.NONE and first[13] == look0.y and first[14] == look0.z and first[15] == look0.w,
+		"instance colour = (status, mask, colours, wear) of the zombie's rolled look")
 	# Hit flash -> flinch; stun -> stagger; just attacked in reach -> lunge.
 	h.flash[0] = 0.1
 	view.draw(h, map, 1.1, 0.016)
-	_check(_instance(view, v0, 0)[19] > 0.9 and _instance(view, v0, 0)[15] > 0.3, "a hit flinches the zombie and flashes it")
+	_check(_instance(view, v0, 0)[19] > 0.9 and _instance(view, v0, 0)[12] == ZombieModel.Status.FLASH, "a hit flinches the zombie and flashes it")
 	h.flash[0] = 0.0
 	h.stun[0] = 1.0
 	view.draw(h, map, 1.2, 0.016)
@@ -173,11 +302,28 @@ func _test_view() -> void:
 	h.freeze_time[0] = 2.0
 	view.draw(h, map, 1.4, 0.016)
 	var frozen: PackedFloat32Array = _instance(view, v0, 0)
-	_check(frozen[17] == 0.0 and frozen[15] > 0.5, "frozen zombies stop and turn icy")
+	_check(frozen[17] == 0.0 and frozen[12] == ZombieModel.Status.FROZEN and frozen[13] == look0.y, "frozen zombies stop and turn icy (and keep their look)")
 	h.freeze_time[0] = 0.0
-	# Death: the zombie leaves the horde, its corpse keeps its variant and falls.
+	# Compaction: removing zombie 1 moves the last one into its slot; the
+	# moved zombie keeps its look (it travels with its base speed). The
+	# brutes were added last: drop them so the last enemy is a walker.
+	while h.kinds[h.count - 1] != GameData.EnemyKind.WALKER:
+		h.remove(h.count - 1)
+	var last_speed: float = h.speeds[h.count - 1]
+	var last_look: Vector4 = ZombieModel.instance_look(last_speed)
+	h.remove(1)
+	view.draw(h, map, 1.45, 0.016)
+	var kept: bool = false
+	var lv: int = int(last_look.x)
+	for i in view.instance_count(lv):
+		var inst: PackedFloat32Array = _instance(view, lv, i)
+		if is_equal_approx(inst[3], h.positions[1].x) and is_equal_approx(inst[11], h.positions[1].z):
+			kept = inst[13] == last_look.y and inst[14] == last_look.z and inst[15] == last_look.w
+	_check(h.speeds[1] == last_speed and kept, "a zombie moved by horde compaction keeps its outfit")
+	# Death: the zombie leaves the horde, its corpse keeps its variant and look and falls.
 	var dead: Vector3 = h.positions[5]
 	var dead_variant: int = ZombieModel.variant_for(h.speeds[5])
+	var dead_look: Vector4 = ZombieModel.instance_look(h.speeds[5])
 	view.draw(h, map, 1.5, 0.016)
 	h.remove(5)
 	view.draw(h, map, 1.52, 0.016)
@@ -185,9 +331,12 @@ func _test_view() -> void:
 	view.on_death(Vector4(dead.x, dead.z, GameData.EnemyKind.WALKER, 1.0), dead, dead + Vector3(0, 0, 5))
 	view.on_death(Vector4(50, 50, GameData.EnemyKind.BRUTE, 0.0), Vector3(50, 0, 50), Vector3.ZERO)
 	view.draw(h, map, 1.54, 0.5)
-	_check(view.corpse_count() == 1 and view.instance_count(dead_variant) == before + 1, "a dead walker becomes one corpse of its own variant (brutes do not)")
+	_check(view.corpse_count() == 2 and view.instance_count(dead_variant) == before + 1
+		and view.instance_count(ZombieHordeView.variant_for(GameData.EnemyKind.BRUTE, 0.0)) == 1,
+		"Dead walker and brute each retain their own model as a corpse")
 	var corpse: PackedFloat32Array = _instance(view, dead_variant, view.instance_count(dead_variant) - 1)
 	_check(corpse[19] >= 4.0 and corpse[19] <= 5.0, "headshot corpse falls without its head (state %.2f)" % corpse[19])
+	_check(corpse[13] == dead_look.y and corpse[14] == dead_look.z and corpse[15] == dead_look.w, "the corpse wears the dead zombie's outfit")
 	view.draw(h, map, 2.0, ZombieHordeView.CORPSE_TIME)
 	_check(view.corpse_count() == 0, "corpses sink and are removed after %.0f s" % ZombieHordeView.CORPSE_TIME)
 	view.free()

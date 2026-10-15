@@ -1,0 +1,446 @@
+{
+  "topology": [
+    {
+      "part": "Walnut shoulder stock",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.0018613870033071923
+    },
+    {
+      "part": "Shotgun recoil pad",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 6.116767413741933e-05
+    },
+    {
+      "part": "Walnut cheek panel",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.513433531950572e-05
+    },
+    {
+      "part": "Stock pad screw",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.01009811496738e-08
+    },
+    {
+      "part": "Walnut cheek panel.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 3.513433530246598e-05
+    },
+    {
+      "part": "Stock pad screw.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.010097777482347e-08
+    },
+    {
+      "part": "870 class rounded receiver",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.0008738306577769886
+    },
+    {
+      "part": "Shotgun visible bolt",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.285998097978119e-06
+    },
+    {
+      "part": "Trigger guard",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.4132013285712586e-05
+    },
+    {
+      "part": "Curved trigger",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.7691507512002414e-06
+    },
+    {
+      "part": "Shotgun barrel",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.00012205540411315247
+    },
+    {
+      "part": "Shotgun bore shadow",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.5592924666836316e-07
+    },
+    {
+      "part": "Tube magazine",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.00012870832993564472
+    },
+    {
+      "part": "Magazine cap",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 7.822677963272657e-06
+    },
+    {
+      "part": "Magazine cap knurl",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4003456977267515e-08
+    },
+    {
+      "part": "Magazine cap knurl.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4003456977267952e-08
+    },
+    {
+      "part": "Magazine cap knurl.002",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4003466389334803e-08
+    },
+    {
+      "part": "Magazine cap knurl.003",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4003466389335656e-08
+    },
+    {
+      "part": "Magazine cap knurl.004",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4003456977267131e-08
+    },
+    {
+      "part": "Magazine cap knurl.005",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4003456977267277e-08
+    },
+    {
+      "part": "Magazine cap knurl.006",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.400345697726733e-08
+    },
+    {
+      "part": "Magazine cap knurl.007",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4003495371114706e-08
+    },
+    {
+      "part": "Magazine cap knurl.008",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4003495371118412e-08
+    },
+    {
+      "part": "Magazine cap knurl.009",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.4003456977267277e-08
+    },
+    {
+      "part": "Grooved walnut pump slide",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 0.00022017497018124517
+    },
+    {
+      "part": "Pump action bar",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.004666796863101e-06
+    },
+    {
+      "part": "Pump action bar.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 2.004666796863101e-06
+    },
+    {
+      "part": "Barrel magazine clamp",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.700324424242561e-05
+    },
+    {
+      "part": "Bead sight base",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 7.753763809771806e-08
+    },
+    {
+      "part": "Brass class sight bead",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 4.5408138767327845e-08
+    },
+    {
+      "part": "Shotgun trigger plate pin",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.2380736709779119e-06
+    },
+    {
+      "part": "Shotgun trigger plate pin.001",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.2380741369891958e-06
+    },
+    {
+      "part": "Cross bolt safety",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 1.3730739880553169e-06
+    },
+    {
+      "part": "Slide release",
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "volume_m3": 7.536664770053494e-07
+    }
+  ],
+  "intersections": {
+    "self_intersection_candidates": [],
+    "interpenetration_samples": [
+      {
+        "parts": [
+          "Walnut shoulder stock",
+          "870 class rounded receiver"
+        ],
+        "surface_crossings": 40,
+        "maximum_sampled_depth_m": 0.014500000514090061
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Shotgun trigger plate pin"
+        ],
+        "surface_crossings": 48,
+        "maximum_sampled_depth_m": 0.014493333175778389
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Shotgun trigger plate pin.001"
+        ],
+        "surface_crossings": 50,
+        "maximum_sampled_depth_m": 0.014493333175778389
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Shotgun barrel"
+        ],
+        "surface_crossings": 128,
+        "maximum_sampled_depth_m": 0.006999999284744263
+      },
+      {
+        "parts": [
+          "Grooved walnut pump slide",
+          "Pump action bar"
+        ],
+        "surface_crossings": 23,
+        "maximum_sampled_depth_m": 0.006217176094651222
+      },
+      {
+        "parts": [
+          "Grooved walnut pump slide",
+          "Pump action bar.001"
+        ],
+        "surface_crossings": 24,
+        "maximum_sampled_depth_m": 0.0061936043202877045
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Curved trigger"
+        ],
+        "surface_crossings": 18,
+        "maximum_sampled_depth_m": 0.005955830216407776
+      },
+      {
+        "parts": [
+          "Walnut shoulder stock",
+          "Trigger guard"
+        ],
+        "surface_crossings": 32,
+        "maximum_sampled_depth_m": 0.00430319644510746
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Cross bolt safety"
+        ],
+        "surface_crossings": 48,
+        "maximum_sampled_depth_m": 0.003866027109324932
+      },
+      {
+        "parts": [
+          "Shotgun recoil pad",
+          "Stock pad screw"
+        ],
+        "surface_crossings": 27,
+        "maximum_sampled_depth_m": 0.003800034523010254
+      },
+      {
+        "parts": [
+          "Shotgun recoil pad",
+          "Stock pad screw.001"
+        ],
+        "surface_crossings": 28,
+        "maximum_sampled_depth_m": 0.003800034523010254
+      },
+      {
+        "parts": [
+          "Tube magazine",
+          "Barrel magazine clamp"
+        ],
+        "surface_crossings": 194,
+        "maximum_sampled_depth_m": 0.0034087584353983402
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Trigger guard"
+        ],
+        "surface_crossings": 30,
+        "maximum_sampled_depth_m": 0.0020000003278255463
+      },
+      {
+        "parts": [
+          "Walnut shoulder stock",
+          "Walnut cheek panel"
+        ],
+        "surface_crossings": 32,
+        "maximum_sampled_depth_m": 0.0015000011771917343
+      },
+      {
+        "parts": [
+          "Walnut shoulder stock",
+          "Walnut cheek panel.001"
+        ],
+        "surface_crossings": 32,
+        "maximum_sampled_depth_m": 0.0015000011771917343
+      },
+      {
+        "parts": [
+          "870 class rounded receiver",
+          "Tube magazine"
+        ],
+        "surface_crossings": 54,
+        "maximum_sampled_depth_m": 0.0009999871253967285
+      },
+      {
+        "parts": [
+          "Bead sight base",
+          "Brass class sight bead"
+        ],
+        "surface_crossings": 30,
+        "maximum_sampled_depth_m": 0.000800006091594696
+      },
+      {
+        "parts": [
+          "Shotgun barrel",
+          "Barrel magazine clamp"
+        ],
+        "surface_crossings": 516,
+        "maximum_sampled_depth_m": 0.000774587388150394
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.001"
+        ],
+        "surface_crossings": 12,
+        "maximum_sampled_depth_m": 0.000587250804528594
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.006"
+        ],
+        "surface_crossings": 12,
+        "maximum_sampled_depth_m": 0.0005872496985830367
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.009"
+        ],
+        "surface_crossings": 12,
+        "maximum_sampled_depth_m": 0.0005872496985830367
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.004"
+        ],
+        "surface_crossings": 12,
+        "maximum_sampled_depth_m": 0.0005872485344298184
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl"
+        ],
+        "surface_crossings": 14,
+        "maximum_sampled_depth_m": 0.0005858042859472334
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.005"
+        ],
+        "surface_crossings": 14,
+        "maximum_sampled_depth_m": 0.0005858028889633715
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.007"
+        ],
+        "surface_crossings": 14,
+        "maximum_sampled_depth_m": 0.0005755695165134966
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.002"
+        ],
+        "surface_crossings": 14,
+        "maximum_sampled_depth_m": 0.0005755678284913301
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.003"
+        ],
+        "surface_crossings": 14,
+        "maximum_sampled_depth_m": 0.0005755678284913301
+      },
+      {
+        "parts": [
+          "Magazine cap",
+          "Magazine cap knurl.008"
+        ],
+        "surface_crossings": 14,
+        "maximum_sampled_depth_m": 0.0005755678284913301
+      },
+      {
+        "parts": [
+          "Walnut shoulder stock",
+          "Cross bolt safety"
+        ],
+        "surface_crossings": 20,
+        "maximum_sampled_depth_m": 0.0003994181752204895
+      }
+    ],
+    "method": "BVH surface crossings; signed nearest-surface vertex and triangle-centre penetration samples. Mounts require explicit inspection; this is not exact intersection-volume proof."
+  }
+}

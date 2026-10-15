@@ -1,0 +1,187 @@
+{
+  "date": "2026-10-15",
+  "authorization": "User explicitly authorized sending only loader and arm-adjustment excerpts to JEV.",
+  "scope": [
+    {
+      "path": "game/world/weapon_model.gd (loader excerpts only)",
+      "characters": 3331
+    },
+    {
+      "path": "game/world/weapon_support_hold.gd (arm adjustment excerpt)",
+      "characters": 3433
+    }
+  ],
+  "excluded": "No other project source, tests, test logs, locomotion code, credentials or personal data were sent.",
+  "request": "Review ONLY these authorized code excerpts from two Godot 4.7 GDScript files. Loader requirements: cache the five bundled original static identity-transform GLBs, merge geometry by original PBR material without losing UVs/normals/tangents, preserve grip-space Muzzle transform and forward -Z; bundled assets already satisfy the static import contract. Arm requirements: adapt the left palm contact to the equipped weapon with two-bone IK, retain animated wrist orientation and bone lengths, safely clamp unreachable targets. Identify correctness risks, test gaps and blast radius within these excerpts. Other source, tests and project files are intentionally not supplied and are outside authorization. This is an advisory code review, not evidence that tests passed.",
+  "response": {
+    "tool": "jev_review",
+    "model": "jev-1.13.0",
+    "provider": "typesafe",
+    "truncated": false,
+    "mode": "per-file",
+    "action": "escalate",
+    "composite": 0.5345,
+    "safe_to_apply": 0.11,
+    "reason_codes": [
+      "confidence_below_review",
+      "safe_to_apply_below_review"
+    ],
+    "limiting": [
+      {
+        "file": "game/world/weapon_model.gd (loader excerpts only)",
+        "rubrics": [
+          "correctness"
+        ]
+      },
+      {
+        "file": "game/world/weapon_support_hold.gd (arm adjustment excerpt)",
+        "rubrics": [
+          "blast_radius"
+        ]
+      }
+    ],
+    "weights": {
+      "correctness": 0.4,
+      "spec_match": 0.3,
+      "test_gap": 0.15,
+      "blast_radius": 0.15
+    },
+    "thresholds": {
+      "auto_accept": 0.8,
+      "review_at": 0.5,
+      "composite_floor": 0.7
+    },
+    "files": [
+      {
+        "path": "game/world/weapon_model.gd (loader excerpts only)",
+        "safe_to_apply": 0.18,
+        "scores": {
+          "correctness": {
+            "score": 1.38,
+            "confidence": 0.25,
+            "probabilities": {
+              "0": 0.06,
+              "1": 0.5,
+              "2": 0.44
+            }
+          },
+          "spec_match": {
+            "score": 1.77,
+            "confidence": 0.67,
+            "probabilities": {
+              "0": 0.01,
+              "1": 0.2,
+              "2": 0.79
+            }
+          },
+          "test_gap": {
+            "score": 1.92,
+            "confidence": 0.88,
+            "probabilities": {
+              "0": 0.03,
+              "1": 0.02,
+              "2": 0.95
+            }
+          },
+          "blast_radius": {
+            "score": 1.69,
+            "confidence": 0.52,
+            "probabilities": {
+              "0": 0.03,
+              "1": 0.26,
+              "2": 0.71
+            }
+          }
+        },
+        "weights": {
+          "correctness": 0.4,
+          "spec_match": 0.3,
+          "test_gap": 0.15,
+          "blast_radius": 0.15
+        },
+        "thresholds": {
+          "auto_accept": 0.8,
+          "review_at": 0.5,
+          "composite_floor": 0.7
+        },
+        "action": "escalate",
+        "composite": 0.57075,
+        "reason_codes": [
+          "confidence_below_review",
+          "safe_to_apply_below_review"
+        ],
+        "limiting_rubrics": [
+          "correctness"
+        ]
+      },
+      {
+        "path": "game/world/weapon_support_hold.gd (arm adjustment excerpt)",
+        "safe_to_apply": 0.11,
+        "scores": {
+          "correctness": {
+            "score": 1.04,
+            "confidence": 0.49,
+            "probabilities": {
+              "0": 0.15,
+              "1": 0.66,
+              "2": 0.19
+            }
+          },
+          "spec_match": {
+            "score": 1.72,
+            "confidence": 0.58,
+            "probabilities": {
+              "0": 0.01,
+              "1": 0.26,
+              "2": 0.73
+            }
+          },
+          "test_gap": {
+            "score": 1.97,
+            "confidence": 0.95,
+            "probabilities": {
+              "0": 0.01,
+              "1": 0.01,
+              "2": 0.98
+            }
+          },
+          "blast_radius": {
+            "score": 1.6,
+            "confidence": 0.41,
+            "probabilities": {
+              "0": 0.04,
+              "1": 0.31,
+              "2": 0.65
+            }
+          }
+        },
+        "weights": {
+          "correctness": 0.4,
+          "spec_match": 0.3,
+          "test_gap": 0.15,
+          "blast_radius": 0.15
+        },
+        "thresholds": {
+          "auto_accept": 0.8,
+          "review_at": 0.5,
+          "composite_floor": 0.7
+        },
+        "action": "escalate",
+        "composite": 0.49825,
+        "reason_codes": [
+          "confidence_below_review",
+          "safe_to_apply_below_review"
+        ],
+        "limiting_rubrics": [
+          "blast_radius"
+        ]
+      }
+    ],
+    "usage": {
+      "input_tokens": 3468,
+      "output_tokens": 186
+    }
+  },
+  "interpretation": "Advisory escalate result due to low confidence/safe_to_apply scores; response contains no concrete line-level defect diagnosis. This is not approval or proof of a defect.",
+  "local_followup": "Inspected scoped source and existing local test evidence. Weapon models and support-palm tests passed in the completed 46/48 suite. Two known mission simulation failures remain outside these excerpts. No runtime code was changed in response to this score-only review."
+}

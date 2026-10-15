@@ -1,0 +1,75 @@
+{
+  "tool": "jev_verify",
+  "model": "jev-1.13.0",
+  "provider": "typesafe",
+  "auto_accept": 0.8,
+  "subject_at": 0.5,
+  "summary": {
+    "verified": 4,
+    "contradicted": 0,
+    "unsupported": 0,
+    "needs_review": 0
+  },
+  "results": [
+    {
+      "id": "claim0",
+      "claim": "All five exported weapons are between 4000 and 9000 triangles and within 0.02 metres of requested overall lengths 0.96, 0.74, 1.04, 1.04, 1.12.",
+      "verdict": "verified",
+      "probabilities": {
+        "supports": 0.94,
+        "contradicts": 0.06,
+        "says_nothing": 0
+      },
+      "confidence": 0.91,
+      "action": "auto",
+      "supporting_evidence": null,
+      "same_subject": 0.82
+    },
+    {
+      "id": "claim1",
+      "claim": "The exported-file checks report no UV overlaps and passing normals/tangents for every weapon.",
+      "verdict": "verified",
+      "probabilities": {
+        "supports": 0.93,
+        "contradicts": 0.01,
+        "says_nothing": 0.05
+      },
+      "confidence": 0.89,
+      "action": "auto",
+      "supporting_evidence": null,
+      "same_subject": 0.78
+    },
+    {
+      "id": "claim2",
+      "claim": "Godot 4.7.2 decoded all five GLBs and its validation report passed.",
+      "verdict": "verified",
+      "probabilities": {
+        "supports": 1,
+        "contradicts": 0,
+        "says_nothing": 0
+      },
+      "confidence": 1,
+      "action": "auto",
+      "supporting_evidence": null,
+      "same_subject": 0.95
+    },
+    {
+      "id": "claim3",
+      "claim": "Source topology checks report manifold closed solids, positive volume, no degenerate faces and zero BVH self-intersection candidates. This does not prove absence of all possible volumetric intersections; mounting contacts were separately reviewed.",
+      "verdict": "verified",
+      "probabilities": {
+        "supports": 0.99,
+        "contradicts": 0,
+        "says_nothing": 0.01
+      },
+      "confidence": 0.98,
+      "action": "auto",
+      "supporting_evidence": null,
+      "same_subject": 0.92
+    }
+  ],
+  "usage": {
+    "input_tokens": 2803,
+    "output_tokens": 248
+  }
+}
