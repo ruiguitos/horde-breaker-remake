@@ -21,9 +21,7 @@ Para correr só um spike: abrir a cena (`spikes/<nome>/*.tscn`) e **F6**.
 
 **Testar uma ilha:** no ecrã inicial há um botão **TEST ISLAND**, que só
 aparece nas versões de desenvolvimento (o editor e as exportações de debug).
-- Escolhes a missão e uma das ilhas de `world/handmade/islands/` (a
-  Hashima, a `beach_01`...) e entras logo nela, sem rota nem sorteio.
-- O bioma vem do nome do ficheiro: `port_hashima` é Industrial Port.
+- Escolhes a missão e uma das ilhas de `world/handmade/islands/` (a `beach_01`...) e entras logo nela, sem rota nem sorteio.
 - Quando as cenas da Expedição Berlenga existem, a lista mostra também a
   ilha inteira (`BERLENGA / WHOLE ISLAND`, com a missão escolhida) e cada
   parte (`BERLENGA 1 / CARREIRO DO MOSTEIRO (RESCUE)`...). Uma parte joga
@@ -261,7 +259,8 @@ A Berlenga é a ilha real, com 1,5 km, feita a partir de dados abertos:
 relevo, a costa e os caminhos do OpenStreetMap e texturas do Poly Haven.
 Já não sai no sorteio da rota Beach.
 - **Expedição Berlenga:** é uma viagem própria, que se escolhe no Armory.
-  São 4 partes seguidas, ligadas a pé: Rescue, Light the Signals (dois
+  São 4 partes seguidas, ligadas a pé: Escort (um sobrevivente pela
+  estrada acima, do Bairro dos Pescadores à saída), Light the Signals (dois
   sinais e o farol), Hold Sequence e o final no forte. Ver "Berlenga Expedition" mais abaixo e
   `docs/design/BERLENGA_EXPEDITION.md`.
 - **Cenas:** estão em `world/handmade/expeditions/berlenga/`:
@@ -284,25 +283,13 @@ Já não sai no sorteio da rota Beach.
 - **Licença:** os dados do mapa têm licença ODbL, "© OpenStreetMap
   contributors" (ver `assets/LICENSES.md`).
 
-### Hashima (ilha real)
+### Hashima (removida)
 
-A rota Industrial Port sorteia por seed entre a `port_01` e
-`islands/port_hashima.scn`. É Hashima (Gunkanjima), a ilha mineira
-abandonada do Japão, com 0,5 km.
-- **A ilha:** os 66 edifícios de betão com a altura real, o paredão e o
-  rochedo central.
-- **Desembarque:** no cais Dolphin.
-- **Geradores:** no poço 2 da mina, no Bloco 65 (o maior prédio) e no poço 4.
-- **Sabotage:** a missão "da casa". Uma rota Port com Sabotage leva sempre à
-  Hashima (o `sabotage.tres` diz `preferred_islands = ["port_hashima"]` e
-  `HandmadeIsland.pick` só escolhe entre essas, quando existem no bioma); as
-  outras missões continuam a sortear entre as duas ilhas do Port. O quadro
-  (`PowerSwitch`) fica na subestação junto ao poço 4, as cargas
-  (`Machine_1`, `Machine_2`) na ponta do tapete transportador e à porta da
-  sala de carregamento; a saída é o barco no cais Dolphin, pelo caminho
-  junto ao paredão (cerca de 135 m a pé).
-- **Construção:** foi feita pela mesma ferramenta da Berlenga
-  (`tools/real_island/`, sítio `hashima`).
+O Port de Hashima (islands/port_hashima.scn) foi retirado a 2026-10-16. A
+rota Industrial Port usa só a port_01, e a Sabotage já não tem ilha
+preferida (corre na port_01 ou numa ilha gerada). A ferramenta
+`tools/real_island/` ainda tem o sítio hashima, mas o resultado não é
+usado pelo jogo.
 
 **Mapas grandes:** com 2 milhões de células, recalcular os caminhos da
 horda para a ilha toda demora 0,5 s. Por isso:
@@ -383,7 +370,7 @@ só visual. A câmara de 3.ª pessoa encurta para não entrar nas colinas.
 | `Trees/` | Cada filho bloqueia só a célula do tronco (a copa não conta) |
 | `Bridges/` | Cada filho é o tabuleiro de uma ponte (`MeshInstance3D`): as células por baixo andam-se à altura do tabuleiro, mesmo sobre água; os filhos (guardas) são decoração |
 | `Decor/` | Nunca bloqueia: relva, flores, estradas, luzes, água de pré-visualização |
-| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed), `Cargo_1..` e `Delivery` (missão Fuel Run: onde estão os bidões e onde se entregam; sem `Cargo_*` o jogo escolhe sítios como os do Hold Sequence, sem `Delivery` entrega-se no barco/Exit), `Nest_1..` (missão Nests: onde estão os ninhos; sem eles o jogo escolhe sítios como os do Hold Sequence, com 4 m livres à volta), `Search_1..` e `Uplink` (missão Intel Search: os sítios a procurar, de preferência à porta das casas, e onde se transmite; sem `Search_*` o jogo escolhe sítios alcançáveis a menos de 3 m de um edifício ou rocha, ou em qualquer lado se não houver; sem `Uplink` escolhe o ponto aberto mais perto do meio dos sítios, a 10 m ou mais de cada um), `Signal_1..`, `Lighthouse` e `Fuel_1..` (missão Light the Signals: os sinais por ordem do número, o farol opcional como último sinal, e o combustível de cada sinal pelo mesmo número, o do farol a seguir aos outros; sem `Signal_*` o jogo escolhe sítios como os do Hold Sequence, cada um mais para dentro; sem `Fuel_*` põe o bidão a 15–30 m do seu sinal), `PowerSwitch`, `Machine_1..` e `ExfilPoint` (missão Sabotage: o quadro a cortar, as máquinas onde se armam as cargas e, opcional, o ponto de saída; sem `PowerSwitch` o jogo escolhe um sítio fundo na ilha, longe do barco; sem `Machine_*` põe as máquinas a 30–60 m do quadro, afastadas entre si; sem `ExfilPoint` sai-se pelo barco) (nós `Marker3D`) |
+| `Markers/` | `Boat` (obrigatório; o barco fica ancorado no sentido +Z do marcador), `PlayerStart`, `Generator1..3`, `Cache1..`, `HoldPoint_1..` (missão Hold Sequence, segurados pela ordem do número; sem eles o jogo escolhe pontos alcançáveis e afastados, fixos por seed), `Cargo_1..` e `Delivery` (missão Fuel Run: onde estão os bidões e onde se entregam; sem `Cargo_*` o jogo escolhe sítios como os do Hold Sequence, sem `Delivery` entrega-se no barco/Exit), `Nest_1..` (missão Nests: onde estão os ninhos; sem eles o jogo escolhe sítios como os do Hold Sequence, com 4 m livres à volta), `Search_1..` e `Uplink` (missão Intel Search: os sítios a procurar, de preferência à porta das casas, e onde se transmite; sem `Search_*` o jogo escolhe sítios alcançáveis a menos de 3 m de um edifício ou rocha, ou em qualquer lado se não houver; sem `Uplink` escolhe o ponto aberto mais perto do meio dos sítios, a 10 m ou mais de cada um), `Signal_1..`, `Lighthouse` e `Fuel_1..` (missão Light the Signals: os sinais por ordem do número, o farol opcional como último sinal, e o combustível de cada sinal pelo mesmo número, o do farol a seguir aos outros; sem `Signal_*` o jogo escolhe sítios como os do Hold Sequence, cada um mais para dentro; sem `Fuel_*` põe o bidão a 15–30 m do seu sinal), `PowerSwitch`, `Machine_1..` e `ExfilPoint` (missão Sabotage: o quadro a cortar, as máquinas onde se armam as cargas e, opcional, o ponto de saída; sem `PowerSwitch` o jogo escolhe um sítio fundo na ilha, longe do barco; sem `Machine_*` põe as máquinas a 30–60 m do quadro, afastadas entre si; sem `ExfilPoint` sai-se pelo barco), `EscortRoute_1..`, `EscortStop_1..`, `EscortEnd` e `EscortSurvivor` (missão Escort: a rota por ordem do número, o 1.º é onde o carrinho espera; as paragens, levadas para cima da rota; opcional, o ponto de entrega, senão o barco/Exit; opcional, um sobrevivente em vez do carrinho, que espera ali, antes do `EscortRoute_1`; sem `EscortRoute_*` o jogo escolhe um início alcançável a 150–230 m a pé do barco e a rota até ele, com as paragens a ⅓ e ⅔) (nós `Marker3D`) |
 
 A ilha ocupa o quadrado de 0 a `size` metros em X e Z (160 por omissão;
 muda no inspetor do nó raiz). Mantém tudo lá dentro.
@@ -568,7 +555,22 @@ Cada rota mostra também a missão da ilha:
   câmara treme. Se chegares à saída antes, rebenta atrás de ti, sem dano.
   15 de Intel pelo corte e 15 por carga. A saída é o marcador `ExfilPoint`
   quando a ilha o tem, senão o barco. É a missão "da casa" do Industrial
-  Port (peso 3 no sorteio) e, no Port, leva sempre a Hashima.
+  Port (peso 3 no sorteio).
+- **Escort**: um carrinho de mina (cuba de aço enferrujado, rodas de aço,
+  caixotes sob uma lona) espera longe do barco e só anda (2 m/s) enquanto
+  estás a menos de 8 m dele (anel âmbar à volta). Um zombie a menos de 2 m
+  à frente, no caminho dele, trava-o (`BLOCKED`): tens de limpar o caminho.
+  Os zombies que lhe tocam gastam-lhe a vida (200; 4 por segundo cada, no
+  máximo 6 contam). A 0 avaria (nunca falha a missão): ficar 5 s a menos de
+  3 m repara-o, com metade da vida. Pára em 2 paragens (placas vermelhas
+  junto ao caminho), 20 s cada, com um pico da horda: defende-o. A rota
+  vê-se no chão (setas âmbar) e no minimapa; chegar ao fim (o barco, ou o
+  `Exit` numa parte de expedição) abre a saída. 15 de Intel por paragem e
+  15 pela entrega; cada paragem devolve um terço da munição. HUD
+  `ESCORT 45% · STOP 1/2`, barra `CART 180`. Com um marcador
+  `EscortSurvivor` é um sobrevivente que caminha a rota, com as mesmas
+  regras (cai em vez de avariar; `PATCH UP`): a Berlenga parte 1. Peso 1 em
+  todos os biomas.
 
 No Vulcão, o boss aparece depois de cumprires a missão.
 
@@ -634,6 +636,10 @@ Pack ao fim de 3 min") em vez de impressões.
 
 ## Luz e gráficos
 
+- **Inimigos**: Walker com quatro variantes; Runner, Brute, Grabber,
+  Bloater, Screamer e Behemoth com modelos e silhuetas próprios, materiais
+  PBR, poses e cadáveres no sistema da horda. Ver
+  [modelos dos especiais](../docs/tech/SPECIAL_ENEMY_MODELS.md).
 - **Sky3D** (addon): céu físico com nuvens, sol e lua, e um relógio. Cada
   ilha começa a uma hora diferente (9h00, 16h30, 16h15 no Vulcão) e o tempo
   avança devagar (~1 hora de jogo a cada 5 min), por isso a luz muda enquanto
@@ -651,9 +657,14 @@ Pack ao fim de 3 min") em vez de impressões.
 - **Natureza** (Quaternius Nature MegaKit, `world/nature_kit.gd`): árvores e
   rochas reais, e relva, fetos, flores ou seixos por bioma, desenhados com
   `MultiMesh`. A praia e o porto mantêm as palmeiras feitas em código.
-- **Soldado** (`world/soldier_model.gd`): Recruit v03 com rig, animações
-  Idle/Walk/Sprint e empunhadura de duas mãos; Vanguard com armadura pesada
-  e animação procedural. A arma acompanha a seleção da run. Ver
+- **Soldado** (`world/soldier_model.gd`): Recruit v03 com rig, locomoção
+  Idle/Walk/Jog/Sprint ao ritmo da velocidade, recuar, strafe e tronco a
+  apontar (`docs/tech/LOCOMOTION.md`) e empunhadura de duas mãos; Vanguard com armadura pesada
+  e a mesma biblioteca de locomoção. A arma acompanha a seleção da run;
+  os cinco GLB originais têm apoio da mão esquerda por arma e usam o seu
+  próprio cano para o disparo (`docs/tech/WEAPON_MODELS.md`). Os pés têm
+  apoio no terreno e correção do deslize, com alcance das pernas preservado;
+  [pré-visualização animada](../docs/design/art/locomotion_contact.gif). Ver
   `docs/tech/RECRUIT_MODEL.md` para assets, câmaras e integração.
 - Tonemap ACES sempre ligado. O preset de Graphics (Settings) decide
   sombras, bloom, SSAO e SSIL.

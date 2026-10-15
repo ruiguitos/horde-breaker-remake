@@ -61,6 +61,18 @@ var signal_fuel: Array[Vector3] = []
 var power_switch := Vector3(-1, 0, -1)
 var machine_points: Array[Vector3] = []
 var exfil := Vector3(-1, 0, -1)
+## Escort: the cart's route (EscortRoute_* markers in number order; the
+## first is where it waits; empty = the run picks a route,
+## pick_escort_route), the stops on the way (EscortStop_* markers in number
+## order, each moved onto the route; empty = at even shares of the route),
+## where it is delivered (EscortEnd marker; x < 0 = the extraction point)
+## and whether a survivor walks the route instead of a cart (an
+## EscortSurvivor marker: where the survivor waits, the route's first
+## point, before the EscortRoute_* ones).
+var escort_route: Array[Vector3] = []
+var escort_stops: Array[Vector3] = []
+var escort_end := Vector3(-1, 0, -1)
+var escort_survivor: bool = false
 ## Optional supply caches (detours with a reward).
 var caches: Array[Vector3] = []
 ## Biome id: beach, town, jungle, port or volcano (see GameData.BIOMES).
@@ -382,6 +394,192 @@ static func pick_machine_points(map: IslandMap, switch: Vector3, count: int, rng
 	while out.size() < count:
 		out.append(switch)
 	return out
+
+
+## Escort on a map without EscortRoute_* markers: a route of
+## ESCORT_WAYPOINTS + 1 points, from a start `min_walk`..`max_walk` metres
+## on foot from `end` (the delivery point) to just before it. The start is
+## the first hold-point candidate (reachable from the landing, 3 m open, off
+## the boat, out of the lava; shuffled per seed, its own salt) in that band;
+## none in the band: the candidate farthest on foot from `end`; none at all:
+## `end` itself (a route of length 0: delivered at once, never a softlock).
+## The other points sit at even shares of the walk from the start to `end`,
+## so a map's route always follows walkable ground. `end` is not included.
+const ESCORT_WAYPOINTS: int = 3
+
+static func pick_escort_route(map: IslandMap, end: Vector3, rng_seed: int, min_walk: float, max_walk: float) -> Array[Vector3]:
+	var f: FlowField = map.field
+	var goal: Vector3 = _walkable_near(f, end)
+	var nav := FlowField.new(f.width, f.height)
+	nav.blocked = f.blocked
+	nav.max_distance = int(max_walk) + 30
+	nav.compute_now(nav.world_to_cell(goal))
+	var candidates: Array[Vector3] = _hold_candidates(map, rng_seed ^ 0x45534352, 3.0)[0]
+	var start := Vector3(-1, 0, -1)
+	var far := Vector3(-1, 0, -1)
+	var far_d: int = -1
+	for p in candidates:
+		var d: int = nav.distance_at(p)
+		if d >= FlowField.UNREACHABLE:
+			continue
+		if d >= int(min_walk) and d <= int(max_walk):
+			start = p
+			break
+		if d > far_d:
+			far_d = d
+			far = p
+	if start.x < 0.0:
+		start = far if far_d >= 0 else goal
+	var out: Array[Vector3] = [start]
+	var walk: PackedVector3Array = _descend(nav, start, goal)
+	if walk.size() < 2:
+		return out
+	var length: float = polyline_length(walk)
+	for k in range(1, ESCORT_WAYPOINTS + 1):
+		out.append(point_along(walk, length * k / float(ESCORT_WAYPOINTS + 1)))
+	return out
+
+
+## The path the escort follows through `waypoints` (in order; the last one
+## is the delivery point), on walkable ground: each leg is walked on the
+## grid (a breadth-first search from the leg's far end, limited to
+## ESCORT_LEG_FACTOR times its straight length plus ESCORT_LEG_SLACK metres,
+## so it never searches all of a 2-million-cell Berlenga; three times wider
+## when that is not enough; a straight leg when even that fails), then its
+## corners are cut where a straight line keeps ESCORT_CLEARANCE metres from
+## every blocked cell (leg by leg: the path still passes every waypoint).
+## Points on the simulation plane (y = 0).
+const ESCORT_LEG_FACTOR: float = 3.0
+const ESCORT_LEG_SLACK: int = 40
+const ESCORT_CLEARANCE: float = 0.45
+## How many path points a straight cut may skip (bounds the line checks).
+const ESCORT_CUT_MAX: int = 40
+
+static func escort_path(map: IslandMap, waypoints: Array[Vector3]) -> PackedVector3Array:
+	var f: FlowField = map.field
+	var dense := PackedVector3Array()
+	if waypoints.is_empty():
+		return dense
+	var pts: Array[Vector3] = []
+	for p in waypoints:
+		pts.append(_walkable_near(f, p))
+	dense.append(pts[0])
+	if pts.size() == 1:
+		return dense
+	var nav := FlowField.new(f.width, f.height)
+	nav.blocked = f.blocked
+	for k in range(1, pts.size()):
+		var a: Vector3 = pts[k - 1]
+		var b: Vector3 = pts[k]
+		var limit: int = int(Vector2(a.x - b.x, a.z - b.z).length() * ESCORT_LEG_FACTOR) + ESCORT_LEG_SLACK
+		for attempt in 2:
+			nav.max_distance = limit
+			nav.compute_now(nav.world_to_cell(b))
+			if nav.distance_at(a) < FlowField.UNREACHABLE:
+				break
+			limit *= 3
+		var leg: PackedVector3Array = _descend(nav, a, b) if nav.distance_at(a) < FlowField.UNREACHABLE else PackedVector3Array([a, b])
+		# Straightened leg by leg: every waypoint stays on the path.
+		leg = _straighten(f, leg)
+		for i in range(1, leg.size()):
+			dense.append(leg[i])
+	return dense
+
+
+## Steps down the walking distances of `nav` (its target is `to`) from
+## `from`: the cell centres on the way, `from` first and `to` last.
+static func _descend(nav: FlowField, from: Vector3, to: Vector3) -> PackedVector3Array:
+	var out := PackedVector3Array([from])
+	var p: Vector3 = from
+	var guard: int = mini(nav.distance_at(from), 100000) * 2 + 8
+	while guard > 0:
+		guard -= 1
+		var d: Vector2 = nav.direction_at(p)
+		if d == Vector2.ZERO:
+			break
+		p = Vector3(floorf(p.x) + d.x + 0.5, 0, floorf(p.z) + d.y + 0.5)
+		out.append(p)
+	if nav.world_to_cell(out[out.size() - 1]) == nav.world_to_cell(to) and out.size() > 1:
+		out[out.size() - 1] = to
+	elif out[out.size() - 1] != to:
+		out.append(to)
+	return out
+
+
+## Corner cutting: from each kept point, the farthest later point (at most
+## ESCORT_CUT_MAX on) that a straight, clear line reaches.
+static func _straighten(f: FlowField, pts: PackedVector3Array) -> PackedVector3Array:
+	if pts.size() <= 2:
+		return pts
+	var out := PackedVector3Array([pts[0]])
+	var i: int = 0
+	while i < pts.size() - 1:
+		var j: int = i + 1
+		while j + 1 < pts.size() and j + 1 - i <= ESCORT_CUT_MAX and _clear_line(f, pts[i], pts[j + 1]):
+			j += 1
+		out.append(pts[j])
+		i = j
+	return out
+
+
+## True when the straight line a-b stays ESCORT_CLEARANCE off blocked
+## cells (sampled every 0.5 m, on the line and to both sides of it).
+static func _clear_line(f: FlowField, a: Vector3, b: Vector3) -> bool:
+	var d := Vector2(b.x - a.x, b.z - a.z)
+	var length: float = d.length()
+	if length < 0.01:
+		return true
+	var side: Vector2 = Vector2(-d.y, d.x) / length * ESCORT_CLEARANCE
+	var n: int = ceili(length / 0.5)
+	for k in n + 1:
+		var t: float = float(k) / n
+		var p := Vector2(a.x, a.z) + d * t
+		for o: Vector2 in [Vector2.ZERO, side, -side]:
+			if f.is_blocked(floori(p.x + o.x), floori(p.y + o.y)):
+				return false
+	return true
+
+
+## The walkable cell centre nearest to `p` within 8 m (`p` itself when its
+## cell is open or nothing is): routes start and end on open ground.
+static func _walkable_near(f: FlowField, p: Vector3) -> Vector3:
+	var c: Vector2i = f.world_to_cell(p)
+	if not f.is_blocked(c.x, c.y):
+		return Vector3(p.x, 0, p.z)
+	for r in range(1, 9):
+		var best := Vector3(-1, 0, -1)
+		var bd: float = INF
+		for dz in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				if maxi(absi(dx), absi(dz)) != r or f.is_blocked(c.x + dx, c.y + dz):
+					continue
+				var q := Vector3(c.x + dx + 0.5, 0, c.y + dz + 0.5)
+				var d: float = Vector2(q.x - p.x, q.z - p.z).length()
+				if d < bd:
+					bd = d
+					best = q
+		if best.x >= 0.0:
+			return best
+	return Vector3(p.x, 0, p.z)
+
+
+## Length (flat metres) of a polyline.
+static func polyline_length(pts: PackedVector3Array) -> float:
+	var total: float = 0.0
+	for i in range(1, pts.size()):
+		total += Vector2(pts[i].x - pts[i - 1].x, pts[i].z - pts[i - 1].z).length()
+	return total
+
+
+## The point `at` metres along a polyline (clamped to its ends).
+static func point_along(pts: PackedVector3Array, at: float) -> Vector3:
+	var left: float = at
+	for i in range(1, pts.size()):
+		var seg: float = Vector2(pts[i].x - pts[i - 1].x, pts[i].z - pts[i - 1].z).length()
+		if left <= seg and seg > 0.0:
+			return pts[i - 1].lerp(pts[i], left / seg)
+		left -= seg
+	return pts[pts.size() - 1]
 
 
 ## Breadth-first walk (4 neighbours) from `from` over open cells, up to

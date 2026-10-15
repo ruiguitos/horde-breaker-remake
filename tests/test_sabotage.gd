@@ -1,6 +1,5 @@
 extends SceneTree
-## Sabotage (docs/design/OBJECTIVES_PROPOSAL.md, step 6; Hashima's
-## signature): cut the power at a switch (hold, leaving pauses it, a spike
+## Sabotage (docs/design/OBJECTIVES_PROPOSAL.md, step 6): cut the power at a switch (hold, leaving pauses it, a spike
 ## on the first step in), then plant a charge on each machine (only once the
 ## power is cut; hold each, a spike each), then the fuse burns down while
 ## the player gets out: a player still in the blast takes heavy damage (not
@@ -9,12 +8,11 @@ extends SceneTree
 ## Also: data, PowerSwitch/Machine_*/ExfilPoint markers and the fallback
 ## spots (switch deep in the island, machines 30-60 m from it, spread),
 ## death and redeploy, the boat draw (weight 3 on the Industrial Port, no
-## repeat), Hashima preferred for Sabotage on the Port, a bot run, the
-## Island scene in the three cameras and Hashima's real markers.
+## repeat), no preferred island for Sabotage, a bot run, the Island scene in
+## the three cameras.
 ## Run: godot --headless --path . --script res://tests/test_sabotage.gd
 
 const DT: float = 1.0 / 60.0
-const HASHIMA: String = "res://game/world/handmade/islands/port_hashima.scn"
 
 class MemoryProfile extends Profile:
 	func save(_path: String = Profile.PATH) -> bool:
@@ -42,7 +40,6 @@ func _initialize() -> void:
 	_test_death_and_redeploy()
 	_test_draw()
 	_test_island_preference()
-	_test_hashima()
 	_test_bot()
 	_test_scene.call_deferred()
 
@@ -105,14 +102,14 @@ func _test_data() -> void:
 		float(m.get("power_seconds", 0)), float(m.get("power_radius", 0)), float(m.get("power_spike_seconds", 0)),
 		int(m.get("points", 0)), float(m.get("seconds", 0)), float(m.get("radius", 0)), float(m.get("spike_seconds", 0)),
 		float(m.get("fuse_seconds", 0)), float(m.get("blast_radius", 0)), 100.0 * float(m.get("blast_damage", 0))])
-	_check(GameData.ROUTE_MISSIONS.has(&"sabotage") and GameData.ROUTE_MISSIONS[-1] == &"sabotage",
-		"Sabotage is offered on archipelago routes (last in order)")
+	_check(GameData.ROUTE_MISSIONS.has(&"sabotage") and GameData.ROUTE_MISSIONS.find(&"sabotage") == GameData.ROUTE_MISSIONS.find(&"signals") + 1,
+		"Sabotage is offered on archipelago routes (after Light the Signals)")
 	_check(IslandRun.charge_count_wanted() == 2 and IslandRun.charge_seconds() == float(m.get("seconds", 0))
 		and IslandRun.charge_radius() == float(m.get("radius", 0)) and IslandRun.power_seconds() == float(m.get("power_seconds", 0))
 		and IslandRun.power_radius() == float(m.get("power_radius", 0)) and IslandRun.fuse_seconds() == float(m.get("fuse_seconds", 0))
 		and IslandRun.blast_radius() == float(m.get("blast_radius", 0)) and IslandRun.blast_damage() == float(m.get("blast_damage", 0)),
 		"the run reads its numbers from the data")
-	_check((m.get("preferred_islands", []) as Array) == ["port_hashima"], "Sabotage prefers the Hashima island")
+	_check((m.get("preferred_islands", []) as Array).is_empty(), "Sabotage has no preferred island (Hashima was removed)")
 	var cues: bool = true
 	for cue: StringName in [&"land_sabotage", &"power_cut", &"charge_planted", &"charges_set", &"sabotage_blast"]:
 		cues = cues and Story.RADIO.has(cue)
@@ -173,11 +170,9 @@ func _test_fallback_spots() -> void:
 
 
 ## The archipelago's hand-made islands without Sabotage markers: the
-## fallback must work on their real grids (Hashima has markers: below).
+## fallback must work on their real grids.
 func _test_handmade_islands() -> void:
 	for path in HandmadeIsland.island_paths():
-		if path == HASHIMA:
-			continue
 		var scene: PackedScene = load(path)
 		if scene == null:
 			_check(false, "%s loads" % path)
@@ -457,8 +452,8 @@ func _test_draw() -> void:
 			repeats += 1
 	var want_beach: float = GameData.mission_share(&"sabotage", &"beach")
 	var want_port: float = GameData.mission_share(&"sabotage", &"port")
-	_check(absf(want_port - 3.0 / 11.0) < 0.001 and absf(want_beach - 1.0 / 11.0) < 0.001,
-		"shares: Port %.1f%% (3 of 11), Beach %.1f%% (1 of 11)" % [100.0 * want_port, 100.0 * want_beach])
+	_check(absf(want_port - 3.0 / 12.0) < 0.001 and absf(want_beach - 1.0 / 12.0) < 0.001,
+		"shares: Port %.1f%% (3 of 12), Beach %.1f%% (1 of 12)" % [100.0 * want_port, 100.0 * want_beach])
 	_check(absf(beach / float(n) - want_beach) < 0.03 and absf(port / float(n) - want_port) < 0.03,
 		"draw shares: Beach %.0f%% (expected %.0f%%), Port %.0f%% (expected %.0f%%)" % [100.0 * beach / n, 100.0 * want_beach, 100.0 * port / n, 100.0 * want_port])
 	_check(repeats == 0, "no repeat")
@@ -507,67 +502,15 @@ func _boat_routes(boat_script: Script, s: int, prev: StringName) -> Array:
 	return out
 
 
-## Sabotage on the Port lands on Hashima (the mission's preferred island);
-## any other mission keeps both Port islands; a biome without the preferred
-## island keeps all of its own.
+## Sabotage has no preferred island any more: on the Port every hand-made
+## island (or a generated one) is allowed, like the other missions.
 func _test_island_preference() -> void:
 	var port: PackedStringArray = HandmadeIsland.island_paths(&"port")
-	var pref: PackedStringArray = HandmadeIsland.preferred_paths(port, &"sabotage")
-	_check(port.size() >= 2 and pref == PackedStringArray([HASHIMA]), "Sabotage on the Port: only Hashima (%s of %s)" % [pref, port])
+	_check(HandmadeIsland.preferred_paths(port, &"sabotage") == port, "Sabotage on the Port: every Port island (%s)" % [port])
 	_check(HandmadeIsland.preferred_paths(port, &"activate") == port and HandmadeIsland.preferred_paths(port, &"") == port,
 		"other missions: every Port island")
 	var beach: PackedStringArray = HandmadeIsland.island_paths(&"beach")
 	_check(HandmadeIsland.preferred_paths(beach, &"sabotage") == beach, "Sabotage elsewhere: that biome's islands, unchanged")
-	var all_hashima: bool = true
-	for s in [1, 2, 3, 4]:
-		var scene: PackedScene = HandmadeIsland.pick(&"port", s, &"sabotage")
-		all_hashima = all_hashima and scene != null and scene.resource_path == HASHIMA
-	_check(all_hashima, "HandmadeIsland.pick(port, any seed, sabotage) is Hashima")
-
-
-## Hashima's real markers (tools/real_island/build.gd preset): the switch at
-## the substation by pit 4, the charges at the conveyor's drive end and the
-## loading room, all reachable on the grid; no ExfilPoint (the Boat marker
-## is the Dolphin Pier). A bot plays it through.
-func _test_hashima() -> void:
-	if not ResourceLoader.exists(HASHIMA):
-		_check(false, "%s exists" % HASHIMA)
-		return
-	var hm: HandmadeIsland = (load(HASHIMA) as PackedScene).instantiate()
-	root.add_child(hm)
-	var problems: Array[String] = []
-	var map: IslandMap = hm.build_map(problems)
-	_check(problems.is_empty() and map.generators.size() == 3, "Hashima: no problems, still 3 generators for Activate %s" % [problems])
-	_check(map.power_switch.x >= 0.0 and map.machine_points.size() == 2 and map.exfil.x < 0.0,
-		"Hashima: PowerSwitch %s and Machine_1, _2 %s; no ExfilPoint" % [map.power_switch, map.machine_points])
-	# Near the real places (OSM, island metres): the substation 変電所
-	# (283, 180), the belt's east end (282, 244), the loading room (300, 258).
-	var near: bool = _flat_dist(map.power_switch, Vector3(283, 0, 180)) < 15.0 \
-		and _flat_dist(map.machine_points[0], Vector3(282, 0, 244)) < 8.0 and _flat_dist(map.machine_points[1], Vector3(300, 0, 258)) < 14.0
-	_check(near, "Hashima: the switch at the substation (%.0f m), the charges at the conveyor (%.0f m) and the loading room (%.0f m)" % [
-		_flat_dist(map.power_switch, Vector3(283, 0, 180)), _flat_dist(map.machine_points[0], Vector3(282, 0, 244)),
-		_flat_dist(map.machine_points[1], Vector3(300, 0, 258))])
-	var f: FlowField = map.field
-	var saved: int = f.max_distance
-	f.max_distance = 0
-	f.compute_now(f.world_to_cell(map.boat))
-	var walk_out: int = f.distance_at(map.machine_points[0])
-	f.compute_now(f.world_to_cell(map.player_start))
-	var walk_in: int = f.distance_at(map.power_switch)
-	f.max_distance = saved
-	var dock: float = _flat_dist(map.boat, Vector3(263, 0, 357))
-	_check(walk_in < FlowField.UNREACHABLE and walk_out < FlowField.UNREACHABLE and dock < 20.0,
-		"Hashima: %d m on foot from the landing to the switch, %d m from the charges back to the boat at the Dolphin Pier (%.0f m from its centre)" % [walk_in, walk_out, dock])
-	hm.free()
-	var ctx := RunContext.new(42)
-	ctx.threat = 2
-	ctx.biome = &"port"
-	ctx.mission = &"sabotage"
-	var run := IslandRun.new(ctx.island_seed(), ctx.biome, map)
-	run.load_context(ctx)
-	_check(run.power_pos == map.power_switch and run.charge_pos == map.machine_points and run.extraction_point() == map.boat,
-		"Hashima: the run uses its markers; out at the boat")
-	_bot(run, "bot on Hashima (threat 2)")
 
 
 ## A bot walks to each goal (the switch, then the nearest machine) and
@@ -638,7 +581,7 @@ func _bot(run: IslandRun, label: String) -> void:
 ## first person cuts the power through the scene's own loop (the lights
 ## die), third person plants a charge, the fixed camera the last one (the
 ## fuse: blast rings, HUD countdown), then the blast (machines gone, camera
-## shake). Then Hashima, picked by the mission on a Port route.
+## shake).
 func _test_scene() -> void:
 	var profile := MemoryProfile.new()
 	var ctx := RunContext.new(5)
@@ -719,29 +662,4 @@ func _test_scene() -> void:
 		"the blast: machines gone, scorches, camera shake (trauma %.2f)" % float(island.get("_trauma")))
 	island.queue_free()
 	await process_frame
-	await _test_hashima_scene()
 	_finish()
-
-
-## A Port route with Sabotage lands on Hashima (HandmadeIsland.pick with the
-## mission) and builds the job at its markers.
-func _test_hashima_scene() -> void:
-	if not ResourceLoader.exists(HASHIMA):
-		return
-	var t0: int = Time.get_ticks_msec()
-	var ctx := RunContext.new(31)
-	ctx.mission = &"sabotage"
-	ctx.biome = &"port"
-	var island: Node = (load("res://game/world/island.tscn") as PackedScene).instantiate()
-	island.set("profile", MemoryProfile.new())
-	island.set("context", ctx)
-	root.add_child(island)
-	for i in 3:
-		await process_frame
-	var hm: HandmadeIsland = island.get("_handmade")
-	var run: IslandRun = island.get("run")
-	_check(hm != null and hm.scene_file_path == HASHIMA and run.power_pos == run.map.power_switch and run.map.machine_points.size() == 2
-		and (island.get("_machines") as Array).size() == 2,
-		"a Port Sabotage lands on Hashima and builds the job at its markers (scene ready in %d ms)" % (Time.get_ticks_msec() - t0))
-	island.queue_free()
-	await process_frame

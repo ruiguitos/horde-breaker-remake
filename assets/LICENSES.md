@@ -2,8 +2,7 @@
 
 Só entram assets com licença que permita usá-los num jogo (CC0, MIT, OFL ou
 royalty-free comercial). Cada entrada indica a origem e a licença. Exceção
-aceite pelo utilizador: os dados do OpenStreetMap (ODbL) da Berlenga e de
-Hashima, e o céu noturno do Sky3D (CC BY 4.0). O ecrã **CREDITS** no título
+aceite pelo utilizador: os dados do OpenStreetMap (ODbL) da Berlenga, e o céu noturno do Sky3D (CC BY 4.0). O ecrã **CREDITS** no título
 mostra "© OpenStreetMap contributors" e a atribuição da Via Láctea,
 incluindo fontes, licenças e indicação das modificações. Ver
 `docs/tech/CREDITS.md`.
@@ -40,8 +39,8 @@ incluindo fontes, licenças e indicação das modificações. Ver
 | `PlayerCharacter/`, `Map/`, `Arts/` | Third Person Controller (cena de exemplo, *plush* do Godot, fontes) | Jeh3no | MIT (`LICENSE` na raiz) |
 | `assets/textures/polyhaven/` | Texturas das ilhas reais, empacotadas e comprimidas por `tools/real_island/build.gd`. Berlenga: aerial_grass_rock, rock_face_03, coast_sand_rocks_02, rocky_trail; casas e caminhos do bairro: white_plaster_02, clay_roof_tiles_02, stone_wall_02. Hashima: cracked_concrete, concrete_wall_006, dark_rock, concrete_pavement_03, concrete_wall_008 (fachada, com janelas desenhadas, e o seu relevo). Construções das duas ilhas (2026-10-11): stone_wall_04 (granito do forte e dos muros), weathered_planks (ponte de madeira, santuário, torii), rusty_metal_04 (ferro pintado: gradeamentos, lanterna e cúpula do farol, tapete transportador), dirty_concrete (cais, pontes de betão, lajes, galerias e paredão de Hashima), rusty_corrugated_iron (chapa ondulada em Hashima) | Poly Haven (polyhaven.com) | CC0 |
 | `assets/textures/polyhaven/` (zombies e armas, 2026-10-14) | Mapas diffuse/nor_gl/rough empacotados por `tools/art/pack_textures.gd` (descarregados por `tools/art/fetch_polyhaven_textures.py`). Zombies, a 512 px: leather_white (pele), cotton_jersey (T-shirts, calças caqui), denim_fabric_06 (jeans), fabric_leather_02 (casaco, cinto, botas, cabelo), rough_linen (camisa de trabalho). Armas, a 1k: blue_metal_plate (aço/gunmetal; diffuse convertido para cinzento), rubberized_track (polímero; diffuse convertido para cinzento), american_walnut_veneer (coronhas de nogueira); reutiliza rusty_metal_04. Sangue e feridas são procedimentais (`game/world/zombie.gdshader`), sem texturas | Poly Haven (polyhaven.com) | CC0 |
-| `game/world/handmade/islands/beach_berlenga*`, `port_hashima*` | Costa, caminhos, pontes, edifícios (plantas e alturas), paredões, farol e cais da Berlenga Grande e de Hashima | © OpenStreetMap contributors | **ODbL 1.0** (aceite pelo utilizador a 2026-10-07; atribuição obrigatória, e quem partilhar a base de dados derivada tem de a partilhar com a mesma licença) |
-| `game/world/handmade/islands/*_berlenga_data/`, `port_hashima_data/` | Relevo | AWS Terrain Tiles (Mapzen; fontes SRTM, EU-DEM e outras) | Dados abertos com atribuição às fontes |
+| `game/world/handmade/islands/beach_berlenga*` | Costa, caminhos, pontes, edifícios (plantas e alturas), paredões, farol e cais da Berlenga Grande | © OpenStreetMap contributors | **ODbL 1.0** (aceite pelo utilizador a 2026-10-07; atribuição obrigatória, e quem partilhar a base de dados derivada tem de a partilhar com a mesma licença) |
+| `game/world/handmade/islands/*_berlenga_data/`, `*_berlenga_data/` | Relevo | AWS Terrain Tiles (Mapzen; fontes SRTM, EU-DEM e outras) | Dados abertos com atribuição às fontes |
 | `assets/audio/ovani_sfx_starter_vol1/` | Sound FX Starter Pack Vol. 1 (só os 21 sons usados; o resto foi retirado, recuperável no histórico) | Ovani Sound | Royalty-free (`Royalty-Free License (Link).pdf`; https://ovanisound.com/policies/terms-of-service) |
 | `assets/fonts/barlow_condensed/`, `assets/fonts/barlow/` | Barlow Condensed (SemiBold, Bold, ExtraBold) e Barlow (Regular, Medium, SemiBold): títulos e corpo dos menus e do HUD | The Barlow Project Authors (Jeremy Tribby), via github.com/google/fonts | OFL 1.1 (`OFL.txt` em cada pasta) |
 | `assets/fonts/ibm_plex_mono/` | IBM Plex Mono (Regular, SemiBold): números e teclas | IBM Corp., via github.com/google/fonts | OFL 1.1 (`OFL.txt`) |

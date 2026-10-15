@@ -17,6 +17,5 @@ power_spike_seconds = 20.0
 fuse_seconds = 20.0
 blast_radius = 15.0
 blast_damage = 0.6
-preferred_islands = Array[String](["port_hashima"])
 preferred_biomes = Array[StringName]([&"port"])
 preferred_weight = 3

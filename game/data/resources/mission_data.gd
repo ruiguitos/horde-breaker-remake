@@ -94,6 +94,35 @@ extends Resource
 ## lands on one of them instead of any island of the biome
 ## (HandmadeIsland.pick).
 @export var preferred_islands: Array[String] = []
+@export_group("Escort")
+# Escort also uses the shared fields: `points` = how many stops on the way
+# (the map's EscortStop_* markers win when it has them), `seconds_per_point`
+# = seconds the cart halts at each stop, `radius` = metres from the cart
+# within which the player must stay for it to move, `spike_seconds` = the
+# horde spike when a stop starts.
+## Escort: the cart's (or survivor's) speed in m/s while it moves.
+@export var escort_speed: float = 0.0
+## Escort: the cart's hit points, the damage per second each enemy touching
+## it deals (at most 6 count at once) and how close an enemy must be to
+## touch it (metres, centre to centre).
+@export var escort_hp: float = 0.0
+@export var escort_hit_dps: float = 0.0
+@export var escort_contact_radius: float = 0.0
+## Escort: an enemy this close (metres) in front of the cart, in its lane
+## (IslandRun.ESCORT_LANE_HALF_WIDTH to each side), blocks it: the player
+## has to clear the way.
+@export var block_radius: float = 0.0
+## Escort: at 0 HP the cart breaks down (never a mission fail). Standing
+## within repair_radius metres of it for repair_seconds repairs it, back to
+## repair_hp of its max HP (0.5 = half).
+@export var repair_seconds: float = 0.0
+@export var repair_radius: float = 0.0
+@export var repair_hp: float = 0.0
+## Escort on a map without EscortRoute_* markers: the route's length on
+## foot (metres), from a start picked in this band back to the delivery
+## point (the extraction point unless the map has an EscortEnd marker).
+@export var route_min: float = 0.0
+@export var route_max: float = 0.0
 @export_group("Boat draw")
 ## Biomes where the boat offers this mission more often: its "signature"
 ## islands (it can still be drawn anywhere).

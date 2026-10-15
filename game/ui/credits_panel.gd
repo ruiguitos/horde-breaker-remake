@@ -29,7 +29,7 @@ func _ready() -> void:
 	var osm := UiTheme.label("© OpenStreetMap contributors", 18)
 	osm.name = "OpenStreetMapCredit"
 	list.add_child(osm)
-	list.add_child(UiTheme.label("Berlenga and Hashima coastlines, paths and building footprints. OpenStreetMap data is available under the Open Database License (ODbL 1.0).", 16, UiTheme.MUTED))
+	list.add_child(UiTheme.label("Berlenga coastlines, paths and building footprints. OpenStreetMap data is available under the Open Database License (ODbL 1.0).", 16, UiTheme.MUTED))
 	_link(list, "OpenStreetMap / copyright & licence", "https://www.openstreetmap.org/copyright")
 	list.add_child(UiTheme.label("Elevation: AWS Terrain Tiles / Mapzen, based on SRTM, EU-DEM and other open elevation sources.", 16, UiTheme.MUTED))
 	list.add_child(HSeparator.new())

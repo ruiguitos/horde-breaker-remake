@@ -103,10 +103,18 @@ const PLACES: Dictionary = {
 		# on the pier. horde_radius -1 = measured (0 when the part is small).
 		"expedition": "berlenga",
 		"parts": [
-			{"mission": &"rescue", "horde_radius": 120,
+			# Escort, survivor variant (the catalogue's "escoltar sobrevivente
+			# com paragens no caminho de subida"): the survivor waits in the
+			# Bairro dos Pescadores (the old RescueTarget spot) and walks the
+			# island's road (OSM service way 441503021, the climb from the
+			# bairro to the plateau) up to the Exit. The builder puts the
+			# route markers along the road and the two stops on the climb
+			# (_escort_markers).
+			{"mission": &"escort", "horde_radius": 120,
 				"polygon": [Vector2(650, 0), Vector2(1466, 0), Vector2(1466, 1466), Vector2(880, 1466), Vector2(880, 800), Vector2(865, 630), Vector2(800, 540), Vector2(650, 400)],
 				"exit": [Vector2(835, 589), 441503021],
-				"rescue": Vector2(1011, 720), "caches": [Vector2(1059, 768), Vector2(909, 560)]},
+				"escort": {"survivor": Vector2(1011, 720), "road": 441503021, "stops": 2},
+				"caches": [Vector2(1059, 768), Vector2(909, 560)]},
 			# Light the Signals: two beacons on the plateau's edges (the old
 			# generator spots east and southwest of the lighthouse), then the
 			# lighthouse itself (Farol da Berlenga, OSM; its tower centre).
@@ -2502,6 +2510,8 @@ func _build_part(k: int, whole: IslandMap) -> Dictionary:
 		_marker("Exit", _cell3(_reachable_near(f, reach, (cr[0] as Vector2) + cr[1] * 4.0, 0.0, 10.0)))
 	if spec.has("rescue"):
 		_marker("RescueTarget", _cell3(_reachable_near(f, reach, spec["rescue"], 0.0, 30.0)))
+	if spec.has("escort"):
+		_escort_markers(spec["escort"], f, reach, _root.get_node("Markers/Exit").position)
 	var gens: Array = spec.get("generators", [])
 	for g in gens.size():
 		_marker("Generator%d" % (g + 1), _cell3(_reachable_near(f, reach, gens[g], 0.0, 30.0)))
@@ -2587,6 +2597,94 @@ func _build_part(k: int, whole: IslandMap) -> Dictionary:
 		"decor": decor, "problems": problems, "grid": grid, "blocked": mf.blocked}
 
 
+## Metres between two EscortRoute markers along the road (short legs: the
+## game walks each leg on the grid, so the survivor keeps to the road).
+const ESCORT_MARKER_STEP: float = 30.0
+## Below this rise (m) from the route's lowest point to the Exit the route
+## has no real climb: the stops go at even shares of its length instead.
+const ESCORT_MIN_CLIMB: float = 4.0
+
+## Escort markers of a part (preset "escort": survivor spot, OSM way of the
+## road, number of stops): EscortSurvivor at the nearest clear, reachable
+## cell to the survivor's spot; the road from the point nearest to the
+## survivor to the point nearest to the Exit, with an EscortRoute marker
+## every ESCORT_MARKER_STEP metres along it (each on the nearest reachable
+## cell with 1 m clear: roads are narrow); the stops on the climb, at the
+## first road points (after its lowest point) that have risen a third and
+## two thirds of the way from there up to the Exit. No EscortEnd: the
+## survivor is delivered at the Exit.
+func _escort_markers(esc: Dictionary, f: FlowField, reach: PackedInt32Array, exit: Vector3) -> void:
+	var sv: Vector2 = _reachable_near(f, reach, esc["survivor"], 0.0, 30.0)
+	_marker("EscortSurvivor", _cell3(sv))
+	var road := PackedVector2Array()
+	for path: Array in _paths:
+		if int(path[4].get("osm_id", -1)) == int(esc["road"]) and (path[0] as PackedVector2Array).size() > road.size():
+			road = path[0]
+	if road.size() < 2:
+		print("  WARNING: escort road %d not found: the game walks straight from the survivor to the Exit" % int(esc["road"]))
+		return
+	var a: float = _along(road, sv)
+	var b: float = _along(road, Vector2(exit.x, exit.z))
+	var step: float = ESCORT_MARKER_STEP if b >= a else -ESCORT_MARKER_STEP
+	var pts: Array[Vector2] = []
+	var d: float = a
+	while (step > 0.0 and d < b - ESCORT_MARKER_STEP * 0.5) or (step < 0.0 and d > b + ESCORT_MARKER_STEP * 0.5):
+		pts.append(_reachable_near(f, reach, _road_point(road, d), 0.0, 8.0, 1))
+		d += step
+	for k in pts.size():
+		_marker("EscortRoute_%d" % (k + 1), _cell3(pts[k]))
+	# Stops on the climb, by height along the road (survivor first, then the
+	# road points, then the Exit).
+	var line: Array[Vector2] = [sv]
+	line.append_array(pts)
+	line.append(Vector2(exit.x, exit.z))
+	var low: int = 0
+	for k in line.size():
+		if height_at(line[k].x, line[k].y) < height_at(line[low].x, line[low].y):
+			low = k
+	var h_low: float = height_at(line[low].x, line[low].y)
+	var h_top: float = height_at(exit.x, exit.z)
+	var n: int = int(esc.get("stops", 2))
+	var stops: Array[Vector2] = []
+	for s in range(1, n + 1):
+		var want: float = h_low + (h_top - h_low) * s / float(n + 1)
+		var at: Vector2 = line[mini(line.size() - 2, maxi(1, roundi(line.size() * s / float(n + 1))))]
+		if h_top - h_low >= ESCORT_MIN_CLIMB:
+			for k in range(low, line.size() - 1):
+				if height_at(line[k].x, line[k].y) >= want and (stops.is_empty() or line[k] != stops[-1]):
+					at = line[k]
+					break
+		stops.append(at)
+		_marker("EscortStop_%d" % s, _cell3(at))
+	print("  escort: survivor (%d, %d), %d route markers along way %d, climb %.0f m -> %.0f m, stops %s" % [int(sv.x), int(sv.y),
+		pts.size(), int(esc["road"]), h_low, h_top, ", ".join(PackedStringArray(stops.map(func(p: Vector2) -> String: return "(%d, %d) %.0f m" % [int(p.x), int(p.y), height_at(p.x, p.y)])))])
+
+
+## Metres along a polyline of its point nearest to `p`.
+func _along(line: PackedVector2Array, p: Vector2) -> float:
+	var best: float = 0.0
+	var bd: float = INF
+	var walked: float = 0.0
+	for i in line.size() - 1:
+		var q: Vector2 = Geometry2D.get_closest_point_to_segment(p, line[i], line[i + 1])
+		if q.distance_to(p) < bd:
+			bd = q.distance_to(p)
+			best = walked + q.distance_to(line[i])
+		walked += line[i].distance_to(line[i + 1])
+	return best
+
+
+## The point `d` metres along a polyline (clamped to its ends).
+func _road_point(line: PackedVector2Array, d: float) -> Vector2:
+	var left: float = maxf(0.0, d)
+	for i in line.size() - 1:
+		var seg: float = line[i].distance_to(line[i + 1])
+		if left <= seg and seg > 0.0:
+			return line[i].lerp(line[i + 1], left / seg)
+		left -= seg
+	return line[line.size() - 1]
+
+
 ## The mission's walk on the grid: start > generators (nearest first) >
 ## rescue target or defence zone > Exit (the last part: the boat on the
 ## pier). Returns [labels, metres per leg as text, total metres].
@@ -2612,6 +2710,9 @@ func _route(map: IslandMap) -> Array:
 		stops.append(["RescueTarget", map.rescue_target])
 	if map.defend_zone.x >= 0.0:
 		stops.append(["DefendZone", map.defend_zone])
+	for e in map.escort_route.size():  # the survivor (or cart), then the route
+		var first: bool = e == 0 and map.escort_survivor
+		stops.append(["EscortSurvivor" if first else "EscortRoute_%d" % (e if map.escort_survivor else e + 1), map.escort_route[e]])
 	for h in map.hold_points.size():
 		stops.append(["HoldPoint_%d" % (h + 1), map.hold_points[h]])
 	for s in map.signal_points.size():  # each signal's fuel, then the signal

@@ -247,6 +247,45 @@ var fuse_left: float = 0.0
 var blast_hit: bool = false
 ## Where the run ends after a Sabotage (x < 0: the usual extraction point).
 var exfil_pos: Vector3 = Vector3(-1, 0, -1)
+## Escort: a cart (or, with the map's EscortSurvivor marker, a survivor)
+## moves along escort_path (walkable ground from where it waits to the
+## delivery point; escort_cum = metres from the start to each point) at
+## escort_speed() only while the player is within escort_radius() of it and
+## no enemy stands within block_radius() in front of it. escort_dist is how
+## far it has come, escort_pos / escort_dir where it is and which way it
+## faces. Enemies touching it wear its HP down; at 0 it breaks down
+## (escort_broken) until the player stands by it for repair_seconds()
+## (repair_progress), then it has repair_hp() of its max HP back: never a
+## mission fail. At each stop (escort_stop_at, metres along the path,
+## ascending) it halts for stop_seconds() (stop_left counts down; a spike
+## when it arrives); stop_index is the next stop not finished. Delivered:
+## the extraction opens. escort_status is what it is doing (ESC_*: the HUD
+## and the tests read it).
+const ESC_WAITING: int = 0
+const ESC_MOVING: int = 1
+const ESC_BLOCKED: int = 2
+const ESC_STOPPED: int = 3
+const ESC_BROKEN: int = 4
+const ESC_DONE: int = 5
+var escort_path: PackedVector3Array = PackedVector3Array()
+var escort_cum: PackedFloat32Array = PackedFloat32Array()
+var escort_length: float = 0.0
+var escort_dist: float = 0.0
+var escort_pos: Vector3 = Vector3.ZERO
+var escort_dir: Vector3 = Vector3(0, 0, -1)
+var escort_hp: float = 0.0
+var escort_broken: bool = false
+var repair_progress: float = 0.0
+var escort_stop_at: PackedFloat32Array = PackedFloat32Array()
+var stop_index: int = 0
+var stop_left: float = 0.0
+var escort_started: bool = false
+var escort_delivered: bool = false
+var escort_survivor: bool = false
+var escort_status: int = ESC_WAITING
+## Times the cart broke down on this island (tests, the bot's report).
+var escort_breakdowns: int = 0
+var _escort_seg: int = 0  ## path segment escort_dist is on (it only grows)
 ## The seed this island was built with (fallback hold points, fuel cans,
 ## nests, search spots).
 var run_seed: int = 7
@@ -366,7 +405,7 @@ func load_context(ctx: RunContext) -> void:
 	perk_ranks = ctx.perk_ranks.duplicate()
 	set_mission(ctx.mission)
 	exit_label = next_part_name(ctx)
-	radio.append(StringName("land_" + String(mission)))
+	radio.append(escort_cue(&"land_escort") if mission == &"escort" else StringName("land_" + String(mission)))
 	# The last island has the Behemoth; the expedition's holdout is itself
 	# the finale (hold the fort, then the boat), so it has none.
 	has_boss = ctx.is_last_island() and mission != &"holdout"
@@ -795,6 +834,214 @@ func set_mission(id: StringName) -> void:
 			charge_planted.append(false)
 		exfil_pos = map.exfil
 		site = sabotage_goal()
+	_reset_escort()
+
+
+## Escort: the route, stops and cart state from the map (or the seeded
+## fallback), all fresh. Other missions: everything empty.
+func _reset_escort() -> void:
+	escort_path.clear()
+	escort_cum.clear()
+	escort_length = 0.0
+	escort_dist = 0.0
+	escort_pos = site
+	escort_dir = Vector3(0, 0, -1)
+	escort_hp = escort_max_hp()
+	escort_broken = false
+	repair_progress = 0.0
+	escort_stop_at.clear()
+	stop_index = 0
+	stop_left = 0.0
+	escort_started = false
+	escort_delivered = false
+	escort_survivor = false
+	escort_status = ESC_WAITING
+	escort_breakdowns = 0
+	_escort_seg = 0
+	if mission != &"escort":
+		return
+	var route: Array[Vector3] = map.escort_route.duplicate()
+	escort_survivor = map.escort_survivor and not route.is_empty()
+	var end: Vector3 = escort_end_point()
+	if route.is_empty():
+		route = IslandMap.pick_escort_route(map, end, run_seed, escort_route_min(), escort_route_max())
+	route.append(end)
+	escort_path = IslandMap.escort_path(map, route)
+	escort_cum.append(0.0)
+	for i in range(1, escort_path.size()):
+		escort_length += _flat_dist(escort_path[i], escort_path[i - 1])
+		escort_cum.append(escort_length)
+	# Stops: the markers moved onto the route, else even shares of it; none
+	# within 1 m of either end (a stop at the start or the delivery point
+	# would only delay the job).
+	var at: Array[float] = []
+	if escort_length > 3.0:
+		if not map.escort_stops.is_empty():
+			for s in map.escort_stops:
+				at.append(clampf(_path_project(s), 1.0, escort_length - 1.0))
+		else:
+			var n: int = stop_count_wanted()
+			for k in n:
+				at.append(escort_length * (k + 1) / float(n + 1))
+	at.sort()
+	for d in at:
+		escort_stop_at.append(d)
+	_place_escort()
+	site = escort_pos
+
+
+## Where the escort is delivered: the map's EscortEnd marker, else the
+## extraction point (the boat, or the Exit of an expedition part).
+func escort_end_point() -> Vector3:
+	return map.escort_end if map.escort_end.x >= 0.0 else extraction_point()
+
+
+## Metres along escort_path of the route point nearest to `p` (a stop
+## marker placed beside the road still halts the cart on it).
+func _path_project(p: Vector3) -> float:
+	var best: float = 0.0
+	var best_d: float = INF
+	for i in range(1, escort_path.size()):
+		var a := Vector2(escort_path[i - 1].x, escort_path[i - 1].z)
+		var b := Vector2(escort_path[i].x, escort_path[i].z)
+		var q: Vector2 = Geometry2D.get_closest_point_to_segment(Vector2(p.x, p.z), a, b)
+		var d: float = q.distance_to(Vector2(p.x, p.z))
+		if d < best_d:
+			best_d = d
+			best = escort_cum[i - 1] + q.distance_to(a)
+	return best
+
+
+## escort_pos and escort_dir from escort_dist (the segment index only moves
+## forward: the cart never goes back).
+func _place_escort() -> void:
+	if escort_path.is_empty():
+		return
+	if escort_path.size() == 1:
+		escort_pos = escort_path[0]
+		return
+	while _escort_seg < escort_path.size() - 2 and escort_cum[_escort_seg + 1] < escort_dist:
+		_escort_seg += 1
+	var a: Vector3 = escort_path[_escort_seg]
+	var b: Vector3 = escort_path[_escort_seg + 1]
+	var seg: float = escort_cum[_escort_seg + 1] - escort_cum[_escort_seg]
+	var t: float = clampf((escort_dist - escort_cum[_escort_seg]) / seg, 0.0, 1.0) if seg > 0.0 else 1.0
+	escort_pos = a.lerp(b, t)
+	var d := Vector3(b.x - a.x, 0, b.z - a.z)
+	if d.length_squared() > 0.0001:
+		escort_dir = d.normalized()
+
+
+## Escort numbers, from the mission's data (escort.tres).
+static func stop_count_wanted() -> int:
+	return int(GameData.mission_value(&"escort", "points", 2.0))
+
+
+static func stop_seconds() -> float:
+	return GameData.mission_value(&"escort", "seconds", 20.0)
+
+
+static func escort_radius() -> float:
+	return GameData.mission_value(&"escort", "radius", 8.0)
+
+
+static func stop_spike_seconds() -> float:
+	return GameData.mission_value(&"escort", "spike_seconds", 20.0)
+
+
+static func escort_speed() -> float:
+	return GameData.mission_value(&"escort", "escort_speed", 2.0)
+
+
+static func escort_max_hp() -> float:
+	return GameData.mission_value(&"escort", "escort_hp", 200.0)
+
+
+static func escort_hit_dps() -> float:
+	return GameData.mission_value(&"escort", "escort_hit_dps", 4.0)
+
+
+static func escort_contact_radius() -> float:
+	return GameData.mission_value(&"escort", "escort_contact_radius", 1.4)
+
+
+static func block_radius() -> float:
+	return GameData.mission_value(&"escort", "block_radius", 2.0)
+
+
+static func repair_seconds() -> float:
+	return GameData.mission_value(&"escort", "repair_seconds", 5.0)
+
+
+static func repair_radius() -> float:
+	return GameData.mission_value(&"escort", "repair_radius", 3.0)
+
+
+static func repair_hp() -> float:
+	return GameData.mission_value(&"escort", "repair_hp", 0.5)
+
+
+static func escort_route_min() -> float:
+	return GameData.mission_value(&"escort", "route_min", 150.0)
+
+
+static func escort_route_max() -> float:
+	return GameData.mission_value(&"escort", "route_max", 230.0)
+
+
+## 0..1 of the route covered (1 for a route of length 0).
+func escort_progress() -> float:
+	return clampf(escort_dist / escort_length, 0.0, 1.0) if escort_length > 0.0 else (1.0 if escort_delivered else 0.0)
+
+
+## Where stop `k` is on the route.
+func stop_pos(k: int) -> Vector3:
+	return IslandMap.point_along(escort_path, escort_stop_at[k])
+
+
+## Index of the first route point still ahead of the cart.
+func next_path_point() -> int:
+	return mini(_escort_seg + 1, escort_path.size())
+
+
+## Stops finished so far.
+func stops_done() -> int:
+	return mini(stop_index, escort_stop_at.size())
+
+
+## True while the cart is halted at a stop.
+func at_stop() -> bool:
+	return stop_left > 0.0
+
+
+## "cart" or "survivor" (messages, HUD).
+func escort_noun() -> String:
+	return "survivor" if escort_survivor else "cart"
+
+
+## A radio cue in the escort's variant: `base` + "_survivor" for a survivor.
+func escort_cue(base: StringName) -> StringName:
+	return StringName(String(base) + "_survivor") if escort_survivor else base
+
+
+## Half the width of the escort's lane (m): the cart (1.1 m across), or the
+## survivor (0.5 m), plus an enemy's body. Only an enemy in the lane is in
+## the way.
+const ESCORT_LANE_HALF_WIDTH: float = 1.0
+const SURVIVOR_LANE_HALF_WIDTH: float = 0.7
+
+## True when an enemy stands in the escort's lane, ahead of it and within
+## block_radius(): it cannot push through (one beside or behind it only
+## hurts it).
+func escort_blocked() -> bool:
+	var lane: float = SURVIVOR_LANE_HALF_WIDTH if escort_survivor else ESCORT_LANE_HALF_WIDTH
+	for i in horde.query_radius(escort_pos, block_radius() + lane):
+		var d: Vector3 = horde.positions[i] - escort_pos
+		var ahead: float = d.x * escort_dir.x + d.z * escort_dir.z
+		var aside: float = absf(d.x * escort_dir.z - d.z * escort_dir.x)
+		if ahead > 0.0 and ahead <= block_radius() and aside <= lane:
+			return true
+	return false
 
 
 ## Intel Search numbers, from the mission's data (intel_search.tres).
@@ -1381,6 +1628,8 @@ func _main_task_done() -> bool:
 			return signal_index >= signal_pos.size()
 		&"sabotage":
 			return sabotage_phase >= SAB_FUSE
+		&"escort":
+			return escort_delivered
 	for p in generator_progress:
 		if p < GameData.GENERATOR_HOLD_SECONDS:
 			return false
@@ -1468,6 +1717,8 @@ func _intel_base() -> int:
 			base += signals_lit() * 15
 		&"sabotage":
 			base += (15 if power_cut() else 0) + charges_planted() * 15
+		&"escort":
+			base += stops_done() * 15 + (15 if escort_delivered else 0)
 		_:
 			base += done * 15
 	base += 20 if boss_killed else 0
@@ -2753,6 +3004,8 @@ func _update_mission(dt: float) -> void:
 					_update_signals(dt)
 				&"sabotage":
 					_update_sabotage(dt)
+				&"escort":
+					_update_escort(dt)
 				_:
 					_update_generators(dt)
 			if _main_task_done() and has_boss:
@@ -2775,6 +3028,8 @@ func _update_mission(dt: float) -> void:
 					radio.append(&"lighthouse_lit" if signal_lighthouse else &"signals_done")
 				elif mission == &"sabotage":
 					radio.append(&"charges_set")
+				elif mission == &"escort":
+					radio.append(escort_cue(&"escort_done"))
 				elif mission != &"rescue":
 					radio.append(&"objective_done_on_foot" if has_exit() else &"objective_done")
 		Objective.BOSS:
@@ -2822,6 +3077,8 @@ func _start_extraction() -> void:
 		messages.append("No intel to send. Get back to the boat!")
 	elif mission == &"sabotage":
 		messages.append("Charges set: %d s. Get clear and make for the %s!" % [ceili(fuse_left), extraction_name().to_lower()])
+	elif mission == &"escort":
+		messages.append("The %s made it. Get back to the boat!" % escort_noun())
 	else:
 		messages.append("Objective complete. Get back to the boat!")
 
@@ -3044,6 +3301,84 @@ func _detonate(hurt_player: bool = true) -> void:
 	elif not is_over():
 		messages.append("The machine is gone. Get out!")
 	radio.append(&"sabotage_blast")
+
+
+## Escort, one step. Enemies touching the cart wear it down (at most 6
+## count, escort_hit_dps() each); at 0 HP it breaks down and the player
+## repairs it by standing within repair_radius() for repair_seconds()
+## (leaving pauses it), back to repair_hp() of its max HP. At a stop the
+## cart waits stop_seconds() (the countdown runs even while it is broken),
+## then a third of the ammo comes back. Otherwise it rolls on at
+## escort_speed() while the player is within escort_radius() and nothing
+## blocks it in front, halting at the next stop (a horde spike) and at the
+## end, where it is delivered (_main_task_done opens the extraction).
+func _update_escort(dt: float) -> void:
+	if escort_delivered:
+		escort_status = ESC_DONE
+		return
+	var noun: String = escort_noun()
+	if not escort_broken:
+		var touching: int = horde.query_radius(escort_pos, escort_contact_radius()).size()
+		if touching > 0:
+			escort_hp = maxf(0.0, escort_hp - mini(touching, 6) * escort_hit_dps() * dt)
+			if escort_hp <= 0.0:
+				escort_broken = true
+				repair_progress = 0.0
+				escort_breakdowns += 1
+				messages.append(("The survivor is down: stand by them to patch them up!" if escort_survivor
+					else "The cart broke down: stand by it to repair it!"))
+				radio.append(escort_cue(&"escort_broken"))
+	if escort_broken:
+		escort_status = ESC_BROKEN
+		if _flat_dist(player_pos, escort_pos) <= repair_radius():
+			repair_progress += dt
+			if repair_progress >= repair_seconds():
+				escort_broken = false
+				repair_progress = 0.0
+				escort_hp = escort_max_hp() * repair_hp()
+				messages.append("The survivor is back on their feet!" if escort_survivor else "Cart repaired. Keep it moving!")
+	if at_stop():
+		stop_left = maxf(0.0, stop_left - dt)
+		if not escort_broken:
+			escort_status = ESC_STOPPED
+		if stop_left <= 0.0:
+			stop_index += 1
+			_refill_third()
+			messages.append("Stop %d done. Moving on!" % stops_done())
+		site = escort_pos
+		return
+	if escort_broken:
+		site = escort_pos
+		return
+	if _flat_dist(player_pos, escort_pos) > escort_radius():
+		escort_status = ESC_WAITING
+		site = escort_pos
+		return
+	if escort_blocked():
+		escort_status = ESC_BLOCKED
+		site = escort_pos
+		return
+	escort_status = ESC_MOVING
+	if not escort_started:
+		escort_started = true
+		messages.append("The %s is moving: stay within %d m!" % [noun, int(escort_radius())])
+	var limit: float = escort_length
+	if stop_index < escort_stop_at.size():
+		limit = minf(limit, escort_stop_at[stop_index])
+	escort_dist = minf(limit, escort_dist + escort_speed() * dt)
+	_place_escort()
+	site = escort_pos
+	if stop_index < escort_stop_at.size() and escort_dist >= escort_stop_at[stop_index] - 0.001:
+		stop_left = stop_seconds()
+		escort_status = ESC_STOPPED
+		director.trigger_peak(stop_spike_seconds())
+		messages.append("Stop %d of %d: defend the %s for %d s!" % [stop_index + 1, escort_stop_at.size(), noun, int(stop_seconds())])
+		radio.append(escort_cue(&"escort_stop"))
+	elif escort_dist >= escort_length - 0.001:
+		escort_dist = escort_length
+		escort_delivered = true
+		escort_status = ESC_DONE
+		_refill_third()
 
 
 ## Nests: each living nest near the player (nest_wake_range()) spawns a
@@ -3424,6 +3759,14 @@ func objective_text() -> String:
 				var k: int = nearest_unplanted()
 				return "Plant the charges (%d / %d, %d / %d s)" % [charges_planted(), charge_pos.size(),
 					int(charge_progress[k]) if k >= 0 else 0, int(charge_seconds())]
+			if mission == &"escort":
+				var noun: String = escort_noun()
+				if escort_broken:
+					return ("Patch up the survivor (%d / %d s)" if escort_survivor else "Repair the cart (%d / %d s)") % [
+						int(repair_progress), int(repair_seconds())]
+				if at_stop():
+					return "Defend the %s: stop %d / %d (%d s)" % [noun, stop_index + 1, escort_stop_at.size(), ceili(stop_left)]
+				return "Escort the %s (%d%%, stops %d / %d)" % [noun, int(100.0 * escort_progress()), stops_done(), escort_stop_at.size()]
 			var done: int = 0
 			for p in generator_progress:
 				if p >= GameData.GENERATOR_HOLD_SECONDS:

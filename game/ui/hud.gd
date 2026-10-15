@@ -1340,6 +1340,8 @@ func _mission_progress(run: IslandRun) -> String:
 					if not run.power_cut():
 						return "power %d/%d s" % [int(run.power_progress), int(IslandRun.power_seconds())]
 					return "%d/%d" % [run.charges_planted(), run.charge_pos.size()]
+				&"escort":
+					return "%d%%, stop %d/%d" % [int(100.0 * run.escort_progress()), run.stops_done(), run.escort_stop_at.size()]
 				_:
 					return "%d/%d" % [_generators_done(run), GameData.GENERATOR_COUNT]
 		IslandRun.Objective.BOSS:
@@ -1750,6 +1752,12 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 					# Pips: the switch, then each charge.
 					pips = charges + 1
 					pips_done = (1 if run.power_cut() else 0) + run.charges_planted()
+				&"escort":
+					_objective.text = escort_title(run)
+					detail += " · " + escort_detail(run)
+					# Pips: each stop, then the delivery.
+					pips = run.escort_stop_at.size() + 1
+					pips_done = run.stops_done() + (1 if run.escort_delivered else 0)
 				_:
 					_objective.text = "ACTIVATE THE GENERATORS"
 					detail += " · %d OF %d ONLINE" % [_generators_done(run), GameData.GENERATOR_COUNT]
@@ -1783,10 +1791,48 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 	_objective_detail.text = detail
 	_objective_pips.set_state(pips, pips_done, UiTheme.INFO)
 	_objective_pips.visible = pips > 0
+	if run.mission == &"escort":
+		# The same row shows the cart's (or the survivor's) HP while it is on
+		# its way; broken down, the repair's progress.
+		_survivor_row.visible = run.objective == IslandRun.Objective.GENERATORS and not run.is_over()
+		if run.escort_broken:
+			_survivor_text.text = "%s · %s %d%%" % [run.escort_noun().to_upper(), "PATCHING UP" if run.escort_survivor else "REPAIR",
+				int(100.0 * run.repair_progress / IslandRun.repair_seconds())]
+			_survivor_bar.max_value = IslandRun.repair_seconds()
+			_survivor_bar.value = run.repair_progress
+		else:
+			_survivor_text.text = "%s %d" % [run.escort_noun().to_upper(), ceili(run.escort_hp)]
+			_survivor_bar.max_value = IslandRun.escort_max_hp()
+			_survivor_bar.value = run.escort_hp
+		return
 	_survivor_row.visible = run.mission == &"rescue" and run.survivor_found and not run.survivor_lost and not run.is_over()
 	_survivor_text.text = "SURVIVOR %d" % ceili(run.survivor_hp)
 	_survivor_bar.max_value = GameData.SURVIVOR_HP
 	_survivor_bar.value = run.survivor_hp
+
+
+## Escort: the objective line, "ESCORT 45% · STOP 1/2" (the next or current
+## stop; after the last one, "LAST LEG").
+static func escort_title(run: IslandRun) -> String:
+	var n: int = run.escort_stop_at.size()
+	var leg: String = "STOP %d/%d" % [run.stop_index + 1, n] if run.stop_index < n else "LAST LEG"
+	return "ESCORT %d%% · %s" % [int(100.0 * run.escort_progress()), leg]
+
+
+## Escort: what the cart is doing and what the player must do about it.
+static func escort_detail(run: IslandRun) -> String:
+	var noun: String = run.escort_noun().to_upper()
+	if run.escort_broken:
+		return ("%s DOWN · PATCH THEM UP · %d OF %d s" if run.escort_survivor else "%s BROKEN · REPAIR IT · %d OF %d s") % [
+			noun, int(run.repair_progress), int(IslandRun.repair_seconds())]
+	match run.escort_status:
+		IslandRun.ESC_STOPPED:
+			return "STOPPED · DEFEND IT · %d s" % ceili(run.stop_left)
+		IslandRun.ESC_BLOCKED:
+			return "BLOCKED · CLEAR THE WAY"
+		IslandRun.ESC_MOVING:
+			return "MOVING · STAY CLOSE"
+	return "STAY WITHIN %d m TO MOVE IT" % int(IslandRun.escort_radius())
 
 
 func _update_hit_arc(run: IslandRun, camera: Camera3D) -> void:
@@ -1916,6 +1962,9 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"sabotage":
 		goal = run.sabotage_goal()  # the switch, then the nearest unplanted charge
 		goal_name = "Machine" if run.power_cut() else "Power switch"
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"escort":
+		goal = run.escort_pos
+		goal_name = run.escort_noun().capitalize()
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"rescue":
 		goal = run.survivor_pos
 		goal_name = "Survivor"
@@ -1962,6 +2011,16 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 		_marker.text = "CUTTING POWER · %d%%" % int(100.0 * run.power_progress / IslandRun.power_seconds())
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"sabotage" and run.power_cut() 			and run.nearest_unplanted() != -1 and dist <= IslandRun.charge_radius():
 		_marker.text = "PLANTING · %d%%" % int(100.0 * run.charge_progress[run.nearest_unplanted()] / IslandRun.charge_seconds())
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"escort" and run.escort_broken \
+			and dist <= IslandRun.repair_radius():
+		_marker.text = "%s · %d%%" % ["PATCHING UP" if run.escort_survivor else "REPAIRING", int(100.0 * run.repair_progress / IslandRun.repair_seconds())]
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"escort" and dist <= IslandRun.escort_radius():
+		var state: String = "BROKEN" if run.escort_broken else "%d HP" % ceili(run.escort_hp)
+		if not run.escort_broken and run.escort_status == IslandRun.ESC_STOPPED:
+			state = "STOP · %d s" % ceili(run.stop_left)
+		elif not run.escort_broken and run.escort_status == IslandRun.ESC_BLOCKED:
+			state = "BLOCKED"
+		_marker.text = "%s · %s" % [goal_name.to_upper(), state]
 	elif run.objective == IslandRun.Objective.RETURN_TO_BOAT and run.mission == &"sabotage" and run.sabotage_phase == IslandRun.SAB_FUSE:
 		_marker.text = "%s · %d m · %d s" % [goal_name.to_upper(), int(dist), ceili(run.fuse_left)]
 	else:

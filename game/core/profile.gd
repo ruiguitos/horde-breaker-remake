@@ -58,6 +58,10 @@ var antialias: int = GraphicsSettings.AA_FXAA
 enum CameraMode { FIRST_PERSON, THIRD_PERSON, FIXED }
 const CAMERA_MODE_NAMES: Array[String] = ["First person", "Third person (shoulder)", "Fixed (top-down)"]
 var camera_mode: int = CameraMode.THIRD_PERSON
+## Field of view setting in degrees (60..120, Settings > Graphics). It applies
+## to first person; third person and fixed are capped (see field_of_view).
+var fov: int = 60
+const THIRD_PERSON_MAX_FOV: int = 75
 var mouse_sensitivity: int = 50  ## percent
 var controller_icons: int = 0  ## 0 = auto; see InputIcons.PLATFORM_NAMES
 var hud_scale: int = 100  ## HUD size in percent (60..100); new profiles start at 100
@@ -71,6 +75,13 @@ var last_run: Dictionary = {}
 var lore_read: int = 0
 ## Set by record_run when the run beat the kill record (not saved).
 var new_best_kills: bool = false
+
+
+## Field of view in degrees for a camera mode: the setting in first person,
+## and at most THIRD_PERSON_MAX_FOV in third person and fixed (so the soldier
+## is not stretched at the screen edges).
+static func field_of_view(setting: int, first_person: bool) -> float:
+	return float(setting) if first_person else float(mini(setting, THIRD_PERSON_MAX_FOV))
 
 
 static func load_profile(path: String = PATH) -> Profile:
@@ -116,6 +127,7 @@ static func from_dict(d: Dictionary) -> Profile:
 	p.controller_icons = clampi(int(d.get("controller_icons", 0)), 0, InputIcons.PLATFORM_NAMES.size() - 1)
 	p.max_fps = maxi(0, int(d.get("max_fps", 0)))
 	p.render_scale = clampi(int(d.get("render_scale", 100)), 50, 100)
+	p.fov = clampi(int(d.get("fov", 60)), 60, 120)
 	p.antialias = clampi(int(d.get("antialias", GraphicsSettings.AA_FXAA)), 0, GraphicsSettings.AA_NAMES.size() - 1)
 	# Version 2 stored one master volume 0..10; version 3 stores percentages.
 	p.master_volume = clampi(int(d.get("master_volume", int(d.get("volume", 8)) * 10)), 0, 100)
@@ -188,7 +200,7 @@ func save(path: String = PATH) -> bool:
 		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x)),
 		"selected_primary": String(selected_primary), "selected_secondary": String(selected_secondary),
 		"quality": quality, "window_mode": window_mode, "resolution": "%dx%d" % [resolution.x, resolution.y],
-		"vsync": vsync, "hud_scale": hud_scale, "camera_mode": camera_mode, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "controller_icons": controller_icons, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias,
+		"vsync": vsync, "hud_scale": hud_scale, "camera_mode": camera_mode, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "controller_icons": controller_icons, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias, "fov": fov,
 		"last_run": last_run, "lore_read": lore_read}, "  "))
 	return true
 

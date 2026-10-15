@@ -42,6 +42,7 @@ registadas as decisões dessa data.
 | 2026-10-14 | Rerolls: **1 reroll grátis por ecrã de level-up**, sem acumular. | Substitui a regra provisória (2 no início, +1 por ilha, máx. 3). O power-up Extra Reroll dá +1 no ecrã seguinte. |
 | 2026-10-14 | Fim de ilha: **contagem direta "NEXT ISLAND IN 5…"** e partida automática para uma rota sorteada. | Sem escolha de rota entre ilhas; o 1.º barco da run mantém duas rotas e o briefing. Os mantimentos mantêm-se. O acampamento da Berlenga usa a mesma contagem. |
 | 2026-10-14 | Arte: **zombies e armas em blocos, como o Recruit e o Vanguard, com materiais realistas** (texturas CC0) e **gore forte**. | Começa pelos zombies comuns; inimigos especiais, Behemoth e sobrevivente depois. Atualiza o "estilo alvo low-poly" de 2026-10-05. |
+| 2026-10-16 | **Campo de visão (FOV)** em Definições > Gráficos: 60°–120°, 60° por defeito. Aplica-se à **primeira pessoa**; a **terceira pessoa e a câmara fixa** ficam limitadas a **75°**. | Pedido do utilizador. A câmara fixa conta como terceira pessoa. |
 | 2026-10-14 | Plugins: **remover o Orchestrator**. | Não usado. Remoção a fazer com o editor fechado (a DLL fica bloqueada enquanto está aberto). NAP Map Generator: não usado e sem licença, remoção recomendada. |
 
 ## Em aberto

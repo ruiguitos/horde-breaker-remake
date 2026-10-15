@@ -36,6 +36,12 @@ const SIGNAL_LIT_COLOR := Color(1.0, 0.45, 0.12)
 ## same colours); a planted charge gets a ring on the map until it blows.
 const POWER_COLOR := Color(0.35, 0.85, 1.0)
 const CHARGE_COLOR := Color(1.0, 0.3, 0.2)
+## Escort: the cart and the route still ahead of it (the arrows on the
+## ground use the same amber), and its stops (a red "stop sign").
+const ESCORT_COLOR := Color(1.0, 0.78, 0.3)
+const STOP_COLOR := Color(0.92, 0.22, 0.2)
+## Metres between two route points drawn on the map (a long route stays cheap).
+const ROUTE_STEP_M: float = 4.0
 
 var run: IslandRun
 var _texture: ImageTexture
@@ -189,6 +195,13 @@ func _draw() -> void:
 			_mark(&"power", _px(run.power_pos))
 		for k in run.charge_pos.size():
 			_mark(&"charge_set" if run.charge_planted[k] else &"charge", _px(run.charge_pos[k]))
+	elif run.mission == &"escort" and run.objective == IslandRun.Objective.GENERATORS:
+		# The route still ahead, the stops not reached yet, then the cart
+		# (or survivor) on top.
+		_draw_route()
+		for k in range(run.stop_index, run.escort_stop_at.size()):
+			_mark(&"stop", _px(run.stop_pos(k)))
+		_mark(&"survivor" if run.escort_survivor else &"cart", _px(run.escort_pos), Vector2(run.escort_dir.x, run.escort_dir.z))
 	elif run.mission == &"rescue" and not run.survivor_lost:
 		_mark(&"survivor", _px(run.survivor_pos))
 	if run.has_exfil():
@@ -209,6 +222,29 @@ func _draw() -> void:
 		# The holdout's pier shows before the boat comes: it is where to go.
 		_mark(&"boat", _px(run.map.boat))
 	_mark(&"player", _px(run.player_pos), Vector2(run.facing.x, run.facing.z))
+
+
+## Escort: the route from the cart to the delivery point, as a line through
+## points ROUTE_STEP_M apart. Only pieces inside the window are drawn (a
+## route off the map is not pinned to its edge like a marker).
+func _draw_route() -> void:
+	var r: IslandRun = run
+	if r.escort_path.size() < 2:
+		return
+	var frame := Rect2(Vector2.ZERO, Vector2(SIZE_PX, SIZE_PX))
+	var px_per_m: float = SIZE_PX / _view
+	var prev: Vector2 = (Vector2(r.escort_pos.x, r.escort_pos.z) - _origin) * px_per_m
+	for i in range(r.next_path_point(), r.escort_path.size()):
+		var a: Vector2 = prev
+		var b: Vector2 = (Vector2(r.escort_path[i].x, r.escort_path[i].z) - _origin) * px_per_m
+		var n: int = maxi(1, ceili(a.distance_to(b) / (ROUTE_STEP_M * px_per_m)))
+		for k in n:
+			var p: Vector2 = a.lerp(b, float(k) / n)
+			var q: Vector2 = a.lerp(b, float(k + 1) / n)
+			if frame.has_point(p) and frame.has_point(q):
+				draw_line(p, q, ESCORT_COLOR, 1.5, true)
+		prev = b
+	drawn_kinds[&"route"] = true
 
 
 func _mark(kind: StringName, at: Vector2, facing: Vector2 = Vector2(0, -1)) -> void:
@@ -273,6 +309,25 @@ static func draw_marker(item: CanvasItem, kind: StringName, p: Vector2, s: float
 			# A planted charge: a solid red square under a ring.
 			item.draw_rect(Rect2(p - Vector2(3, 3) * s, Vector2(6, 6) * s), CHARGE_COLOR)
 			item.draw_arc(p, 5.5 * s, 0, TAU, 16, CHARGE_COLOR, 1.0 * s, true)
+		&"cart":
+			# The escort's cart: an amber block with a dark tub, nose ahead.
+			var fwd := facing.normalized() if facing.length_squared() > 0.0001 else Vector2(0, -1)
+			var side := Vector2(-fwd.y, fwd.x)
+			var corners := PackedVector2Array([p + (fwd * 4.0 + side * 3.0) * s, p + (fwd * 4.0 - side * 3.0) * s,
+				p + (-fwd * 4.0 - side * 3.0) * s, p + (-fwd * 4.0 + side * 3.0) * s])
+			item.draw_colored_polygon(corners, ESCORT_COLOR)
+			item.draw_circle(p, 1.4 * s, Color(0.2, 0.14, 0.08))
+		&"stop":
+			# An escort stop: a small red octagon (a stop sign) with a white rim.
+			var oct := PackedVector2Array()
+			for k in 8:
+				oct.append(p + Vector2.from_angle(PI / 8.0 + k * TAU / 8.0) * 4.0 * s)
+			item.draw_colored_polygon(oct, STOP_COLOR)
+			oct.append(oct[0])
+			item.draw_polyline(oct, Color(1, 1, 1, 0.9), 1.0 * s, true)
+		&"route":
+			# The route still ahead: a short amber line.
+			item.draw_line(p - Vector2(5, 0) * s, p + Vector2(5, 0) * s, ESCORT_COLOR, 1.5 * s, true)
 		&"exfil":
 			# The exfil point: a green ring with a dot.
 			item.draw_arc(p, 4.5 * s, 0, TAU, 16, UiTheme.SUCCESS, 1.5 * s, true)
@@ -335,6 +390,13 @@ static func legend_entries(r: IslandRun) -> Array[Array]:
 					out.append([&"charge", "MACHINE"])
 				if r.charges_planted() > 0:
 					out.append([&"charge_set", "CHARGE"])
+		&"escort":
+			if r.objective == IslandRun.Objective.GENERATORS:
+				out.append([&"survivor", "SURVIVOR"] if r.escort_survivor else [&"cart", "CART"])
+				if r.escort_path.size() >= 2:
+					out.append([&"route", "ROUTE"])
+				if r.stop_index < r.escort_stop_at.size():
+					out.append([&"stop", "STOP"])
 		&"rescue":
 			out.append([&"survivor", "SURVIVOR"])
 		&"activate":

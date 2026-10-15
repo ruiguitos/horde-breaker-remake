@@ -180,7 +180,7 @@ func _context_tests(parts: Array) -> void:
 	Expeditions.stand_ins.clear()
 	# The real data: four parts, in order, with the design's missions.
 	var real: Array = Expeditions.parts(&"berlenga")
-	_check(real.size() == 4 and real[0]["mission"] == &"rescue" and real[3]["mission"] == &"holdout", "Berlenga: 4 parts, rescue first, holdout last")
+	_check(real.size() == 4 and real[0]["mission"] == &"escort" and real[3]["mission"] == &"holdout", "Berlenga: 4 parts, the survivor escort first, holdout last")
 
 
 func _menu_tests() -> void:

@@ -644,6 +644,10 @@ static func _load_missions() -> Dictionary:
 			"power_seconds": d.power_seconds, "power_radius": d.power_radius,
 			"power_spike_seconds": d.power_spike_seconds, "fuse_seconds": d.fuse_seconds,
 			"blast_radius": d.blast_radius, "blast_damage": d.blast_damage,
+			"escort_speed": d.escort_speed, "escort_hp": d.escort_hp, "escort_hit_dps": d.escort_hit_dps,
+			"escort_contact_radius": d.escort_contact_radius, "block_radius": d.block_radius,
+			"repair_seconds": d.repair_seconds, "repair_radius": d.repair_radius, "repair_hp": d.repair_hp,
+			"route_min": d.route_min, "route_max": d.route_max,
 			"preferred_islands": d.preferred_islands.duplicate(),
 			"preferred_biomes": d.preferred_biomes.duplicate(), "preferred_weight": d.preferred_weight}
 	return out

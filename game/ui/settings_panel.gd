@@ -133,6 +133,12 @@ func _graphics() -> void:
 	_options("Anti-aliasing", GraphicsSettings.AA_NAMES, profile.antialias, func(i: int) -> void:
 		profile.antialias = i
 		_apply_graphics())
+	# Field of view: the island camera picks it up at once (also in the pause menu).
+	var set_fov := func(v: int) -> void:
+		profile.fov = v
+		profile.save()
+	_percent_row("Field of view", profile.fov, 60, set_fov, 120, "°")
+	_body.add_child(UiTheme.label("First person: 60°–120°. Third person and fixed camera: up to %d°." % Profile.THIRD_PERSON_MAX_FOV, 16, UiTheme.MUTED))
 
 
 func _audio() -> void:
@@ -300,13 +306,13 @@ func _toggle(label_text: String, on: bool, on_change: Callable) -> CheckButton:
 	return cb
 
 
-## Slider + editable percentage field kept in sync (min..100).
-func _percent_row(label_text: String, value: int, min_value: int, setter: Callable) -> HSlider:
+## Slider + editable value field kept in sync (min..max_value, percent by default).
+func _percent_row(label_text: String, value: int, min_value: int, setter: Callable, max_value: int = 100, unit: String = "%") -> HSlider:
 	var row := _row(label_text)
 	var slider := HSlider.new()
 	slider.name = "Slider_" + label_text.replace(" ", "_")
 	slider.min_value = min_value
-	slider.max_value = 100
+	slider.max_value = max_value
 	slider.step = 1
 	slider.value = value
 	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -319,7 +325,7 @@ func _percent_row(label_text: String, value: int, min_value: int, setter: Callab
 	field.max_length = 3
 	row.add_child(field)
 	var pct := Label.new()
-	pct.text = "%"
+	pct.text = unit
 	row.add_child(pct)
 
 	slider.value_changed.connect(func(v: float) -> void:
@@ -328,7 +334,7 @@ func _percent_row(label_text: String, value: int, min_value: int, setter: Callab
 		setter.call(int(v)))
 	# Typing: accept digits only; apply on Enter or when the field loses focus.
 	var commit := func() -> void:
-		var v: int = clampi(int(field.text) if field.text.is_valid_int() else int(slider.value), min_value, 100)
+		var v: int = clampi(int(field.text) if field.text.is_valid_int() else int(slider.value), min_value, max_value)
 		field.text = str(v)
 		slider.set_value_no_signal(v)
 		setter.call(v)

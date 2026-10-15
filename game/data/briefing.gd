@@ -28,6 +28,7 @@ const ADVICE: Dictionary = {
 	&"intel_search": "Not every marked spot has something. Search, don't linger: when the clock runs out you send what you have.",
 	&"signals": "Only the next beacon is marked, and its fuel lies close by. Carry it in, stay while it catches, then follow the light.",
 	&"sabotage": "Switch first: the charges won't take while the line is live. Then wire the machine and run. Be well clear when the fuse runs out.",
+	&"escort": "It only moves while you walk beside it, and nothing gets past what stands in front of it. Clear the road, hold at the stops, fix it when it breaks.",
 	&"holdout": "Hold the courtyard until I can send the boat. When it comes, run for the pier. It won't wait.",
 }
 

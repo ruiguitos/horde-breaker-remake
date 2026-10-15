@@ -199,6 +199,8 @@ func _expedition_checks() -> void:
 		goals.append_array(map.hold_points)
 		goals.append_array(map.signal_points)
 		goals.append_array(map.signal_fuel)
+		goals.append_array(map.escort_route)
+		goals.append_array(map.escort_stops)
 		_check(goals.all(func(g: Vector3) -> bool: return f.distance_at(g) < FlowField.UNREACHABLE),
 			"%s: its %d markers are reachable from the start" % [label, goals.size()])
 		# Each marker at most 10 m from where the design puts it (snapped to clear ground).
@@ -207,6 +209,13 @@ func _expedition_checks() -> void:
 			pairs.append(["RescueTarget", map.rescue_target, spec["rescue"]])
 		if spec.has("defend"):
 			pairs.append(["DefendZone", map.defend_zone, spec["defend"]])
+		# Escort (survivor variant): EscortSurvivor at its spot, the route
+		# markers and two stops (placed along the road by the builder).
+		if spec.has("escort"):
+			var esc: Dictionary = spec["escort"]
+			_check(map.escort_survivor and map.escort_route.size() >= 3 and map.escort_stops.size() == int(esc.get("stops", 2)),
+				"%s: EscortSurvivor, %d route markers, %d EscortStop markers" % [label, map.escort_route.size() - 1, map.escort_stops.size()])
+			pairs.append(["EscortSurvivor", map.escort_route[0] if not map.escort_route.is_empty() else Vector3(-1000, 0, -1000), esc["survivor"]])
 		var holds: Array = spec.get("holds", [])
 		_check(map.hold_points.size() == holds.size(), "%s: %d HoldPoint markers, in order" % [label, map.hold_points.size()])
 		for h in holds.size():
@@ -364,29 +373,22 @@ func _md5_tree(dir: String) -> Dictionary:
 	return out
 
 
-## Hashima (tools/real_island/build.gd -- hashima): the real mining island,
-## dense concrete blocks. Converts without problems, its 66 real buildings
-## block, Port routes can pick it.
+## Hashima was removed (2026-10-16): its scene is gone, and Port routes pick
+## the remaining Port island (port_01), also for Sabotage.
 func _hashima_checks() -> void:
 	var path: String = HandmadeIsland.ISLANDS_DIR + "port_hashima.scn"
-	var island: HandmadeIsland = (load(path) as PackedScene).instantiate()
-	root.add_child(island)
-	var problems: Array[String] = []
-	var map: IslandMap = island.build_map(problems)
-	_check(problems.is_empty() and map.generators.size() == 3 and map.caches.size() >= 4, "port_hashima has no problems, 3 generators, %d caches %s" % [map.caches.size(), problems])
-	_check(map.buildings.size() >= 60 and map.biome == &"port", "%d buildings on a port island" % map.buildings.size())
+	_check(not ResourceLoader.exists(path), "port_hashima.scn is removed")
 	var picked: Array[String] = []
 	for s in 8:
 		var scene: PackedScene = HandmadeIsland.pick(&"port", s)
-		if not picked.has(scene.resource_path):
+		if scene != null and not picked.has(scene.resource_path):
 			picked.append(scene.resource_path)
-	_check(picked.has(path) and picked.size() == 2, "Port routes pick port_01 or Hashima %s" % [picked])
-	# Sabotage (Hashima's signature) lands on Hashima: its switch and charges.
-	var sabotage: bool = map.power_switch.x >= 0.0 and map.machine_points.size() == 2
+	_check(picked == [HandmadeIsland.ISLANDS_DIR + "port_01.tscn"], "Port routes pick port_01 only %s" % [picked])
+	var sabotage: bool = true
 	for s in 4:
-		sabotage = sabotage and HandmadeIsland.pick(&"port", s, &"sabotage").resource_path == path
-	_check(sabotage, "a Port Sabotage always lands on Hashima, which has PowerSwitch and 2 Machine markers")
-	island.queue_free()
+		var scene: PackedScene = HandmadeIsland.pick(&"port", s, &"sabotage")
+		sabotage = sabotage and scene != null and scene.resource_path == HandmadeIsland.ISLANDS_DIR + "port_01.tscn"
+	_check(sabotage, "a Port Sabotage lands on port_01 (no preferred island)")
 
 
 func _run_checks() -> void:

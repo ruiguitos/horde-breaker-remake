@@ -315,18 +315,31 @@ fronteira) e os objetivos. O construtor grava, na pasta da expedição:
   42 mil células alcançáveis, abaixo das 60 mil (a Hashima tem 51 mil), e
   fica com 0.
 - **Objetivos no preset:** cada parte tem os seus pontos (`rescue`,
-  `defend`, `holds`, `signals`, `lighthouse`, `fuel`, `caches`) e o
+  `escort`, `defend`, `holds`, `signals`, `lighthouse`, `fuel`, `caches`) e o
   construtor põe o marcador no sítio alcançável mais perto, com 4 m livres
   (o `Lighthouse` com 2 m, no pátio estreito da casa dos faroleiros; os
   `Fuel_*` com 1 m, à porta das casas). Mudar a missão de uma parte é mudar
   o preset, o `game/data/expeditions.gd` e voltar a construir.
+- **Escolta na parte 1** (preset `escort`: o sítio do sobrevivente, o
+  caminho do OSM e o número de paragens; `_escort_markers`): o
+  `EscortSurvivor` fica no Bairro dos Pescadores (1011, 720); ao longo da
+  estrada 441503021, do ponto mais perto do sobrevivente até ao mais perto
+  da `Exit`, há um `EscortRoute_*` a cada 30 m (10 marcadores, cada um na
+  célula alcançável mais perto, com 1 m livre). As duas `EscortStop_*`
+  ficam nos primeiros pontos da estrada, depois do ponto mais baixo, que
+  subiram um terço e dois terços até à `Exit`: (957, 642) a 33 m e
+  (945, 584) a 46 m (a subida vai de 16 m a 57 m). Com troços de 30 m o
+  jogo anda cada troço pela grelha e o sobrevivente fica na estrada. A
+  reconstrução de 2026-10-14 só mudou o `part_1.scn`; o `base.scn` saiu
+  com bytes diferentes (sem diferença no conteúdo verificado) e foi reposto
+  como estava.
 - **Imagens:** `data/berlenga/reach_part_<n>.png` mostra o que se alcança.
   Os limites aparecem a magenta (muro) e a branco (penedos), e os
   marcadores a vermelho.
 
 | Parte | Missão | Transitáveis / alcançáveis | Percurso na grelha | Limites |
 |---|---|---|---|---|
-| 1 | rescue | 253 mil / 238 mil | 229 + 307 = 536 m | 114 m |
+| 1 | escort | 253 mil / 238 mil | 229 até ao sobrevivente + 387 pela estrada (11 troços de 23 a 40 m) = 616 m | 114 m |
 | 2 | signals | 276 mil / 256 mil | 138 + 97 + 75 + 46 + 67 + 41 + 394 = 858 m (combustível e sinal, três vezes, e a saída) | 939 m |
 | 3 | hold_sequence | 171 mil / 171 mil | 100 + 120 + 88 + 254 = 562 m | 719 m |
 | 4 | holdout | 44 mil / 43 mil | 363 + 48 = 411 m (até ao barco) | 685 m |

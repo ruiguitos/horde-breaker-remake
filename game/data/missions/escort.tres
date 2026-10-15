@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="MissionData" format=3 uid="uid://cescort0cart"]
+
+[ext_resource type="Script" path="res://game/data/resources/mission_data.gd" id="1_esco"]
+
+[resource]
+script = ExtResource("1_esco")
+display_name = "Escort"
+text = "Walk the cart along its route: clear the way, defend it at the stops, repair it if it breaks."
+order = 10
+points = 2
+seconds_per_point = 20.0
+radius = 8.0
+spike_seconds = 20.0
+escort_speed = 2.0
+escort_hp = 200.0
+escort_hit_dps = 4.0
+escort_contact_radius = 1.4
+block_radius = 2.0
+repair_seconds = 5.0
+repair_radius = 3.0
+repair_hp = 0.5
+route_min = 150.0
+route_max = 230.0

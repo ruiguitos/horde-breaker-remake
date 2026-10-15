@@ -28,7 +28,15 @@ extends Node3D
 ##                     last one), and for Sabotage: PowerSwitch (cut
 ##                     first), Machine_1, Machine_2... (the charges) and
 ##                     ExfilPoint (optional: where to get out after the
-##                     charges are set; default: the boat/Exit)
+##                     charges are set; default: the boat/Exit), and for
+##                     Escort: EscortRoute_1, EscortRoute_2... (the
+##                     route, in number order; the first is where the
+##                     cart waits), EscortStop_1, EscortStop_2... (where
+##                     it halts, moved onto the route), EscortEnd
+##                     (optional: the delivery point; default: the
+##                     boat/Exit) and EscortSurvivor (optional: a
+##                     survivor walks the route instead of a cart; it
+##                     waits there, before EscortRoute_1)
 ## The island covers x, z in [0, size): keep everything inside that square.
 ## How to build one: game/README.md, "Ilhas feitas à mão".
 
@@ -169,6 +177,8 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	var signals: Array = []  # same, for the Signal_* markers
 	var fuels: Array = []  # same, for the Fuel_* markers
 	var machines: Array = []  # same, for the Machine_* markers
+	var route: Array = []  # same, for the EscortRoute_* markers
+	var stops: Array = []  # same, for the EscortStop_* markers
 	for node in _children_of("Markers"):
 		if node.name.begins_with("Generator"):
 			map.generators.append(_flat(_local(node).origin))
@@ -188,6 +198,10 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 			fuels.append([marker_number(String(node.name), "Fuel"), _flat(_local(node).origin)])
 		elif node.name.begins_with("Machine"):
 			machines.append([marker_number(String(node.name), "Machine"), _flat(_local(node).origin)])
+		elif node.name.begins_with("EscortRoute"):
+			route.append([marker_number(String(node.name), "EscortRoute"), _flat(_local(node).origin)])
+		elif node.name.begins_with("EscortStop"):
+			stops.append([marker_number(String(node.name), "EscortStop"), _flat(_local(node).origin)])
 	holds.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	for h: Array in holds:
 		map.hold_points.append(h[1])
@@ -213,8 +227,18 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	machines.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	for mc: Array in machines:
 		map.machine_points.append(mc[1])
+	var survivor: Node3D = get_node_or_null("Markers/EscortSurvivor")
+	if survivor != null:
+		map.escort_route.append(_flat(_local(survivor).origin))
+		map.escort_survivor = true
+	route.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	for r: Array in route:
+		map.escort_route.append(r[1])
+	stops.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	for s: Array in stops:
+		map.escort_stops.append(s[1])
 	for spot: Array in [["Exit", "exit"], ["RescueTarget", "rescue_target"], ["DefendZone", "defend_zone"], ["Delivery", "delivery"], ["Uplink", "uplink"],
-			["PowerSwitch", "power_switch"], ["ExfilPoint", "exfil"]]:
+			["PowerSwitch", "power_switch"], ["ExfilPoint", "exfil"], ["EscortEnd", "escort_end"]]:
 		var node: Node3D = get_node_or_null("Markers/" + spot[0])
 		if node != null:
 			map.set(spot[1], _flat(_local(node).origin))
@@ -227,10 +251,10 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	else:
 		f.compute_now(start_cell)
 		var spots: Array[Vector3] = []
-		for p: Vector3 in [map.exit, map.rescue_target, map.defend_zone, map.delivery, map.uplink, map.power_switch, map.exfil]:
+		for p: Vector3 in [map.exit, map.rescue_target, map.defend_zone, map.delivery, map.uplink, map.power_switch, map.exfil, map.escort_end]:
 			if p.x >= 0.0:
 				spots.append(p)
-		for list: Array in [["Boat", [map.boat]], ["Generator", map.generators], ["Cache", map.caches], ["Exit/RescueTarget/DefendZone/Delivery/Uplink/PowerSwitch/ExfilPoint", spots], ["HoldPoint", map.hold_points], ["Cargo", map.cargo_points], ["Nest", map.nest_points], ["Search", map.search_points], ["Signal/Lighthouse", map.signal_points], ["Fuel", map.signal_fuel], ["Machine", map.machine_points]]:
+		for list: Array in [["Boat", [map.boat]], ["Generator", map.generators], ["Cache", map.caches], ["Exit/RescueTarget/DefendZone/Delivery/Uplink/PowerSwitch/ExfilPoint/EscortEnd", spots], ["HoldPoint", map.hold_points], ["Cargo", map.cargo_points], ["Nest", map.nest_points], ["Search", map.search_points], ["Signal/Lighthouse", map.signal_points], ["Fuel", map.signal_fuel], ["Machine", map.machine_points], ["EscortSurvivor/EscortRoute", map.escort_route], ["EscortStop", map.escort_stops]]:
 			for p: Vector3 in list[1]:
 				if f.distance_at(p) >= FlowField.UNREACHABLE:
 					problems.append("%s at (%d, %d) cannot be reached from the start." % [list[0], int(p.x), int(p.z)])

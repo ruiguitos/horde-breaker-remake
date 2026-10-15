@@ -26,10 +26,10 @@ func _settle() -> void:
 func _run_tests() -> void:
 	var all: PackedStringArray = HandmadeIsland.island_paths()
 	# The Berlenga is an expedition now (Expeditions.test_entries), not an island.
-	_check(all.has(HandmadeIsland.ISLANDS_DIR + "port_hashima.scn") and not Array(all).any(func(p: String) -> bool: return "berlenga" in p), "the list has Hashima, not the Berlenga")
+	_check(all.has(HandmadeIsland.ISLANDS_DIR + "port_01.tscn") and not all.has(HandmadeIsland.ISLANDS_DIR + "port_hashima.scn") and not Array(all).any(func(p: String) -> bool: return "berlenga" in p), "the list has port_01, not Hashima or the Berlenga")
 	_check(Expeditions.test_entries().size() == 5, "the Berlenga's whole island and 4 parts are listed (%d)" % Expeditions.test_entries().size())
 	var port: PackedStringArray = HandmadeIsland.island_paths(&"port")
-	_check(port.size() >= 2 and Array(port).all(func(p: String) -> bool: return p.get_file().begins_with("port_")), "a biome lists only its islands")
+	_check(port.size() >= 1 and Array(port).all(func(p: String) -> bool: return p.get_file().begins_with("port_")), "a biome lists only its islands")
 	# The picker: choosing a mission, then an island, hands both over.
 	var holder := Control.new()
 	root.add_child(holder)

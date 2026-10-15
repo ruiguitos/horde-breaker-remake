@@ -81,6 +81,13 @@ const CHARGE_COLOR := Minimap.CHARGE_COLOR
 const MACHINE_LAMP_COLOR := Color(1.0, 0.72, 0.25)
 const MACHINE_LIGHT_RANGE: float = 9.0
 const BLAST_SHAKE_RANGE: float = 60.0
+## Escort: the route's arrows on the ground (and the minimap's line) share
+## the cart's amber; one arrow every ESCORT_ARROW_STEP metres of the route
+## still ahead. The cart's bar and status show within ESCORT_BAR_RANGE.
+const ESCORT_COLOR := Minimap.ESCORT_COLOR
+const ESCORT_STOP_COLOR := Minimap.STOP_COLOR
+const ESCORT_ARROW_STEP: float = 3.0
+const ESCORT_BAR_RANGE: float = 45.0
 
 var run: IslandRun
 var hud: Hud
@@ -193,6 +200,19 @@ var _blast_rings: Array[MeshInstance3D] = []
 var _machine_scorches: Array[MeshInstance3D] = []
 var _sabotage_seen_cut: bool = false
 var _sabotage_seen_blast: bool = false
+## Escort: the cart (or survivor) model, its HP bar (back and fill, both
+## billboards), the status label over it, the ring of escort_radius() that
+## follows it, the arrows of the route ahead (a MultiMesh, nearest last, so
+## visible_instance_count hides the ones it has passed), a post at each
+## stop, and the model's smoothed heading.
+var _escort: EscortModel
+var _escort_bar: Node3D
+var _escort_fill: MeshInstance3D
+var _escort_label: Label3D
+var _escort_ring: MeshInstance3D
+var _escort_arrows := MultiMesh.new()
+var _escort_stop_posts: Array[Node3D] = []
+var _escort_yaw: float = 0.0
 var _survivor: MeshInstance3D
 var _caches: Array[MeshInstance3D] = []
 var _buildings: Array[MeshInstance3D] = []
@@ -209,7 +229,7 @@ var _debris_color := PackedColorArray()
 ## Debris size; a negative value marks a severed head (drawn as a sphere).
 var _debris_size := PackedFloat32Array()
 var _head_debris_mm := MultiMesh.new()
-var _zombies := ZombieHordeView.new()  ## common zombies (ZombieModel); others stay capsules
+var _zombies := ZombieHordeView.new()  ## common zombies and six distinct special models
 var _breaker_held: bool = false
 var _trauma: float = 0.0
 var _last_hp: float = -1.0
@@ -402,6 +422,8 @@ func _build_world() -> void:
 			_build_fuel_can()
 	if run.mission == &"sabotage":
 		_build_sabotage()
+	if run.mission == &"escort":
+		_build_escort()
 	_survivor = MeshInstance3D.new()
 	_survivor.mesh = _capsule(0.35, 1.7)
 	_survivor.material_override = _mat(Color(1.0, 0.55, 0.1))
@@ -436,6 +458,7 @@ func _build_world() -> void:
 
 	# Low-poly contractor in the selected class's kit (SoldierModel).
 	var soldier := SoldierModel.create(run.player_class)
+	soldier.ground_height = ground_height
 	_player = soldier
 	_muzzle = OmniLight3D.new()
 	_muzzle.light_color = Color(1, 0.8, 0.4)
@@ -471,7 +494,7 @@ func _build_world() -> void:
 	add_child(tracer)
 
 	_camera = Camera3D.new()
-	_camera.fov = camera_fov
+	_camera.fov = _camera_fov(camera_mode == Profile.CameraMode.FIRST_PERSON)
 	add_child(_camera)
 	_view_model = ViewModel.create(run.player_class)
 	_view_model.visible = false
@@ -1518,6 +1541,159 @@ func _draw_sabotage() -> void:
 		_blast_rings[k].visible = fuse
 
 
+## Escort: the cart (EscortModel, or the survivor with an EscortSurvivor
+## marker), an HP bar and a status label over it (billboards: they face
+## every camera), the ring of escort_radius() that follows it, flat amber
+## arrows on the ground along the route ahead (one MultiMesh, cheap: a
+## 300 m route is 100 triangles) and a stop post (a red octagon on a pole)
+## beside the road at every stop.
+func _build_escort() -> void:
+	_escort = EscortModel.survivor_model() if run.escort_survivor else EscortModel.cart()
+	add_child(_escort)
+	_escort_yaw = atan2(-run.escort_dir.x, -run.escort_dir.z)
+	var top: float = 2.2 if run.escort_survivor else 1.6
+	_escort_bar = Node3D.new()
+	_escort_bar.position.y = top
+	for k in 2:
+		var q := MeshInstance3D.new()
+		var qm := QuadMesh.new()
+		qm.size = Vector2(1.6, 0.16) if k == 0 else Vector2(1.5, 0.1)
+		q.mesh = qm
+		var bm := _mat(Color(0.05, 0.05, 0.05, 0.75) if k == 0 else UiTheme.SUCCESS, true)
+		bm.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+		bm.billboard_keep_scale = true
+		bm.no_depth_test = true
+		bm.render_priority = k + 1
+		if k == 0:
+			bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		q.material_override = bm
+		_escort_bar.add_child(q)
+		if k == 1:
+			_escort_fill = q
+	_escort.add_child(_escort_bar)
+	_escort_label = Label3D.new()
+	_escort_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_escort_label.no_depth_test = true
+	_escort_label.fixed_size = false
+	_escort_label.pixel_size = 0.008
+	_escort_label.font_size = 40
+	_escort_label.outline_size = 10
+	_escort_label.modulate = ESCORT_COLOR
+	_escort_label.position.y = top + 0.45
+	_escort.add_child(_escort_label)
+	_escort_ring = _ring(run.escort_pos, IslandRun.escort_radius(), ESCORT_COLOR)
+	# Route arrows: flat triangles pointing along the route, from the far
+	# end back to the start (index 0 = nearest the delivery point).
+	var arrow := ArrayMesh.new()
+	var verts := PackedVector3Array([Vector3(0, 0, -0.38), Vector3(0.32, 0, 0.26), Vector3(-0.32, 0, 0.26)])
+	var arrays: Array = []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = verts
+	arrays[Mesh.ARRAY_NORMAL] = PackedVector3Array([Vector3.UP, Vector3.UP, Vector3.UP])
+	arrow.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	_setup_multimesh(_escort_arrows, arrow, false, ESCORT_COLOR, true)
+	var inst: MultiMeshInstance3D = get_child(get_child_count() - 1)
+	inst.name = "EscortRoute"
+	(inst.material_override as StandardMaterial3D).cull_mode = BaseMaterial3D.CULL_DISABLED
+	var n: int = floori(run.escort_length / ESCORT_ARROW_STEP)
+	_escort_arrows.instance_count = n
+	for i in n:
+		var d: float = run.escort_length - (i + 0.5) * ESCORT_ARROW_STEP
+		var p: Vector3 = _on_ground(IslandMap.point_along(run.escort_path, d)) + Vector3(0, 0.08, 0)
+		var ahead: Vector3 = _on_ground(IslandMap.point_along(run.escort_path, minf(run.escort_length, d + 0.6))) + Vector3(0, 0.08, 0)
+		var look: Vector3 = ahead - p
+		var b := Basis.IDENTITY
+		if Vector2(look.x, look.z).length() > 0.05:
+			b = Basis.looking_at(look, Vector3.UP)
+		_escort_arrows.set_instance_transform(i, Transform3D(b, p))
+	_escort_arrows.visible_instance_count = n
+	for k in run.escort_stop_at.size():
+		var at: Vector3 = run.stop_pos(k)
+		var dir: Vector3 = IslandMap.point_along(run.escort_path, minf(run.escort_length, run.escort_stop_at[k] + 0.5)) - at
+		var side := Vector3(-dir.z, 0, dir.x).normalized() if dir.length() > 0.01 else Vector3.RIGHT
+		var post := Node3D.new()
+		post.name = "EscortStop%d" % k
+		post.position = _on_ground(at + side * 1.6)
+		var pole := MeshInstance3D.new()
+		var pm := CylinderMesh.new()
+		pm.top_radius = 0.04
+		pm.bottom_radius = 0.05
+		pm.height = 2.2
+		pole.mesh = pm
+		pole.position.y = 1.1
+		pole.material_override = EscortModel.material("steel")
+		post.add_child(pole)
+		var sign_plate := MeshInstance3D.new()
+		var sm := CylinderMesh.new()
+		sm.top_radius = 0.38
+		sm.bottom_radius = 0.38
+		sm.height = 0.04
+		sm.radial_segments = 8
+		sign_plate.mesh = sm
+		sign_plate.position.y = 2.25
+		sign_plate.rotation_degrees.x = 90.0
+		sign_plate.material_override = _mat(ESCORT_STOP_COLOR)
+		post.add_child(sign_plate)
+		post.rotation.y = atan2(-dir.x, -dir.z) if dir.length() > 0.01 else 0.0
+		add_child(post)
+		_escort_stop_posts.append(post)
+
+
+func _draw_escort() -> void:
+	var dt: float = get_process_delta_time()
+	var t: float = Time.get_ticks_msec() * 0.001
+	var active: bool = run.objective == IslandRun.Objective.GENERATORS and not run.escort_delivered
+	var p: Vector3 = _on_ground(run.escort_pos)
+	_escort_yaw = lerp_angle(_escort_yaw, atan2(-run.escort_dir.x, -run.escort_dir.z), minf(1.0, dt * 6.0))
+	var pitch: float = 0.0
+	if not run.escort_survivor:
+		# The cart follows the slope: nose up going uphill.
+		var front: float = run.map.ground_y(run.escort_pos + run.escort_dir * 0.6)
+		var back: float = run.map.ground_y(run.escort_pos - run.escort_dir * 0.6)
+		pitch = atan2(front - back, 1.2)
+	_escort.transform = Transform3D(Basis(Vector3.UP, _escort_yaw) * Basis(Vector3.RIGHT, pitch), p)
+	_escort.set_motion(run.escort_dist, active and run.escort_status == IslandRun.ESC_MOVING, run.escort_broken, t)
+	var near: bool = _flat(run.player_pos).distance_to(_flat(run.escort_pos)) <= ESCORT_BAR_RANGE
+	_escort_bar.visible = active and near
+	if run.escort_broken:
+		var r: float = clampf(run.repair_progress / IslandRun.repair_seconds(), 0.0, 1.0)
+		_escort_fill.scale = Vector3(maxf(0.001, r), 1, 1)
+		(_escort_fill.material_override as StandardMaterial3D).albedo_color = ESCORT_COLOR
+	else:
+		var frac: float = clampf(run.escort_hp / IslandRun.escort_max_hp(), 0.0, 1.0)
+		_escort_fill.scale = Vector3(maxf(0.001, frac), 1, 1)
+		(_escort_fill.material_override as StandardMaterial3D).albedo_color = \
+			UiTheme.SUCCESS if frac > 0.5 else (ESCORT_COLOR if frac > 0.25 else UiTheme.DANGER)
+	var text: String = ""
+	if run.escort_broken:
+		text = "%s %d%%" % ["PATCH UP" if run.escort_survivor else "REPAIR", int(100.0 * run.repair_progress / IslandRun.repair_seconds())]
+	elif run.escort_status == IslandRun.ESC_STOPPED:
+		text = "STOP · %d s" % ceili(run.stop_left)
+	elif run.escort_status == IslandRun.ESC_BLOCKED:
+		text = "BLOCKED"
+	elif run.escort_status == IslandRun.ESC_WAITING:
+		text = "WAITING"
+	_escort_label.text = text
+	_escort_label.visible = active and near and text != ""
+	_escort_label.modulate = UiTheme.DANGER if run.escort_broken or run.escort_status == IslandRun.ESC_BLOCKED else ESCORT_COLOR
+	_escort_ring.visible = active
+	if active:
+		_escort_ring.position = p + Vector3(0, 0.05, 0)
+		var inside: bool = _flat(run.player_pos).distance_to(_flat(run.escort_pos)) <= IslandRun.escort_radius()
+		(_escort_ring.material_override as StandardMaterial3D).albedo_color = Color(0.3, 1.0, 0.5) if inside else ESCORT_COLOR
+	# The arrows the cart has passed (and all of them once delivered) go.
+	var n: int = _escort_arrows.instance_count
+	var ahead: int = clampi(ceili((run.escort_length - run.escort_dist - 1.5) / ESCORT_ARROW_STEP - 0.5), 0, n)
+	_escort_arrows.visible_instance_count = ahead if active else 0
+	for k in _escort_stop_posts.size():
+		_escort_stop_posts[k].visible = active and k >= run.stop_index
+		if k == run.stop_index and run.at_stop():
+			# The stop being held pulses.
+			_escort_stop_posts[k].scale = Vector3.ONE * (1.0 + 0.12 * absf(sin(t * 4.0)))
+		else:
+			_escort_stop_posts[k].scale = Vector3.ONE
+
+
 ## Flat (x, z) of a point, for distances on the ground.
 func _flat(p: Vector3) -> Vector2:
 	return Vector2(p.x, p.z)
@@ -1689,6 +1865,10 @@ func _process(delta: float) -> void:
 	_play_audio()  # before drawing: the draw functions consume the run's events
 	if profile != null and not showcase and profile.camera_mode != camera_mode:
 		_set_camera_mode(profile.camera_mode, false)  # changed in Settings (pause)
+	if profile != null and _camera != null:
+		var fov: float = _camera_fov(camera_mode == Profile.CameraMode.FIRST_PERSON)
+		if _camera.fov != fov:
+			_camera.fov = fov  # field of view changed in Settings (pause)
 	_update_mouse_mode()
 	_draw_player_and_camera()
 	_draw_enemies()
@@ -1742,6 +1922,12 @@ func _play_audio() -> void:
 				sfx.play(&"cache", -6.0, 0.05)
 			&"power_cut":
 				sfx.play(&"generator", -4.0, 0.0)  # the line powering down
+			&"escort_stop", &"escort_stop_survivor":
+				sfx.play(&"generator", -6.0, 0.0)  # the cart grinds to a halt
+			&"escort_broken", &"escort_broken_survivor":
+				sfx.play(&"slam_hit", -8.0, 0.05)
+			&"escort_done", &"escort_done_survivor":
+				sfx.play(&"cache", -6.0, 0.05)
 			&"low_hp":
 				sfx.play(&"low_hp", -4.0, 0.0)
 	if _audio_slam and run.slam_time <= 0.0:
@@ -1856,6 +2042,13 @@ func _crosshair_ground_hit() -> Variant:
 	return null
 
 
+## Field of view in degrees for the camera mode (Settings > Graphics sets it).
+func _camera_fov(first: bool) -> float:
+	if profile == null:
+		return fp_fov if first else camera_fov
+	return Profile.field_of_view(profile.fov, first)
+
+
 ## Switches the island camera (V cycles; Settings > Controls sets it too).
 func _set_camera_mode(mode: int, save: bool = true) -> void:
 	var was_free: bool = _free_look()
@@ -1873,7 +2066,7 @@ func _set_camera_mode(mode: int, save: bool = true) -> void:
 	_set_pcam_active(camera_mode == Profile.CameraMode.THIRD_PERSON)
 	_camera.h_offset = 0.0
 	_camera.v_offset = 0.0
-	_camera.fov = fp_fov if first else camera_fov
+	_camera.fov = _camera_fov(first)
 	_camera.near = 0.03 if first else 0.05  # the gun sits close to the eye
 	(_player as SoldierModel).set_shadow_only(first)
 	_view_model.visible = first
@@ -2130,6 +2323,9 @@ func _draw_player_and_camera() -> void:
 	var moved: float = _player.position.distance_to(_view_pos())
 	_walk_speed = lerpf(_walk_speed, clampf(moved / maxf(delta, 0.001) / 6.0, 0.0, 1.0), 0.2)
 	var animation_delta: float = 0.0 if paused or not run.card_choices.is_empty() or _hitstop > 0.0 or run.is_over() else delta
+	soldier.carrying = run.is_carrying()
+	soldier.aim_pitch = -_tp_pitch if camera_mode != Profile.CameraMode.FIXED else 0.0
+	soldier.grounded = not run.noclip and _fly < 0.01
 	soldier.animate(_walk_speed, Time.get_ticks_msec() / 1000.0, run.sprinting or run.dash_time > 0.0, animation_delta)
 	_player.position = _view_pos()
 	_player.basis = Basis.looking_at(run.facing, Vector3.UP)
@@ -2594,6 +2790,8 @@ func _draw_mission() -> void:
 		_draw_intel_search()
 	if run.mission == &"sabotage":
 		_draw_sabotage()
+	if run.mission == &"escort":
+		_draw_escort()
 	for g in _generators.size():
 		var p: float = run.generator_progress[g] / GameData.GENERATOR_HOLD_SECONDS
 		var m: StandardMaterial3D = _generators[g].material_override

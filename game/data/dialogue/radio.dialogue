@@ -53,6 +53,16 @@ Director Hale: That conveyor still feeds them. Cut its power at the switch, wire
 Director Hale: Demolition contract, contractor. Power first, charges second, distance third. [ID:RADIO_LAND_SABOTAGE_2]
 => END
 
+~ land_escort
+Director Hale: There's a cart of our property on this rock. It moves when you walk with it. Walk with it. [ID:RADIO_LAND_ESCORT_1]
+Director Hale: Escort contract. The cart is slow, the road is full and the cargo is worth more than you. [ID:RADIO_LAND_ESCORT_2]
+=> END
+
+~ land_escort_survivor
+Director Hale: Survivor up ahead, and too weak to run. Walk them out, stop when they stop. [ID:RADIO_LAND_ESCORT_SURVIVOR_1]
+Director Hale: One of ours made it this far. Get them up the path. At their pace, not yours. [ID:RADIO_LAND_ESCORT_SURVIVOR_2]
+=> END
+
 ~ land_boss
 Director Hale: Thermal readings on the volcano are... large. Do the job, then leave before it notices. [ID:RADIO_LAND_BOSS_1]
 => END
@@ -154,6 +164,36 @@ Director Hale: Timer's running. Be somewhere else when it stops. [ID:RADIO_CHARG
 ~ sabotage_blast
 Director Hale: And there goes the machine. Lovely. Now get yourself out of the smoke. [ID:RADIO_SABOTAGE_BLAST_1]
 Director Hale: Target destroyed. Paperwork says you were clear. Make it true. [ID:RADIO_SABOTAGE_BLAST_2]
+=> END
+
+~ escort_stop
+Director Hale: The cart's stopped for a reason I don't care about. They're coming. Hold the line until it rolls. [ID:RADIO_ESCORT_STOP_1]
+Director Hale: Scheduled stop. Unscheduled visitors. Keep them off the cargo. [ID:RADIO_ESCORT_STOP_2]
+=> END
+
+~ escort_stop_survivor
+Director Hale: Your survivor needs a breather. Give them one. A loud one, with bullets. [ID:RADIO_ESCORT_STOP_SURVIVOR_1]
+Director Hale: They've stopped to rest. Make sure it isn't a permanent rest. [ID:RADIO_ESCORT_STOP_SURVIVOR_2]
+=> END
+
+~ escort_broken
+Director Hale: The cart's broken down. Get your hands on it and fix it. The insurance won't. [ID:RADIO_ESCORT_BROKEN_1]
+Director Hale: Cargo's stuck. Stand by it and repair it, contractor, it won't push itself. [ID:RADIO_ESCORT_BROKEN_2]
+=> END
+
+~ escort_broken_survivor
+Director Hale: Survivor's down. Get over there and patch them up before something else does. [ID:RADIO_ESCORT_BROKEN_SURVIVOR_1]
+Director Hale: They're hurt but breathing. Stay with them until they're on their feet. [ID:RADIO_ESCORT_BROKEN_SURVIVOR_2]
+=> END
+
+~ escort_done
+Director Hale: Cargo delivered. Signed, stamped, slightly bloody. Now get yourself out. [ID:RADIO_ESCORT_DONE_1]
+Director Hale: The cart made it. Don't make me write that you didn't. [ID:RADIO_ESCORT_DONE_2]
+=> END
+
+~ escort_done_survivor
+Director Hale: Survivor's through. They'll make their own way from here. You make yours. [ID:RADIO_ESCORT_DONE_SURVIVOR_1]
+Director Hale: Good. They're safe, or as safe as this rock gets. Keep moving. [ID:RADIO_ESCORT_DONE_SURVIVOR_2]
 => END
 
 ~ objective_done
