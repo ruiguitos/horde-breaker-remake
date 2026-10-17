@@ -74,6 +74,9 @@ static func create(profile: Profile, node: StringName, state: String, focus: Cal
 		pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		pips.add_child(pip)
 	var cost: int = profile.next_rank_cost(node)
+	var count := UiTheme.label("%d/%d" % [rank, GameData.PERK_MAX_RANK], 11, UiTheme.MUTED, true)
+	count.name = "RankCount"
+	pips.add_child(count)
 	var foot: String = "Requires tier " + GameData.RANK_NAMES[GameData.perk_node_tier(node) - 1] if locked \
 		else ("%d Intel" % cost if rank == 0 else "Rank " + GameData.RANK_NAMES[profile.use_rank(node)])
 	b.tooltip_text = "%s / %s\n%s · %s" % [names[0], names[1], tag.text, foot]
@@ -107,12 +110,12 @@ static func _alternative(perk: GameData.Perk, option: int, on: bool, owned: bool
 	tile.add_child(column)
 	var tint: Color = UiTheme.TEXT if on else (Color(UiTheme.MUTED, 0.55) if locked else UiTheme.MUTED)
 	column.add_child(Art.image(perk.id if perk != null else &"", ICON_SIZE, tint))
-	var line := UiTheme.label(perk.title.to_upper() if perk != null else "—", 11, tint)
+	var line := UiTheme.label(perk.title.to_upper() if perk != null else "—", 13, tint)
 	line.name = "Option" + "AB"[option]
 	line.add_theme_font_override("font", UiTheme.heading_font())
 	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	line.custom_minimum_size.x = 40
+	line.custom_minimum_size.x = 54
 	column.add_child(line)
 	# Corner marks: tick on the equipped pick, padlock on locked tiers.
 	var mark_texture: Texture2D = UiTheme.tick_icon() if on and equipped else (UiTheme.lock_icon() if locked else null)

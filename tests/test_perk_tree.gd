@@ -584,8 +584,9 @@ func _test_armory_screen() -> void:
 	_check(c1.get_node(c1.focus_neighbor_bottom) == c2 and c1.get_node(c1.focus_neighbor_right) == s1, "D-pad: down the branch, right across")
 	_check((c1.find_child("State", true, false) as Label).text == "✓ EQUIPPED" and (c2.find_child("State", true, false) as Label).text == "NEW"
 		and ((nodes[&"combat_3"] as Button).find_child("State", true, false) as Label).text == "LOCKED", "EQUIPPED / NEW / LOCKED states")
-	var pips: Array = (c1.find_child("Pips", true, false) as Control).get_children()
-	_check(pips.size() == 3 and (pips[1] as ColorRect).color == UiTheme.ACCENT and (pips[2] as ColorRect).color == UiTheme.LINE, "rank pips show rank II")
+	var pips: Array = (c1.find_child("Pips", true, false) as Control).get_children().filter(func(n: Node) -> bool: return n is ColorRect)
+	var rank_count: Label = c1.find_child("RankCount", true, false) as Label
+	_check(rank_count != null and rank_count.text == "2/%d" % GameData.PERK_MAX_RANK, "rank count reads 2/3 next to the pips")
 	c1.grab_focus()
 	await _settle()
 	var effects: Control = armory.find_child("PerkEffects", true, false)

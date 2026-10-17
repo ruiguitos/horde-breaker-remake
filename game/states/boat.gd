@@ -665,35 +665,22 @@ func _key_name(action: StringName, pad: bool) -> String:
 	if bindings.is_empty() and InputMap.has_action(action):
 		for e: InputEvent in InputMap.action_get_events(action):
 			if pad and e is InputEventJoypadButton:
-				return _pad_name((e as InputEventJoypadButton).button_index)
+				return InputIcons.text("joy:%d" % (e as InputEventJoypadButton).button_index)
 			if not pad and e is InputEventKey:
 				var k := e as InputEventKey
 				var code: Key = k.physical_keycode if k.physical_keycode != KEY_NONE else k.keycode
 				return "ESC" if code == KEY_ESCAPE else OS.get_keycode_string(code).to_upper()
 	for b: Variant in bindings:
 		if pad and b is String and String(b).begins_with("joy:"):
-			return _pad_name(int(String(b).get_slice(":", 1)))
+			return InputIcons.text(b)
 		if not pad and b is int:
 			return OS.get_keycode_string(b).to_upper()
 	# ui_* actions: GameInput only adds the pad side; the keys are Godot's.
 	if action == &"ui_accept":
-		return "A" if pad else "ENTER"
+		return InputIcons.text("joy:%d" % JOY_BUTTON_A) if pad else "ENTER"
 	if action == &"ui_cancel":
-		return "B" if pad else "ESC"
+		return InputIcons.text("joy:%d" % JOY_BUTTON_B) if pad else "ESC"
 	return "?"
-
-
-static func _pad_name(button: int) -> String:
-	match button:
-		JOY_BUTTON_A: return "A"
-		JOY_BUTTON_B: return "B"
-		JOY_BUTTON_X: return "X"
-		JOY_BUTTON_Y: return "Y"
-		JOY_BUTTON_LEFT_SHOULDER: return "LB"
-		JOY_BUTTON_RIGHT_SHOULDER: return "RB"
-		JOY_BUTTON_START: return "START"
-		JOY_BUTTON_BACK: return "VIEW"
-	return "PAD %d" % button
 
 
 static func _style(bg: Color, border: Color, width: int, pad: int, radius: int = UiTheme.RADIUS) -> StyleBoxFlat:
