@@ -7,7 +7,6 @@ em `build.gd` diz como construir.
 | Sítio | Ilha no jogo | Rota |
 |---|---|---|
 | `berlenga`: Berlenga Grande (Portugal) | `expeditions/berlenga/` (inteira + 4 partes), 1,5 km | Expedição Berlenga (fora do sorteio Beach) |
-| `hashima`: Hashima ou Gunkanjima (Japão) | `islands/port_hashima.scn`, 0,5 km | Industrial Port |
 
 Começou como spike (`spikes/real_island`, retirado; ver o histórico do git)
 e passou a ferramenta quando a Berlenga entrou no jogo.
@@ -15,8 +14,6 @@ e passou a ferramenta quando a Berlenga entrou no jogo.
 ## Como correr
 
 ```bash
-python tools/real_island/fetch_data.py hashima
-godot --headless --path . --script res://tools/real_island/build.gd -- hashima
 ```
 
 1. `fetch_data.py` descarrega uma vez para `data/<sítio>/`, que fica fora do

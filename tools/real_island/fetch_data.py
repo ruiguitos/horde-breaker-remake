@@ -41,13 +41,6 @@ PLACES = {
                      "stone_wall_04": "granite", "weathered_planks": "wood", "rusty_metal_04": "metal",
                      "dirty_concrete": "concrete"},
     },
-    "hashima": {
-        "name": "Hashima (Gunkanjima)", "lat": 32.6278, "lon": 129.7386, "size": 1024,
-        "textures": {"cracked_concrete": "ground", "concrete_wall_006": "cliff",
-                     "dark_rock": "shore", "concrete_pavement_03": "path", "concrete_wall_008": "facade",
-                     "dirty_concrete": "concrete", "weathered_planks": "wood", "rusty_metal_04": "metal",
-                     "rusty_corrugated_iron": "sheet"},
-    },
 }
 OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter",
             "https://overpass.kumi.systems/api/interpreter"]

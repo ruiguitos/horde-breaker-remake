@@ -11,7 +11,7 @@ As fontes de verdade continuam a ser `assets/LICENSES.md` e as licenças
 incluídas com os assets. O painel apresenta:
 
 - **© OpenStreetMap contributors**, com ligação à página de direitos e
-  licença ODbL; mapas da Berlenga e de Hashima.
+  licença ODbL; mapas da Berlenga.
 - **The Milky Way panorama by ESO/S. Brunier, licensed under CC BY 4.0
   and used in original and modified forms.**, com ligações à imagem da
   ESO e à CC BY 4.0. O panorama é original; o star field foi modificado.

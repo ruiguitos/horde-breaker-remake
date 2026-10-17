@@ -8,9 +8,9 @@ resource_local_to_scene = false
 resource_name = ""
 enabled = true
 script = ExtResource("2_grade")
-shadows = Vector4(0.55, 0.35, 1.1, 0.95)
-midtones = Vector4(0.12, 0.12, 1.15, 1.0)
-highlights = Vector4(0.2, 0.25, 1.05, 1.03)
+shadows = Vector4(0.55, 0.18, 0.98, 0.97)
+midtones = Vector4(0.12, 0.1, 0.98, 0.98)
+highlights = Vector4(0.16, 0.14, 1.0, 1.01)
 
 [resource]
 script = ExtResource("1_h616x")
