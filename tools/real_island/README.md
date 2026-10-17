@@ -56,13 +56,10 @@ depois de a construir, ou muda o script.
 - **Relevo:** os dados reais têm 25 a 30 m de resolução. São suavizados até
   1 m e é-lhes acrescentado ruído:
   - na **Berlenga**, 3 m para dar textura à rocha;
-  - em **Hashima**, 0,4 m, porque é betão;
-  - em Hashima o chão fica a pelo menos 5 m, porque é terreno conquistado ao
-    mar atrás de um paredão.
 
   Onde a terra encontra o mar há falésias, ou paredão; na areia, uma praia
   suave.
-  - **Largura das falésias:** em Hashima é sempre de 4 m. Na Berlenga varia
+  - **Largura das falésias:** na Berlenga varia
     entre 4 e 16 m, conforme o desenho do Codex: é mais larga onde a terra
     atrás é alta e mais estreita onde é íngreme, e varia lentamente ao longo
     da costa. Fica nos 4 m antigos junto a caminhos, pontes, praias e
@@ -92,32 +89,6 @@ depois de a construir, ou muda o script.
 - **Edifícios:** usam as plantas e alturas reais do OSM e ficam em
   `Buildings/`, um nó cada, a bloquear a planta.
   - **Berlenga:** paredes caiadas e telhado de quatro águas.
-  - **Hashima:** betão com telhado plano e platibanda. A fachada é uma
-    textura do Poly Haven com uma janela desenhada a cada 3 m, mais ou menos
-    um andar. Os 66 edifícios têm a altura do OSM; o Bloco 65 tem 27 m.
-- **Mais detalhe dos edifícios em Hashima:** acrescentado na revisão com o
-  Codex.
-  - Os blocos de habitação (`号棟`) têm galerias abertas a cada andar, como
-    as reais. Ficam em `Decor/` para não fecharem as vielas na grelha.
-  - O `roof:shape` do OSM sobrepõe-se ao estilo do sítio: o Poço 4 tem
-    telhado inclinado.
-  - O farol é uma só torre, com os 10 m do OSM.
-  - A orientação das paredes vem do sentido do polígono, para que as plantas
-    em L e em U fiquem com as paredes viradas para fora.
-- **Dois níveis em Hashima:** feito na terceira ronda, com o Codex.
-  - O aterro abaixo de 17 m fica mais plano e o rochedo acima mantém a
-    altura.
-  - Entre os dois há uma faixa íngreme que a grelha não sobe. Só se
-    atravessa pelas escadas e caminhos escavados, que são gargalos a sério.
-  - Custo: o troço entre o Bloco 65 e o Poço 4 passou de 159 m para 647 m,
-    porque a faixa a leste do rochedo é estreita.
-- **Marcos de Hashima:**
-  - **Santuário (端島神社):** salão de madeira com telhado de duas águas e um
-    torii. Fica na clareira livre mais próxima do ponto do OSM, que está
-    encostado ao Bloco 1. Bloqueiam o salão e os pilares; as vigas do torii
-    são só decoração.
-  - **Tapete transportador (ベルトコンベアー):** passadeira a 5 m de altura
-    sobre pilares. Só os pilares bloqueiam.
 - **Kits de detalhe (Berlenga):** feitos em paralelo por subagentes Claude
   e revistos pelo Codex. Cada kit é um ficheiro próprio, para os subagentes
   poderem trabalhar sem mexer no mesmo código.
@@ -188,10 +159,9 @@ depois de a construir, ou muda o script.
   | Papel | Textura | Onde |
   |---|---|---|
   | `granite` | stone_wall_04 | forte, edifício do ilhéu, muros dos limites, pontes de pedra |
-  | `wood` | weathered_planks | ponte de madeira (`surface=wood`), santuário e torii de Hashima |
+  | `wood` | weathered_planks | ponte de madeira (`surface=wood`) |
   | `metal` | rusty_metal_04 | gradeamentos, lanterna e cúpula dos faróis, tapete transportador |
-  | `concrete` | dirty_concrete | cais, pontes de betão, lajes, galerias e paredão de Hashima |
-  | `sheet` | rusty_corrugated_iron | telhado de duas águas do Poço 4 e cobertura do tapete |
+  | `concrete` | dirty_concrete | cais, pontes de betão, lajes e paredões |
 
   - **Porquê assim:** a cor de cada peça passa a ser um *tint* sobre a
     textura (a cor pretendida a dividir pela cor média da imagem). A paleta
@@ -207,47 +177,23 @@ depois de a construir, ou muda o script.
     5 texturas novas (3 mapas cada, 1k, DXT), partilhadas pelas duas ilhas.
   - O ferro e o vermelho pintado usam a mesma textura de metal com outro
     *tint*. O vidro da lanterna continua a ser um material transparente.
-- **Praças:** os passeios com `area=yes` no OSM (o percurso turístico de
-  Hashima) são pavimento por inteiro, e não um caminho ao longo do contorno.
+- **Praças:** os passeios com `area=yes` no OSM são pavimento por inteiro, e não um caminho ao longo do contorno.
 - **Gargalos e arenas** (`chokes`, `arenas` no preset): são marcadores
   `Choke_*` e `Arena_*`, com as posições que o Codex leu na disposição real.
   O construtor fecha cada gargalo à vez e diz se algum objetivo fica
-  inacessível. Em Hashima só o cais corta o caminho para o barco: é o funil
-  do desembarque.
-- **Paredão:** em Hashima há um muro de 1,7 m ao longo do paredão do OSM.
-  É só decoração, porque o desnível atrás dele já bloqueia.
+  inacessível.
 - **Espalhados:** cada sítio tem a sua lista em `PLACES`.
   - **Berlenga:**
     - 800 rochas nas bordas das falésias, que bloqueiam;
     - 180 mil tufos de erva por toda a ilha, que não bloqueiam e só se
       desenham perto da câmara.
-  - **Hashima:**
-    - entulho junto aos prédios, que bloqueia;
-    - erva, fetos e plantas só nas zonas verdes do OSM.
 - **Marcadores:**
   - **Barco:**
     - **Berlenga:** na areia do Carreiro do Mosteiro.
-    - **Hashima:** junto ao cais Dolphin, onde atracam os barcos de
-      turistas.
   - **Geradores:** em sítios reais, com 4 m livres à volta.
     - **Berlenga:** no Bairro dos Pescadores, junto ao farol e no ilhéu do
       forte.
-    - **Hashima:** no poço 2 da mina (第二坑捲), no Bloco 65 e no poço 4
-      (四坑上家).
   - **Caixas:** nas pontas da ilha, o mais longe possível de tudo.
-  - **Sabotage (Hashima, `sabotage` no preset):** o `PowerSwitch` na
-    subestação (変電所) junto ao poço 4, no extremo norte da zona do carvão;
-    o `Machine_1` no chão, depois do último pilar do tapete transportador
-    (ベルトコンベアー, elevado: os marcadores ficam nas pontas, não por
-    baixo da passadeira), e o `Machine_2` à porta da sala de carregamento
-    (詰込室). Cada um vai para a célula livre (2 m) e alcançável mais perto
-    do ponto do preset; ficaram a 9 m, 3 m e 9 m do sítio real (as plantas
-    dos edifícios bloqueiam). Não há `ExfilPoint`: o `Boat` já é o cais
-    Dolphin, e a retirada faz-se pelo caminho junto ao paredão (135 m a pé
-    das cargas ao barco; 239 m do desembarque ao quadro). São colocados
-    depois das caixas, por isso o resto da ilha não muda: a reconstrução de
-    2026-10-14 só alterou o `port_hashima.scn` (mais 3 marcadores); o
-    terreno, as texturas e a grelha ficaram iguais byte a byte.
 
 ## Expedição Berlenga
 
@@ -309,7 +255,7 @@ fronteira) e os objetivos. O construtor grava, na pasta da expedição:
     para fora até 3 m; se ainda tapar, fica de fora. Por parte, são 17 a
     30 penedos empurrados e 1 a 6 peças deixadas de fora.
 - **Horda:** as partes 1 a 3 mantêm `horde_radius` 120. A parte 4 tem
-  42 mil células alcançáveis, abaixo das 60 mil (a Hashima tem 51 mil), e
+  42 mil células alcançáveis, abaixo das 60 mil, e
   fica com 0.
 - **Objetivos no preset:** cada parte tem os seus pontos (`rescue`,
   `escort`, `defend`, `holds`, `signals`, `lighthouse`, `fuel`, `caches`) e o
@@ -348,16 +294,16 @@ verifica uma construção de teste.
 
 Ambiente: Windows 11, Godot 4.7.2, AMD Ryzen 5 5600, NVIDIA RTX 5060.
 
-| O quê | Berlenga | Hashima |
-|---|---|---|
-| Construir a ilha (headless) | cerca de 45 s: 18 s a ilha, 20 s as 4 partes (verificadas), 6 s a gravar e reler | cerca de 5 s |
-| Grelha | 1466 m, 2,1 M células | 495 m, 245 mil células |
-| Converter para a grelha (`build_map`) | 0,75 a 1,2 s | cerca de 0,1 s |
-| Células transitáveis / alcançáveis do desembarque | 744 mil / 709 mil (761 mil / 727 mil com falésias de 4 m) | 50,9 mil / 50,9 mil (36,7 mil / 34,6 mil quando os edifícios bloqueavam a caixa) |
-| Rota Activate pela grelha (troços) | cerca de 2,4 km: 229 + 414 + 737 + 1056 m | cerca de 1,3 km: 142 + 642 + 281 + 221 m |
-| Passo da simulação (bot) | 1,1 a 1,3 ms em média, pior 8 ms | 1,6 a 1,8 ms em média (até 150 vivos), pior 8,5 ms |
-| Frame em jogo a 1920 × 1080 (Ultra, horda a chegar) | 4,6 a 6,2 ms | 3,4 a 4,3 ms |
-| Bot invencível, Threat 2 | Activate 6 min, Defend 4,5 min, Rescue 3,5 min | Activate 2,5 min, Defend 2,5 min, Rescue 1,5 min, Sabotage 1,5 min (81 s) |
+| O quê | Berlenga |
+|---|---|
+| Construir a ilha (headless) | cerca de 45 s: 18 s a ilha, 20 s as 4 partes (verificadas), 6 s a gravar e reler |
+| Grelha | 1466 m, 2,1 M células |
+| Converter para a grelha (`build_map`) | 0,75 a 1,2 s |
+| Células transitáveis / alcançáveis do desembarque | 744 mil / 709 mil (761 mil / 727 mil com falésias de 4 m) |
+| Rota Activate pela grelha (troços) | cerca de 2,4 km: 229 + 414 + 737 + 1056 m |
+| Passo da simulação (bot) | 1,1 a 1,3 ms em média, pior 8 ms |
+| Frame em jogo a 1920 × 1080 (Ultra, horda a chegar) | 4,6 a 6,2 ms |
+| Bot invencível, Threat 2 | Activate 6 min, Defend 4,5 min, Rescue 3,5 min |
 
 ## Limites
 
@@ -366,9 +312,6 @@ Ambiente: Windows 11, Godot 4.7.2, AMD Ryzen 5 5600, NVIDIA RTX 5060.
 - **Berlenga:**
   - a altura dos edifícios é estimada, porque o OSM quase não a tem;
   - o forte é uma aproximação: segue a costa do ilhéu, não uma planta real.
-- **Hashima:**
-  - os prédios são caixas com janelas pintadas, sem varandas nem interiores;
-  - as ruas estreitas entre prédios dependem do traçado do OSM.
 - As falésias vistas de perto mostram os veios verticais da textura de rocha.
 
 ## Licenças
