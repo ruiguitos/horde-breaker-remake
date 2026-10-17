@@ -2671,7 +2671,8 @@ func _draw_effects(delta: float) -> void:
 			_head_debris_mm.set_instance_color(hi, _debris_color[k])
 			hi += 1
 		else:
-			var scale := Vector3(sz, sz, sz) if sz < 1.2 else Vector3(0.5, 0.5, sz * 1.5)
+			# Big pieces (legs, arms) are limbs: a thin stick about sz/2 long, not a pillar.
+			var scale := Vector3(sz, sz, sz) if sz < 1.2 else Vector3(0.18, 0.18, sz * 0.5)
 			_debris_mm.set_instance_transform(bi, Transform3D(spin.scaled(scale), _debris_pos[k]))
 			_debris_mm.set_instance_color(bi, _debris_color[k])
 			bi += 1
