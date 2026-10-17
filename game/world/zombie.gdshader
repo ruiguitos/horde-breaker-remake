@@ -68,7 +68,18 @@ const uint SHOW_LEGLESS = 21u; // ZombieModel.Show.LEGLESS: a Crawler (crawl pos
 const float CRAWL_LEAN = 1.2;
 const float CRAWL_DROP = 0.68;
 const float CRAWL_HEAD_NOD = -0.5;
-const float CRAWL_ELBOW = 1.1;
+// Crawl arms (ZombieModel.CRAWL_*): a planted hand moves back in the body's
+// frame at the crawl speed during its stance, then lifts and returns.
+const float CRAWL_STRIDE = 0.8;
+const float CRAWL_STANCE = 0.5;
+const float CRAWL_LIFT = 0.1;
+const float CRAWL_HAND_Y = 0.07;
+const float CRAWL_HAND_Z = 0.44;
+const float CRAWL_UPPER = 0.3;
+const float CRAWL_FOREARM = 0.335;
+const float CRAWL_WALK_FULL = 0.15;  // walk share at which the hands stride at full length
+const float PI_C = 3.14159265;
+const float TAU_C = 6.28318531;
 
 mat3 rot_x(float a) {
 	float c = cos(a);
@@ -86,6 +97,33 @@ mat3 rot_z(float a) {
 	float c = cos(a);
 	float s = sin(a);
 	return mat3(vec3(c, s, 0.0), vec3(-s, c, 0.0), vec3(0.0, 0.0, 1.0));
+}
+
+// One hand of a Crawler (ZombieModel.crawl_stroke): the offset from its rest
+// point (x: dz forward, y: dy up) for the cycle fraction. Stance: on the ground,
+// dz falls from +half to -half, so the hand slides back at the crawl speed while
+// the body moves over it. Recovery: the hand lifts (sine) and comes back forward.
+vec2 crawl_stroke(float cycle) {
+	float u = fract(cycle);
+	float half_stride = CRAWL_STRIDE * CRAWL_STANCE * 0.5;
+	if (u < CRAWL_STANCE) {
+		return vec2(half_stride - 2.0 * half_stride * u / CRAWL_STANCE, 0.0);
+	}
+	float v = (u - CRAWL_STANCE) / (1.0 - CRAWL_STANCE);
+	return vec2(-half_stride + half_stride * (1.0 - cos(PI_C * v)), CRAWL_LIFT * sin(PI_C * v));
+}
+
+// Two-bone IK in the arm's plane (ZombieModel.crawl_arm): the upper arm's reach
+// and the elbow bend that put the hand centre at `hand` (before the lean and the
+// drop). The angles are from straight down, towards +Z.
+vec2 crawl_arm(vec3 hand) {
+	vec3 loc = rot_x(-CRAWL_LEAN) * (hand + vec3(0.0, CRAWL_DROP, 0.0) - WAIST) + WAIST;
+	vec2 t = loc.yz - SHOULDER_L.yz;
+	float d = max(length(t), 0.001);
+	float psi = atan(t.y, -t.x);
+	float beta = acos(clamp((CRAWL_UPPER * CRAWL_UPPER + d * d - CRAWL_FOREARM * CRAWL_FOREARM) / (2.0 * CRAWL_UPPER * d), -1.0, 1.0));
+	float gamma = acos(clamp((CRAWL_UPPER * CRAWL_UPPER + CRAWL_FOREARM * CRAWL_FOREARM - d * d) / (2.0 * CRAWL_UPPER * CRAWL_FOREARM), -1.0, 1.0));
+	return vec2(psi - beta, PI_C - gamma);
 }
 
 void turn(inout vec3 p, inout vec3 n, inout vec3 t, mat3 r, vec3 pivot) {
@@ -197,7 +235,7 @@ void vertex() {
 	} else if (part >= 3 && part <= 6) {
 		float cx = part <= 4 ? 0.29 : -0.29;
 		p.x = cx + (p.x - cx) * wl + sign(cx) * arm_shift;
-		p.z *= wl;
+		p.z *= mix(wl, 1.0, crawl);  // a Crawler's arms keep their length (planted hands)
 	} else if (part >= 7) {
 		float cx = part <= 8 ? 0.12 : -0.12;
 		p.x = cx * wx + (p.x - cx) * wl;
@@ -233,13 +271,26 @@ void vertex() {
 		if (creature_type == 5) { reach = -0.1 + 0.12 * walk * s; elbow_bend = 0.15; }
 		if (creature_type == 6) { reach = 1.7 + 0.08 * sin(phase); elbow_bend = 1.15; }
 		if (legless) {
-			// Crawling: the arms hang to the ground from the lowered shoulders
-			// and the forearms reach forward; they pull in turn with the steps.
-			float crawl_reach = CRAWL_LEAN + (0.12 + 0.1 * walk) * sin(phase + (left ? 0.0 : 3.14));
-			reach = mix(reach, crawl_reach, crawl);
-			elbow_bend = mix(elbow_bend, CRAWL_ELBOW, crawl);
+			// Crawling, with the hands planted. Each hand has a cycle (the right
+			// one half a cycle behind): stance, when it stays on the ground and
+			// the body moves over it, then recovery, when it lifts and returns
+			// (crawl_stroke). The shoulder and elbow angles come from IK on that
+			// target (crawl_arm). The stroke scales with the walk, so a Crawler
+			// standing still keeps its hands put.
+			vec2 ca;
+			if (left && ((mask >> SHOW_STUMP_L) & 1u) == 1u) {
+				// No forearm: the stump stays at its rest point, tucked up off
+				// the ground (it does not plant); the right hand does the pulling.
+				ca = crawl_arm(vec3(0.0, CRAWL_HAND_Y, CRAWL_HAND_Z));
+			} else {
+				float k = smoothstep(0.0, CRAWL_WALK_FULL, walk);
+				vec2 st = crawl_stroke(phase / TAU_C + (left ? 0.0 : 0.5)) * k;
+				ca = crawl_arm(vec3(0.0, CRAWL_HAND_Y + st.y, CRAWL_HAND_Z + st.x));
+			}
+			reach = mix(reach, ca.x, crawl);
+			elbow_bend = mix(elbow_bend, ca.y, crawl);
 		}
-		reach = reach * limp - 0.3 * flinch;
+		reach = reach * limp - 0.3 * flinch * (1.0 - crawl);
 		float spread = (left ? 1.0 : -1.0) * (0.1 + 0.15 * stagger + 0.5 * fall);
 		vec3 shift = vec3(left ? arm_shift : -arm_shift, 0.0, 0.0);
 		if (part == 4 || part == 6) {
@@ -277,6 +328,9 @@ void vertex() {
 	vec3 root = vec3(0.0, 0.04 * walk * abs(s), 0.2 * lunge);
 	float sway = 0.05;
 	if (creature_type > 0) { root = vec3(0.0, 0.02 * walk * abs(s), 0.08 * lunge); sway = creature_type == 5 ? 0.04 : 0.02; }
+	// A Crawler's body does not bob or roll: its hands stay on the ground.
+	root.y *= 1.0 - crawl;
+	sway *= 1.0 - crawl;
 	turn(p, n, t, rot_z(sway * walk * s + 0.12 * stagger * sin(phase * 3.0)), vec3(0.0));
 	p += root * limp;
 	if (death > 0.0) {
@@ -321,7 +375,8 @@ void fragment() {
 	vec3 tex = texture(albedo_tex, uv).rgb;
 	// Recoloured boxes keep the texture's detail (luminance over its mean),
 	// softened so high-contrast weaves (denim) do not darken the colour.
-	float detail = clamp(mix(1.0, dot(tex, LUMA) / tex_mean, 0.6), 0.35, 1.8);
+	// Skin uses less of the leather's grain (0.3, not 0.6): its mottling shows instead.
+	float detail = clamp(mix(1.0, dot(tex, LUMA) / tex_mean, rot > 0.5 ? 0.3 : 0.6), 0.35, 1.8);
 	vec3 base = v_look.x > 0.5 ? v_col * detail : tex * v_col;
 	// Shirt patterns, in rest space (they follow the body).
 	int pat = int(v_look.y + 0.5);
@@ -354,13 +409,33 @@ void fragment() {
 	float grime = fbm(q * 3.0) * dirt * (1.2 - clamp(v_rest.y * 0.5, 0.0, 1.0));
 	base *= 1.0 - grime;
 	if (rot > 0.5) {
-		// Relative to the skin tone, so light and dark skins both rot.
-		float blotch = smoothstep(0.45, 0.75, fbm(q * 5.0 + 11.0));
-		base = mix(base, base * vec3(0.72, 0.82, 0.55), blotch * 0.6);
-		float bruise = smoothstep(0.55, 0.8, fbm(q * 3.5 + 23.0));
-		base = mix(base, base * vec3(0.66, 0.45, 0.66), bruise * 0.55);
-		float vein = 1.0 - smoothstep(0.0, 0.02, abs(fbm(q * 9.0) - 0.5));
-		base = mix(base, base * vec3(0.5, 0.5, 0.65), vein * 0.4 * smoothstep(0.4, 0.6, vnoise(q * 2.0)));
+		// Dead skin, relative to its own tone so light and dark skins both work.
+		// Mottling: fine patches, a little warmer or cooler. Lividity: purple
+		// blood pooled in blotches, heavier on the low body (gravity), with dark
+		// veins running through it. A few greenish patches of decay on top.
+		float mottle = 0.5 * vnoise(q * 9.0) + 0.5 * vnoise(q * 23.0);
+		base *= 0.82 + 0.34 * mottle;
+		base *= mix(vec3(1.05, 0.97, 0.9), vec3(0.9, 0.98, 1.07), vnoise(q * 4.0 + 8.0));
+		float low = smoothstep(1.3, 0.6, v_rest.y);
+		float pool = smoothstep(0.38, 0.66, fbm(q * 2.6 + 31.0)) * (0.3 + 0.7 * low);
+		base = mix(base, base * vec3(0.45, 0.38, 0.78), pool * 0.75);
+		float vein = (1.0 - smoothstep(0.0, 0.035, abs(fbm(q * 11.0 + 5.0) - 0.5))) * pool;
+		base = mix(base, base * vec3(0.4, 0.36, 0.6), vein * 0.7);
+		float blotch = smoothstep(0.5, 0.78, fbm(q * 5.0 + 11.0));
+		base = mix(base, base * vec3(0.78, 0.84, 0.6), blotch * 0.45);
+	}
+	// Sunken eye sockets (the head's front): dark skin set back around each eye,
+	// the bowl's normal tilting in towards the eye.
+	float socket = 0.0;
+	vec2 sock_d = vec2(0.0);
+	if (abs(v_info.x - 2.0) < 0.5 && v_rest.z > 0.12 && v_rest.y > 1.7 && v_rest.y < 1.92) {
+		vec2 dl = v_rest.xy - vec2(0.06, 1.82);
+		vec2 dr = v_rest.xy - vec2(-0.06, 1.82);
+		sock_d = length(dl) < length(dr) ? dl : dr;
+		socket = 1.0 - smoothstep(0.03, 0.065, length(sock_d));
+		base *= mix(1.0, 0.3, socket);
+		vec3 bowl = normalize(vec3(-sock_d.x * 10.0, sock_d.y * 10.0, 1.0));  // tangent space: x along the face, y flipped
+		NORMAL_MAP = mix(NORMAL_MAP, bowl * 0.5 + 0.5, socket);
 	}
 	// Wounds: noise blobs whose size grows with the box's gore amount.
 	float w = fbm(q * 6.0);
@@ -388,9 +463,13 @@ void fragment() {
 		float rn = fbm(q * 3.3 + 41.0);
 		float rc = 0.88 - 0.1 * v_wear.z;
 		float rip = smoothstep(rc, rc + 0.015, rn);
-		base *= 1.0 - 0.55 * (smoothstep(rc - 0.03, rc - 0.005, rn) - rip);
+		// The frayed edge is a flat dark tone, and the torn cloth gets a smooth
+		// normal: the weave of the cloth does not show along a rip.
+		float edge = smoothstep(rc - 0.03, rc - 0.005, rn) - rip;
+		base = mix(base, v_col * 0.45, edge);
 		torn = max(torn, rip);
 		base = mix(base, skin, torn);
+		NORMAL_MAP = mix(NORMAL_MAP, vec3(0.5, 0.5, 1.0), max(torn, edge));
 		rough = mix(rough, 0.6, torn);
 	}
 	base = mix(base, blood_col, blood);
@@ -412,9 +491,13 @@ void fragment() {
 		rough = 0.55;
 		NORMAL_MAP = vec3(0.5, 0.5, 1.0);
 	} else if (kind > 2.5 && kind < 3.5) {
-		base = srgb(vec3(0.62, 0.62, 0.5));  // milky dead eyes
-		rough = 0.08;
-		NORMAL_MAP = vec3(0.5, 0.5, 1.0);
+		// Dead eyes: a domed, glassy milky eyeball with a dark, dilated pupil.
+		float side = v_rest.x >= 0.0 ? 0.06 : -0.06;
+		vec2 e = (v_rest.xy - vec2(side, 1.82)) / vec2(0.0275, 0.0175);  // the eye box, -1..1
+		float pupil = 1.0 - smoothstep(0.3, 0.45, length(e));
+		base = mix(srgb(vec3(0.62, 0.62, 0.5)), srgb(vec3(0.02, 0.02, 0.02)), pupil);
+		rough = mix(0.08, 0.25, pupil);
+		NORMAL_MAP = vec3(normalize(vec3(e.x * 0.4, -e.y * 0.4, 1.0)) * 0.5 + 0.5);
 	} else if (kind > 3.5) {
 		base = srgb(vec3(0.12, 0.02, 0.02));
 		rough = 0.3;

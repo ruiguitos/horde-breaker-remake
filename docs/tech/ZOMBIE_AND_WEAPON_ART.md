@@ -65,8 +65,8 @@ enquanto esses ficheiros estão a ser editados.
   caixas de coto na anca: carne escura, osso na ponta; `ZombieModel.legless_mask`).
   O shader lê o bit 21 e põe a pose de rastejar: tronco, anca e cabeça
   inclinados para a frente (`CRAWL_LEAN` 1,2 rad), afundados (`CRAWL_DROP`
-  0,68 m), antebraços a alcançar o chão (`CRAWL_ELBOW` 1,1), cabeça
-  levantada (`CRAWL_HEAD_NOD` −0,5), braços a puxar com os passos. A cabeça
+  0,68 m), cabeça levantada (`CRAWL_HEAD_NOD` −0,5), e os braços em
+  apoio/recuperação (ver *Correções visuais de 2026-10-17*). A cabeça
   fica a 0,69 m e as mãos a 0,07 m do chão. Só o `ZombieHordeView` põe o bit
   (quando `kind == CRAWLER`). A queda dura 0,4 s (`CRAWL_TRANSITION_TIME`): o
   instância leva `6 + progresso` em `INSTANCE_CUSTOM.w` (a faixa 6–7 está livre
@@ -77,6 +77,7 @@ enquanto esses ficheiros estão a ser editados.
   `ZombieModel.crawl_points()` é o espelho em GDScript da pose (para testes).
   Custo: +4 caixas por variante (≈ +96 vértices, cerca de +9 %; as caixas
   escondidas também passam pelo vertex shader). Medição: ver *Desempenho*.
+  Os cotos e as abas de calça mudaram em 2026-10-17 (ver abaixo).
 - **Estado**: queimadura, veneno, frio, congelado, *flash* de impacto e
   atordoado tingem o zombie, como tingiam a cápsula. A instância manda só um
   índice (`ZombieModel.Status`); as cores estão em `STATUS_TINTS`.
@@ -166,6 +167,88 @@ repouso (o sangue não "escorrega" quando o zombie anda):
   a encharcado, e os rasgões da roupa (independentes das feridas) de quase
   nenhuns a muitos. Os rasgões mostram a pele do próprio zombie.
 
+## Correções visuais de 2026-10-17
+
+Origem: uma revisão só de leitura do aspeto dos zombies, feita pelo Codex
+do utilizador; o utilizador aprovou quatro correções. Só código de jogo,
+testes, a ferramenta de captura `tools/dev/zombie_preview.gd` e este
+documento (sem Blender, `assets/models/*` nem `docs/design/art/*`). Capturas em `docs/design/zombie_fix/`: `before_*`
+(antes) e `after_*` (depois), com `tools/dev/zombie_preview.gd`.
+
+**1. Ferimento do flanco como cavidade (sem-camisa).** Antes era uma placa
+de carne e três ossos de 12 mm colados numa caixa de torso intacta. Agora o
+torso do sem-camisa é feito de peças: um bloco de trás e uma parede da
+frente com uma abertura (x −0,17 a 0,09 m; y 1,14 a 1,34 m). Dentro: chão e
+quatro paredes de carne escura (`Kind.MOUTH`), três costelas de osso
+recuadas (a 3 a 5 cm do fundo, contra 13 cm da parede) e quatro lábios de
+carne em losango nos cantos, a 45°, para a borda ser irregular. As outras
+variantes não mudam. Teste: a abertura não é tapada por nenhuma caixa e há
+cinco caixas escuras e três costelas dentro dela.
+
+**2. Rastejar com as mãos presas ao chão.** Antes os braços oscilavam com um
+seno da fase, mesmo parados. Agora cada mão tem um ciclo de
+`CRAWL_STRIDE` = 0,8 m de percurso:
+
+- **apoio** (metade do ciclo, `CRAWL_STANCE` 0,5): a mão fica no chão
+  (y = 0,07 m) e desliza para trás no referencial do corpo à velocidade de
+  rastejar; o corpo passa por cima dela (o *pull*);
+- **recuperação**: a mão levanta `CRAWL_LIFT` 0,10 m (seno) e volta à frente
+  (cosseno).
+
+As mãos alternam (meio ciclo). O ombro e o cotovelo vêm de IK de dois ossos
+(`crawl_arm`: 0,30 m de ombro a cotovelo, 0,335 m de cotovelo ao centro da
+mão) no referencial do torso, por isso o alvo fica no chão mesmo com o
+torso inclinado. A fase do Crawler passa a
+`ZombieModel.crawl_phase_rate(base) = 2π · (0,4 · base) / 0,8`, a velocidade
+real de rastejar, em vez de `0,7 · (3 + 2,6 · base)`. Única mudança na
+horda: `zombie_horde_view.gd`. A cadência ficou perto da antiga (6,9 rad/s
+para a velocidade-base 2,2; antes 6,1). O corpo deixou de balançar e de
+subir/descer ao rastejar, para não mexer nas mãos. Com o zombie parado
+(`walk` = 0) o ganho do ciclo vai a zero e as mãos ficam no ponto de
+repouso.
+
+- **Variante *worker* sem antebraço** (apoio assimétrico): o coto fica
+  parado, pousado na posição de repouso, sem ciclo; a mão direita faz o
+  puxão sozinha, com o mesmo ciclo. O coto fica a cerca de 0,3 m do chão,
+  por isso não pode plantar-se. **Escolha de autor, a confirmar a olho.**
+- **Espelho CPU**: `ZombieModel.crawl_points(cycle)` usa o mesmo IK e ciclo.
+  A cabeça e o torso não mudaram: `CRAWL_HEAD_HEIGHT` 0,685 m e
+  `CRAWL_CHEST_HEIGHT` 0,44 m continuam a bater com a pose (testes).
+- **Limites**: a mão fica exatamente no chão à velocidade nominal. Com frio
+  (que abranda o Crawler) desliza um pouco, porque a fase não integra a
+  velocidade real (só a nominal, `base × 0,4`).
+
+**3. Cotos irregulares.** Comprimento por variante (`STUMP_LENGTHS`:
+0,16 / 0,10 / 0,13 / 0,08 m, o esquerdo +2 cm). Uma ponta de osso sai 5 cm
+para além da carne. Duas abas de calça por coto (por fora e atrás), com
+desgaste 0,9 (encharcadas), inclinadas (±0,12 rad). Continuam a ser caixas.
+Testes: quatro comprimentos diferentes, uma ponta de osso por coto, quatro
+abas por Crawler.
+
+**4. Materiais.**
+
+- **Pele** (camada da pele, `rot`): a textura de couro usa só 30 % do seu
+  detalhe (60 % nas roupas), para a pele não parecer couro; manchas finas
+  (*mottling*, ±17 %) e cor quente ou fria; **livor**: manchas roxo-azuladas (mistura 0,75) onde o sangue
+  assentou, mais no corpo baixo (`smoothstep(1.3, 0.6, y)` no shader), com veias
+  escuras; manchas esverdeadas de decomposição.
+- **Órbitas**: a pele à volta de cada olho escurece 70 % num raio de 3 a
+  6,5 cm e a normal dobra-se para dentro (tigela).
+- **Olhos**: calote com normal abaulada e pupila escura (dilatada), em vez
+  da placa pálida plana.
+- **Rasgos de tecido**: a borda desfiada passa a cor plana (desbotada, 45 %)
+  e a normal fica lisa onde o pano está rasgado ou desfiado: o tramado não
+  aparece no rasgo. O tecido por rasgar mantém o tramado.
+
+Geometria (caixas e vértices por variante; entre parênteses, antes destas
+correções, calculado): civil 59 caixas / 1416 vértices (antes
+55 / 1320), trabalhador 55 / 1320 (51 / 1224), casaco 53 / 1272 (49 /
+1176), sem camisa 67 / 1608 (52 / 1248). O sem-camisa é o que mais cresce
+(+11 caixas com a cavidade); cada variante tem +4 caixas de coto.
+
+Testes: `tests/test_crawlers.gd` (mão planted, recuperação, fase = velocidade,
+abas, cabeça e peito) e `tests/test_zombie_model.gd` (cavidade, cotos).
+
 ## Armas
 
 - **Atualização de 2026-10-15, pedido do utilizador:** os cinco modelos em
@@ -254,6 +337,22 @@ em vez de 36 vértices soltos) desceu para +0,065 ms. Cada variante tem agora
 escondidas em cada zombie. O `draw` não ficou mais caro porque o aspeto vem
 de uma cache (dicionário velocidade → aspeto) em vez de um `hash()` por
 zombie e por frame. Não há LOD.
+
+**Correções de 2026-10-17** (mesma máquina, mas com outros processos a
+usar GPU e CPU durante a sessão: um Godot aberto desde as 13:03 e outras
+aplicações; por isso **não é medição limpa**):
+
+| Medida | Valor |
+|---|---|
+| 150 Walkers, `ZombieHordeView.draw` (headless, CPU) | 0,54 a 0,73 ms |
+| 150 Crawlers, `ZombieHordeView.draw` (headless, CPU) | 0,57 a 0,61 ms |
+| `bench` / `bench_empty` (GPU, janela) | **não utilizável**: a cena vazia dava 18 a 22 ms de GPU (não 0,56 ms) |
+
+Estimativa, não medida: cerca de +24 mil vértices no total da horda (+13 %, sobretudo
+o sem-camisa), mais umas contas no fragment shader (ruído da pele e da
+órbita só nos pixels de pele e de cara; o `if` das órbitas só corre na
+cabeça). Por medir no editor do utilizador: `zombie_preview.gd bench` e
+`bench_empty` com o computador livre, comparado com os números de 2026-10-14.
 
 ## Ligações ao resto do jogo
 

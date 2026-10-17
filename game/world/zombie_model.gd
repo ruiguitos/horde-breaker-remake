@@ -115,19 +115,41 @@ const PATTERN_COLORS: Array[Color] = [
 const WAIST: Vector3 = Vector3(0, 1.02, 0)
 const NECK: Vector3 = Vector3(0, 1.58, 0.02)
 ## Crawl pose (legless, added 2026-10-17; zombie.gdshader mirrors them):
-## the upper body pitches forward about the waist, sinks by CRAWL_DROP so the
-## hands reach the ground, the forearms reach forward (CRAWL_ELBOW bend) and
-## the head is lifted (CRAWL_HEAD_NOD). Model metres; the Crawler's aim
-## height in enemies.tres is 0.7 m, close to where its head is drawn.
+## the upper body pitches forward about the waist and sinks by CRAWL_DROP so
+## the hands reach the ground; the head is lifted (CRAWL_HEAD_NOD). Model
+## metres; the Crawler's aim height in enemies.tres is 0.7 m, close to where
+## its head is drawn.
 const CRAWL_LEAN: float = 1.2
 const CRAWL_DROP: float = 0.68
 const CRAWL_HEAD_NOD: float = -0.5
-const CRAWL_ELBOW: float = 1.1
+## Crawl arms (2026-10-17): each hand has a cycle of CRAWL_STRIDE metres of
+## travel. In the stance (CRAWL_STANCE of the cycle) the hand is planted: it
+## stays on the ground and slides back in the body's frame at the crawl speed,
+## so the body moves over it. In the recovery the hand lifts by CRAWL_LIFT and
+## comes back forward. The arms alternate. The phase rate is set from the crawl
+## speed (crawl_phase_rate), so a hand stays planted while the Crawler moves
+## at its nominal speed. Two-bone IK (crawl_arm) gives the upper arm and the
+## elbow bend for each hand target; the shader does the same.
+const CRAWL_STRIDE: float = 0.8
+const CRAWL_STANCE: float = 0.5
+const CRAWL_LIFT: float = 0.1
+## The hand centre on the ground, and its rest point: metres ahead of the
+## model origin (world z), under the shoulders in the crawl pose.
+const CRAWL_HAND_Y: float = 0.07
+const CRAWL_HAND_Z: float = 0.44
+## Arm bones (metres, the shader's joints): shoulder to elbow, elbow to hand.
+const CRAWL_UPPER: float = 0.30
+const CRAWL_FOREARM: float = 0.335
 ## Where a Crawler is aimed (IslandRun.enemy_head / enemy_chest), in metres
 ## above the ground: the posed head centre and torso centre at rest of the
 ## pose (crawl_points(0)). Tests check they match the pose.
 const CRAWL_HEAD_HEIGHT: float = 0.685
 const CRAWL_CHEST_HEIGHT: float = 0.44
+## Joints of the crawl pose: the shoulder, the hand's x.
+const SHOULDER: Vector3 = Vector3(0.27, 1.49, 0.0)
+const HAND_X: float = 0.29
+## Hip stump length per variant (metres): civilian, worker, jacket, shirtless.
+const STUMP_LENGTHS: Array[float] = [0.16, 0.1, 0.13, 0.08]
 
 static var _meshes: Array[ArrayMesh] = []
 static var _materials: Array[ShaderMaterial] = []
@@ -285,20 +307,59 @@ static func head_pose(walk: float, lunge: float, flinch: float, phase: float) ->
 	return p + Vector3(0, 0.04 * walk * absf(s), 0.2 * lunge)
 
 
+## The phase rate (radians per second) of a Crawler with this rolled speed:
+## its nominal crawl speed over one stride, so the arms' cycle matches its
+## travel (ZombieHordeView sends it as the walk phase).
+static func crawl_phase_rate(base_speed: float) -> float:
+	return TAU * GameData.CRAWL_SPEED_RATIO * base_speed / CRAWL_STRIDE
+
+
+## Where a hand is in its cycle: the offset from the rest point (dz forward,
+## dy up, metres) for cycle fraction `cycle` (0..1, wraps). Stance: the hand
+## is on the ground and dz falls from +half to -half over the stance, so it
+## moves back at the crawl speed. Recovery: dy is a sine (the lift) and dz
+## returns forward with an ease. Mirrored by zombie.gdshader crawl_stroke().
+static func crawl_stroke(cycle: float) -> Vector2:
+	var u: float = fposmod(cycle, 1.0)
+	var half_stride: float = CRAWL_STRIDE * CRAWL_STANCE * 0.5
+	if u < CRAWL_STANCE:
+		return Vector2(half_stride - 2.0 * half_stride * u / CRAWL_STANCE, 0.0)
+	var v: float = (u - CRAWL_STANCE) / (1.0 - CRAWL_STANCE)
+	return Vector2(-half_stride + half_stride * (1.0 - cos(PI * v)), CRAWL_LIFT * sin(PI * v))
+
+
+## Two-bone IK in the arm's plane: the upper arm's reach and the elbow bend
+## that put the hand centre at `hand_world` (the posed frame, after the lean
+## and the drop). Angles are measured from straight down, towards +Z.
+## Mirrored by zombie.gdshader crawl_arm().
+static func crawl_arm(hand_world: Vector3) -> Vector2:
+	var loc: Vector3 = _turn(hand_world + Vector3(0, CRAWL_DROP, 0), Basis(Vector3.RIGHT, -CRAWL_LEAN), WAIST)
+	var ty: float = loc.y - SHOULDER.y
+	var tz: float = loc.z - SHOULDER.z
+	var d: float = maxf(sqrt(ty * ty + tz * tz), 0.001)
+	var psi: float = atan2(tz, -ty)
+	var beta: float = acos(clampf((CRAWL_UPPER * CRAWL_UPPER + d * d - CRAWL_FOREARM * CRAWL_FOREARM) / (2.0 * CRAWL_UPPER * d), -1.0, 1.0))
+	var gamma: float = acos(clampf((CRAWL_UPPER * CRAWL_UPPER + CRAWL_FOREARM * CRAWL_FOREARM - d * d) / (2.0 * CRAWL_UPPER * CRAWL_FOREARM), -1.0, 1.0))
+	return Vector2(psi - beta, PI - gamma)
+
+
 ## CPU mirror of the legless crawl pose in zombie.gdshader (tests and the
 ## design numbers): the head centre, the left hand, the lowest corner of the
-## torso and the left hip stump, in model space. `pull` is the arm swing in
-## radians (the shader's sine term; 0 = rest of the pose).
-static func crawl_points(pull: float = 0.0) -> Dictionary:
+## torso and the left hip stump, in model space. `cycle` is the left hand's
+## cycle fraction (0..1; 0 starts its stance; the right hand is half a cycle
+## behind). The hand is planted through the stance; see crawl_stroke().
+static func crawl_points(cycle: float = 0.0) -> Dictionary:
 	var torso := Basis(Vector3.RIGHT, CRAWL_LEAN)
 	var drop := Vector3(0, -CRAWL_DROP, 0)
-	var elbow := Vector3(0.29, 1.19, 0)
-	var shoulder := Vector3(0.27, 1.49, 0)
 	var head: Vector3 = _turn(HEAD_CENTER, Basis(Vector3.RIGHT, CRAWL_HEAD_NOD), NECK)
 	head = _turn(head, torso, WAIST) + drop
-	var hand: Vector3 = _turn(Vector3(0.29, 0.855, 0.01), Basis(Vector3.RIGHT, -CRAWL_ELBOW), elbow)
-	hand = _turn(hand, Basis(Vector3.RIGHT, -(CRAWL_LEAN + pull)), shoulder)
-	hand = _turn(hand, torso, WAIST) + drop
+	var stroke: Vector2 = crawl_stroke(cycle)
+	var target := Vector3(HAND_X, CRAWL_HAND_Y + stroke.y, CRAWL_HAND_Z + stroke.x)
+	var angles: Vector2 = crawl_arm(target)
+	var shoulder := Vector3(HAND_X, SHOULDER.y, SHOULDER.z)
+	var elbow: Vector3 = shoulder + Vector3(0, -CRAWL_UPPER * cos(angles.x), CRAWL_UPPER * sin(angles.x))
+	var wrist: Vector3 = elbow + Vector3(0, -CRAWL_FOREARM * cos(angles.x + angles.y), CRAWL_FOREARM * sin(angles.x + angles.y))
+	var hand: Vector3 = _turn(wrist, torso, WAIST) + drop
 	var stump: Vector3 = _turn(Vector3(0.12, 0.86, 0.0), torso, WAIST) + drop
 	var lowest: float = INF
 	var c := Vector3(0, 1.3, 0)
@@ -393,16 +454,31 @@ static func boxes(variant: int) -> Array[Dictionary]:
 			add.call(Vector3(x, 0.05, 0.05), Vector3(0.16, 0.1, 0.27), shin, Layer.LEATHER, Slot.SHOES, 0.0, Kind.SURFACE, Show.LEGS, Show.SHOES)
 		else:
 			add.call(Vector3(x, 0.05, 0.05), Vector3(0.15, 0.1, 0.27), shin, Layer.LEATHER, Slot.SHOES, 0.0, Kind.SURFACE, Show.LEGS, Show.SHOES)
-		# Crawler: the hip stump, dark flesh with a bone tip pointing back
-		# (the crawl pose turns the pelvis, so these end up behind the body).
-		add.call(Vector3(x, 0.86, 0.0), Vector3(0.15, 0.12, 0.16), Part.PELVIS, Layer.SKIN, Slot.FIXED, 0.9, Kind.FLESH, Show.LEGLESS)
-		add.call(Vector3(x, 0.8, -0.03), Vector3(0.06, 0.1, 0.06), Part.PELVIS, Layer.SKIN, Slot.FIXED, 0.0, Kind.BONE, Show.LEGLESS)
+		# Crawler: the hip stump, dark flesh whose length depends on the variant
+		# (a worker's is short, a civilian's long; the left one a little
+		# longer). A bone tip sticks out of its end, and two blood-soaked
+		# trouser flaps hang beside it, outside and behind. The crawl pose
+		# turns the pelvis, so these end up behind the body.
+		var stump_len: float = STUMP_LENGTHS[variant] + (0.02 if left else 0.0)
+		var stump_top: float = 0.93
+		var stump_end: float = stump_top - stump_len
+		add.call(Vector3(x, (stump_top + stump_end) * 0.5, 0.0), Vector3(0.15, stump_len, 0.16), Part.PELVIS, Layer.SKIN, Slot.FIXED, 0.9, Kind.FLESH, Show.LEGLESS)
+		add.call(Vector3(x, stump_end - 0.02, -0.03), Vector3(0.06, 0.07, 0.06), Part.PELVIS, Layer.SKIN, Slot.FIXED, 0.0, Kind.BONE, Show.LEGLESS)
+		var flap_top: float = stump_top + 0.05
+		var flap_end: float = stump_end + 0.02
+		var flap_mid: float = (flap_top + flap_end) * 0.5
+		var flap_len: float = flap_top - flap_end
+		add.call(Vector3(x + 0.085 * side, flap_mid, 0.0), Vector3(0.03, flap_len, 0.15), Part.PELVIS, legs_layer, Slot.TROUSERS, 0.9, Kind.SURFACE, Show.LEGLESS)
+		out.back()["rotation"] = Vector3(0.0, 0.0, 0.12 * side)
+		add.call(Vector3(x, flap_mid, -0.09), Vector3(0.15, flap_len, 0.03), Part.PELVIS, legs_layer, Slot.TROUSERS, 0.9, Kind.SURFACE, Show.LEGLESS)
+		out.back()["rotation"] = Vector3(-0.12, 0.0, 0.0)
 	# Pelvis and belt.
 	add.call(Vector3(0, 0.97, 0), Vector3(0.42, 0.2, 0.22), Part.PELVIS, legs_layer, Slot.TROUSERS, 0.1)
 	add.call(Vector3(0, 1.06, 0), Vector3(0.44, 0.05, 0.235), Part.PELVIS, Layer.LEATHER, Slot.FIXED, 0.0, Kind.SURFACE, Show.ALWAYS, Show.ALWAYS, Color(0.3, 0.25, 0.22))
 	# Torso.
 	var torso_gore: float = [0.85, 0.6, 0.5, 0.95][variant]
-	add.call(Vector3(0, 1.3, 0), Vector3(0.46, 0.5, 0.26), Part.TORSO, shirt_layer, shirt_slot, torso_gore)
+	if variant != 3:  # the shirtless one's torso is built in pieces, below
+		add.call(Vector3(0, 1.3, 0), Vector3(0.46, 0.5, 0.26), Part.TORSO, shirt_layer, shirt_slot, torso_gore)
 	if variant == 0:
 		# Hoodie: the hood bunched behind the neck, a front pocket, drawstrings.
 		add.call(Vector3(0, 1.54, -0.13), Vector3(0.36, 0.13, 0.1), Part.TORSO, Layer.JERSEY, Slot.SHIRT, 0.2, Kind.SURFACE, Show.HOOD)
@@ -414,11 +490,36 @@ static func boxes(variant: int) -> Array[Dictionary]:
 		add.call(Vector3(0, 1.29, 0.132), Vector3(0.16, 0.46, 0.012), Part.TORSO, Layer.JERSEY, Slot.SHIRT, 0.95)
 		add.call(Vector3(0, 1.53, -0.02), Vector3(0.48, 0.06, 0.29), Part.TORSO, Layer.LEATHER, Slot.JACKET)  # collar
 	if variant == 3:
-		# Torn-open flank: ragged flesh with ribs showing through.
-		add.call(Vector3(-0.04, 1.24, 0.131), Vector3(0.22, 0.14, 0.012), Part.TORSO, Layer.SKIN, Slot.FIXED, 0.0, Kind.FLESH)
-		add.call(Vector3(0.04, 1.14, 0.131), Vector3(0.12, 0.08, 0.012), Part.TORSO, Layer.SKIN, Slot.FIXED, 0.0, Kind.FLESH)
+		# Torn-open flank, cut into the front of the torso (not a sticker on an
+		# intact box). The torso is a back block plus a front wall around an
+		# opening (x -0.17..0.09, y 1.14..1.34). Behind the opening is a dark
+		# cavity: a floor and four inner walls of dark flesh, three ribs set back
+		# inside it, and raw flesh lips at the corners, angled 45 degrees.
+		add.call(Vector3(0, 1.3, -0.065), Vector3(0.46, 0.5, 0.13), Part.TORSO, shirt_layer, shirt_slot, torso_gore)
+		add.call(Vector3(0, 1.445, 0.065), Vector3(0.46, 0.21, 0.13), Part.TORSO, shirt_layer, shirt_slot, torso_gore)  # above
+		add.call(Vector3(0, 1.095, 0.065), Vector3(0.46, 0.09, 0.13), Part.TORSO, shirt_layer, shirt_slot, torso_gore)  # below
+		add.call(Vector3(-0.2, 1.24, 0.065), Vector3(0.06, 0.2, 0.13), Part.TORSO, shirt_layer, shirt_slot, torso_gore)  # left of it
+		add.call(Vector3(0.16, 1.24, 0.065), Vector3(0.14, 0.2, 0.13), Part.TORSO, shirt_layer, shirt_slot, torso_gore)  # right of it
+		add.call(Vector3(-0.04, 1.24, 0.01), Vector3(0.26, 0.2, 0.02), Part.TORSO, Layer.SKIN, Slot.FIXED, 0.0, Kind.MOUTH)  # floor
+		add.call(Vector3(-0.04, 1.335, 0.065), Vector3(0.26, 0.01, 0.13), Part.TORSO, Layer.SKIN, Slot.FIXED, 0.0, Kind.MOUTH)  # roof
+		add.call(Vector3(-0.04, 1.145, 0.065), Vector3(0.26, 0.01, 0.13), Part.TORSO, Layer.SKIN, Slot.FIXED, 0.0, Kind.MOUTH)  # sill
+		add.call(Vector3(-0.165, 1.24, 0.065), Vector3(0.01, 0.2, 0.13), Part.TORSO, Layer.SKIN, Slot.FIXED, 0.0, Kind.MOUTH)  # left wall
+		add.call(Vector3(0.085, 1.24, 0.065), Vector3(0.01, 0.2, 0.13), Part.TORSO, Layer.SKIN, Slot.FIXED, 0.0, Kind.MOUTH)  # right wall
+		# Ribs at uneven heights, depths and lengths, so the cavity reads as real.
+		var rib_y: Array[float] = [1.19, 1.237, 1.296]
+		var rib_depth: Array[float] = [0.035, 0.043, 0.029]
+		var rib_len: Array[float] = [0.2, 0.17, 0.22]
+		var rib_x: Array[float] = [-0.04, -0.02, -0.06]
 		for k in 3:
-			add.call(Vector3(-0.12 + k * 0.06, 1.24 + k * 0.012, 0.137), Vector3(0.05, 0.016, 0.012), Part.TORSO, Layer.SKIN, Slot.FIXED, 0.0, Kind.BONE)  # ribs
+			add.call(Vector3(rib_x[k], rib_y[k], rib_depth[k]), Vector3(rib_len[k], 0.018, 0.02), Part.TORSO, Layer.SKIN, Slot.FIXED, 0.0, Kind.BONE)  # ribs
+		# Lips of torn flesh: each corner its own size and angle.
+		var lip_pos: Array[Vector2] = [Vector2(-0.17, 1.34), Vector2(0.09, 1.33), Vector2(-0.16, 1.14), Vector2(0.1, 1.15)]
+		var lip_size: Array[float] = [0.05, 0.065, 0.042, 0.056]
+		var lip_angle: Array[float] = [PI * 0.25, -PI * 0.22, PI * 0.31, -PI * 0.27]
+		for k in 4:
+			var lip: Vector2 = lip_pos[k]
+			add.call(Vector3(lip.x, lip.y, 0.12), Vector3(lip_size[k], lip_size[k], lip_size[k]), Part.TORSO, Layer.SKIN, Slot.FIXED, 0.0, Kind.FLESH)
+			out.back()["rotation"] = Vector3(0.0, 0.0, lip_angle[k])
 	add.call(Vector3(0, 1.585, 0.01), Vector3(0.12, 0.09, 0.12), Part.TORSO, Layer.SKIN, Slot.SKIN, 0.6 if variant == 2 else 0.25)  # neck
 	# Arms: upper arm about the shoulder, forearm + hand about the elbow.
 	for side: float in [1.0, -1.0]:

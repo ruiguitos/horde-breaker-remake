@@ -28,6 +28,9 @@ var freeze_time: PackedFloat32Array = PackedFloat32Array()
 ## Seconds left in a Crawler's topple after its legs went (it stands still
 ## while its body sinks into the crawl pose). Moves with the enemy on removal.
 var crawl_delay: PackedFloat32Array = PackedFloat32Array()
+## Metres walked along the ground since the enemy spawned, from the real moves
+## (walls included). A Crawler's hands follow it, so they stay planted.
+var travel: PackedFloat32Array = PackedFloat32Array()
 var count: int = 0
 var target: Vector3 = Vector3.ZERO
 
@@ -73,6 +76,7 @@ func add(pos: Vector3, kind: int, rng: RandomNumberGenerator) -> int:
 	cold_stacks.append(0)
 	freeze_time.append(0.0)
 	crawl_delay.append(0.0)
+	travel.append(0.0)
 	_next.append(-1)
 	_stamp.append(0)
 	count += 1
@@ -98,6 +102,7 @@ func remove(i: int) -> void:
 	cold_stacks[i] = cold_stacks[last]
 	freeze_time[i] = freeze_time[last]
 	crawl_delay[i] = crawl_delay[last]
+	travel[i] = travel[last]
 	positions.resize(last)
 	velocities.resize(last)
 	speeds.resize(last)
@@ -112,6 +117,7 @@ func remove(i: int) -> void:
 	cold_stacks.resize(last)
 	freeze_time.resize(last)
 	crawl_delay.resize(last)
+	travel.resize(last)
 	_next.resize(last)
 	_stamp.resize(last)
 	count = last
@@ -239,7 +245,9 @@ func tick(dt: float) -> void:
 			var s: float = max_step / sqrt(m2)
 			mx *= s
 			mz *= s
-		positions[i] = move_against_walls(field, p, mx, mz, RADIUS)
+		var moved: Vector3 = move_against_walls(field, p, mx, mz, RADIUS)
+		travel[i] += Vector2(moved.x - p.x, moved.z - p.z).length()
+		positions[i] = moved
 	rebuild_hash()
 
 

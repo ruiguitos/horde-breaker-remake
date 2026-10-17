@@ -325,6 +325,7 @@ func _test_model_and_pose() -> void:
 	var stumps_legless: int = 0
 	var stumps_normal: int = 0
 	var stump_parts_ok: bool = true
+	var stump_flaps: int = 0
 	for b: Dictionary in boxes:
 		var part: int = b["part"]
 		if part >= ZombieModel.Part.LEG_UPPER_L and part <= ZombieModel.Part.LEG_LOWER_R:
@@ -334,13 +335,16 @@ func _test_model_and_pose() -> void:
 				legs_off += 1
 		if b["show_a"] == ZombieModel.Show.LEGLESS:
 			stump_parts_ok = stump_parts_ok and part == ZombieModel.Part.PELVIS
-			if ZombieModel.shows(b, legless):
-				stumps_legless += 1
-			if ZombieModel.shows(b, normal):
-				stumps_normal += 1
+			if b["kind"] == ZombieModel.Kind.FLESH or b["kind"] == ZombieModel.Kind.BONE:
+				if ZombieModel.shows(b, legless):
+					stumps_legless += 1
+				if ZombieModel.shows(b, normal):
+					stumps_normal += 1
+			elif b["slot"] == ZombieModel.Slot.TROUSERS and ZombieModel.shows(b, legless):
+				stump_flaps += 1
 	_check(legs_on >= 4 and legs_off == 0, "the legless pose hides the legs (walker shows %d leg boxes, Crawler %d)" % [legs_on, legs_off])
-	_check(stumps_legless == 4 and stumps_normal == 0 and stump_parts_ok,
-		"a Crawler shows its two hip stumps (flesh and bone); a walker none")
+	_check(stumps_legless == 4 and stumps_normal == 0 and stump_parts_ok and stump_flaps == 4,
+		"a Crawler shows its two hip stumps (flesh and bone tip) and four blood-soaked trouser flaps; a walker none")
 	_check(ZombieModel.is_legless(legless) and not ZombieModel.is_legless(normal) and ZombieModel.legless_mask(legless) == legless,
 		"legless_mask sets the Crawler bit and only that")
 	var pose: Dictionary = ZombieModel.crawl_points(0.0)
@@ -348,12 +352,47 @@ func _test_model_and_pose() -> void:
 	var hand: Vector3 = pose["hand"]
 	var torso_low: float = pose["torso_low"]
 	var stump: Vector3 = pose["stump"]
-	_check(head.y > 0.55 and head.y < 0.85 and hand.y > -0.02 and hand.y < 0.12 and torso_low > 0.1 and torso_low < 0.35 and stump.z < 0.0,
-		"crawl pose: head %.2f m, hand %.2f m, torso %.2f m off the ground, stumps behind" % [head.y, hand.y, torso_low])
-	var forward: Dictionary = ZombieModel.crawl_points(0.18)
-	var back: Dictionary = ZombieModel.crawl_points(-0.18)
-	_check(forward["hand"].y < 0.15 and back["hand"].y < 0.15 and forward["hand"].y > -0.02 and back["hand"].y > -0.02,
-		"pulling the arms (+-0.18 rad) keeps the hands on the ground")
+	_check(head.y > 0.55 and head.y < 0.85 and absf(hand.y - ZombieModel.CRAWL_HAND_Y) < 0.005 and torso_low > 0.1 and torso_low < 0.35 and stump.z < 0.0,
+		"crawl pose: head %.2f m, hand %.3f m, torso %.2f m off the ground, stumps behind" % [head.y, hand.y, torso_low])
+	# Planted: through the stance (the first half of the cycle) the hand stays
+	# on the ground and moves back in the body's frame by exactly the distance
+	# the body travels, so it does not slide.
+	var planted: bool = true
+	var stance_steps: int = 20
+	for k in stance_steps:
+		var f: float = float(k) / float(stance_steps) * ZombieModel.CRAWL_STANCE * 0.99
+		var a: Vector3 = ZombieModel.crawl_points(f)["hand"]
+		var b: Vector3 = ZombieModel.crawl_points(f + 0.01)["hand"]
+		planted = planted and absf(a.y - ZombieModel.CRAWL_HAND_Y) < 0.002 and absf(b.y - ZombieModel.CRAWL_HAND_Y) < 0.002
+		planted = planted and absf((a.z - b.z) - 0.01 * ZombieModel.CRAWL_STRIDE) < 0.002
+	_check(planted, "the planted hand stays on the ground through its stance and moves back %.2f m per stride" % ZombieModel.CRAWL_STRIDE)
+	# Recovery: the hand lifts off the ground, comes forward and lands at the start.
+	var top: float = 0.0
+	var front: float = -INF
+	var back_z: float = INF
+	for k in 21:
+		var f: float = ZombieModel.CRAWL_STANCE + (1.0 - ZombieModel.CRAWL_STANCE) * float(k) / 20.0
+		var r: Vector3 = ZombieModel.crawl_points(f)["hand"]
+		top = maxf(top, r.y)
+		back_z = minf(back_z, r.z)
+		front = maxf(front, r.z)
+	var landed: Vector3 = ZombieModel.crawl_points(1.0)["hand"]
+	var start: Vector3 = ZombieModel.crawl_points(0.0)["hand"]
+	_check(top > ZombieModel.CRAWL_HAND_Y + 0.07 and top < ZombieModel.CRAWL_HAND_Y + ZombieModel.CRAWL_LIFT + 0.01
+		and landed.distance_to(start) < 0.001 and front > back_z + 0.5 * ZombieModel.CRAWL_STRIDE * ZombieModel.CRAWL_STANCE,
+		"recovery: the hand lifts %.2f m and comes forward %.2f m, back to its start" % [top - ZombieModel.CRAWL_HAND_Y, front - back_z])
+	# The arm's phase runs at the crawl speed over one stride: the body's
+	# travel per second equals the hand's stance speed, so the planting holds.
+	var speed: float = 2.2 * GameData.CRAWL_SPEED_RATIO
+	var rate: float = ZombieModel.crawl_phase_rate(2.2)
+	_check(absf(rate * ZombieModel.CRAWL_STRIDE / TAU - speed) < 0.0001,
+		"the crawl phase rate (%.2f rad/s) matches the crawl speed (%.2f m/s) over one stride" % [rate, speed])
+	var dt: float = 0.02
+	var moved: float = ZombieModel.crawl_points(0.1)["hand"].z - ZombieModel.crawl_points(0.1 + rate * dt / TAU)["hand"].z
+	_check(absf(moved - speed * dt) < 0.002,
+		"in %.2f s the Crawler moves %.1f mm and its planted hand moves back %.1f mm (same)" % [dt, speed * dt * 1000.0, moved * 1000.0])
+	_check(ZombieModel.crawl_stroke(0.25).y == 0.0 and ZombieModel.crawl_stroke(0.75).y > 0.0 and ZombieModel.crawl_stroke(1.0).x == ZombieModel.crawl_stroke(0.0).x,
+		"crawl_stroke: stance on the ground, recovery lifted, the cycle wraps")
 
 
 ## Aim follows the posed model (not the standing height): the head and chest

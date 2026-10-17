@@ -6,12 +6,18 @@ extends SceneTree
 ## (24 random looks), crowd (48 random zombies), weapons (the 5 guns),
 ## hands (Recruit holding each gun), hands_vanguard, fp_<weapon id> (first person),
 ## specials / specials_back (all kinds), bench_specials (150 mixed enemies), bench
-## and bench_empty (GPU/CPU timings of 150 zombies).
+## and bench_empty (GPU/CPU timings of 150 zombies), crawl (3 Crawlers, 3/4
+## front), crawl_side, crawl_close (one Crawler, low side view: the hands),
+## legless (two legs-gone zombies mid-topple), flank (shirtless flank wound),
+## face (eyes and sockets). A third argument sets the animation time (seconds)
+## of a still, e.g. crawl_close 0.4.
 
 const CENTER := Vector3(20, 0, 20)
 
 var _out: String
 var _shot: String = "lineup"
+## Animation time of the still (optional 3rd argument): stride frames of a Crawler.
+var _now: float = -1.0
 var _frames: int = 0
 var _world: Node3D
 var _camera: Camera3D
@@ -34,6 +40,8 @@ func _initialize() -> void:
 	_out = args[0]
 	if args.size() > 1:
 		_shot = args[1]
+	if args.size() > 2:
+		_now = float(args[2])
 	DisplayServer.window_set_size(Vector2i(1600, 900))
 	_world = Node3D.new()
 	root.add_child(_world)
@@ -109,6 +117,16 @@ func _zombie_at(pos: Vector3, speed: float, velocity: Vector3 = Vector3.ZERO) ->
 	var i: int = _horde.add(pos, GameData.EnemyKind.WALKER, rng)
 	_horde.speeds[i] = speed
 	_horde.velocities[i] = velocity
+	_horde.attack_cd[i] = 99.0
+	return i
+
+
+## A Crawler walking towards +Z (its legs are gone from the start).
+func _crawler(pos: Vector3, speed: float) -> int:
+	var rng := RandomNumberGenerator.new()
+	var i: int = _horde.add(pos, GameData.EnemyKind.CRAWLER, rng)
+	_horde.speeds[i] = speed
+	_horde.velocities[i] = Vector3(0, 0, 0.9)
 	_horde.attack_cd[i] = 99.0
 	return i
 
@@ -229,6 +247,55 @@ func _setup() -> void:
 			_camera.fov = 70
 			DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 			RenderingServer.viewport_set_measure_render_time(root.get_viewport_rid(), true)
+		"crawl", "crawl_side", "crawl_close":
+			# Crawlers moving towards +Z: a civilian, a worker with a missing
+			# forearm (the stump hand) and a shirtless one (the flank wound).
+			var civ: float = _speed_where(func(l: Dictionary) -> bool: return l["variant"] == 0 and l["missing"] == ZombieModel.Missing.NONE)
+			var stump: float = _speed_where(func(l: Dictionary) -> bool: return l["variant"] == 1 and l["missing"] == ZombieModel.Missing.FOREARM)
+			var shirtless: float = _speed_where(func(l: Dictionary) -> bool: return l["variant"] == 3 and l["missing"] == ZombieModel.Missing.NONE)
+			if _shot == "crawl":
+				_crawler(CENTER + Vector3(-1.5, 0, 0), civ)
+				_crawler(CENTER + Vector3(0, 0, 0), stump)
+				_crawler(CENTER + Vector3(1.5, 0, 0), shirtless)
+				_camera.position = CENTER + Vector3(0.6, 1.5, 4.6)
+				_camera.look_at(CENTER + Vector3(0, 0.45, 0))
+				_camera.fov = 45
+			elif _shot == "crawl_close":
+				_crawler(CENTER, civ)
+				_camera.position = CENTER + Vector3(1.25, 0.5, 0.6)
+				_camera.look_at(CENTER + Vector3(0, 0.3, 0.3))
+				_camera.fov = 40
+			else:
+				_crawler(CENTER, stump)
+				_camera.position = CENTER + Vector3(2.4, 0.95, 0.2)
+				_camera.look_at(CENTER + Vector3(0, 0.4, 0))
+				_camera.fov = 40
+		"legless":
+			# Legs just gone: a worker with a missing forearm and a shirtless
+			# zombie half-way through the topple (progress 0.5).
+			var stump: float = _speed_where(func(l: Dictionary) -> bool: return l["variant"] == 1 and l["missing"] == ZombieModel.Missing.FOREARM)
+			var shirtless: float = _speed_where(func(l: Dictionary) -> bool: return l["variant"] == 3 and l["missing"] == ZombieModel.Missing.NONE)
+			var a: int = _zombie_at(CENTER + Vector3(-0.8, 0, 0), stump)
+			_horde.amputate(a)
+			_horde.crawl_delay[a] = GameData.CRAWL_TRANSITION_TIME * 0.5
+			var b: int = _zombie_at(CENTER + Vector3(0.8, 0, 0), shirtless)
+			_horde.amputate(b)
+			_horde.crawl_delay[b] = GameData.CRAWL_TRANSITION_TIME * 0.5
+			_camera.position = CENTER + Vector3(0.6, 1.4, 3.6)
+			_camera.look_at(CENTER + Vector3(0, 0.6, 0))
+			_camera.fov = 45
+		"flank":
+			var shirtless: float = _speed_where(func(l: Dictionary) -> bool: return l["variant"] == 3 and l["missing"] == ZombieModel.Missing.NONE)
+			_zombie_at(CENTER, shirtless)
+			_camera.position = CENTER + Vector3(0.5, 1.35, 1.5)
+			_camera.look_at(CENTER + Vector3(0, 1.2, 0))
+			_camera.fov = 40
+		"face":
+			var hair: float = _speed_where(func(l: Dictionary) -> bool: return l["variant"] == 0 and l["hair"] > 0 and l["missing"] == ZombieModel.Missing.NONE)
+			_zombie_at(CENTER, hair)
+			_camera.position = CENTER + Vector3(0, 1.8, 1.1)
+			_camera.look_at(CENTER + Vector3(0, 1.75, 0))
+			_camera.fov = 28
 		_:
 			if _shot.begins_with("fp_"):
 				var id := StringName(_shot.substr(3))
@@ -251,7 +318,7 @@ func _process(delta: float) -> bool:
 	for child: Node in _world.get_children():
 		if child.has_method("animate"):
 			child.call("animate", 0.0, _t, false, delta)
-	var now: float = 0.35 if _shot != "walk" else 0.55
+	var now: float = _now if _now >= 0.0 else (0.35 if _shot != "walk" else 0.55)
 	if _shot.begins_with("bench"):
 		now = _t
 		if _frames > 60 and _frames <= 560:

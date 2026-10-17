@@ -22,6 +22,7 @@ func _initialize() -> void:
 	_test_variants()
 	_test_looks()
 	_test_hiding()
+	_test_cavity_and_stumps()
 	_test_head()
 	_test_view()
 	_test_timing()
@@ -207,6 +208,52 @@ func _test_hiding() -> void:
 		if bx["show_a"] == ZombieModel.Show.HOOD:
 			hood_boxes += 1
 	_check(hood["variant"] == 0 and hood["sleeves"] == ZombieModel.Sleeves.LONG and hood_boxes >= 3, "hoodies: hood, pocket and drawstrings, long sleeves")
+
+
+## The shirtless flank is a cavity cut into the torso: nothing covers the
+## opening, a dark lining (MOUTH kind) lines it and the ribs sit back inside.
+## The hip stumps differ in length per variant, each with a bone tip.
+func _test_cavity_and_stumps() -> void:
+	var open_flank: bool = true
+	var dark: int = 0
+	var ribs_inside: bool = true
+	var ribs: int = 0
+	for b: Dictionary in _visible(3, 1):
+		var c: Vector3 = b["c"]
+		var s: Vector3 = b["s"]
+		if b["part"] == ZombieModel.Part.TORSO and c.z > 0.0:
+			var covers: bool = c.x - s.x * 0.5 <= -0.17 and c.x + s.x * 0.5 >= 0.09 and c.y - s.y * 0.5 <= 1.14 and c.y + s.y * 0.5 >= 1.34
+			open_flank = open_flank and not covers
+		if b["kind"] == ZombieModel.Kind.MOUTH:
+			dark += 1
+		if b["kind"] == ZombieModel.Kind.BONE and b["part"] == ZombieModel.Part.TORSO:
+			ribs += 1
+			ribs_inside = ribs_inside and c.z > 0.02 and c.z < 0.06 and c.y > 1.14 and c.y < 1.34
+	_check(open_flank and dark >= 5 and ribs == 3 and ribs_inside,
+		"shirtless flank: an open cavity (%d dark lining boxes), three ribs set back inside it" % dark)
+	var lengths: Array[float] = []
+	var tips: bool = true
+	for v in ZombieModel.VARIANTS:
+		var flesh: Dictionary = {}
+		var tip: Dictionary = {}
+		for b: Dictionary in ZombieModel.boxes(v):
+			if b["show_a"] != ZombieModel.Show.LEGLESS or (b["c"] as Vector3).x <= 0.0:
+				continue
+			if b["kind"] == ZombieModel.Kind.FLESH:
+				flesh = b
+			elif b["kind"] == ZombieModel.Kind.BONE:
+				tip = b
+		if flesh.is_empty() or tip.is_empty():
+			tips = false
+			continue
+		lengths.append((flesh["s"] as Vector3).y)
+		var flesh_end: float = (flesh["c"] as Vector3).y - (flesh["s"] as Vector3).y * 0.5
+		tips = tips and (tip["c"] as Vector3).y - (tip["s"] as Vector3).y * 0.5 < flesh_end - 0.02
+	var distinct: Dictionary = {}
+	for l: float in lengths:
+		distinct[snappedf(l, 0.001)] = true
+	_check(tips and lengths.size() == ZombieModel.VARIANTS and distinct.size() == ZombieModel.VARIANTS,
+		"hip stumps: %d different lengths (%s m) per variant, each with a bone tip past the flesh" % [distinct.size(), lengths])
 
 
 func _test_head() -> void:

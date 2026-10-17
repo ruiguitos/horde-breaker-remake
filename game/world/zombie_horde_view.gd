@@ -187,9 +187,11 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 		# The phase advances with the enemy's own (constant) rolled speed, so it
 		# stays continuous when the horde compacts its arrays.
 		var offset: float = fmod(base_speed * 977.0, TAU)
-		# A Crawler pulls itself along more slowly than a walker steps.
-		var pace: float = 0.7 if kinds[i] == GameData.EnemyKind.CRAWLER else 1.0
-		var phase: float = offset + now * (3.0 + base_speed * 2.6) * pace
+		# A Crawler's phase runs at its crawl speed over one stride, so its
+		# planted hands keep pace with the ground (ZombieModel.crawl_phase_rate).
+		# A Crawler's hands advance with the metres it really walked (h.travel), so
+		# they stay planted when it slows, turns or is blocked; a walker keeps time.
+		var phase: float = offset + h.travel[i] * TAU / ZombieModel.CRAWL_STRIDE if kinds[i] == GameData.EnemyKind.CRAWLER else offset + now * (3.0 + base_speed * 2.6)
 		var act: float = 0.0
 		if close:
 			var since: float = t.attack_interval - attack_cd[i]
