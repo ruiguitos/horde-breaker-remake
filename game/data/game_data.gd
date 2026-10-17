@@ -383,7 +383,9 @@ static func card_category(id: StringName) -> StringName:
 
 
 ## Horde
-const MAX_ALIVE: int = 150
+const MAX_ALIVE: int = 150  ## base enemies alive; Threat, Swarm and Hazard Pay raise it
+## Absolute ceiling on enemies alive at once, whatever raises the limit (decided: up to 300).
+const HORDE_CAP: int = 300
 const SPAWN_MIN_DIST: float = 28.0
 const SPAWN_MAX_DIST: float = 45.0
 const ATTACK_REACH: float = 1.1

@@ -468,6 +468,8 @@ func load_context(ctx: RunContext) -> void:
 			director.max_alive += 40
 		&"elite":
 			director.specials_mult = 2.0
+	# One ceiling for every spawn (ring, nests, boss summons): see GameData.HORDE_CAP.
+	director.max_alive = mini(director.max_alive, GameData.HORDE_CAP)
 	# Fresh ammo (start or Ammo Crate) fills to the max; carried ammo is capped.
 	for w in weapons.size():
 		if weapons[w].max_ammo > 0:
@@ -3471,10 +3473,9 @@ func _nest_brood(n: int) -> void:
 	var p: Vector3 = nest_pos[n]
 	if power_ups.spawn_delay > 0.0 or _flat_dist(p, player_pos) > nest_wake_range():
 		return
-	var cap: int = mini(director.max_alive, GameData.MAX_ALIVE)
 	var near: int = horde.query_radius(p, NEST_BROOD_RADIUS).size()
 	for k in nest_spawn_count():
-		if horde.count >= cap or near >= nest_brood_cap():
+		if horde.count >= director.max_alive or near >= nest_brood_cap():
 			return
 		var spot: Vector3 = _nest_spawn_spot(p)
 		if spot == Vector3.INF:
@@ -3679,13 +3680,13 @@ func _update_boss(dt: float, b: int) -> void:
 		_summon_cd = GameData.BOSS_SUMMON_INTERVAL
 		if boss_enraged:
 			var bpos: Vector3 = bp + Vector3(0, 0, 3.5)
-			if can_spawn_at(bpos):
+			if horde.count < director.max_alive and can_spawn_at(bpos):
 				horde.add(bpos, GameData.EnemyKind.BRUTE, rng)
 		for k in GameData.BOSS_SUMMON_COUNT:
 			var p: Vector3 = bp + Vector3(cos(k * 1.05), 0, sin(k * 1.05)) * 3.0
 			# Free and reachable: a summon behind a wall (in a closed yard, or
 			# outside an expedition part's play area) would never reach the fight.
-			if can_spawn_at(p):
+			if horde.count < director.max_alive and can_spawn_at(p):
 				horde.add(p, GameData.EnemyKind.RUNNER, rng)
 
 
@@ -3757,7 +3758,7 @@ static func spawn_sector(center: Vector3, p: Vector3) -> int:
 
 
 func _spawn_enemy() -> void:
-	if horde.count >= GameData.MAX_ALIVE or power_ups.spawn_delay > 0.0:
+	if horde.count >= director.max_alive or power_ups.spawn_delay > 0.0:
 		return
 	spawn_requests += 1
 	# Uniform over the free ground of the ring (rejection sampling): no side

@@ -481,6 +481,8 @@ func _test_spawn_sectors() -> void:
 	var radii: Array = [mid, GameData.SPAWN_MIN_DIST, GameData.SPAWN_MAX_DIST, 52.0, 60.0]
 	for path in ["normal", "fallback"]:
 		var run: IslandRun = _open_run(4242)
+		# Normal spawns obey the director's limit (at most GameData.HORDE_CAP).
+		run.director.max_alive = GameData.HORDE_CAP
 		var c: Vector3 = run.player_pos
 		var hist := PackedInt32Array()
 		hist.resize(IslandRun.SPAWN_SECTORS)
@@ -511,7 +513,9 @@ func _test_spawn_sectors() -> void:
 	# Determinism: two runs with the same seed spawn on the same spots, and
 	# the gameplay RNG does not move them.
 	var a: IslandRun = _open_run(99)
+	a.director.max_alive = GameData.HORDE_CAP
 	var b: IslandRun = _open_run(99)
+	b.director.max_alive = GameData.HORDE_CAP
 	b.rng.randf()  # spawns have their own RNG
 	var same: bool = true
 	for k in 64:
