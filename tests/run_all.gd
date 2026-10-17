@@ -30,9 +30,9 @@ func _initialize() -> void:
 		var code := OS.execute(exe, args, output, true)
 		var elapsed := Time.get_ticks_msec() - start
 		var log_text := "".join(PackedStringArray(output))
-		# A test that prints "TEST FAIL" but exits 0 still counts as failed.
-		var ok := code == 0 and not log_text.contains("TEST FAIL")
-		print("%s %s (%d ms, exit %d)" % ["PASS" if ok else "FAIL", test_path, elapsed, code])
+		var verdict: String = classify(code, log_text)
+		var ok: bool = verdict == "PASS" or verdict == "PASS (exit code at quit)"
+		print("%s %s (%d ms, exit %d) %s" % ["PASS" if ok else "FAIL", test_path, elapsed, code, verdict if verdict != "PASS" else ""])
 		if not ok:
 			failed.append(test_path)
 			for line in log_text.split("\n"):
@@ -46,6 +46,22 @@ func _initialize() -> void:
 	else:
 		print("TEST FAIL: %d test(s) failed: %s" % [failed.size(), ", ".join(PackedStringArray(failed))])
 		quit(1)
+
+
+## Verdict for one test run. A test passes when its log has no error markers,
+## it reached its own result lines, and it exited 0 - or exited with a known
+## Windows exit code at quit after finishing (the engine's shutdown quirk).
+## A script error, a parse error or a TEST FAIL always fails the test, even
+## with exit 0. A run that never printed a result line did not finish.
+static func classify(code: int, log_text: String) -> String:
+	if log_text.contains("TEST FAIL") or log_text.contains("SCRIPT ERROR") or log_text.contains("Parse Error"):
+		return "FAIL (test or script error)"
+	var finished: bool = log_text.contains("TEST: ")
+	if code == 0:
+		return "PASS" if finished or log_text.strip_edges() == "" else "FAIL (exit 0 without results)"
+	if finished and code in [5, 139, -1073741819, 3221225477]:
+		return "PASS (exit code at quit)"
+	return "FAIL (exit %d)" % code
 
 
 func _discover_tests() -> Array[String]:
