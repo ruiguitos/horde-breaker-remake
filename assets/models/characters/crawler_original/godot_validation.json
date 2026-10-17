@@ -1,0 +1,79 @@
+{
+  "bounds_max_m": [
+    0.299190014600754,
+    0.833999991416931,
+    0.30935999751091
+  ],
+  "bounds_min_m": [
+    -0.297969996929169,
+    -0.00000000745058059692383,
+    -1.02321004867554
+  ],
+  "engine": "4.7.2-stable (official)",
+  "failures": [],
+  "glb_sha256": "ba3a74b2b9fc8a74017056f151e86ad00fef9b250dee4d1d5606d8935974afd9",
+  "material_names": [
+    "skin_rot",
+    "flesh_wound",
+    "bone",
+    "hair_dark",
+    "cloth_shirt",
+    "cloth_trousers"
+  ],
+  "mesh_count": 8,
+  "node_names": [
+    "Torso",
+    "Arm_Left",
+    "Hand_Left",
+    "Arm_Right",
+    "Hand_Right",
+    "Head",
+    "Hip_Stump_Left",
+    "Hip_Stump_Right"
+  ],
+  "normals_tangents_uvs_vertex_tints_imported": true,
+  "passed": true,
+  "pivots_godot_m": {
+    "Arm_Left": [
+      -0.204999998211861,
+      0.46000000834465,
+      -0.579999983310699
+    ],
+    "Arm_Right": [
+      0.204999998211861,
+      0.46000000834465,
+      -0.579999983310699
+    ],
+    "Hand_Left": [
+      -0.241999998688698,
+      0.0559999942779541,
+      -0.845000028610229
+    ],
+    "Hand_Right": [
+      0.241999998688698,
+      0.0559999942779541,
+      -0.834999978542328
+    ],
+    "Head": [
+      0.0,
+      0.589999973773956,
+      -0.754999995231628
+    ],
+    "Hip_Stump_Left": [
+      -0.0850000008940697,
+      0.245000004768372,
+      -0.0149999996647239
+    ],
+    "Hip_Stump_Right": [
+      0.0850000008940697,
+      0.245000004768372,
+      -0.0149999996647239
+    ],
+    "Torso": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "triangle_count": 4728
+}

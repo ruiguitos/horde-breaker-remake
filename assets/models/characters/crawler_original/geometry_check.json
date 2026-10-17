@@ -1,0 +1,90 @@
+{
+  "Torso": {
+    "triangles": 1394,
+    "connected_components": 1,
+    "component_volumes_m3": [
+      0.05280357207579082
+    ],
+    "signed_volume_m3": 0.0528035792962811,
+    "nonmanifold_edges": 0,
+    "degenerate_faces": 0,
+    "self_intersection_candidates": 0
+  },
+  "Head": {
+    "triangles": 1296,
+    "connected_components": 1,
+    "component_volumes_m3": [
+      0.010741502478396114
+    ],
+    "signed_volume_m3": 0.010741508621448652,
+    "nonmanifold_edges": 0,
+    "degenerate_faces": 0,
+    "self_intersection_candidates": 0
+  },
+  "Arm_Left": {
+    "triangles": 208,
+    "connected_components": 1,
+    "component_volumes_m3": [
+      0.006904639506520501
+    ],
+    "signed_volume_m3": 0.006904637417629809,
+    "nonmanifold_edges": 0,
+    "degenerate_faces": 0,
+    "self_intersection_candidates": 0
+  },
+  "Arm_Right": {
+    "triangles": 202,
+    "connected_components": 1,
+    "component_volumes_m3": [
+      0.006901721565299113
+    ],
+    "signed_volume_m3": 0.006901721612836229,
+    "nonmanifold_edges": 0,
+    "degenerate_faces": 0,
+    "self_intersection_candidates": 0
+  },
+  "Hand_Left": {
+    "triangles": 402,
+    "connected_components": 1,
+    "component_volumes_m3": [
+      0.0008420983357855979
+    ],
+    "signed_volume_m3": 0.0008420980496283995,
+    "nonmanifold_edges": 0,
+    "degenerate_faces": 0,
+    "self_intersection_candidates": 0
+  },
+  "Hand_Right": {
+    "triangles": 454,
+    "connected_components": 1,
+    "component_volumes_m3": [
+      0.0008128182745963386
+    ],
+    "signed_volume_m3": 0.0008128192630750472,
+    "nonmanifold_edges": 0,
+    "degenerate_faces": 0,
+    "self_intersection_candidates": 0
+  },
+  "Hip_Stump_Left": {
+    "triangles": 384,
+    "connected_components": 1,
+    "component_volumes_m3": [
+      0.006574627803414519
+    ],
+    "signed_volume_m3": 0.006574627400338764,
+    "nonmanifold_edges": 0,
+    "degenerate_faces": 0,
+    "self_intersection_candidates": 0
+  },
+  "Hip_Stump_Right": {
+    "triangles": 388,
+    "connected_components": 1,
+    "component_volumes_m3": [
+      0.006574724786256721
+    ],
+    "signed_volume_m3": 0.006574724925743684,
+    "nonmanifold_edges": 0,
+    "degenerate_faces": 0,
+    "self_intersection_candidates": 0
+  }
+}

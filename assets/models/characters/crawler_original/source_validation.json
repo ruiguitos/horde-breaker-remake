@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "meshes": 8,
+  "triangles": 4728,
+  "only_named_mesh_objects": true,
+  "cameras_lights_armatures_actions": 0,
+  "modifiers": 0,
+  "uv_layouts_per_mesh": 1,
+  "root_identity": true,
+  "neck_mount_shared_interior_verified": true,
+  "rotations_applied": true,
+  "scales_applied": true,
+  "metre_scale": true,
+  "blend_sha256": "f8b11236aa30d64d022ee7183f2b9beb5798bb33f0b7bf1c3de69573a9c7fe1a",
+  "glb_sha256": "ba3a74b2b9fc8a74017056f151e86ad00fef9b250dee4d1d5606d8935974afd9"
+}

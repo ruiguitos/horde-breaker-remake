@@ -1,0 +1,470 @@
+{
+  "blender_version": "5.2.2 LTS",
+  "file": "crawler.glb",
+  "all_checks_passed": true,
+  "units": "metres",
+  "axes": {
+    "up": "+Y",
+    "forward": "-Z"
+  },
+  "height_definition": "Head: authored skull centre. Chest: sternum-region centre; not skin surface or joint pivot.",
+  "head_height_m": 0.6899999976158142,
+  "chest_height_m": 0.4399999976158142,
+  "head_bounds_center_height_m": 0.6969999969005585,
+  "head_landmark_godot_m": [
+    0.0,
+    0.6899999976158142,
+    -0.8109999895095825
+  ],
+  "chest_landmark_godot_m": [
+    0.0,
+    0.4399999976158142,
+    -0.5099999904632568
+  ],
+  "total_length_m": 1.3325700461864471,
+  "total_width_m": 0.5971600115299225,
+  "head_to_stumps_length_m": 1.3018600046634674,
+  "bounds_min_godot_m": [
+    -0.2979699969291687,
+    0.0,
+    -1.023210048675537
+  ],
+  "bounds_max_godot_m": [
+    0.2991900146007538,
+    0.8339999914169312,
+    0.30935999751091003
+  ],
+  "minimum_ground_clearance_m": 0.0,
+  "triangle_count": 4728,
+  "mesh_count": 8,
+  "node_names": [
+    "Arm_Left",
+    "Arm_Right",
+    "Hand_Left",
+    "Hand_Right",
+    "Head",
+    "Hip_Stump_Left",
+    "Hip_Stump_Right",
+    "Torso"
+  ],
+  "material_names": [
+    "bone",
+    "cloth_shirt",
+    "cloth_trousers",
+    "flesh_wound",
+    "hair_dark",
+    "skin_rot"
+  ],
+  "materials": {
+    "skin_rot": {
+      "base_color": [
+        0.18782077729701996,
+        0.24228112399578094,
+        0.19120168685913086,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.8600000143051147
+    },
+    "flesh_wound": {
+      "base_color": [
+        0.16202937066555023,
+        0.014443843625485897,
+        0.017641954123973846,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.3199999928474426
+    },
+    "bone": {
+      "base_color": [
+        0.6514056324958801,
+        0.5583403706550598,
+        0.3613067865371704,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.7900000214576721
+    },
+    "cloth_shirt": {
+      "base_color": [
+        0.03433980792760849,
+        0.04666508734226227,
+        0.03688944876194,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9399999976158142
+    },
+    "hair_dark": {
+      "base_color": [
+        0.019382361322641373,
+        0.021219009533524513,
+        0.01599629409611225,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9200000166893005
+    },
+    "cloth_trousers": {
+      "base_color": [
+        0.03688944876194,
+        0.04666508734226227,
+        0.05612849071621895,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9599999785423279
+    }
+  },
+  "meshes": {
+    "Hand_Left": {
+      "triangles": 402,
+      "pivot_godot_m": [
+        -0.24199999868869781,
+        0.0560000017285347,
+        -0.8450000286102295
+      ],
+      "bounds_min_godot_m": [
+        -0.29194000363349915,
+        0.0,
+        -1.023210048675537
+      ],
+      "bounds_max_godot_m": [
+        -0.15255999565124512,
+        0.08100000023841858,
+        -0.8320000171661377
+      ],
+      "ground_clearance_m": 0.0,
+      "uv": {
+        "in_0_1": true,
+        "degenerate_triangles": 0,
+        "overlapping_triangle_pairs": 0,
+        "overlap_area_tolerance": 1e-10
+      },
+      "uv_density_min": 0.40852770573346797,
+      "uv_density_max": 0.40873589976188496
+    },
+    "Arm_Left": {
+      "triangles": 208,
+      "pivot_godot_m": [
+        -0.20499999821186066,
+        0.46000000834465027,
+        -0.5799999833106995
+      ],
+      "bounds_min_godot_m": [
+        -0.2979699969291687,
+        0.0030600130558013916,
+        -0.8550800085067749
+      ],
+      "bounds_max_godot_m": [
+        -0.13394999504089355,
+        0.47380998730659485,
+        -0.5063700079917908
+      ],
+      "ground_clearance_m": 0.0030600130558013916,
+      "uv": {
+        "in_0_1": true,
+        "degenerate_triangles": 0,
+        "overlapping_triangle_pairs": 0,
+        "overlap_area_tolerance": 1e-10
+      },
+      "uv_density_min": 0.40851998248376287,
+      "uv_density_max": 0.40864920882844014
+    },
+    "Hand_Right": {
+      "triangles": 454,
+      "pivot_godot_m": [
+        0.24199999868869781,
+        0.0560000017285347,
+        -0.8349999785423279
+      ],
+      "bounds_min_godot_m": [
+        0.15255999565124512,
+        0.0,
+        -1.0132100582122803
+      ],
+      "bounds_max_godot_m": [
+        0.29100000858306885,
+        0.08100000023841858,
+        -0.8220000267028809
+      ],
+      "ground_clearance_m": 0.0,
+      "uv": {
+        "in_0_1": true,
+        "degenerate_triangles": 0,
+        "overlapping_triangle_pairs": 0,
+        "overlap_area_tolerance": 1e-10
+      },
+      "uv_density_min": 0.408481698778579,
+      "uv_density_max": 0.4087616202892393
+    },
+    "Arm_Right": {
+      "triangles": 202,
+      "pivot_godot_m": [
+        0.20499999821186066,
+        0.46000000834465027,
+        -0.5799999833106995
+      ],
+      "bounds_min_godot_m": [
+        0.1304900050163269,
+        0.0030600130558013916,
+        -0.8450800180435181
+      ],
+      "bounds_max_godot_m": [
+        0.2991900146007538,
+        0.47435998916625977,
+        -0.49720001220703125
+      ],
+      "ground_clearance_m": 0.0030600130558013916,
+      "uv": {
+        "in_0_1": true,
+        "degenerate_triangles": 0,
+        "overlapping_triangle_pairs": 0,
+        "overlap_area_tolerance": 1e-10
+      },
+      "uv_density_min": 0.40851662206855455,
+      "uv_density_max": 0.4086462609482564
+    },
+    "Head": {
+      "triangles": 1296,
+      "pivot_godot_m": [
+        0.0,
+        0.5899999737739563,
+        -0.7549999952316284
+      ],
+      "bounds_min_godot_m": [
+        -0.12933999300003052,
+        0.5600000023841858,
+        -0.9925000071525574
+      ],
+      "bounds_max_godot_m": [
+        0.12933999300003052,
+        0.8339999914169312,
+        -0.688319981098175
+      ],
+      "ground_clearance_m": 0.5600000023841858,
+      "uv": {
+        "in_0_1": true,
+        "degenerate_triangles": 0,
+        "overlapping_triangle_pairs": 0,
+        "overlap_area_tolerance": 1e-10
+      },
+      "uv_density_min": 0.40851401491440786,
+      "uv_density_max": 0.4087535123095912
+    },
+    "Hip_Stump_Left": {
+      "triangles": 384,
+      "pivot_godot_m": [
+        -0.08500000089406967,
+        0.24500000476837158,
+        -0.014999999664723873
+      ],
+      "bounds_min_godot_m": [
+        -0.17599999904632568,
+        0.12000000476837158,
+        -0.05000000074505806
+      ],
+      "bounds_max_godot_m": [
+        -0.00899999588727951,
+        0.32600000500679016,
+        0.30935999751091003
+      ],
+      "ground_clearance_m": 0.12000000476837158,
+      "uv": {
+        "in_0_1": true,
+        "degenerate_triangles": 0,
+        "overlapping_triangle_pairs": 0,
+        "overlap_area_tolerance": 1e-10
+      },
+      "uv_density_min": 0.4084802976109483,
+      "uv_density_max": 0.4087270916807543
+    },
+    "Hip_Stump_Right": {
+      "triangles": 388,
+      "pivot_godot_m": [
+        0.08500000089406967,
+        0.24500000476837158,
+        -0.014999999664723873
+      ],
+      "bounds_min_godot_m": [
+        0.00899999588727951,
+        0.12000000476837158,
+        -0.05000000074505806
+      ],
+      "bounds_max_godot_m": [
+        0.17599999904632568,
+        0.32600000500679016,
+        0.30935999751091003
+      ],
+      "ground_clearance_m": 0.12000000476837158,
+      "uv": {
+        "in_0_1": true,
+        "degenerate_triangles": 0,
+        "overlapping_triangle_pairs": 0,
+        "overlap_area_tolerance": 1e-10
+      },
+      "uv_density_min": 0.40851684689880424,
+      "uv_density_max": 0.40864210760480213
+    },
+    "Torso": {
+      "triangles": 1394,
+      "pivot_godot_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "bounds_min_godot_m": [
+        -0.20749999582767487,
+        0.1574999988079071,
+        -0.7870000004768372
+      ],
+      "bounds_max_godot_m": [
+        0.20749999582767487,
+        0.6539999842643738,
+        0.03500000014901161
+      ],
+      "ground_clearance_m": 0.1574999988079071,
+      "uv": {
+        "in_0_1": true,
+        "degenerate_triangles": 0,
+        "overlapping_triangle_pairs": 0,
+        "overlap_area_tolerance": 1e-10
+      },
+      "uv_density_min": 0.40853499791307335,
+      "uv_density_max": 0.40867639808559325
+    }
+  },
+  "geometry": {
+    "Torso": {
+      "triangles": 1394,
+      "connected_components": 1,
+      "component_volumes_m3": [
+        0.05280357207579082
+      ],
+      "signed_volume_m3": 0.0528035792962811,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "self_intersection_candidates": 0
+    },
+    "Head": {
+      "triangles": 1296,
+      "connected_components": 1,
+      "component_volumes_m3": [
+        0.010741502478396114
+      ],
+      "signed_volume_m3": 0.010741508621448652,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "self_intersection_candidates": 0
+    },
+    "Arm_Left": {
+      "triangles": 208,
+      "connected_components": 1,
+      "component_volumes_m3": [
+        0.006904639506520501
+      ],
+      "signed_volume_m3": 0.006904637417629809,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "self_intersection_candidates": 0
+    },
+    "Arm_Right": {
+      "triangles": 202,
+      "connected_components": 1,
+      "component_volumes_m3": [
+        0.006901721565299113
+      ],
+      "signed_volume_m3": 0.006901721612836229,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "self_intersection_candidates": 0
+    },
+    "Hand_Left": {
+      "triangles": 402,
+      "connected_components": 1,
+      "component_volumes_m3": [
+        0.0008420983357855979
+      ],
+      "signed_volume_m3": 0.0008420980496283995,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "self_intersection_candidates": 0
+    },
+    "Hand_Right": {
+      "triangles": 454,
+      "connected_components": 1,
+      "component_volumes_m3": [
+        0.0008128182745963386
+      ],
+      "signed_volume_m3": 0.0008128192630750472,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "self_intersection_candidates": 0
+    },
+    "Hip_Stump_Left": {
+      "triangles": 384,
+      "connected_components": 1,
+      "component_volumes_m3": [
+        0.006574627803414519
+      ],
+      "signed_volume_m3": 0.006574627400338764,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "self_intersection_candidates": 0
+    },
+    "Hip_Stump_Right": {
+      "triangles": 388,
+      "connected_components": 1,
+      "component_volumes_m3": [
+        0.006574724786256721
+      ],
+      "signed_volume_m3": 0.006574724925743684,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "self_intersection_candidates": 0
+    }
+  },
+  "origin_check": {
+    "passed": true,
+    "root": "Torso",
+    "position_m": [
+      0,
+      0,
+      0
+    ],
+    "description": "Ground directly under hips; joint translations preserved, all rotations identity and scales one."
+  },
+  "uv_check": {
+    "passed": true,
+    "layouts_per_mesh": 1,
+    "global_atlas": {
+      "in_0_1": true,
+      "degenerate_triangles": 0,
+      "overlapping_triangle_pairs": 0,
+      "overlap_area_tolerance": 1e-10
+    },
+    "texel_density_max_to_min_ratio": 1.0006887056240812,
+    "method": "Smart planar islands, average world area scale, one global non-overlapping 0-1 pack. Exported UV triangles clipped pairwise."
+  },
+  "hands_ground_contact_check": {
+    "passed": true,
+    "tolerance_m": 1e-05
+  },
+  "normals_check": {
+    "passed": true,
+    "source": "Every GLB primitive",
+    "finite_unit_vectors": true
+  },
+  "tangents_check": {
+    "passed": true,
+    "source": "Every GLB primitive",
+    "finite_unit_vectors": true,
+    "orthogonal_to_normal": true
+  },
+  "no_textures_cameras_lights_armatures_animations": true,
+  "limitations": [
+    "BVH non-adjacent triangle audit is a numerical check, not an exact solid-intersection proof.",
+    "Anatomical height landmarks are authored markers, not automatically inferred from the silhouette."
+  ]
+}
