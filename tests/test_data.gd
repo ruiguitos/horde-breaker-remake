@@ -32,8 +32,8 @@ func _initialize() -> void:
 		"registry index query: tier I perks")
 	# World data: enemies follow EnemyKind, routes exclude the volcano.
 	var enemies: Array[GameData.EnemyType] = GameData.enemy_types()
-	_check(enemies.size() == 7 and enemies[GameData.EnemyKind.BRUTE].id == &"brute" and enemies[GameData.EnemyKind.BOSS].id == &"behemoth",
-		"7 enemy types indexed by EnemyKind")
+	_check(enemies.size() == 8 and enemies[GameData.EnemyKind.BRUTE].id == &"brute" and enemies[GameData.EnemyKind.BOSS].id == &"behemoth"
+		and enemies[GameData.EnemyKind.CRAWLER].id == &"crawler", "8 enemy types indexed by EnemyKind")
 	_check(not enemies[GameData.EnemyKind.BRUTE].pushable and is_equal_approx(enemies[GameData.EnemyKind.BRUTE].front_armor, 0.75)
 		and enemies[GameData.EnemyKind.BLOATER].explodes and enemies[GameData.EnemyKind.GRABBER].grabs, "enemy flags (armor, grabs, explodes)")
 	_check(GameData.ISLAND_BIOMES == ([&"beach", &"town", &"jungle", &"port"] as Array[StringName]) and GameData.BIOMES.has(&"volcano"),
@@ -56,6 +56,6 @@ func _test_xp_scale(enemies: Array[GameData.EnemyType]) -> void:
 	for level in range(1, 30):
 		total += GameData.xp_for_level(level)
 	_check(total == 113970, "level 1 to 30 costs 113970 received XP")
-	var rewards: Array[int] = [10, 12, 100, 45, 1000, 45, 60]  # EnemyKind order
+	var rewards: Array[int] = [10, 12, 100, 45, 1000, 45, 60, 10]  # EnemyKind order
 	for kind in rewards.size():
 		_check(enemies[kind].xp == rewards[kind], "%s rewards %d base XP" % [enemies[kind].id, rewards[kind]])

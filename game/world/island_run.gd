@@ -17,6 +17,10 @@ var _element_rng := RandomNumberGenerator.new()
 ## Spawn positions have their own RNG (derived from the run seed), so the
 ## same seed gives the same spawn spots whatever else used `rng`.
 var _spawn_rng := RandomNumberGenerator.new()
+## Leg loss rolls after grenade blasts (seeded from the run seed; tests seed it).
+var limb_rng := RandomNumberGenerator.new()
+## 0-based island being played (from the RunContext); Crawlers start on the next one.
+var _island_index: int = 0
 var power_ups: PowerUps
 var power_ups_picked: Array[StringName] = []
 var _intel_checkpoint: int = 0
@@ -326,6 +330,8 @@ var spawn_failures: int = 0
 # Render events, consumed (cleared) by the scene every frame.
 var tracers: Array[PackedVector3Array] = []
 var deaths: Array[Vector4] = []  ## (x, z, kind, headshot 0/1)
+## Walkers whose legs a grenade took this frame (x, z): they became Crawlers.
+var leg_losses: PackedVector2Array = PackedVector2Array()
 var explosions: PackedVector3Array = PackedVector3Array()
 var messages: PackedStringArray = PackedStringArray()
 ## Radio events (Story.RADIO keys), consumed by the HUD.
@@ -351,6 +357,7 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMa
 	power_ups = PowerUps.new(rng_seed)
 	_element_rng.seed = rng_seed ^ 0x454c454d
 	_spawn_rng.seed = rng_seed ^ 0x5350574e
+	limb_rng.seed = rng_seed ^ 0x4c494d42
 	map = custom_map if custom_map != null else IslandMap.build(rng_seed, biome)
 	field = map.field
 	horde = Horde.new(field)
@@ -467,6 +474,8 @@ func load_context(ctx: RunContext) -> void:
 			ammo[w] = max_ammo(w) if ctx.ammo.size() != ammo.size() else mini(ammo[w], max_ammo(w))
 	# A head start makes the director spawn more specials on later islands.
 	director.elapsed = 120.0 * ctx.island_index
+	_island_index = ctx.island_index
+	director.crawler_share = _crawler_share()
 
 
 ## Expedition runs: the name of the part after the current one ("" when the
@@ -678,13 +687,57 @@ func _update_grenades(dt: float) -> void:
 			var p: Vector3 = grenades[i]
 			explosions.append(p)
 			for j in horde.query_radius(p, radius):
-				_damage(j, grenade_damage(), p, false, true)
+				_damage(j, grenade_blast_damage(horde.positions[j].distance_to(p), radius), p, false, true)
+				if not _dead.has(j):
+					_roll_leg_loss(j, p, radius)
 				horde.stun[j] = maxf(horde.stun[j], 0.6 + 0.25 * stacks(&"concussion") + perk_value(&"concussion_blast"))
 				horde.knock_back(j, p, 2.0)
 			_damage_nests_in(p, radius, grenade_damage())
 			grenades.remove_at(i)
 			grenade_fuses.remove_at(i)
 		i -= 1
+
+
+## Share of the grenade's damage left at the edge of its radius (full at the
+## centre). Edge hits leave survivors, who can lose their legs.
+const GRENADE_EDGE_DAMAGE: float = 0.3
+
+## Grenade damage to a zombie `distance` metres from the blast: full at the
+## centre, falling linearly to GRENADE_EDGE_DAMAGE at the radius.
+func grenade_blast_damage(distance: float, radius: float) -> float:
+	var t: float = clampf(distance / maxf(radius, 0.001), 0.0, 1.0)
+	return grenade_damage() * lerpf(1.0, GRENADE_EDGE_DAMAGE, t)
+
+## Chance that a grenade blast takes the legs off a walker `distance` metres
+## from the centre: GameData.LEG_LOSS_CHANCE at 0 m, falling linearly to 0 at
+## the blast radius.
+static func leg_loss_chance(distance: float, radius: float) -> float:
+	if radius <= 0.0:
+		return 0.0
+	return GameData.LEG_LOSS_CHANCE * clampf(1.0 - distance / radius, 0.0, 1.0)
+
+
+## A walker that survived a grenade's damage may lose both legs and crawl on
+## as a Crawler, keeping its remaining HP. Rolled once, for survivors only
+## (the caller checks), and only for walkers: bullets, the breaker and other
+## explosions never take legs, nor do Grabbers and Bloaters.
+func _roll_leg_loss(j: int, blast: Vector3, radius: float) -> void:
+	if horde.kinds[j] != GameData.EnemyKind.WALKER:
+		return
+	var p: Vector3 = horde.positions[j]
+	var distance: float = Vector2(p.x - blast.x, p.z - blast.z).length()
+	if limb_rng.randf() >= leg_loss_chance(distance, radius):
+		return
+	horde.amputate(j)
+	leg_losses.append(Vector2(p.x, p.z))
+
+
+## Crawlers join the horde from the second island on, and never on a boss
+## island (the boss arena): their share of spawns is 0 there.
+func _crawler_share() -> float:
+	if _island_index < GameData.CRAWLER_FIRST_ISLAND or has_boss or objective == Objective.BOSS:
+		return 0.0
+	return GameData.CRAWLER_SPAWN_SHARE
 
 
 func set_mission(id: StringName) -> void:
@@ -1844,6 +1897,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	_update_lava(dt)
 	_regenerate(dt)
 	var near: int = horde.query_radius(player_pos, 6.0).size()
+	director.crawler_share = _crawler_share()
 	var to_spawn: int = director.update(dt, horde.count, horde.damage_to_player, near)
 	if power_ups.spawn_delay > 0.0:
 		to_spawn = 0
@@ -2321,15 +2375,20 @@ func _above_ground(a: Vector3, b: Vector3) -> bool:
 
 
 ## World position (terrain height included) of an enemy's chest and head, as
-## the Island scene draws them (body capsule of t.height, head on top).
+## the Island scene draws them (body capsule of t.height, head on top). A
+## Crawler's aim follows its posed model (the crawl pose), not the standing one.
 func enemy_chest(i: int) -> Vector3:
 	var p: Vector3 = horde.positions[i]
+	if horde.kinds[i] == GameData.EnemyKind.CRAWLER:
+		return Vector3(p.x, p.y + map.ground_y(p) + ZombieModel.CRAWL_CHEST_HEIGHT, p.z)
 	var t: GameData.EnemyType = horde.types[horde.kinds[i]]
 	return Vector3(p.x, p.y + map.ground_y(p) + t.height * 0.6, p.z)
 
 
 func enemy_head(i: int) -> Vector3:
 	var p: Vector3 = horde.positions[i]
+	if horde.kinds[i] == GameData.EnemyKind.CRAWLER:
+		return Vector3(p.x, p.y + map.ground_y(p) + ZombieModel.CRAWL_HEAD_HEIGHT, p.z)
 	var t: GameData.EnemyType = horde.types[horde.kinds[i]]
 	return Vector3(p.x, p.y + map.ground_y(p) + t.height + 0.08 * t.radius_scale, p.z)
 
@@ -3420,7 +3479,7 @@ func _nest_brood(n: int) -> void:
 		var spot: Vector3 = _nest_spawn_spot(p)
 		if spot == Vector3.INF:
 			return
-		horde.add(spot, director.pick_kind(), rng)
+		horde.add(spot, director.pick_kind(false), rng)  # no Crawlers from nests (for now)
 		near += 1
 		nest_spawns += 1
 

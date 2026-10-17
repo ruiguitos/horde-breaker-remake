@@ -153,7 +153,7 @@ class Modifier:
 		intel_mult = p_mult
 
 
-enum EnemyKind { WALKER, RUNNER, BRUTE, GRABBER, BOSS, BLOATER, SCREAMER }
+enum EnemyKind { WALKER, RUNNER, BRUTE, GRABBER, BOSS, BLOATER, SCREAMER, CRAWLER }
 
 ## Player
 const PLAYER_MAX_HP: float = 100.0
@@ -201,6 +201,22 @@ const GRENADE_RANGE: float = 14.0
 const GRENADE_FUSE: float = 0.8
 const GRENADE_RADIUS: float = 5.0
 const GRENADE_DAMAGE: float = 90.0
+## Leg loss (grenade blasts only, added 2026-10-17): a walker that survives a
+## blast loses both legs with this chance at the centre, falling linearly to
+## 0 at the blast radius. It then becomes a Crawler.
+const LEG_LOSS_CHANCE: float = 0.75
+## Crawlers (legless zombies, and the kind the director spawns) move at this
+## share of the walker's speed. HP, reach and damage are the walker's. The
+## speed range in enemies/crawler.tres is the walker's on purpose: the rolled
+## speed is also the zombie's look key, so it must not change on amputation.
+const CRAWL_SPEED_RATIO: float = 0.4
+## After its legs go, the zombie topples for this long (it stands still and
+## its body sinks into the crawl pose), then crawls. Tunable, 0.3 to 0.5 s.
+const CRAWL_TRANSITION_TIME: float = 0.4
+## Share of spawns that are Crawlers, in percent, from island index
+## CRAWLER_FIRST_ISLAND on (0 = the first island). Never on a boss island.
+const CRAWLER_SPAWN_SHARE: float = 6.0
+const CRAWLER_FIRST_ISLAND: int = 1
 
 ## Bloater explosion and Screamer call
 const BLOATER_RADIUS: float = 3.5
@@ -356,7 +372,7 @@ static func power_up_icon(id: StringName) -> String:
 
 
 static func power_up_normal(kind: int) -> bool:
-	return kind == EnemyKind.WALKER or kind == EnemyKind.RUNNER
+	return kind == EnemyKind.WALKER or kind == EnemyKind.RUNNER or kind == EnemyKind.CRAWLER
 
 
 static func card_category(id: StringName) -> StringName:

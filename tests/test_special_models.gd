@@ -87,7 +87,7 @@ func _test_instances(view: ZombieHordeView, types: Array[GameData.EnemyType]) ->
 		visible += instance.multimesh.visible_instance_count
 		if String(node.name) in ["Zombies_runner", "Zombies_brute", "Zombies_grabber", "Zombies_behemoth", "Zombies_bloater", "Zombies_screamer"]:
 			_check(instance.multimesh.visible_instance_count == 1, "%s draws its own enemy even with identical rolled speeds" % node.name)
-	_check(visible == 7, "Exactly seven alive models are drawn")
+	_check(visible == types.size(), "Exactly one model per alive enemy (%d) is drawn" % types.size())
 	for i in h.count:
 		h.freeze_time[i] = 1.0
 	view.draw(h, map, 2.0, 0.0)
@@ -105,11 +105,12 @@ func _test_instances(view: ZombieHordeView, types: Array[GameData.EnemyType]) ->
 	view.draw(h, map, 1.1, 0.016)
 	var screamer := view.get_node("Zombies_screamer") as MultiMeshInstance3D
 	_check(screamer.multimesh.visible_instance_count == 1, "A compacted special keeps its model")
-	for kind in range(1, types.size()):
+	# Specials only: a Crawler's corpse is a walker-model corpse (test_crawlers).
+	for kind in range(1, GameData.EnemyKind.CRAWLER):
 		view.on_death(Vector4(10 + kind * 3, 20, kind, 0), Vector3(10 + kind * 3, 0, 20), Vector3.ZERO)
 	view.draw(h, map, 1.1, 0.0)
 	_check(view.corpse_count() == 6, "Every special has a modelled corpse")
-	for kind in range(1, types.size()):
+	for kind in range(1, GameData.EnemyKind.CRAWLER):
 		var variant: int = ZombieHordeView.variant_for(kind, 1.7)
 		_check(view.instance_count(variant) == (1 if kind == GameData.EnemyKind.RUNNER else 2), "%s corpse keeps its own model" % types[kind].display_name)
 	view.draw(h, map, 1.1, ZombieHordeView.CORPSE_TIME + 0.01)
@@ -119,6 +120,8 @@ func _test_instances(view: ZombieHordeView, types: Array[GameData.EnemyType]) ->
 func _test_head_targets(view: ZombieHordeView) -> void:
 	var run := IslandRun.new(71)
 	for kind in range(1, GameData.enemy_types().size()):
+		if kind == GameData.EnemyKind.CRAWLER:
+			continue  # walker model in its legless pose: its head is not the standing one
 		var type: GameData.EnemyType = run.horde.types[kind]
 		var instance: int = run.horde.add(Vector3(20 + kind, 0, 20), kind, run.rng)
 		var node := view.get_node("Zombies_" + ("behemoth" if kind == GameData.EnemyKind.BOSS else String(type.id))) as MultiMeshInstance3D
@@ -161,7 +164,7 @@ func _test_island_models() -> void:
 	var count: int = 0
 	for variant in ZombieHordeView.VARIANTS:
 		count += view.instance_count(variant)
-	_check(count == 7, "Real island scene draws all seven enemy kinds as models")
+	_check(count == GameData.enemy_types().size(), "Real island scene draws all %d enemy kinds as models" % GameData.enemy_types().size())
 	# Dummy RenderingServer does not retain MultiMesh transforms. Check actual
 	# capsule hiding only with a GPU, never infer it from Dummy identity values.
 	if DisplayServer.get_name() != "headless":

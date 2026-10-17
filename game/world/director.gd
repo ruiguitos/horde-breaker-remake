@@ -16,6 +16,9 @@ var elapsed: float = 0.0
 var max_alive: int = GameData.MAX_ALIVE
 ## Multiplies the chance of Brutes and Grabbers (Elite Pack modifier).
 var specials_mult: float = 1.0
+## Percent of spawns that are Crawlers. IslandRun sets it (0 on the first
+## island and on boss islands).
+var crawler_share: float = 0.0
 
 var _spawn_accum: float = 0.0
 var _peak_length: float = 15.0
@@ -80,9 +83,14 @@ func _set_phase(p: Phase) -> void:
 	phase_time = _rng.randf_range(10.0, 15.0) if p == Phase.RELAX else 0.0
 
 
-func pick_kind() -> int:
+## `crawlers` = false keeps Crawlers out of this pick (nests do that for now).
+func pick_kind(crawlers: bool = true) -> int:
 	var specials: float = clampf(elapsed / 300.0, 0.0, 1.0)
 	var roll: float = _rng.randf() * 100.0
+	var share: float = crawler_share if crawlers else 0.0
+	if roll < share:
+		return GameData.EnemyKind.CRAWLER
+	roll -= share
 	var brute: float = (2.0 + 4.0 * specials) * specials_mult
 	var grabber: float = (4.0 + 5.0 * specials) * specials_mult
 	var runner: float = 15.0 + 10.0 * specials

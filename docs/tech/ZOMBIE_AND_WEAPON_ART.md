@@ -59,6 +59,24 @@ enquanto esses ficheiros estão a ser editados.
   frame anterior), que
   cai para trás (longe do jogador), fica no chão ~4 s e afunda. Com
   *headshot* cai sem cabeça (a cabeça voa como antes, nos destroços).
+- **Pernas e rastejar (2026-10-17)**: o Crawler é o mesmo zombie sem pernas.
+  Não há variante nem malha nova: a máscara ganha dois bits, `Show.LEGS`
+  (20, as caixas das pernas dependem dele) e `Show.LEGLESS` (21, quatro
+  caixas de coto na anca: carne escura, osso na ponta; `ZombieModel.legless_mask`).
+  O shader lê o bit 21 e põe a pose de rastejar: tronco, anca e cabeça
+  inclinados para a frente (`CRAWL_LEAN` 1,2 rad), afundados (`CRAWL_DROP`
+  0,68 m), antebraços a alcançar o chão (`CRAWL_ELBOW` 1,1), cabeça
+  levantada (`CRAWL_HEAD_NOD` −0,5), braços a puxar com os passos. A cabeça
+  fica a 0,69 m e as mãos a 0,07 m do chão. Só o `ZombieHordeView` põe o bit
+  (quando `kind == CRAWLER`). A queda dura 0,4 s (`CRAWL_TRANSITION_TIME`): o
+  instância leva `6 + progresso` em `INSTANCE_CUSTOM.w` (a faixa 6–7 está livre
+  depois da morte, 4–5), e o shader mistura a pose de pé para a de rastejar.
+  Os Crawlers não são escalados em altura (a pose já é baixa); a mira usa a
+  pose (`IslandRun.enemy_head/enemy_chest`, constantes `CRAWL_HEAD_HEIGHT` e
+  `CRAWL_CHEST_HEIGHT`, testadas contra `ZombieModel.crawl_points`).
+  `ZombieModel.crawl_points()` é o espelho em GDScript da pose (para testes).
+  Custo: +4 caixas por variante (≈ +96 vértices, cerca de +9 %; as caixas
+  escondidas também passam pelo vertex shader). Medição: ver *Desempenho*.
 - **Estado**: queimadura, veneno, frio, congelado, *flash* de impacto e
   atordoado tingem o zombie, como tingiam a cápsula. A instância manda só um
   índice (`ZombieModel.Status`); as cores estão em `STATUS_TINTS`.
@@ -220,6 +238,13 @@ corridas de cada; a GPU variou menos de 0,02 ms entre corridas):
 | `ZombieHordeView.draw` (150, com janela) | 0,34 ms | 0,33 ms |
 | `ZombieHordeView.draw` headless (teste) | — | 0,30 ms |
 | construir as 4 malhas | ~7–9 ms | 8 ms |
+
+**Crawlers** (2026-10-17, `tests/test_crawlers.gd`, só CPU headless: **não é
+medição de GPU**, não houve janela nem GPU nesta sessão): `ZombieHordeView.draw`
+com 150 Walkers ≈ 0,44–0,46 ms; com 150 Crawlers ≈ 0,50–0,51 ms (+≈0,06 ms,
+duas corridas em sequência, sem outros testes em paralelo). A GPU por medir no
+editor do utilizador (`zombie_preview.gd bench`): o esperado é uns centésimos
+de ms a mais por caixas extra.
 
 A primeira versão custava +0,14 ms de GPU: as caixas alternativas
 escondidas continuam a passar pelo *vertex shader* (também nas sombras).

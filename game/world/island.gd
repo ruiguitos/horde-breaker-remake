@@ -2626,6 +2626,14 @@ func _draw_effects(delta: float) -> void:
 			# Body shot: an arm comes off.
 			_add_debris(origin + Vector3(0, t.height * 0.3, 0), Vector3(randf_range(-4, 4), 5.0, randf_range(-4, 4)), chunk, sx * 1.6)
 	run.deaths.clear()
+	# A grenade took both legs off a walker, which crawls on: two legs fly off.
+	for lp in run.leg_losses:
+		var at := Vector3(lp.x, run.map.ground_y(Vector3(lp.x, 0, lp.y)), lp.y)
+		fx.emit(&"blood", at + Vector3(0, 0.3, 0))
+		for side: float in [-1.0, 1.0]:
+			var vel := Vector3(randf_range(-3, 3) + side * 2.5, randf_range(3, 6), randf_range(-3, 3))
+			_add_debris(at + Vector3(0.15 * side, 0.6, 0), vel, ZombieHordeView.DEBRIS_COLOR, 1.4)
+	run.leg_losses.clear()
 	var i: int = _debris_pos.size() - 1
 	while i >= 0:
 		_debris_life[i] -= delta

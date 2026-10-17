@@ -25,6 +25,9 @@ var poison_time: PackedFloat32Array = PackedFloat32Array()
 var cold_time: PackedFloat32Array = PackedFloat32Array()
 var cold_stacks: PackedByteArray = PackedByteArray()
 var freeze_time: PackedFloat32Array = PackedFloat32Array()
+## Seconds left in a Crawler's topple after its legs went (it stands still
+## while its body sinks into the crawl pose). Moves with the enemy on removal.
+var crawl_delay: PackedFloat32Array = PackedFloat32Array()
 var count: int = 0
 var target: Vector3 = Vector3.ZERO
 
@@ -69,6 +72,7 @@ func add(pos: Vector3, kind: int, rng: RandomNumberGenerator) -> int:
 	cold_time.append(0.0)
 	cold_stacks.append(0)
 	freeze_time.append(0.0)
+	crawl_delay.append(0.0)
 	_next.append(-1)
 	_stamp.append(0)
 	count += 1
@@ -93,6 +97,7 @@ func remove(i: int) -> void:
 	cold_time[i] = cold_time[last]
 	cold_stacks[i] = cold_stacks[last]
 	freeze_time[i] = freeze_time[last]
+	crawl_delay[i] = crawl_delay[last]
 	positions.resize(last)
 	velocities.resize(last)
 	speeds.resize(last)
@@ -106,6 +111,7 @@ func remove(i: int) -> void:
 	cold_time.resize(last)
 	cold_stacks.resize(last)
 	freeze_time.resize(last)
+	crawl_delay.resize(last)
 	_next.resize(last)
 	_stamp.resize(last)
 	count = last
@@ -163,6 +169,11 @@ func tick(dt: float) -> void:
 			if grabbed_by == i:
 				grabbed_by = -1
 			continue  # frozen enemies neither move, separate, attack nor grab
+		if crawl_delay[i] > 0.0:
+			# Toppling after the legs went: no steps, no attacks, until it crawls.
+			crawl_delay[i] = maxf(0.0, crawl_delay[i] - dt)
+			velocities[i] = Vector3.ZERO
+			continue
 		var tx: float = target.x - p.x
 		var tz: float = target.z - p.z
 		var to_target2: float = tx * tx + tz * tz
@@ -232,9 +243,19 @@ func tick(dt: float) -> void:
 	rebuild_hash()
 
 
+## A walker loses both legs: it becomes a Crawler and topples for
+## GameData.CRAWL_TRANSITION_TIME. HP, speed (the outfit key) and the rest stay.
+func amputate(i: int) -> void:
+	kinds[i] = GameData.EnemyKind.CRAWLER
+	crawl_delay[i] = GameData.CRAWL_TRANSITION_TIME
+
+
+## Scales the desired speed: cold slows, and a Crawler (legless) drags itself
+## at GameData.CRAWL_SPEED_RATIO of its rolled speed (the walker's range).
 func speed_multiplier(i: int) -> float:
 	var per_stack: float = 0.075 if kinds[i] == GameData.EnemyKind.BOSS else 0.15
-	return 1.0 - per_stack * cold_stacks[i]
+	var crawl: float = GameData.CRAWL_SPEED_RATIO if kinds[i] == GameData.EnemyKind.CRAWLER else 1.0
+	return crawl * (1.0 - per_stack * cold_stacks[i])
 
 
 ## Axis-separated move: slides along walls, never enters them.

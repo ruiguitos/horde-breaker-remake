@@ -17,6 +17,8 @@ shader_type spatial;
 //     colours: shirt 5 bits | trousers 4 | skin 3 | hair 3 | pattern 2 |
 //              pattern colour 3 | shoes 2 | jacket 2
 //     wear:    gore 3 bits | blood 3 | torn 3 | fade 3 | build 3 | offset 8
+//   mask bit 21 (LEGLESS, a Crawler) switches to the crawl pose: the legs are
+//   hidden by the mask (bit 20, LEGS) and the hip stumps show instead.
 // The skeleton is procedural: each box belongs to a part that rotates about
 // a fixed joint (same joints as ZombieModel), like the old soldier pivots,
 // but on the GPU so 150 zombies cost one MultiMesh update.
@@ -61,6 +63,12 @@ uniform vec3 KNEE_L = vec3(0.12, 0.5, 0.0);
 uniform vec3 KNEE_R = vec3(-0.12, 0.5, 0.0);
 const vec3 LUMA = vec3(0.3, 0.59, 0.11);
 const uint SHOW_STUMP_L = 2u;  // ZombieModel.Show.STUMP_L
+const uint SHOW_LEGLESS = 21u; // ZombieModel.Show.LEGLESS: a Crawler (crawl pose)
+// Crawl pose (ZombieModel.CRAWL_*): torso pitched forward, sunk to the ground.
+const float CRAWL_LEAN = 1.2;
+const float CRAWL_DROP = 0.68;
+const float CRAWL_HEAD_NOD = -0.5;
+const float CRAWL_ELBOW = 1.1;
 
 mat3 rot_x(float a) {
 	float c = cos(a);
@@ -136,6 +144,13 @@ void vertex() {
 	v_wear = vec4(mix(0.7, 1.2, float(wear & 7u) / 7.0), float((wear >> 3u) & 7u) / 3.5 - 1.0,
 			float((wear >> 6u) & 7u) / 7.0, float((wear >> 15u) & 255u));
 	vec4 ic = INSTANCE_CUSTOM;
+	// A Crawler toppling after its legs went sends 6 + progress (0 = standing,
+	// 1 = crawling): the slot is free above the death range (4 to 5).
+	float topple = -1.0;
+	if (ic.w >= 5.5) {
+		topple = clamp(ic.w - 6.0, 0.0, 1.0);
+		ic.w = 0.0;
+	}
 	float phase = ic.x;
 	float walk = ic.y;
 	float lunge = max(ic.z, 0.0);
@@ -163,6 +178,9 @@ void vertex() {
 	if (!shown) {
 		p = vec3(0.0, 1.3, 0.0);
 	}
+	bool legless = ((mask >> SHOW_LEGLESS) & 1u) == 1u;
+	// How far the crawl pose is in: 0 standing (just amputated), 1 crawling.
+	float crawl = legless ? (topple >= 0.0 ? topple : 1.0) : 0.0;
 	if (headless && part == 2) {
 		p = NECK;  // collapsed: the head popped off (debris in island.gd)
 	}
@@ -214,6 +232,13 @@ void vertex() {
 		if (creature_type == 3) { reach = 0.85 + 0.08 * sin(phase) + 0.5 * lunge; elbow_bend = 0.15; }
 		if (creature_type == 5) { reach = -0.1 + 0.12 * walk * s; elbow_bend = 0.15; }
 		if (creature_type == 6) { reach = 1.7 + 0.08 * sin(phase); elbow_bend = 1.15; }
+		if (legless) {
+			// Crawling: the arms hang to the ground from the lowered shoulders
+			// and the forearms reach forward; they pull in turn with the steps.
+			float crawl_reach = CRAWL_LEAN + (0.12 + 0.1 * walk) * sin(phase + (left ? 0.0 : 3.14));
+			reach = mix(reach, crawl_reach, crawl);
+			elbow_bend = mix(elbow_bend, CRAWL_ELBOW, crawl);
+		}
 		reach = reach * limp - 0.3 * flinch;
 		float spread = (left ? 1.0 : -1.0) * (0.1 + 0.15 * stagger + 0.5 * fall);
 		vec3 shift = vec3(left ? arm_shift : -arm_shift, 0.0, 0.0);
@@ -227,17 +252,26 @@ void vertex() {
 		float loll = 0.22 * sin(phase * 0.5) + 0.1 + 0.4 * stagger * sin(phase * 3.0);
 		if (creature_type > 0) { loll = 0.035 * sin(phase * 0.5) + 0.15 * stagger * sin(phase * 3.0); }
 		float nod = creature_type == 6 ? -0.30 : (creature_type > 0 ? -0.05 : -0.18);
+		if (legless) { nod = mix(nod, CRAWL_HEAD_NOD, crawl); }
 		turn(p, n, t, rot_z(loll * limp) * rot_x(nod - 0.55 * flinch + 0.2 * lunge), NECK);
 	}
-	// Torso: hunched, twisting with the steps, lunging and recoiling.
-	if (part >= 1 && part <= 6) {
+	// Torso: hunched, twisting with the steps, lunging and recoiling. A
+	// Crawler pitches the whole upper body (pelvis too) forward and sinks it.
+	if ((part >= 1 && part <= 6) || (legless && part == 0)) {
 		float lean = 0.18 + 0.08 * walk + 0.4 * lunge - 0.5 * flinch - 0.2 * stagger;
 		float twist = 0.14;
 		if (creature_type > 0) {
 			lean = (creature_type == 1 ? 0.10 : 0.025) + 0.02 * walk + 0.12 * lunge - 0.3 * flinch - 0.15 * stagger;
 			twist = 0.04;
 		}
+		if (legless) {
+			lean = mix(lean, CRAWL_LEAN, crawl);
+			twist = mix(twist, 0.0, crawl);
+		}
 		turn(p, n, t, rot_x(lean * limp) * rot_y(twist * walk * s), WAIST);
+	}
+	if (legless) {
+		p.y -= CRAWL_DROP * crawl;
 	}
 	// Whole body: bob and sway with the steps, lunge forward, fall backwards.
 	vec3 root = vec3(0.0, 0.04 * walk * abs(s), 0.2 * lunge);

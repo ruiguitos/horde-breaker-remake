@@ -14,7 +14,10 @@ extends Node3D
 ## Enemy kinds drawn with ZombieModel (the Walker = the "Zombie normal" of the GDD).
 const Specials = preload("res://game/world/special_enemy_model.gd")
 const KINDS: Array[int] = [GameData.EnemyKind.WALKER, GameData.EnemyKind.RUNNER, GameData.EnemyKind.BRUTE,
-	GameData.EnemyKind.GRABBER, GameData.EnemyKind.BOSS, GameData.EnemyKind.BLOATER, GameData.EnemyKind.SCREAMER]
+	GameData.EnemyKind.GRABBER, GameData.EnemyKind.BOSS, GameData.EnemyKind.BLOATER, GameData.EnemyKind.SCREAMER,
+	GameData.EnemyKind.CRAWLER]
+## Crawlers use the walker's models and MultiMeshes: the legless mask (see
+## ZombieModel.legless_mask) turns the legs off and the crawl pose on.
 const VARIANTS: int = ZombieModel.VARIANTS + 6
 ## Floats per instance in MultiMesh.buffer: transform 12 + colour 4 + custom 4.
 const STRIDE: int = 20
@@ -83,10 +86,16 @@ func handles(kind: int) -> bool:
 
 
 static func variant_for(kind: int, key: float) -> int:
-	if kind == GameData.EnemyKind.WALKER:
+	if kind == GameData.EnemyKind.WALKER or kind == GameData.EnemyKind.CRAWLER:
 		return ZombieModel.variant_for(key)
 	var special: int = Specials.KINDS.find(kind)
 	return ZombieModel.VARIANTS + special if special >= 0 else -1
+
+
+## Height scale of a model: the Crawler keeps the walker's model size (its pose
+## lies low by itself), the other kinds scale to their EnemyType height.
+static func model_scale_y(kind: int, height: float) -> float:
+	return 1.0 if kind == GameData.EnemyKind.CRAWLER else height / ZombieModel.MODEL_HEIGHT
 
 
 func instance_count(variant: int) -> int:
@@ -123,6 +132,7 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 	var flash: PackedFloat32Array = h.flash
 	var stun: PackedFloat32Array = h.stun
 	var freeze: PackedFloat32Array = h.freeze_time
+	var crawl_delay: PackedFloat32Array = h.crawl_delay
 	var burn: PackedFloat32Array = h.burn_time
 	var poison: PackedFloat32Array = h.poison_time
 	var cold: PackedByteArray = h.cold_stacks
@@ -149,6 +159,8 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 				_looks[key] = cached
 			var look: Vector4 = cached
 			look.x = variant_for(kinds[i], key)
+			if kinds[i] == GameData.EnemyKind.CRAWLER:
+				look.y = float(ZombieModel.legless_mask(int(look.y)))
 			var v: int = int(look.x)
 			variants[i] = v
 			looks[i] = look
@@ -175,7 +187,9 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 		# The phase advances with the enemy's own (constant) rolled speed, so it
 		# stays continuous when the horde compacts its arrays.
 		var offset: float = fmod(base_speed * 977.0, TAU)
-		var phase: float = offset + now * (3.0 + base_speed * 2.6)
+		# A Crawler pulls itself along more slowly than a walker steps.
+		var pace: float = 0.7 if kinds[i] == GameData.EnemyKind.CRAWLER else 1.0
+		var phase: float = offset + now * (3.0 + base_speed * 2.6) * pace
 		var act: float = 0.0
 		if close:
 			var since: float = t.attack_interval - attack_cd[i]
@@ -201,9 +215,14 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 				status = ZombieModel.Status.COLD
 		if flash[i] > 0.0:
 			status = ZombieModel.Status.FLASH
+		if kinds[i] == GameData.EnemyKind.CRAWLER and crawl_delay[i] > 0.0:
+			# Toppling after the legs went: 6 + progress tells zombie.gdshader
+			# to sink the body from standing into the crawl pose (no flinch).
+			w = 6.0 + 1.0 - crawl_delay[i] / GameData.CRAWL_TRANSITION_TIME
+			act = 0.0
 		var look: Vector4 = looks[i]
 		var sx: float = t.radius_scale
-		var sy: float = t.height / ZombieModel.MODEL_HEIGHT
+		var sy: float = model_scale_y(kinds[i], t.height)
 		var gy: float = p.y if flat_ground else p.y + map.ground_y(p)
 		var cy: float = cos(yaw)
 		var sn: float = sin(yaw)
@@ -246,30 +265,38 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 func on_death(d: Vector4, ground: Vector3, from: Vector3) -> void:
 	if not handles(int(d.z)):
 		return
+	var kind: int = int(d.z)
 	var fallback: Vector4 = ZombieModel.instance_look(d.x + d.y)
-	fallback.x = variant_for(int(d.z), d.x + d.y)
-	var type: GameData.EnemyType = GameData.enemy_types()[int(d.z)]
-	var info := Vector4(fallback.x, type.radius_scale, type.height / ZombieModel.MODEL_HEIGHT, 0)
+	fallback.x = variant_for(kind, d.x + d.y)
+	if kind == GameData.EnemyKind.CRAWLER:
+		fallback.y = float(ZombieModel.legless_mask(int(fallback.y)))
+	var type: GameData.EnemyType = GameData.enemy_types()[kind]
+	var info := Vector4(fallback.x, type.radius_scale, model_scale_y(kind, type.height), 0)
 	var look := Vector3(fallback.y, fallback.z, fallback.w)
 	var best: float = 2.25  # within 1.5 m of where a zombie was drawn
+	# Walkers and Crawlers share the common models: a corpse takes the look
+	# of a drawn zombie that is legless exactly when the dead one was.
+	var common: bool = kind == GameData.EnemyKind.WALKER or kind == GameData.EnemyKind.CRAWLER
+	var legless: bool = kind == GameData.EnemyKind.CRAWLER
 	for list: int in 2:
 		var pos: PackedVector3Array = _prev_pos if list == 0 else _last_pos
 		var infos: PackedVector4Array = _prev_info if list == 0 else _last_info
+		var looks: PackedVector3Array = _prev_look if list == 0 else _last_look
 		for k in pos.size():
 			var candidate: Vector4 = infos[k]
 			# Neighbours can occupy the same point. A corpse must never borrow
 			# a different class's silhouette, even when its distance is zero.
-			if int(d.z) == GameData.EnemyKind.WALKER:
+			if common:
 				if int(candidate.x) >= ZombieModel.VARIANTS:
 					continue
 			elif int(candidate.x) != int(fallback.x):
 				continue
 			var q: Vector3 = pos[k]
 			var d2: float = (q.x - d.x) * (q.x - d.x) + (q.z - d.y) * (q.z - d.y)
-			if d2 < best:
+			if d2 < best and (not common or ZombieModel.is_legless(int(looks[k].x)) == legless):
 				best = d2
 				info = candidate
-				look = _prev_look[k] if list == 0 else _last_look[k]
+				look = looks[k]
 	var yaw: float = atan2(from.x - d.x, from.z - d.y)
 	if _corpse_pos.size() >= MAX_CORPSES:
 		_corpse_pos.remove_at(0)

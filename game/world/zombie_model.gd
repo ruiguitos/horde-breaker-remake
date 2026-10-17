@@ -35,7 +35,10 @@ enum Slot { FIXED, SKIN, SHIRT, TROUSERS, SHOES, HAIR, JACKET }
 ## when both of its conditions hold (ALWAYS is always set). Alternatives
 ## (cloth or bare forearm, shoe or bare foot) are both in the mesh, and the
 ## mask shows exactly one. zombie.gdshader reads STUMP_L (bit 2): keep it.
-enum Show { ALWAYS, FOREARM_L, STUMP_L, JAW, NO_JAW, EAR_L, NO_EAR_L, FINGERS_R, NO_FINGERS_R, LONG_SLEEVES, BARE_FOREARMS, UPPER_SLEEVES, BARE_UPPER_ARMS, SHOES, BAREFOOT, HAIR, LONG_HAIR, HOOD, SHIN_R_CLOTH, SHIN_R_BARE }
+## LEGS: the legs are on (a walker). LEGLESS: a Crawler, legs gone: the hip
+## stumps show and zombie.gdshader lays the body down (crawl pose). The view
+## sets them per zombie (legless_mask); the leg boxes need LEGS.
+enum Show { ALWAYS, FOREARM_L, STUMP_L, JAW, NO_JAW, EAR_L, NO_EAR_L, FINGERS_R, NO_FINGERS_R, LONG_SLEEVES, BARE_FOREARMS, UPPER_SLEEVES, BARE_UPPER_ARMS, SHOES, BAREFOOT, HAIR, LONG_HAIR, HOOD, SHIN_R_CLOTH, SHIN_R_BARE, LEGS, LEGLESS }
 enum Missing { NONE, FOREARM, JAW, EAR, FINGERS }
 enum Pattern { PLAIN, STRIPES, PLAID, PRINT }
 ## SHORT: T-shirt sleeves, or a work shirt rolled up (bare forearms).
@@ -111,6 +114,20 @@ const PATTERN_COLORS: Array[Color] = [
 ## Joints of zombie.gdshader (keep both in sync).
 const WAIST: Vector3 = Vector3(0, 1.02, 0)
 const NECK: Vector3 = Vector3(0, 1.58, 0.02)
+## Crawl pose (legless, added 2026-10-17; zombie.gdshader mirrors them):
+## the upper body pitches forward about the waist, sinks by CRAWL_DROP so the
+## hands reach the ground, the forearms reach forward (CRAWL_ELBOW bend) and
+## the head is lifted (CRAWL_HEAD_NOD). Model metres; the Crawler's aim
+## height in enemies.tres is 0.7 m, close to where its head is drawn.
+const CRAWL_LEAN: float = 1.2
+const CRAWL_DROP: float = 0.68
+const CRAWL_HEAD_NOD: float = -0.5
+const CRAWL_ELBOW: float = 1.1
+## Where a Crawler is aimed (IslandRun.enemy_head / enemy_chest), in metres
+## above the ground: the posed head centre and torso centre at rest of the
+## pose (crawl_points(0)). Tests check they match the pose.
+const CRAWL_HEAD_HEIGHT: float = 0.685
+const CRAWL_CHEST_HEIGHT: float = 0.44
 
 static var _meshes: Array[ArrayMesh] = []
 static var _materials: Array[ShaderMaterial] = []
@@ -201,8 +218,17 @@ static func _pick(rng: RandomNumberGenerator, weights: Array) -> int:
 	return weights.size() - 1
 
 
+## The mask of a Crawler: the same look with the legs off and the stumps on.
+static func legless_mask(mask: int) -> int:
+	return (mask & ~(1 << Show.LEGS)) | (1 << Show.LEGLESS)
+
+
+static func is_legless(mask: int) -> bool:
+	return (mask >> Show.LEGLESS) & 1 == 1
+
+
 static func _mask(l: Dictionary) -> int:
-	var on: Array[int] = [Show.ALWAYS]
+	var on: Array[int] = [Show.ALWAYS, Show.LEGS]
 	var missing: int = l["missing"]
 	on.append(Show.STUMP_L if missing == Missing.FOREARM else Show.FOREARM_L)
 	on.append(Show.NO_JAW if missing == Missing.JAW else Show.JAW)
@@ -257,6 +283,37 @@ static func head_pose(walk: float, lunge: float, flinch: float, phase: float) ->
 	p = WAIST + (Basis(Vector3.RIGHT, lean) * Basis(Vector3.UP, 0.14 * walk * s)) * (p - WAIST)
 	p = Basis(Vector3.FORWARD, -(0.05 * walk * s)) * p
 	return p + Vector3(0, 0.04 * walk * absf(s), 0.2 * lunge)
+
+
+## CPU mirror of the legless crawl pose in zombie.gdshader (tests and the
+## design numbers): the head centre, the left hand, the lowest corner of the
+## torso and the left hip stump, in model space. `pull` is the arm swing in
+## radians (the shader's sine term; 0 = rest of the pose).
+static func crawl_points(pull: float = 0.0) -> Dictionary:
+	var torso := Basis(Vector3.RIGHT, CRAWL_LEAN)
+	var drop := Vector3(0, -CRAWL_DROP, 0)
+	var elbow := Vector3(0.29, 1.19, 0)
+	var shoulder := Vector3(0.27, 1.49, 0)
+	var head: Vector3 = _turn(HEAD_CENTER, Basis(Vector3.RIGHT, CRAWL_HEAD_NOD), NECK)
+	head = _turn(head, torso, WAIST) + drop
+	var hand: Vector3 = _turn(Vector3(0.29, 0.855, 0.01), Basis(Vector3.RIGHT, -CRAWL_ELBOW), elbow)
+	hand = _turn(hand, Basis(Vector3.RIGHT, -(CRAWL_LEAN + pull)), shoulder)
+	hand = _turn(hand, torso, WAIST) + drop
+	var stump: Vector3 = _turn(Vector3(0.12, 0.86, 0.0), torso, WAIST) + drop
+	var lowest: float = INF
+	var c := Vector3(0, 1.3, 0)
+	var h := Vector3(0.23, 0.25, 0.13)
+	for sx: float in [-1.0, 1.0]:
+		for sy: float in [-1.0, 1.0]:
+			for sz: float in [-1.0, 1.0]:
+				var corner: Vector3 = _turn(c + Vector3(h.x * sx, h.y * sy, h.z * sz), torso, WAIST) + drop
+				lowest = minf(lowest, corner.y)
+	var torso_centre: Vector3 = _turn(c, torso, WAIST) + drop
+	return {"head": head, "hand": hand, "torso_low": lowest, "stump": stump, "torso": torso_centre}
+
+
+static func _turn(p: Vector3, r: Basis, pivot: Vector3) -> Vector3:
+	return pivot + r * (p - pivot)
 
 
 ## One material per texture layer, shared by every variant.
@@ -321,19 +378,25 @@ static func boxes(variant: int) -> Array[Dictionary]:
 		var thigh: int = Part.LEG_UPPER_L if left else Part.LEG_UPPER_R
 		var shin: int = Part.LEG_LOWER_L if left else Part.LEG_LOWER_R
 		var x: float = 0.12 * side
-		add.call(Vector3(x, 0.71, 0), Vector3(0.17, 0.44, 0.18), thigh, legs_layer, Slot.TROUSERS, 0.35 if variant == 0 and left else 0.15)
+		# Every leg box needs LEGS (off for a Crawler) and its own condition.
+		add.call(Vector3(x, 0.71, 0), Vector3(0.17, 0.44, 0.18), thigh, legs_layer, Slot.TROUSERS, 0.35 if variant == 0 and left else 0.15,
+			Kind.SURFACE, Show.LEGS)
 		if left:
-			add.call(Vector3(x, 0.31, 0), Vector3(0.15, 0.42, 0.16), shin, legs_layer, Slot.TROUSERS, 0.1)
+			add.call(Vector3(x, 0.31, 0), Vector3(0.15, 0.42, 0.16), shin, legs_layer, Slot.TROUSERS, 0.1, Kind.SURFACE, Show.LEGS)
 		else:
 			# The right trouser leg may be torn off: a bare, bitten shin.
-			add.call(Vector3(x, 0.31, 0), Vector3(0.15, 0.42, 0.16), shin, legs_layer, Slot.TROUSERS, 0.1, Kind.SURFACE, Show.SHIN_R_CLOTH)
-			add.call(Vector3(x, 0.31, 0), Vector3(0.13, 0.42, 0.14), shin, Layer.SKIN, Slot.SKIN, 0.75, Kind.SURFACE, Show.SHIN_R_BARE)
-		add.call(Vector3(x, 0.045, 0.04), Vector3(0.13, 0.09, 0.25), shin, Layer.SKIN, Slot.SKIN, 0.3, Kind.SURFACE, Show.BAREFOOT)
+			add.call(Vector3(x, 0.31, 0), Vector3(0.15, 0.42, 0.16), shin, legs_layer, Slot.TROUSERS, 0.1, Kind.SURFACE, Show.LEGS, Show.SHIN_R_CLOTH)
+			add.call(Vector3(x, 0.31, 0), Vector3(0.13, 0.42, 0.14), shin, Layer.SKIN, Slot.SKIN, 0.75, Kind.SURFACE, Show.LEGS, Show.SHIN_R_BARE)
+		add.call(Vector3(x, 0.045, 0.04), Vector3(0.13, 0.09, 0.25), shin, Layer.SKIN, Slot.SKIN, 0.3, Kind.SURFACE, Show.LEGS, Show.BAREFOOT)
 		if variant == 1:  # work boots
-			add.call(Vector3(x, 0.15, 0.0), Vector3(0.165, 0.3, 0.175), shin, Layer.LEATHER, Slot.SHOES, 0.0, Kind.SURFACE, Show.SHOES)
-			add.call(Vector3(x, 0.05, 0.05), Vector3(0.16, 0.1, 0.27), shin, Layer.LEATHER, Slot.SHOES, 0.0, Kind.SURFACE, Show.SHOES)
+			add.call(Vector3(x, 0.15, 0.0), Vector3(0.165, 0.3, 0.175), shin, Layer.LEATHER, Slot.SHOES, 0.0, Kind.SURFACE, Show.LEGS, Show.SHOES)
+			add.call(Vector3(x, 0.05, 0.05), Vector3(0.16, 0.1, 0.27), shin, Layer.LEATHER, Slot.SHOES, 0.0, Kind.SURFACE, Show.LEGS, Show.SHOES)
 		else:
-			add.call(Vector3(x, 0.05, 0.05), Vector3(0.15, 0.1, 0.27), shin, Layer.LEATHER, Slot.SHOES, 0.0, Kind.SURFACE, Show.SHOES)
+			add.call(Vector3(x, 0.05, 0.05), Vector3(0.15, 0.1, 0.27), shin, Layer.LEATHER, Slot.SHOES, 0.0, Kind.SURFACE, Show.LEGS, Show.SHOES)
+		# Crawler: the hip stump, dark flesh with a bone tip pointing back
+		# (the crawl pose turns the pelvis, so these end up behind the body).
+		add.call(Vector3(x, 0.86, 0.0), Vector3(0.15, 0.12, 0.16), Part.PELVIS, Layer.SKIN, Slot.FIXED, 0.9, Kind.FLESH, Show.LEGLESS)
+		add.call(Vector3(x, 0.8, -0.03), Vector3(0.06, 0.1, 0.06), Part.PELVIS, Layer.SKIN, Slot.FIXED, 0.0, Kind.BONE, Show.LEGLESS)
 	# Pelvis and belt.
 	add.call(Vector3(0, 0.97, 0), Vector3(0.42, 0.2, 0.22), Part.PELVIS, legs_layer, Slot.TROUSERS, 0.1)
 	add.call(Vector3(0, 1.06, 0), Vector3(0.44, 0.05, 0.235), Part.PELVIS, Layer.LEATHER, Slot.FIXED, 0.0, Kind.SURFACE, Show.ALWAYS, Show.ALWAYS, Color(0.3, 0.25, 0.22))

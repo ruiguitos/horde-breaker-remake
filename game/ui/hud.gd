@@ -2062,7 +2062,7 @@ func _update_threats(run: IslandRun, camera: Camera3D) -> void:
 	var near: Array = []
 	for i in run.horde.query_radius(run.player_pos, THREAT_RANGE):
 		var kind: int = run.horde.kinds[i]
-		if kind == GameData.EnemyKind.WALKER or kind == GameData.EnemyKind.RUNNER:
+		if kind == GameData.EnemyKind.WALKER or kind == GameData.EnemyKind.RUNNER or kind == GameData.EnemyKind.CRAWLER:
 			continue
 		near.append([run.player_pos.distance_squared_to(run.horde.positions[i]), i])
 	near.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])

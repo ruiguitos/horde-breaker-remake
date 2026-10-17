@@ -117,6 +117,13 @@ run. Antes da primeira ilha, voltar cancela só a preparação.
     o diretor manda um pico de horda. O HUD avisa: mata-o primeiro.
   - **Grabber** (roxo): agarra-te e não te deixa andar até o matares ou usares
     o breaker.
+  - **Crawler** (verde-musgo, rente ao chão) (2026-10-17): arrasta-se com os
+    braços a 40 % da velocidade do Walker, com o mesmo HP, alcance e dano. Nasce
+    de duas maneiras: 6 % dos spawns a partir da 2.ª ilha (nunca na ilha do
+    boss; os ninhos ainda não os geram), e um Walker que sobreviva ao dano de
+    uma granada pode perder as duas pernas: cai durante 0,4 s e depois arrasta-se.
+    Essa chance é 75 % no centro da explosão e cai linearmente até 0 % no raio.
+    Só a granada corta pernas. Ver `docs/design/COMBAT_AND_ENEMIES.md` §4.
 - Mortes largam **orbes de XP** (azuis). Ao subir de nível o jogo pausa e
   escolhes 1 de 3 cartas, de um catálogo de **39**. A oferta garante uma
   carta nova e uma melhoria quando ambas existem; respeita a classe,

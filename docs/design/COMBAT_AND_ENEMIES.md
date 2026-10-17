@@ -220,7 +220,7 @@ vermelho perigo, amarelo especial a matar primeiro.
 | 6 | **Bloater** | perigo de área / ferramenta | esfera grande verde sobre cápsula curta | lento; explode ao morrer: raio 3,5 m, empurra e dá dano **a todos** | matar longe ou **usar** perto da horda | 90 | 1,6 | 30 explosão (inimigos também) |
 | 7 | **Screamer** | amplificador (chama horda) | cápsula amarela com cone (boca) para cima | foge do jogador; ao fim de 3 s com linha de visão grita → diretor faz pico | matar primeiro (prioridade auto-fire 3) | 50 | 3,0 | 0 |
 | 8 | **Armored** | exige posicionamento | cápsula com caixa-escudo frontal cinza-escura | frente imune a balas (−90%); roda devagar para o jogador | atirar por trás/lado, explosivos, Railgun | 200 | 2,0 | 15 |
-| 9 | **Crawler** | ameaça baixa, esconde-se | cápsula deitada, rente ao chão | rasteja por baixo da multidão, morde pernas (lento 30% 2 s) | Shotgun, chamas; difícil de ver → linha de luz no chão | 30 | 3,0 | 6 + lentidão |
+| 9 | **Crawler** (revisto 2026-10-17) | ameaça baixa; um Walker que perde as pernas | corpo rente ao chão, braços a arrastar (modelo do Walker em pose de rastejar) | rasteja a 40 % da velocidade do Walker, sem corrida; alcance e dano do Walker (8 / 1 s) | granada (os Walkers que sobrevivem podem ficar sem pernas); cabeça mais baixa, a mira ajusta-se | 30 (o do Walker) | 0,72–1,04 | 8 |
 | 10 | **The Breaker** (boss) | clímax de ilha | Brute ×1,5 com espinhos (cones) vermelhos | fases: cargas, pisões em área, invoca Shamblers | combina tudo; pontos fracos nas costas | 3000 | 2,0 | 35 / 20 área |
 
 Vertical slice: **Shambler, Runner, Brute, Grabber** (+ o boss só se sobrar
@@ -230,6 +230,45 @@ breaker está mal.
 Leitura de especiais fora de vista: indicador na borda do ecrã só para
 Screamer, Grabber, Brute em carga e boss (máx. 4 setas), mais um som
 característico por especial.
+
+### 4.1 Pernas cortadas e Crawlers (2026-10-17)
+
+Pedido do utilizador: os zombies desmembram-se com realismo. Regras (valores
+por defeito, todos em `game/data/game_data.gd` e ajustáveis):
+
+- **Só a granada corta pernas.** Balas, o breaker e explosões de Bloater não.
+- **Quem pode perder pernas:** só o Walker (o zombie comum). Runners e
+  especiais ficam com as pernas: os seus modelos não têm pose sem pernas.
+- **Ordem:** o dano da granada aplica-se primeiro (uniforme, 90 por agora).
+  Só os Walkers que sobrevivem, com o HP que lhes resta (real, sem HP
+  inflacionado), rolam a perna, uma vez.
+- **Chance:** `LEG_LOSS_CHANCE` = 75 % no centro, a cair linearmente até 0 %
+  na borda do raio (`IslandRun.leg_loss_chance`).
+- **Resultado:** o zombie fica vivo como **Crawler**, com o HP que tinha
+  (`Horde.amputate`). Durante 0,4 s (`CRAWL_TRANSITION_TIME`, ajustável entre
+  0,3 e 0,5 s) cai: fica parado, sem atacar, e o corpo afunda na pose de
+  rastejar. Depois arrasta-se a `CRAWL_SPEED_RATIO` = 40 % da velocidade do
+  Walker (só no movimento; a velocidade rolada, que escolhe a roupa, não muda),
+  sem corrida, com o alcance e o dano do Walker.
+- **Quem converte:** só Walkers. Runners, Grabbers, Bloaters e especiais
+  mantêm as pernas.
+- **Debris:** duas pernas voam em tom de carne (dois pedaços alongados, como
+  os destroços antigos).
+- **Spawn direto do diretor:** o Crawler é um tipo novo (`crawler.tres`) com
+  `CRAWLER_SPAWN_SHARE` = 6 % dos spawns a partir da 2.ª ilha
+  (`CRAWLER_FIRST_ISLAND` = 1, índice 0-based), pelo `_spawn_enemy()` (também
+  no caso de fallback em anel). Nunca na ilha do boss. Conta para o limite de 150 vivos.
+  **Os ninhos não geram Crawlers, por agora** (`pick_kind(false)`).
+- **Mira:** a cabeça e o peito de um Crawler são os da pose (cabeça a 0,69 m,
+  peito a 0,44 m), não os de um zombie de pé.
+- **Visual:** o Crawler usa o modelo do Walker com a máscara "sem pernas"
+  (as pernas escondem-se, aparecem os cotos) e a pose de rastejar do shader.
+  Sem nó novo por zombie. Ver `docs/tech/ZOMBIE_AND_WEAPON_ART.md`.
+
+Ainda por decidir (ver §7, pergunta 8): com o dano uniforme da granada (90) e o
+HP do Walker (30 vezes o multiplicador da ilha e da ameaça), quase nenhum Walker
+sobrevive a uma granada, por isso a perna raramente se corta. Os valores são
+os defaults do lead (75 %, 40 %, a partir da 2.ª ilha) e serão confirmados.
 
 ---
 
@@ -372,3 +411,9 @@ temporária) e Zombie Blood (os zombies deixam de ver o jogador).
    o jogador (puro perigo)?
 6. Humor: só visual (cabeças a saltitar) ou também frases do personagem?
 7. O boss "The Breaker" fica com esse nome (confunde com o verbo breaker)?
+8. (2026-10-17) As pernas só saem a quem sobrevive à granada, e hoje quase
+   ninguém sobrevive (granada 90, Walker 30 HP; com Demolitions no máximo,
+   63). Opções: (a) o dano da granada cai com a distância (ex.: 100 % no
+   centro, 35 % na borda), para que o Walker da borda sobreviva; (b) as
+   pernas saem a todos os Walkers do raio, mesmo mortos (o corpo cai sem
+   pernas); (c) manter a regra e aceitar que é raro.
