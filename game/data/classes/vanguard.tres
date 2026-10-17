@@ -7,5 +7,5 @@ script = ExtResource("1_b6ook")
 display_name = "Vanguard"
 cost = 150
 ability = "War Cry"
-text = "+40 max HP, breaker cooldown -30%. Ability: War Cry (stun 7 m, -40% damage taken for 5 s)."
+text = "+40 max HP, breaker cooldown -30%. Ability: War Cry (stun 7 m, -40% melee damage taken for 5 s)."
 order = 1

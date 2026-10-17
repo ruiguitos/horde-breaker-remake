@@ -88,12 +88,25 @@ static func load_profile(path: String = PATH) -> Profile:
 	var p := Profile.new()
 	if not FileAccess.file_exists(path):
 		return p
-	var text: String = FileAccess.get_file_as_string(path)
-	var data: Variant = JSON.parse_string(text)
-	if not data is Dictionary:
-		push_warning("Profile: unreadable save, starting fresh")
-		return p
+	var data: Variant = _read_save(path)
+	if data == null:
+		# Unreadable: keep a copy of the damaged file (never overwrite it silently),
+		# then fall back to the last good save if there is one.
+		var stamp: int = int(Time.get_unix_time_from_system())
+		DirAccess.copy_absolute(ProjectSettings.globalize_path(path), ProjectSettings.globalize_path("%s.damaged-%d" % [path, stamp]))
+		push_warning("Profile: unreadable save kept as .damaged-%d" % stamp)
+		data = _read_save(path + ".bak")
+		if data == null:
+			return p
 	return from_dict(data)
+
+
+## The save as a Dictionary, or null when the file is missing or not valid JSON.
+static func _read_save(path: String) -> Variant:
+	if not FileAccess.file_exists(path):
+		return null
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	return data if data is Dictionary else null
 
 
 static func from_dict(d: Dictionary) -> Profile:
@@ -185,11 +198,7 @@ static func from_dict(d: Dictionary) -> Profile:
 
 
 func save(path: String = PATH) -> bool:
-	var f := FileAccess.open(path, FileAccess.WRITE)
-	if f == null:
-		push_warning("Profile: cannot write " + path)
-		return false
-	f.store_string(JSON.stringify({
+	var text: String = JSON.stringify({
 		"version": VERSION, "intel": intel, "runs": runs,
 		"extractions": extractions, "best_kills": best_kills,
 		"perk_ranks": _string_keys(perk_ranks), "perk_options": _string_keys(perk_options),
@@ -201,8 +210,19 @@ func save(path: String = PATH) -> bool:
 		"selected_primary": String(selected_primary), "selected_secondary": String(selected_secondary),
 		"quality": quality, "window_mode": window_mode, "resolution": "%dx%d" % [resolution.x, resolution.y],
 		"vsync": vsync, "hud_scale": hud_scale, "camera_mode": camera_mode, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "controller_icons": controller_icons, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias, "fov": fov,
-		"last_run": last_run, "lore_read": lore_read}, "  "))
-	return true
+		"last_run": last_run, "lore_read": lore_read}, "  ")
+	# Write a temporary file first, keep the last readable save as .bak, then
+	# replace. An interrupted save never leaves a half-written profile.
+	var tmp: String = path + ".tmp"
+	var f := FileAccess.open(tmp, FileAccess.WRITE)
+	if f == null:
+		push_warning("Profile: cannot write " + tmp)
+		return false
+	f.store_string(text)
+	f.close()
+	if _read_save(path) != null:
+		DirAccess.copy_absolute(ProjectSettings.globalize_path(path), ProjectSettings.globalize_path(path + ".bak"))
+	return DirAccess.rename_absolute(ProjectSettings.globalize_path(tmp), ProjectSettings.globalize_path(path)) == OK
 
 
 ## Adds a finished run's results.

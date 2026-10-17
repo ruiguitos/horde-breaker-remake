@@ -1,5 +1,119 @@
 # Horde Breaker — auditoria do jogo e trabalho por terminar
 
+## Estado atual — 2026-10-17
+
+**Referência:** `2555d01`. Revisão estática da documentação, código e recursos
+da cópia local. Há alterações locais de limpeza de addons e ficheiros de
+importação; foram preservadas. Não foram executados testes, exportações ou
+uma sessão gráfica nesta revisão. As contagens de testes e medições da
+auditoria de 11 de outubro, abaixo, são históricas.
+
+**Conclusão:** o ciclo principal já está implementado. Os pendentes atuais
+concentram-se na coerência das regras, robustez, animações de ações,
+acabamento dos cenários e validação jogada. Não é necessário voltar a criar
+os modelos das cinco armas, a locomoção ou os modelos dos especiais.
+
+### 1. Correções técnicas prioritárias
+
+P1 significa prioridade antes de distribuir uma versão; não significa que
+tenha sido reproduzido um bloqueio de uma run nesta revisão.
+
+| Prioridade | O que falta | Evidência atual e critério de conclusão |
+|---|---|---|
+| P1 | Unificar os limites da horda. | `IslandRun.load_context()` aumenta `director.max_alive` com Threat/modificadores, mas `_spawn_enemy()` continua limitado a `GameData.MAX_ALIVE = 150`. Ninhos usam o menor dos dois limites; invocações do boss acrescentam inimigos sem consultar esse teto. Aplicar uma política comum, respeitando o máximo de 300 decidido, e verificar todos os caminhos. [Simulação](../../game/world/island_run.gd), [diretor](../../game/world/director.gd). |
+| P1 | Proteger a gravação do perfil. | `Profile.save()` abre diretamente o ficheiro final para escrita; `load_profile()` devolve um perfil novo quando o JSON é ilegível. Faltam escrita temporária/substituição, recuperação e preservação do ficheiro danificado. Não foi observada perda de dados nesta análise. [Perfil](../../game/core/profile.gd). |
+| P1 | Corrigir o executor geral de testes. | `run_all.gd` exige código de saída zero e só procura `TEST FAIL`; não verifica explicitamente `SCRIPT ERROR`, parsing, conclusão ou timeout. Pode rejeitar testes concluídos no Windows ou não reconhecer um erro de script. Validar com casos controlados de sucesso, erro, falha e processo pendurado. [Executor](../../tests/run_all.gd). |
+| P1, distribuição | Restringir noclip ao desenvolvimento. | Mouse 4/5 ativa `run.noclip` sem proteção de build no respetivo handler. Confirmar que fica inacessível numa versão de release. [Entrada](../../game/core/game_input.gd), [ilha](../../game/world/island.gd). |
+| P1, distribuição | Preparar e validar o pacote Windows. | Não existe `export_presets.cfg` nesta cópia. Falta demonstrar exportação reproduzível, versão/ícone, inclusão das licenças e arranque sem editor. O ecrã de créditos já existe; não o contar novamente como sistema em falta. |
+| P2 | Alinhar texto e efeitos. | War Cry promete redução genérica de dano, mas o fator 0,6 está no dano melee. Elite Pack menciona Brutes/Grabbers, mas o diretor também aumenta Bloaters/Screamers. Corrigir descrições ou decidir alterar os efeitos. A antiga descrição de Pack Rat já foi corrigida. [Vanguard](../../game/data/classes/vanguard.tres), [Elite Pack](../../game/data/modifiers/elite.tres). |
+| P2 | Completar definições de comando. | Settings guarda sensibilidade do rato, mas não do stick nem zonas mortas configuráveis. A mira lê o dispositivo 0 e usa velocidades fixas. Rever seleção do comando ativo e validar com hardware. [Settings](../../game/ui/settings_panel.gd), [mira](../../game/world/island.gd). |
+| P2 | Completar a telemetria para reprodução de problemas. | O JSON inclui resultados por etapa, mas não guarda seed da run/ilha, revisão do jogo, utilização das armas ou causa de morte. O nome tem precisão de segundos e falhas de abertura são silenciosas. [Gravação](../../game/main.gd), [resultados](../../game/world/island_run.gd). |
+
+### 2. Modelos, animações, som e cenários ainda parciais
+
+| Área | O que já existe | Trabalho ainda por fazer |
+|---|---|---|
+| Jogador | Recruit/Vanguard com Idle/Walk/Jog/Sprint, strafe/recuo sintetizados, apoio dos pés e empunhadura por arma. | Movimento próprio do Breaker; rodar no sítio e arranques/paragens mais naturais; ações de habilidade, ferimento e morte; resolver a interseção da perna com a lata. A avaliação visual nas mudanças de direção continua necessária. [Locomoção](LOCOMOTION.md), [modelo](../../game/world/soldier_model.gd). |
+| Armas | Cinco GLB originais integrados; pega, cano, recuo e ADS em primeira pessoa. | Clips de recarga e bombeamento da shotgun, mãos/dedos mais detalhados e lentes mais convincentes. A mecânica já tem carregadores: SMG recarrega em 1,1 s, Machine Gun em 3,2 s; AR continua instantânea. Não afirmar que todas as recargas mecânicas estão em falta. [Armas](WEAPON_MODELS.md), [dados](../../game/data/weapons). |
+| Sobrevivente | Escort tem modelo humano próprio com movimento simples dos membros e pose caído. | Rescue continua a criar uma cápsula laranja em `island.gd`. Integrar um humano nessa missão e melhorar deslocação, ferimento e morte; não criar outro sistema de escolta. [Modelos](../../game/world/escort_model.gd), [integração](../../game/world/island.gd). |
+| Inimigos | Walker e seis especiais com silhuetas próprias; Crawler e perda de pernas também existem. | Sincronizar poses com ações reais: grito, explosão e fases/ataques do boss. O shader usa animação por pivôs; não há necessidade demonstrada de substituir esse sistema por VAT. Não confundir modelos existentes com todos os estados de animação concluídos. [Especiais](SPECIAL_ENEMY_MODELS.md), [arte atual](ZOMBIE_AND_WEAPON_ART.md). |
+| Props | Gerador, bidão, caixote e barreira realistas; carrinho original procedural. | A integração dos restantes oito downloads continua pendente segundo `REALISTIC_PROPS.md`: barril, carrinho, braseiro, rádio, boia, cais, kit de forte e Venus. Rever utilidade antes de integrar: já há alternativas procedurais, incluindo carrinho e forte. [Props](REALISTIC_PROPS.md), [registo ativo](../../game/world/island_props.gd). |
+| Cenários | Quatro ilhas manuais do arquipélago; Berlenga com quatro partes. O gerador já tem kits de farol e forte. | Volcano continua sem uma cena manual equivalente a `volcano_01.tscn`. Acabamento, colisões, caminhos, visibilidade e landmarks precisam de revisão jogada. Não classificar automaticamente o farol/forte como modelos inexistentes; a presença dos kits não certifica o aspeto de todas as cenas geradas. [Kits](../../tools/real_island/landmarks.gd), [ilhas](../../game/world/handmade/islands). |
+| Áudio | Ambiente, música adaptativa, síntese e amostras Ovani. | Sons de disparo apropriados para AR/SMG/Machine Gun/Shotgun; continuam sintetizados. Afinar volumes, fadiga e leitura direcional a ouvido. [Som](../../game/audio/sfx.gd), [README](../../game/README.md). |
+
+### 3. Validação pendente — não é ausência de implementação
+
+1. **Desempenho do jogo completo:** medir 150 inimigos e o teto efetivo
+   depois da correção dos limites, nas três câmaras, com terreno, IA, HUD,
+   boss e efeitos elementais. O ensaio gráfico dos modelos dos especiais
+   exclui esses sistemas; não demonstra FPS da ilha completa. Registar
+   tempos médios/p95, memória e estabilidade numa sessão prolongada.
+2. **Equilíbrio com jogadores:** XP/cartas, munição/recargas, duas classes,
+   Threat 1–3, pressão entre ilhas, economia e duração das runs. Rever o
+   impacto de Nuke/Insta-Kill no boss. Os bots que repõem vida não validam
+   dificuldade humana.
+3. **Berlenga de ponta a ponta:** Escort → Signals → Hold Sequence →
+   Holdout, incluindo rampas, passagens estreitas, spawns e barco.
+4. **Comando, resoluções e acessibilidade:** testar dispositivo ativo,
+   reconexão, foco, legibilidade, ultrawide/4K e estados que dependem de cor.
+5. **Suite atual:** voltar a executar antes de afirmar uma contagem verde.
+   O commit `173d93c` contém correções de Escort/Intel Search; os resultados
+   45/47, 46/48 e 47/49 dos relatórios de modelos são anteriores. Esta
+   revisão não confirma nem repete essas falhas.
+
+### 4. Pendentes antigos que já não devem orientar implementação
+
+- Armas originais, empunhadura de duas mãos, caminhar/correr e modelos dos
+  especiais: implementados. ADS, Crawlers e perda de pernas foram
+  acrescentados entretanto.
+- Árvore de perks, seleção de arma principal/secundária e substituição da
+  Heavy Pistol pela Machine Gun: implementadas.
+- Painel `ISLAND CLEARED`/`PART CLEARED`: existe `IslandEndPanel`, com
+  estatísticas por etapa separadas do total da run. A pré-visualização da
+  Berlenga recebe expedição/parte e desenha paisagem própria sem palmeiras.
+  O §5 do handoff continua a pedir estas tarefas já feitas.
+- Hold Sequence, Fuel Run, Nests, Intel Search, Signals, Sabotage e Escort:
+  existem no código. O início de `OBJECTIVES_PROPOSAL.md` descreve uma
+  proposta antiga; as secções posteriores registam integrações. Não usar
+  a frase inicial «nada implementado» como estado atual.
+- Remapeamento de armas 4/5: deixou de ser um requisito do loadout atual,
+  que leva principal/secundária nas teclas 1/2. `weapon_next` e reroll
+  continuam fora da lista de remapeamento, se se pretender completá-la.
+- Créditos: já têm painel integrado. Hashima: removida por decisão;
+  restaurá-la não é um pendente.
+- `TODO.md` ainda duplica VAT, usa XP anterior à escala ×10 e diz «3
+  missões». `CLAUDE.md` ainda apresenta uma slice de uma ilha. O handoff,
+  propostas e relatórios históricos precisam de referências ao estado
+  atual, preservando as decisões do utilizador.
+
+### 5. Expansões que exigem decisão de âmbito
+
+**Origin jogável**, mapa de rotas em grafo, cartas desbloqueadas por Intel,
+mais classes/armas, evoluções e co-op continuam propostas/expansões. Não
+são falhas do ciclo single-player aprovado. O final narrativo Origin já
+existe. O grafo de rotas também deve ser reconciliado com a decisão mais
+recente de transições automáticas e rota aleatória entre ilhas.
+
+**Ordem recomendada:** limites da horda → saves/runner → sobrevivente Rescue
+e ações de animação → medição completa e playtest → acabamento dos
+cenários/áudio → pacote distribuível. Atualizar a lista curta de tarefas
+em conjunto com essa próxima ronda; não implementar expansões por inferência.
+
+**Verificação externa limitada:** o JEV verificou três distinções
+metodológicas usando apenas um resumo abstrato e sanitizado, sem código,
+caminhos ou identificadores do projeto: benchmark de arte versus jogo
+completo, locomoção versus animações de ações e listas antigas versus
+código atual. Confirmou as três; não auditou o repositório nem certificou
+as implementações. Não foram enviados novos trechos de código.
+
+---
+
+## Auditoria histórica — 2026-10-11
+
+O restante documento conserva a análise daquela data. Pendentes,
+catálogos, commits e resultados abaixo não representam automaticamente
+o estado atual; prevalece a atualização de 17 de outubro acima.
+
 **Data:** 2026-10-11. **Estado analisado:** `48d0c42ae3fc7501d0eb3993fb9351ab3e9daa61`, depois das alterações do Claude.
 
 **Atualização posterior à auditoria (2026-10-11):** a escala de XP mudou

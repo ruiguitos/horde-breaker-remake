@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_perk")
 title = "Pack Rat"
-description = "Long expeditions: more secondary ammo."
+description = "Long expeditions: more ammo for every weapon with a finite reserve."
 branch = "survival"
 tier = 2
 option = 0
