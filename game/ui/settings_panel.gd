@@ -73,7 +73,7 @@ func _show(t: String) -> void:
 	tab = t
 	_body_scroll.scroll_vertical = 0
 	for b in _tab_buttons:
-		b.theme_type_variation = &"SelectedButton" if b.name == "Tab_" + t else &""
+		_style_tab(b, b.name == "Tab_" + t)
 	for child in _body.get_children():
 		_body.remove_child(child)
 		child.queue_free()
@@ -86,6 +86,21 @@ func _show(t: String) -> void:
 	# Keep focus on the tab that was pressed (the trap focuses the first one).
 	call_deferred("_focus_tab", t)
 
+
+## Tabs read as parts of one panel: the selected tab has an amber base rule and
+## a faint fill that runs into the content; the others are flat.
+func _style_tab(b: Button, selected: bool) -> void:
+	b.theme_type_variation = &""
+	var box := StyleBoxFlat.new()
+	box.bg_color = Color(UiTheme.ACCENT, 0.12) if selected else Color(0, 0, 0, 0)
+	box.border_color = UiTheme.ACCENT if selected else UiTheme.LINE
+	box.set_border_width_all(0)
+	box.border_width_bottom = 3 if selected else 1
+	box.content_margin_top = 6
+	box.content_margin_bottom = 6
+	for state in ["normal", "hover", "pressed", "focus"]:
+		b.add_theme_stylebox_override(state, box)
+	b.add_theme_color_override("font_color", UiTheme.ACCENT if selected else UiTheme.MUTED)
 
 func _focus_tab(t: String) -> void:
 	for b in _tab_buttons:

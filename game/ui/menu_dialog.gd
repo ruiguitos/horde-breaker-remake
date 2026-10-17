@@ -87,20 +87,48 @@ static func credits(parent: Node) -> MenuDialog:
 	return dialog
 
 
+## Intel archive: the file list on the left (a NEW tag for files not read
+## before this visit), the selected file's text on the right. The NEW tags
+## are read before the caller marks the archive as read.
 static func archive(parent: Node, profile: Profile) -> MenuDialog:
 	var dialog := MenuDialog.new()
 	parent.add_child(dialog)
 	dialog.content.add_child(UiTheme.title("INTEL ARCHIVE", 36))
 	dialog.content.add_child(UiTheme.label("RECOVERED FILES  %02d / %02d" % [profile.lore_pages, Story.FILES.size()], 16, UiTheme.ACCENT, true))
-	var list := _scroll(dialog.content, 320)
+	var body := HBoxContainer.new()
+	body.add_theme_constant_override("separation", 18)
+	dialog.content.add_child(body)
+	var column := VBoxContainer.new()
+	column.custom_minimum_size.x = 240
+	body.add_child(column)
+	var index := _scroll(column, 340)
+	index.add_theme_constant_override("separation", 6)
+	var reader := VBoxContainer.new()
+	reader.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	reader.add_theme_constant_override("separation", 10)
+	body.add_child(reader)
+	var heading := UiTheme.title("", 22)
+	var text := UiTheme.label("", 16, UiTheme.TEXT)
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	reader.add_child(heading)
+	reader.add_child(text)
+	var show := func(i: int) -> void:
+		var recovered: bool = i < profile.lore_pages
+		heading.text = Story.FILES[i]["title"] if recovered else "FILE %02d / ENCRYPTED" % (i + 1)
+		text.text = Story.FILES[i]["text"] if recovered else "Recover this file from supply caches or the Behemoth."
+		text.add_theme_color_override("font_color", UiTheme.TEXT if recovered else UiTheme.MUTED)
 	for i in Story.FILES.size():
 		var recovered: bool = i < profile.lore_pages
-		list.add_child(UiTheme.title(Story.FILES[i]["title"] if recovered else "FILE %02d / ENCRYPTED" % (i + 1), 22))
-		list.add_child(UiTheme.label(Story.FILES[i]["text"] if recovered else "Recover this file from supply caches or the Behemoth.", 16, UiTheme.TEXT if recovered else UiTheme.MUTED))
-		list.add_child(HSeparator.new())
+		var label: String = Story.FILES[i]["title"] if recovered else "FILE %02d / ENCRYPTED" % (i + 1)
+		if recovered and i >= profile.lore_read:
+			label += "   NEW"
+		var b := UiTheme.button(index, label, show.bind(i))
+		b.name = "File%02d" % (i + 1)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.add_theme_font_size_override("font_size", 14)
+	show.call(0)
 	UiTheme.button(dialog.content, "CLOSE", dialog.close, true)
 	return dialog
-
 
 static func controls(parent: Node) -> MenuDialog:
 	var dialog := MenuDialog.new()
@@ -108,7 +136,7 @@ static func controls(parent: Node) -> MenuDialog:
 	dialog.content.add_child(UiTheme.title("CONTROLS", 36))
 	var list := _scroll(dialog.content, 300)
 	list.add_child(UiTheme.label("Your weapon fires automatically at enemies in front of you. Turn your body to choose a target.", 18, UiTheme.ACCENT))
-	list.add_child(UiTheme.label("MOVE       WASD / arrows / left stick\nAIM        Mouse / right stick\nBREAKER    Space / RMB / A / RB\nABILITY    G / MMB / LB\nSPRINT     Shift / L3\nWEAPONS    1–2 / D-pad\nPAUSE      Esc / Start\nMENUS      Enter / A · Esc / B back\nSUPPLIES   1–3 / X · Y · B\nROUTES     4–5 / LB · RB", 18, UiTheme.TEXT, true))
+	list.add_child(UiTheme.label("MOVE       WASD / arrows / left stick\nAIM        Right mouse / left trigger (first person)\nBREAKER    Space / A / RB\nABILITY    G / MMB / LB\nSPRINT     Shift / L3\nWEAPONS    1–2 / D-pad\nPAUSE      Esc / Start\nMENUS      Enter / A · Esc / B back\nSUPPLIES   1–3 / X · Y · B\nROUTES     4–5 / LB · RB", 18, UiTheme.TEXT, true))
 	UiTheme.button(dialog.content, "BACK", dialog.close, true)
 	return dialog
 

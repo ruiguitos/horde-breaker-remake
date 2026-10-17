@@ -167,6 +167,7 @@ func _build_header_band() -> void:
 		var tile := TextureRect.new()
 		tile.name = "AzulejoRight" if right else "AzulejoLeft"
 		tile.texture = Art.tile(int(HEADER_HEIGHT))
+		tile.modulate = Color(1, 1, 1, 0.5)  # discreet: the azulejo frames the header, it does not compete with the character
 		tile.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tile.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT if right else Control.PRESET_TOP_LEFT)
