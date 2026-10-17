@@ -22,3 +22,7 @@ game/world/handmade/world_test_handmade_data/
 
 # Godot's temporary copies of loaded GDExtension libraries (recreated by the editor)
 addons/**/~*.dll
+
+# Godot import stubs for review captures (generated; the PNGs are kept)
+docs/design/zombie_fix/*.import
+docs/design/grading/*.import
