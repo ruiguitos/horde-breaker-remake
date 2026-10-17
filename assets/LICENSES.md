@@ -10,7 +10,6 @@ incluindo fontes, licenças e indicação das modificações. Ver
 | Caminho | O quê | Autor / origem | Licença |
 |---|---|---|---|
 | `addons/terrain_3d/` | Terrain3D 1.0.2 (terreno por heightmap, GDExtension) | Cory Petkovsek & Roope Palmroos | MIT (`LICENSE.txt`) |
-| `addons/terrabrush/` | TerraBrush (terreno pintável, GDExtension) | spimort | MIT (`LICENSE`) |
 | `addons/sky_3d/` | Sky3D 2.1 (céu e ciclo dia/noite) | Cory Petkovsek, J. Cuéllar e contribuidores | MIT (`LICENSE.txt`) |
 | `addons/sky_3d/assets/thirdparty/textures/milkyway/` (`Milkyway.jpg`, `StarField.jpg`) | Céu noturno do Sky3D: "The Milky Way panorama"; `StarField.jpg` é uma versão modificada | ESO/S. Brunier | **CC BY 4.0**: exceção aceite pelo utilizador a 2026-10-11. Os créditos do jogo têm de mostrar: "The Milky Way panorama by ESO/S. Brunier, licensed under CC BY 4.0 and used in original and modified forms." |
 | `addons/phantom_camera/` | Phantom Camera 0.11 (transições de câmara) | Marcus Skov | MIT (`LICENSE`) |
@@ -26,12 +25,8 @@ incluindo fontes, licenças e indicação das modificações. Ver
 | `assets/models/polyhaven/wooden_crate_02/` | Caixote de madeira, glTF oficial com texturas de 1K | James Ray Cock e Jurita Burger / [Poly Haven](https://polyhaven.com/a/wooden_crate_02) | CC0 (`assets/models/polyhaven/LICENSE.txt`) |
 | `assets/models/polyhaven/concrete_road_barrier_02/` | Barricada de betão, glTF oficial com texturas de 1K | Amal Kumar / [Poly Haven](https://polyhaven.com/a/concrete_road_barrier_02) | CC0 (`assets/models/polyhaven/LICENSE.txt`) |
 | `addons/road-generator/` + `road_demos/` | Road Generator 0.9.4 (estradas 3D) | Moo-Ack! Productions | MIT (`LICENSE`) |
-| `addons/lit/` | Lit 1.1.6 (luz **2D**; não usado no 3D) | Shawn Deprey | MIT (`LICENSE`) |
 | `addons/guide/` + `guide_examples/` | G.U.I.D.E 0.14 (input e ícones de comandos) | Jan Thomä | MIT (`LICENSE.md`) |
 | `addons/boot_splash_plus/` | Boot Splash Plus 0.4.5 | GamingFirstOne | MIT (`LICENSE`) |
-| `addons/asset_placer/` | Godot Asset Placer 1.6 (ferramenta de editor) | Roman Levinzon | MIT (`LICENSE`) |
-| `addons/orchestrator/` | Orchestrator (visual scripting, GDExtension, 170 MB) | CraterCrash e contribuidores (`AUTHORS.md`) | Apache 2.0 (`LICENSE`) |
-| `addons/zylann.hterrain/` | HTerrain 1.8 (terreno por heightmap) | Marc Gilleron | MIT (`LICENSE.md`) |
 | `addons/Color grading/` + `Compositor/` | Color Grading (efeitos de compositor) | Rytelier | MIT (`LICENSE.txt` na raiz) |
 | `addons/yard/` | YARD 1.3 (registos de Resources) | Elliot Fontaine e contribuidores | MIT (`LICENSE`) |
 | `addons/dialogue_manager/` | Dialogue Manager 4.1 | Nathan Hoad | MIT (`LICENSE`) |
