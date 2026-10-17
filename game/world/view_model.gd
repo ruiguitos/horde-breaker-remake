@@ -6,6 +6,8 @@ extends Node3D
 
 ## Rest position in camera space: lower right, a little ahead of the eye.
 const REST: Vector3 = Vector3(0.19, -0.2, -0.47)
+## Sights: the gun is brought to the centre of the view while aiming down sights.
+const ADS_REST: Vector3 = Vector3(0.0, -0.12, -0.4)
 ## The guns are modelled at real size (WeaponModel, ~1 m with the stock); at
 ## the eye that filled a third of the screen. Drawn at half size it reads as
 ## a gun in the hands, not a wall.
@@ -21,6 +23,8 @@ var _flash: MeshInstance3D
 var _flash_time: float = 0.0
 var _kick: float = 0.0
 var _mats: Dictionary = {}
+## 0 = hip, 1 = aiming down sights (set by the island each frame).
+var aim: float = 0.0
 
 
 static func create(id: StringName) -> ViewModel:
@@ -104,5 +108,5 @@ func update(delta: float, pull_back: float, walk: float, t: float) -> void:
 		_flash.rotation.z = randf() * TAU
 	var bob := Vector3(sin(t * 9.0) * 0.008, -absf(cos(t * 9.0)) * 0.01, 0) * walk
 	var near: float = clampf(pull_back / MAX_PULL, 0.0, 1.0)
-	position = REST + bob + Vector3(0, -pull_back * 0.3, pull_back + _kick * 0.035)
+	position = REST.lerp(ADS_REST, aim) + bob + Vector3(0, -pull_back * 0.3, pull_back + _kick * 0.035)
 	rotation.x = _kick * 0.06 - near * 1.1  # negative: the barrel points down

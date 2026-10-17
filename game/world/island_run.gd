@@ -1977,12 +1977,19 @@ func fire_rate() -> float:
 	return weapons[weapon_index].fire_rate * (1.0 + bonus) * mult
 
 
+## Aim down sights (first person, the aim action): set each step by the island.
+var aiming: bool = false
+
+## Spread multiplier while aiming down sights.
+const ADS_SPREAD_MULT: float = 0.4
+
 ## Spread of weapon `w` now: Steady Grip tightens the primary standing
 ## still; Skirmisher widens it standing still.
 func weapon_spread(w: GameData.Weapon) -> float:
+	var ads: float = ADS_SPREAD_MULT if aiming else 1.0
 	if not w.primary or not _stationary:
-		return w.spread_deg
-	return w.spread_deg * (1.0 - perk_value(&"steady_grip") / 100.0) * (1.0 + perk_cost(&"skirmisher") / 100.0)
+		return w.spread_deg * ads
+	return w.spread_deg * ads * (1.0 - perk_value(&"steady_grip") / 100.0) * (1.0 + perk_cost(&"skirmisher") / 100.0)
 
 
 func breaker_radius() -> float:

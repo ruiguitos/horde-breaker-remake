@@ -231,6 +231,10 @@ var _debris_size := PackedFloat32Array()
 var _head_debris_mm := MultiMesh.new()
 var _zombies := ZombieHordeView.new()  ## common zombies and six distinct special models
 var _breaker_held: bool = false
+## Aim down sights: 0 = hip, 1 = fully aimed (see run.aiming).
+var _ads: float = 0.0
+const ADS_TIME: float = 0.15  ## seconds to raise or lower the sights
+const ADS_FOV_RATIO: float = 0.75  ## field of view while aiming, relative to the setting
 var _trauma: float = 0.0
 var _last_hp: float = -1.0
 var _was_dashing: bool = false
@@ -1833,6 +1837,9 @@ func _physics_process(delta: float) -> void:
 			aim = Vector3(stick.x, 0, stick.y)
 	var t0: int = Time.get_ticks_usec()
 	var sprint: bool = Input.is_action_pressed(&"sprint")
+	# Aim down sights: first person only; the gun and the view narrow over ADS_TIME.
+	run.aiming = _free_look() and camera_mode == Profile.CameraMode.FIRST_PERSON and Input.is_action_pressed(&"aim")
+	_ads = move_toward(_ads, 1.0 if run.aiming else 0.0, delta / ADS_TIME)
 	run.step(delta, move, aim, _breaker_held, sprint)
 	if _grenade_held:
 		# First / third person: where the crosshair meets the ground (a spot
@@ -1866,7 +1873,7 @@ func _process(delta: float) -> void:
 	if profile != null and not showcase and profile.camera_mode != camera_mode:
 		_set_camera_mode(profile.camera_mode, false)  # changed in Settings (pause)
 	if profile != null and _camera != null:
-		var fov: float = _camera_fov(camera_mode == Profile.CameraMode.FIRST_PERSON)
+		var fov: float = _camera_fov(camera_mode == Profile.CameraMode.FIRST_PERSON) * lerpf(1.0, ADS_FOV_RATIO, _ads)
 		if _camera.fov != fov:
 			_camera.fov = fov  # field of view changed in Settings (pause)
 	_update_mouse_mode()
@@ -2104,6 +2111,7 @@ func _update_first_person_camera(jitter: Vector3, delta: float) -> void:
 			break
 		d += 0.1
 	_view_model.set_weapon(run.weapons[run.weapon_index].id)
+	_view_model.aim = _ads
 	_view_model.update(delta, clampf(REACH - free, 0.0, ViewModel.MAX_PULL), _walk_speed, Time.get_ticks_msec() / 1000.0)
 
 

@@ -15,7 +15,9 @@ static var ACTIONS: Dictionary = {
 	&"move_right": [KEY_D, KEY_RIGHT, "axis:%d:1" % JOY_AXIS_LEFT_X],
 	&"move_up": [KEY_W, KEY_UP, "axis:%d:-1" % JOY_AXIS_LEFT_Y],
 	&"move_down": [KEY_S, KEY_DOWN, "axis:%d:1" % JOY_AXIS_LEFT_Y],
-	&"breaker": [KEY_SPACE, "mouse:%d" % MOUSE_BUTTON_RIGHT, "joy:%d" % JOY_BUTTON_A, "joy:%d" % JOY_BUTTON_RIGHT_SHOULDER],
+	&"breaker": [KEY_SPACE, "joy:%d" % JOY_BUTTON_A, "joy:%d" % JOY_BUTTON_RIGHT_SHOULDER],
+	## Aim down sights (first person): right mouse, left trigger on the pad.
+	&"aim": ["mouse:%d" % MOUSE_BUTTON_RIGHT, "axis:%d:1" % JOY_AXIS_TRIGGER_LEFT],
 	&"ability": [KEY_G, "mouse:%d" % MOUSE_BUTTON_MIDDLE, "joy:%d" % JOY_BUTTON_LEFT_SHOULDER],
 	&"sprint": [KEY_SHIFT, "joy:%d" % JOY_BUTTON_LEFT_STICK],
 	## Pick up / put down a carried object (Fuel Run cans). Pad X is free on
@@ -95,7 +97,7 @@ static func _event(binding: Variant) -> InputEvent:
 const REBINDABLE: Dictionary = {
 	&"move_up": "Move forward", &"move_down": "Move back",
 	&"move_left": "Move left", &"move_right": "Move right",
-	&"breaker": "Breaker (charge)", &"ability": "Class ability",
+	&"breaker": "Breaker (charge)", &"ability": "Class ability", &"aim": "Aim down sights",
 	&"sprint": "Sprint", &"interact": "Pick up / drop", &"camera_toggle": "Camera view",
 	&"weapon_1": "Primary weapon", &"weapon_2": "Secondary weapon",
 	&"pause": "Pause",
