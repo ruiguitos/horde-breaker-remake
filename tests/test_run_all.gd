@@ -16,7 +16,7 @@ func _check(ok: bool, what: String) -> void:
 func _initialize() -> void:
 	var runner: Script = load("res://tests/run_all.gd")
 	_check(runner.classify(0, "TEST: a\nTEST: b\n") == "PASS", "a clean run passes")
-	_check(runner.classify(0, "TEST FAIL: x\n").begins_with("FAIL"), "TEST FAIL fails even with exit 0")
+	_check(runner.classify(0, "TEST FAIL: x\n").begins_with("FAIL"), "a failure marker fails even with exit 0")
 	_check(runner.classify(0, "SCRIPT ERROR: boom\nTEST: a\n").begins_with("FAIL"), "a script error fails even with exit 0")
 	_check(runner.classify(0, "Parse Error: bad\n").begins_with("FAIL"), "a parse error fails")
 	_check(runner.classify(139, "TEST: a\nTEST: b\n") == "PASS (exit code at quit)", "a finished run with the Windows exit code at quit passes")
