@@ -1,0 +1,116 @@
+{
+  "armature": "Arms",
+  "bind_rest_positions_gun_m": {
+    "Forearm_L": [
+      -0.128467679023743,
+      -0.029171409085393,
+      0.0232236348092556
+    ],
+    "Forearm_R": [
+      0.0681731700897217,
+      -0.0756517797708511,
+      0.105390124022961
+    ],
+    "Hand_L": [
+      -0.0369353368878365,
+      0.0416571870446205,
+      -0.25355276465416
+    ],
+    "Hand_R": [
+      -0.0836537033319473,
+      0.00869646668434143,
+      -0.139219760894775
+    ],
+    "Shoulder_L": [
+      -0.185000002384186,
+      -0.100000001490116,
+      0.300000011920929
+    ],
+    "Shoulder_R": [
+      0.185000002384186,
+      -0.159999996423721,
+      0.349999994039536
+    ],
+    "UpperArm_L": [
+      -0.220000013709068,
+      -0.0999999940395355,
+      0.299999952316284
+    ],
+    "UpperArm_R": [
+      0.219999998807907,
+      -0.159999996423721,
+      0.349999994039536
+    ]
+  },
+  "bone_names": [
+    "Shoulder_R",
+    "UpperArm_R",
+    "Forearm_R",
+    "Hand_R",
+    "Shoulder_L",
+    "UpperArm_L",
+    "Forearm_L",
+    "Hand_L"
+  ],
+  "engine": "4.7.2-stable (official)",
+  "failures": [],
+  "glb_sha256": "a05d7dc7676e4cf4fbd246ee74588c17897bf336fe4afc805d06f55cb32ddfd6",
+  "godot_default_skeleton_rest_positions_gun_m": {
+    "Forearm_L": [
+      -0.211801081895828,
+      -0.1149085983634,
+      0.000482797622680664
+    ],
+    "Forearm_R": [
+      0.250833779573441,
+      -0.27297568321228,
+      0.0738011002540588
+    ],
+    "Hand_L": [
+      -0.0520000606775284,
+      0.0300001725554466,
+      -0.208000123500824
+    ],
+    "Hand_R": [
+      0.0399999767541885,
+      -0.0600000321865082,
+      0.0599999353289604
+    ],
+    "Shoulder_L": [
+      -0.185000002384186,
+      -0.100000001490116,
+      0.300000011920929
+    ],
+    "Shoulder_R": [
+      0.185000002384186,
+      -0.159999996423721,
+      0.349999994039536
+    ],
+    "UpperArm_L": [
+      -0.219999998807907,
+      -0.100000001490116,
+      0.300000011920929
+    ],
+    "UpperArm_R": [
+      0.219999998807907,
+      -0.159999996423721,
+      0.349999994039536
+    ]
+  },
+  "left_palm_contact_error_m": 0.0000000819563865661621,
+  "material_names": [
+    "glove",
+    "skin",
+    "sleeve_cloth"
+  ],
+  "maximum_imported_weight_sum_error": 0.0000152587890625,
+  "mesh_count": 12,
+  "normals_tangents_uvs_imported": true,
+  "passed": true,
+  "rest_definition": "Skin inverse binds retain straight Blender bind rest. Godot Skeleton rest is the fixed bent glTF node pose.",
+  "rigid_bone_child_finger_meshes": 10,
+  "skinned_mesh_count": 2,
+  "triangles": 2616,
+  "weight_quantization_tolerance": 0.0000305180437933928,
+  "wrist_blended_exported_vertices": 342
+}

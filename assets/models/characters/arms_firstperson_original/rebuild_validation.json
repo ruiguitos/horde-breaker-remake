@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "factory_startup_headless_rebuild": true,
+  "command": "blender --background --factory-startup --python build_arms.py -- --no-render",
+  "rebuilt_glb_byte_identical": true,
+  "glb_sha256": "a05d7dc7676e4cf4fbd246ee74588c17897bf336fe4afc805d06f55cb32ddfd6",
+  "triangles": 2616,
+  "blender_version": "5.2.2 LTS",
+  "report_hashes_match": true
+}

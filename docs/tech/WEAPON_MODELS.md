@@ -124,3 +124,27 @@ movimentos, todos por código e medidos pelos nós do GLB:
 Não inclui: braço e mão em primeira pessoa (ainda luvas em caixa), IK, clips
 de Blender, recarga da espingarda e da marksman (sem temporizador), ótica.
 Capturas em `docs/design/weapon_animation/`.
+
+## Braços e mãos em primeira pessoa (F2, 2026-10-18)
+
+`FirstPersonArms` (`game/world/first_person_arms.gd`) carrega
+`assets/models/characters/arms_firstperson_original/arms_firstperson.glb`, o
+modelo do Codex. A mão direita fica no punho; o braço esquerdo é resolvido com
+dois ossos (lei dos cossenos, 0,30 m cada) para que a palma fique no ponto de
+apoio da arma (`WeaponModel.support_point`). A mão não roda: o contacto da
+palma é uma translação exata do punho.
+
+O repouso do GLB é a pose fletida de empunhadura, não o bind reto; o IK parte
+dos comprimentos fletidos e mantém o cotovelo do seu lado. Mangas e luvas
+tomam as cores da classe (`SoldierModel.PALETTES`).
+
+Escala: a arma é desenhada a meia escala (`GUN_SCALE` 0,5), mas os braços
+são à escala real, dentro da arma (`scale` 1/GUN_SCALE). O alvo da palma é o
+ponto de apoio tal como o olho o vê (`support * GUN_SCALE`). O repouso da arma
+(`ViewModel.REST`, z = -0,40) é o compromisso medido: os ombros caem perto do
+corpo e a arma não tapa a vista. Com a arma à escala real, o ombro só ficava
+perto se a arma estivesse a 0,3 m do olho, e então ocupava o ecrã.
+
+Alcance medido no código (teste `test_first_person_arms`): AR, SMG e Machine
+Gun exatas (menos de 0,001 mm); marksman a 1,5 mm; espingarda a 1,07 cm, fora do
+alcance do braço atual. Falta ver tudo isto no editor.

@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "mesh_count": 12,
+  "bone_count": 8,
+  "armature": "Arms",
+  "no_cameras_lights_actions": true,
+  "one_uv_layer_per_mesh": true,
+  "all_vertex_weights_sum_to_one": true,
+  "root_identity": true,
+  "blend_sha256": "b19e4b03958c9ff70b8e6cf29c969f4eb9f1523b700b35be68c32308b2afbb5a",
+  "glb_sha256": "a05d7dc7676e4cf4fbd246ee74588c17897bf336fe4afc805d06f55cb32ddfd6"
+}

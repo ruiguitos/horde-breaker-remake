@@ -4,8 +4,10 @@ extends Node3D
 ## view, a glove and sleeve in the class kit's colours (SoldierModel.PALETTES)
 ## and a muzzle flash at the tip. A child of the camera (local -Z is forward).
 
-## Rest position in camera space: lower right, a little ahead of the eye.
-const REST: Vector3 = Vector3(0.19, -0.2, -0.47)
+## Rest position of the grip in camera space: the right hand holds the grip a
+## little right of the centre line, the arms come from shoulders just behind the
+## eye (see FirstPersonArms: the shoulders sit at ±0.2 m, about 0.1 m behind the eye).
+const REST: Vector3 = Vector3(0.02, -0.1, -0.40)
 ## Sights: while aiming down sights the front sight is put on the centre of the
 ## view, with the rear sight `EYE_TO_REAR` metres from the eye (see sight_rest).
 ## Used only when a gun has no sight parts in LAYOUT.
@@ -30,9 +32,9 @@ const LAYOUT: Dictionary = {
 	&"shotgun": {"magazine": [], "charge": ["Shotgun visible bolt"], "front": "", "rear": ""},
 	&"marksman": {"magazine": [], "charge": ["DMR bolt handle"], "front": "", "rear": ""},
 }
-## The guns are modelled at real size (WeaponModel, ~1 m with the stock); at
-## the eye that filled a third of the screen. Drawn at half size it reads as
-## a gun in the hands, not a wall.
+## The guns are drawn at real size: the arms are at real size too, and the
+## hands only meet the grip and the handguard if gun and arms share one scale.
+## (At half size the gun looked small and the arms looked too short to reach it.)
 const GUN_SCALE: float = 0.5
 ## Largest pull towards the eye (metres); at it the gun is also lowered.
 const MAX_PULL: float = 0.3
@@ -44,7 +46,7 @@ var _gun: Node3D
 var _flash: MeshInstance3D
 var _flash_time: float = 0.0
 var _kick: float = 0.0
-var _mats: Dictionary = {}
+var _arms: FirstPersonArms  ## the arms and hands on the gun (FirstPersonArms)
 var _model: WeaponModel  ## the gun's named parts (WeaponModel.build_parts)
 var _ads_rest: Vector3 = ADS_FALLBACK
 var _ads_tilt: float = 0.0  ## radians the gun tilts about its grip at full aim
@@ -90,9 +92,15 @@ func set_weapon(id: StringName) -> void:
 	var sight: Dictionary = sight_rest(model, String(layout.get("front", "")), String(layout.get("rear", "")))
 	_ads_rest = sight["position"]
 	_ads_tilt = sight["tilt"]
-	# Right hand on the grip and the sleeve going out of the view.
-	_box(Vector3(0.08, 0.08, 0.09), Vector3(0.01, -0.07, 0.04), "dark")
-	_box(Vector3(0.1, 0.1, 0.3), Vector3(0.04, -0.12, 0.22), "cloth", Vector3(18, 0, 0))
+	# The arms and hands: the right on the grip, the left on the weapon's support point.
+	_arms = FirstPersonArms.build(SoldierModel.PALETTES[class_id])
+	# The arms are drawn at real size (inside the half-size gun): the palm meets
+	# the gun's support point, which the eye sees at GUN_SCALE.
+	_arms.scale = Vector3.ONE / GUN_SCALE
+	_arms.set_support(model.support_point * GUN_SCALE)
+	for part: MeshInstance3D in _arms.find_children("*", "MeshInstance3D", true, false):
+		part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_gun.add_child(_arms)
 	tip = Node3D.new()
 	tip.position = model.muzzle.position + Vector3(0, 0, -0.03)
 	_gun.add_child(tip)
@@ -112,23 +120,6 @@ func set_weapon(id: StringName) -> void:
 	_flash.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	_flash.visible = false
 	tip.add_child(_flash)
-
-
-func _box(size: Vector3, pos: Vector3, key: String, rot_deg: Vector3 = Vector3.ZERO) -> void:
-	var mi := MeshInstance3D.new()
-	var b := BoxMesh.new()
-	b.size = size
-	mi.mesh = b
-	mi.position = pos
-	mi.rotation_degrees = rot_deg
-	if not _mats.has(key):
-		var m := StandardMaterial3D.new()
-		m.albedo_color = SoldierModel.PALETTES[class_id][key]
-		m.roughness = 0.6
-		_mats[key] = m
-	mi.material_override = _mats[key]
-	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_gun.add_child(mi)
 
 
 ## Gun-space offset of the magazine parts for a reload at progress `p`: out
