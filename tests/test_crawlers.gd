@@ -38,6 +38,7 @@ func _initialize() -> void:
 	_test_model_and_pose()
 	_test_posed_aim()
 	await _test_debris()
+	_test_glb_body()
 	_test_timing()
 	quit(1 if _failures > 0 else 0)
 
@@ -455,17 +456,190 @@ func _draw_ms(view: ZombieHordeView, h: Horde, map: IslandMap) -> float:
 	return (Time.get_ticks_usec() - t0) / 1000.0 / frames
 
 
+## The GLB body (crawler.glb, CrawlerBody) and its pose. The mesh is read from
+## the file at runtime, so these run headless; the pose is the CPU mirror of
+## crawler_body.gdshader (the shader itself is only checked in a window).
+func _test_glb_body() -> void:
+	var info: Dictionary = {}
+	var body: ArrayMesh = CrawlerBody.build(CrawlerBody.GLB_PATH, info)
+	_check(body != null and body.get_surface_count() == 1, "crawler.glb loads headless as one merged mesh")
+	if body == null:
+		return
+	var drawn: int = info["triangles"]
+	var dropped: int = info["degenerate"]
+	_check(drawn + dropped == CrawlerBody.TRIANGLES and dropped < 200,
+		"the GLB's %d triangles: %d drawn, %d zero-area dropped" % [CrawlerBody.TRIANGLES, drawn, dropped])
+	var head: Vector3 = info["head_pivot"]
+	_check(absf(head.y - 0.685) < 0.001 and absf(head.y - ZombieModel.CRAWL_HEAD_HEIGHT) < 0.001,
+		"the GLB head pivot is %.3f m above the ground (the aim height, CRAWL_HEAD_HEIGHT)" % head.y)
+	var hands: Array = info["hands_y"]
+	_check(absf(float(hands[0]) - 0.056) < 0.001 and absf(float(hands[1]) - 0.056) < 0.001,
+		"both wrists (hand pivots) are %.3f m above the ground" % float(hands[0]))
+	_check(absf(float(info["top"]) - 0.929) < 0.002 and absf(float(info["bottom"])) < 0.001,
+		"the mesh spans 0 to %.3f m (top of the head)" % float(info["top"]))
+	var arrays: Array = body.surface_get_arrays(0)
+	var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	var custom: PackedFloat32Array = arrays[Mesh.ARRAY_CUSTOM0]
+	var arm_rest_err: float = 0.0
+	var hand_l: PackedVector3Array = PackedVector3Array()
+	var hand_r: PackedVector3Array = PackedVector3Array()
+	var arm_weights: Array[float] = []
+	for i in verts.size():
+		var part: int = int(custom[i * 4] + 0.5)
+		var weight: float = custom[i * 4 + 1]
+		if part == CrawlerBody.PART_LEFT or part == CrawlerBody.PART_RIGHT:
+			var side: int = part - CrawlerBody.PART_LEFT
+			arm_rest_err = maxf(arm_rest_err, CrawlerBody.arm_pose(verts[i], side, weight, Vector2.ZERO).distance_to(verts[i]))
+			if weight > 1.5:
+				(hand_l if side == 0 else hand_r).append(verts[i])
+			else:
+				arm_weights.append(weight)
+	_check(arm_rest_err < 0.0001 and hand_l.size() > 100 and hand_r.size() > 100,
+		"the arms' rest pose is the GLB's own (IK at rest moves nothing, %.6f m; %d and %d hand vertices)" % [arm_rest_err, hand_l.size(), hand_r.size()])
+	var blended: int = 0
+	for w: float in arm_weights:
+		if w > 0.02 and w < 0.98:
+			blended += 1
+	_check(blended > 0, "the elbow is blended: %d arm vertices sit between the upper arm and the forearm" % blended)
+	# Chain: through a whole cycle the wrist reaches its target (the bones are right
+	# and the stroke is in reach: a stroke out of reach stretches the arm off its hand).
+	var chain_err: float = 0.0
+	var fore_err: float = 0.0
+	for side: int in 2:
+		var w3: Vector3 = info["arms"][side]["wrist3"]
+		for k in 48:
+			var stroke: Vector2 = CrawlerBody.hand_stroke(float(k) / 48.0)
+			var want := Vector3(w3.x, w3.y + stroke.y, w3.z + stroke.x)
+			chain_err = maxf(chain_err, CrawlerBody.arm_pose(w3, side, CrawlerBody.WEIGHT_HAND, stroke).distance_to(want))
+			fore_err = maxf(fore_err, CrawlerBody.arm_pose(w3, side, 1.0, stroke).distance_to(want))
+	_check(chain_err < 0.0005 and fore_err < 0.0005,
+		"the arm IK puts the wrist on its target through a cycle (%.5f m error, forearm chain %.5f m)" % [chain_err, fore_err])
+	# Planted: the hand's lowest point stays on the ground through the stance, moves back
+	# one stride per cycle, and lifts by CRAWL_LIFT in the recovery.
+	var planted: bool = true
+	var worst: float = 0.0
+	var steps: int = 40
+	for k in range(0, steps):
+		var cycle: float = float(k) / float(steps) * ZombieModel.CRAWL_STANCE * 0.99
+		var low: float = _hand_low(hand_l, 0, CrawlerBody.hand_stroke(cycle))
+		worst = maxf(worst, absf(low))
+		planted = planted and absf(low) < 0.001
+	_check(planted, "the GLB hand stays on the ground through its stance (worst %.4f m off the ground)" % worst)
+	var a: Vector3 = _hand_centre(hand_l, CrawlerBody.hand_stroke(0.1))
+	var b: Vector3 = _hand_centre(hand_l, CrawlerBody.hand_stroke(0.11))
+	_check(absf((a.z - b.z) - 0.01 * ZombieModel.CRAWL_STRIDE) < 0.001 and absf(a.y - b.y) < 0.001,
+		"through the stance the hand moves back %.4f m per 0.01 cycle (%.4f m)" % [0.01 * ZombieModel.CRAWL_STRIDE, a.z - b.z])
+	var lift: float = 0.0
+	for k in range(0, steps):
+		var cycle: float = ZombieModel.CRAWL_STANCE + (1.0 - ZombieModel.CRAWL_STANCE) * float(k) / float(steps - 1)
+		lift = maxf(lift, _hand_low(hand_l, 0, CrawlerBody.hand_stroke(cycle)))
+	_check(absf(lift - ZombieModel.CRAWL_LIFT) < 0.002, "the recovery lifts the hand by %.3f m (CRAWL_LIFT)" % lift)
+	_check(CrawlerBody.hand_stroke(0.3, 0.0) == Vector2.ZERO and absf(_hand_low(hand_l, 0, Vector2.ZERO)) < 0.001,
+		"standing still the hands stay at rest (walk 0)")
+	# The topple (CrawlerBody.TOPPLE_*): through its whole rear-up the body never goes under the ground.
+	var topple_low: float = INF
+	for k in 9:
+		var ang: float = -CrawlerBody.TOPPLE_ANGLE * float(k) / 8.0
+		for p: Vector3 in verts:
+			var yz: Vector2 = CrawlerBody.spin(Vector2(p.y, p.z - CrawlerBody.TOPPLE_PIVOT_Z), ang)
+			topple_low = minf(topple_low, yz.x)
+	_check(topple_low > -0.001, "the topple keeps the whole body above the ground (lowest %.4f m)" % topple_low)
+	# Nothing goes under the ground in a full cycle (forearms, hands, the other arm).
+	var lowest: float = INF
+	for k in 24:
+		lowest = minf(lowest, _arms_low(verts, custom, float(k) / 24.0))
+	_check(lowest > -0.002, "no arm vertex goes under the ground through a cycle (lowest %.4f m)" % lowest)
+	# Travel: the view's phase turns one cycle per CRAWL_STRIDE of travel, so the hands follow the metres walked.
+	var map := IslandMap.new()
+	map.field = FlowField.new(64, 64)
+	var view := ZombieHordeView.new()
+	root.add_child(view)
+	var h := _horde_of(GameData.EnemyKind.CRAWLER, 1, map)
+	h.speeds[0] = 1.3
+	h.travel[0] = 0.0
+	view.draw(h, map, 0.0, 0.0)
+	var phase0: float = view.buffer(ZombieHordeView.CRAWLER_VARIANT)[16]
+	h.travel[0] = ZombieModel.CRAWL_STRIDE
+	view.draw(h, map, 0.0, 0.0)
+	var phase1: float = view.buffer(ZombieHordeView.CRAWLER_VARIANT)[16]
+	_check(absf(fposmod(phase1 - phase0, TAU)) < 0.0001 or absf(fposmod(phase1 - phase0, TAU) - TAU) < 0.0001,
+		"a Crawler's phase turns once per %.1f m walked (%.4f rad)" % [ZombieModel.CRAWL_STRIDE, fposmod(phase1 - phase0, TAU)])
+	# The GLB mesh is the crawler's MultiMesh; without it the walker models take over.
+	var glb_node := view.get_node("Zombies_crawler") as MultiMeshInstance3D
+	_check(glb_node.multimesh.mesh == CrawlerBody.mesh() and view.instance_count(ZombieHordeView.CRAWLER_VARIANT) == 1,
+		"the GLB body is drawn in its own MultiMesh (one Crawler)")
+	CrawlerBody.enabled = false
+	view.draw(h, map, 0.0, 0.0)
+	var fallback: bool = view.instance_count(ZombieHordeView.CRAWLER_VARIANT) == 0 \
+		and view.instance_count(ZombieHordeView.variant_for(GameData.EnemyKind.WALKER, h.speeds[0])) == 1 \
+		and ZombieHordeView.variant_for(GameData.EnemyKind.CRAWLER, h.speeds[0]) < ZombieModel.VARIANTS
+	CrawlerBody.enabled = true
+	_check(fallback, "with the GLB switched off, a Crawler is drawn as a walker model in the legless pose (fallback)")
+	var missing: ArrayMesh = CrawlerBody.build("res://assets/models/characters/crawler_original/missing.glb")
+	_check(missing == null, "a missing crawler.glb gives no mesh, so the procedural Crawler is used")
+	view.free()
+
+
+## Lowest y of a hand's vertices (the hand is rigid with its wrist) in the stroke.
+func _hand_low(hand: PackedVector3Array, side: int, stroke: Vector2) -> float:
+	var low: float = INF
+	for p: Vector3 in hand:
+		low = minf(low, CrawlerBody.arm_pose(p, side, CrawlerBody.WEIGHT_HAND, stroke).y)
+	return low
+
+
+func _hand_centre(hand: PackedVector3Array, stroke: Vector2) -> Vector3:
+	var sum: Vector3 = Vector3.ZERO
+	for p: Vector3 in hand:
+		sum += CrawlerBody.arm_pose(p, 0, CrawlerBody.WEIGHT_HAND, stroke)
+	return sum / float(hand.size())
+
+
+## Lowest vertex of both arms at a cycle (the right arm half a cycle behind).
+func _arms_low(verts: PackedVector3Array, custom: PackedFloat32Array, cycle: float) -> float:
+	var low: float = INF
+	for i in verts.size():
+		var part: int = int(custom[i * 4] + 0.5)
+		if part != CrawlerBody.PART_LEFT and part != CrawlerBody.PART_RIGHT:
+			continue
+		var side: int = part - CrawlerBody.PART_LEFT
+		var stroke: Vector2 = CrawlerBody.hand_stroke(cycle + 0.5 * side)
+		low = minf(low, CrawlerBody.arm_pose(verts[i], side, custom[i * 4 + 1], stroke).y)
+	return low
+
+
+func _best_ms(view: ZombieHordeView, h: Horde, map: IslandMap) -> float:
+	var best: float = INF
+	for round in 3:
+		best = minf(best, _draw_ms(view, h, map))
+	return best
+
+
 ## CPU time of ZombieHordeView.draw, headless (no GPU here: not a frame-cost
-## measurement of the game). Crawlers reuse the walker MultiMeshes.
+## measurement of the game). Crawlers draw the GLB body in their own MultiMesh;
+## the procedural Crawler (walker models, legless) is the reference.
 func _test_timing() -> void:
 	var map := IslandMap.new()
 	map.field = FlowField.new(64, 64)
 	var view := ZombieHordeView.new()
 	root.add_child(view)
-	var walkers_ms: float = _draw_ms(view, _horde_of(GameData.EnemyKind.WALKER, 150, map), map)
-	var crawlers_ms: float = _draw_ms(view, _horde_of(GameData.EnemyKind.CRAWLER, 150, map), map)
-	print("PERF: 150 walkers %.3f ms/frame, 150 Crawlers %.3f ms/frame (CPU, headless; not a GPU measurement)"
-		% [walkers_ms, crawlers_ms])
-	_check(crawlers_ms < 3.0, "150 Crawlers draw in %.3f ms per frame on the CPU (headless; budget 3 ms)" % crawlers_ms)
-	_check(crawlers_ms < walkers_ms * 1.5 + 0.05, "Crawlers cost about the same CPU time as walkers (%.3f vs %.3f ms)" % [crawlers_ms, walkers_ms])
+	var walkers_ms: float = _best_ms(view, _horde_of(GameData.EnemyKind.WALKER, 150, map), map)
+	var glb_h: Horde = _horde_of(GameData.EnemyKind.CRAWLER, 150, map)
+	var glb_ms: float = _best_ms(view, glb_h, map)
+	CrawlerBody.enabled = false
+	var procedural_ms: float = _best_ms(view, _horde_of(GameData.EnemyKind.CRAWLER, 150, map), map)
+	CrawlerBody.enabled = true
+	print("PERF: 150 walkers %.3f ms/frame, 150 Crawlers (GLB) %.3f ms/frame, 150 Crawlers (procedural) %.3f ms/frame"
+		% [walkers_ms, glb_ms, procedural_ms])
+	print("PERF: triangles per Crawler: GLB %d, walker model %d" % [CrawlerBody.info()["triangles"], _triangles(ZombieModel.mesh(0))])
+	_check(glb_ms < 3.0, "150 GLB Crawlers draw in %.3f ms per frame on the CPU (headless; budget 3 ms)" % glb_ms)
+	_check(glb_ms - procedural_ms < 0.1, "the GLB body costs at most +0.1 ms CPU for 150 Crawlers (%.3f vs %.3f ms)" % [glb_ms, procedural_ms])
 	view.free()
+
+
+func _triangles(m: ArrayMesh) -> int:
+	var n: int = 0
+	for s in m.get_surface_count():
+		var idx: PackedInt32Array = m.surface_get_arrays(s)[Mesh.ARRAY_INDEX]
+		n += idx.size() / 3
+	return n

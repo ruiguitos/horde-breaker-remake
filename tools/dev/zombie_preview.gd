@@ -228,13 +228,19 @@ func _setup() -> void:
 				x += 1.6
 			_camera.position = CENTER + Vector3(0, 1.5, 6.5)
 			_camera.look_at(CENTER + Vector3(0, 1.2, 0))
-		"bench", "bench_empty", "bench_specials":
+		"bench", "bench_empty", "bench_specials", "bench_crawl", "bench_crawl_proc":
 			# 150 walking zombies (the alive cap) seen from the third-person
-			# height; "bench_empty" is the same scene without them.
+			# height; "bench_empty" is the same scene without them. bench_crawl:
+			# 150 Crawlers (their travel grows 2.2 m/s in _process); bench_crawl_proc
+			# the same with the procedural Crawler (CrawlerBody switched off).
+			if _shot == "bench_crawl_proc":
+				CrawlerBody.enabled = false
 			if _shot != "bench_empty":
 				for k in 150:
 					var pos: Vector3 = CENTER + Vector3(-9.0 + (k % 15) * 1.3, 0, -12.0 + (k / 15) * 1.3)
-					if _shot == "bench_specials":
+					if _shot.begins_with("bench_crawl"):
+						_crawler(pos, 1.0)
+					elif _shot == "bench_specials":
 						var kinds: Array[int] = [0, 0, 0, 1, 2, 3, 5, 6]
 						var rng := RandomNumberGenerator.new()
 						rng.seed = 100 + k
@@ -269,6 +275,52 @@ func _setup() -> void:
 				_crawler(CENTER, stump)
 				_camera.position = CENTER + Vector3(2.4, 0.95, 0.2)
 				_camera.look_at(CENTER + Vector3(0, 0.4, 0))
+				_camera.fov = 40
+		"crawl_topple":
+			# Three Crawlers mid-topple: progress 0 (rear up on the hands), 0.5, 1 (crawling).
+			for k in 3:
+				var i: int = _crawler(CENTER + Vector3(-1.8 + k * 1.8, 0, 0), 0.0)
+				_horde.crawl_delay[i] = GameData.CRAWL_TRANSITION_TIME * (1.0 - k * 0.5)
+				_horde.velocities[i] = Vector3.ZERO
+			_camera.position = CENTER + Vector3(0.0, 2.2, 7.0)
+			_camera.look_at(CENTER + Vector3(0, 0.5, 0))
+			_camera.fov = 45
+		"crawl_death":
+			# Crawlers killed a moment ago (0.45 s of fall): one normal, one headless.
+			for k in 2:
+				var at: Vector3 = CENTER + Vector3(-1.0 + k * 2.0, 0, 0)
+				var i: int = _crawler(at, 0.0)
+				_horde.velocities[i] = Vector3.ZERO
+			_view.draw(_horde, _map, 0.0, 0.0)
+			for k in range(_horde.count - 1, -1, -1):
+				var p: Vector3 = _horde.positions[k]
+				_horde.remove(k)
+				_view.draw(_horde, _map, 0.0, 0.0)
+				_view.on_death(Vector4(p.x, p.z, GameData.EnemyKind.CRAWLER, 1.0 if k == 1 else 0.0), p, p + Vector3(0, 0, 5))
+			_view.draw(_horde, _map, 0.0, 0.45)
+			_camera.position = CENTER + Vector3(0.0, 2.0, 5.0)
+			_camera.look_at(CENTER + Vector3(0, 0.2, 0))
+			_camera.fov = 45
+		"crawl_stride", "crawl_crowd":
+			# Four Crawlers that have travelled 0, 0.2, 0.4, 0.6 m (the hands' phase
+			# follows the travel): the planting through a stride. crawl_crowd: 60
+			# random Crawlers moving towards the camera, at random travel.
+			var rng := RandomNumberGenerator.new()
+			rng.seed = 7
+			if _shot == "crawl_stride":
+				for k in 4:
+					var i: int = _crawler(CENTER + Vector3(-2.1 + k * 1.4, 0, 0), 2.0 + k * 0.1)
+					_horde.travel[i] = k * 0.2
+				_camera.position = CENTER + Vector3(0.9, 1.4, 6.4)
+				_camera.look_at(CENTER + Vector3(0, 0.35, 0))
+				_camera.fov = 45
+			else:
+				for k in 60:
+					var pos: Vector3 = CENTER + Vector3(rng.randf_range(-9.0, 9.0), 0, rng.randf_range(-9.0, 9.0))
+					var i: int = _crawler(pos, rng.randf_range(0.6, 2.4))
+					_horde.travel[i] = rng.randf_range(0.0, 4.0)
+				_camera.position = CENTER + Vector3(0, 9.0, 13.0)
+				_camera.look_at(CENTER + Vector3(0, 0.0, 0))
 				_camera.fov = 40
 		"legless":
 			# Legs just gone: a worker with a missing forearm and a shirtless
@@ -327,6 +379,9 @@ func _process(delta: float) -> bool:
 			_bench_frame += delta
 		if _frames == 560:
 			print("BENCH %s: GPU %.3f ms, render CPU %.3f ms, frame %.3f ms (500 frames, vsync off)" % [_shot, _bench_gpu / 500.0, _bench_cpu / 500.0, _bench_frame / 500.0 * 1000.0])
+	if _shot.begins_with("bench_crawl"):
+		for i in _horde.count:
+			_horde.travel[i] += delta * 2.2  # the hands move with the metres walked
 	var t0: int = Time.get_ticks_usec()
 	_view.draw(_horde, _map, now, 0.0)
 	if _shot.begins_with("bench") and _frames > 60 and _frames <= 560:

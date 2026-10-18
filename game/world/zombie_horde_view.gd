@@ -16,9 +16,12 @@ const Specials = preload("res://game/world/special_enemy_model.gd")
 const KINDS: Array[int] = [GameData.EnemyKind.WALKER, GameData.EnemyKind.RUNNER, GameData.EnemyKind.BRUTE,
 	GameData.EnemyKind.GRABBER, GameData.EnemyKind.BOSS, GameData.EnemyKind.BLOATER, GameData.EnemyKind.SCREAMER,
 	GameData.EnemyKind.CRAWLER]
-## Crawlers use the walker's models and MultiMeshes: the legless mask (see
-## ZombieModel.legless_mask) turns the legs off and the crawl pose on.
-const VARIANTS: int = ZombieModel.VARIANTS + 6
+## Crawlers draw the crawler.glb body (CrawlerBody) in their own MultiMesh.
+## If it does not load (CrawlerBody.available() is false), they use the walker
+## models: the legless mask (see ZombieModel.legless_mask) turns the legs off
+## and the procedural crawl pose on.
+const CRAWLER_VARIANT: int = ZombieModel.VARIANTS + 6
+const VARIANTS: int = CRAWLER_VARIANT + 1
 ## Floats per instance in MultiMesh.buffer: transform 12 + colour 4 + custom 4.
 const STRIDE: int = 20
 ## Corpses: fall, lie, then sink into the ground.
@@ -73,12 +76,30 @@ func _init() -> void:
 		mm.transform_format = MultiMesh.TRANSFORM_3D
 		mm.use_colors = true
 		mm.use_custom_data = true
-		mm.mesh = ZombieModel.mesh(v) if v < ZombieModel.VARIANTS else Specials.mesh(Specials.KINDS[v - ZombieModel.VARIANTS])
+		mm.mesh = _mesh_of(v)
 		_mm.append(mm)
 		var inst := MultiMeshInstance3D.new()
-		inst.name = "Zombies_" + (ZombieModel.VARIANT_NAMES[v] if v < ZombieModel.VARIANTS else Specials.NAMES[v - ZombieModel.VARIANTS])
+		inst.name = "Zombies_" + _name_of(v)
 		inst.multimesh = mm
 		add_child(inst)
+
+
+static func _mesh_of(v: int) -> Mesh:
+	if v < ZombieModel.VARIANTS:
+		return ZombieModel.mesh(v)
+	if v == CRAWLER_VARIANT:
+		# Without the GLB the MultiMesh stays empty: the walker mesh is a placeholder.
+		var body: ArrayMesh = CrawlerBody.mesh()
+		return body if body != null else ZombieModel.mesh(0)
+	return Specials.mesh(Specials.KINDS[v - ZombieModel.VARIANTS])
+
+
+static func _name_of(v: int) -> String:
+	if v < ZombieModel.VARIANTS:
+		return ZombieModel.VARIANT_NAMES[v]
+	if v == CRAWLER_VARIANT:
+		return "crawler"
+	return Specials.NAMES[v - ZombieModel.VARIANTS]
 
 
 func handles(kind: int) -> bool:
@@ -86,6 +107,8 @@ func handles(kind: int) -> bool:
 
 
 static func variant_for(kind: int, key: float) -> int:
+	if kind == GameData.EnemyKind.CRAWLER and CrawlerBody.available():
+		return CRAWLER_VARIANT
 	if kind == GameData.EnemyKind.WALKER or kind == GameData.EnemyKind.CRAWLER:
 		return ZombieModel.variant_for(key)
 	var special: int = Specials.KINDS.find(kind)
@@ -289,7 +312,7 @@ func on_death(d: Vector4, ground: Vector3, from: Vector3) -> void:
 			# Neighbours can occupy the same point. A corpse must never borrow
 			# a different class's silhouette, even when its distance is zero.
 			if common:
-				if int(candidate.x) >= ZombieModel.VARIANTS:
+				if int(candidate.x) >= ZombieModel.VARIANTS and int(candidate.x) != CRAWLER_VARIANT:
 					continue
 			elif int(candidate.x) != int(fallback.x):
 				continue

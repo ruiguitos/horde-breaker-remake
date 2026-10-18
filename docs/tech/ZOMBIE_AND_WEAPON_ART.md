@@ -249,6 +249,108 @@ correções, calculado): civil 59 caixas / 1416 vértices (antes
 Testes: `tests/test_crawlers.gd` (mão planted, recuperação, fase = velocidade,
 abas, cabeça e peito) e `tests/test_zombie_model.gd` (cavidade, cotos).
 
+## Crawler com o corpo do GLB (2026-10-18)
+
+O Crawler passa a desenhar o modelo `assets/models/characters/crawler_original/crawler.glb`
+(Codex do utilizador, CC0), em vez das caixas do Walker na pose de rastejar. O
+procedimento de 2026-10-17 (ciclo, IK, fase por distância percorrida) mantém-se;
+muda só o corpo e o que o shader faz com ele. Capturas em
+`docs/design/crawler_integration/`: `crawl_stride` (4 Crawlers a 0; 0,2; 0,4 e
+0,6 m percorridos), `crawl_close`, `crawl_crowd` (60 ao acaso), `crawl_topple`
+(tombamento em três fases) e `crawl_death` (mortes, uma sem cabeça).
+
+**Escolhas e porquê.**
+
+- **Malha única, carregada em tempo de execução** (`game/world/crawler_body.gd`):
+  `GLTFDocument` lê o GLB do ficheiro (sem depender da importação do editor), junta
+  as oito peças numa malha só e guarda em cada vértice a peça (corpo, cabeça,
+  braço esquerdo, braço direito), o peso do braço e a rugosidade. A horda desenha
+  os Crawlers numa `MultiMesh` própria (`CRAWLER_VARIANT`), por isso o custo por
+  zombie continua a ser uma instância.
+- **Shader próprio** (`game/world/crawler_body.gdshader`), em vez de meter o GLB em
+  `zombie.gdshader`: o shader dos Walkers fica intacto. O shader repete só o que o
+  corpo precisa: a fase (`CRAWL_STRIDE` 0,8 m, `CRAWL_STANCE` 0,5, `CRAWL_LIFT` 0,10 m),
+  o IK de dois ossos e a pose da cabeça.
+- **Articulações do GLB, não as do procedimento.** Ombros (0,46 m), pulsos
+  (0,056 m) e pivô da cabeça (0,685 m) vêm dos nós do ficheiro. Os ossos do braço
+  são as distâncias ombro-cotovelo (0,262 m) e cotovelo-pulso (0,276 e 0,267 m,
+  esquerdo e direito); o cotovelo (0,25; 0,20; 0,61 m) foi estimado da geometria
+  do braço, e a IK de repouso cai nesse ponto a menos de 1 mm.
+- **Braço e mão.** O braço é um só sólido no GLB, com o cotovelo fletido. Cada
+  vértice recebe um peso (0 no braço superior, 1 no antebraço, mistura junto ao
+  cotovelo). A mão é transladada com o pulso e não roda: fica plana no chão.
+  Assim a mão não pode afundar-se nem descolar-se do antebraço.
+- **Curso centrado para trás, 0,16 m** (`CRAWL_CENTRE_Z`, `CrawlerBody.CENTRE_Z`).
+  Medido: com o curso centrado no ponto de repouso, a fase da frente do apoio
+  (+0,2 m) fica a 0,615 m do ombro e o alcance do braço é 0,538 m, por isso o IK
+  não chegava ao pulso. Descentrado, o alcance máximo usado é 0,506 m. O apoio
+  continua com os mesmos 0,8 m de percurso por ciclo e a mão continua no chão.
+  Com o Crawler parado (`walk` = 0) as mãos ficam na pose do GLB.
+- **Tombamento** (`TOPPLE_ANGLE` 0,8 rad, pivô `TOPPLE_PIVOT_Z` 1,03 m, logo à
+  frente dos dedos): o traseiro sobe e o corpo deita-se nas mãos em 0,4 s. Com o
+  pivô nos dedos, todo o corpo fica acima do chão (medido, +8 mm no mínimo; com
+  o pivô à altura das mãos os dedos afundavam 0,13 m parados e 0,16 m com o curso;
+  detetado numa revisão do Codex e corrigido).
+- **Morte.** Achata o corpo para 35 % da altura (a normal corrige-se pela
+  transposta inversa). Sem cabeça: a cabeça colapsa para o pescoço.
+- **Cores.** As roupas (`cloth_shirt`, `cloth_trousers`) tiram a cor da paleta do
+  zombie (camisa e calças), para o bando ter variedade como os Walkers. A pele, o
+  osso e as feridas usam as cores do GLB (com o sangue por vértice).
+- **Triângulos de área nula.** O GLB tem 4728, dos quais 96 têm área zero; a malha
+  guarda 4632 (é o que se desenha).
+- **Alvo de mira (contrato, não mudou).** `CRAWL_HEAD_HEIGHT` 0,685 m é o pivô da
+  cabeça do GLB; o centro visual da cabeça está a cerca de 0,79 m. Ver "Por fazer".
+
+**Limites conhecidos.**
+
+- **Cabeça solta do tronco.** O GLB levantou a cabeça 0,095 m mas o pescoço do
+  tronco ficou na altura antiga (NOTES do modelo). A distância mínima entre
+  vértices da cabeça e do tronco é de 3,2 cm. Corrige-se no Blender, não no jogo.
+- **Aspeto igual.** Todos os Crawlers têm a mesma cabeça e o mesmo corpo; só a
+  roupa muda de cor.
+- **Um vértice a −1 mm** do chão durante a recuperação do braço. Dentro da
+  tolerância do teste (−2 mm) e invisível.
+- **GPU.** Ver os números abaixo: é o custo real desta mudança.
+
+**Testes** (`tests/test_crawlers.gd`, headless, 57 linhas `TEST:` sem falhas):
+o GLB carrega (4728 triângulos, 96 descartados), pivô da cabeça 0,685 m, pulsos
+0,056 m, malha de 0 a 0,929 m; a pose de repouso não move nada; a cadeia do
+braço chega ao alvo em todo o ciclo (erro 0 m); a mão fica no chão no apoio,
+recua 0,8 m por ciclo e levanta 0,10 m na recuperação; em repouso as mãos não
+se movem; o tombamento não desce abaixo do chão; a fase do Crawler dá uma volta
+por 0,8 m percorridos; sem o GLB (`CrawlerBody.enabled = false` ou ficheiro em
+falta) o Crawler é o Walker em pose de rastejar. Os testes de geometria dos
+especiais (`test_special_models.gd`) também cobrem o novo `Zombies_crawler`.
+
+**Desempenho** (Windows 11, RTX 5060, Godot 4.7.2, 1600×900, vsync desligado,
+sombras ligadas; `zombie_preview.gd bench_crawl` e `bench_crawl_proc`, 500 frames,
+duas corridas cada; `bench_empty` = 0,56 ms de GPU):
+
+| Medida | Procedural (Walker em pose) | GLB | Diferença |
+|---|---|---|---|
+| 150 Crawlers, GPU | 1,01 ms | 1,53 ms | **+0,52 ms** |
+| 150 Crawlers, `ZombieHordeView.draw` (janela) | 0,45–0,46 ms | 0,44–0,48 ms | ≈ 0 |
+| 150 Crawlers, `draw` (headless, teste) | 0,42–0,45 ms | 0,41 ms | ≈ 0 |
+| Triângulos por Crawler | 708 | 4632 | ×6,5 |
+
+O CPU fica dentro do orçamento (+0,1 ms): a diferença é ruído. O custo é de GPU:
+o GLB tem ~6,5 vezes os triângulos. Mitigações, se o jogo pedir: uma versão com
+menos triângulos (o GLB tem muitas faces pequenas nas feridas e nos dentes),
+desligar a projeção de sombra dos Crawlers, ou um LOD. Não foram feitas.
+
+**Por fazer (decisões do utilizador).**
+
+- Confirmar a altura de mira: o pivô da cabeça do GLB (0,685 m) fica na base da
+  cabeça; o centro visual está a ~0,79 m. Se os headshots falharem a olho,
+  `CRAWL_HEAD_HEIGHT` pode subir (é contrato; não foi mudado).
+- Fechar o pescoço no GLB (ver limites).
+- Se o custo de GPU de +0,52 ms for demais, escolher uma das mitigações acima.
+- Playtest no editor do Windows: os testes são headless, por isso o aspeto só se
+  confirma com GPU. Verificado aqui por captura com janela (Godot compilou o shader
+  sem erros no log): as mãos ficam no chão nas quatro fases do passo, o tombamento
+  e a morte têm forma razoável. Falta ver o ritmo do passo em jogo e a leitura da
+  cabeça para os tiros.
+
 ## Armas
 
 - **Atualização de 2026-10-15, pedido do utilizador:** os cinco modelos em
