@@ -7,7 +7,7 @@ extends Node3D
 ## Rest position of the grip in camera space: the right hand holds the grip a
 ## little right of the centre line, the arms come from shoulders just behind the
 ## eye (see FirstPersonArms: the shoulders sit at ±0.2 m, about 0.1 m behind the eye).
-const REST: Vector3 = Vector3(0.02, -0.1, -0.40)
+const REST: Vector3 = Vector3(0.16, -0.16, -0.40)
 ## Sights: while aiming down sights the front sight is put on the centre of the
 ## view, with the rear sight `EYE_TO_REAR` metres from the eye (see sight_rest).
 ## Used only when a gun has no sight parts in LAYOUT.

@@ -141,8 +141,9 @@ tomam as cores da classe (`SoldierModel.PALETTES`).
 Escala: a arma é desenhada a meia escala (`GUN_SCALE` 0,5), mas os braços
 são à escala real, dentro da arma (`scale` 1/GUN_SCALE). O alvo da palma é o
 ponto de apoio tal como o olho o vê (`support * GUN_SCALE`). O repouso da arma
-(`ViewModel.REST`, z = -0,40) é o compromisso medido: os ombros caem perto do
-corpo e a arma não tapa a vista. Com a arma à escala real, o ombro só ficava
+(`ViewModel.REST` = (0,16; -0,16; -0,40)) é o compromisso medido: os ombros caem
+perto do corpo, e a arma fica à direita e em baixo, sem tapar a mira. Com o
+eixo central (x = 0,02) a arma tapava a mira na captura do jogo. Com a arma à escala real, o ombro só ficava
 perto se a arma estivesse a 0,3 m do olho, e então ocupava o ecrã.
 
 Alcance medido no código (teste `test_first_person_arms`): AR, SMG e Machine
