@@ -369,14 +369,15 @@ func _test_view() -> void:
 	_check(h.speeds[1] == last_speed and kept, "a zombie moved by horde compaction keeps its outfit")
 	# Death: the zombie leaves the horde, its corpse keeps its variant and look and falls.
 	var dead: Vector3 = h.positions[5]
-	var dead_variant: int = ZombieModel.variant_for(h.speeds[5])
-	var dead_look: Vector4 = ZombieModel.instance_look(h.speeds[5])
+	var dead_key: float = h.speeds[5]  # the seed IslandRun.death_keys records for this death
+	var dead_variant: int = ZombieModel.variant_for(dead_key)
+	var dead_look: Vector4 = ZombieModel.instance_look(dead_key)
 	view.draw(h, map, 1.5, 0.016)
 	h.remove(5)
 	view.draw(h, map, 1.52, 0.016)
 	var before: int = view.instance_count(dead_variant)
-	view.on_death(Vector4(dead.x, dead.z, GameData.EnemyKind.WALKER, 1.0), dead, dead + Vector3(0, 0, 5))
-	view.on_death(Vector4(50, 50, GameData.EnemyKind.BRUTE, 0.0), Vector3(50, 0, 50), Vector3.ZERO)
+	view.on_death(Vector4(dead.x, dead.z, GameData.EnemyKind.WALKER, 1.0), dead, dead + Vector3(0, 0, 5), dead_key)
+	view.on_death(Vector4(50, 50, GameData.EnemyKind.BRUTE, 0.0), Vector3(50, 0, 50), Vector3.ZERO, 0.0)
 	view.draw(h, map, 1.54, 0.5)
 	_check(view.corpse_count() == 2 and view.instance_count(dead_variant) == before + 1
 		and view.instance_count(ZombieHordeView.variant_for(GameData.EnemyKind.BRUTE, 0.0)) == 1,

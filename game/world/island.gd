@@ -124,9 +124,6 @@ var _view_model: ViewModel  ## first-person placeholder gun (child of the camera
 var _pcam: Node3D
 var _pcam_host: Node
 var _tp_pivot: Node3D
-var _enemy_mm := MultiMesh.new()
-var _head_mm := MultiMesh.new()
-var _arm_mm := MultiMesh.new()
 var _orb_mm := MultiMesh.new()
 var _cloud_mm := MultiMesh.new()
 var _debris_mm := MultiMesh.new()
@@ -474,12 +471,6 @@ func _build_world() -> void:
 	soldier.muzzle.add_child(_muzzle)
 	add_child(_player)
 
-	_setup_multimesh(_enemy_mm, _capsule(0.35, 1.7), true)
-	# Heads and arms: separate MultiMeshes that follow the body transform.
-	_setup_multimesh(_head_mm, _sphere(0.24), true)
-	var arm := BoxMesh.new()
-	arm.size = Vector3(0.13, 0.13, 0.65)
-	_setup_multimesh(_arm_mm, arm, true)
 	_setup_multimesh(_orb_mm, _sphere(0.18), false, Color(0.3, 0.9, 1.0), true)
 	_setup_multimesh(_grenade_mm, _sphere(0.22), false, Color(0.15, 0.3, 0.1))
 	var warn := TorusMesh.new()
@@ -893,13 +884,6 @@ func _mat(c: Color, unshaded: bool = false) -> StandardMaterial3D:
 	if unshaded:
 		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	return m
-
-
-func _capsule(r: float, h: float) -> CapsuleMesh:
-	var c := CapsuleMesh.new()
-	c.radius = r
-	c.height = h
-	return c
 
 
 func _sphere(r: float) -> SphereMesh:
@@ -2383,65 +2367,9 @@ func _draw_player_and_camera() -> void:
 
 
 func _draw_enemies() -> void:
-	var h: Horde = run.horde
 	var now: float = Time.get_ticks_msec() * 0.001
-	_enemy_mm.instance_count = h.count
-	_head_mm.instance_count = h.count
-	_arm_mm.instance_count = h.count * 2
-	_zombies.draw(h, run.map, now, 0.0 if paused else get_process_delta_time())
-	for i in h.count:
-		if _zombies.handles(h.kinds[i]):  # drawn by ZombieHordeView instead
-			_enemy_mm.set_instance_transform(i, ZombieHordeView.HIDDEN)
-			_head_mm.set_instance_transform(i, ZombieHordeView.HIDDEN)
-			_arm_mm.set_instance_transform(i * 2, ZombieHordeView.HIDDEN)
-			_arm_mm.set_instance_transform(i * 2 + 1, ZombieHordeView.HIDDEN)
-			continue
-		var t: GameData.EnemyType = h.types[h.kinds[i]]
-		var v: Vector3 = h.velocities[i]
-		var speed: float = Vector2(v.x, v.z).length()
-		var yaw: float = atan2(v.x, v.z) if speed > 0.1 else 0.0
-		var sy: float = t.height / 1.7
-		# Zombie waddle without bones: roll side to side, bob and lean forward
-		# in proportion to speed. Stunned enemies wobble harder.
-		var walk: float = clampf(speed / 2.5, 0.0, 1.0)
-		var phase: float = now * (4.0 + speed * 2.0) + i * 1.7
-		var roll: float = sin(phase) * 0.14 * walk
-		var lean: float = 0.18 * walk
-		if h.stun[i] > 0.0 and h.freeze_time[i] <= 0.0:
-			roll = sin(now * 25.0 + i) * 0.3
-			lean = -0.25
-		var rot := Basis(Vector3.UP, yaw) * Basis(Vector3.RIGHT, lean) * Basis(Vector3.FORWARD, roll)
-		var sx: float = t.radius_scale
-		var bob: float = absf(sin(phase)) * 0.12 * walk
-		var center: Vector3 = _on_ground(h.positions[i]) + Vector3(0, t.height * 0.5 + bob, 0)
-		_enemy_mm.set_instance_transform(i, Transform3D(rot.scaled(Vector3(sx, sy, sx)), center))
-		# Local +Z is the walking direction (yaw = atan2(v.x, v.z)).
-		var head_pos: Vector3 = center + rot * Vector3(0, t.height * 0.5 + 0.08 * sx, 0.06 * sx)
-		_head_mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * sx), head_pos))
-		var swing: float = sin(phase) * 0.25 * walk
-		for side in 2:
-			var sign: float = -1.0 if side == 0 else 1.0
-			var arm_rot: Basis = rot * Basis(Vector3.RIGHT, -0.15 + swing * sign)
-			var arm_pos: Vector3 = center + rot * Vector3(0.3 * sign * sx, t.height * 0.28, 0.3 * sx)
-			_arm_mm.set_instance_transform(i * 2 + side, Transform3D(arm_rot.scaled(Vector3.ONE * sx), arm_pos))
-		var c: Color = t.color
-		if h.burn_time[i] > 0.0:
-			c = c.lerp(Color(1.0, 0.35, 0.08), 0.65)
-		if h.poison_time[i] > 0.0:
-			c = c.lerp(Color(0.65, 0.9, 0.16), 0.65)
-		if h.cold_stacks[i] > 0:
-			c = c.lerp(Color(0.25, 0.7, 1.0), 0.5)
-		if h.freeze_time[i] > 0.0:
-			c = Color(0.55, 0.92, 1.0)
-		if h.flash[i] > 0.0:
-			c = Color.WHITE
-		elif h.stun[i] > 0.0:
-			c = c.lightened(0.35)
-		_enemy_mm.set_instance_color(i, c)
-		_arm_mm.set_instance_color(i * 2, c)
-		_arm_mm.set_instance_color(i * 2 + 1, c)
-		# Heads are paler so they read as the target for headshots.
-		_head_mm.set_instance_color(i, c if h.flash[i] > 0.0 else c.lerp(Color(0.85, 0.8, 0.7), 0.45))
+	# Every enemy kind is drawn by ZombieHordeView, with its models (ZombieHordeView.handles).
+	_zombies.draw(run.horde, run.map, now, 0.0 if paused else get_process_delta_time())
 
 
 ## Where a tracer ends: 1.2 m up, or (crosshair aim) at the height of the
@@ -2616,7 +2544,8 @@ func _draw_effects(delta: float) -> void:
 		_tracer_mesh.surface_end()
 
 	# Dismemberment with primitives: chunks fly off killed enemies.
-	for d in run.deaths:
+	for n in run.deaths.size():
+		var d: Vector4 = run.deaths[n]
 		var t: GameData.EnemyType = run.horde.types[int(d.z)]
 		var gy: float = run.map.ground_y(Vector3(d.x, 0, d.y))
 		fx.emit(&"blood", Vector3(d.x, gy + t.height * 0.7, d.y))
@@ -2625,7 +2554,8 @@ func _draw_effects(delta: float) -> void:
 			_trauma = minf(1.0, _trauma + 0.3)
 		var origin := Vector3(d.x, gy + 1.0, d.y)
 		var sx: float = t.radius_scale
-		_zombies.on_death(d, Vector3(d.x, gy, d.y), run.player_pos)  # the body falls (common zombies)
+		# The body falls (every zombie kind that ZombieHordeView draws); it keeps the look of its own seed.
+		_zombies.on_death(d, Vector3(d.x, gy, d.y), run.player_pos, run.death_keys[n])
 		var chunk: Color = ZombieHordeView.DEBRIS_COLOR if _zombies.handles(int(d.z)) else t.color
 		for k in 3:
 			var vel := Vector3(randf_range(-3, 3), randf_range(3, 7), randf_range(-3, 3))
@@ -2640,6 +2570,7 @@ func _draw_effects(delta: float) -> void:
 			# Body shot: an arm comes off.
 			_add_debris(origin + Vector3(0, t.height * 0.3, 0), Vector3(randf_range(-4, 4), 5.0, randf_range(-4, 4)), chunk, sx * 1.6)
 	run.deaths.clear()
+	run.death_keys.clear()
 	# A grenade took both legs off a walker, which crawls on: two legs fly off.
 	for lp in run.leg_losses:
 		var at := Vector3(lp.x, run.map.ground_y(Vector3(lp.x, 0, lp.y)), lp.y)

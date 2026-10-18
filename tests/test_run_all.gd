@@ -24,4 +24,5 @@ func _initialize() -> void:
 	_check(runner.classify(139, "").begins_with("FAIL"), "a crash before any result fails")
 	_check(runner.classify(1, "TEST: a\n") == "FAIL (exit 1)", "a non-zero exit fails when it is not the known quit code")
 	_check(runner.classify(0, "some output without results\n") == "FAIL (exit 0 without results)", "exit 0 without results does not pass")
+	_check(runner.classify(0, "").begins_with("FAIL"), "exit 0 with no output at all does not pass")
 	quit(1 if _failures > 0 else 0)

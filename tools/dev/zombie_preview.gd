@@ -305,7 +305,7 @@ func _setup() -> void:
 				var p: Vector3 = _horde.positions[k]
 				_horde.remove(k)
 				_view.draw(_horde, _map, 0.0, 0.0)
-				_view.on_death(Vector4(p.x, p.z, GameData.EnemyKind.CRAWLER, 1.0 if k == 1 else 0.0), p, p + Vector3(0, 0, 5))
+				_view.on_death(Vector4(p.x, p.z, GameData.EnemyKind.CRAWLER, 1.0 if k == 1 else 0.0), p, p + Vector3(0, 0, 5), 0.5 + k * 0.37)
 			_view.draw(_horde, _map, 0.0, 0.45)
 			_camera.position = CENTER + Vector3(0.0, 2.0, 5.0)
 			_camera.look_at(CENTER + Vector3(0, 0.2, 0))
@@ -407,7 +407,7 @@ func _process(delta: float) -> bool:
 			var p: Vector3 = _horde.positions[k]
 			_horde.remove(k)
 			_view.draw(_horde, _map, now, 0.0)
-			_view.on_death(Vector4(p.x, p.z, GameData.EnemyKind.WALKER, 1.0 if k % 2 == 1 else 0.0), p, p + Vector3(0, 0, 5))
+			_view.on_death(Vector4(p.x, p.z, GameData.EnemyKind.WALKER, 1.0 if k % 2 == 1 else 0.0), p, p + Vector3(0, 0, 5), 0.5 + k * 0.37)
 	if _shot == "corpses" and _horde.count == 0:
 		_view.draw(_horde, _map, now, delta)  # corpses age in real time (gone after 5 s)
 	# BootSplashPlus covers the window for at least 2.3 s.

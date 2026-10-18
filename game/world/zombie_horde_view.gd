@@ -46,15 +46,6 @@ var _all: PackedFloat32Array = PackedFloat32Array()
 var _base: PackedInt32Array = PackedInt32Array()
 var _counts: PackedInt32Array = PackedInt32Array()
 var _handles: PackedByteArray = PackedByteArray()
-## This frame's zombies and the previous frame's (for corpses: by the time
-## the island hears of a death, the dead one has left the horde, so its
-## variant is looked up where it was last drawn).
-var _last_pos: PackedVector3Array = PackedVector3Array()
-var _last_info: PackedVector4Array = PackedVector4Array()  ## (variant, sx, sy, yaw)
-var _last_look: PackedVector3Array = PackedVector3Array()  ## (mask, colours, wear)
-var _prev_pos: PackedVector3Array = PackedVector3Array()
-var _prev_info: PackedVector4Array = PackedVector4Array()
-var _prev_look: PackedVector3Array = PackedVector3Array()
 ## Corpses: (x, y, z, yaw), (variant, sx, sy, age), look, headless flag.
 var _corpse_pos: PackedVector4Array = PackedVector4Array()
 var _corpse_info: PackedVector4Array = PackedVector4Array()
@@ -140,12 +131,6 @@ func corpse_count() -> int:
 ## cycle, `delta` the corpses (0 while paused).
 func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 	_counts.fill(0)
-	_prev_pos = _last_pos
-	_prev_info = _last_info
-	_prev_look = _last_look
-	_last_pos = PackedVector3Array()
-	_last_info = PackedVector4Array()
-	_last_look = PackedVector3Array()
 	# Local references to the horde arrays (read only: no copies) are much
 	# faster in GDScript than h.positions[i] every time.
 	var kinds: PackedByteArray = h.kinds
@@ -275,9 +260,6 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 		_all[o + 17] = walk
 		_all[o + 18] = act
 		_all[o + 19] = w
-		_last_pos.append(Vector3(p.x, gy, p.z))
-		_last_info.append(Vector4(variant, sx, sy, yaw))
-		_last_look.append(Vector3(look.y, look.z, look.w))
 	_draw_corpses(delta)
 	for v in VARIANTS:
 		_mm[v].visible_instance_count = _counts[v]
@@ -285,43 +267,22 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 			_mm[v].buffer = buffer(v)
 
 
-## A Horde death (IslandRun.deaths entry: x, z, kind, headshot) becomes a
-## corpse that falls backwards, away from `from` (the player).
-func on_death(d: Vector4, ground: Vector3, from: Vector3) -> void:
+## A Horde death (IslandRun.deaths entry: x, z, kind, headshot, and `key`, the
+## dead zombie's look seed from IslandRun.death_keys) becomes a corpse that
+## falls backwards, away from `from` (the player). The corpse rebuilds the
+## look from the same seed the zombie was drawn with, so a neighbour in a
+## crowd never lends its silhouette.
+func on_death(d: Vector4, ground: Vector3, from: Vector3, key: float) -> void:
 	if not handles(int(d.z)):
 		return
 	var kind: int = int(d.z)
-	var fallback: Vector4 = ZombieModel.instance_look(d.x + d.y)
-	fallback.x = variant_for(kind, d.x + d.y)
+	var look4: Vector4 = ZombieModel.instance_look(key)
+	look4.x = variant_for(kind, key)
 	if kind == GameData.EnemyKind.CRAWLER:
-		fallback.y = float(ZombieModel.legless_mask(int(fallback.y)))
+		look4.y = float(ZombieModel.legless_mask(int(look4.y)))
 	var type: GameData.EnemyType = GameData.enemy_types()[kind]
-	var info := Vector4(fallback.x, type.radius_scale, model_scale_y(kind, type.height), 0)
-	var look := Vector3(fallback.y, fallback.z, fallback.w)
-	var best: float = 2.25  # within 1.5 m of where a zombie was drawn
-	# Walkers and Crawlers share the common models: a corpse takes the look
-	# of a drawn zombie that is legless exactly when the dead one was.
-	var common: bool = kind == GameData.EnemyKind.WALKER or kind == GameData.EnemyKind.CRAWLER
-	var legless: bool = kind == GameData.EnemyKind.CRAWLER
-	for list: int in 2:
-		var pos: PackedVector3Array = _prev_pos if list == 0 else _last_pos
-		var infos: PackedVector4Array = _prev_info if list == 0 else _last_info
-		var looks: PackedVector3Array = _prev_look if list == 0 else _last_look
-		for k in pos.size():
-			var candidate: Vector4 = infos[k]
-			# Neighbours can occupy the same point. A corpse must never borrow
-			# a different class's silhouette, even when its distance is zero.
-			if common:
-				if int(candidate.x) >= ZombieModel.VARIANTS and int(candidate.x) != CRAWLER_VARIANT:
-					continue
-			elif int(candidate.x) != int(fallback.x):
-				continue
-			var q: Vector3 = pos[k]
-			var d2: float = (q.x - d.x) * (q.x - d.x) + (q.z - d.y) * (q.z - d.y)
-			if d2 < best and (not common or ZombieModel.is_legless(int(looks[k].x)) == legless):
-				best = d2
-				info = candidate
-				look = looks[k]
+	var info := Vector4(look4.x, type.radius_scale, model_scale_y(kind, type.height), 0)
+	var look := Vector3(look4.y, look4.z, look4.w)
 	var yaw: float = atan2(from.x - d.x, from.z - d.y)
 	if _corpse_pos.size() >= MAX_CORPSES:
 		_corpse_pos.remove_at(0)

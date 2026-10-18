@@ -334,6 +334,9 @@ var spawn_failures: int = 0
 # Render events, consumed (cleared) by the scene every frame.
 var tracers: Array[PackedVector3Array] = []
 var deaths: Array[Vector4] = []  ## (x, z, kind, headshot 0/1)
+## The dead zombie's look seed (its speed), parallel to `deaths`: the corpse
+## takes the look that zombie was drawn with, not a neighbour's.
+var death_keys: PackedFloat32Array = PackedFloat32Array()
 ## Walkers whose legs a grenade took this frame (x, z): they became Crawlers.
 var leg_losses: PackedVector2Array = PackedVector2Array()
 var explosions: PackedVector3Array = PackedVector3Array()
@@ -2788,6 +2791,7 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 			headshots += 1
 		var p: Vector3 = horde.positions[i]
 		deaths.append(Vector4(p.x, p.z, horde.kinds[i], 1.0 if headshot else 0.0))
+		death_keys.append(horde.speeds[i])
 		popups.append(Vector4(p.x, p.z, amount, 1.0 if headshot else 0.0))
 		if t.explodes and not _nuking:
 			explosions.append(p)
@@ -3625,6 +3629,9 @@ func boss_hp_fraction() -> float:
 
 
 func _spawn_boss() -> void:
+	# Does not check director.max_alive: the boss is the one enemy allowed one
+	# past the limit (GameData.HORDE_CAP). Removing a neighbour to make room
+	# would change indices that _dead may still hold.
 	# Arrives from the far side of the player's position, on reachable ground.
 	for attempt in 40:
 		var ang: float = rng.randf() * TAU

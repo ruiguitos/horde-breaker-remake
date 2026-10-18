@@ -107,7 +107,7 @@ func _test_instances(view: ZombieHordeView, types: Array[GameData.EnemyType]) ->
 	_check(screamer.multimesh.visible_instance_count == 1, "A compacted special keeps its model")
 	# Specials only: a Crawler's corpse is a walker-model corpse (test_crawlers).
 	for kind in range(1, GameData.EnemyKind.CRAWLER):
-		view.on_death(Vector4(10 + kind * 3, 20, kind, 0), Vector3(10 + kind * 3, 0, 20), Vector3.ZERO)
+		view.on_death(Vector4(10 + kind * 3, 20, kind, 0), Vector3(10 + kind * 3, 0, 20), Vector3.ZERO, 1.7)
 	view.draw(h, map, 1.1, 0.0)
 	_check(view.corpse_count() == 6, "Every special has a modelled corpse")
 	for kind in range(1, GameData.EnemyKind.CRAWLER):
@@ -165,14 +165,6 @@ func _test_island_models() -> void:
 	for variant in ZombieHordeView.VARIANTS:
 		count += view.instance_count(variant)
 	_check(count == GameData.enemy_types().size(), "Real island scene draws all %d enemy kinds as models" % GameData.enemy_types().size())
-	# Dummy RenderingServer does not retain MultiMesh transforms. Check actual
-	# capsule hiding only with a GPU, never infer it from Dummy identity values.
-	if DisplayServer.get_name() != "headless":
-		var bodies: MultiMesh = island.get("_enemy_mm")
-		var hidden: bool = true
-		for i in 7:
-			hidden = hidden and absf(bodies.get_instance_transform(i).basis.determinant()) < 0.000001
-		_check(hidden, "GPU: capsule placeholders are hidden for every enemy kind")
 	island.free()
 
 
@@ -188,10 +180,11 @@ func _test_overlapping_deaths() -> void:
 		h.add(p, kind, rng)
 	view.draw(h, map, 1.0, 0.0)
 	for kind in range(6, 0, -1):
+		var key: float = h.speeds[kind]  # the dead zombie's own seed, as IslandRun.death_keys records it
 		h.remove(kind)
 		view.draw(h, map, 1.0, 0.0)
-		view.on_death(Vector4(p.x, p.z, kind, 0), p, Vector3.ZERO)
+		view.on_death(Vector4(p.x, p.z, kind, 0), p, Vector3.ZERO, key)
 		view.draw(h, map, 1.0, 0.0)
-		_check(view.instance_count(ZombieHordeView.variant_for(kind, 0.0)) == 1,
+		_check(view.instance_count(ZombieHordeView.variant_for(kind, key)) == 1,
 			"An overlapping %s dies as its own model, never a neighbour's" % h.types[kind].display_name)
 	view.free()

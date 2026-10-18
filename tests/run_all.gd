@@ -52,13 +52,14 @@ func _initialize() -> void:
 ## it reached its own result lines, and it exited 0 - or exited with a known
 ## Windows exit code at quit after finishing (the engine's shutdown quirk).
 ## A script error, a parse error or a TEST FAIL always fails the test, even
-## with exit 0. A run that never printed a result line did not finish.
+## with exit 0. A run that never printed a result line did not finish, even
+## with exit 0 and no output: silence is not a pass.
 static func classify(code: int, log_text: String) -> String:
 	if log_text.contains("TEST FAIL") or log_text.contains("SCRIPT ERROR") or log_text.contains("Parse Error"):
 		return "FAIL (test or script error)"
 	var finished: bool = log_text.contains("TEST: ")
 	if code == 0:
-		return "PASS" if finished or log_text.strip_edges() == "" else "FAIL (exit 0 without results)"
+		return "PASS" if finished else "FAIL (exit 0 without results)"
 	if finished and code in [5, 139, -1073741819, 3221225477]:
 		return "PASS (exit code at quit)"
 	return "FAIL (exit %d)" % code
