@@ -17,6 +17,16 @@ em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
   `audio/sfx.gd` e `audio/music.gd`). Sons de disparo AR/SMG/Machine Gun/Shotgun
   continuam sintetizados; gravar quando houver.
 - [ ] Comando: sessão com comando físico, reconexão, resoluções e ultrawide.
+- [ ] Crawler com o GLB: ritmo do passo em jogo, leitura dos headshots (alvo a
+  0.685 m, centro visual ~0.79 m), tombamento e morte. Custo de GPU medido a
+  +0.52 ms com 150 crawlers em planície; decidir se cabe com o jogo cheio.
+
+## Modelos (Codex)
+
+- [ ] `crawler.glb`: a cabeça está ~3 cm afastada do tronco (NOTES do Codex só
+  subiu a cabeça); todos os crawlers têm a mesma cabeça e corpo. Pedir correção
+  ao Codex. Triângulos: 4632 por crawler (walker 708); reduzir feridas e dentes
+  se o playtest pedir.
 
 ## Conteúdo
 
