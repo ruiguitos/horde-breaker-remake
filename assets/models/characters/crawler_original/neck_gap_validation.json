@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "previous_minimum_vertex_distance_m": 0.03161485120654106,
+  "minimum_vertex_distance_m": 0.0,
+  "body_vertices_outside_neck_unchanged": true,
+  "other_seven_meshes_and_uvs_unchanged": true,
+  "head_pivot_height_m": 0.6850000023841858,
+  "mesh_top_height_m": 0.9290000200271606,
+  "glb_sha256": "39f966994e6c3833d7b5df87cc49bdf25e6d343fabf944d646dd1fe498801379"
+}

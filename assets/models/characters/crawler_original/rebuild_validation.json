@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "factory_startup_headless_rebuild": true,
+  "command": "blender --background --factory-startup --python build_crawler.py -- --no-render",
+  "rebuilt_glb_byte_identical": true,
+  "glb_sha256": "39f966994e6c3833d7b5df87cc49bdf25e6d343fabf944d646dd1fe498801379",
+  "triangles": 4814,
+  "blender_version": "5.2.2 LTS",
+  "report_hashes_match": true
+}

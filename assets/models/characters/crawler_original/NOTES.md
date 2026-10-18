@@ -30,7 +30,7 @@ braços, mãos e cotos são construídos pelo script desta pasta.
 - Comprimento total aproximado de **1,33 m**, incluindo os dedos;
   cabeça até às pontas dos cotos aproximadamente **1,30 m**. Largura
   aproximadamente **0,60 m**. Valores exatos em `validation.json`.
-- **4 728 triângulos**, oito malhas/nós com os nomes pedidos e seis
+- **4 814 triângulos**, oito malhas/nós com os nomes pedidos e seis
   materiais PBR. As duas mãos tocam o plano Y=0; nenhuma peça atravessa
   o chão. Cada malha é um único sólido ligado, fechado e de volume positivo.
 - Ambos os membros inferiores estão ausentes. Os cotos terminam em
@@ -56,8 +56,14 @@ Ajuste de 2026-10-18: apenas `Head` foi transladada **+0,095 m** em altura.
 O pivô do pescoço fica a **0,685 m** e o topo da malha a **0,929 m**.
 As coordenadas locais da cabeça, UVs e restantes peças foram preservadas;
 o script de construção aplica a diferença após criar o modelo original.
-O pescoço que pertence a `Torso` conserva a geometria e altura anteriores,
-conforme o pedido de mover apenas a cabeça.
+Correção seguinte de 2026-10-18: o pescoço de `Torso` foi prolongado até à
+base existente da cabeça. A distância mínima entre vértices `Head`–`Torso`
+passou de **31,615 mm para 0 mm**, confirmada no GLB e no Godot. O pivô e
+o topo da cabeça mantêm os valores acima; o peito permanece a 0,44 m.
+As outras sete malhas, UVs e todas as transformações foram comparadas com
+o `.blend` anterior e são idênticas. Os vértices do tronco fora da região
+do pescoço foram preservados. As ilhas UV novas ocupam espaços livres do
+atlas, sem repack das ilhas existentes. Acrescentaram-se 86 triângulos.
 
 ## Materiais e UVs
 
@@ -118,12 +124,18 @@ contagem de triângulos. Esse teste de integração é independente do build
 Blender e não é recriado pelo comando acima. Não foi corrida a suite
 completa do jogo, porque nenhum sistema de gameplay foi alterado.
 `source_validation.json` regista ainda a reabertura do `.blend`, sem
-câmaras/luzes/rigs/animações, a contagem das malhas e a alteração isolada
-da posição da cabeça. A antiga verificação de contacto do pescoço refere-se
-à pose anterior; o ajuste pedido não prolonga a geometria de `Torso`.
+câmaras/luzes/rigs/animações, a contagem das malhas, o contacto do pescoço
+e a preservação das restantes sete malhas e de todas as transformações.
+`neck_gap_validation.json` compara a distância anterior e a atual.
+`head_raise_validation.json` é um registo histórico da subida da cabeça,
+anterior à correção do pescoço; o hash nele identifica essa versão antiga.
+O script atualizado foi também executado de raiz numa pasta isolada,
+com todas as verificações aprovadas.
 Os hashes do GLB nos dois relatórios de integração identificam o mesmo
 ficheiro final. Esses relatórios adicionais são evidência da entrega,
 não dependências do script de construção.
+O teste Godot pode repetir-se a partir da raiz do projeto com
+`--headless --path . --script res://assets/models/characters/crawler_original/validate_godot.gd`.
 
 ## Licença
 

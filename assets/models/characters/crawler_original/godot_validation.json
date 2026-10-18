@@ -11,8 +11,9 @@
   ],
   "engine": "4.7.2-stable (official)",
   "failures": [],
-  "glb_sha256": "bf462240f5a7feae6d34d9dfc5fe386febb956ec88ca337e5996c5127441a658",
+  "glb_sha256": "39f966994e6c3833d7b5df87cc49bdf25e6d343fabf944d646dd1fe498801379",
   "head_pivot_height_m": 0.685000002384186,
+  "head_torso_minimum_vertex_distance_m": 0.0,
   "material_names": [
     "skin_rot",
     "flesh_wound",
@@ -23,6 +24,7 @@
   ],
   "mesh_count": 8,
   "mesh_top_height_m": 0.929000020027161,
+  "neck_gap_closed": true,
   "node_names": [
     "Torso",
     "Arm_Left",
@@ -77,5 +79,5 @@
       0.0
     ]
   },
-  "triangle_count": 4728
+  "triangle_count": 4814
 }

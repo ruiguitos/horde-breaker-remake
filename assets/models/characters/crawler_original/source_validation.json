@@ -1,7 +1,7 @@
 {
   "passed": true,
   "meshes": 8,
-  "triangles": 4728,
+  "triangles": 4814,
   "only_named_mesh_objects": true,
   "cameras_lights_armatures_actions": 0,
   "modifiers": 0,
@@ -10,15 +10,12 @@
   "rotations_applied": true,
   "scales_applied": true,
   "metre_scale": true,
-  "blend_sha256": "f88d4cc561f0152e8191698c53c54ded2e67f5b2bb17bf30a4d3302f6f523703",
-  "glb_sha256": "bf462240f5a7feae6d34d9dfc5fe386febb956ec88ca337e5996c5127441a658",
+  "other_seven_mesh_data_and_uvs_unchanged": true,
+  "all_part_transforms_unchanged": true,
+  "torso_vertices_outside_neck_unchanged": true,
+  "head_torso_minimum_vertex_distance_m": 0.0,
   "head_pivot_height_m": 0.6850000023841858,
   "mesh_top_height_m": 0.9290000200271606,
-  "head_translation_delta_m": 0.095,
-  "all_mesh_data_and_uvs_unchanged": true,
-  "other_part_transforms_unchanged": true,
-  "neck_mount_check": {
-    "applicable": false,
-    "reason": "Requested Head-only translation; Torso neck geometry retained."
-  }
+  "blend_sha256": "1a41f434d106c48fd67a843345847f50b34c9836dd5c874597abbcfa29a17e7f",
+  "glb_sha256": "39f966994e6c3833d7b5df87cc49bdf25e6d343fabf944d646dd1fe498801379"
 }

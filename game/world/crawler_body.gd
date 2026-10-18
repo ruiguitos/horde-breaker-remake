@@ -18,7 +18,7 @@ extends RefCounted
 const GLB_PATH: String = "res://assets/models/characters/crawler_original/crawler.glb"
 const SHADER: String = "res://game/world/crawler_body.gdshader"
 ## Triangles of the GLB file (the file's own count; the merged mesh drops its zero-area ones).
-const TRIANGLES: int = 4728
+const TRIANGLES: int = 4814
 const NODE_NAMES: Array[String] = ["Torso", "Head", "Arm_Left", "Hand_Left", "Arm_Right", "Hand_Right",
 	"Hip_Stump_Left", "Hip_Stump_Right"]
 ## Part ids (CUSTOM0.x): the body and the stumps, the head, the left and right arms.

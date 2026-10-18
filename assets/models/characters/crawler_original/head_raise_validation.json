@@ -1,4 +1,6 @@
 {
+  "status": "historical_before_neck_gap_fix",
+  "superseded_by": "neck_gap_validation.json",
   "passed": true,
   "head_pivot_height_m": 0.6850000023841858,
   "head_translation_delta_m": 0.095,

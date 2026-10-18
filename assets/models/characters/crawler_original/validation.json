@@ -12,6 +12,8 @@
   "chest_height_m": 0.4399999976158142,
   "head_pivot_height_m": 0.6850000023841858,
   "mesh_top_height_m": 0.9290000200271606,
+  "head_torso_minimum_vertex_distance_m": 0.0,
+  "neck_gap_closed": true,
   "head_bounds_center_height_m": 0.792000025510788,
   "head_landmark_godot_m": [
     0.0,
@@ -37,7 +39,7 @@
     0.30935999751091003
   ],
   "minimum_ground_clearance_m": 0.0,
-  "triangle_count": 4728,
+  "triangle_count": 4814,
   "mesh_count": 8,
   "node_names": [
     "Arm_Left",
@@ -310,7 +312,7 @@
       "uv_density_max": 0.40864210760480213
     },
     "Torso": {
-      "triangles": 1394,
+      "triangles": 1480,
       "pivot_godot_m": [
         0.0,
         0.0,
@@ -319,11 +321,11 @@
       "bounds_min_godot_m": [
         -0.20749999582767487,
         0.1574999988079071,
-        -0.7870000004768372
+        -0.9021999835968018
       ],
       "bounds_max_godot_m": [
         0.20749999582767487,
-        0.6539999842643738,
+        0.6550000309944153,
         0.03500000014901161
       ],
       "ground_clearance_m": 0.1574999988079071,
@@ -334,28 +336,28 @@
         "overlap_area_tolerance": 1e-10
       },
       "uv_density_min": 0.40853499791307335,
-      "uv_density_max": 0.40867639808559325
+      "uv_density_max": 0.4086770399258629
     }
   },
   "geometry": {
-    "Torso": {
-      "triangles": 1394,
-      "connected_components": 1,
-      "component_volumes_m3": [
-        0.05280357207579082
-      ],
-      "signed_volume_m3": 0.0528035792962811,
-      "nonmanifold_edges": 0,
-      "degenerate_faces": 0,
-      "self_intersection_candidates": 0
-    },
     "Head": {
       "triangles": 1296,
       "connected_components": 1,
       "component_volumes_m3": [
-        0.010741502478396114
+        0.010741508938398425
       ],
-      "signed_volume_m3": 0.010741508621448652,
+      "signed_volume_m3": 0.010741508621448634,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "self_intersection_candidates": 0
+    },
+    "Torso": {
+      "triangles": 1480,
+      "connected_components": 1,
+      "component_volumes_m3": [
+        0.05340364114804904
+      ],
+      "signed_volume_m3": 0.053403642525120726,
       "nonmanifold_edges": 0,
       "degenerate_faces": 0,
       "self_intersection_candidates": 0
@@ -364,9 +366,9 @@
       "triangles": 208,
       "connected_components": 1,
       "component_volumes_m3": [
-        0.006904639506520501
+        0.006904636592063677
       ],
-      "signed_volume_m3": 0.006904637417629809,
+      "signed_volume_m3": 0.0069046371647033915,
       "nonmanifold_edges": 0,
       "degenerate_faces": 0,
       "self_intersection_candidates": 0
@@ -375,31 +377,9 @@
       "triangles": 202,
       "connected_components": 1,
       "component_volumes_m3": [
-        0.006901721565299113
+        0.006901721598877733
       ],
-      "signed_volume_m3": 0.006901721612836229,
-      "nonmanifold_edges": 0,
-      "degenerate_faces": 0,
-      "self_intersection_candidates": 0
-    },
-    "Hand_Left": {
-      "triangles": 402,
-      "connected_components": 1,
-      "component_volumes_m3": [
-        0.0008420983357855979
-      ],
-      "signed_volume_m3": 0.0008420980496283995,
-      "nonmanifold_edges": 0,
-      "degenerate_faces": 0,
-      "self_intersection_candidates": 0
-    },
-    "Hand_Right": {
-      "triangles": 454,
-      "connected_components": 1,
-      "component_volumes_m3": [
-        0.0008128182745963386
-      ],
-      "signed_volume_m3": 0.0008128192630750472,
+      "signed_volume_m3": 0.0069017214164886305,
       "nonmanifold_edges": 0,
       "degenerate_faces": 0,
       "self_intersection_candidates": 0
@@ -408,9 +388,9 @@
       "triangles": 384,
       "connected_components": 1,
       "component_volumes_m3": [
-        0.006574627803414519
+        0.006574626931251215
       ],
-      "signed_volume_m3": 0.006574627400338764,
+      "signed_volume_m3": 0.00657462719476605,
       "nonmanifold_edges": 0,
       "degenerate_faces": 0,
       "self_intersection_candidates": 0
@@ -419,9 +399,31 @@
       "triangles": 388,
       "connected_components": 1,
       "component_volumes_m3": [
-        0.006574724786256721
+        0.0065747247839593
       ],
-      "signed_volume_m3": 0.006574724925743684,
+      "signed_volume_m3": 0.006574724720170966,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "self_intersection_candidates": 0
+    },
+    "Hand_Left": {
+      "triangles": 402,
+      "connected_components": 1,
+      "component_volumes_m3": [
+        0.0008420980167370695
+      ],
+      "signed_volume_m3": 0.0008420980485341597,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "self_intersection_candidates": 0
+    },
+    "Hand_Right": {
+      "triangles": 454,
+      "connected_components": 1,
+      "component_volumes_m3": [
+        0.0008128192300671522
+      ],
+      "signed_volume_m3": 0.0008128192644646574,
       "nonmanifold_edges": 0,
       "degenerate_faces": 0,
       "self_intersection_candidates": 0

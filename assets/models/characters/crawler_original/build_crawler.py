@@ -16,6 +16,7 @@ import bpy
 import bmesh
 from mathutils import Matrix, Vector
 from mathutils.bvhtree import BVHTree
+from mathutils.kdtree import KDTree
 
 ROOT = Path(__file__).resolve().parent
 NAMES = ('Head', 'Torso', 'Arm_Left', 'Arm_Right', 'Hip_Stump_Left',
@@ -457,6 +458,131 @@ def arrange_pivots():
     return root
 
 
+def neck_vertex_distance():
+    head, torso = PARTS['Head'], PARTS['Torso']
+    tree = KDTree(len(head.data.vertices))
+    for i, vertex in enumerate(head.data.vertices):
+        tree.insert(head.matrix_world @ vertex.co, i)
+    tree.balance()
+    return min(tree.find(torso.matrix_world @ v.co)[2] for v in torso.data.vertices)
+
+
+def close_neck_gap():
+    """Extend only the torso neck to the existing skull base; preserve UVs.
+
+    The cap ring reuses the Head's eight lowest vertex positions exactly.
+    New UV islands are placed in unused atlas rectangles; other parts and
+    existing torso UV coordinates are never repacked.
+    """
+    if neck_vertex_distance() < 1e-6:
+        return
+    head, torso = PARTS['Head'], PARTS['Torso']
+    points = [head.matrix_world @ v.co for v in head.data.vertices]
+    low = min(p.z for p in points)
+    cap = [p for p in points if abs(p.z-low) < 1e-6]
+    assert len(cap) == 8, len(cap)
+    cy = sum(p.y for p in cap)/8
+    cap.sort(key=lambda p: math.atan2(p.y-cy, p.x))
+    vertices = []
+    for y, z, width, depth in [(.740, .590, .110, .090), (.785, .628, .113, .116)]:
+        ring = [Vector((x, y+b, z)) for x, b in octagon(width, depth)]
+        ring.sort(key=lambda p: math.atan2(p.y-y, p.x))
+        vertices.extend(ring)
+    vertices.extend(cap)
+    faces = [tuple(range(7, -1, -1)), tuple(range(16, 24))]
+    for k in range(2):
+        faces.extend((k*8+i, k*8+(i+1)%8, (k+1)*8+(i+1)%8, (k+1)*8+i) for i in range(8))
+    tool = raw_mesh('Neck extension', vertices, faces, 'skin_rot')
+    tool_uv = tool.data.uv_layers.new(name='UVMap', do_init=False)
+    for item in tool_uv.data:
+        item.uv = (0, 0)
+    boolean(torso, tool)
+    bm = bmesh.new(); bm.from_mesh(torso.data)
+    bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=.0001)
+    bmesh.ops.dissolve_degenerate(bm, edges=list(bm.edges), dist=.00001)
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bmesh.ops.triangulate(bm, faces=list(bm.faces))
+    bm.to_mesh(torso.data); bm.free(); torso.data.update()
+    # Retain exact shared cap positions after the Boolean operation.
+    for vertex in torso.data.vertices:
+        nearest = min(cap, key=lambda p: (vertex.co-p).length_squared)
+        if (vertex.co-nearest).length < .0002:
+            vertex.co = nearest
+    torso.data.update()
+    uv = torso.data.uv_layers.active.data
+    new_faces = []
+    for face in torso.data.polygons:
+        ids = list(face.loop_indices)
+        a, b, c = [uv[i].uv for i in ids]
+        if abs((b-a).cross(c-a)) < 1e-15:
+            new_faces.append(face)
+    # Exact triangle packing into existing atlas gaps, without repacking it.
+    size = 512
+    retained, bins = [], {}
+    def cells(coords):
+        xs, ys = [p[0] for p in coords], [p[1] for p in coords]
+        return [(x, y) for x in range(int(min(xs)*64), int(max(xs)*64)+1)
+                for y in range(int(min(ys)*64), int(max(ys)*64)+1)]
+    def insert(coords):
+        index = len(retained)
+        retained.append(coords)
+        for cell in cells(coords):
+            bins.setdefault(cell, set()).add(index)
+    new_ids = {face.index for face in new_faces}
+    density_sum, area_sum = 0.0, 0.0
+    for obj in PARTS.values():
+        data_uv = obj.data.uv_layers.active.data
+        for face in obj.data.polygons:
+            if obj == torso and face.index in new_ids:
+                continue
+            coords = [data_uv[i].uv for i in face.loop_indices]
+            insert([tuple(p) for p in coords])
+            density_sum += abs((coords[1]-coords[0]).cross(coords[2]-coords[0]))*.5
+            area_sum += face.area
+    density = math.sqrt(density_sum/area_sum)
+    islands = []
+    for face in new_faces:
+        p = [torso.data.vertices[i].co for i in face.vertices]
+        a, b = max(((0, 1), (1, 2), (2, 0)), key=lambda pair: (p[pair[1]]-p[pair[0]]).length)
+        e = (p[b]-p[a]).normalized()
+        n = (p[1]-p[0]).cross(p[2]-p[0]).normalized()
+        up = n.cross(e)
+        coords = [Vector(((v-p[0]).dot(e)*density, (v-p[0]).dot(up)*density)) for v in p]
+        low_uv = Vector((min(v.x for v in coords), min(v.y for v in coords)))
+        coords = [v-low_uv for v in coords]
+        islands.append((face.area, face, coords))
+    for _, face, coords in sorted(islands, key=lambda item: -item[0]):
+        found = None
+        for turn in range(4):
+            rotated = [Vector((v.x*math.cos(turn*math.pi/2)-v.y*math.sin(turn*math.pi/2),
+                               v.x*math.sin(turn*math.pi/2)+v.y*math.cos(turn*math.pi/2))) for v in coords]
+            offset = Vector((min(v.x for v in rotated), min(v.y for v in rotated)))
+            rotated = [v-offset for v in rotated]
+            w, h = math.ceil(max(v.x for v in rotated)*size)+2, math.ceil(max(v.y for v in rotated)*size)+2
+            for y in range(1, size-h):
+                for x in range(1, size-w):
+                    candidate = [tuple(v+Vector((x/size, y/size))) for v in rotated]
+                    center = sum((Vector(v) for v in candidate), Vector((0, 0)))/3
+                    guard = [tuple(center+(Vector(v)-center)*1.015) for v in candidate]
+                    nearby = set().union(*(bins.get(cell, set()) for cell in cells(guard)))
+                    if all(overlap_area(guard, retained[i]) < 1e-14 for i in nearby):
+                        found = candidate; break
+                if found is not None:
+                    break
+            if found is not None:
+                break
+        assert found is not None, 'No free UV triangle slot'
+        insert(found)
+        for loop, coord in zip(face.loop_indices, found):
+            uv[loop].uv = coord
+    colors = torso.data.color_attributes.get('SurfaceTint')
+    if colors:
+        for color in colors.data:
+            if color.color[3] == 0:
+                color.color = (1, 1, 1, 1)
+    assert neck_vertex_distance() < 1e-6
+
+
 def read_glb(path):
     raw = path.read_bytes()
     magic, version, size = struct.unpack_from('<III', raw)
@@ -560,6 +686,7 @@ def validate_glb(geometry):
     all_uvs = []
     all_densities = []
     mesh_info = {}
+    world_vertices = {}
     total = 0
     for name, node in nodes.items():
         world_translation = Vector((PIVOTS[name][0], PIVOTS[name][2], -PIVOTS[name][1]))
@@ -593,6 +720,7 @@ def validate_glb(geometry):
                 assert area > 1e-11
                 densities.append(math.sqrt(abs(cross(*tri))*.5/area))
         total += count
+        world_vertices[name] = node_bounds
         bounds.extend(node_bounds)
         all_densities.extend(densities)
         all_uvs.extend(triangles)
@@ -621,11 +749,18 @@ def validate_glb(geometry):
     assert abs(head_bounds_center-head_center.z) < .015
     head_to_stumps = max(mesh_info[name]['bounds_max_godot_m'][2]
         for name in ('Hip_Stump_Left', 'Hip_Stump_Right'))-mesh_info['Head']['bounds_min_godot_m'][2]
+    neck_tree = KDTree(len(world_vertices['Torso']))
+    for index, point in enumerate(world_vertices['Torso']):
+        neck_tree.insert(point, index)
+    neck_tree.balance()
+    neck_distance = min(neck_tree.find(point)[2] for point in world_vertices['Head'])
+    assert neck_distance < 1e-6, neck_distance
     report = dict(blender_version=bpy.app.version_string, file='crawler.glb',
         all_checks_passed=True, units='metres', axes=dict(up='+Y', forward='-Z'),
         height_definition='Head: authored skull centre. Chest: sternum-region centre; not skin surface or joint pivot.',
         head_height_m=head_center.z, chest_height_m=CHEST_CENTER.z,
         head_pivot_height_m=nodes['Head']['translation'][1], mesh_top_height_m=hi[1],
+        head_torso_minimum_vertex_distance_m=neck_distance, neck_gap_closed=True,
         head_bounds_center_height_m=head_bounds_center,
         head_landmark_godot_m=[head_center.x, head_center.z, -head_center.y],
         chest_landmark_godot_m=[CHEST_CENTER.x, CHEST_CENTER.z, -CHEST_CENTER.y],
@@ -749,6 +884,9 @@ def main():
     (ROOT/'geometry_check.json').write_text(json.dumps(geometry, indent=2), encoding='utf-8')
     unwrap()
     arrange_pivots()
+    close_neck_gap()
+    geometry = topology()
+    (ROOT/'geometry_check.json').write_text(json.dumps(geometry, indent=2), encoding='utf-8')
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.export_scene.gltf(filepath=str(ROOT/'crawler.glb'), export_format='GLB',
         use_selection=True, export_yup=True, export_apply=True, export_texcoords=True,
