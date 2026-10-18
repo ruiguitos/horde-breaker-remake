@@ -52,6 +52,13 @@ em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
   (a telemetria regista `dev` até lá).
 - [ ] Correr a suite completa (`tests/test_*.gd`) antes de cada entrega e
   confirmar 0 `TEST FAIL`, `SCRIPT ERROR` e `Parse Error`.
+- [ ] Executor de testes: timeout por teste (hoje `OS.execute` é bloqueante; um
+  teste pendurado trava o executor). Exige supervisor, porque
+  `OS.execute_with_pipe` não devolve o código de saída. Aceitar códigos de
+  saída do Windows só com marcador de fim em cada teste.
+- [ ] Decidir se a AR tem tempo de recarga (hoje é instantânea, sem animação).
+- [ ] Decidir o motor: proposta em `docs/tech/ENGINE_MIGRATION.md` (ficar no
+  Godot e medir o jogo completo).
 
 ## Fora do plano (decisões)
 
