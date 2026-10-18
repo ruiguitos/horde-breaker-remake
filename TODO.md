@@ -38,8 +38,8 @@ em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
 - [ ] Pacote Windows: não existe `export_presets.cfg` (está no `.gitignore`).
   Falta exportação reproduzível, versão, ícone, licenças incluídas e arranque
   sem editor. Precisa dos templates de exportação 4.7 (só há os de mono).
-- [ ] Telemetria: registar a causa de morte por run (a semente e a versão já
-  são gravadas desde o formato 2).
+- [ ] Definir `application/config/version` antes da primeira versão distribuída
+  (a telemetria regista `dev` até lá).
 - [ ] Correr a suite completa (`tests/test_*.gd`) antes de cada entrega e
   confirmar 0 `TEST FAIL`, `SCRIPT ERROR` e `Parse Error`.
 
