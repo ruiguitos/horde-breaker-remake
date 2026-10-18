@@ -737,6 +737,12 @@ func _perk_detail() -> void:
 	where.autowrap_mode = TextServer.AUTOWRAP_OFF
 	titles.add_child(where)
 	titles.add_child(_pips(rank, Vector2(14, 8), false))
+	# A class-only perk does nothing for another class: say so, do not hide it.
+	if perk != null and perk.class_filter != &"" and perk.class_filter != profile.selected_class:
+		var warning := UiTheme.label("NO EFFECT WITH THIS CLASS: works only with the %s" % String(GameData.CLASS_INFO[perk.class_filter]["name"]).to_upper(), 13, UiTheme.DANGER)
+		warning.name = "ClassWarning"
+		warning.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		titles.add_child(warning)
 	var options := HBoxContainer.new()
 	options.add_theme_constant_override("separation", 4)
 	_summary.add_child(options)
