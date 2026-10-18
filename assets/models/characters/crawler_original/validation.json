@@ -8,12 +8,14 @@
     "forward": "-Z"
   },
   "height_definition": "Head: authored skull centre. Chest: sternum-region centre; not skin surface or joint pivot.",
-  "head_height_m": 0.6899999976158142,
+  "head_height_m": 0.7849999666213989,
   "chest_height_m": 0.4399999976158142,
-  "head_bounds_center_height_m": 0.6969999969005585,
+  "head_pivot_height_m": 0.6850000023841858,
+  "mesh_top_height_m": 0.9290000200271606,
+  "head_bounds_center_height_m": 0.792000025510788,
   "head_landmark_godot_m": [
     0.0,
-    0.6899999976158142,
+    0.7849999666213989,
     -0.8109999895095825
   ],
   "chest_landmark_godot_m": [
@@ -31,7 +33,7 @@
   ],
   "bounds_max_godot_m": [
     0.2991900146007538,
-    0.8339999914169312,
+    0.9290000200271606,
     0.30935999751091003
   ],
   "minimum_ground_clearance_m": 0.0,
@@ -230,20 +232,20 @@
       "triangles": 1296,
       "pivot_godot_m": [
         0.0,
-        0.5899999737739563,
+        0.6850000023841858,
         -0.7549999952316284
       ],
       "bounds_min_godot_m": [
         -0.12933999300003052,
-        0.5600000023841858,
+        0.6550000309944153,
         -0.9925000071525574
       ],
       "bounds_max_godot_m": [
         0.12933999300003052,
-        0.8339999914169312,
+        0.9290000200271606,
         -0.688319981098175
       ],
-      "ground_clearance_m": 0.5600000023841858,
+      "ground_clearance_m": 0.6550000309944153,
       "uv": {
         "in_0_1": true,
         "degenerate_triangles": 0,

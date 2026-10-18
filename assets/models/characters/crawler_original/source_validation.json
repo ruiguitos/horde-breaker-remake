@@ -7,10 +7,18 @@
   "modifiers": 0,
   "uv_layouts_per_mesh": 1,
   "root_identity": true,
-  "neck_mount_shared_interior_verified": true,
   "rotations_applied": true,
   "scales_applied": true,
   "metre_scale": true,
-  "blend_sha256": "f8b11236aa30d64d022ee7183f2b9beb5798bb33f0b7bf1c3de69573a9c7fe1a",
-  "glb_sha256": "ba3a74b2b9fc8a74017056f151e86ad00fef9b250dee4d1d5606d8935974afd9"
+  "blend_sha256": "f88d4cc561f0152e8191698c53c54ded2e67f5b2bb17bf30a4d3302f6f523703",
+  "glb_sha256": "bf462240f5a7feae6d34d9dfc5fe386febb956ec88ca337e5996c5127441a658",
+  "head_pivot_height_m": 0.6850000023841858,
+  "mesh_top_height_m": 0.9290000200271606,
+  "head_translation_delta_m": 0.095,
+  "all_mesh_data_and_uvs_unchanged": true,
+  "other_part_transforms_unchanged": true,
+  "neck_mount_check": {
+    "applicable": false,
+    "reason": "Requested Head-only translation; Torso neck geometry retained."
+  }
 }

@@ -31,14 +31,17 @@ PALETTE = {
 MATERIALS = []
 PARTS = {}
 HEAD_CENTER = Vector((0, .811, .690))
+HEAD_LIFT = .095  # Translate the completed Head only; retain its mesh and UVs.
 CHEST_CENTER = Vector((0, .510, .440))
-PIVOTS = {
+REST_PIVOTS = {
     'Torso': (0, 0, 0), 'Head': (0, .755, .590),
     'Arm_Left': (-.205, .580, .460), 'Arm_Right': (.205, .580, .460),
     'Hip_Stump_Left': (-.085, .015, .245),
     'Hip_Stump_Right': (.085, .015, .245),
     'Hand_Left': (-.242, .845, .056), 'Hand_Right': (.242, .835, .056),
 }
+PIVOTS = dict(REST_PIVOTS)
+PIVOTS['Head'] = (0, .755, .685)
 
 
 def activate(obj):
@@ -437,7 +440,7 @@ def topology():
 
 def arrange_pivots():
     for name, obj in PARTS.items():
-        pivot = Vector(PIVOTS[name])
+        pivot = Vector(REST_PIVOTS[name])
         for vertex in obj.data.vertices:
             vertex.co -= pivot
         obj.location = pivot
@@ -614,15 +617,17 @@ def validate_glb(geometry):
     density_ratio = max(all_densities)/min(all_densities)
     assert density_ratio < 1.05, density_ratio
     head_bounds_center = (mesh_info['Head']['bounds_min_godot_m'][1]+mesh_info['Head']['bounds_max_godot_m'][1])/2
-    assert abs(head_bounds_center-HEAD_CENTER.z) < .015
+    head_center = HEAD_CENTER + Vector((0, 0, HEAD_LIFT))
+    assert abs(head_bounds_center-head_center.z) < .015
     head_to_stumps = max(mesh_info[name]['bounds_max_godot_m'][2]
         for name in ('Hip_Stump_Left', 'Hip_Stump_Right'))-mesh_info['Head']['bounds_min_godot_m'][2]
     report = dict(blender_version=bpy.app.version_string, file='crawler.glb',
         all_checks_passed=True, units='metres', axes=dict(up='+Y', forward='-Z'),
         height_definition='Head: authored skull centre. Chest: sternum-region centre; not skin surface or joint pivot.',
-        head_height_m=HEAD_CENTER.z, chest_height_m=CHEST_CENTER.z,
+        head_height_m=head_center.z, chest_height_m=CHEST_CENTER.z,
+        head_pivot_height_m=nodes['Head']['translation'][1], mesh_top_height_m=hi[1],
         head_bounds_center_height_m=head_bounds_center,
-        head_landmark_godot_m=[HEAD_CENTER.x, HEAD_CENTER.z, -HEAD_CENTER.y],
+        head_landmark_godot_m=[head_center.x, head_center.z, -head_center.y],
         chest_landmark_godot_m=[CHEST_CENTER.x, CHEST_CENTER.z, -CHEST_CENTER.y],
         total_length_m=hi[2]-lo[2], total_width_m=hi[0]-lo[0],
         head_to_stumps_length_m=head_to_stumps,
@@ -679,7 +684,10 @@ def preview():
     floor = bpy.context.object
     floor.data.materials.append(grey)
     temporary.append(floor)
-    target = Vector((0, .34, .40))
+    points = [obj.matrix_world @ v.co for obj in PARTS.values() for v in obj.data.vertices]
+    lo = Vector(tuple(min(p[i] for p in points) for i in range(3)))
+    hi = Vector(tuple(max(p[i] for p in points) for i in range(3)))
+    target = (lo+hi)/2
     for position, energy, size in [((-1.7, 1.4, 2.6), 210, 2.0),
                                    ((1.6, .4, 1.5), 120, 1.7), ((-.2, -1.6, 2.2), 200, 1.4)]:
         data = bpy.data.lights.new('Preview softbox', 'AREA')
@@ -701,7 +709,13 @@ def preview():
                                    ('rear_detail', (-1.25, -2.7, 1.35), 1.65)]:
         camera.location = target+Vector(direction)
         camera.rotation_euler = (target-camera.location).to_track_quat('-Z', 'Y').to_euler()
-        data.ortho_scale = scale
+        basis = camera.rotation_euler.to_matrix().transposed()
+        corners = [basis @ (Vector((x, y, z))-target)
+            for x in (lo.x, hi.x) for y in (lo.y, hi.y) for z in (lo.z, hi.z)]
+        span_x = max(v.x for v in corners)-min(v.x for v in corners)
+        span_y = max(v.y for v in corners)-min(v.y for v in corners)
+        aspect = scene.render.resolution_x/scene.render.resolution_y
+        data.ortho_scale = max(scale, max(span_x, span_y*aspect)*1.12)
         scene.render.filepath = str(ROOT/'previews'/('crawler_'+name+'.png'))
         bpy.ops.render.render(write_still=True)
     for obj in temporary:

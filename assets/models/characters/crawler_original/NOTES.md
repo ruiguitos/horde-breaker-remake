@@ -23,7 +23,7 @@ braços, mãos e cotos são construídos pelo script desta pasta.
 
 - Metros reais; +Y para cima e frente em -Z no GLB. Em Blender, Z é cima
   e +Y é frente; a conversão é feita pelo exportador glTF.
-- Cabeça: centro anatómico de construção a **0,69 m**; peito: centro da
+- Cabeça: centro anatómico de construção a **0,785 m**; peito: centro da
   região do esterno a **0,44 m**. Não são alturas da pele exterior nem
   dos pivôs. A altura do centro dos limites da malha da cabeça é também
   medida no JSON, separadamente. Só as mãos/antebraços apoiam no chão.
@@ -51,6 +51,13 @@ peças são filhas de `Torso`. Os nomes Left/Right são anatómicos: Left fica
 em X negativo. Os braços incluem braço e antebraço num único sólido,
 com o cotovelo já fletido; o contrato de oito nós não inclui um nó de
 cotovelo. Não existe rig, animação, câmara ou luz no GLB ou no `.blend`.
+
+Ajuste de 2026-10-18: apenas `Head` foi transladada **+0,095 m** em altura.
+O pivô do pescoço fica a **0,685 m** e o topo da malha a **0,929 m**.
+As coordenadas locais da cabeça, UVs e restantes peças foram preservadas;
+o script de construção aplica a diferença após criar o modelo original.
+O pescoço que pertence a `Torso` conserva a geometria e altura anteriores,
+conforme o pedido de mover apenas a cabeça.
 
 ## Materiais e UVs
 
@@ -111,7 +118,9 @@ contagem de triângulos. Esse teste de integração é independente do build
 Blender e não é recriado pelo comando acima. Não foi corrida a suite
 completa do jogo, porque nenhum sistema de gameplay foi alterado.
 `source_validation.json` regista ainda a reabertura do `.blend`, sem
-câmaras/luzes/rigs/animações, a contagem das malhas e o contacto do pescoço.
+câmaras/luzes/rigs/animações, a contagem das malhas e a alteração isolada
+da posição da cabeça. A antiga verificação de contacto do pescoço refere-se
+à pose anterior; o ajuste pedido não prolonga a geometria de `Torso`.
 Os hashes do GLB nos dois relatórios de integração identificam o mesmo
 ficheiro final. Esses relatórios adicionais são evidência da entrega,
 não dependências do script de construção.

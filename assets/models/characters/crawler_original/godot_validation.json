@@ -1,7 +1,7 @@
 {
   "bounds_max_m": [
     0.299190014600754,
-    0.833999991416931,
+    0.929000020027161,
     0.30935999751091
   ],
   "bounds_min_m": [
@@ -11,7 +11,8 @@
   ],
   "engine": "4.7.2-stable (official)",
   "failures": [],
-  "glb_sha256": "ba3a74b2b9fc8a74017056f151e86ad00fef9b250dee4d1d5606d8935974afd9",
+  "glb_sha256": "bf462240f5a7feae6d34d9dfc5fe386febb956ec88ca337e5996c5127441a658",
+  "head_pivot_height_m": 0.685000002384186,
   "material_names": [
     "skin_rot",
     "flesh_wound",
@@ -21,6 +22,7 @@
     "cloth_trousers"
   ],
   "mesh_count": 8,
+  "mesh_top_height_m": 0.929000020027161,
   "node_names": [
     "Torso",
     "Arm_Left",
@@ -56,7 +58,7 @@
     ],
     "Head": [
       0.0,
-      0.589999973773956,
+      0.685000002384186,
       -0.754999995231628
     ],
     "Hip_Stump_Left": [

@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "head_pivot_height_m": 0.6850000023841858,
+  "head_translation_delta_m": 0.095,
+  "only_glb_json_change": "Head.translation[1]",
+  "entire_glb_mesh_binary_identical": true,
+  "uv_normals_tangents_colors_indices_unchanged": true,
+  "materials_and_other_nodes_unchanged": true,
+  "updated_build_reproduces_identical_glb": true,
+  "glb_sha256": "bf462240f5a7feae6d34d9dfc5fe386febb956ec88ca337e5996c5127441a658"
+}
