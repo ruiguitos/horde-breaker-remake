@@ -26,3 +26,7 @@ addons/**/~*.dll
 # Godot import stubs for review captures (generated; the PNGs are kept)
 docs/design/zombie_fix/*.import
 docs/design/grading/*.import
+docs/design/menus_review/*.import
+
+# Python caches (tools/real_island and the Blender helpers)
+__pycache__/
