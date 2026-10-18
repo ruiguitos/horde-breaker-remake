@@ -96,6 +96,11 @@ Pilares possíveis:
   fogo", "recarregar empurra a horda").
 - Skill tree → perks equipáveis com slots, ou árvore pequena (~15 nós) com
   escolhas exclusivas.
+- Acessórios de arma ao subir de nível (ideia do utilizador, 2026-10-18):
+  além das cartas, cada nível dá um acessório para a arma equipada (mira,
+  supressor, carregador maior, guarda-mão), com efeito de jogo e, quando
+  couber, peça visível no modelo de primeira pessoa. Por decidir: se é uma
+  escolha separada das cartas ou a substitui, e se dura só a run ou é permanente.
 - Munição: arma base infinita + armas especiais limitadas (Helldivers 1,
   Enter the Gungeon). Logística como escolha, não ansiedade.
 
