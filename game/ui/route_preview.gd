@@ -34,7 +34,8 @@ func _draw() -> void:
 		_draw_granite_island()
 		return
 	var info: Dictionary = GameData.BIOMES[biome]
-	draw_rect(Rect2(Vector2.ZERO, size), info["sky"])
+	var sky: Color = info["sky"]
+	draw_polygon(PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), size, Vector2(0, size.y * 0.6)]), PackedColorArray([sky.darkened(0.2), sky.darkened(0.2), sky.lightened(0.12), sky.lightened(0.12)]))
 	draw_circle(size * Vector2(0.78, 0.24), 10, Color("edcc83"))
 	var shore := PackedVector2Array([Vector2(0, 0.8), Vector2(0.15, 0.46), Vector2(0.3, 0.54), Vector2(0.5, 0.28), Vector2(0.7, 0.55), Vector2(1, 0.72), Vector2(1, 1), Vector2(0, 1)])
 	for i in shore.size():
@@ -46,22 +47,33 @@ func _draw() -> void:
 	elif biome == &"town":
 		for i in 6:
 			var pos := size * Vector2(0.1 + i * 0.14, 0.6)
+			draw_rect(Rect2(pos + Vector2(4, 22), Vector2(22, 5)), Color(0, 0, 0, 0.25))
 			draw_rect(Rect2(pos, Vector2(20, 24)), info["building"])
+			draw_rect(Rect2(pos, Vector2(20, 3)), info["building"].lightened(0.2))
 			draw_colored_polygon(PackedVector2Array([pos + Vector2(-3, 0), pos + Vector2(10, -10), pos + Vector2(23, 0)]), Color("504137"))
 	elif biome == &"port":
 		for i in 6:
-			draw_rect(Rect2(size * Vector2(0.08 + i * 0.14, 0.67), Vector2(25, 16)), info["building"] if i % 2 == 0 else Color("536975"))
+			var box_pos: Vector2 = size * Vector2(0.08 + i * 0.14, 0.67)
+			draw_rect(Rect2(box_pos + Vector2(4, 14), Vector2(25, 4)), Color(0, 0, 0, 0.25))
+			draw_rect(Rect2(box_pos, Vector2(25, 16)), info["building"] if i % 2 == 0 else Color("536975"))
+			draw_rect(Rect2(box_pos, Vector2(25, 3)), (info["building"] if i % 2 == 0 else Color("536975")).lightened(0.2))
 		draw_polyline(PackedVector2Array([size * Vector2(0.3, 0.7), size * Vector2(0.35, 0.16), size * Vector2(0.66, 0.32), size * Vector2(0.62, 0.7)]), Color("44494a"), 3)
 	else:
 		for i in 6:
 			var foot := size * Vector2(0.08 + i * 0.16, 0.84)
 			var crown := foot - Vector2(5, 25 + (i % 3) * 7)
+			draw_ground_shadow(foot)
 			draw_line(foot, crown, Color("51442e"), 3)
 			draw_colored_polygon(PackedVector2Array([crown + Vector2(-15, 7), crown + Vector2(-4, -6), crown + Vector2(15, 5), crown, crown + Vector2(-1, 12)]), info["foliage"])
 	draw_rect(Rect2(Vector2(0, size.y * 0.84), Vector2(size.x, size.y * 0.16)), Color("334e55"))
 
 
 ## Polygon in 0..1 coordinates, scaled to the control.
+## A soft ground shadow under an object standing at oot.
+func draw_ground_shadow(foot: Vector2) -> void:
+	draw_colored_polygon(PackedVector2Array([foot + Vector2(-9, 1), foot + Vector2(0, -2), foot + Vector2(12, 1), foot + Vector2(3, 4)]), Color(0, 0, 0, 0.22))
+
+
 func _poly(points: Array, color: Color) -> void:
 	var out := PackedVector2Array()
 	for pt: Vector2 in points:
