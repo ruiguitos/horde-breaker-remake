@@ -213,7 +213,11 @@ var _escort_ring: MeshInstance3D
 var _escort_arrows := MultiMesh.new()
 var _escort_stop_posts: Array[Node3D] = []
 var _escort_yaw: float = 0.0
-var _survivor: MeshInstance3D
+var _survivor: EscortModel
+## Rescue: where the survivor stood last frame, metres walked and facing.
+var _survivor_last: Vector3 = Vector3.ZERO
+var _survivor_walked: float = 0.0
+var _survivor_yaw: float = 0.0
 var _caches: Array[MeshInstance3D] = []
 var _buildings: Array[MeshInstance3D] = []
 var _building_boxes: Array[AABB] = []
@@ -428,11 +432,10 @@ func _build_world() -> void:
 		_build_sabotage()
 	if run.mission == &"escort":
 		_build_escort()
-	_survivor = MeshInstance3D.new()
-	_survivor.mesh = _capsule(0.35, 1.7)
-	_survivor.material_override = _mat(Color(1.0, 0.55, 0.1))
+	_survivor = EscortModel.survivor_model()
 	_survivor.visible = run.mission == &"rescue"
 	add_child(_survivor)
+	_survivor_last = _on_ground(run.survivor_pos)
 
 	var boat := MeshInstance3D.new()
 	var hull := BoxMesh.new()
@@ -2776,7 +2779,17 @@ func _boat_spot() -> Vector3:
 func _draw_mission() -> void:
 	if run.mission == &"rescue":
 		_survivor.visible = not run.survivor_lost
-		_survivor.position = _on_ground(run.survivor_pos) + Vector3(0, 0.85 + (0.0 if run.survivor_found else absf(sin(Time.get_ticks_msec() * 0.006)) * 0.3), 0)
+		var at: Vector3 = _on_ground(run.survivor_pos)
+		var step: Vector3 = at - _survivor_last
+		step.y = 0.0
+		_survivor_last = at
+		# Walking only once found and following the player: it faces where it goes.
+		var moving: bool = run.survivor_found and not run.survivor_lost and step.length() > 0.001
+		if moving:
+			_survivor_walked += step.length()
+			_survivor_yaw = atan2(-step.x, -step.z)
+		_survivor.transform = Transform3D(Basis(Vector3.UP, _survivor_yaw), at)
+		_survivor.set_motion(_survivor_walked, moving, false, Time.get_ticks_msec() * 0.001)
 	if run.mission == &"defend" or run.mission == &"holdout":
 		var m2: StandardMaterial3D = _defend_ring.material_override
 		var inside: bool = run.player_pos.distance_to(run.site) <= GameData.DEFEND_RADIUS

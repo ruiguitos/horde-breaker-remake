@@ -237,12 +237,16 @@ func _on_load_failed(screen: LoadingScreen) -> void:
 ## Writes a JSON summary of the run to user://runs/ for balancing.
 func _write_telemetry() -> void:
 	DirAccess.make_dir_recursive_absolute("user://runs")
-	var stamp: String = Time.get_datetime_string_from_system().replace(":", "-")
-	var f := FileAccess.open("user://runs/run_%s.json" % stamp, FileAccess.WRITE)
+	# Milliseconds keep two runs finished in the same second from overwriting each other.
+	var stamp: String = "%s_%03d" % [Time.get_datetime_string_from_system().replace(":", "-"), Time.get_ticks_msec() % 1000]
+	var path: String = "user://runs/run_%s.json" % stamp
+	var f := FileAccess.open(path, FileAccess.WRITE)
 	if f == null:
+		push_warning("Could not write the run summary to %s (error %d)" % [path, FileAccess.get_open_error()])
 		return
 	f.store_string(JSON.stringify({
-		"version": 1, "won": context.won, "threat": context.threat,
+		"version": 2, "build": ProjectSettings.get_setting("application/config/version", "dev"),
+		"seed": context.rng_seed, "won": context.won, "threat": context.threat,
 		"expedition": String(context.expedition),
 		"class": String(context.player_class),
 		"perks": context.perks.map(func(x: StringName) -> String: return String(x)),
