@@ -29,9 +29,29 @@ func _ready() -> void:
 	resized.connect(queue_redraw)
 
 
+## The render of this biome's island, or null when there is none (the drawn picture is used).
+static var _pictures: Dictionary = {}
+
+func _picture() -> Texture2D:
+	if not _pictures.has(biome):
+		var path: String = "res://assets/ui/routes/%s.png" % biome
+		var texture: Texture2D = null
+		if FileAccess.file_exists(path):
+			var image: Image = Image.load_from_file(ProjectSettings.globalize_path(path))
+			if image != null:
+				texture = ImageTexture.create_from_image(image)
+		_pictures[biome] = texture
+	return _pictures[biome]
+
+
 func _draw() -> void:
 	if expedition != &"":
 		_draw_granite_island()
+		return
+	# A real render of the island when there is one (assets/ui/routes); the drawn picture is the fallback.
+	var picture: Texture2D = _picture()
+	if picture != null:
+		draw_texture_rect(picture, Rect2(Vector2.ZERO, size), false)
 		return
 	var info: Dictionary = GameData.BIOMES[biome]
 	var sky: Color = info["sky"]
