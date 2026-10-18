@@ -51,6 +51,10 @@ var dash_dir: Vector3 = Vector3.ZERO
 var invulnerable: float = 0.0
 ## Debug noclip (Mouse 4/5): move through walls and sea, faster, no damage.
 var noclip: bool = false
+## What last took the player's HP (see _take_player_damage) and, once the
+## player dies, the cause recorded for the telemetry.
+var last_hit_by: StringName = &""
+var death_cause: StringName = &""
 var player_class: StringName = &"recruit"
 var hazard_pay: bool = false  ## boat briefing deal (see RunContext)
 var war_cry_time: float = 0.0  ## > 0 while War Cry reduces damage taken
@@ -503,6 +507,7 @@ func save_to_context(ctx: RunContext) -> void:
 		"cards_picked": cards_picked.map(func(x: StringName) -> String: return String(x)),
 		"power_ups": power_ups_picked.map(func(x: StringName) -> String: return String(x)),
 		"power_up_intel_bonus": _power_up_intel_bonus, "shield_left": int(shield),
+		"cause": String(death_cause),
 	})
 	ctx.intel += intel_earned()
 	ctx.hazard_pay = false  # one island only
@@ -1876,7 +1881,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	horde.tick(dt)
 	if invulnerable <= 0.0 and dash_time <= 0.0:
 		var melee: float = minf(horde.damage_to_player, GameData.MAX_MELEE_PER_FRAME)
-		_take_player_damage(melee * (0.6 if war_cry_time > 0.0 else 1.0))
+		_take_player_damage(melee * (0.6 if war_cry_time > 0.0 else 1.0), &"melee")
 	war_cry_time = maxf(0.0, war_cry_time - dt)
 	battle_rhythm_time = maxf(0.0, battle_rhythm_time - dt)
 	opening_volley_time = maxf(0.0, opening_volley_time - dt)
@@ -1915,6 +1920,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	if hp <= 0.0:
 		hp = 0.0
 		objective = Objective.LOST
+		death_cause = last_hit_by
 	_sync_intel_bonus()
 
 
@@ -2052,12 +2058,16 @@ func breaker_radius() -> float:
 	return GameData.BREAKER_RADIUS * (1.0 + 0.2 * stacks(&"shockwave"))
 
 
-func _take_player_damage(amount: float) -> void:
+## `source` names what hurt the player (telemetry: the death cause); the game
+## always passes one, the default is for tests that only check HP.
+func _take_player_damage(amount: float, source: StringName = &"unknown") -> void:
 	if amount > 0.0 and not noclip:
 		var absorbed: float = minf(shield, amount)
 		shield -= absorbed
 		hp -= amount - absorbed
 		_last_damage_time = time_alive
+		if amount > absorbed:
+			last_hit_by = source
 
 
 func add_shield(amount: float) -> void:
@@ -2782,7 +2792,7 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 		if t.explodes and not _nuking:
 			explosions.append(p)
 			if player_pos.distance_to(p) <= GameData.BLOATER_RADIUS and dash_time <= 0.0:
-				_take_player_damage(GameData.BLOATER_PLAYER_DAMAGE)
+				_take_player_damage(GameData.BLOATER_PLAYER_DAMAGE, &"bloater")
 			for j in horde.query_radius(p, GameData.BLOATER_RADIUS):
 				_damage(j, GameData.BLOATER_DAMAGE, p, false, true, true)
 				horde.knock_back(j, p, 1.5)
@@ -3364,7 +3374,7 @@ func _detonate(hurt_player: bool = true) -> void:
 				_damage(j, 100000.0, c, false, true)
 	if hurt_player and in_blast(player_pos) and not is_over():
 		blast_hit = true
-		_take_player_damage(max_hp * blast_damage())
+		_take_player_damage(max_hp * blast_damage(), &"detonation")
 		messages.append("Caught in the blast!")
 	elif not is_over():
 		messages.append("The machine is gone. Get out!")
@@ -3550,7 +3560,7 @@ func _update_lava(dt: float) -> void:
 		var c: Vector3 = map.lava[k]
 		var r: float = map.lava_radius[k]
 		if dash_time <= 0.0 and Vector2(player_pos.x - c.x, player_pos.z - c.z).length() <= r:
-			_take_player_damage(GameData.LAVA_PLAYER_DPS * dt)
+			_take_player_damage(GameData.LAVA_PLAYER_DPS * dt, &"lava")
 		for i in horde.query_radius(c, r):
 			if horde.kinds[i] != GameData.EnemyKind.BOSS:
 				_damage(i, GameData.LAVA_ENEMY_DPS * dt, c, false, true, true)
@@ -3649,7 +3659,7 @@ func _update_boss(dt: float, b: int) -> void:
 		if slam_time <= 0.0:
 			explosions.append(slam_pos)
 			if dash_time <= 0.0 and player_pos.distance_to(slam_pos) <= GameData.BOSS_SLAM_RADIUS:
-				_take_player_damage(GameData.BOSS_SLAM_DAMAGE)
+				_take_player_damage(GameData.BOSS_SLAM_DAMAGE, &"boss_slam")
 				messages.append("SLAMMED!")
 			for j in horde.query_radius(slam_pos, GameData.BOSS_SLAM_RADIUS):
 				if j != b:
@@ -3671,7 +3681,7 @@ func _update_boss(dt: float, b: int) -> void:
 		if rock_times[r] <= 0.0:
 			explosions.append(rocks[r])
 			if dash_time <= 0.0 and player_pos.distance_to(rocks[r]) <= GameData.BOSS_ROCK_RADIUS:
-				_take_player_damage(GameData.BOSS_ROCK_DAMAGE)
+				_take_player_damage(GameData.BOSS_ROCK_DAMAGE, &"boss_rock")
 			rocks.remove_at(r)
 			rock_times.remove_at(r)
 			rock_origins.remove_at(r)
