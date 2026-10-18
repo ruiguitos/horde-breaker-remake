@@ -358,8 +358,9 @@ func _setup() -> void:
 			_camera.look_at(CENTER + Vector3(0, 1.75, 0))
 			_camera.fov = 28
 		_:
-			if _shot.begins_with("fp_"):
-				var id := StringName(_shot.substr(3))
+			if _shot.begins_with("fp_") or _shot.begins_with("fpads_") or _shot.begins_with("fpreload_"):
+				# fp_<id> hip, fpads_<id> aiming down the sights, fpreload_<id> half way through a reload.
+				var id := StringName(_shot.substr(_shot.find("_") + 1))
 				_camera.position = CENTER + Vector3(0, 1.72, 6)
 				_camera.look_at(CENTER + Vector3(0, 1.5, 0))
 				_camera.fov = 75
@@ -367,6 +368,9 @@ func _setup() -> void:
 				var vm: Variant = _script("view_model").create(&"recruit")
 				_camera.add_child(vm)
 				vm.set_weapon(id)
+				vm.aim = 1.0 if _shot.begins_with("fpads_") else 0.0
+				vm.reload = 0.5 if _shot.begins_with("fpreload_") else 0.0
+				vm.update(0.0, 0.0, 0.0, 0.0)
 				for v in ZombieModel.VARIANTS:
 					_zombie(CENTER + Vector3(-2.4 + v * 1.6, 0, 1.0 - v * 0.5), v, Vector3(0, 0, 1.5))
 

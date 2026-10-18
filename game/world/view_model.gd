@@ -6,8 +6,30 @@ extends Node3D
 
 ## Rest position in camera space: lower right, a little ahead of the eye.
 const REST: Vector3 = Vector3(0.19, -0.2, -0.47)
-## Sights: the gun is brought to the centre of the view while aiming down sights.
-const ADS_REST: Vector3 = Vector3(0.0, -0.12, -0.4)
+## Sights: while aiming down sights the front sight is put on the centre of the
+## view, with the rear sight `EYE_TO_REAR` metres from the eye (see sight_rest).
+## Used only when a gun has no sight parts in LAYOUT.
+const ADS_FALLBACK: Vector3 = Vector3(0.0, -0.12, -0.4)
+const EYE_TO_REAR: float = 0.12
+## Reload: the magazine drops this far (gun metres) and the charging handle
+## is pulled back this far (gun metres) at the end of the reload.
+const MAG_DROP: float = 0.12
+const CHARGE_PULL: float = 0.03
+## Named parts of each GLB (node names as Godot imports them: a dot in a GLB
+## name becomes an underscore, so "5.56" is "5_56") for the animations.
+## `magazine` lists name prefixes (the body, floor plate and stiffeners move
+## together); `charge`
+## the charging handle or bolt; `front` and `rear` the sight parts. Empty where
+## a gun has no such part (the Machine Gun is belt-fed, so no magazine).
+const LAYOUT: Dictionary = {
+	&"rifle": {"magazine": ["Curved 5_56 magazine", "Magazine floor plate", "Magazine pressed stiffener"],
+		"charge": ["Charging handle"], "front": "Front sight post", "rear": "Rear sight aperture"},
+	&"smg": {"magazine": ["Curved 9mm magazine", "Magazine floor plate", "Magazine pressed stiffener"],
+		"charge": ["Visible bolt"], "front": "Front sight blade", "rear": "Diopter sight drum"},
+	&"machine_gun": {"magazine": [], "charge": ["Charging slide"], "front": "LMG front sight post", "rear": ""},
+	&"shotgun": {"magazine": [], "charge": ["Shotgun visible bolt"], "front": "", "rear": ""},
+	&"marksman": {"magazine": [], "charge": ["DMR bolt handle"], "front": "", "rear": ""},
+}
 ## The guns are modelled at real size (WeaponModel, ~1 m with the stock); at
 ## the eye that filled a third of the screen. Drawn at half size it reads as
 ## a gun in the hands, not a wall.
@@ -23,8 +45,16 @@ var _flash: MeshInstance3D
 var _flash_time: float = 0.0
 var _kick: float = 0.0
 var _mats: Dictionary = {}
+var _model: WeaponModel  ## the gun's named parts (WeaponModel.build_parts)
+var _ads_rest: Vector3 = ADS_FALLBACK
+var _ads_tilt: float = 0.0  ## radians the gun tilts about its grip at full aim
+var _magazine: Array[String] = []  ## node names of the parts that drop in a reload
+var _charge: Array[String] = []  ## node names of the charging handle or bolt
+var _base: Dictionary = {}  ## node name -> rest position of an animated part
 ## 0 = hip, 1 = aiming down sights (set by the island each frame).
 var aim: float = 0.0
+## Reload progress 0..1 (0 when not reloading or the gun has no timed reload).
+var reload: float = 0.0
 
 
 static func create(id: StringName) -> ViewModel:
@@ -47,9 +77,19 @@ func set_weapon(id: StringName) -> void:
 		_gun.queue_free()
 	_gun = Node3D.new()
 	add_child(_gun)
-	var model := WeaponModel.build(id)
+	var model := WeaponModel.build_parts(id)
 	model.set_cast_shadow(GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)
 	_gun.add_child(model)
+	_model = model
+	var layout: Dictionary = LAYOUT.get(model.weapon_id, {})
+	_magazine = _parts_named(model, layout.get("magazine", []))
+	_charge = _parts_named(model, layout.get("charge", []))
+	_base.clear()
+	for name: String in _magazine + _charge:
+		_base[name] = (model.parts[name] as MeshInstance3D).position
+	var sight: Dictionary = sight_rest(model, String(layout.get("front", "")), String(layout.get("rear", "")))
+	_ads_rest = sight["position"]
+	_ads_tilt = sight["tilt"]
 	# Right hand on the grip and the sleeve going out of the view.
 	_box(Vector3(0.08, 0.08, 0.09), Vector3(0.01, -0.07, 0.04), "dark")
 	_box(Vector3(0.1, 0.1, 0.3), Vector3(0.04, -0.12, 0.22), "cloth", Vector3(18, 0, 0))
@@ -91,6 +131,56 @@ func _box(size: Vector3, pos: Vector3, key: String, rot_deg: Vector3 = Vector3.Z
 	_gun.add_child(mi)
 
 
+## Gun-space offset of the magazine parts for a reload at progress `p`: out
+## over the first 30 %, held, back in over the last 30 %.
+static func reload_offset(p: float) -> Vector3:
+	var drop: float = clampf(smoothstep(0.0, 0.3, p) - smoothstep(0.7, 1.0, p), 0.0, 1.0)
+	return Vector3(0, -MAG_DROP * drop, 0)
+
+
+## Gun-space offset of the charging handle: pulled back and released in the
+## last fifth of the reload, so it reads as "chambering" the new magazine.
+static func charge_offset(p: float) -> Vector3:
+	var pull: float = sin(PI * clampf((p - 0.8) / 0.2, 0.0, 1.0))
+	return Vector3(0, 0, CHARGE_PULL * pull)
+
+
+## Sight alignment. The eye has to see the front sight through the rear one, so
+## both must sit on the view's centre line. A gun held level keeps the rear
+## sight a little off it (the sight line is not parallel to the bore), so the
+## gun is tilted about its grip by the angle that levels the two sights. Returns
+## the camera-space position at full aim, `tilt` (radians about X, applied while
+## aiming) and the rear sight `EYE_TO_REAR` from the eye. Falls back when a sight
+## is missing.
+static func sight_rest(model: WeaponModel, front: String, rear: String) -> Dictionary:
+	if front == "" or rear == "" or not model.parts.has(front) or not model.parts.has(rear):
+		return {"position": ADS_FALLBACK, "tilt": 0.0}
+	var f: Vector3 = _part_centre(model.parts[front] as MeshInstance3D)
+	var r: Vector3 = _part_centre(model.parts[rear] as MeshInstance3D)
+	var v: Vector3 = r - f
+	var tilt: float = atan2(v.y, v.z)
+	var basis := Basis(Vector3.RIGHT, tilt)
+	var fr: Vector3 = basis * f
+	var rr: Vector3 = basis * r
+	var position := Vector3(-GUN_SCALE * fr.x, -GUN_SCALE * fr.y, -EYE_TO_REAR - GUN_SCALE * rr.z)
+	return {"position": position, "tilt": tilt}
+
+
+static func _part_centre(part: MeshInstance3D) -> Vector3:
+	return part.transform * part.mesh.get_aabb().get_center()
+
+
+## Node names of `model` that start with one of `prefixes`, in file order.
+static func _parts_named(model: WeaponModel, prefixes: Array) -> Array[String]:
+	var out: Array[String] = []
+	for name: String in model.parts:
+		for prefix: String in prefixes:
+			if name.begins_with(prefix):
+				out.append(name)
+				break
+	return out
+
+
 ## A shot: flash at the tip and a small recoil kick.
 func fire() -> void:
 	_flash_time = 0.035
@@ -108,5 +198,21 @@ func update(delta: float, pull_back: float, walk: float, t: float) -> void:
 		_flash.rotation.z = randf() * TAU
 	var bob := Vector3(sin(t * 9.0) * 0.008, -absf(cos(t * 9.0)) * 0.01, 0) * walk
 	var near: float = clampf(pull_back / MAX_PULL, 0.0, 1.0)
-	position = REST.lerp(ADS_REST, aim) + bob + Vector3(0, -pull_back * 0.3, pull_back + _kick * 0.035)
+	position = REST.lerp(_ads_rest, aim) + bob + Vector3(0, -pull_back * 0.3, pull_back + _kick * 0.035)
 	rotation.x = _kick * 0.06 - near * 1.1  # negative: the barrel points down
+	if _gun != null:
+		_gun.rotation.x = _ads_tilt * aim  # levels the sights while aiming
+	_animate_parts()
+
+
+## The magazine drops and the charging handle is pulled during a reload; every
+## part returns to its rest position when `reload` is 0.
+func _animate_parts() -> void:
+	if _model == null:
+		return
+	var drop: Vector3 = reload_offset(reload)
+	for name: String in _magazine:
+		(_model.parts[name] as MeshInstance3D).position = (_base[name] as Vector3) + drop
+	var pull: Vector3 = charge_offset(reload)
+	for name: String in _charge:
+		(_model.parts[name] as MeshInstance3D).position = (_base[name] as Vector3) + pull

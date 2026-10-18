@@ -104,3 +104,23 @@ Devolveu `escalate`, com baixa confiança e sem diagnóstico concreto por linha;
 não constitui aprovação nem prova de defeito. O resultado consultivo está em
 `checks/jev_loader_arm_review.json`. A inspeção e os testes locais continuam
 a ser a evidência de funcionamento; não houve alteração de código nesta revisão.
+
+## Primeira pessoa: peças, mira e recarga (F1, 2026-10-18)
+
+`ViewModel` monta a arma com `WeaponModel.build_parts`: o mesmo GLB com cada
+peça como nó próprio (o mundo continua a usar a versão fundida). Três
+movimentos, todos por código e medidos pelos nós do GLB:
+
+- **Mira:** a mira frontal e a traseira ficam na linha central da vista; a
+  arma inclina-se em torno do punho o ângulo que as nivela
+  (`ViewModel.sight_rest`). A traseira fica a 0,12 m do olho.
+- **Recarga:** o carregador desce a meio e volta; o punho do ferrolho puxa
+  para trás no fim. A duração é a do temporizador (SMG 1,1 s, Machine Gun
+  3,2 s). A AR é instantânea: não tem animação, porque a recarga do jogo também
+  não tem tempo.
+- **Nomes:** o Godot troca o ponto dos nomes do GLB por `_` (`5.56` vira
+  `5_56`). Tabela `ViewModel.LAYOUT`.
+
+Não inclui: braço e mão em primeira pessoa (ainda luvas em caixa), IK, clips
+de Blender, recarga da espingarda e da marksman (sem temporizador), ótica.
+Capturas em `docs/design/weapon_animation/`.

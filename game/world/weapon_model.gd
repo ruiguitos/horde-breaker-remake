@@ -48,6 +48,8 @@ static var _assets: Dictionary = {}
 var weapon_id: StringName = &""
 var muzzle: Node3D  ## the barrel's tip (flashes, tracers)
 var length: float = 0.0  ## muzzle to butt (metres)
+## build_parts only: each named part of the GLB by its node name.
+var parts: Dictionary = {}
 var support_point: Vector3  ## left palm contact, in grip space
 
 
@@ -56,6 +58,42 @@ static func build(id: StringName) -> WeaponModel:
 	w.weapon_id = id if id in IDS else &"rifle"
 	w.name = "Weapon_" + String(w.weapon_id)
 	w._build()
+	return w
+
+
+## First person: the same GLB with each named part kept as its own node (the
+## magazine, charging handle and sights can move and be aimed at). The world
+## copy above is batched and cannot be animated, so only the view model uses this.
+static func build_parts(id: StringName) -> WeaponModel:
+	var w := WeaponModel.new()
+	w.weapon_id = id if id in IDS else &"rifle"
+	w.name = "Weapon_" + String(w.weapon_id)
+	w.support_point = SUPPORT_POINTS[w.weapon_id]
+	var packed := load(MODEL_DIR + String(FILES[w.weapon_id])) as PackedScene
+	assert(packed != null, "Missing imported weapon GLB for " + String(w.weapon_id))
+	var source := packed.instantiate() as Node3D
+	var box: AABB = AABB()
+	var first: bool = true
+	for part: MeshInstance3D in source.find_children("*", "MeshInstance3D", true, false):
+		var mi := MeshInstance3D.new()
+		mi.name = part.name
+		mi.mesh = part.mesh
+		mi.transform = _in_root(part, source)
+		for surface: int in part.mesh.get_surface_count():
+			mi.set_surface_override_material(surface, _surface_material(w.weapon_id, part.get_active_material(surface)))
+		w.add_child(mi)
+		w.parts[mi.name] = mi
+		var part_box: AABB = mi.transform * part.mesh.get_aabb()
+		box = part_box if first else box.merge(part_box)
+		first = false
+	var source_muzzle := source.find_child("Muzzle", true, false) as Node3D
+	assert(source_muzzle != null, "Missing Muzzle in the weapon GLB")
+	w.muzzle = Node3D.new()
+	w.muzzle.name = "Muzzle"
+	w.muzzle.transform = _in_root(source_muzzle, source)
+	w.add_child(w.muzzle)
+	w.length = box.size.z
+	source.free()
 	return w
 
 

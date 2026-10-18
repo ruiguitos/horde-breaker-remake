@@ -2097,6 +2097,15 @@ func muzzle_position() -> Vector3:
 
 ## Eye height, yaw + pitch. The body only casts its shadow; the placeholder
 ## gun is pulled back when a wall or slope is right in front of it.
+## Reload progress of the equipped gun for the view model: 0 when it is not
+## reloading or has no timed reload (the AR), up to 1 when the reload ends.
+func _reload_progress() -> float:
+	var total: float = run.weapons[run.weapon_index].reload_seconds
+	if total <= 0.0 or run.reload_left <= 0.0:
+		return 0.0
+	return clampf(1.0 - run.reload_left / total, 0.0, 1.0)
+
+
 func _update_first_person_camera(jitter: Vector3, delta: float) -> void:
 	var eye: Vector3 = _view_pos() + Vector3(0, fp_eye_height, 0)
 	var look: Vector3 = _look_dir()
@@ -2116,6 +2125,7 @@ func _update_first_person_camera(jitter: Vector3, delta: float) -> void:
 		d += 0.1
 	_view_model.set_weapon(run.weapons[run.weapon_index].id)
 	_view_model.aim = _ads
+	_view_model.reload = _reload_progress()
 	_view_model.update(delta, clampf(REACH - free, 0.0, ViewModel.MAX_PULL), _walk_speed, Time.get_ticks_msec() / 1000.0)
 
 
