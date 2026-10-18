@@ -186,10 +186,6 @@ func _controls() -> void:
 		profile.stick_deadzone = v
 		profile.save()
 	_percent_row("Stick dead zone", profile.stick_deadzone, 5, set_stick_deadzone, 40, "%")
-	_options("Controller icons", InputIcons.PLATFORM_NAMES, profile.controller_icons, func(i: int) -> void:
-		profile.controller_icons = i
-		profile.save()
-		_show("CONTROLS"))
 	var headings := HBoxContainer.new()
 	headings.add_theme_constant_override("separation", 10)
 	_body.add_child(headings)
@@ -224,7 +220,7 @@ func _controls() -> void:
 		b.pressed.connect(_start_rebind.bind(action))
 		row.add_child(b)
 		InputIcons.fill(key_icon, [GameInput.current_binding(action, profile.key_bindings)])
-		InputIcons.fill(pad_icon, pad, profile.controller_icons)
+		InputIcons.fill(pad_icon, pad)
 	var reset := UiTheme.button(_body, "RESET DEFAULT KEYS", func() -> void:
 		profile.key_bindings.clear()
 		GameInput.apply_overrides(profile.key_bindings)

@@ -606,7 +606,7 @@ static func card_box(bg: Color, border: Color, width: int = 1, dashed: bool = fa
 
 
 ## One control hint: the platform's button/key icons (InputIcons, so the
-## Settings "Controller icons" choice applies) and a word. `keys` are shown
+## connected pad's style applies) and a word. `keys` are shown
 ## without a gamepad, `pads` ("joy:N") with one connected.
 static func icon_hint(parent: Control, keys: Array, pads: Array, word: String) -> HBoxContainer:
 	var hint := HBoxContainer.new()

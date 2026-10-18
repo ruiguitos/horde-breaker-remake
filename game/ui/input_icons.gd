@@ -6,7 +6,6 @@ extends RefCounted
 ## art instead of plain text. Falls back to text when G.U.I.D.E is missing.
 
 const ICON_SIZE: int = 28
-const PLATFORM_NAMES: Array[String] = ["Auto (connected controller)", "Xbox", "PlayStation", "Nintendo", "Steam Deck"]
 ## Platform index -> G.U.I.D.E's JoyType (Sony and Nintendo use another order).
 const GUIDE_TYPES: Array[int] = [0, 1, 3, 2, 4]
 
@@ -79,12 +78,11 @@ static func text(binding: Variant, platform: int = -1) -> String:
 	return String(binding)
 
 
+## Gamepad style: `platform` (1..4) when given, else the first connected
+## pad's, else Xbox.
 static func resolved_platform(platform: int = -1) -> int:
-	var choice: int = platform
-	if choice < 0:
-		choice = Profile.current.controller_icons if Profile.current != null else 0
-	if choice > 0:
-		return clampi(choice, 1, PLATFORM_NAMES.size() - 1)
+	if platform > 0:
+		return clampi(platform, 1, GUIDE_TYPES.size() - 1)
 	var pads: Array[int] = Input.get_connected_joypads()
 	return platform_for_name(Input.get_joy_name(pads[0])) if not pads.is_empty() else 1
 

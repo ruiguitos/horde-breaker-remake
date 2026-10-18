@@ -237,9 +237,9 @@ func _test_migration() -> void:
 	_check(v1.perk_ranks.is_empty() and v1.equipped_perks.is_empty() and v1.intel == 12 and v1.slots == 1, "a version 1 save loads with an empty tree")
 	# Version 6 weapon fields survive the bump.
 	var weapons := Profile.from_dict({"version": 6, "unlocked_weapons": ["smg", "marksman"], "selected_primary": "smg",
-		"selected_secondary": "marksman", "controller_icons": 2})
-	_check(weapons.selected_primary == &"smg" and weapons.selected_secondary == &"marksman" and weapons.controller_icons == 2,
-		"v6 weapon and controller fields still load")
+		"selected_secondary": "marksman"})
+	_check(weapons.selected_primary == &"smg" and weapons.selected_secondary == &"marksman",
+		"v6 weapon fields still load")
 
 
 func _test_class_variants() -> void:

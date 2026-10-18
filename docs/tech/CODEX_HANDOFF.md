@@ -40,7 +40,7 @@ JEV estão registadas em [CREDITS.md](CREDITS.md).
 Ao integrar a árvore de perks, preservar estes contratos:
 
 1. **Perfil versão 6:** `selected_primary`, `selected_secondary`,
-   propriedade das armas, `controller_icons` e as armas de Quick Redeploy.
+   propriedade das armas e as armas de Quick Redeploy.
    Seleções antigas da pistola passam para Shotgun, sem reembolso.
 2. **Run com dois espaços:** AR/SMG/Machine Gun na principal e
    Shotgun/Marksman na secundária. `RunContext.weapons` contém as armas
