@@ -45,11 +45,9 @@ em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
 
 ## Técnico
 
-- [ ] Pacote Windows: não existe `export_presets.cfg` (está no `.gitignore`).
-  Falta exportação reproduzível, versão, ícone, licenças incluídas e arranque
-  sem editor. Precisa dos templates de exportação 4.7 (só há os de mono).
-- [ ] Definir `application/config/version` antes da primeira versão distribuída
-  (a telemetria regista `dev` até lá).
+- [ ] Pacote Windows: exportação validada (`tools/export/README.md`; executável
+  de ~303 MB que arranca em headless e sai com código 0). Falta ver o título no
+  ecrã, e decidir o ícone.
 - [ ] Correr a suite completa (`tests/test_*.gd`) antes de cada entrega e
   confirmar 0 `TEST FAIL`, `SCRIPT ERROR` e `Parse Error`.
 - [ ] Executor de testes: timeout por teste (hoje `OS.execute` é bloqueante; um
