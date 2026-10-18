@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "weapons": {
+    "machine_gun": {
+      "triangles": 2658,
+      "glb_sha256": "f83bdd882e4fca1a74273341c23294f4c8e01e0483d50a2634cb18aa736dbdc7",
+      "palm_surface_error_m": 0.0,
+      "support_m": [
+        0.0,
+        0.07090000808238983,
+        -0.3499999940395355
+      ]
+    },
+    "marksman": {
+      "triangles": 2704,
+      "glb_sha256": "80ee0688e1d3d4589975aa7a4dc0ce398711731cdca35d8363a2919df3d3841e",
+      "palm_surface_error_m": 4.26173210144043e-06,
+      "support_m": [
+        0.0,
+        0.09448425471782684,
+        -0.3100000023841858
+      ]
+    },
+    "rifle": {
+      "triangles": 2616,
+      "glb_sha256": "ecbdfce31513bad6d4131c35e2d14b66403b07f42bb97d7252f8c25ee70aeb29",
+      "palm_surface_error_m": 1.03733821532614e-08,
+      "support_m": [
+        0.0,
+        0.07718001306056976,
+        -0.25999999046325684
+      ]
+    },
+    "shotgun": {
+      "triangles": 2592,
+      "glb_sha256": "e30a5b217b144c4fdf4615febccff9a6798696279b5e6986627c10f3daf11ada",
+      "palm_surface_error_m": 3.3816322684288e-06,
+      "support_m": [
+        0.0,
+        0.01283334195613861,
+        -0.33500000834465027
+      ]
+    },
+    "smg": {
+      "triangles": 2568,
+      "glb_sha256": "ee1e333c59319007aa7535cdd1b9a2d5fd0cee3c2a4c11f42a6caaf500bda710",
+      "palm_surface_error_m": 5.66244125366211e-07,
+      "support_m": [
+        0.0,
+        0.06517057120800018,
+        -0.23000000417232513
+      ]
+    }
+  },
+  "tests_passed": [
+    "test_first_person_arms",
+    "test_first_person_grip_assets",
+    "test_view_model",
+    "test_weapon_models",
+    "test_weapon_grips"
+  ],
+  "gpu_captures": 25,
+  "blender_source_files_reopened": 5,
+  "global_suite_status": "Not rerun: user:// persistence remains unavailable in this restricted environment; see prior CODEX_REVIEW.md."
+}

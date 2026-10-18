@@ -1,0 +1,97 @@
+{
+  "engine": "4.7.2-stable (official)",
+  "failures": [],
+  "passed": true,
+  "weapons": {
+    "machine_gun": {
+      "bone_count": 8,
+      "fitting_report_support_m": [
+        0.0,
+        0.0709000080823898,
+        -0.349999994039536
+      ],
+      "glb_sha256": "f83bdd882e4fca1a74273341c23294f4c8e01e0483d50a2634cb18aa736dbdc7",
+      "materials": [
+        "glove",
+        "skin",
+        "sleeve_cloth"
+      ],
+      "mesh_count": 12,
+      "palm_surface_error_m": 0.0,
+      "triangles": 2658,
+      "weapon": "machine_gun"
+    },
+    "marksman": {
+      "bone_count": 8,
+      "fitting_report_support_m": [
+        0.0,
+        0.0944842547178268,
+        -0.310000002384186
+      ],
+      "glb_sha256": "80ee0688e1d3d4589975aa7a4dc0ce398711731cdca35d8363a2919df3d3841e",
+      "materials": [
+        "glove",
+        "skin",
+        "sleeve_cloth"
+      ],
+      "mesh_count": 12,
+      "palm_surface_error_m": 0.00000426173210144043,
+      "triangles": 2704,
+      "weapon": "marksman"
+    },
+    "rifle": {
+      "bone_count": 8,
+      "fitting_report_support_m": [
+        0.0,
+        0.0771800130605698,
+        -0.259999990463257
+      ],
+      "glb_sha256": "ecbdfce31513bad6d4131c35e2d14b66403b07f42bb97d7252f8c25ee70aeb29",
+      "materials": [
+        "glove",
+        "skin",
+        "sleeve_cloth"
+      ],
+      "mesh_count": 12,
+      "palm_surface_error_m": 0.0000000103733821532614,
+      "triangles": 2616,
+      "weapon": "rifle"
+    },
+    "shotgun": {
+      "bone_count": 8,
+      "fitting_report_support_m": [
+        0.0,
+        0.0128333419561386,
+        -0.33500000834465
+      ],
+      "glb_sha256": "e30a5b217b144c4fdf4615febccff9a6798696279b5e6986627c10f3daf11ada",
+      "materials": [
+        "glove",
+        "skin",
+        "sleeve_cloth"
+      ],
+      "mesh_count": 12,
+      "palm_surface_error_m": 0.0000033816322684288,
+      "triangles": 2592,
+      "weapon": "shotgun"
+    },
+    "smg": {
+      "bone_count": 8,
+      "fitting_report_support_m": [
+        0.0,
+        0.0651705712080002,
+        -0.230000004172325
+      ],
+      "glb_sha256": "ee1e333c59319007aa7535cdd1b9a2d5fd0cee3c2a4c11f42a6caaf500bda710",
+      "materials": [
+        "glove",
+        "skin",
+        "sleeve_cloth"
+      ],
+      "mesh_count": 12,
+      "palm_surface_error_m": 0.000000566244125366211,
+      "triangles": 2568,
+      "weapon": "smg"
+    }
+  }
+}

@@ -107,10 +107,12 @@ func _test_view_model() -> void:
 					shadows = true
 		_check(gun != null and not shadows and vm.tip != null and vm.tip.position.z < gun.muzzle.position.z,
 			"first person: %s in the hands, no shadow at the eye, flash past the muzzle" % id)
-	# Reach in camera space: the gun must not fill the view.
+	# Real-size DMR: 0.42 m eye-to-grip + 0.76 m grip-to-muzzle + 0.03 m flash.
+	# The former half-scale limit would make the authored hands oversized again.
 	vm.set_weapon(&"marksman")
 	var reach: float = -(vm.position.z + vm.tip.position.z * vm.scale.z)
-	_check(reach < 0.95 and vm.scale.x <= 0.6, "first-person marksman reaches %.2f m ahead of the eye at %.0f %% scale" % [reach, vm.scale.x * 100])
+	_check(absf(reach - 1.21) < 0.02 and vm.scale.is_equal_approx(Vector3.ONE),
+		"first-person marksman keeps metre scale and the expected camera-space reach (%.2f m)" % reach)
 	vm.free()
 
 

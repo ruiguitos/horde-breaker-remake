@@ -37,9 +37,9 @@ const FILES: Dictionary = {
 }
 ## Palm contact on the underside of each model's forearm, in grip space.
 const SUPPORT_POINTS: Dictionary = {
-	&"rifle": Vector3(0, 0.077, -0.26), &"smg": Vector3(0, 0.065, -0.23),
-	&"machine_gun": Vector3(0, 0.078, -0.31), &"shotgun": Vector3(0, 0.012, -0.335),
-	&"marksman": Vector3(0, 0.094, -0.31),
+	&"rifle": Vector3(0, 0.077180013, -0.26), &"smg": Vector3(0, 0.065170571, -0.23),
+	&"machine_gun": Vector3(0, 0.070900008, -0.35), &"shotgun": Vector3(0, 0.012833342, -0.335),
+	&"marksman": Vector3(0, 0.094484255, -0.31),
 }
 
 static var _mats: Dictionary = {}

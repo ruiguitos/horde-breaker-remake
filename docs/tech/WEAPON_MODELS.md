@@ -127,9 +127,9 @@ Capturas em `docs/design/weapon_animation/`.
 
 ## Braços e mãos em primeira pessoa (F2, 2026-10-18)
 
-`FirstPersonArms` (`game/world/first_person_arms.gd`) carrega
-`assets/models/characters/arms_firstperson_original/arms_firstperson.glb`, o
-modelo do Codex. A mão direita fica no punho; o braço esquerdo é resolvido com
+`FirstPersonArms` (`game/world/first_person_arms.gd`) começou com um só modelo,
+`assets/models/characters/arms_firstperson_original/arms_firstperson.glb`; desde
+F3 cada arma tem o seu par de mãos. A mão direita fica no punho; o braço esquerdo é resolvido com
 dois ossos (lei dos cossenos, 0,30 m cada) para que a palma fique no ponto de
 apoio da arma (`WeaponModel.support_point`). A mão não roda: o contacto da
 palma é uma translação exata do punho.
@@ -138,14 +138,56 @@ O repouso do GLB é a pose fletida de empunhadura, não o bind reto; o IK parte
 dos comprimentos fletidos e mantém o cotovelo do seu lado. Mangas e luvas
 tomam as cores da classe (`SoldierModel.PALETTES`).
 
-Escala: a arma é desenhada a meia escala (`GUN_SCALE` 0,5), mas os braços
-são à escala real, dentro da arma (`scale` 1/GUN_SCALE). O alvo da palma é o
-ponto de apoio tal como o olho o vê (`support * GUN_SCALE`). O repouso da arma
-(`ViewModel.REST` = (0,16; -0,16; -0,40)) é o compromisso medido: os ombros caem
-perto do corpo, e a arma fica à direita e em baixo, sem tapar a mira. Com o
-eixo central (x = 0,02) a arma tapava a mira na captura do jogo. Com a arma à escala real, o ombro só ficava
-perto se a arma estivesse a 0,3 m do olho, e então ocupava o ecrã.
+Correção de escala (2026-10-18): arma e braços partilham a escala real
+(`GUN_SCALE` 1,0; braços sem compensação inversa). O alvo é o ponto de apoio
+direto, em espaço da arma. A solução anterior usava arma a 0,5 e braços a
+1,0: acertava o marcador da palma, mas os dedos ficavam duas vezes maiores
+em relação ao guarda-mão e à empunhadura. O teste passa agora a verificar
+também a escala, além do contacto da palma.
 
-Alcance medido no código (teste `test_first_person_arms`): AR, SMG e Machine
-Gun exatas (menos de 0,001 mm); marksman a 1,5 mm; espingarda a 1,07 cm, fora do
-alcance do braço atual. Falta ver tudo isto no editor.
+O repouso `ViewModel.REST` é (0,16; -0,23; -0,42): o conjunto fica mais baixo
+e 2 cm mais à frente do que antes. A comparação usa uma captura isolada do
+Godot, Vanguard, rifle, FOV 70°, 1280×720, sem UI nem movimento:
+[antes](../design/first_person_arms/codex_scale_before.png) e
+[depois](../design/first_person_arms/codex_scale_after.png). O ajuste visual
+do enquadramento completo da ilha continua sujeito a playtest; as capturas
+isoladas não representam uma nova validação em combate.
+
+Os anteriores défices de alcance da marksman e da shotgun foram resolvidos
+pelas variantes abaixo.
+
+## Empunhadura própria de cada arma (F3, 2026-10-18)
+
+`FirstPersonArms.MODELS` referencia cinco GLBs em
+`assets/models/characters/weapon_grips_original/`. `ViewModel.set_weapon`
+escolhe o par de mãos correspondente. Mantêm o mesmo rig de oito ossos,
+materiais e escala real; a curvatura dos dedos e a posição inicial dos braços
+passam a corresponder à geometria de cada arma.
+
+- **Rifle e SMG:** dedos fechados nas pegas e apoio nos respetivos guarda-mãos.
+- **Machine Gun:** apoio 4 cm mais à frente (Z=-0,35 m), afastado da caixa de
+  munições; enquadramento de anca 6 cm mais baixo para ocultar o fim da manga.
+- **Shotgun:** mão direita inclinada em torno do pescoço da coronha,
+  mão esquerda adaptada ao pump, com espaço para o cano superior.
+- **Marksman:** polegar direito pelo espaço da coronha e dedos sem entrar
+  nas aberturas do guarda-mão.
+
+Os apoios foram medidos na superfície dos GLBs e atualizados em
+`WeaponModel.SUPPORT_POINTS`; o teste de terceira pessoa passou nas duas
+classes e cinco armas. Os ossos de braço/antebraço conservam 0,30 m, sem
+esticar. O contacto da palma após skinning no Godot tem erro inferior a
+0,005 mm nas cinco variantes. Triângulos por variante: rifle 2 616, SMG
+2 568, Machine Gun 2 658, shotgun 2 592 e marksman 2 704.
+
+O teste antigo que exigia arma a meia escala foi substituído pelo contrato
+de escala real já aplicado em F2: marksman a 1,21 m do olho até à ponta do
+clarão, com tolerância de 2 cm. Mantém a verificação de alcance; não reduz
+novamente a arma em relação às mãos.
+
+Fontes, limites numéricos, comando de reconstrução e relatórios:
+[NOTES.md](../../assets/models/characters/weapon_grips_original/NOTES.md).
+Capturas de primeira pessoa, pega direita, apoio esquerdo, ADS e parede em
+`docs/design/weapon_grips/`, produzidas com `tools/dev/weapon_grip_preview.gd`.
+São poses estáticas no renderer real, não novas animações de dedos ou recarga.
+O alinhamento/ótica ADS não configurado das armas compridas continua a ser
+uma limitação do sistema existente; não faz parte desta alteração de grip.

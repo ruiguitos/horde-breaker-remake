@@ -1,7 +1,7 @@
 class_name FirstPersonArms
 extends Node3D
-## The first-person arms and hands (arms_firstperson.glb, made for the rifle):
-## the right hand stays on the grip; the left arm is solved with two bones so
+## Weapon-specific first-person arms and hands, all using the same eight bones:
+## the right hand stays on its authored grip; the left arm uses two bones so
 ## the palm's contact point sits on the weapon's support point
 ## (WeaponModel.support_point). Gun space: origin at the right grip, -Z forward.
 ##
@@ -10,7 +10,15 @@ extends Node3D
 ## elbow on its own side. The hands do not rotate: the palm stays flat on the
 ## support point, so the contact is an exact translation of the wrist.
 
-const GLB: String = "res://assets/models/characters/arms_firstperson_original/arms_firstperson.glb"
+const MODEL_DIR: String = "res://assets/models/characters/weapon_grips_original/"
+## Explicit resources keep all five scenes included in an exported game.
+const MODELS: Dictionary = {
+	&"rifle": preload("res://assets/models/characters/weapon_grips_original/rifle/arms_firstperson.glb"),
+	&"smg": preload("res://assets/models/characters/weapon_grips_original/smg/arms_firstperson.glb"),
+	&"machine_gun": preload("res://assets/models/characters/weapon_grips_original/machine_gun/arms_firstperson.glb"),
+	&"shotgun": preload("res://assets/models/characters/weapon_grips_original/shotgun/arms_firstperson.glb"),
+	&"marksman": preload("res://assets/models/characters/weapon_grips_original/marksman/arms_firstperson.glb"),
+}
 ## Palm contact of the rifle's left hand at rest, in gun space (the same point
 ## the file was checked against: WeaponModel.SUPPORT_POINTS[&"rifle"]).
 const PALM_REST: Vector3 = Vector3(0, 0.077, -0.26)
@@ -19,6 +27,8 @@ const CLOTH_KEY: String = "cloth"
 const GLOVE_KEY: String = "dark"
 
 var skeleton: Skeleton3D
+var grip_weapon: StringName = &"rifle"
+var palm_rest: Vector3 = PALM_REST
 var reach_error: float = 0.0  ## metres the wrist fell short of the last target (0 = reached)
 var _upper: int = -1
 var _fore: int = -1
@@ -36,11 +46,12 @@ var _palm_offset: Vector3  ## palm contact in the hand's own space
 
 ## Loads the file and returns the arms in gun space. `palette` (SoldierModel.PALETTES
 ## entry) colours the sleeve and the glove for the class.
-static func build(palette: Dictionary) -> FirstPersonArms:
+static func build(palette: Dictionary, weapon: StringName = &"rifle") -> FirstPersonArms:
 	var arms := FirstPersonArms.new()
 	arms.name = "FirstPersonArms"
-	var packed := load(GLB) as PackedScene
-	assert(packed != null, "Missing arms GLB: " + GLB)
+	arms.grip_weapon = weapon if MODELS.has(weapon) else &"rifle"
+	arms.palm_rest = WeaponModel.SUPPORT_POINTS[arms.grip_weapon]
+	var packed: PackedScene = MODELS[arms.grip_weapon]
 	var model := packed.instantiate() as Node3D
 	arms.add_child(model)
 	arms.skeleton = model.find_child("Skeleton3D", true, false) as Skeleton3D
@@ -67,8 +78,8 @@ func _read_rest() -> void:
 	_upper_len = (_elbow_rest - _shoulder).length()
 	_fore_len = (_wrist_rest - _elbow_rest).length()
 	# The palm contact measured on the rest pose, in the hand's own space.
-	_palm_offset = hand.affine_inverse() * PALM_REST
-	set_support(PALM_REST)
+	_palm_offset = hand.affine_inverse() * palm_rest
+	set_support(palm_rest)
 
 
 ## Moves the left palm contact to `support` (gun space) and solves the arm.

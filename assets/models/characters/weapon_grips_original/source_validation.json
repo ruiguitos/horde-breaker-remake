@@ -1,0 +1,140 @@
+{
+  "passed": true,
+  "weapons": {
+    "rifle": {
+      "passed": true,
+      "mesh_count": 12,
+      "bone_count": 8,
+      "connected_components_per_mesh": {
+        "Arm_R": 1,
+        "Arm_L": 1,
+        "Index_L": 1,
+        "Middle_L": 1,
+        "Ring_L": 1,
+        "Little_L": 1,
+        "Thumb_L": 1,
+        "Middle_R": 1,
+        "Ring_R": 1,
+        "Little_R": 1,
+        "Index_R": 1,
+        "Thumb_R": 1
+      },
+      "no_weapons_cameras_lights_actions_textures": true,
+      "only_builtin_viewer_image_handles": true,
+      "materials": [
+        "glove",
+        "skin",
+        "sleeve_cloth"
+      ],
+      "blend_sha256": "bcbffbe45a9c96a460f418a79bd5de5c125b99dafbb81649c73a834ed8f968fe"
+    },
+    "smg": {
+      "passed": true,
+      "mesh_count": 12,
+      "bone_count": 8,
+      "connected_components_per_mesh": {
+        "Arm_R": 1,
+        "Arm_L": 1,
+        "Index_L": 1,
+        "Middle_L": 1,
+        "Ring_L": 1,
+        "Little_L": 1,
+        "Thumb_L": 1,
+        "Middle_R": 1,
+        "Ring_R": 1,
+        "Little_R": 1,
+        "Index_R": 1,
+        "Thumb_R": 1
+      },
+      "no_weapons_cameras_lights_actions_textures": true,
+      "only_builtin_viewer_image_handles": true,
+      "materials": [
+        "glove",
+        "skin",
+        "sleeve_cloth"
+      ],
+      "blend_sha256": "15dba3eca3fc3b91b4946417ab2ffb00645137aa3a776c82dab2e01cbda4590b"
+    },
+    "machine_gun": {
+      "passed": true,
+      "mesh_count": 12,
+      "bone_count": 8,
+      "connected_components_per_mesh": {
+        "Arm_R": 1,
+        "Arm_L": 1,
+        "Index_L": 1,
+        "Middle_L": 1,
+        "Ring_L": 1,
+        "Little_L": 1,
+        "Thumb_L": 1,
+        "Middle_R": 1,
+        "Ring_R": 1,
+        "Little_R": 1,
+        "Index_R": 1,
+        "Thumb_R": 1
+      },
+      "no_weapons_cameras_lights_actions_textures": true,
+      "only_builtin_viewer_image_handles": true,
+      "materials": [
+        "glove",
+        "skin",
+        "sleeve_cloth"
+      ],
+      "blend_sha256": "41f80863fa7ee48df376a115f0c173bc4cef0f1461166a62a96582a0c2b58f4e"
+    },
+    "shotgun": {
+      "passed": true,
+      "mesh_count": 12,
+      "bone_count": 8,
+      "connected_components_per_mesh": {
+        "Arm_R": 1,
+        "Arm_L": 1,
+        "Index_L": 1,
+        "Middle_L": 1,
+        "Ring_L": 1,
+        "Little_L": 1,
+        "Thumb_L": 1,
+        "Middle_R": 1,
+        "Ring_R": 1,
+        "Little_R": 1,
+        "Index_R": 1,
+        "Thumb_R": 1
+      },
+      "no_weapons_cameras_lights_actions_textures": true,
+      "only_builtin_viewer_image_handles": true,
+      "materials": [
+        "glove",
+        "skin",
+        "sleeve_cloth"
+      ],
+      "blend_sha256": "f5de3ffe2261e6906528cba461781a63002d6a05408b3415d43429d7f88a421c"
+    },
+    "marksman": {
+      "passed": true,
+      "mesh_count": 12,
+      "bone_count": 8,
+      "connected_components_per_mesh": {
+        "Arm_R": 1,
+        "Arm_L": 1,
+        "Index_L": 1,
+        "Middle_L": 1,
+        "Ring_L": 1,
+        "Little_L": 1,
+        "Thumb_L": 1,
+        "Middle_R": 1,
+        "Ring_R": 1,
+        "Little_R": 1,
+        "Index_R": 1,
+        "Thumb_R": 1
+      },
+      "no_weapons_cameras_lights_actions_textures": true,
+      "only_builtin_viewer_image_handles": true,
+      "materials": [
+        "glove",
+        "skin",
+        "sleeve_cloth"
+      ],
+      "blend_sha256": "d51a65ef7818442cffe6609983b148ae748e28dcf477f669a8a6ad16022d027a"
+    }
+  }
+}

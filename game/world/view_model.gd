@@ -4,10 +4,9 @@ extends Node3D
 ## view, a glove and sleeve in the class kit's colours (SoldierModel.PALETTES)
 ## and a muzzle flash at the tip. A child of the camera (local -Z is forward).
 
-## Rest position of the grip in camera space: the right hand holds the grip a
-## little right of the centre line, the arms come from shoulders just behind the
-## eye (see FirstPersonArms: the shoulders sit at ±0.2 m, about 0.1 m behind the eye).
-const REST: Vector3 = Vector3(0.16, -0.16, -0.40)
+## Hip-fire grip position in camera space: below and right of the centre line,
+## with the elbows outside the bottom edge of the first-person frame.
+const REST: Vector3 = Vector3(0.16, -0.23, -0.42)
 ## Sights: while aiming down sights the front sight is put on the centre of the
 ## view, with the rear sight `EYE_TO_REAR` metres from the eye (see sight_rest).
 ## Used only when a gun has no sight parts in LAYOUT.
@@ -34,8 +33,10 @@ const LAYOUT: Dictionary = {
 }
 ## The guns are drawn at real size: the arms are at real size too, and the
 ## hands only meet the grip and the handguard if gun and arms share one scale.
-## (At half size the gun looked small and the arms looked too short to reach it.)
-const GUN_SCALE: float = 0.5
+## Scaling only the gun made the fingers oversized despite correct palm markers.
+const GUN_SCALE: float = 1.0
+## Keep the longer LMG support arm's sleeve cap below the hip-fire frame.
+const HIP_OFFSETS: Dictionary = {&"machine_gun": Vector3(0, -0.06, 0)}
 ## Largest pull towards the eye (metres); at it the gun is also lowered.
 const MAX_PULL: float = 0.3
 
@@ -50,6 +51,7 @@ var _arms: FirstPersonArms  ## the arms and hands on the gun (FirstPersonArms)
 var _model: WeaponModel  ## the gun's named parts (WeaponModel.build_parts)
 var _ads_rest: Vector3 = ADS_FALLBACK
 var _ads_tilt: float = 0.0  ## radians the gun tilts about its grip at full aim
+var _hip_rest: Vector3 = REST
 var _magazine: Array[String] = []  ## node names of the parts that drop in a reload
 var _charge: Array[String] = []  ## node names of the charging handle or bolt
 var _base: Dictionary = {}  ## node name -> rest position of an animated part
@@ -74,6 +76,8 @@ func set_weapon(id: StringName) -> void:
 	if id == weapon_id and _gun != null:
 		return
 	weapon_id = id
+	_hip_rest = REST + (HIP_OFFSETS.get(id, Vector3.ZERO) as Vector3)
+	position = _hip_rest
 	if _gun != null:
 		remove_child(_gun)
 		_gun.queue_free()
@@ -93,11 +97,9 @@ func set_weapon(id: StringName) -> void:
 	_ads_rest = sight["position"]
 	_ads_tilt = sight["tilt"]
 	# The arms and hands: the right on the grip, the left on the weapon's support point.
-	_arms = FirstPersonArms.build(SoldierModel.PALETTES[class_id])
-	# The arms are drawn at real size (inside the half-size gun): the palm meets
-	# the gun's support point, which the eye sees at GUN_SCALE.
-	_arms.scale = Vector3.ONE / GUN_SCALE
-	_arms.set_support(model.support_point * GUN_SCALE)
+	_arms = FirstPersonArms.build(SoldierModel.PALETTES[class_id], model.weapon_id)
+	# Keep the visible fingers and the gun in the same authored metre space.
+	_arms.set_support(model.support_point)
 	for part: MeshInstance3D in _arms.find_children("*", "MeshInstance3D", true, false):
 		part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	_gun.add_child(_arms)
@@ -189,7 +191,7 @@ func update(delta: float, pull_back: float, walk: float, t: float) -> void:
 		_flash.rotation.z = randf() * TAU
 	var bob := Vector3(sin(t * 9.0) * 0.008, -absf(cos(t * 9.0)) * 0.01, 0) * walk
 	var near: float = clampf(pull_back / MAX_PULL, 0.0, 1.0)
-	position = REST.lerp(_ads_rest, aim) + bob + Vector3(0, -pull_back * 0.3, pull_back + _kick * 0.035)
+	position = _hip_rest.lerp(_ads_rest, aim) + bob + Vector3(0, -pull_back * 0.3, pull_back + _kick * 0.035)
 	rotation.x = _kick * 0.06 - near * 1.1  # negative: the barrel points down
 	if _gun != null:
 		_gun.rotation.x = _ads_tilt * aim  # levels the sights while aiming

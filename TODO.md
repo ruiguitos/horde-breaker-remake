@@ -27,10 +27,9 @@ em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
   validado em `neck_gap_validation.json`). Falta reconfirmar os testes do
   crawler e ver o resultado no editor. Todos os crawlers têm a mesma cabeça e
   corpo; triângulos 4814 por crawler (walker 708), reduzir se o playtest pedir.
-- [ ] Braços em primeira pessoa (`arms_firstperson.glb`, Codex): integrados em
-  `FirstPersonArms` (IK do braço esquerdo ao ponto de apoio). Alcance medido: AR,
-  SMG e Machine Gun exatas; marksman a 1,5 mm; espingarda a 1,07 cm (fora do
-  alcance do braço atual). Falta ver no editor e decidir o braço da espingarda.
+- [ ] Empunhaduras de primeira pessoa (`weapon_grips_original/`, Codex): uma
+  variante de braços e mãos por arma, com alcance exato nas cinco. Falta ver no
+  editor: mangas, mão direita e espingarda (ombro ajustado, sem alongar ossos).
 - [ ] Animação de recarga dos braços (F3, `docs/tech/WEAPON_ARMS_BRIEF.md`).
 
 ## Conteúdo

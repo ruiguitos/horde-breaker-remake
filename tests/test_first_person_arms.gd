@@ -21,28 +21,17 @@ func _contact(arms: FirstPersonArms) -> Vector3:
 
 
 func _initialize() -> void:
+	call_deferred("_run_tests")
+
+
+func _run_tests() -> void:
 	var palette: Dictionary = SoldierModel.PALETTES[&"recruit"]
 	var arms: FirstPersonArms = FirstPersonArms.build(palette)
 	_check(arms.skeleton.get_bone_count() == 8, "the arms file has its eight bones")
 
-	arms.set_support(FirstPersonArms.PALM_REST)
-	_check(arms.reach_error < 0.0001 and _contact(arms).distance_to(FirstPersonArms.PALM_REST) < 0.001,
-		"at rest the palm stays on the rifle's support point (%.4f mm)" % (_contact(arms).distance_to(FirstPersonArms.PALM_REST) * 1000.0))
-
-	for id: StringName in [&"rifle", &"smg", &"machine_gun"]:
-		var support: Vector3 = WeaponModel.SUPPORT_POINTS[id]
-		arms.set_support(support)
-		var error: float = _contact(arms).distance_to(support)
-		_check(arms.reach_error < 0.0001 and error < 0.001,
-			"%s: the palm reaches its support point (%.4f mm off)" % [id, error * 1000.0])
-
-	# Just out of reach (measured): the arm stretches fully and the gap is reported.
-	arms.set_support(WeaponModel.SUPPORT_POINTS[&"marksman"])
-	_check(arms.reach_error > 0.0005 and arms.reach_error < 0.003,
-		"marksman: a few millimetres short of its support point (%.2f mm)" % (arms.reach_error * 1000.0))
-	arms.set_support(WeaponModel.SUPPORT_POINTS[&"shotgun"])
-	_check(arms.reach_error > 0.005 and arms.reach_error < 0.02,
-		"shotgun: the handguard is out of reach, the gap is measured (%.2f cm)" % (arms.reach_error * 100.0))
+	arms.set_support(arms.palm_rest)
+	_check(arms.reach_error < 0.0001 and _contact(arms).distance_to(arms.palm_rest) < 0.001,
+		"at rest the palm stays on the rifle's fitted contact (%.4f mm)" % (_contact(arms).distance_to(arms.palm_rest) * 1000.0))
 
 	# The sleeve and the glove take the class colours.
 	var sleeve_ok: bool = false
@@ -64,12 +53,31 @@ func _initialize() -> void:
 	vm.set_weapon(&"smg")
 	_check(vm._arms != null and vm._arms.get_parent() == vm._gun and vm._arms.skeleton != null,
 		"the view model carries the arms on the gun")
-	# The arms are drawn at real size inside the half-size gun: the palm meets the
-	# gun's support point as the eye sees it, at GUN_SCALE.
+	# A matching contact marker cannot catch oversized fingers: both assets must
+	# use the same metre scale so their visible grasp has its authored proportions.
+	_check(vm._arms.scale.is_equal_approx(Vector3.ONE) and vm.scale.is_equal_approx(Vector3.ONE),
+		"the gun and hands share their authored metre scale (no inverse arm scaling)")
 	var vm_contact: Vector3 = _contact(vm._arms)
-	var seen: Vector3 = WeaponModel.SUPPORT_POINTS[&"smg"] * ViewModel.GUN_SCALE
+	var seen: Vector3 = WeaponModel.SUPPORT_POINTS[&"smg"]
 	_check(vm._arms.reach_error < 0.0001 and vm_contact.distance_to(seen) < 0.001,
-		"the view model's arms hold the SMG's support point (as drawn at GUN_SCALE)")
+		"the view model's arms hold the SMG's support point in unscaled gun space")
+	root.add_child(vm)
+	_check(vm.is_inside_tree() and vm._arms.skeleton.is_inside_tree(), "world-space checks run inside the SceneTree")
+	for id: StringName in WeaponModel.IDS:
+		vm.set_weapon(id)
+		_check(vm._arms.get("grip_weapon") == id, "%s: loads its own fitted hand model" % id)
+		_check(vm._arms.reach_error < 0.0001, "%s: fitted grip reaches without stretching the bones" % id)
+		_check(vm._arms.palm_rest.distance_to(vm._model.support_point) < 0.00001,
+			"%s: runtime and fitted contact agree" % id)
+		vm._arms.skeleton.force_update_all_bone_transforms()
+		var skeleton_in_gun: Transform3D = vm._gun.global_transform.affine_inverse() * vm._arms.skeleton.global_transform
+		_check(skeleton_in_gun.is_equal_approx(Transform3D.IDENTITY),
+			"%s: skeleton and weapon use the same coordinate frame" % id)
+		var world_contact: Vector3 = vm._arms.skeleton.global_transform * _contact(vm._arms)
+		var world_support: Vector3 = vm._gun.to_global(vm._model.support_point)
+		var world_error: float = world_contact.distance_to(world_support)
+		_check(absf(world_error - vm._arms.reach_error) < 0.00001,
+			"%s: visible-frame contact error matches measured IK reach (%.3f mm)" % [id, world_error * 1000.0])
 	vm.free()
 	arms.free()
 	quit(1 if _failures > 0 else 0)

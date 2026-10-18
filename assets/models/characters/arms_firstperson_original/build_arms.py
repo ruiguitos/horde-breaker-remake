@@ -20,6 +20,7 @@ PALETTE = {'sleeve_cloth': ('485345', .94), 'glove': ('272b2b', .86), 'skin': ('
 MATS, CORES, FINGERS, JOINTS = [], {}, {}, {}
 BONES = [stem+'_'+side for side in ('R', 'L') for stem in ('Shoulder', 'UpperArm', 'Forearm', 'Hand')]
 PALM_L = Vector((0, .077, -.26))
+HAND_TARGET_R = Vector((.039, -.010, -.025))
 WRISTS = {'R': Vector((.040, -.060, .060)), 'L': Vector((-.052, .030, -.208))}
 SHOULDERS = {'R': Vector((.220, -.160, .350)), 'L': Vector((-.220, -.100, .300))}
 RIG = None
@@ -239,7 +240,7 @@ def rig_and_bind():
         s, w = SHOULDERS[side], WRISTS[side]
         direction = (w-s).normalized()
         edit_e, edit_w = s+direction*.30, s+direction*.60
-        hand_direction = (Vector((.039, -.010, -.025)) if side == 'R' else PALM_L)-w
+        hand_direction = (HAND_TARGET_R if side == 'R' else PALM_L)-w
         hand_direction.normalize()
         points = [('Shoulder', s-Vector((.035 if side == 'R' else -.035, 0, 0)), s),
             ('UpperArm', s, edit_e), ('Forearm', edit_e, edit_w),
@@ -258,7 +259,7 @@ def rig_and_bind():
     for side in ('R', 'L'):
         joints = JOINTS[side]
         s, e, w = joints['shoulder'], joints['elbow'], joints['wrist']
-        target = Vector((.039, -.010, -.025)) if side == 'R' else PALM_L
+        target = HAND_TARGET_R if side == 'R' else PALM_L
         for stem, a, b in [('UpperArm', s, e), ('Forearm', e, w), ('Hand', w, w+(target-w).normalized()*.09)]:
             RIG.pose.bones[stem+'_'+side].matrix = bone_matrix(B(a), B(b))
             bpy.context.view_layer.update()
