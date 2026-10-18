@@ -1,36 +1,51 @@
 # TODO
 
-Lista viva de pendentes. Uma linha por item; apagar quando feito.
+Lista viva de pendentes. Uma linha por item; apagar quando feito. Decisões
+do utilizador estão em `docs/DECISIONS.md`; a evidência da última auditoria
+em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
 
-## Equilíbrio (afinar a jogar)
+## Validação (precisa de jogar ou de hardware)
 
-- [ ] **Level-up**: curva passou a quadrática (`8 + 6n + n²`; 300 XP → nível 7
-  em vez de 10) e há 39 cartas. Confirmar a jogar com o catálogo ampliado.
-- [ ] Power-ups de abate: afinar probabilidades, garantia, duração, escudo
-  e recompensas a jogar; valores provisórios em `game/data/game_data.gd`.
-- [ ] Dano corpo a corpo limitado a 25 por frame (`MAX_MELEE_PER_FRAME`):
-  confirmar a jogar se cercado ainda é perigoso o suficiente.
-- [ ] Boss: confirmar a duração do combate (bot: ~2 min com a nova escolha
-  de alvo).
-- [ ] Dificuldade entre ilhas (HP ×1,3 por ilha, mais especiais) por validar.
+- [ ] Medir FPS no PC (RTX 5060 8 GB) com 150 inimigos, em jogo completo
+  (terreno, HUD, boss e efeitos), e preencher `game/README.md`.
+- [ ] Equilíbrio a jogar: curva de XP (quadrática, ×10; ver
+  `docs/tech/COMBAT_CATALOG.md`), power-ups, dano corpo a corpo limitado a 25
+  por frame, duração do boss, dificuldade entre ilhas.
+- [ ] Berlenga de ponta a ponta à mão: Escort → Signals → Hold Sequence →
+  Holdout, com rampas, passagens estreitas, spawns e barco.
+- [ ] Som e música a ouvido (volumes em `island.gd::_play_audio`, timbres em
+  `audio/sfx.gd` e `audio/music.gd`). Sons de disparo AR/SMG/Machine Gun/Shotgun
+  continuam sintetizados; gravar quando houver.
+- [ ] Comando: sessão com comando físico, reconexão, resoluções e ultrawide.
 
-## Gameplay
+## Conteúdo
 
-- [ ] Ilhas: 5 biomas e 9 missões, Berlenga em 4 partes; falta a cena "à mão" do Volcano e acabar as peças da Berlenga (farol, forte, ponte).
+- [ ] Volcano sem cena feita à mão equivalente a `volcano_01.tscn` (o gerador
+  procedural cobre o boss; falta acabamento e landmarks).
+- [ ] Props realistas restantes (`docs/tech/REALISTIC_PROPS.md`): rever a
+  utilidade antes de integrar, já há alternativas procedurais.
+- [ ] Cartas desbloqueadas por Intel no pool; equilibrar classes.
 
-- [ ] Rotas: mapa em grafo visível (agora são 2 opções por paragem).
-- [ ] Mais desbloqueios com Intel: cartas no pool. Equilibrar classes.
+## Animação e feedback
 
-## Gráficos e feel
-
-- [ ] Afinar som e música a ouvido (volumes em `island.gd::_play_audio`, timbres em `audio/sfx.gd` e `audio/music.gd`).
-- [ ] Animação melhor que o "balançar" (Vertex Animation Textures, BRAINSTORM §8).
-
-- [ ] Animação dos zombies com Vertex Animation Textures (andar/atacar).
-- [ ] História: ilha "Origin" jogável como extra depois do final (o final já existe como conversa no debrief).
-
-- [ ] Sons de rifle/SMG/shotgun gravados (o pack Ovani não os tem).
+- [ ] Movimento próprio do Breaker, e ações de ferimento e morte no modelo do
+  jogador (`docs/tech/LOCOMOTION.md`).
+- [ ] Poses dos especiais sincronizadas com as ações reais (grito, explosão,
+  fases do boss).
 
 ## Técnico
 
-- [ ] Medir FPS no PC (RTX 5060 8 GB) com 150 inimigos e preencher `game/README.md`.
+- [ ] Pacote Windows: não existe `export_presets.cfg` (está no `.gitignore`).
+  Falta exportação reproduzível, versão, ícone, licenças incluídas e arranque
+  sem editor. Precisa dos templates de exportação 4.7 (só há os de mono).
+- [ ] Telemetria: registar a causa de morte por run (a semente e a versão já
+  são gravadas desde o formato 2).
+- [ ] Correr a suite completa (`tests/test_*.gd`) antes de cada entrega e
+  confirmar 0 `TEST FAIL`, `SCRIPT ERROR` e `Parse Error`.
+
+## Fora do plano (decisões)
+
+- Origin jogável, co-op e mapa de rotas em grafo: expansões, fora do ciclo
+  single-player aprovado. A rota entre ilhas é sorteada desde 2026-10-14.
+- VAT para zombies: é uma proposta de `BRAINSTORM.md` §8, não uma decisão; o
+  shader atual anima por pivôs e a auditoria não demonstrou necessidade.

@@ -616,8 +616,9 @@ blindado à frente (−50 %) e não é empurrado.
 
 ## Telemetria
 
-No fim de cada run grava-se `user://runs/run_<data>.json`, ao lado do
-perfil. Tem, por ilha: modificador, resultado, segundos, mortes, headshots,
+No fim de cada run grava-se `user://runs/run_<data>_<ms>.json`, ao lado do
+perfil (versão 2 do formato). Tem a semente da run (`seed`), a versão do
+jogo (`build`), por ilha: modificador, resultado, segundos, mortes, headshots,
 dano recebido na vida, vida e escudo restantes, nível, Intel, caixas abertas,
 cartas escolhidas, power-ups apanhados e bónus de Intel dos power-ups
 (antes dos multiplicadores de rota/Threat). Serve para equilibrar com números ("morri na ilha 2 com Elite
