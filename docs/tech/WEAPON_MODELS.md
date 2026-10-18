@@ -85,8 +85,17 @@ modelos visuais. A suite geral continua, por isso, com estas duas falhas.
 Esta integração não acrescenta clips de recarga, bombeamento da shotgun,
 dedos articulados por arma nem IK dos pés. As luvas/mangas de primeira pessoa
 continuam a representação simples existente. A locomoção mantém as limitações
-medidas em [LOCOMOTION.md](LOCOMOTION.md). Os materiais são PBR sem mapas e as
-lentes são opacas, conforme as notas dos assets.
+medidas em [LOCOMOTION.md](LOCOMOTION.md). As lentes são opacas, conforme as
+notas dos assets.
+
+**Texturas (2026-10-18).** A AR (`TEXTURED` em `weapon_model.gd`) recebe os
+mapas normal e de rugosidade Poly Haven nos materiais `gunmetal`, `steel` e
+`polymer`, por nome no GLB, em triplanar. As cores são as do Blender: um mapa
+de cor multiplicado por elas mudou a cor aprovada, por isso não é usado. As
+outras armas continuam com cor lisa até serem verificadas do mesmo modo. A
+comparação de perto está em [docs/design/weapon_textures/](../design/weapon_textures/).
+Ganho visível sobretudo na coronha e no punho; o metal mantém-se liso.
+Verificação com `tools/dev/zombie_preview.gd -- <png> rifle` (janela, GPU).
 
 A revisão externa foi inicialmente bloqueada. Após autorização explícita do
 utilizador, o JEV recebeu apenas os trechos do carregador e do ajuste do

@@ -4,6 +4,7 @@ extends SceneTree
 ## Shots: lineup (Recruit + the 4 zombie variants), walk (mid-stride, side
 ## view), closeup (faces, gore and missing parts), back, corpses, variety
 ## (24 random looks), crowd (48 random zombies), weapons (the 5 guns),
+## rifle (the assault rifle alone, close),
 ## hands (Recruit holding each gun), hands_vanguard, fp_<weapon id> (first person),
 ## specials / specials_back (all kinds), bench_specials (150 mixed enemies), bench
 ## and bench_empty (GPU/CPU timings of 150 zombies), crawl (3 Crawlers, 3/4
@@ -217,6 +218,14 @@ func _setup() -> void:
 				y -= 0.36
 			_camera.position = CENTER + Vector3(0, 1.2, 2.7)
 			_camera.look_at(CENTER + Vector3(0, 1.18, 0))
+		"rifle":
+			# The assault rifle alone, close, from the front-right: receiver, grip, stock.
+			var rifle: Variant = _script("weapon_model").build(&"rifle")
+			rifle.position = CENTER + Vector3(0, 1.25, 0)
+			rifle.rotation_degrees.y = 90  # barrel to the left (-X)
+			_world.add_child(rifle)
+			_camera.position = CENTER + Vector3(0.55, 1.45, 0.9)
+			_camera.look_at(CENTER + Vector3(0, 1.25, 0))
 		"hands", "hands_vanguard":
 			var x: float = -3.2
 			for id: StringName in _script("weapon_model").IDS:

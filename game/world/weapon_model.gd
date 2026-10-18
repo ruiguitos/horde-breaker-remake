@@ -23,6 +23,13 @@ const MATERIALS: Dictionary = {
 	"bore": {"id": "", "tint": Color(0.02, 0.02, 0.02), "metal": 0.0, "rough": 0.6, "uv": 1.0},
 }
 
+## Weapons whose GLB materials get the Poly Haven normal and roughness maps
+## (matched by the material name in the GLB). Their colours stay the Blender
+## ones: a diffuse map multiplied by them shifted the approved colours, so only
+## the surface response changes. The others stay flat until checked the same way
+## with tools/dev/zombie_preview.gd.
+const TEXTURED: Array[StringName] = [&"rifle"]
+
 const MODEL_DIR: String = "res://assets/models/weapons/tactical_original/"
 const FILES: Dictionary = {
 	&"rifle": "assault_rifle.glb", &"smg": "smg.glb", &"machine_gun": "machine_gun.glb",
@@ -60,17 +67,33 @@ static func material(key: String) -> StandardMaterial3D:
 	m.albedo_color = d["tint"]
 	m.metallic = d["metal"]
 	m.roughness = d["rough"]
-	var id: String = d["id"]
-	if id != "" and ResourceLoader.exists(TEX + id + "_diffuse.res"):
-		m.albedo_texture = load(TEX + id + "_diffuse.res") as Texture2D
-		m.normal_enabled = true
-		m.normal_texture = load(TEX + id + "_nor_gl.res") as Texture2D
-		m.roughness_texture = load(TEX + id + "_rough.res") as Texture2D
-		m.uv1_triplanar = true
-		m.uv1_scale = Vector3.ONE * float(d["uv"])
-		m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	_add_maps(m, d)
 	_mats[key] = m
 	return m
+
+
+## The Poly Haven maps of a MATERIALS entry on `m` (triplanar, so they stick
+## to the part). Keys without a set keep the flat colour.
+static func _add_maps(m: StandardMaterial3D, d: Dictionary) -> void:
+	var id: String = d["id"]
+	if id == "" or not ResourceLoader.exists(TEX + id + "_diffuse.res"):
+		return
+	m.albedo_texture = load(TEX + id + "_diffuse.res") as Texture2D
+	_add_surface_maps(m, d)
+
+
+## Normal and roughness only: the surface relief and wear, with the colour left
+## to the material (see TEXTURED).
+static func _add_surface_maps(m: StandardMaterial3D, d: Dictionary) -> void:
+	var id: String = d["id"]
+	if id == "" or not ResourceLoader.exists(TEX + id + "_nor_gl.res"):
+		return
+	m.normal_enabled = true
+	m.normal_texture = load(TEX + id + "_nor_gl.res") as Texture2D
+	m.roughness_texture = load(TEX + id + "_rough.res") as Texture2D
+	m.uv1_triplanar = true
+	m.uv1_scale = Vector3.ONE * float(d["uv"])
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 
 
 ## Read each imported scene once; combine only its static surfaces with the
@@ -87,7 +110,7 @@ static func _asset(id: StringName) -> Dictionary:
 	var groups: Dictionary = {}
 	for part: MeshInstance3D in source.find_children("*", "MeshInstance3D", true, false):
 		for surface: int in part.mesh.get_surface_count():
-			var mat: Material = part.get_active_material(surface)
+			var mat: Material = _surface_material(id, part.get_active_material(surface))
 			if not groups.has(mat):
 				var tool := SurfaceTool.new()
 				tool.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -101,6 +124,29 @@ static func _asset(id: StringName) -> Dictionary:
 	_assets[id] = data
 	source.free()
 	return data
+
+
+## The textured material for a GLB material with a Poly Haven set (by name);
+## the GLB material itself for the rest, and for weapons not in TEXTURED.
+static func _surface_material(id: StringName, mat: Material) -> Material:
+	if not TEXTURED.has(id) or not mat is StandardMaterial3D:
+		return mat
+	var key: String = String(mat.resource_name)
+	if not MATERIALS.has(key) or String(MATERIALS[key]["id"]) == "":
+		return mat
+	# Keep the Blender colour and finish; the maps only add the surface.
+	var cache_key: String = "%s/%s" % [id, key]
+	if _mats.has(cache_key):
+		return _mats[cache_key]
+	var src := mat as StandardMaterial3D
+	var textured := StandardMaterial3D.new()
+	textured.resource_name = key  # the GLB name stays the material's identity
+	textured.albedo_color = src.albedo_color
+	textured.metallic = src.metallic
+	textured.roughness = src.roughness
+	_add_surface_maps(textured, MATERIALS[key])
+	_mats[cache_key] = textured
+	return textured
 
 
 ## Relative transforms without entering the SceneTree (no global queries).
