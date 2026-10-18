@@ -178,6 +178,14 @@ func _controls() -> void:
 	_percent_row("Mouse sensitivity", profile.mouse_sensitivity, 1, func(v: int) -> void:
 		profile.mouse_sensitivity = v
 		profile.save())
+	var set_stick_speed := func(v: int) -> void:
+		profile.stick_sensitivity = v
+		profile.save()
+	_percent_row("Stick look speed", profile.stick_sensitivity, 10, set_stick_speed, 200, "%")
+	var set_stick_deadzone := func(v: int) -> void:
+		profile.stick_deadzone = v
+		profile.save()
+	_percent_row("Stick dead zone", profile.stick_deadzone, 5, set_stick_deadzone, 40, "%")
 	_options("Controller icons", InputIcons.PLATFORM_NAMES, profile.controller_icons, func(i: int) -> void:
 		profile.controller_icons = i
 		profile.save()

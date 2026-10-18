@@ -63,6 +63,9 @@ var camera_mode: int = CameraMode.THIRD_PERSON
 var fov: int = 60
 const THIRD_PERSON_MAX_FOV: int = 75
 var mouse_sensitivity: int = 50  ## percent
+## Right-stick look: speed in percent of the default (10..200) and the dead zone in percent of stick travel (5..40).
+var stick_sensitivity: int = 100
+var stick_deadzone: int = 20
 var controller_icons: int = 0  ## 0 = auto; see InputIcons.PLATFORM_NAMES
 var hud_scale: int = 100  ## HUD size in percent (60..100); new profiles start at 100
 ## Rebound keys: action -> "key:N" / "mouse:N" (see GameInput.REBINDABLE).
@@ -80,6 +83,16 @@ var new_best_kills: bool = false
 ## Field of view in degrees for a camera mode: the setting in first person,
 ## and at most THIRD_PERSON_MAX_FOV in third person and fixed (so the soldier
 ## is not stretched at the screen edges).
+## Right-stick look for one frame: the stick below the dead zone does nothing; past it the
+## travel is rescaled to 0..1 and multiplied by the sensitivity.
+static func stick_look(stick: Vector2, sensitivity: int, deadzone: int) -> Vector2:
+	var dz: float = deadzone / 100.0
+	var length: float = stick.length()
+	if length <= dz:
+		return Vector2.ZERO
+	return stick.normalized() * ((length - dz) / (1.0 - dz)) * (sensitivity / 100.0)
+
+
 static func field_of_view(setting: int, first_person: bool) -> float:
 	return float(setting) if first_person else float(mini(setting, THIRD_PERSON_MAX_FOV))
 
@@ -137,6 +150,8 @@ static func from_dict(d: Dictionary) -> Profile:
 			if GameInput.REBINDABLE.has(StringName(k)):
 				p.key_bindings[String(k)] = String(kb[k])
 	p.mouse_sensitivity = clampi(int(d.get("mouse_sensitivity", 50)), 1, 100)
+	p.stick_sensitivity = clampi(int(d.get("stick_sensitivity", 100)), 10, 200)
+	p.stick_deadzone = clampi(int(d.get("stick_deadzone", 20)), 5, 40)
 	p.controller_icons = clampi(int(d.get("controller_icons", 0)), 0, InputIcons.PLATFORM_NAMES.size() - 1)
 	p.max_fps = maxi(0, int(d.get("max_fps", 0)))
 	p.render_scale = clampi(int(d.get("render_scale", 100)), 50, 100)
@@ -209,7 +224,7 @@ func save(path: String = PATH) -> bool:
 		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x)),
 		"selected_primary": String(selected_primary), "selected_secondary": String(selected_secondary),
 		"quality": quality, "window_mode": window_mode, "resolution": "%dx%d" % [resolution.x, resolution.y],
-		"vsync": vsync, "hud_scale": hud_scale, "camera_mode": camera_mode, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "controller_icons": controller_icons, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias, "fov": fov,
+		"vsync": vsync, "hud_scale": hud_scale, "camera_mode": camera_mode, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "stick_sensitivity": stick_sensitivity, "stick_deadzone": stick_deadzone, "controller_icons": controller_icons, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias, "fov": fov,
 		"last_run": last_run, "lore_read": lore_read}, "  ")
 	# Write a temporary file first, keep the last readable save as .bak, then
 	# replace. An interrupted save never leaves a half-written profile.

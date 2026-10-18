@@ -1818,10 +1818,11 @@ func _physics_process(delta: float) -> void:
 	if _free_look():
 		# Right stick turns the camera; movement is relative to where it looks
 		# and auto-fire shoots what the centre crosshair is on.
-		if right.length() > 0.2:
-			_tp_yaw -= right.x * 2.6 * delta
+		var look: Vector2 = Profile.stick_look(right, profile.stick_sensitivity if profile != null else 100, profile.stick_deadzone if profile != null else 20)
+		if look != Vector2.ZERO:
+			_tp_yaw -= look.x * 2.6 * delta
 			var limits: Vector2 = _pitch_limits()
-			_tp_pitch = clampf(_tp_pitch + right.y * 1.6 * delta, limits.x, limits.y)
+			_tp_pitch = clampf(_tp_pitch + look.y * 1.6 * delta, limits.x, limits.y)
 		var m3 := Vector3(move.x, 0, move.y).rotated(Vector3.UP, _tp_yaw)
 		move = Vector2(m3.x, m3.z)
 		aim = _tp_forward() * 12.0
