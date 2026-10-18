@@ -34,4 +34,3 @@ Lista viva de pendentes. Uma linha por item; apagar quando feito.
 ## Técnico
 
 - [ ] Medir FPS no PC (RTX 5060 8 GB) com 150 inimigos e preencher `game/README.md`.
-- [ ] Sensibilidade do stick direito (a do rato e o remapear teclas já existem).
