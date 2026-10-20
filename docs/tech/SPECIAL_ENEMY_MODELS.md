@@ -93,6 +93,30 @@ A atualização usa os formatos documentados de
 [SurfaceTool](https://docs.godotengine.org/en/stable/tutorials/3d/procedural_geometry/surfacetool.html)
 e [MultiMesh](https://docs.godotengine.org/en/stable/classes/class_multimesh.html).
 
+## Ações e poses (2026-10-20)
+
+Duas ações do jogo aparecem agora no corpo dos especiais, pelo canal `act`
+(lunge) que já servia o ataque:
+
+- **Chamada do Screamer:** no instante em que um Screamer chama a horda
+  (`IslandRun.scream_age` = 0), todos os Screamers tomam a pose de chamada e
+  ela desvanece em 0,8 s. A cabeça vai para trás e os braços sobem
+  (`zombie.gdshader`, tipo 6: alcance +0,25 e inclinação −0,35 com o lunge).
+  Capturas: `docs/design/specials_poses/screamer_close_rest.png` (repouso) e
+  `screamer_close_scream.png` (chamada).
+- **Carga do golpe do Behemoth:** durante a janela de carga do golpe de chão
+  (`run.slam_time`, `GameData.BOSS_SLAM_WINDUP`), o Behemoth levanta os
+  braços de 0 a 1 e baixa-os no impacto.
+
+Um inimigo atordoado mantém o atordoamento: a pose de ação não sobrepõe o
+`act` −1. Não alterado nesta etapa: a explosão do Bloater (não verifiquei se
+já coincide com a morte) e a fase de enraivecimento do Behemoth
+(`boss_enraged`), que não tem pose própria. Os valores da pose são constantes
+para afinar a olho no editor.
+
+Teste: `tests/test_special_poses.gd` (chamada no instante, desvanecimento,
+atordoamento, carga do golpe e os outros tipos sem reação).
+
 ## Limites
 
 São modelos estilizados de baixo custo, com animação por pivôs no shader,
