@@ -42,8 +42,8 @@ em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
 
 ## Animação e feedback
 
-- [ ] Movimento próprio do Breaker, e ações de ferimento e morte no modelo do
-  jogador (`docs/tech/LOCOMOTION.md`).
+- [ ] Ver no editor o flinch, o roll do dash e a queda na morte do modelo do
+  jogador (feitos com clips UAL; `docs/tech/LOCOMOTION.md`, secção Reações).
 - [ ] Poses dos especiais sincronizadas com as ações reais (grito, explosão,
   fases do boss).
 

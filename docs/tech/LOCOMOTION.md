@@ -200,8 +200,8 @@ desliga o apoio dos pés durante noclip/voo.
 - **Pés no chão**: corrigidos nesta atualização nos percursos medidos;
   persistem as limitações de terreno e das solas descritas acima.
 - **Breaker**: 5 m em 0,18 s (~28 m/s); o ritmo está limitado a 2,2
-  ciclos/s, por isso os pés deslizam durante o dash. A UAL tem `Roll`, que
-  pode servir.
+  ciclos/s, por isso os pés deslizam durante o dash. Desde 2026-10-20 o dash
+  rola o corpo com o clip `Roll` (ver Reações); a passada continua limitada.
 - **Lata**: a lata é desenhada pelo `island.gd` num ponto fixo
   (`CARRY_OFFSET`) e a perna direita passa por ela ao correr; a arma vai
   baixa na mão esquerda (33–43° para baixo), porque não se dispara.
@@ -211,6 +211,27 @@ desliga o apoio dos pés durante noclip/voo.
   lado a disparar; rodar o rato depressa parado; o Armory a rodar;
   uma Fuel Run. Os números medem o deslize e a mira; a avaliação visual
   continua a ser necessária, sobretudo nas mudanças bruscas de direção.
+
+## Reações: ferimento, dash e morte (2026-10-20)
+
+Três clips pontuais da UAL, nos dois rigs, sobrepostos à locomoção em
+`soldier_model.gd` (nós `hit`, `dash` e `death` da árvore):
+
+- **Ferimento:** `Hit_Chest` quando `run.hp` desce (`island.gd`, ao lado do
+  tremor da câmara). No máximo um flinch a cada 0,35 s: uma multidão não
+  sacode o corpo a cada fotograma. O modificador de duas mãos continua a
+  correr, por isso as mãos ficam na arma.
+- **Dash do Breaker:** `Roll` durante o dash e desvanece no fim (0,1 s). O
+  dash dura 0,18 s, por isso só se vê o início do rolamento; é uma escolha a
+  validar no editor.
+- **Morte** (`run.objective == LOST`, ou seja, a vida chegou a zero): `Death01`
+  entra em 0,25 s e segura a última pose. Os modificadores de posição (mãos,
+  apoio, pernas) são desligados quando o clip toma o corpo; senão puxavam os
+  braços de volta.
+
+`tests/test_soldier_reactions.gd` cobre as duas classes: cooldown do flinch,
+flinch que acaba sozinho, roll do dash, morte sem novos flinches e pose que
+não deriva em 3 s (0,0000 m).
 
 ## Validação
 
