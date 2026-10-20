@@ -29,6 +29,13 @@ const GAITS: Array = [
 	{"clip": &"UAL/Sprint_Loop", "speed": 8.75, "length": 0.6666667, "phase": 0.85},
 ]
 const IDLE_CLIP: StringName = &"UAL/Idle_Loop"
+## Reactions, from the same UAL libraries (both rigs have them): a flinch when
+## hit, the Breaker's roll for the dash, and the death.
+const HIT_CLIP: StringName = &"UAL/Hit_Chest"
+const ROLL_CLIP: StringName = &"UAL/Roll"
+const DEATH_CLIP: StringName = &"UAL/Death01"
+const HIT_COOLDOWN: float = 0.35  ## s between two flinches: a crowd must not flinch every frame
+const DEATH_FADE: float = 4.0  ## 1/s: the death pose takes over in 0.25 s
 const MOVE_MIN: float = 0.35  ## m/s: slower than this is standing
 const TELEPORT: float = 3.0  ## m in one frame: a respawn, not a step
 const VELOCITY_SMOOTH: float = 18.0  ## 1/s, measured velocity filter
@@ -102,6 +109,11 @@ var _rate: float = 0.0  ## cycles per second, negative = backpedal
 var _move: float = 0.0  ## 0 idle, 1 locomotion
 var _carry: float = 0.0
 var _carry_mounted: bool = false
+# Reactions (see the constants above).
+var _dashing: bool = false
+var _dead: bool = false
+var _death_amount: float = 0.0  ## 0 = locomotion, 1 = the death clip alone
+var _hit_cooldown: float = 0.0
 
 
 static func create(id: StringName) -> SoldierModel:
@@ -253,15 +265,43 @@ func _locomotion_tree() -> AnimationNodeBlendTree:
 		gait.add_blend_point(clip, float(i), -1, StringName(String(g.clip).trim_prefix("UAL/")))
 	var rate := AnimationNodeTimeScale.new()
 	var move := AnimationNodeBlend2.new()
+	# Reactions stack on the locomotion: a flinch, the dash roll, and last the
+	# death, which replaces everything below it.
+	var hit := AnimationNodeOneShot.new()
+	hit.fadein_time = 0.03
+	hit.fadeout_time = 0.2
+	var dash := AnimationNodeOneShot.new()
+	dash.fadein_time = 0.03
+	dash.fadeout_time = 0.1
+	var death := AnimationNodeBlend2.new()
 	blend_tree.add_node(&"idle", idle, Vector2(0, 0))
 	blend_tree.add_node(&"gait", gait, Vector2(0, 160))
 	blend_tree.add_node(&"rate", rate, Vector2(200, 160))
 	blend_tree.add_node(&"move", move, Vector2(400, 60))
+	blend_tree.add_node(&"hit", hit, Vector2(560, 60))
+	blend_tree.add_node(&"dash", dash, Vector2(680, 60))
+	blend_tree.add_node(&"death", death, Vector2(800, 60))
+	blend_tree.add_node(&"hit_clip", _clip(HIT_CLIP), Vector2(560, 200))
+	blend_tree.add_node(&"roll_clip", _clip(ROLL_CLIP), Vector2(680, 200))
+	blend_tree.add_node(&"death_clip", _clip(DEATH_CLIP), Vector2(800, 200))
 	blend_tree.connect_node(&"rate", 0, &"gait")
 	blend_tree.connect_node(&"move", 0, &"idle")
 	blend_tree.connect_node(&"move", 1, &"rate")
-	blend_tree.connect_node(&"output", 0, &"move")
+	blend_tree.connect_node(&"hit", 0, &"move")
+	blend_tree.connect_node(&"hit", 1, &"hit_clip")
+	blend_tree.connect_node(&"dash", 0, &"hit")
+	blend_tree.connect_node(&"dash", 1, &"roll_clip")
+	blend_tree.connect_node(&"death", 0, &"dash")
+	blend_tree.connect_node(&"death", 1, &"death_clip")
+	blend_tree.connect_node(&"output", 0, &"death")
 	return blend_tree
+
+
+## A plain clip node (the UAL reactions do not loop).
+static func _clip(clip: StringName) -> AnimationNodeAnimation:
+	var node := AnimationNodeAnimation.new()
+	node.animation = clip
+	return node
 
 
 func _ready() -> void:
@@ -328,15 +368,51 @@ func set_shadow_only(on: bool) -> void:
 ## between calls (island.gd moves the model after this call, so it is the
 ## previous frame's step) and only use `sprinting`; `speed` (0..1) and `t`
 ## drive the placeholder's box legs.
+## A flinch when the body is hit. Ignored while dying and for HIT_COOLDOWN
+## after the last one. Returns true when the flinch starts.
+func react_hit() -> bool:
+	if _tree == null or _dead or _hit_cooldown > 0.0:
+		return false
+	_hit_cooldown = HIT_COOLDOWN
+	_tree.set(&"parameters/hit/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+	return true
+
+
+## The Breaker's dash rolls the body; the roll fades out when the dash ends.
+func set_dashing(on: bool) -> void:
+	if _tree == null or on == _dashing or _dead:
+		return
+	_dashing = on
+	var request: int = AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE if on else AnimationNodeOneShot.ONE_SHOT_REQUEST_FADE_OUT
+	_tree.set(&"parameters/dash/request", request)
+
+
+## Death: the death clip takes over and holds its last pose. The posing rig is
+## switched off once the clip has taken the body; the rifle stays in the hand.
+func die() -> void:
+	if _tree == null or _dead:
+		return
+	set_dashing(false)
+	_dead = true
+
+
+func is_dead() -> bool:
+	return _dead
+
+
 func animate(speed: float, t: float, sprinting: bool = false, delta: float = 0.0) -> void:
+	_hit_cooldown = maxf(0.0, _hit_cooldown - delta)
 	if _tree != null:
 		if not is_inside_tree() or delta <= 0.0:
 			return
-		_update_locomotion(sprinting, delta)
-		_apply_locomotion()
-		_feet.set("ground_height", ground_height)
-		_feet.set("moving", _velocity.length() > MOVE_MIN)
-		_feet.call("advance")
+		if _dead:
+			_update_death(delta)
+		else:
+			_update_locomotion(sprinting, delta)
+			_apply_locomotion()
+			_feet.set("ground_height", ground_height)
+			_feet.set("moving", _velocity.length() > MOVE_MIN)
+			_feet.call("advance")
 		_tree.advance(delta)
 		return
 	var swing: float = sin(t * 9.0) * 0.6 * clampf(speed, 0.0, 1.0)
@@ -417,6 +493,16 @@ func _update_locomotion(sprinting: bool, delta: float) -> void:
 	_rate = minf(cycles, MAX_CYCLES) * (-1.0 if _backward else 1.0)
 	_move = lerpf(_move, 1.0 if moving else 0.0, 1.0 - exp(-MOVE_SMOOTH * delta))
 	_carry = move_toward(_carry, 1.0 if carrying else 0.0, delta * 6.0)
+
+
+## Fades the death pose in; once it has the body, the posing modifiers are off
+## (they would otherwise pull the arms and legs back into the locomotion).
+func _update_death(delta: float) -> void:
+	_death_amount = move_toward(_death_amount, 1.0, DEATH_FADE * delta)
+	_tree.set(&"parameters/death/blend_amount", _death_amount)
+	if _death_amount >= 1.0:
+		for modifier: SkeletonModifier3D in [_hold, _support, _rig, _feet]:
+			modifier.active = false
 
 
 func _apply_locomotion() -> void:

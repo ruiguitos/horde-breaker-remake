@@ -2328,7 +2328,12 @@ func _draw_player_and_camera() -> void:
 		_fly = move_toward(_fly, 0.0, FLY_SPEED * 2.0 * delta)
 	var moved: float = _player.position.distance_to(_view_pos())
 	_walk_speed = lerpf(_walk_speed, clampf(moved / maxf(delta, 0.001) / 6.0, 0.0, 1.0), 0.2)
-	var animation_delta: float = 0.0 if paused or not run.card_choices.is_empty() or _hitstop > 0.0 or run.is_over() else delta
+	# A lost run is the player's death: the body keeps animating into the death pose.
+	var lost: bool = run.objective == IslandRun.Objective.LOST
+	var animation_delta: float = 0.0 if paused or not run.card_choices.is_empty() or _hitstop > 0.0 or (run.is_over() and not lost) else delta
+	if lost:
+		soldier.die()
+	soldier.set_dashing(run.dash_time > 0.0)
 	soldier.carrying = run.is_carrying()
 	soldier.aim_pitch = -_tp_pitch if camera_mode != Profile.CameraMode.FIXED else 0.0
 	soldier.grounded = not run.noclip and _fly < 0.01
@@ -2348,6 +2353,7 @@ func _draw_player_and_camera() -> void:
 	# the offset grows with trauma squared so small hits stay subtle.
 	if _last_hp >= 0.0 and run.hp < _last_hp:
 		_trauma = minf(1.0, _trauma + (_last_hp - run.hp) * 0.04)
+		soldier.react_hit()
 	_last_hp = run.hp
 	_trauma = maxf(0.0, _trauma - delta * 1.8)
 	var shake: float = _trauma * _trauma * 0.6
