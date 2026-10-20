@@ -2,14 +2,21 @@ extends SceneTree
 ## Headless test runner: discovers res://tests/test_*.gd and
 ## res://spikes/*/tests/test_*.gd and runs each one in its own Godot
 ## subprocess, so a crash, hang-free failure or leaked state in one test
-## cannot affect the others.
+## cannot affect the others. A test still running after the timeout is killed
+## and fails, so one hung test cannot block the rest.
 ## Run: godot --headless --path . --script res://tests/run_all.gd
-## Optional filter: ... --script res://tests/run_all.gd -- --filter=<substring>
+## Optional: ... --script res://tests/run_all.gd -- --filter=<substring> --timeout=<seconds>
 ## Exit code: 0 if every test exits 0, 1 otherwise (or if no tests are found).
+
+const DEFAULT_TIMEOUT_SECONDS: int = 240
+## Each test writes its engine log here. The exit code comes from the process and
+## the result lines from this file: create_process does not capture the output.
+const LOG_DIR: String = "user://test_logs"
 
 
 func _initialize() -> void:
 	var filter := _read_filter()
+	var timeout_seconds := _read_timeout_seconds()
 	var tests := _discover_tests()
 	if filter != "":
 		tests = tests.filter(func(p: String) -> bool: return p.contains(filter))
@@ -20,17 +27,28 @@ func _initialize() -> void:
 
 	var exe := OS.get_executable_path()
 	var project_dir := ProjectSettings.globalize_path("res://")
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(LOG_DIR))
 	var failed: Array[String] = []
 	var total_start := Time.get_ticks_msec()
 
 	for test_path in tests:
-		var args := PackedStringArray(["--headless", "--path", project_dir, "--script", test_path])
-		var output: Array = []
+		var log_file := "%s/%s.log" % [LOG_DIR, test_path.trim_prefix("res://").replace("/", "__")]
+		var args := PackedStringArray(["--headless", "--path", project_dir, "--log-file",
+			ProjectSettings.globalize_path(log_file), "--script", test_path])
 		var start := Time.get_ticks_msec()
-		var code := OS.execute(exe, args, output, true)
+		var pid := OS.create_process(exe, args)
+		var timed_out := false
+		if pid != -1:
+			while OS.is_process_running(pid):
+				if Time.get_ticks_msec() - start > timeout_seconds * 1000:
+					OS.kill(pid)
+					timed_out = true
+					break
+				OS.delay_msec(50)
 		var elapsed := Time.get_ticks_msec() - start
-		var log_text := "".join(PackedStringArray(output))
-		var verdict: String = classify(code, log_text)
+		var code := OS.get_process_exit_code(pid) if pid != -1 else -1
+		var log_text := FileAccess.get_file_as_string(log_file)
+		var verdict: String = verdict_for(code, log_text, timed_out, timeout_seconds) if pid != -1 else "FAIL (could not start)"
 		var ok: bool = verdict == "PASS" or verdict == "PASS (exit code at quit)"
 		print("%s %s (%d ms, exit %d) %s" % ["PASS" if ok else "FAIL", test_path, elapsed, code, verdict if verdict != "PASS" else ""])
 		if not ok:
@@ -46,6 +64,14 @@ func _initialize() -> void:
 	else:
 		print("TEST FAIL: %d test(s) failed: %s" % [failed.size(), ", ".join(PackedStringArray(failed))])
 		quit(1)
+
+
+## Verdict for one run. A run killed at the timeout always fails; otherwise the
+## log decides (see classify).
+static func verdict_for(code: int, log_text: String, timed_out: bool, timeout_seconds: int) -> String:
+	if timed_out:
+		return "FAIL (timeout after %d s)" % timeout_seconds
+	return classify(code, log_text)
 
 
 ## Verdict for one test run. A test passes when its log has no error markers,
@@ -95,3 +121,10 @@ func _read_filter() -> String:
 		if arg.begins_with("--filter="):
 			return arg.trim_prefix("--filter=")
 	return ""
+
+
+func _read_timeout_seconds() -> int:
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--timeout="):
+			return maxi(1, int(arg.trim_prefix("--timeout=")))
+	return DEFAULT_TIMEOUT_SECONDS

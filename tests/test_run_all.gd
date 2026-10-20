@@ -1,7 +1,8 @@
 extends SceneTree
 ## The test runner's verdicts on controlled logs: a good test, a TEST FAIL,
 ## a script error, a parse error, a known Windows exit code at quit, a
-## failing exit code and a run that never reached its results.
+## failing exit code, a run that never reached its results and a run killed at
+## the timeout.
 ## Run: godot --headless --path . --script res://tests/test_run_all.gd
 
 var _failures: int = 0
@@ -25,4 +26,6 @@ func _initialize() -> void:
 	_check(runner.classify(1, "TEST: a\n") == "FAIL (exit 1)", "a non-zero exit fails when it is not the known quit code")
 	_check(runner.classify(0, "some output without results\n") == "FAIL (exit 0 without results)", "exit 0 without results does not pass")
 	_check(runner.classify(0, "").begins_with("FAIL"), "exit 0 with no output at all does not pass")
+	_check(runner.verdict_for(0, "TEST: a\n", true, 5) == "FAIL (timeout after 5 s)", "a run killed at the timeout fails, even if it printed results")
+	_check(runner.verdict_for(0, "TEST: a\n", false, 5) == "PASS", "without a timeout the log decides")
 	quit(1 if _failures > 0 else 0)
