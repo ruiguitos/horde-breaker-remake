@@ -2375,6 +2375,8 @@ func _draw_player_and_camera() -> void:
 func _draw_enemies() -> void:
 	var now: float = Time.get_ticks_msec() * 0.001
 	# Every enemy kind is drawn by ZombieHordeView, with its models (ZombieHordeView.handles).
+	_zombies.scream_age = run.scream_age
+	_zombies.slam_windup = 1.0 - run.slam_time / GameData.BOSS_SLAM_WINDUP if run.slam_time > 0.0 else 0.0
 	_zombies.draw(run.horde, run.map, now, 0.0 if paused else get_process_delta_time())
 
 

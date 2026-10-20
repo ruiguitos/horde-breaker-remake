@@ -6,7 +6,8 @@ extends SceneTree
 ## (24 random looks), crowd (48 random zombies), weapons (the 5 guns),
 ## rifle (the assault rifle alone, close),
 ## hands (Recruit holding each gun), hands_vanguard, fp_<weapon id> (first person),
-## specials / specials_back (all kinds), bench_specials (150 mixed enemies), bench
+## specials / specials_back (all kinds; scream = the same with a Screamer's call
+## pose, see ZombieHordeView.scream_age), bench_specials (150 mixed enemies), bench
 ## and bench_empty (GPU/CPU timings of 150 zombies), crawl (3 Crawlers, 3/4
 ## front), crawl_side, crawl_close (one Crawler, low side view: the hands),
 ## legless (two legs-gone zombies mid-topple), flank (shirtless flank wound),
@@ -135,7 +136,8 @@ func _crawler(pos: Vector3, speed: float) -> int:
 func _setup() -> void:
 	_horde.target = CENTER + Vector3(0, 0, 40)
 	match _shot:
-		"specials", "specials_back":
+		"specials", "specials_back", "scream", "scream_rest":
+			_view.scream_age = 0.0 if _shot == "scream" else 99.0
 			var types: Array[GameData.EnemyType] = GameData.enemy_types()
 			var rng := RandomNumberGenerator.new()
 			rng.seed = 41
@@ -152,9 +154,15 @@ func _setup() -> void:
 				label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 				label.no_depth_test = true
 				_world.add_child(label)
-			_camera.position = CENTER + Vector3(0.4, 4.5, -18.0 if _shot == "specials_back" else 18.0)
-			_camera.look_at(CENTER + Vector3(0, 1.7, 0))
-			_camera.fov = 56
+			if _shot.begins_with("scream"):
+				# Close on the Screamer (the sixth kind, x = -7.5 + 6 * 2.5).
+				_camera.position = CENTER + Vector3(7.5, 1.7, 3.2)
+				_camera.look_at(CENTER + Vector3(7.5, 1.6, 0))
+				_camera.fov = 30
+			else:
+				_camera.position = CENTER + Vector3(0.4, 4.5, -18.0 if _shot == "specials_back" else 18.0)
+				_camera.look_at(CENTER + Vector3(0, 1.7, 0))
+				_camera.fov = 56
 		"lineup", "back":
 			var soldier: Variant = _script("soldier_model").create(&"recruit")
 			soldier.position = CENTER + Vector3(-3.2, 0, 0)

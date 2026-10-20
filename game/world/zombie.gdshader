@@ -11,6 +11,7 @@ shader_type spatial;
 // Per instance (MultiMesh):
 //   INSTANCE_CUSTOM = (walk phase, walk 0..1, lunge 0..1 or -stagger,
 //                      flinch 0..1 | 2 + death 0..1 | 4 + headless death)
+//   lunge is also the Screamer's call pose and the Behemoth's slam windup.
 //   COLOR (instance colour) = (status index, show mask, colours, wear): the
 //   last three are integers below 2^24 packed by ZombieModel.roll_look,
 //   exact in float32 (Forward+ keeps the multimesh buffer in float32).
@@ -269,7 +270,7 @@ void vertex() {
 		if (creature_type == 2 || creature_type == 4) { reach = 0.15 + 0.13 * walk * s + 0.75 * lunge; elbow_bend = 0.25; }
 		if (creature_type == 3) { reach = 0.85 + 0.08 * sin(phase) + 0.5 * lunge; elbow_bend = 0.15; }
 		if (creature_type == 5) { reach = -0.1 + 0.12 * walk * s; elbow_bend = 0.15; }
-		if (creature_type == 6) { reach = 1.7 + 0.08 * sin(phase); elbow_bend = 1.15; }
+		if (creature_type == 6) { reach = 1.7 + 0.08 * sin(phase) + 0.25 * lunge; elbow_bend = 1.15; }
 		if (legless) {
 			// Crawling, with the hands planted. Each hand has a cycle (the right
 			// one half a cycle behind): stance, when it stays on the ground and
@@ -302,7 +303,7 @@ void vertex() {
 	if (part == 2) {
 		float loll = 0.22 * sin(phase * 0.5) + 0.1 + 0.4 * stagger * sin(phase * 3.0);
 		if (creature_type > 0) { loll = 0.035 * sin(phase * 0.5) + 0.15 * stagger * sin(phase * 3.0); }
-		float nod = creature_type == 6 ? -0.30 : (creature_type > 0 ? -0.05 : -0.18);
+		float nod = creature_type == 6 ? -0.30 - 0.35 * lunge : (creature_type > 0 ? -0.05 : -0.18);
 		if (legless) { nod = mix(nod, CRAWL_HEAD_NOD, crawl); }
 		turn(p, n, t, rot_z(loll * limp) * rot_x(nod - 0.55 * flinch + 0.2 * lunge), NECK);
 	}

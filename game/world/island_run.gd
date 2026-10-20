@@ -353,6 +353,8 @@ var _low_hp_cd: float = 0.0
 
 var _kills_at_start: int = 0
 var scream_progress: float = 0.0  ## seconds a Screamer has seen the player
+## Seconds since a Screamer last called the horde (99 = not yet): its pose pulse.
+var scream_age: float = 99.0
 var _scream_cd: float = 0.0
 var _dead: Dictionary = {}  ## enemy index -> true, removed at the end of step()
 
@@ -674,6 +676,7 @@ func throw_grenade(aim: Vector3) -> bool:
 ## A Screamer that sees the player for SCREAM_TIME seconds calls a horde peak.
 func _update_screamers(dt: float) -> void:
 	_scream_cd = maxf(0.0, _scream_cd - dt)
+	scream_age = minf(scream_age + dt, 99.0)
 	var seen: bool = false
 	for i in horde.count:
 		if horde.kinds[i] == GameData.EnemyKind.SCREAMER and horde.stun[i] <= 0.0 and horde.freeze_time[i] <= 0.0 \
@@ -685,6 +688,7 @@ func _update_screamers(dt: float) -> void:
 	if scream_progress >= GameData.SCREAM_TIME and _scream_cd <= 0.0:
 		scream_progress = 0.0
 		_scream_cd = GameData.SCREAM_COOLDOWN
+		scream_age = 0.0
 		director.trigger_peak(15.0)
 		messages.append("A Screamer called the horde!")
 		radio.append(&"screamer")

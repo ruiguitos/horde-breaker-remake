@@ -39,6 +39,13 @@ const HIDDEN: Transform3D = Transform3D(Basis(Vector3.ZERO, Vector3.ZERO, Vector
 ## cleared past this size (a long run spawns thousands of zombies).
 const MAX_LOOKS: int = 4096
 
+## How long a Screamer holds its call pose after calling the horde (s).
+const SCREAM_POSE_TIME: float = 0.8
+## Set by island.gd before each draw: seconds since a Screamer called the horde
+## (99 = never) and the Behemoth's slam windup 0..1. Both become the lunge channel
+## of the pose, so the body acts out the call and the slam.
+var scream_age: float = 99.0
+var slam_windup: float = 0.0
 var _mm: Array[MultiMesh] = []
 ## All variants' instance data in one array (a packed array inside an Array
 ## would be copied on every write): variant v starts at _base[v] instances.
@@ -134,6 +141,7 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 	# Local references to the horde arrays (read only: no copies) are much
 	# faster in GDScript than h.positions[i] every time.
 	var kinds: PackedByteArray = h.kinds
+	var scream_pulse: float = clampf(1.0 - scream_age / SCREAM_POSE_TIME, 0.0, 1.0)
 	var speeds: PackedFloat32Array = h.speeds
 	var positions: PackedVector3Array = h.positions
 	var velocities: PackedVector3Array = h.velocities
@@ -223,6 +231,12 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 				status = ZombieModel.Status.POISONED
 			if cold[i] > 0:
 				status = ZombieModel.Status.COLD
+			# Specials act out the call and the slam windup (the lunge channel).
+			if act >= 0.0:
+				if kinds[i] == GameData.EnemyKind.SCREAMER:
+					act = maxf(act, scream_pulse)
+				elif kinds[i] == GameData.EnemyKind.BOSS:
+					act = maxf(act, slam_windup)
 		if flash[i] > 0.0:
 			status = ZombieModel.Status.FLASH
 		if kinds[i] == GameData.EnemyKind.CRAWLER and crawl_delay[i] > 0.0:
