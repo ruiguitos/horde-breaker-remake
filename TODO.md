@@ -30,7 +30,7 @@ em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
 - [ ] Empunhaduras de primeira pessoa (`weapon_grips_original/`, Codex): uma
   variante de braços e mãos por arma, com alcance exato nas cinco. Falta ver no
   editor: mangas, mão direita e espingarda (ombro ajustado, sem alongar ossos).
-- [ ] Animação de recarga dos braços (F3, `docs/tech/WEAPON_ARMS_BRIEF.md`).
+- [ ] Animação de recarga dos braços (parte 2 de `docs/tech/WEAPON_ARMS_BRIEF.md`).
 
 ## Conteúdo
 
@@ -54,10 +54,6 @@ em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
   ecrã, e decidir o ícone.
 - [ ] Correr a suite completa (`tests/test_*.gd`) antes de cada entrega e
   confirmar 0 `TEST FAIL`, `SCRIPT ERROR` e `Parse Error`.
-- [ ] Executor de testes: timeout por teste (hoje `OS.execute` é bloqueante; um
-  teste pendurado trava o executor). Exige supervisor, porque
-  `OS.execute_with_pipe` não devolve o código de saída. Aceitar códigos de
-  saída do Windows só com marcador de fim em cada teste.
 - [ ] Decidir se a AR tem tempo de recarga (hoje é instantânea, sem animação).
 - [ ] Decidir o motor: proposta em `docs/tech/ENGINE_MIGRATION.md` (ficar no
   Godot e medir o jogo completo).

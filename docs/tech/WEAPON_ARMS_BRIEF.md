@@ -1,4 +1,4 @@
-# Pedido ao Codex: braços e mãos em primeira pessoa (F2 e F3, 2026-10-18)
+# Pedido ao Codex: braços e mãos em primeira pessoa (F2 e recarga, 2026-10-18)
 
 Para colar na janela do Codex (ele trabalha no Blender; a integração é do Claude).
 Quando o modelo chegar, a integração segue o `WEAPON_MODELS.md` (secção de
@@ -61,7 +61,7 @@ Budget and export contract:
 - Name the armature "Arms".
 ```
 
-## Parte 2: as animações de recarga (F3)
+## Parte 2: as animações de recarga
 
 Só depois de a Parte 1 estar aceite. A recarga real do jogo é cronometrada e
 o código já move o carregador e o punho do ferrolho (`ViewModel.reload_offset`

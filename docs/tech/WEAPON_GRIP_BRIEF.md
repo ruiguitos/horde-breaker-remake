@@ -3,7 +3,7 @@
 Estado: entregue e integrado (`assets/models/characters/weapon_grips_original/`,
 ver `NOTES.md` na pasta). Fica como registo do pedido. Os valores de contrato
 abaixo (`GUN_SCALE` 0,5, `REST` antigo) foram substituídos; o estado atual está
-em `docs/tech/WEAPON_MODELS.md`, secção F3.
+em `docs/tech/WEAPON_MODELS.md`, secção «Empunhadura própria de cada arma».
 
 Para colar na janela do Codex. Os números são os do código e foram medidos; o
 trabalho é desenhar a pega de cada arma para os braços de primeira pessoa.

@@ -129,7 +129,7 @@ Capturas em `docs/design/weapon_animation/`.
 
 `FirstPersonArms` (`game/world/first_person_arms.gd`) começou com um só modelo,
 `assets/models/characters/arms_firstperson_original/arms_firstperson.glb`; desde
-F3 cada arma tem o seu par de mãos. A mão direita fica no punho; o braço esquerdo é resolvido com
+com as empunhaduras abaixo, cada arma tem o seu par de mãos. A mão direita fica no punho; o braço esquerdo é resolvido com
 dois ossos (lei dos cossenos, 0,30 m cada) para que a palma fique no ponto de
 apoio da arma (`WeaponModel.support_point`). A mão não roda: o contacto da
 palma é uma translação exata do punho.
@@ -156,7 +156,7 @@ isoladas não representam uma nova validação em combate.
 Os anteriores défices de alcance da marksman e da shotgun foram resolvidos
 pelas variantes abaixo.
 
-## Empunhadura própria de cada arma (F3, 2026-10-18)
+## Empunhadura própria de cada arma (2026-10-18)
 
 `FirstPersonArms.MODELS` referencia cinco GLBs em
 `assets/models/characters/weapon_grips_original/`. `ViewModel.set_weapon`
