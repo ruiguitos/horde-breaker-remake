@@ -30,7 +30,8 @@ em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
 - [ ] Empunhaduras de primeira pessoa (`weapon_grips_original/`, Codex): uma
   variante de braços e mãos por arma, com alcance exato nas cinco. Falta ver no
   editor: mangas, mão direita e espingarda (ombro ajustado, sem alongar ossos).
-- [ ] Animação de recarga dos braços (parte 2 de `docs/tech/WEAPON_ARMS_BRIEF.md`).
+- [ ] Animação de recarga dos braços (SMG e Machine Gun): pedido pronto para
+  o Codex em `docs/tech/CODEX_PENDING.md`.
 
 ## Conteúdo
 
@@ -38,7 +39,8 @@ em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
   procedural cobre o boss; falta acabamento e landmarks).
 - [ ] Props realistas restantes (`docs/tech/REALISTIC_PROPS.md`): rever a
   utilidade antes de integrar, já há alternativas procedurais.
-- [ ] Cartas desbloqueadas por Intel no pool; equilibrar classes.
+- [ ] Equilibrar classes a jogar (as seis cartas com preço já estão no Intel;
+  `docs/design/PROGRESSION_AND_ECONOMY.md` §3.2).
 
 ## Animação e feedback
 

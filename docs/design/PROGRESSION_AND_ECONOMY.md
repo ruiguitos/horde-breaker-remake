@@ -321,6 +321,11 @@ Tudo o que o Intel compra **acrescenta opções**:
 |---|---|---|
 | Armas no pool | Shotgun, SMG, Marksman Rifle, Grenade Launcher | 40–80 |
 | Cartas no pool | as 6 cartas raras/incomuns mais complexas começam bloqueadas | 30 cada |
+
+Implementado a 2026-10-20 com Chain Lightning, Wildfire, Pop Goes the Head,
+Ricochet, Piercing Rounds e Shockwave Breaker: a escolha é por mecânica (cadeias
+e gatilhos), porque o código não tem campo de raridade. Compra-se na página de
+Armas da Armaria.
 | Classes | Vanguard, Field Medic | 150 / 200 |
 | Perks | novos perks para os slots (§4) | 40–60 |
 | Slots de perk | 2.º e 3.º slot por classe | 100 / 200 |
