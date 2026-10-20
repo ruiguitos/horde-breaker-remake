@@ -15,3 +15,5 @@ extends Resource
 ## Card ID -> minimum owned rank.
 @export var prerequisites: Dictionary[StringName, int] = {}
 @export var order: int = 0
+## Intel to buy the card in the Armory; 0 = in the offers from the start.
+@export var unlock_cost: int = 0

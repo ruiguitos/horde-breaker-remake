@@ -539,6 +539,26 @@ func _weapons() -> void:
 		b.disabled = selected or not owned and profile.intel < cost
 		if selected:
 			b.theme_type_variation = &"SelectedButton"
+	# Priced cards: Intel buys them, and they join the level-up offers.
+	var cards_heading := UiTheme.title("CARDS", 28)
+	cards_heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	list.add_child(cards_heading)
+	list.add_child(UiTheme.label("Bought cards join the level-up offers in every run.", 16, UiTheme.MUTED))
+	for card in GameData.cards():
+		if card.unlock_cost <= 0:
+			continue
+		var panel := UiTheme.panel(list)
+		panel.add_child(UiTheme.title(card.title.to_upper(), 22))
+		panel.add_child(UiTheme.label(card.description, 16, UiTheme.MUTED, true))
+		var bought: bool = profile.owns_card(card.id)
+		var buy := UiTheme.button(panel, "BOUGHT" if bought else "UNLOCK / %d INTEL" % card.unlock_cost, _choose_card.bind(card.id))
+		buy.name = "Card_" + String(card.id)
+		buy.disabled = bought or profile.intel < card.unlock_cost
+
+
+func _choose_card(id: StringName) -> void:
+	if profile.buy_card(id):
+		_act(true)
 
 
 func _choose_weapon(id: StringName) -> void:

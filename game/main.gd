@@ -79,6 +79,7 @@ func _fresh_context() -> RunContext:
 	ctx.apply_class(profile.selected_class)
 	ctx.apply_perks(profile.equipped_perks, profile.equipped_perk_ranks())
 	ctx.weapons = profile.weapon_loadout()
+	ctx.locked_cards = profile.locked_card_ids()
 	return ctx
 
 

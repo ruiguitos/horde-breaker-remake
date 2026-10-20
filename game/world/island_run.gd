@@ -109,6 +109,8 @@ var _shots: int = 0
 
 # Cards
 var all_cards: Array[GameData.Card] = GameData.cards()
+## Priced cards the player has not bought (RunContext.locked_cards).
+var locked_cards: Array[StringName] = []
 var card_stacks: Dictionary = {}  ## StringName -> int
 var card_choices: Array[GameData.Card] = []
 ## Bumps on every new card offer (level-up or reroll), even when the cards
@@ -426,6 +428,7 @@ func load_context(ctx: RunContext) -> void:
 	if has_boss:
 		radio.append(&"land_boss")
 	player_class = ctx.player_class
+	locked_cards = ctx.locked_cards.duplicate()
 	weapons = GameData.loadout(ctx.weapons)
 	weapon_index = 0
 	mag.clear()
@@ -3047,6 +3050,15 @@ func _roll_cards_if_needed() -> void:
 		_roll_cards_if_needed()
 
 
+## The cards the offers may draw: all of them but the priced ones not bought.
+static func offer_pool(cards: Array[GameData.Card], locked: Array[StringName]) -> Array[GameData.Card]:
+	var pool: Array[GameData.Card] = []
+	for c in cards:
+		if not locked.has(c.id):
+			pool.append(c)
+	return pool
+
+
 ## Fills card_choices with up to 3 cards that are not maxed, avoiding
 ## `avoid` (the offer being rerolled) while the deck has others left.
 func _draw_cards(avoid: Array[GameData.Card]) -> bool:
@@ -3057,7 +3069,7 @@ func _draw_cards(avoid: Array[GameData.Card]) -> bool:
 	var excluded: Array[StringName] = []
 	for c in avoid:
 		excluded.append(c.id)
-	card_choices = card_offers.draw(all_cards, player_class, owned, card_stacks, excluded)
+	card_choices = card_offers.draw(offer_pool(all_cards, locked_cards), player_class, owned, card_stacks, excluded)
 	if card_choices.is_empty():
 		return false
 	card_offer += 1

@@ -12,3 +12,4 @@ icon = &"primary_weapon"
 tags = Array[StringName]([&"pierce", &"damage"])
 weapon_filter = Array[StringName]([&"rifle", &"smg", &"machine_gun"])
 order = 12
+unlock_cost = 30

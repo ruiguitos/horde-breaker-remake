@@ -38,6 +38,7 @@ var dialogue_voice: bool = true
 ## can open the settings panel.
 static var current: Profile
 var unlocked_weapons: Array[StringName] = []  ## bought in the armory
+var unlocked_cards: Array[StringName] = []  ## cards with an Intel price, bought in the armory
 var selected_primary: StringName = &"rifle"
 var selected_secondary: StringName = &"shotgun"
 var unlocked_classes: Array[StringName] = [&"recruit"]
@@ -171,6 +172,10 @@ static func from_dict(d: Dictionary) -> Profile:
 		var weapon_id := StringName(id)
 		if GameData.weapon(weapon_id) != null and not p.unlocked_weapons.has(weapon_id):
 			p.unlocked_weapons.append(weapon_id)
+	for id in d.get("unlocked_cards", []):
+		var card_id := StringName(id)
+		if GameData.card_cost(card_id) > 0 and not p.unlocked_cards.has(card_id):
+			p.unlocked_cards.append(card_id)
 	# Removed Heavy Pistol selections become the free Shotgun, without refund.
 	var primary_id := StringName(d.get("selected_primary", "rifle"))
 	var secondary_id := StringName(d.get("selected_secondary", d.get("selected_weapon", "shotgun")))
@@ -220,6 +225,7 @@ func save(path: String = PATH) -> bool:
 		"slots": slots, "max_threat": max_threat, "threat": threat, "master_volume": master_volume, "sfx_volume": sfx_volume, "music_volume": music_volume, "dialogue_voice": dialogue_voice, "lore_pages": lore_pages, "ending": ending, "selected_class": String(selected_class),
 		"unlocked_classes": unlocked_classes.map(func(x: StringName) -> String: return String(x)),
 		"unlocked_weapons": unlocked_weapons.map(func(x: StringName) -> String: return String(x)),
+		"unlocked_cards": unlocked_cards.map(func(x: StringName) -> String: return String(x)),
 		"selected_primary": String(selected_primary), "selected_secondary": String(selected_secondary),
 		"quality": quality, "window_mode": window_mode, "resolution": "%dx%d" % [resolution.x, resolution.y],
 		"vsync": vsync, "hud_scale": hud_scale, "camera_mode": camera_mode, "key_bindings": key_bindings, "mouse_sensitivity": mouse_sensitivity, "stick_sensitivity": stick_sensitivity, "stick_deadzone": stick_deadzone, "max_fps": max_fps, "render_scale": render_scale, "antialias": antialias, "fov": fov,
@@ -563,6 +569,29 @@ func buy_class(id: StringName) -> bool:
 	intel -= cost
 	unlocked_classes.append(id)
 	return true
+
+
+## Cards with an Intel price stay out of the level-up offers until bought.
+func owns_card(id: StringName) -> bool:
+	return GameData.card_cost(id) <= 0 or unlocked_cards.has(id)
+
+
+func buy_card(id: StringName) -> bool:
+	var cost: int = GameData.card_cost(id)
+	if cost <= 0 or unlocked_cards.has(id) or intel < cost:
+		return false
+	intel -= cost
+	unlocked_cards.append(id)
+	return true
+
+
+## Priced cards the player has not bought: kept out of this run's offers.
+func locked_card_ids() -> Array[StringName]:
+	var out: Array[StringName] = []
+	for c in GameData.cards():
+		if not owns_card(c.id):
+			out.append(c.id)
+	return out
 
 
 func buy_weapon(id: StringName) -> bool:

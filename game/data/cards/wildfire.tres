@@ -15,3 +15,4 @@ prerequisites = Dictionary[StringName, int]({
 &"fire_rounds": 1
 })
 order = 35
+unlock_cost = 30

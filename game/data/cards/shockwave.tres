@@ -11,3 +11,4 @@ category = "breaker"
 icon = &"breaker"
 tags = Array[StringName]([&"breaker", &"area", &"damage"])
 order = 7
+unlock_cost = 30

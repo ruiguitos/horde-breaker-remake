@@ -42,6 +42,8 @@ var max_hp: float = GameData.PLAYER_MAX_HP
 ## Equipped primary and secondary; ownership stays in Profile.
 var weapons: Array[StringName] = GameData.starting_weapons()
 var player_class: StringName = &"recruit"
+## Priced cards the player has not bought: kept out of the offers.
+var locked_cards: Array[StringName] = []
 ## Hazard pay accepted in the boat briefing: +25% Intel, +25% enemies on
 ## the next island only (reset when the island ends).
 var hazard_pay: bool = false

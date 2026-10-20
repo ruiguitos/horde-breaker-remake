@@ -88,6 +88,7 @@ class Card:
 	var weapon_filter: Array[StringName] = []
 	var requires_finite_weapon: bool = false
 	var prerequisites: Dictionary[StringName, int] = {}
+	var unlock_cost: int = 0  ## Intel to buy it; 0 = in the offers from the start
 
 	func _init(p_id: StringName, p_title: String, p_desc: String, p_max: int) -> void:
 		id = p_id
@@ -512,6 +513,14 @@ static func weapon_cost(id: StringName) -> int:
 	return -1
 
 
+## Intel to buy a card; 0 = in the offers from the start, -1 = no such card.
+static func card_cost(id: StringName) -> int:
+	for c in cards():
+		if c.id == id:
+			return c.unlock_cost
+	return -1
+
+
 static func cards() -> Array[Card]:
 	if _cards.is_empty():
 		for e: Array in _entries(CARD_REGISTRY):
@@ -524,6 +533,7 @@ static func cards() -> Array[Card]:
 			c.weapon_filter = d.weapon_filter.duplicate()
 			c.requires_finite_weapon = d.requires_finite_weapon
 			c.prerequisites = d.prerequisites.duplicate()
+			c.unlock_cost = d.unlock_cost
 			_cards.append(c)
 	return _cards.duplicate()
 
