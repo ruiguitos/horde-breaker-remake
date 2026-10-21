@@ -1900,6 +1900,8 @@ func _process(delta: float) -> void:
 			label = "Island %d/%d" % [context.island_index + 1, RunContext.ISLAND_COUNT]
 		if context.modifier != &"calm":
 			label += " [%s]" % GameData.modifier(context.modifier).title
+	# The dev menu's panel covers the HUD: with it open, the HUD steps aside (its minimap too).
+	hud.visible = not _dev_menu_open()
 	hud.refresh(run, _camera, _sim_ms, paused, label)
 
 
