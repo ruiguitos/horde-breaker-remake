@@ -362,6 +362,34 @@ func _scene_tests() -> void:
 		and view_model.visible and crosshair.visible and camera.near <= 0.05
 		and body.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY,
 		"first person: camera at eye height (%.2f m), gun and crosshair shown, body shadow only" % eye_h)
+	# Exercise the real UI controls, including headless runs and lowering ADS.
+	island.set("_ads", 1.0)
+	run.aiming = true
+	island.call("_update_aim_ui", true)
+	_check(not crosshair.visible, "AR: aiming hides the HUD crosshair")
+	run.aiming = false
+	island.set("_ads", 0.5)
+	island.call("_update_aim_ui", true)
+	_check(not crosshair.visible, "AR: lowering the sights keeps the crosshair hidden until hip fire")
+	island.set("_ads", 0.0)
+	island.call("_update_aim_ui", true)
+	_check(crosshair.visible, "AR: hip fire restores the crosshair")
+	view_model.set_weapon(&"marksman")
+	view_model.aim = 1.0
+	view_model.update(0, 0, 0, 0)
+	island.call("_update_aim_ui", true)
+	var scope: Control = island.get("_scope_overlay")
+	_check(scope.visible and not crosshair.visible, "marksman: scope reticle replaces the HUD crosshair")
+	island.call("_update_aim_ui", false)
+	_check(not scope.visible and not crosshair.visible, "menus hide both aiming overlays")
+	island.set("camera_mode", Profile.CameraMode.THIRD_PERSON)
+	island.call("_update_aim_ui", true)
+	_check(not scope.visible and crosshair.visible, "third person keeps its crosshair even after using the scope")
+	island.set("camera_mode", Profile.CameraMode.FIRST_PERSON)
+	view_model.set_weapon(&"rifle")
+	view_model.aim = 0.0
+	view_model.update(0, 0, 0, 0)
+	island.call("_update_aim_ui", true)
 
 	# No laser sight: the only line mesh is the tracers'.
 	var lines: int = 0

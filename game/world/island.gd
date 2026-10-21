@@ -117,6 +117,7 @@ var _tp_yaw: float = 0.0
 ## Positive looks down. 8 degrees puts the crosshair on chests from ~3 to ~20 m.
 var _tp_pitch: float = deg_to_rad(8.0)
 var _crosshair: Control
+var _scope_overlay: Control
 var _view_model: ViewModel  ## first-person placeholder gun (child of the camera)
 ## Phantom Camera (addon) drives the third-person camera: a SpringArm3D
 ## follows `_tp_pivot` (without damping, see _setup_phantom_camera).
@@ -293,6 +294,9 @@ func _ready() -> void:
 	# what it is on).
 	var layer := CanvasLayer.new()
 	add_child(layer)
+	_scope_overlay = (load("res://game/ui/scope_overlay.gd") as GDScript).new()
+	_scope_overlay.visible = false
+	layer.add_child(_scope_overlay)
 	_crosshair = CenterContainer.new()
 	_crosshair.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_crosshair.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1864,8 +1868,8 @@ func _process(delta: float) -> void:
 		var fov: float = _camera_fov(camera_mode == Profile.CameraMode.FIRST_PERSON) * lerpf(1.0, ADS_FOV_RATIO, _ads)
 		if _camera.fov != fov:
 			_camera.fov = fov  # field of view changed in Settings (pause)
-	_update_mouse_mode()
 	_draw_player_and_camera()
+	_update_mouse_mode()
 	_draw_enemies()
 	_draw_orbs()
 	_draw_grenades()
@@ -2113,17 +2117,26 @@ func _update_first_person_camera(jitter: Vector3, delta: float) -> void:
 	_view_model.update(delta, clampf(REACH - free, 0.0, ViewModel.MAX_PULL), _walk_speed, Time.get_ticks_msec() / 1000.0)
 
 
-## The mouse is captured (hidden, turns the camera) only while playing in
-## third person; menus, cards, pause and the end screen get it back.
+## First / third person captures the mouse while playing; menus, cards, pause
+## and the end screen get it back. Aim overlays follow the same playing state.
 func _update_mouse_mode() -> void:
+	var playing: bool = _free_look() and not paused and run.card_choices.is_empty() and not run.is_over()
+	_update_aim_ui(playing)
 	if DisplayServer.get_name() == "headless":
 		return
-	var playing: bool = _free_look() and not paused and run.card_choices.is_empty() and not run.is_over()
 	var want: Input.MouseMode = Input.MOUSE_MODE_CAPTURED if playing else Input.MOUSE_MODE_VISIBLE
 	if Input.mouse_mode != want:
 		Input.mouse_mode = want
+
+
+func _update_aim_ui(playing: bool) -> void:
+	var first: bool = camera_mode == Profile.CameraMode.FIRST_PERSON
+	var scoped: bool = first and _view_model != null and _view_model.is_scoped()
+	var rifle_ads: bool = first and run.weapons[run.weapon_index].id == &"rifle" and (run.aiming or _ads > 0.01)
 	if _crosshair != null:
-		_crosshair.visible = playing
+		_crosshair.visible = playing and not rifle_ads and not scoped
+	if _scope_overlay != null:
+		_scope_overlay.visible = playing and scoped
 
 
 ## Over-the-shoulder: orbit behind the player at (yaw, pitch), offset to the

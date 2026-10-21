@@ -1,0 +1,454 @@
+{
+  "date": "2026-10-21",
+  "engine": "Godot 4.7.2",
+  "scope": "ADS da Machine Gun e marksman; crosshair da AR",
+  "regression_tests_passed": 60,
+  "regression_tests": [
+    {
+      "test": "test_aim.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_armory_layout.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_boat_redesign.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_boss_spawn.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_briefing.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_camera_aim.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_card_unlocks.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_cards_catalog.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_crawlers.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_credits.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_data.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_death_cause.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_defeat_power_up_hud.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_dialogue.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_escort.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false,
+      "repeated_after_runner_timeout": true
+    },
+    {
+      "test": "test_expedition_missions.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_expedition.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_first_person_arms.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_first_person_reload.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_foot_contact.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_fov.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_fuel_run.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_game_scene.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_handmade.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_hold_sequence.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_hud_redesign.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_hud.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_intel_search.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_island_end_panel.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_island_props.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_island_run.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_loading_screen.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_menus.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_nests.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_noclip.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_perk_tree.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_power_ups.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_recruit_animation.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_rescue_survivor.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_run_all.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_run_and_gun.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_sabotage.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_settings.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_sfx.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_signals.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_smoke.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_soak_run.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false,
+      "repeated_after_runner_timeout": true
+    },
+    {
+      "test": "test_soldier_reactions.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_special_models.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_special_poses.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_stick.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_test_island.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_title_debrief_redesign.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_view_model.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_weapon_grips.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_weapon_loadout.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_weapon_models.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_weapon_texture.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_world_dressing.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    },
+    {
+      "test": "test_zombie_model.gd",
+      "passed": true,
+      "exit": 0,
+      "timeout": false
+    }
+  ],
+  "initial_interrupted_attempts": [
+    {
+      "test": "test_escort.gd",
+      "passed": false,
+      "exit": -1,
+      "timeout": true
+    },
+    {
+      "test": "test_soak_run.gd",
+      "passed": false,
+      "exit": -1,
+      "timeout": true
+    }
+  ],
+  "excluded_tests": [
+    {
+      "test": "test_first_person_grip_assets.gd",
+      "reason": "Auditoria dos assets/clips de recarga em curso, fora desta correção ADS."
+    },
+    {
+      "test": "test_reload_arm_clips.gd",
+      "reason": "Auditoria dos assets/clips de recarga em curso, fora desta correção ADS."
+    }
+  ],
+  "local_logs": ".godot/ads_tests/",
+  "checks": {
+    "regression_failed_before_patch": [
+      "MG sight axis",
+      "MG missing rear aperture",
+      "marksman sight axis",
+      "opaque scoped model"
+    ],
+    "mg_rear_eye_relief_m": 0.12,
+    "marksman_ocular_eye_relief_m": 0.12,
+    "scope_entry_ads_fraction": 0.95,
+    "existing_ads_fov_ratio_preserved": 0.75,
+    "ar_hud_plus_hidden_during_ads_and_lowering": true,
+    "third_person_hud_plus_preserved": true,
+    "menus_hide_aim_overlays": true,
+    "gun_and_hands_scale": 1.0
+  },
+  "visual_checks": {
+    "gpu": "NVIDIA GeForce RTX 5060",
+    "size": [
+      1280,
+      720
+    ],
+    "island_renderer": "Compatibility",
+    "island_base_fov_degrees": 60,
+    "island_ads_fov_degrees": 45,
+    "island_captures": [
+      "machine_gun_island.png",
+      "marksman_island.png",
+      "rifle_island.png"
+    ],
+    "isolated_base_fov_degrees": 70,
+    "isolated_ads_fov_degrees": 52.5,
+    "isolated_captures": [
+      "machine_gun_ads.png",
+      "marksman_ads.png"
+    ],
+    "additional_local_checks": [
+      "MG Forward+ full ADS",
+      "MG transition at base FOV120 and ADS0.5",
+      "marksman transition at base FOV120 and ADS0.9"
+    ],
+    "limits": "Capturas estáticas; sem validação nova de combate em movimento ou refração ótica."
+  },
+  "jev": {
+    "input": "Apenas resumos sanitizados; sem código, imagens ou modelos.",
+    "action": "escalate",
+    "claims_verified": 0,
+    "claims_contradicted": 0,
+    "claims_unsupported": 2,
+    "reason": "Resumo insuficiente e baixa confiança. Não é aprovação externa."
+  },
+  "source_sha256": {
+    "game/world/view_model.gd": "a9b4bceb00176563156c8fbad97c38d0a526d782d60ce4f51dedba9478473cf1",
+    "game/world/island.gd": "82139cc37bcdb3c61eeca0d79b125d5e345d911ee4577826aab4891d451e8332",
+    "game/ui/scope_overlay.gd": "d11f3ba9ba562d6cb9dfe90ebd0b773a4a962350f10b5cd0e60bbb9f4618910e",
+    "tests/test_view_model.gd": "1a69ffecd0b8dfce3c4db77b116cb91782630dcc197aa07222244fe34d4dbb68",
+    "tests/test_camera_aim.gd": "d7732310379c5834e71503e2b4b591234cae8b60b67d73e9299e69737075e37e",
+    "tools/dev/weapon_grip_preview.gd": "cffdcc15c00dfbda4f5f8b457017b5cba9267ba2c244a878d5132afe47272a78"
+  }
+}

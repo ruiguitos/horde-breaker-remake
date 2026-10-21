@@ -20,6 +20,30 @@ func _initialize() -> void:
 		and rifle.parts.has("Front sight post") and rifle.parts.has("Rear sight aperture") and rifle.muzzle.get_parent() == rifle,
 		"the rifle keeps %d named parts (not batched), with its sights and muzzle" % meshes)
 	rifle.free()
+	for id: StringName in [&"machine_gun", &"marksman"]:
+		var aimed: ViewModel = ViewModel.create(&"recruit")
+		aimed.set_weapon(id)
+		aimed.aim = 1.0
+		aimed.update(0.0, 0.0, 0.0, 0.0)
+		var anchor_name: String = "LMG front sight post" if id == &"machine_gun" else "Eyepiece lens"
+		var anchor: Vector3 = aimed.transform * aimed._gun.transform * ViewModel._part_centre(aimed._model.parts[anchor_name])
+		_check(absf(anchor.x) < 0.001 and absf(anchor.y) < 0.008,
+			"%s: ADS follows the sight axis instead of entering the receiver" % id)
+		if id == &"machine_gun":
+			_check(aimed._model.parts.has("LMG rear sight aperture"), "machine_gun: a rear aperture completes the iron sights")
+			var rear: Vector3 = aimed.transform * aimed._gun.transform * ViewModel._part_centre(aimed._model.parts["LMG rear sight aperture"])
+			_check(rear.distance_to(Vector3(0, 0, -ViewModel.EYE_TO_REAR)) < 0.001,
+				"machine_gun: the eye stays behind the centred rear aperture")
+		else:
+			_check(not aimed._gun.visible, "marksman: the opaque model does not obstruct the scoped view")
+			_check(absf(anchor.z + ViewModel.EYE_TO_REAR) < 0.001, "marksman: the eye stays behind the ocular lens")
+			aimed.aim = 0.5
+			aimed.update(0.0, 0.0, 0.0, 0.0)
+			_check(aimed._gun.visible and not aimed.is_scoped(), "marksman: raising ADS keeps the weapon visible before entering the scope")
+			aimed.aim = 0.0
+			aimed.update(0.0, 0.0, 0.0, 0.0)
+			_check(aimed._gun.visible, "marksman: lowering the scope restores the gun and hands")
+		aimed.free()
 
 	_check(ViewModel.reload_offset(0.0).is_zero_approx() and ViewModel.reload_offset(1.0).is_zero_approx(),
 		"the magazine is in place before and after a reload")

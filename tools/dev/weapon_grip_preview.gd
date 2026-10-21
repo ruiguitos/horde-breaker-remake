@@ -1,6 +1,6 @@
 extends SceneTree
 ## GPU captures of the five fitted first-person grips, with an isolated world.
-## godot --path . --script res://tools/dev/weapon_grip_preview.gd -- [weapon] [view]
+## godot --path . --script res://tools/dev/weapon_grip_preview.gd -- [weapon] [view] [output] [fov] [aim]
 ## Views: first_person, left, right, ads, wall. No args captures all five guns.
 
 const OUTPUT: String = "res://docs/design/weapon_grips/"
@@ -11,13 +11,23 @@ var model: ViewModel
 var jobs: Array[Dictionary] = []
 var job_index: int = 0
 var frames: int = 0
+var output: String = OUTPUT
+var base_fov: float = 70.0
+var ads_amount: float = 1.0
+var scope: Control
 
 func _initialize() -> void:
 	call_deferred("setup")
 
 func setup() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
-	DirAccess.make_dir_recursive_absolute(OUTPUT)
+	if args.size() > 2:
+		output = args[2].trim_suffix("/") + "/"
+	if args.size() > 3:
+		base_fov = float(args[3])
+	if args.size() > 4:
+		ads_amount = clampf(float(args[4]), 0, 1)
+	DirAccess.make_dir_recursive_absolute(output)
 	for weapon: StringName in WeaponModel.IDS:
 		if not args.is_empty() and String(weapon) != args[0]:
 			continue
@@ -53,6 +63,24 @@ func setup() -> void:
 	camera.near = 0.025
 	world.add_child(camera)
 	camera.make_current()
+	var layer := CanvasLayer.new()
+	viewport.add_child(layer)
+	scope = (load("res://game/ui/scope_overlay.gd") as GDScript).new()
+	layer.add_child(scope)
+	# A distant checkerboard makes a blocked optic or central sight line visible.
+	if output != OUTPUT:
+		for x: int in range(-6, 7):
+			for y: int in range(-4, 5):
+				var tile := MeshInstance3D.new()
+				var quad := QuadMesh.new()
+				quad.size = Vector2.ONE
+				tile.mesh = quad
+				tile.position = Vector3(x, y, -8)
+				var material := StandardMaterial3D.new()
+				material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+				material.albedo_color = Color(0.55, 0.64, 0.68) if (x + y) % 2 == 0 else Color(0.36, 0.44, 0.49)
+				tile.material_override = material
+				world.add_child(tile)
 	next_job()
 
 func next_job() -> void:
@@ -64,7 +92,8 @@ func next_job() -> void:
 	model.set_weapon(job["weapon"])
 	var view: String = job["view"]
 	camera.transform = Transform3D.IDENTITY
-	camera.fov = 70.0
+	camera.fov = base_fov
+	scope.visible = false
 	if view in ["left", "right"]:
 		model.transform = Transform3D.IDENTITY
 		var target: Vector3 = model._model.support_point + Vector3(0, 0.025, 0)
@@ -78,9 +107,10 @@ func next_job() -> void:
 		camera.look_at(target)
 		camera.fov = 43.0
 	elif view == "ads":
-		model.aim = 1.0
+		model.aim = ads_amount
 		model.update(0.0, 0.0, 0.0, 0.0)
-		camera.fov *= 0.75
+		camera.fov *= lerpf(1.0, 0.75, ads_amount)
+		scope.visible = model.is_scoped()
 	elif view == "wall":
 		model.update(0.0, ViewModel.MAX_PULL, 0.0, 0.0)
 	frames = 0
@@ -95,7 +125,7 @@ func _process(_delta: float) -> bool:
 
 func capture() -> void:
 	var job: Dictionary = jobs[job_index]
-	var path: String = OUTPUT + String(job["weapon"]) + "_" + String(job["view"]) + ".png"
+	var path: String = output + String(job["weapon"]) + "_" + String(job["view"]) + ".png"
 	var error: Error = viewport.get_texture().get_image().save_png(path)
 	if error != OK:
 		print("CAPTURE FAILED: ", path, " ", error)

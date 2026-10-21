@@ -27,9 +27,9 @@ const LAYOUT: Dictionary = {
 		"charge": ["Charging handle"], "front": "Front sight post", "rear": "Rear sight aperture"},
 	&"smg": {"magazine": ["Curved 9mm magazine", "Magazine floor plate", "Magazine pressed stiffener"],
 		"charge": ["Visible bolt"], "front": "Front sight blade", "rear": "Diopter sight drum"},
-	&"machine_gun": {"magazine": [], "charge": ["Charging slide"], "front": "LMG front sight post", "rear": ""},
+	&"machine_gun": {"magazine": [], "charge": ["Charging slide"], "front": "LMG front sight post", "rear": "LMG rear sight aperture"},
 	&"shotgun": {"magazine": [], "charge": ["Shotgun visible bolt"], "front": "", "rear": ""},
-	&"marksman": {"magazine": [], "charge": ["DMR bolt handle"], "front": "", "rear": ""},
+	&"marksman": {"magazine": [], "charge": ["DMR bolt handle"], "front": "Objective lens", "rear": "Eyepiece lens"},
 }
 ## The guns are drawn at real size: the arms are at real size too, and the
 ## hands only meet the grip and the handguard if gun and arms share one scale.
@@ -87,6 +87,8 @@ func set_weapon(id: StringName) -> void:
 	model.set_cast_shadow(GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)
 	_gun.add_child(model)
 	_model = model
+	if model.weapon_id == &"machine_gun":
+		_add_lmg_rear_sight(model)
 	var layout: Dictionary = LAYOUT.get(model.weapon_id, {})
 	_magazine = _parts_named(model, layout.get("magazine", []))
 	_charge = _parts_named(model, layout.get("charge", []))
@@ -124,6 +126,43 @@ func set_weapon(id: StringName) -> void:
 	tip.add_child(_flash)
 
 
+## The source LMG has only a front post. Complete its rail-mounted sight in
+## the first-person copy; the original asset and the reload parts stay intact.
+static func _add_lmg_rear_sight(model: WeaponModel) -> void:
+	var post: MeshInstance3D = model.parts["LMG front sight post"]
+	var post_box: AABB = post.transform * post.mesh.get_aabb()
+	var centre := Vector3(0, post_box.end.y, 0.06)
+	var aperture := MeshInstance3D.new()
+	aperture.name = "LMG rear sight aperture"
+	var ring := TorusMesh.new()
+	ring.inner_radius = 0.005
+	ring.outer_radius = 0.009
+	ring.rings = 24
+	ring.ring_segments = 8
+	aperture.mesh = ring
+	aperture.position = centre
+	aperture.rotation.x = PI / 2.0
+	aperture.material_override = WeaponModel.material("gunmetal")
+	aperture.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	model.add_child(aperture)
+	model.parts[String(aperture.name)] = aperture
+	var mount := MeshInstance3D.new()
+	mount.name = "LMG rear sight mount"
+	var block := BoxMesh.new()
+	block.size = Vector3(0.018, 0.015, 0.016)
+	mount.mesh = block
+	mount.position = centre - Vector3(0, 0.016, 0)
+	mount.material_override = aperture.material_override
+	mount.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	model.add_child(mount)
+	model.parts[String(mount.name)] = mount
+
+
+## Full ADS uses a clear scoped view: the source optic contains solid lens caps.
+func is_scoped() -> bool:
+	return weapon_id == &"marksman" and aim >= 0.95
+
+
 ## Gun-space offset of the magazine parts for a reload at progress `p`: out
 ## over the first 30 %, held, back in over the last 30 %.
 static func reload_offset(p: float) -> Vector3:
@@ -149,6 +188,9 @@ static func sight_rest(model: WeaponModel, front: String, rear: String) -> Dicti
 	if front == "" or rear == "" or not model.parts.has(front) or not model.parts.has(rear):
 		return {"position": ADS_FALLBACK, "tilt": 0.0}
 	var f: Vector3 = _part_centre(model.parts[front] as MeshInstance3D)
+	if model.weapon_id == &"machine_gun":
+		var post: MeshInstance3D = model.parts[front]
+		f.y = (post.transform * post.mesh.get_aabb()).end.y
 	var r: Vector3 = _part_centre(model.parts[rear] as MeshInstance3D)
 	var v: Vector3 = r - f
 	var tilt: float = atan2(v.y, v.z)
@@ -194,6 +236,7 @@ func update(delta: float, pull_back: float, walk: float, t: float) -> void:
 	position = _hip_rest.lerp(_ads_rest, aim) + bob + Vector3(0, -pull_back * 0.3, pull_back + _kick * 0.035)
 	rotation.x = _kick * 0.06 - near * 1.1  # negative: the barrel points down
 	if _gun != null:
+		_gun.visible = not is_scoped()
 		_gun.rotation.x = _ads_tilt * aim  # levels the sights while aiming
 	_animate_parts()
 	if _arms != null:
