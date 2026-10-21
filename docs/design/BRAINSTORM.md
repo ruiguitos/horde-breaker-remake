@@ -135,6 +135,11 @@ Como mirar (retícula no ecrã + raycast ao plano do jogador vs ao inimigo)?
 Quanto da horda atrás do jogador continua invisível e que pistas são
 precisas (som, borda do ecrã)?
 
+- Escolha da câmara ao arrancar o jogo (nota do utilizador, 2026-10-21): um menu
+  inicial pergunta o tipo de câmara (1.ª pessoa, 3.ª pessoa ou fixa). Hoje a escolha
+  existe nas Definições e com a tecla V dentro da ilha. Por decidir: se a pergunta
+  aparece só na primeira vez ou em todos os arranques, e se pode ser saltada.
+
 ## 8. Tecnologia
 
 - Ficar no Godot (decidido). Horda escalável: **flow field** por ilha,
