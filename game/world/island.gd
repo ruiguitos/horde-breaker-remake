@@ -16,6 +16,7 @@ signal finished(won: bool)
 var context: RunContext
 var profile: Profile
 var paused: bool = false
+var _dev_menu: DevMenu  ## the in-island dev menu (F2), debug builds only
 ## Title-screen backdrop: no HUD, no input, hidden immortal player in the
 ## middle (the horde gathers around), slowly orbiting camera.
 var showcase: bool = false
@@ -297,6 +298,10 @@ func _ready() -> void:
 	_scope_overlay = (load("res://game/ui/scope_overlay.gd") as GDScript).new()
 	_scope_overlay.visible = false
 	layer.add_child(_scope_overlay)
+	if DevOptions.enabled():
+		_dev_menu = DevMenu.new()
+		_dev_menu.run = run
+		layer.add_child(_dev_menu)
 	_crosshair = CenterContainer.new()
 	_crosshair.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_crosshair.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1766,6 +1771,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed(&"noclip") and OS.is_debug_build():  # development builds only
 		run.noclip = not run.noclip
 		run.messages.append("NOCLIP ON (Space up, Ctrl down, no walls, no damage)" if run.noclip else "NOCLIP OFF")
+	elif event.is_action_pressed(&"dev_menu") and _dev_menu != null:
+		_dev_menu.toggle()
 	elif event.is_action_pressed(&"camera_toggle"):
 		# V cycles First person -> Third person -> Fixed.
 		_set_camera_mode((camera_mode + 1) % Profile.CAMERA_MODE_NAMES.size())
@@ -2119,8 +2126,13 @@ func _update_first_person_camera(jitter: Vector3, delta: float) -> void:
 
 ## First / third person captures the mouse while playing; menus, cards, pause
 ## and the end screen get it back. Aim overlays follow the same playing state.
+## The dev menu's panel is open: the mouse is free, as in a menu.
+func _dev_menu_open() -> bool:
+	return _dev_menu != null and _dev_menu.is_open()
+
+
 func _update_mouse_mode() -> void:
-	var playing: bool = _free_look() and not paused and run.card_choices.is_empty() and not run.is_over()
+	var playing: bool = _free_look() and not paused and run.card_choices.is_empty() and not run.is_over() and not _dev_menu_open()
 	_update_aim_ui(playing)
 	if DisplayServer.get_name() == "headless":
 		return

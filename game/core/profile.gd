@@ -216,6 +216,9 @@ static func from_dict(d: Dictionary) -> Profile:
 
 
 func save(path: String = PATH) -> bool:
+	# Dev runs (DevOptions) save nothing: no profile, Intel or unlocks.
+	if DevOptions.changes_balance():
+		return false
 	var text: String = JSON.stringify({
 		"version": VERSION, "intel": intel, "runs": runs,
 		"extractions": extractions, "best_kills": best_kills,

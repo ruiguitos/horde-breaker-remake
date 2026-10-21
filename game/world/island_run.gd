@@ -482,6 +482,8 @@ func load_context(ctx: RunContext) -> void:
 			director.specials_mult = 2.0
 	# One ceiling for every spawn (ring, nests, boss summons): see GameData.HORDE_CAP.
 	director.max_alive = mini(director.max_alive, GameData.HORDE_CAP)
+	if DevOptions.horde_alive > 0:
+		set_horde_alive(DevOptions.horde_alive)
 	# Fresh ammo (start or Ammo Crate) fills to the max; carried ammo is capped.
 	for w in weapons.size():
 		if weapons[w].max_ammo > 0:
@@ -2071,13 +2073,29 @@ func breaker_radius() -> float:
 ## `source` names what hurt the player (telemetry: the death cause); the game
 ## always passes one, the default is for tests that only check HP.
 func _take_player_damage(amount: float, source: StringName = &"unknown") -> void:
-	if amount > 0.0 and not noclip:
+	if amount > 0.0 and not noclip and not DevOptions.invincible:
 		var absorbed: float = minf(shield, amount)
 		shield -= absorbed
 		hp -= amount - absorbed
 		_last_damage_time = time_alive
 		if amount > absorbed:
 			last_hit_by = source
+
+
+## Dev menu: the enemies-alive limit, kept under the hard cap (GameData.HORDE_CAP).
+func set_horde_alive(n: int) -> void:
+	director.max_alive = clampi(n, 1, GameData.HORDE_CAP)
+
+
+## Dev menu: one enemy of `kind` a few metres ahead of the player.
+func dev_spawn(kind: int) -> void:
+	horde.add(player_pos + facing * 6.0, kind, rng)
+
+
+## Dev menu: XP as if the player had collected it, then the level-ups.
+func dev_grant_xp(amount: int) -> void:
+	xp += maxi(0, amount)
+	_advance_xp_levels()
 
 
 func add_shield(amount: float) -> void:
@@ -2458,9 +2476,9 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 	_firing_time = GameData.SKIRMISHER_FIRING_WINDOW
 	if w.primary:
 		_shots += 1
-	if w.max_ammo > 0:
+	if w.max_ammo > 0 and not DevOptions.infinite_ammo:
 		ammo[weapon_index] -= 1
-	if magazine_size(weapon_index) > 0:
+	if magazine_size(weapon_index) > 0 and not DevOptions.infinite_ammo:
 		mag[weapon_index] -= 1
 		if mag[weapon_index] <= 0:
 			_reload(weapon_index)

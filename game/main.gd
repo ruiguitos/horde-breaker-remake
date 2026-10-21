@@ -237,6 +237,8 @@ func _on_load_failed(screen: LoadingScreen) -> void:
 
 ## Writes a JSON summary of the run to user://runs/ for balancing.
 func _write_telemetry() -> void:
+	if DevOptions.changes_balance():
+		return  # dev runs send no telemetry
 	DirAccess.make_dir_recursive_absolute("user://runs")
 	# Milliseconds keep two runs finished in the same second from overwriting each other.
 	var stamp: String = "%s_%03d" % [Time.get_datetime_string_from_system().replace(":", "-"), Time.get_ticks_msec() % 1000]

@@ -26,6 +26,8 @@ static var ACTIONS: Dictionary = {
 	&"pause": [KEY_ESCAPE, "joy:%d" % JOY_BUTTON_START],
 	&"confirm": [KEY_ENTER, KEY_KP_ENTER, KEY_R, "joy:%d" % JOY_BUTTON_A, "joy:%d" % JOY_BUTTON_START],
 	&"debug": [KEY_F3],
+	## Dev menu (debug builds): the in-island panel.
+	&"dev_menu": [KEY_F2],
 	## Debug: walk through everything, take no damage (mouse side buttons).
 	&"noclip": ["mouse:%d" % MOUSE_BUTTON_XBUTTON1, "mouse:%d" % MOUSE_BUTTON_XBUTTON2],
 	&"camera_toggle": [KEY_V, "joy:%d" % JOY_BUTTON_BACK],
