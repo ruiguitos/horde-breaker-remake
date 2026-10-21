@@ -30,8 +30,9 @@ em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
 - [ ] Empunhaduras de primeira pessoa (`weapon_grips_original/`, Codex): uma
   variante de braços e mãos por arma, com alcance exato nas cinco. Falta ver no
   editor: mangas, mão direita e espingarda (ombro ajustado, sem alongar ossos).
-- [ ] Animação de recarga dos braços (SMG e Machine Gun): pedido pronto para
-  o Codex em `docs/tech/CODEX_PENDING.md`.
+- [ ] Recarga dos braços (SMG e Machine Gun): validação concluída, ver
+  `docs/tech/RELOAD_ARM_CLIPS_RESUME.md`. Falta a revisão a jogar (sensação da
+  recarga e posição das mãos).
 
 ## Conteúdo
 

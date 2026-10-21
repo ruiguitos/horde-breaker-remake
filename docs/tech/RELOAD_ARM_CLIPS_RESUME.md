@@ -3,7 +3,8 @@
 Retoma autorizada pelo utilizador: **65/65 scripts headless passaram**,
 todos com saída 0 e sem marcadores reais de falha nos logs de consola e do
 engine. Foram retomados os testes em falta e repetidos os alterados/novos.
-Não foi feito commit nem push.
+Commitado em e54c9ec (clips e ligação ao jogo) e f40bb55 (esta nota).
+A revisão a jogar continua por fazer.
 
 ## Trabalho gravado
 
@@ -85,7 +86,8 @@ de zombies sem relação com esta tarefa. Não editar DECISIONS.md.
 > trabalho; concilia-as sem apagar os clips. Falta uma revisão manual da
 > sensação da recarga a jogar e decidir os commits com o utilizador.
 > As sobreposições herdadas da pega estão documentadas; não afirmar
-> interseção absoluta zero. Não foi feito commit nem push.
+> interseção absoluta zero. Commitado em e54c9ec (clips e ligação ao jogo) e f40bb55 (esta nota).
+A revisão a jogar continua por fazer.
 
 ## Comandos de commit dos assets e validação
 
