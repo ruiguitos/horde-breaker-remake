@@ -69,7 +69,7 @@ def gauge(weapon):
         bpy.data.objects.remove(obj, do_unlink=True)
     # The weapon is a transient fitting gauge; even orphaned mesh/material
     # datablocks must be absent from the saved arm-only source file.
-    for collection in (bpy.data.meshes, bpy.data.materials, bpy.data.armatures, bpy.data.cameras, bpy.data.lights):
+    for collection in (bpy.data.meshes, bpy.data.materials, bpy.data.armatures, bpy.data.cameras, bpy.data.lights, bpy.data.actions):
         for item in list(collection):
             if item.users == 0:
                 collection.remove(item)
@@ -275,6 +275,11 @@ def build(weapon):
         source_weapon_file=SPEC['file']+'.glb', shoulder_left_gun_m=list(b.SHOULDERS['L']),
         finger_surface_audit=contact_audit, sampled_contacts=CONTACTS)
     (b.ROOT/'grip_validation.json').write_text(json.dumps(fit, indent=2))
+    if weapon in ('smg', 'machine_gun'):
+        spec = importlib.util.spec_from_file_location('reload_clips', ROOT/'reload_clips.py')
+        reloads = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(reloads)
+        reloads.add_reload(weapon)
     print('GRIP BUILT '+weapon+' '+json.dumps(dict(support=list(b.PALM_L), audit=contact_audit)), flush=True)
     return fit
 

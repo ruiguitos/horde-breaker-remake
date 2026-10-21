@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "clip": "reload_mag_mg",
+  "triangles": 2658,
+  "static_asset_signature": {
+    "binary_sha256": "25867c26f24255a609febe9568e38268c863632a6b401a396c4c11199764f61e",
+    "scene_sha256": "8e388298a2d04bac3d99f56f973b66c44792545efde9b7e0dd18f8f67bc1c096"
+  },
+  "progress_samples": 1097,
+  "max_left_contact_error_m": 1.544214017425162e-08,
+  "max_endpoint_joint_error_m": 3.332000937312528e-08,
+  "max_moving_contact_error_m": 5.912046266854626e-06,
+  "max_source_glb_joint_error_m": 6.582283307181235e-07,
+  "max_source_glb_vertex_error_m": 8.641388831165386e-07,
+  "max_new_penetration_m": 0.00026609933843246836,
+  "max_existing_rest_penetration_m": 0.007010030560195446,
+  "max_unallowed_penetration_m": 0.0,
+  "collision_sample_method": "Vertices, edge midpoints and triangle centroids against each weapon part; 0.1 mm new-penetration tolerance. Existing finger/grip-furniture contact pairs retain the original grip audit limit of 1.5 mm absolute (or their unchanged deeper rest contact). No such allowance for receivers, forearms or new contact pairs. Not a continuous swept-volume proof.",
+  "collision_records": []
+}

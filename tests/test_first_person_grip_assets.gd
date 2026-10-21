@@ -108,8 +108,14 @@ func run() -> void:
 			check(absf(upper.distance_to(fore) - 0.3) < 0.00001 and absf(fore.distance_to(hand) - 0.3) < 0.00001,
 				"%s %s bind segments stay 0.30 m" % [id, side])
 			check((fore - upper).normalized().dot((hand - fore).normalized()) > 0.99999, "%s %s straight bind" % [id, side])
-		for type: String in ["Camera3D", "Light3D", "AnimationPlayer"]:
+		for type: String in ["Camera3D", "Light3D"]:
 			check(scene.find_children("*", type, true, false).is_empty(), "%s no %s" % [id, type])
+		var players: Array[Node] = scene.find_children("*", "AnimationPlayer", true, false)
+		if id in [&"smg", &"machine_gun"]:
+			var clip: String = "reload_mag_smg" if id == &"smg" else "reload_mag_mg"
+			check(players.size() == 1 and (players[0] as AnimationPlayer).has_animation(clip), "%s owns its reload clip" % id)
+		else:
+			check(players.is_empty(), "%s remains animation-free" % id)
 		var report: Dictionary = {"weapon": id, "triangles": triangles, "palm_surface_error_m": palm_error,
 			"mesh_count": meshes.size(), "bone_count": skeleton.get_bone_count(), "materials": materials.keys(),
 			"glb_sha256": FileAccess.get_sha256(path), "fitting_report_support_m": fitted["support_gun_m"]}

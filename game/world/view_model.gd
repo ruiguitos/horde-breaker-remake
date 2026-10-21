@@ -196,6 +196,8 @@ func update(delta: float, pull_back: float, walk: float, t: float) -> void:
 	if _gun != null:
 		_gun.rotation.x = _ads_tilt * aim  # levels the sights while aiming
 	_animate_parts()
+	if _arms != null:
+		_arms.set_reload(reload)
 
 
 ## The magazine drops and the charging handle is pulled during a reload; every

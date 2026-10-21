@@ -3,13 +3,33 @@
   "weapons": {
     "machine_gun": {
       "triangles": 2658,
-      "glb_sha256": "f83bdd882e4fca1a74273341c23294f4c8e01e0483d50a2634cb18aa736dbdc7",
+      "glb_sha256": "b18ecdd4180fb4e22618d3a4794600f0f45753c37249738056d34559546479d7",
       "palm_surface_error_m": 0.0,
       "support_m": [
         0.0,
         0.07090000808238983,
         -0.3499999940395355
-      ]
+      ],
+      "reload_clip": {
+        "passed": true,
+        "clip": "reload_mag_mg",
+        "triangles": 2658,
+        "static_asset_signature": {
+          "binary_sha256": "25867c26f24255a609febe9568e38268c863632a6b401a396c4c11199764f61e",
+          "scene_sha256": "8e388298a2d04bac3d99f56f973b66c44792545efde9b7e0dd18f8f67bc1c096"
+        },
+        "progress_samples": 1097,
+        "max_left_contact_error_m": 1.544214017425162e-08,
+        "max_endpoint_joint_error_m": 3.332000937312528e-08,
+        "max_moving_contact_error_m": 5.912046266854626e-06,
+        "max_source_glb_joint_error_m": 6.582283307181235e-07,
+        "max_source_glb_vertex_error_m": 8.641388831165386e-07,
+        "max_new_penetration_m": 0.00026609933843246836,
+        "max_existing_rest_penetration_m": 0.007010030560195446,
+        "max_unallowed_penetration_m": 0.0,
+        "collision_sample_method": "Vertices, edge midpoints and triangle centroids against each weapon part; 0.1 mm new-penetration tolerance. Existing finger/grip-furniture contact pairs retain the original grip audit limit of 1.5 mm absolute (or their unchanged deeper rest contact). No such allowance for receivers, forearms or new contact pairs. Not a continuous swept-volume proof.",
+        "collision_records": []
+      }
     },
     "marksman": {
       "triangles": 2704,
@@ -43,13 +63,33 @@
     },
     "smg": {
       "triangles": 2568,
-      "glb_sha256": "ee1e333c59319007aa7535cdd1b9a2d5fd0cee3c2a4c11f42a6caaf500bda710",
+      "glb_sha256": "5bfc80e35642bd6dd602ae37ef58c13f394c7e0e37a32d877400897cbcd20cf6",
       "palm_surface_error_m": 5.66244125366211e-07,
       "support_m": [
         0.0,
         0.06517057120800018,
         -0.23000000417232513
-      ]
+      ],
+      "reload_clip": {
+        "passed": true,
+        "clip": "reload_mag_smg",
+        "triangles": 2568,
+        "static_asset_signature": {
+          "binary_sha256": "def73c590d80f90ce350832a9ddd4f8464e7120edb752631721f25beb061cc9e",
+          "scene_sha256": "c08f2a80bc4263196976ce82501a9dfebbccea30ede48cf33036a8c6d7b8d824"
+        },
+        "progress_samples": 1133,
+        "max_left_contact_error_m": 1.903622582274874e-08,
+        "max_endpoint_joint_error_m": 3.332000937312528e-08,
+        "max_moving_contact_error_m": 6.109963653165076e-06,
+        "max_source_glb_joint_error_m": 8.539320251546169e-07,
+        "max_source_glb_vertex_error_m": 8.968921747509739e-07,
+        "max_new_penetration_m": 0.0003177763835537917,
+        "max_existing_rest_penetration_m": 0.007010030560195446,
+        "max_unallowed_penetration_m": 0.0,
+        "collision_sample_method": "Vertices, edge midpoints and triangle centroids against each weapon part; 0.1 mm new-penetration tolerance. Existing finger/grip-furniture contact pairs retain the original grip audit limit of 1.5 mm absolute (or their unchanged deeper rest contact). No such allowance for receivers, forearms or new contact pairs. Not a continuous swept-volume proof.",
+        "collision_records": []
+      }
     }
   },
   "tests_passed": [
@@ -57,9 +97,436 @@
     "test_first_person_grip_assets",
     "test_view_model",
     "test_weapon_models",
-    "test_weapon_grips"
+    "test_weapon_grips",
+    "test_reload_arm_clips",
+    "test_first_person_reload"
   ],
   "gpu_captures": 25,
   "blender_source_files_reopened": 5,
-  "global_suite_status": "Not rerun: user:// persistence remains unavailable in this restricted environment; see prior CODEX_REVIEW.md."
+  "global_suite_status": "65/65 headless scripts passed; checkpoint resumed and changed/new tests rerun after final import. All exit codes 0. Isolated APPDATA for test profiles.",
+  "validation_date": "2026-10-21",
+  "global_suite": {
+    "passed": 65,
+    "total": 65,
+    "method": "Checkpoint resume with affected tests rerun; stdout and engine logs checked for actual failure markers.",
+    "tests": [
+      {
+        "test": "spikes\\camera_medium\\tests\\test_camera_medium.gd",
+        "passed": true,
+        "seconds": 1.08,
+        "engine_exit": 0
+      },
+      {
+        "test": "spikes\\director\\tests\\test_director.gd",
+        "passed": true,
+        "seconds": 1.34,
+        "engine_exit": 0
+      },
+      {
+        "test": "spikes\\horde_flowfield\\tests\\test_horde.gd",
+        "passed": true,
+        "seconds": 6.27,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_aim.gd",
+        "passed": true,
+        "seconds": 2.02,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_armory_layout.gd",
+        "passed": true,
+        "seconds": 8.73,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_boat_redesign.gd",
+        "passed": true,
+        "seconds": 3.4,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_boss_spawn.gd",
+        "passed": true,
+        "seconds": 1.62,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_briefing.gd",
+        "passed": true,
+        "seconds": 1.93,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_card_unlocks.gd",
+        "passed": true,
+        "seconds": 1.94,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_cards_catalog.gd",
+        "passed": true,
+        "seconds": 4.33,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_crawlers.gd",
+        "passed": true,
+        "seconds": 7.18,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_credits.gd",
+        "passed": true,
+        "seconds": 2.83,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_data.gd",
+        "passed": true,
+        "seconds": 1.53,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_death_cause.gd",
+        "passed": true,
+        "seconds": 2.0,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_defeat_power_up_hud.gd",
+        "passed": true,
+        "seconds": 7.38,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_dialogue.gd",
+        "passed": true,
+        "seconds": 1.9,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_escort.gd",
+        "passed": true,
+        "seconds": 170.48,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_expedition_missions.gd",
+        "passed": true,
+        "seconds": 10.33,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_expedition.gd",
+        "passed": true,
+        "seconds": 32.14,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_foot_contact.gd",
+        "passed": true,
+        "seconds": 29.69,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_fov.gd",
+        "passed": true,
+        "seconds": 1.73,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_fuel_run.gd",
+        "passed": true,
+        "seconds": 61.63,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_game_scene.gd",
+        "passed": true,
+        "seconds": 21.33,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_handmade.gd",
+        "passed": true,
+        "seconds": 15.4,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_hold_sequence.gd",
+        "passed": true,
+        "seconds": 58.8,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_hud_redesign.gd",
+        "passed": true,
+        "seconds": 10.53,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_hud.gd",
+        "passed": true,
+        "seconds": 2.37,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_intel_search.gd",
+        "passed": true,
+        "seconds": 64.28,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_island_end_panel.gd",
+        "passed": true,
+        "seconds": 11.33,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_island_props.gd",
+        "passed": true,
+        "seconds": 7.18,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_island_run.gd",
+        "passed": true,
+        "seconds": 18.01,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_loading_screen.gd",
+        "passed": true,
+        "seconds": 7.1,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_menus.gd",
+        "passed": true,
+        "seconds": 7.01,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_nests.gd",
+        "passed": true,
+        "seconds": 39.04,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_noclip.gd",
+        "passed": true,
+        "seconds": 1.8,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_perk_tree.gd",
+        "passed": true,
+        "seconds": 8.37,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_power_ups.gd",
+        "passed": true,
+        "seconds": 2.82,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_recruit_animation.gd",
+        "passed": true,
+        "seconds": 8.1,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_rescue_survivor.gd",
+        "passed": true,
+        "seconds": 5.8,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_run_all.gd",
+        "passed": true,
+        "seconds": 0.97,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_run_and_gun.gd",
+        "passed": true,
+        "seconds": 6.44,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_sabotage.gd",
+        "passed": true,
+        "seconds": 46.43,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_settings.gd",
+        "passed": true,
+        "seconds": 2.64,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_sfx.gd",
+        "passed": true,
+        "seconds": 2.63,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_signals.gd",
+        "passed": true,
+        "seconds": 57.65,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_smoke.gd",
+        "passed": true,
+        "seconds": 1.34,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_soak_run.gd",
+        "passed": true,
+        "seconds": 128.08,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_soldier_reactions.gd",
+        "passed": true,
+        "seconds": 2.76,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_special_models.gd",
+        "passed": true,
+        "seconds": 7.36,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_special_poses.gd",
+        "passed": true,
+        "seconds": 2.1,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_stick.gd",
+        "passed": true,
+        "seconds": 1.82,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_test_island.gd",
+        "passed": true,
+        "seconds": 6.13,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_title_debrief_redesign.gd",
+        "passed": true,
+        "seconds": 9.06,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_weapon_grips.gd",
+        "passed": true,
+        "seconds": 3.79,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_weapon_loadout.gd",
+        "passed": true,
+        "seconds": 4.73,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_weapon_models.gd",
+        "passed": true,
+        "seconds": 7.83,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_weapon_texture.gd",
+        "passed": true,
+        "seconds": 1.08,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_world_dressing.gd",
+        "passed": true,
+        "seconds": 5.79,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_zombie_model.gd",
+        "passed": true,
+        "seconds": 3.83,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_camera_aim.gd",
+        "passed": true,
+        "seconds": 9.67,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_first_person_arms.gd",
+        "passed": true,
+        "seconds": 1.36,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_first_person_grip_assets.gd",
+        "passed": true,
+        "seconds": 1.46,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_first_person_reload.gd",
+        "passed": true,
+        "seconds": 1.47,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_reload_arm_clips.gd",
+        "passed": true,
+        "seconds": 1.36,
+        "engine_exit": 0
+      },
+      {
+        "test": "tests\\test_view_model.gd",
+        "passed": true,
+        "seconds": 1.36,
+        "engine_exit": 0
+      }
+    ]
+  },
+  "reload_clean_rebuild": {
+    "smg": {
+      "passed": true,
+      "static_signature_matches_original_and_clean_build": true,
+      "clip": "reload_mag_smg",
+      "max_animation_component_error": 5.066394805908203e-07
+    },
+    "machine_gun": {
+      "passed": true,
+      "static_signature_matches_original_and_clean_build": true,
+      "clip": "reload_mag_mg",
+      "max_animation_component_error": 4.172325134277344e-07
+    }
+  },
+  "reload_import": {
+    "bake_fps": 8000,
+    "animation_optimizer_enabled": false,
+    "direct_and_native_test_passed": true,
+    "progress_samples_per_variant_per_import": 401
+  },
+  "reload_gpu_preview": {
+    "renderer": "Compatibility",
+    "engine": "Godot 4.7.2",
+    "poses": 10,
+    "file": "docs/design/weapon_grips/reload_clips.png"
+  },
+  "jev_resume_status": "External consultation rejected by automatic approval review; no verdict obtained. Local deterministic validation used."
 }

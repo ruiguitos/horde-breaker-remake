@@ -46,14 +46,18 @@
         "Index_R": 1,
         "Thumb_R": 1
       },
-      "no_weapons_cameras_lights_actions_textures": true,
       "only_builtin_viewer_image_handles": true,
       "materials": [
         "glove",
         "skin",
         "sleeve_cloth"
       ],
-      "blend_sha256": "15dba3eca3fc3b91b4946417ab2ffb00645137aa3a776c82dab2e01cbda4590b"
+      "blend_sha256": "863d1c81178321ca9c3f52b2446a83e4f950f516faa936a242c55d854938e80e",
+      "no_weapons_cameras_lights_textures": true,
+      "actions": [
+        "reload_mag_smg"
+      ],
+      "max_reload_source_glb_joint_error_m": 8.539320251546169e-07
     },
     "machine_gun": {
       "passed": true,
@@ -73,14 +77,19 @@
         "Index_R": 1,
         "Thumb_R": 1
       },
-      "no_weapons_cameras_lights_actions_textures": true,
       "only_builtin_viewer_image_handles": true,
       "materials": [
         "glove",
         "skin",
         "sleeve_cloth"
       ],
-      "blend_sha256": "41f80863fa7ee48df376a115f0c173bc4cef0f1461166a62a96582a0c2b58f4e"
+      "blend_sha256": "a8fe62706c423987e6b0b2dd6af54c8568d1af7d32b4a17a2e3243283aaa8407",
+      "no_weapons_cameras_lights_textures": true,
+      "actions": [
+        "reload_mag_mg"
+      ],
+      "max_reload_source_glb_joint_error_m": 6.582283307181235e-07,
+      "max_reload_source_glb_vertex_error_m": 8.641388831165386e-07
     },
     "shotgun": {
       "passed": true,

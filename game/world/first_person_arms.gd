@@ -25,10 +25,15 @@ const PALM_REST: Vector3 = Vector3(0, 0.077, -0.26)
 ## Material names in the file, and the class palette key each one takes.
 const CLOTH_KEY: String = "cloth"
 const GLOVE_KEY: String = "dark"
+## Reload clip per weapon, where the file has one: the right hand follows the
+## magazine (SMG) or the charging slide (Machine Gun), sampled by progress.
+const RELOAD_CLIPS: Dictionary = {&"smg": &"reload_mag_smg", &"machine_gun": &"reload_mag_mg"}
 
 var skeleton: Skeleton3D
 var grip_weapon: StringName = &"rifle"
 var palm_rest: Vector3 = PALM_REST
+var _player: AnimationPlayer  ## the file's player, paused: set_reload() places the pose
+var _reload_clip: StringName = &""  ## empty when the file has no reload clip yet
 var reach_error: float = 0.0  ## metres the wrist fell short of the last target (0 = reached)
 var _upper: int = -1
 var _fore: int = -1
@@ -58,6 +63,13 @@ static func build(palette: Dictionary, weapon: StringName = &"rifle") -> FirstPe
 	assert(arms.skeleton != null, "The arms file has no skeleton")
 	arms._read_rest()
 	arms._colour(model, palette)
+	arms._player = model.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	var clip: StringName = RELOAD_CLIPS.get(arms.grip_weapon, &"")
+	if arms._player != null and arms._player.has_animation(clip):
+		arms._reload_clip = clip
+		# Paused: the frame loop never advances the clip, set_reload() does.
+		arms._player.play(clip)
+		arms._player.pause()
 	return arms
 
 
@@ -80,6 +92,20 @@ func _read_rest() -> void:
 	# The palm contact measured on the rest pose, in the hand's own space.
 	_palm_offset = hand.affine_inverse() * palm_rest
 	set_support(palm_rest)
+
+
+## Whether the file has a reload clip for this weapon.
+func has_reload() -> bool:
+	return _reload_clip != &""
+
+
+## Places the arms for a reload at `progress` (0..1, ViewModel.reload). The right
+## hand follows the magazine or the charging slide; the left palm is kept on its
+## support by the IK, which runs after the clip, so the clip cannot move it.
+func set_reload(progress: float) -> void:
+	if _reload_clip == &"":
+		return
+	_player.seek(clampf(progress, 0.0, 1.0) * _player.get_animation(_reload_clip).length, true)
 
 
 ## Moves the left palm contact to `support` (gun space) and solves the arm.
