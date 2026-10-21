@@ -189,5 +189,34 @@ Fontes, limites numéricos, comando de reconstrução e relatórios:
 Capturas de primeira pessoa, pega direita, apoio esquerdo, ADS e parede em
 `docs/design/weapon_grips/`, produzidas com `tools/dev/weapon_grip_preview.gd`.
 São poses estáticas no renderer real, não novas animações de dedos ou recarga.
-O alinhamento/ótica ADS não configurado das armas compridas continua a ser
-uma limitação do sistema existente; não faz parte desta alteração de grip.
+O alinhamento/ótica ADS não configurado das armas compridas era uma limitação
+desta entrega de grip; a correção posterior está descrita abaixo.
+
+## Mira da Machine Gun, marksman e AR (2026-10-21)
+
+A Machine Gun e a marksman usavam `ADS_FALLBACK`, pensado para armas mais
+pequenas: a câmara ficava dentro da geometria e quase todo o ecrã escurecia.
+Arma e braços continuam à escala real, com as mesmas empunhaduras.
+
+- **Machine Gun:** a cópia de primeira pessoa recebe um anel traseiro sobre
+  a calha. O centro desse anel e o topo do poste frontal ficam no eixo da
+  câmara, com o anel a 0,12 m do olho. O GLB original não foi alterado.
+- **Marksman:** os centros das lentes definem a posição de mira. Como a
+  ótica original tem tampas/lentes opacas, a partir de 95% do movimento ADS
+  a arma deixa de ser desenhada e surge uma máscara circular com retículo,
+  sobre a própria vista do mundo. Ao baixar a mira reaparecem arma e mãos.
+  Mantém o zoom ADS existente (FOV × 0,75); não simula refração nem uma
+  segunda câmara dentro da lente.
+- **AR:** o «+» do HUD desaparece ao apontar e durante a descida da mira;
+  regressa ao terminar o movimento. A terceira pessoa mantém o seu «+».
+
+`scope_overlay.gd` desenha a máscara atrás do HUD; pausa, menus e cartas
+ocultam ambos os indicadores de mira. `test_view_model.gd` verifica o
+alinhamento e a visibilidade da arma; `test_camera_aim.gd` verifica os
+controlos reais da interface, incluindo a volta à terceira pessoa.
+
+Capturas verificadas no Godot com GPU, incluindo a ilha e o HUD:
+[Machine Gun](../design/weapon_ads/machine_gun_island.png),
+[marksman](../design/weapon_ads/marksman_island.png) e
+[AR sem «+»](../design/weapon_ads/rifle_island.png).
+Condições e validação em [weapon_ads/README.md](../design/weapon_ads/README.md).

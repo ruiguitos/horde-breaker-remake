@@ -1,5 +1,14 @@
 # Tarefas para o Codex (2026-10-10)
 
+## Recargas SMG e Machine Gun — validação de 2026-10-21
+
+Clips e fontes Blender atualizados; suite retomada com **65/65 scripts
+aprovados**, incluindo testes novos/alterados repetidos após a importação.
+Auditorias geométricas, comparação com o repouso original e rebuilds limpos
+aprovados dentro dos limites documentados. Sem commit nem push.
+Estado, limites, comandos e prompt de passagem ao Claude:
+[RELOAD_ARM_CLIPS_RESUME.md](RELOAD_ARM_CLIPS_RESUME.md).
+
 O utilizador passou estas tarefas do Claude para o Codex, para poupar
 créditos. Fazê-las **por esta ordem, uma de cada vez**. No fim de cada uma:
 correr todos os `tests/test_*.gd`, mostrar ao utilizador o que mudou e só
