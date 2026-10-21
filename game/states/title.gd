@@ -9,6 +9,8 @@ signal play_requested
 signal quick_redeploy_requested
 ## TEST ISLAND (development builds): play this island with this mission.
 signal test_island_requested(path: String, mission: StringName)
+## DEV SANDBOX (development builds): play one island with the form's settings.
+signal sandbox_requested(config: Dictionary)
 
 ## Width of the left column at the 1152x648 base size (the mockup's 467 of
 ## 1280 px). The art shows to the right of it.
@@ -83,15 +85,22 @@ func _build_menu() -> void:
 	gap.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(gap)
-	var bottom := HBoxContainer.new()
+	var bottom := VBoxContainer.new()
+	bottom.add_theme_constant_override("separation", 8)
 	box.add_child(bottom)
-	var motto := UiTheme.label("Recovery is mandatory.\nSurvival is encouraged.", 15, UiTheme.TEXT_MUTED)
+	var motto := UiTheme.label("Recovery is mandatory.
+Survival is encouraged.", 15, UiTheme.TEXT_MUTED)
 	motto.name = "Motto"
 	motto.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	motto.size_flags_vertical = Control.SIZE_SHRINK_END
 	bottom.add_child(motto)
 	if OS.is_debug_build():  # the editor and debug exports; never a release
-		bottom.add_child(_test_island_entry())
+		# Own row under the motto, so the motto keeps the full width.
+		var dev := HBoxContainer.new()
+		dev.alignment = BoxContainer.ALIGNMENT_END
+		dev.add_theme_constant_override("separation", 8)
+		dev.add_child(_test_island_entry())
+		dev.add_child(_sandbox_entry())
+		bottom.add_child(dev)
 
 
 ## Mono caption with a little tracking, like the mockup's brand lines.
@@ -354,6 +363,27 @@ func _settings() -> void:
 func _credits() -> void:
 	if not is_instance_valid(_dialog):
 		_dialog = MenuDialog.credits(_root)
+
+
+## DEV SANDBOX (development builds): the same small text button as TEST ISLAND.
+func _sandbox_entry() -> Button:
+	var b := Button.new()
+	b.name = "Sandbox"
+	b.text = "DEV · SANDBOX"
+	b.focus_mode = Control.FOCUS_ALL
+	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	b.size_flags_vertical = Control.SIZE_SHRINK_END
+	b.theme_type_variation = &"QuietButton"
+	b.add_theme_font_override("font", UiTheme.mono_font())
+	b.add_theme_font_size_override("font_size", 12)
+	b.pressed.connect(_sandbox)
+	return b
+
+
+func _sandbox() -> void:
+	if not is_instance_valid(_dialog):
+		_dialog = DevSandbox.open(_root, func(config: Dictionary) -> void:
+			sandbox_requested.emit(config))
 
 
 func _test_island() -> void:

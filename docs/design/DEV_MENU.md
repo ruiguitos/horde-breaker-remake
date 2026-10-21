@@ -11,8 +11,13 @@ gravam perfil nem telemetria; o HUD mostra as opções que mudam o equilíbrio.
 Feito: invencível, munições infinitas, velocidade do tempo, limite da horda,
 noclip, criar inimigo no ponto de mira, trocar de arma, +1 nível e +100 XP.
 Por fazer: os botões «Saltar» (fim da ilha e boss), que precisam de código
-próprio dos objetivos; a fase 2 (sandbox no título) e a fase 3 (testes
-integrados no painel).
+próprio dos objetivos; a fase 3 (testes integrados no painel).
+
+Fase 2 feita: o sandbox está no ecrã-título, ao lado do «DEV · TEST ISLAND»,
+como pediste («pode ser um sítio no ecrã-título»). O formulário escolhe ilha,
+missão, classe, arma primária e secundária, ameaça e seed, e arranca essa ilha
+sem campanha à volta, como o TEST ISLAND. Perks e cartas vêm do perfil. A
+corrida não grava nada até o título voltar a aparecer (`DevOptions.dev_run`).
 
 ## Objetivo
 

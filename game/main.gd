@@ -103,6 +103,16 @@ func _test_island(path: String, mission: StringName) -> void:
 	_go(GameFlow.ISLAND)
 
 
+## DEV SANDBOX (development builds): one island built from the form. It saves
+## nothing: DevOptions.dev_run stays on until the title is shown again.
+func _sandbox(config: Dictionary) -> void:
+	context = DevSandbox.apply(config, _fresh_context())
+	_test_path = String(config["path"])
+	_test_scene = null
+	DevOptions.dev_run = true
+	_go(GameFlow.ISLAND)
+
+
 func _go(next: GameFlow) -> void:
 	if _current != null:
 		_current.queue_free()
@@ -134,11 +144,13 @@ func _go(next: GameFlow) -> void:
 			debrief.connect("quick_redeploy_requested", _quick_redeploy, CONNECT_DEFERRED)
 			_current = debrief
 		GameFlow.TITLE:
+			DevOptions.dev_run = false  # the sandbox run is over: saving is back on
 			var title := Node.new()
 			title.set_script(load("res://game/states/title.gd"))
 			title.set("profile", profile)
 			title.connect("play_requested", _go.bind(GameFlow.ARMORY), CONNECT_DEFERRED)
 			title.connect("test_island_requested", _test_island, CONNECT_DEFERRED)
+			title.connect("sandbox_requested", _sandbox, CONNECT_DEFERRED)
 			title.connect("quick_redeploy_requested", _quick_redeploy, CONNECT_DEFERRED)
 			_current = title
 		GameFlow.CAMP:
@@ -237,7 +249,7 @@ func _on_load_failed(screen: LoadingScreen) -> void:
 
 ## Writes a JSON summary of the run to user://runs/ for balancing.
 func _write_telemetry() -> void:
-	if DevOptions.changes_balance():
+	if DevOptions.saves_nothing():
 		return  # dev runs send no telemetry
 	DirAccess.make_dir_recursive_absolute("user://runs")
 	# Milliseconds keep two runs finished in the same second from overwriting each other.

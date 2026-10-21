@@ -8,6 +8,7 @@ static var invincible: bool = false  ## no damage to the player
 static var infinite_ammo: bool = false  ## no ammo or magazine use
 static var time_scale: float = 1.0  ## game speed, 0.1 to 2.0
 static var horde_alive: int = 0  ## enemies alive set by the dev menu; 0 = the run's own limit
+static var dev_run: bool = false  ## a sandbox run: saves nothing until the title is shown again
 
 
 ## Whether the dev menu and its options exist in this build.
@@ -19,6 +20,11 @@ static func enabled() -> bool:
 ## sent to telemetry, and the HUD says so.
 static func changes_balance() -> bool:
 	return enabled() and (invincible or infinite_ammo or time_scale != 1.0 or horde_alive > 0)
+
+
+## Whether this run saves nothing: a sandbox run, or one that changes the balance.
+static func saves_nothing() -> bool:
+	return enabled() and (dev_run or changes_balance())
 
 
 ## Names of the options that are on, for the HUD line.
