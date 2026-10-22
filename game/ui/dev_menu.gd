@@ -13,6 +13,8 @@ var _balance: Label
 var _speed: Label
 var _horde: Label
 var _weapons: Array[Button] = []
+var _skip_boss: Button
+var _skip_end: Button
 
 
 func _init() -> void:
@@ -64,6 +66,8 @@ func _process(_delta: float) -> void:
 	_balance.visible = DevOptions.changes_balance()
 	if _balance.visible:
 		_balance.text = "Balance changed: " + ", ".join(DevOptions.active_labels())
+	if _panel.visible:
+		_refresh_skip()  # the run can finish while the panel is open
 
 
 ## Opens or closes the panel. Opening refreshes the readouts.
@@ -154,6 +158,21 @@ func _build(body: VBoxContainer) -> void:
 		if run != null:
 			run.dev_grant_xp(100))
 
+	_heading(body, "Skip")
+	var skip := HBoxContainer.new()
+	skip.add_theme_constant_override("separation", 6)
+	body.add_child(skip)
+	_skip_boss = _button(skip, "To boss", func() -> void:
+		if run != null:
+			run.dev_skip_to_boss()
+			_refresh())
+	_skip_boss.name = "SkipToBoss"
+	_skip_end = _button(skip, "To end", func() -> void:
+		if run != null:
+			run.dev_skip_to_end()
+			_refresh())
+	_skip_end.name = "SkipToEnd"
+
 	var footer := Label.new()
 	footer.text = "Dev run: no profile, Intel or telemetry is saved."
 	footer.add_theme_color_override("font_color", UiTheme.MUTED)
@@ -166,10 +185,16 @@ func _build(body: VBoxContainer) -> void:
 func _refresh() -> void:
 	_speed.text = "%.1f×" % DevOptions.time_scale
 	_horde.text = "%d of %d (hard cap)" % [_horde_value(), GameData.HORDE_CAP]
+	_refresh_skip()
 	if run != null:
 		for i in _weapons.size():
 			var name_text: String = run.weapons[i].display_name
 			_weapons[i].text = ("> " if i == run.weapon_index else "") + name_text
+
+
+func _refresh_skip() -> void:
+	_skip_boss.disabled = run == null or not run.has_boss or run.objective != IslandRun.Objective.GENERATORS
+	_skip_end.disabled = run == null or run.is_over()
 
 
 func _horde_value() -> int:

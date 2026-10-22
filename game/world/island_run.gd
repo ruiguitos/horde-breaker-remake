@@ -2098,6 +2098,78 @@ func dev_grant_xp(amount: int) -> void:
 	_advance_xp_levels()
 
 
+## Dev menu: the mission's main task is done at once, whatever the mission. The
+## next mission update then opens the boss or the extraction. A carried can is
+## dropped, the dash stops, and a sabotage fuse starts as if the charges were set.
+func dev_complete_main_task() -> void:
+	carrying = -1
+	_cargo_dropped = -1
+	dash_time = 0.0
+	match mission:
+		&"defend", &"holdout":
+			defend_time = hold_time()
+		&"rescue":
+			survivor_found = true
+		&"hold_sequence":
+			hold_index = hold_points.size()
+		&"fuel_run":
+			for c in cargo_state.size():
+				cargo_state[c] = CAN_DELIVERED
+		&"nests":
+			for n in nest_pos.size():
+				if nest_alive(n):
+					nest_hp[n] = 0.0
+					_destroy_nest(n)
+		&"intel_search":
+			for i in search_state.size():
+				if search_has_intel[i]:
+					search_state[i] = SPOT_FOUND
+			intel_phase = INTEL_DONE
+		&"signals":
+			signal_index = signal_pos.size()
+		&"sabotage":
+			for c in charge_planted.size():
+				charge_planted[c] = true
+			sabotage_phase = SAB_FUSE
+			fuse_left = fuse_seconds()
+		&"escort":
+			escort_delivered = true
+		_:
+			for g in generator_progress.size():
+				generator_progress[g] = GameData.GENERATOR_HOLD_SECONDS
+
+
+## Dev menu: skips to the boss, on the last island and once the main task is
+## done. False when the island has no boss or the boss is already in play.
+func dev_skip_to_boss() -> bool:
+	if not has_boss or objective != Objective.GENERATORS:
+		return false
+	dev_complete_main_task()
+	_update_mission(0.0)
+	return objective == Objective.BOSS
+
+
+## Dev menu: skips to the end of the island. The main task and the boss are
+## done, the player (and a rescued survivor) stands at the extraction point and
+## the boat is there already, so the next update ends the island. False when the
+## island is over.
+func dev_skip_to_end() -> bool:
+	if is_over():
+		return false
+	if objective == Objective.GENERATORS:
+		dev_complete_main_task()
+		_update_mission(0.0)
+	if objective == Objective.BOSS:
+		_nuke(0.0)  # the boss dies; the next update leaves the boss fight
+		_flush_dead()  # and the dead cannot strike on the next step
+	var out: Vector3 = extraction_point()
+	player_pos = out
+	if mission == &"rescue" and not survivor_lost:
+		survivor_pos = out
+	boat_eta = 0.0
+	return true
+
+
 func add_shield(amount: float) -> void:
 	shield = clampf(shield + maxf(0.0, amount), 0.0, max_shield)
 

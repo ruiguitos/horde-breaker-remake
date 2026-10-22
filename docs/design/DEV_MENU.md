@@ -10,8 +10,9 @@ gravam perfil nem telemetria; o HUD mostra as opções que mudam o equilíbrio.
 
 Feito: invencível, munições infinitas, velocidade do tempo, limite da horda,
 noclip, criar inimigo no ponto de mira, trocar de arma, +1 nível e +100 XP.
-Por fazer: os botões «Saltar» (fim da ilha e boss), que precisam de código
-próprio dos objetivos; a fase 3 (testes integrados no painel).
+Saltar feito: «To boss» (só na última ilha, com boss) e «To end» (fim da ilha).
+Cada missão tem o seu estado de conclusão em `dev_complete_main_task()`,
+com testes em `tests/test_dev_skip.gd`.
 
 Fase 2 feita: o sandbox está no ecrã-título, ao lado do «DEV · TEST ISLAND»,
 como pediste («pode ser um sítio no ecrã-título»). O formulário escolhe ilha,
@@ -24,7 +25,7 @@ TESTS. Três botões na mesma linha do rodapé faziam o rótulo principal quebra
 palavras e passavam a altura do ecrã-base (o teste de redesenho do título
 apanhou-o), por isso ficou uma entrada só. O painel TESTS lista `tests/` e
 `spikes/`, corre cada teste como um processo `run_all` com filtro e mostra o
-veredicto de cada um, com Stop. Por fazer: os botões «Saltar» (fim da ilha e boss).
+veredicto de cada um, com Stop.
 
 ## Objetivo
 
