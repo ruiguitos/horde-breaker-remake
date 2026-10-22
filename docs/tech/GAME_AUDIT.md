@@ -210,7 +210,7 @@ bloqueio do ciclo principal nos testes desta auditoria.
 
 ### G01 — P1 — Fazer os limites da horda corresponderem à dificuldade
 
-- [ ] Usar uma regra comum para o diretor, spawns normais e invocações.
+- [x] Usar uma regra comum para o diretor, spawns normais e invocações.
 
 `IslandRun.load_context()` aumenta `director.max_alive` para Threat, Swarm
 e Hazard Pay, mas `_spawn_enemy()` bloqueia aos `GameData.MAX_ALIVE = 150`.
@@ -227,7 +227,7 @@ Evidência: [island_run.gd](../../game/world/island_run.gd),
 
 ### G02 — P1 — Retirar o acesso normal ao noclip numa versão distribuível
 
-- [ ] Condicionar os atalhos de noclip e a sua ativação a uma versão de desenvolvimento.
+- [x] Condicionar os atalhos de noclip e a sua ativação a uma versão de desenvolvimento.
 
 Os botões laterais Mouse 4/5 têm bindings de noclip e o handler de
 `Island._unhandled_input()` não verifica `OS.is_debug_build()`. A opção
@@ -241,13 +241,13 @@ de release, incluindo por um binding guardado. Evidência:
 
 ### G03 — P2 — Corrigir as descrições que não correspondem aos efeitos
 
-- [ ] War Cry: esclarecer que a redução atual é de dano corpo a corpo, ou
+- [x] War Cry: esclarecer que a redução atual é de dano corpo a corpo, ou
   decidir que deve proteger também de lava, explosões e ataques especiais.
-- [ ] Pack Rat: a descrição cita Shotgun e Heavy Pistol, mas a capacidade
+- [x] Pack Rat: a descrição cita Shotgun e Heavy Pistol, mas a capacidade
   aumenta em **todas as armas de munição finita**, incluindo SMG e Marksman.
-- [ ] Elite Pack: a descrição cita Brutes e Grabbers, mas a ponderação
+- [x] Elite Pack: a descrição cita Brutes e Grabbers, mas a ponderação
   também aumenta Bloaters e Screamers.
-- [ ] Documentar a interação Jungle + Elite Pack: o ×1,4 de especiais da
+- [x] Documentar a interação Jungle + Elite Pack: o ×1,4 de especiais da
   selva é substituído por ×2,0, não combinado para ×2,8.
 
 O War Cry anuncia genericamente “−40% damage taken”; a multiplicação por
@@ -263,7 +263,7 @@ Evidência: [vanguard.tres](../../game/data/classes/vanguard.tres),
 
 ### G04 — P2 — Avisar quando um perk não serve a classe selecionada
 
-- [ ] Demolitions: impedir a equipagem sem efeito no Vanguard, ou apresentar
+- [x] Demolitions: impedir a equipagem sem efeito no Vanguard, ou apresentar
   claramente a incompatibilidade e deixar o jogador trocar de classe.
 
 O perk modifica a Granada do Recruit. A lista da Armory permite comprá-lo
@@ -273,8 +273,8 @@ Conservar a propriedade de perks já comprados. Evidência:
 
 ### T01 — P1 — Tornar o runner de testes fiável no Windows
 
-- [ ] Alinhar `tests/run_all.gd` com os critérios definidos no AGENTS.md.
-- [ ] Detetar `SCRIPT ERROR`/erros de parsing, conclusão efetiva e testes
+- [x] Alinhar `tests/run_all.gd` com os critérios definidos no AGENTS.md.
+- [x] Detetar `SCRIPT ERROR`/erros de parsing, conclusão efetiva e testes
   pendurados; não confundir o problema conhecido de encerramento com uma
   falha da simulação, nem ignorar indiscriminadamente qualquer crash.
 
