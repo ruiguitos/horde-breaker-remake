@@ -19,6 +19,13 @@ missão, classe, arma primária e secundária, ameaça e seed, e arranca essa il
 sem campanha à volta, como o TEST ISLAND. Perks e cartas vêm do perfil. A
 corrida não grava nada até o título voltar a aparecer (`DevOptions.dev_run`).
 
+Fase 3 feita: o botão DEV do título abre um menu com TEST ISLAND, SANDBOX e
+TESTS. Três botões na mesma linha do rodapé faziam o rótulo principal quebrar
+palavras e passavam a altura do ecrã-base (o teste de redesenho do título
+apanhou-o), por isso ficou uma entrada só. O painel TESTS lista `tests/` e
+`spikes/`, corre cada teste como um processo `run_all` com filtro e mostra o
+veredicto de cada um, com Stop. Por fazer: os botões «Saltar» (fim da ilha e boss).
+
 ## Objetivo
 
 Testar o jogo sem o percorrer desde o início: escolher um mapa, uma arma, a
