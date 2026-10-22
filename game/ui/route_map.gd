@@ -58,7 +58,7 @@ func _draw() -> void:
 		# Above the marker (the route line comes in from below), on a dark tag
 		# so the contour lines do not cut through the letters.
 		var tag := Rect2(label_x - 4, marker.y - 34, label_width + 8, 19)
-		draw_rect(tag, Color(UiTheme.BG, 0.85))
+		draw_rect(tag, UiTheme.BG)
 		draw_rect(tag, color if chosen else Color(color, 0.4), false, 1.0)
 		draw_string(font, Vector2(label_x, marker.y - 20), label_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, color)
 	draw_circle(origin, 5, UiTheme.TEXT)

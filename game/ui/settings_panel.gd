@@ -88,11 +88,11 @@ func _show(t: String) -> void:
 
 
 ## Tabs read as parts of one panel: the selected tab has an amber base rule and
-## a faint fill that runs into the content; the others are flat.
+## a raised fill that runs into the content; the others are flat.
 func _style_tab(b: Button, selected: bool) -> void:
 	b.theme_type_variation = &""
 	var box := StyleBoxFlat.new()
-	box.bg_color = Color(UiTheme.ACCENT, 0.12) if selected else Color(0, 0, 0, 0)
+	box.bg_color = UiTheme.PANEL_RAISED if selected else Color(0, 0, 0, 0)
 	box.border_color = UiTheme.ACCENT if selected else UiTheme.LINE
 	box.set_border_width_all(0)
 	box.border_width_bottom = 3 if selected else 1

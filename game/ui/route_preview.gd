@@ -44,6 +44,23 @@ func _picture() -> Texture2D:
 	return _pictures[biome]
 
 
+## The picture fills the box without stretching it: the middle is kept and the
+## edges are cropped, so the island keeps its proportions when the card is taller.
+func _draw_cover(picture: Texture2D) -> void:
+	if size.y <= 0.0:
+		return
+	var texture_size: Vector2 = picture.get_size()
+	var source := Rect2(Vector2.ZERO, texture_size)
+	var box_aspect: float = size.x / size.y
+	if texture_size.x / texture_size.y > box_aspect:
+		source.size.x = texture_size.y * box_aspect
+		source.position.x = (texture_size.x - source.size.x) * 0.5
+	else:
+		source.size.y = texture_size.x / box_aspect
+		source.position.y = (texture_size.y - source.size.y) * 0.5
+	draw_texture_rect_region(picture, Rect2(Vector2.ZERO, size), source)
+
+
 func _draw() -> void:
 	if expedition != &"":
 		_draw_granite_island()
@@ -51,7 +68,7 @@ func _draw() -> void:
 	# A real render of the island when there is one (assets/ui/routes); the drawn picture is the fallback.
 	var picture: Texture2D = _picture()
 	if picture != null:
-		draw_texture_rect(picture, Rect2(Vector2.ZERO, size), false)
+		_draw_cover(picture)
 		return
 	var info: Dictionary = GameData.BIOMES[biome]
 	var sky: Color = info["sky"]

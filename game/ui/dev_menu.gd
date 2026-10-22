@@ -21,6 +21,7 @@ func _init() -> void:
 
 
 func _ready() -> void:
+	theme = UiTheme.get_theme()
 	Engine.time_scale = DevOptions.time_scale
 	_balance = Label.new()
 	_balance.position = Vector2(12, 12)
