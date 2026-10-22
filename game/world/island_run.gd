@@ -55,6 +55,8 @@ var noclip: bool = false
 ## player dies, the cause recorded for the telemetry.
 var last_hit_by: StringName = &""
 var death_cause: StringName = &""
+## Shots fired on this island, per weapon id (the island log: weapon use).
+var shots_by_weapon: Dictionary = {}
 var player_class: StringName = &"recruit"
 var hazard_pay: bool = false  ## boat briefing deal (see RunContext)
 var war_cry_time: float = 0.0  ## > 0 while War Cry reduces damage taken
@@ -505,6 +507,14 @@ static func next_part_name(ctx: RunContext) -> String:
 	return String(parts[next].get("name", "")) if next < parts.size() else ""
 
 
+## Shots per weapon for the island log, with plain string keys.
+func _shots_log() -> Dictionary:
+	var out := {}
+	for id: StringName in shots_by_weapon:
+		out[String(id)] = shots_by_weapon[id]
+	return out
+
+
 ## Writes the run state back when the island ends.
 func save_to_context(ctx: RunContext) -> void:
 	ctx.island_log.append({
@@ -517,7 +527,7 @@ func save_to_context(ctx: RunContext) -> void:
 		"cards_picked": cards_picked.map(func(x: StringName) -> String: return String(x)),
 		"power_ups": power_ups_picked.map(func(x: StringName) -> String: return String(x)),
 		"power_up_intel_bonus": _power_up_intel_bonus, "shield_left": int(shield),
-		"cause": String(death_cause),
+		"cause": String(death_cause), "shots": _shots_log(),
 	})
 	ctx.intel += intel_earned()
 	ctx.hazard_pay = false  # one island only
@@ -2548,6 +2558,7 @@ func _fire(w: GameData.Weapon, target: int) -> void:
 	_firing_time = GameData.SKIRMISHER_FIRING_WINDOW
 	if w.primary:
 		_shots += 1
+	shots_by_weapon[w.id] = int(shots_by_weapon.get(w.id, 0)) + 1
 	if w.max_ammo > 0 and not DevOptions.infinite_ammo:
 		ammo[weapon_index] -= 1
 	if magazine_size(weapon_index) > 0 and not DevOptions.infinite_ammo:

@@ -260,7 +260,7 @@ func _write_telemetry() -> void:
 		push_warning("Could not write the run summary to %s (error %d)" % [path, FileAccess.get_open_error()])
 		return
 	f.store_string(JSON.stringify({
-		"version": 2, "build": ProjectSettings.get_setting("application/config/version", "dev"),
+		"version": 3, "build": ProjectSettings.get_setting("application/config/version", "dev"),
 		"seed": context.rng_seed, "won": context.won, "threat": context.threat,
 		"expedition": String(context.expedition),
 		"class": String(context.player_class),
