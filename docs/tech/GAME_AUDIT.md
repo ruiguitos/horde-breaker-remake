@@ -273,8 +273,8 @@ Conservar a propriedade de perks já comprados. Evidência:
 
 ### T01 — P1 — Tornar o runner de testes fiável no Windows
 
-- [x] Alinhar `tests/run_all.gd` com os critérios definidos no AGENTS.md.
-- [x] Detetar `SCRIPT ERROR`/erros de parsing, conclusão efetiva e testes
+- [ ] Alinhar `tests/run_all.gd` com os critérios definidos no AGENTS.md. Em aberto: `classify()` dá PASS a um código de crash no encerramento sempre que o log tem qualquer linha `TEST: `, mesmo que o teste tenha parado a meio. Falta um marcador final explícito por teste.
+- [ ] Detetar `SCRIPT ERROR`/erros de parsing, conclusão efetiva e testes
   pendurados; não confundir o problema conhecido de encerramento com uma
   falha da simulação, nem ignorar indiscriminadamente qualquer crash.
 
