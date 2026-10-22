@@ -36,8 +36,9 @@ em `docs/tech/GAME_AUDIT.md` (secção de 17 de outubro).
 
 ## Conteúdo
 
-- [ ] Volcano sem cena feita à mão equivalente a `volcano_01.tscn` (o gerador
-  procedural cobre o boss; falta acabamento e landmarks).
+- [ ] Volcano: primeira cena feita à mão (`volcano_01.tscn`, com as poças de
+  lava em marcadores `Lava*`). Falta aprovar o desenho, o acabamento e os
+  landmarks.
 - [ ] Props realistas restantes (`docs/tech/REALISTIC_PROPS.md`): rever a
   utilidade antes de integrar, já há alternativas procedurais.
 - [ ] Equilibrar classes a jogar (as seis cartas com preço já estão no Intel;

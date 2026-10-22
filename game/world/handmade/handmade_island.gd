@@ -11,6 +11,7 @@ extends Node3D
 ##                     walkable ground at the deck's top, even over water
 ##   Decor/         -> never blocks (grass, flowers, roads, lights, water)
 ##   Markers/       -> Boat (required), PlayerStart, Generator*, Cache*,
+##                     Lava* (lava pools, LAVA_RADIUS m across each marker),
 ##                     and for expedition parts: Exit (the way on to the
 ##                     next part), RescueTarget, DefendZone, and for Hold
 ##                     Sequence: HoldPoint_1, HoldPoint_2... (held in the
@@ -69,6 +70,8 @@ extends Node3D
 const ISLANDS_DIR: String = "res://game/world/handmade/islands/"
 const GROUND_MARGIN: float = 0.15
 const NO_TERRAIN: float = 0.0  ## height used when there is no Terrain3D
+## Radius of a lava pool placed by a Lava* marker (the procedural pools use 2.5 to 4.5 m).
+const LAVA_RADIUS: float = 3.5
 
 var _objects := PackedByteArray()  ## cells already in map.wall_cells (build_map)
 
@@ -184,6 +187,9 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 			map.generators.append(_flat(_local(node).origin))
 		elif node.name.begins_with("Cache"):
 			map.caches.append(_flat(_local(node).origin))
+		elif node.name.begins_with("Lava"):
+			map.lava.append(_flat(_local(node).origin))
+			map.lava_radius.append(LAVA_RADIUS)
 		elif node.name.begins_with("HoldPoint"):
 			holds.append([hold_point_number(String(node.name)), _flat(_local(node).origin)])
 		elif node.name.begins_with("Cargo"):

@@ -64,7 +64,7 @@ func _scene_checks() -> void:
 	_scene.call("_draw_player_and_camera")
 	var player: Node3D = _scene.get("_player")
 	_check(absf(player.position.y - 8.0) < 0.1, "player stands on the hill (y %.2f)" % player.position.y)
-	_check(HandmadeIsland.pick(&"volcano", 1) == null, "no hand-made island for a biome -> generated")
+	_check(HandmadeIsland.pick(&"volcano", 1) != null, "the volcano biome has its hand-made island (volcano_01)")
 
 
 func _route_island_checks() -> void:

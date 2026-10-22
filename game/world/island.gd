@@ -347,6 +347,7 @@ func _build_world() -> void:
 		_use_handmade_world()
 	else:
 		_build_generated_world()
+	_build_lava()
 	for c in run.map.caches:
 		var crate := MeshInstance3D.new()
 		var cm := BoxMesh.new()
@@ -582,22 +583,6 @@ func _build_generated_world() -> void:
 
 	_build_props(rng)
 	IslandRoads.build(self, IslandRoads.plan(run.map))
-	for k in run.map.lava.size():
-		var pool := MeshInstance3D.new()
-		var disc := CylinderMesh.new()
-		disc.top_radius = run.map.lava_radius[k]
-		disc.bottom_radius = run.map.lava_radius[k]
-		disc.height = 0.08
-		pool.mesh = disc
-		pool.position = run.map.lava[k] + Vector3(0, 0.03, 0)
-		pool.material_override = _mat(Color(1.0, 0.4, 0.05), true)
-		add_child(pool)
-		var heat := OmniLight3D.new()
-		heat.light_color = Color(1, 0.45, 0.1)
-		heat.omni_range = run.map.lava_radius[k] * 2.5
-		heat.light_energy = 0.6
-		heat.position = run.map.lava[k] + Vector3(0, 1.0, 0)
-		add_child(heat)
 	if _is_volcano():
 		# The volcano itself, rising from the sea north of the island.
 		var cone := MeshInstance3D.new()
@@ -625,6 +610,29 @@ func _build_generated_world() -> void:
 
 ## Hand-made islands: the scene already holds terrain, models and decor.
 ## Only the camera boxes come from it (buildings and rocks, real heights).
+## Lava pools (run.map.lava) on either kind of island: a glowing disc and a light, on
+## the ground under them. The damage is in island_run, so what is drawn must match it.
+func _build_lava() -> void:
+	for k in run.map.lava.size():
+		var c: Vector3 = run.map.lava[k]
+		var ground: float = run.map.ground_y(c)
+		var pool := MeshInstance3D.new()
+		var disc := CylinderMesh.new()
+		disc.top_radius = run.map.lava_radius[k]
+		disc.bottom_radius = run.map.lava_radius[k]
+		disc.height = 0.08
+		pool.mesh = disc
+		pool.position = Vector3(c.x, ground + 0.03, c.z)
+		pool.material_override = _mat(Color(1.0, 0.4, 0.05), true)
+		add_child(pool)
+		var heat := OmniLight3D.new()
+		heat.light_color = Color(1, 0.45, 0.1)
+		heat.omni_range = run.map.lava_radius[k] * 2.5
+		heat.light_energy = 0.6
+		heat.position = Vector3(c.x, ground + 1.0, c.z)
+		add_child(heat)
+
+
 func _use_handmade_world() -> void:
 	_terrain = _handmade.get_node_or_null("Terrain3D")
 	var preview: Node3D = _handmade.get_node_or_null("Decor/SeaPreview")

@@ -18,10 +18,15 @@ const KIT: String = "res://assets/models/nature_megakit/"
 const N: int = 256  ## island size = one Terrain3D region (256 m)
 const C: float = N * 0.5
 ## Clearances per object kind, in metres (see _spot_problem).
-const COAST_CLEAR: Dictionary = {"building": 10.0, "rock": 8.0, "tree": 8.0, "cover": 3.0}
-const RIVER_CLEAR: Dictionary = {"building": 3.5, "rock": 3.5, "tree": 3.5, "cover": 1.5}
-const ROAD_CLEAR: Dictionary = {"building": 0.5, "rock": 1.0, "tree": 1.5, "cover": 0.8}
-const MAX_SLOPE: Dictionary = {"rock": 0.4, "tree": 0.5, "cover": 0.6}
+const COAST_CLEAR: Dictionary = {"building": 10.0, "rock": 8.0, "tree": 8.0, "cover": 3.0, "lava": 8.0}
+const RIVER_CLEAR: Dictionary = {"building": 3.5, "rock": 3.5, "tree": 3.5, "cover": 1.5, "lava": 3.5}
+const ROAD_CLEAR: Dictionary = {"building": 0.5, "rock": 1.0, "tree": 1.5, "cover": 0.8, "lava": 2.0}
+const MAX_SLOPE: Dictionary = {"rock": 0.4, "tree": 0.5, "cover": 0.6, "lava": 0.45}
+## Lava pools (the volcano): kept this far from every goal, beyond their own radius.
+const LAVA_GOAL_CLEAR: float = 10.0
+## Most the ground under a candidate pool may vary (m): a bigger drop cannot be levelled
+## without a cliff at the edge of the 3 m blend (see _flatten_pool).
+const LAVA_RANGE: float = 1.2
 ## Road meshes: height above the terrain (asphalt over sidewalks, so the
 ## asphalt always shows where they overlap), sidewalk width, bridge decks.
 const ROAD_LIFT: float = 0.06
@@ -49,6 +54,7 @@ var plazas: Array = []             ## Rect2 paved / cleared areas
 var buildings: Array = []          ## [Rect2, height, Color, kind]
 var forests: Array = []            ## [Vector2 centre, radius, count, models, spacing, height]
 var rock_count: int = 30
+var lava_pools: int = 0            ## pools to place after the terrain (see _place_lava)
 var cover: Array = []              ## [model, count, height]
 var markers: Dictionary = {}
 var palette: Dictionary = {}
@@ -81,6 +87,7 @@ func _start_next() -> void:
 	call("_design_" + String(biome))
 	_prepare_paths()
 	_sculpt()
+	_place_lava()
 	_root = HandmadeIsland.new()
 	_root.name = String(biome).capitalize() + "Island"
 	_root.size = N
@@ -124,6 +131,7 @@ func _reset(b: StringName) -> void:
 	buildings = []
 	forests = []
 	rock_count = 30
+	lava_pools = 0
 	cover = []
 	markers = {}
 	palette = {
@@ -296,6 +304,41 @@ func _design_port() -> void:
 	forests = [[Vector2(36, 128), 10.0, 6, ["CommonTree_2"], 6.0, 6.0], [Vector2(222, 140), 10.0, 6, ["CommonTree_4"], 6.0, 6.0]]
 	rock_count = 6
 	cover = [["Grass_Common_Short", 300, 0.4], ["Pebble_Square_2", 300, 0.3]]
+
+
+## Ash Cone. A volcano fills the island; its crater is a lava lake, and the
+##   landing is on the south shore at the foot of the cone.
+##   Short routes: the south road up the slope, the lava-field plateau to the
+##   east. Long routes: the west loop round the flank, the east ridge road.
+##   Arenas: the crater rim, the observatory clearing on the slope.
+func _design_volcano() -> void:
+	markers = {
+		"Generator1": Vector2(62, 178), "Generator2": Vector2(196, 150), "Generator3": Vector2(88, 66),
+		"Cache1": Vector2(110, 198), "Cache2": Vector2(164, 186), "Cache3": Vector2(60, 128), "Cache4": Vector2(206, 132),
+		"Choke_WestPass": Vector2(108, 141), "Choke_EastPass": Vector2(176, 124),
+		"Arena_Crater": Vector2(128, 112), "Arena_Clearing": Vector2(112, 128),
+	}
+	coast_r0 = 96.0
+	coast_waves = [[6.0, 3, 0.4], [3.0, 5, 1.7]]
+	lava_pools = 7
+	palette["sand"] = Color(0.18, 0.16, 0.15)
+	palette["grass"] = Color(0.2, 0.2, 0.19)
+	palette["dirt"] = Color(0.26, 0.2, 0.17)
+	palette["cliff"] = Color(0.16, 0.14, 0.13)
+	hills = [[Vector2(128, 104), 90.0, 34.0], [Vector2(128, 104), 11.0, -16.0], [Vector2(60, 170), 22.0, 10.0], [Vector2(200, 180), 20.0, 8.0]]
+	paths = [
+		[_line([Vector2(126, 206), Vector2(126, 180), Vector2(120, 150), Vector2(124, 118)]), 5.0],
+		[_line([Vector2(120, 150), Vector2(96, 132), Vector2(84, 108), Vector2(84, 92)]), 4.0],
+		[_line([Vector2(124, 120), Vector2(166, 112), Vector2(200, 120)]), 4.0],
+	]
+	plazas = [Rect2(Vector2(74, 78), Vector2(20, 20))]
+	buildings.append([Rect2(Vector2(92, 162), Vector2(14, 10)), 4.5, Color(0.35, 0.33, 0.32), "ruin"])
+	buildings.append([Rect2(Vector2(160, 150), Vector2(12, 9)), 4.0, Color(0.4, 0.36, 0.34), "shed"])
+	buildings.append([Rect2(Vector2(62, 160), Vector2(12, 10)), 4.0, Color(0.38, 0.35, 0.33), "shed"])
+	var trees: Array = ["Pine_1", "Pine_3"]
+	forests = [[Vector2(60, 180), 30.0, 40, trees, 5.0, 8.0], [Vector2(196, 170), 26.0, 30, trees, 5.0, 8.0]]
+	rock_count = 60
+	cover = [["Grass_Common_Short", 200, 0.3], ["Pebble_Square_2", 300, 0.3]]
 
 
 ## Thin wall from a to b (axis-aligned), 1 m thick.
@@ -767,11 +810,115 @@ func _audit() -> void:
 	for spot in _cover_spots:
 		_note(issues, _cover_problem(spot[1]), "%s (%d, %d)" % [spot[0], int(spot[1].x), int(spot[1].y)])
 	_audit_roads(issues)
+	_audit_lava(issues)
 	_failed = _failed or not issues.is_empty()
 	if issues.is_empty():
 		print("  audit: no objects in odd places")
 	for k: String in issues:
 		print("  audit %s: %d -> %s" % [k, issues[k].size(), ", ".join(issues[k].slice(0, 6))])
+
+
+## Lava pools (lava_pools of them, volcano only): walkable ground well away from
+## the goals, so a pool never sits on a cliff or on an objective. Chosen after the
+## terrain exists, in a seeded shuffle of candidate cells, so the layout repeats.
+func _place_lava() -> void:
+	if lava_pools <= 0:
+		return  # no shuffle here: other islands must keep their random sequence
+	var goals: Array = _goal_points()
+	var cells: Array = []
+	for z in range(8, N - 8, 4):
+		for x in range(8, N - 8, 4):
+			cells.append(Vector2(x + 0.5, z + 0.5))
+	for i in range(cells.size() - 1, 0, -1):
+		var j: int = _rng.randi_range(0, i)
+		var swap: Vector2 = cells[i]
+		cells[i] = cells[j]
+		cells[j] = swap
+	var placed: Array = []
+	for p: Vector2 in cells:
+		if placed.size() >= lava_pools:
+			break
+		if _lava_clear(p, goals, placed):
+			placed.append(p)
+	if placed.size() < lava_pools:
+		print("  lava: only %d of %d pools fit" % [placed.size(), lava_pools])
+		_failed = true
+	for p: Vector2 in placed:
+		_flatten_pool(p)
+	for i in placed.size():
+		markers["Lava%d" % (i + 1)] = placed[i]
+
+
+## Levels the ground under a lava pool to its mean height, blending over 3 m beyond
+## the rim, so the disc lies flat on the land instead of half-burying itself.
+func _flatten_pool(p: Vector2) -> void:
+	var r: float = HandmadeIsland.LAVA_RADIUS
+	var sum: float = 0.0
+	var count: int = 0
+	for z in range(maxi(0, floori(p.y - r)), mini(N, ceili(p.y + r) + 1)):
+		for x in range(maxi(0, floori(p.x - r)), mini(N, ceili(p.x + r) + 1)):
+			if Vector2(x, z).distance_to(p) <= r:
+				sum += _h[z * N + x]
+				count += 1
+	var mean: float = sum / maxf(1.0, count)
+	for z in range(maxi(0, floori(p.y - r - 3.0)), mini(N, ceili(p.y + r + 3.0) + 1)):
+		for x in range(maxi(0, floori(p.x - r - 3.0)), mini(N, ceili(p.x + r + 3.0) + 1)):
+			var d: float = Vector2(x, z).distance_to(p) - r
+			var k: float = 1.0 - smoothstep(0.0, 3.0, d)
+			_h[z * N + x] = lerpf(_h[z * N + x], mean, k)
+
+
+## Whether a lava pool centred on `p` may stand there, away from `goals` and `others`.
+func _lava_clear(p: Vector2, goals: Array, others: Array) -> bool:
+	for q: Vector2 in goals + others:
+		if p.distance_to(q) < LAVA_GOAL_CLEAR + HandmadeIsland.LAVA_RADIUS:
+			return false
+	for b in buildings:  # the pool and its levelled rim stay off every building plot
+		if (b[0] as Rect2).grow(HandmadeIsland.LAVA_RADIUS + 3.0).has_point(p):
+			return false
+	var lo: float = INF
+	var hi: float = -INF
+	for q2: Vector2 in _lava_points(p):
+		lo = minf(lo, height_at(q2.x, q2.y))
+		hi = maxf(hi, height_at(q2.x, q2.y))
+	if hi - lo > LAVA_RANGE:
+		return false
+	return _spot_problem(_lava_points(p), "lava") == ""
+
+
+## The centre and eight points on the rim of a pool at `p`: what _spot_problem reads.
+func _lava_points(p: Vector2) -> PackedVector2Array:
+	var pts := PackedVector2Array([p])
+	for k in 8:
+		pts.append(p + Vector2.from_angle(TAU * k / 8.0) * HandmadeIsland.LAVA_RADIUS)
+	return pts
+
+
+## The positions the lava pools must keep clear of: generators, caches, the route
+## and arena markers, the boat and the landing.
+func _goal_points() -> Array:
+	var out: Array = []
+	for key: String in markers:
+		if key.begins_with("Generator") or key.begins_with("Cache") or key.begins_with("Choke") or key.begins_with("Arena") or key in ["Boat", "PlayerStart"]:
+			out.append(markers[key])
+	return out
+
+
+## Every Lava marker must pass the same rules as _place_lava.
+func _audit_lava(issues: Dictionary) -> void:
+	var goals: Array = _goal_points()
+	for key: String in markers:
+		if not key.begins_with("Lava"):
+			continue
+		var others: Array = []
+		for other: String in markers:
+			if other.begins_with("Lava") and other != key:
+				others.append(markers[other])
+		var p: Vector2 = markers[key]
+		var reason: String = _spot_problem(_lava_points(p), "lava")
+		if reason == "" and not _lava_clear(p, goals, others):
+			reason = "near a goal or another pool"
+		_note(issues, reason, key)
 
 
 func _note(issues: Dictionary, why: String, what: String) -> void:

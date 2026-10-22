@@ -38,6 +38,7 @@ beach_01  audit: no objects in odd places · todos os gargalos com rota alternat
 town_01   audit: no objects in odd places · todos os gargalos com rota alternativa
 jungle_01 audit: no objects in odd places · todos os gargalos com rota alternativa
 port_01   audit: no objects in odd places · todos os gargalos com rota alternativa
+volcano_01 audit: no objects in odd places · todos os gargalos com rota alternativa
 ```
 
 Medido em Windows (Godot 4.7.2): os testes de `tests/` passam todos e o bot
