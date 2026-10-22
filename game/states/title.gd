@@ -85,22 +85,16 @@ func _build_menu() -> void:
 	gap.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(gap)
-	var bottom := VBoxContainer.new()
-	bottom.add_theme_constant_override("separation", 8)
+	var bottom := HBoxContainer.new()
 	box.add_child(bottom)
 	var motto := UiTheme.label("Recovery is mandatory.
 Survival is encouraged.", 15, UiTheme.TEXT_MUTED)
 	motto.name = "Motto"
 	motto.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	motto.size_flags_vertical = Control.SIZE_SHRINK_END
 	bottom.add_child(motto)
 	if OS.is_debug_build():  # the editor and debug exports; never a release
-		# Own row under the motto, so the motto keeps the full width.
-		var dev := HBoxContainer.new()
-		dev.alignment = BoxContainer.ALIGNMENT_END
-		dev.add_theme_constant_override("separation", 8)
-		dev.add_child(_test_island_entry())
-		dev.add_child(_sandbox_entry())
-		bottom.add_child(dev)
+		bottom.add_child(_dev_entry())
 
 
 ## Mono caption with a little tracking, like the mockup's brand lines.
@@ -224,12 +218,12 @@ func _archive_entry(parent: Control) -> void:
 	row.add_child(_archive_badge)
 
 
-## TEST ISLAND (development builds): a small dashed text button, out of
-## the main menu's way.
-func _test_island_entry() -> Button:
+## DEV (development builds): a small dashed text button, out of the main menu's way.
+## It opens the dev hub.
+func _dev_entry() -> Button:
 	var b := Button.new()
 	b.name = "TestIsland"
-	b.text = "DEV · TEST ISLAND"
+	b.text = "DEV"
 	b.focus_mode = Control.FOCUS_ALL
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.size_flags_vertical = Control.SIZE_SHRINK_END
@@ -249,7 +243,7 @@ func _test_island_entry() -> Button:
 	dashed.base.content_margin_bottom = 4
 	dashed.sync_margins()
 	b.add_theme_stylebox_override("normal", dashed)
-	b.pressed.connect(_test_island)
+	b.pressed.connect(_dev_hub)
 	return b
 
 
@@ -365,25 +359,36 @@ func _credits() -> void:
 		_dialog = MenuDialog.credits(_root)
 
 
-## DEV SANDBOX (development builds): the same small text button as TEST ISLAND.
-func _sandbox_entry() -> Button:
-	var b := Button.new()
-	b.name = "Sandbox"
-	b.text = "DEV · SANDBOX"
-	b.focus_mode = Control.FOCUS_ALL
-	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	b.size_flags_vertical = Control.SIZE_SHRINK_END
-	b.theme_type_variation = &"QuietButton"
-	b.add_theme_font_override("font", UiTheme.mono_font())
-	b.add_theme_font_size_override("font_size", 12)
-	b.pressed.connect(_sandbox)
-	return b
-
-
 func _sandbox() -> void:
 	if not is_instance_valid(_dialog):
 		_dialog = DevSandbox.open(_root, func(config: Dictionary) -> void:
 			sandbox_requested.emit(config))
+
+
+func _tests() -> void:
+	if not is_instance_valid(_dialog):
+		_dialog = DevTestPanel.open(_root)
+
+
+## DEV hub (development builds): the dev tools in one place, so the footer keeps its width.
+func _dev_hub() -> void:
+	if is_instance_valid(_dialog):
+		return
+	var hub := MenuDialog.new()
+	_root.add_child(hub)
+	_dialog = hub
+	hub.content.add_child(UiTheme.title("DEV", 36))
+	hub.content.add_child(UiTheme.label("Development builds only.", 14, UiTheme.MUTED))
+	UiTheme.button(hub.content, "TEST ISLAND", _hub_pick.bind(hub, _test_island))
+	UiTheme.button(hub.content, "SANDBOX", _hub_pick.bind(hub, _sandbox))
+	UiTheme.button(hub.content, "TESTS", _hub_pick.bind(hub, _tests))
+
+
+## Leaves the hub, then opens the chosen tool (each opens its own dialog).
+func _hub_pick(hub: MenuDialog, action: Callable) -> void:
+	hub.close()
+	_dialog = null
+	action.call()
 
 
 func _test_island() -> void:
