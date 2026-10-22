@@ -1,9 +1,10 @@
-# Vertical slice — Dawn Beach
+# Horde Breaker — arquipélago jogável
 
-Grey-box jogável (só primitivas Godot): uma run de **3 ilhas** (layout
-diferente em cada uma), 1 classe (Recruit), 3 armas, 4 inimigos, missão
-"Activate 3" e regresso ao barco. Entre ilhas, o barco oferece "escolhe 1 de 3".
-O Intel ganho fica gravado no perfil, mesmo quando se morre.
+Estado atual: **5 biomas**, **9 missões**, duas classes (Recruit e Vanguard),
+cinco armas e uma run de **3 ilhas**, que acaba sempre no vulcão. A Berlenga
+é uma expedição a pé em 4 partes. As ilhas são feitas à mão
+(`game/world/handmade/islands/`) ou geradas. A Hashima foi retirada. O Intel
+ganho fica gravado no perfil, mesmo quando se morre. O que falta está em `TODO.md`.
 
 ## Como correr no Godot (Windows)
 
