@@ -57,6 +57,8 @@ var last_hit_by: StringName = &""
 var death_cause: StringName = &""
 ## Shots fired on this island, per weapon id (the island log: weapon use).
 var shots_by_weapon: Dictionary = {}
+## XP collected on this island, before any level-up spends it (the island log).
+var xp_earned: int = 0
 var player_class: StringName = &"recruit"
 var hazard_pay: bool = false  ## boat briefing deal (see RunContext)
 var war_cry_time: float = 0.0  ## > 0 while War Cry reduces damage taken
@@ -527,7 +529,7 @@ func save_to_context(ctx: RunContext) -> void:
 		"cards_picked": cards_picked.map(func(x: StringName) -> String: return String(x)),
 		"power_ups": power_ups_picked.map(func(x: StringName) -> String: return String(x)),
 		"power_up_intel_bonus": _power_up_intel_bonus, "shield_left": int(shield),
-		"cause": String(death_cause), "shots": _shots_log(),
+		"cause": String(death_cause), "shots": _shots_log(), "xp_earned": xp_earned,
 	})
 	ctx.intel += intel_earned()
 	ctx.hazard_pay = false  # one island only
@@ -3127,6 +3129,7 @@ func _collect_xp_orb(index: int) -> void:
 	var earned: float = orb_values[index] * reward_mult * (1.0 + fast_learner_bonus()) + xp_fraction
 	var whole: int = floori(earned + 0.000001)
 	xp += whole
+	xp_earned += whole
 	xp_fraction = maxf(0.0, earned - whole)
 	_heal_player(0.2 * stacks(&"field_dressing") + perk_value(&"trail_rations"))
 	orbs.remove_at(index)
