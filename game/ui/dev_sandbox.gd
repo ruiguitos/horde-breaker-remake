@@ -55,20 +55,31 @@ static func open(parent: Node, on_start: Callable) -> MenuDialog:
 	var start: Dictionary = default_config()
 	dialog.content.add_child(UiTheme.title("DEV SANDBOX", 36))
 	dialog.content.add_child(UiTheme.label("Development builds only. One island with the settings below; nothing is saved.", 16, UiTheme.MUTED))
-	var island := _choice(dialog.content, "Island", _island_items(), start["path"])
-	var mission := _choice(dialog.content, "Mission", _mission_items(), start["mission"])
-	var class_id := _choice(dialog.content, "Class", _class_items(), start["class"])
-	var primary := _choice(dialog.content, "Primary weapon", _weapon_items(true), start["primary"])
-	var secondary := _choice(dialog.content, "Secondary weapon", _weapon_items(false), start["secondary"])
-	var threat := _choice(dialog.content, "Threat", _threat_items(), start["threat"])
-	dialog.content.add_child(UiTheme.label("Seed", 14, UiTheme.MUTED))
+	# Two columns of choices and one row for the seed and the start: the form fits the 1152 x 648 base screen.
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 16)
+	grid.add_theme_constant_override("v_separation", 6)
+	dialog.content.add_child(grid)
+	var island := _choice(grid, "Island", _island_items(), start["path"])
+	var mission := _choice(grid, "Mission", _mission_items(), start["mission"])
+	var class_id := _choice(grid, "Class", _class_items(), start["class"])
+	var primary := _choice(grid, "Primary weapon", _weapon_items(true), start["primary"])
+	var secondary := _choice(grid, "Secondary weapon", _weapon_items(false), start["secondary"])
+	var threat := _choice(grid, "Threat", _threat_items(), start["threat"])
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	dialog.content.add_child(row)
+	var seed_label := UiTheme.label("Seed", 14, UiTheme.MUTED)
+	seed_label.autowrap_mode = TextServer.AUTOWRAP_OFF  # a short caption keeps its width in the row
+	row.add_child(seed_label)
 	var seed_box := SpinBox.new()
 	seed_box.min_value = 1
 	seed_box.max_value = 99999
 	seed_box.step = 1
 	seed_box.value = start["seed"]
-	dialog.content.add_child(seed_box)
-	var go := UiTheme.button(dialog.content, "START ISLAND", func() -> void:
+	row.add_child(seed_box)
+	var go := UiTheme.button(row, "START ISLAND", func() -> void:
 		var config := {
 			"path": island.get_item_metadata(island.selected),
 			"mission": mission.get_item_metadata(mission.selected),
@@ -86,8 +97,11 @@ static func open(parent: Node, on_start: Callable) -> MenuDialog:
 
 ## One labelled OptionButton. Each item keeps its value as metadata; `value` is selected.
 static func _choice(parent: Control, text: String, items: Array, value: Variant) -> OptionButton:
-	parent.add_child(UiTheme.label(text, 14, UiTheme.MUTED))
+	var caption := UiTheme.label(text, 14, UiTheme.MUTED)
+	caption.autowrap_mode = TextServer.AUTOWRAP_OFF  # a caption keeps its width in the grid
+	parent.add_child(caption)
 	var box := OptionButton.new()
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for item: Array in items:
 		box.add_item(item[0])
 		box.set_item_metadata(box.item_count - 1, item[1])

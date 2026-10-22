@@ -82,16 +82,17 @@ func _ready() -> void:
 	_filter.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_filter.text_changed.connect(func(_text: String) -> void: _apply_filter())
 	bar.add_child(_filter)
-	_run_all = UiTheme.button(self, "RUN ALL", _run_everything)
+	# The filter and the three actions share one row, so the dialog fits 960 x 540.
+	_run_all = UiTheme.button(bar, "RUN ALL", _run_everything)
 	_run_all.name = "RunAll"
-	_run_selected = UiTheme.button(self, "RUN SELECTED", _run_checked)
+	_run_selected = UiTheme.button(bar, "RUN SELECTED", _run_checked)
 	_run_selected.name = "RunSelected"
-	_stop = UiTheme.button(self, "STOP", _stop_run)
+	_stop = UiTheme.button(bar, "STOP", _stop_run)
 	_stop.name = "Stop"
 	_summary = UiTheme.label("", 13, UiTheme.MUTED)
 	add_child(_summary)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size.y = 280
+	scroll.custom_minimum_size.y = 180
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	add_child(scroll)
 	_list = VBoxContainer.new()
