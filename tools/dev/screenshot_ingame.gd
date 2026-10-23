@@ -6,6 +6,7 @@ extends SceneTree
 var _island: Node
 var _frame: int = 0
 var _out: String
+var _pose: Vector3 = Vector3.INF  ## where to stand for the picture, if given
 
 
 func _initialize() -> void:
@@ -14,16 +15,19 @@ func _initialize() -> void:
 	_island = (load("res://game/world/island.tscn") as PackedScene).instantiate()
 	_island.set("handmade_scene", load(args[0]))
 	root.add_child(_island)
-	(_island.get("run") as IslandRun).noclip = true  # no damage while posing
 	if args.size() > 3:
-		var run: IslandRun = _island.get("run")
-		run.player_pos = Vector3(float(args[2]), 0, float(args[3]))
+		_pose = Vector3(float(args[2]), 0, float(args[3]))
 
 
 func _process(_delta: float) -> bool:
 	_frame += 1
 	var run: IslandRun = _island.get("run")
 	run.hp = run.max_hp  # stay alive while posing
+	if _frame == 5:
+		run.noclip = true  # no damage while posing (the run only exists once the island is ready)
+		if _pose != Vector3.INF:
+			# Set after the island has placed the player on its start, or the start wins.
+			run.player_pos = _pose
 	if _frame == 320:
 		root.get_viewport().get_texture().get_image().save_png(_out)
 		print("saved ", _out)
