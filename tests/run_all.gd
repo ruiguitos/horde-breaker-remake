@@ -8,7 +8,8 @@ extends SceneTree
 ## Optional: ... --script res://tests/run_all.gd -- --filter=<substring> --timeout=<seconds>
 ## Exit code: 0 if every test exits 0, 1 otherwise (or if no tests are found).
 
-const DEFAULT_TIMEOUT_SECONDS: int = 240
+## test_escort runs its bots for about 190 s on its own, so 240 s killed it.
+const DEFAULT_TIMEOUT_SECONDS: int = 600
 ## Each test writes its engine log here. The exit code comes from the process and
 ## the result lines from this file: create_process does not capture the output.
 const LOG_DIR: String = "user://test_logs"
