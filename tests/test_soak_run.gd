@@ -7,6 +7,9 @@ extends SceneTree
 
 const DT: float = 1.0 / 60.0
 const MAX_SECONDS_PER_ISLAND: float = 600.0
+## Loadouts that together fire all five weapons, primary first (the game refuses a
+## loadout with two primaries and falls back to the starting one): each island takes the next pair.
+const LOADOUTS: Array = [["rifle", "shotgun"], ["smg", "marksman"], ["machine_gun", "shotgun"]]
 
 var _failures: int = 0
 
@@ -28,6 +31,9 @@ func _soak(run_seed: int) -> void:
 		ctx.modifier = GameData.modifiers()[(run_seed + island) % GameData.modifiers().size()].id
 		ctx.biome = &"volcano" if ctx.is_last_island() else GameData.ISLAND_BIOMES[(run_seed / 101 * 2 + island) % GameData.ISLAND_BIOMES.size()]
 		ctx.mission = GameData.MISSIONS.keys()[(run_seed + island) % 3]
+		var pair: Array = LOADOUTS[(run_seed + island) % LOADOUTS.size()]
+		var loadout: Array[StringName] = [StringName(pair[0]), StringName(pair[1])]
+		ctx.weapons = loadout
 		# Same island choice as the game: hand-made when one exists.
 		var custom: IslandMap = null
 		var scene: PackedScene = HandmadeIsland.pick(ctx.biome, ctx.island_seed(), ctx.mission)
@@ -47,6 +53,8 @@ func _soak(run_seed: int) -> void:
 			if not run.card_choices.is_empty():
 				run.choose_card(0)
 			run.hp = 10000.0  # invincible: this test checks completability, not balance
+			if steps % 900 == 0:  # every 15 s: the bot switches between its two weapons
+				run.switch_weapon((run.weapon_index + 1) % run.weapons.size())
 			var g: Vector3 = _goal(run)
 			g = Vector3(floorf(g.x) + 0.5, 0, floorf(g.z) + 0.5)  # recompute only when the cell changes
 			if g != goal:
@@ -72,6 +80,7 @@ func _soak(run_seed: int) -> void:
 		print("%s seed %d island %d (%s, %s, %s): %s in %.0f s, kills %d, level %d, boss %s" % [
 			"TEST:" if ok else "TEST FAIL:", run_seed, island + 1, ctx.biome, ctx.mission, ctx.modifier, run.objective_text(),
 			run.time_alive - ctx.time_alive, run.kills - ctx.kills, run.level, run.boss_killed])
+		print("    shots by weapon %s, XP earned %d" % [str(run.shots_by_weapon), run.xp_earned])
 		if not ok:
 			_failures += 1
 			return
