@@ -1,0 +1,116 @@
+{
+  "date": "2026-10-24",
+  "scope": "Advisory claim verification against anonymous aggregate local measurements; no source code sent successfully.",
+  "full_source_review": {
+    "status": "blocked_by_automatic_approval_review",
+    "reason": "Full source and detailed project evidence were too broad for external disclosure; a sanitized alternative was used."
+  },
+  "evidence": {
+    "triangle_counts_A": [
+      570,
+      302,
+      1794,
+      638,
+      1828
+    ],
+    "limit_A": 2500,
+    "triangle_counts_B": [
+      448,
+      512,
+      300,
+      612,
+      508,
+      210,
+      178,
+      296
+    ],
+    "limit_B": 800,
+    "tall_prop_height_m": 4.296706199645996,
+    "required_height_range_m": [
+      3,
+      5
+    ],
+    "long_prop_length_m": 5.272280216217041,
+    "required_length_range_m": [
+      4,
+      6
+    ],
+    "independent_checks": {
+      "file_count": 13,
+      "all_geometry_checks_passed": true,
+      "base_and_mount_pivots_checked": true,
+      "texture_dimensions_px": [
+        1024,
+        1024
+      ],
+      "textures_embedded": true,
+      "cameras": 0,
+      "lights": 0,
+      "animations": 0,
+      "renders_from_reimported_files": 6,
+      "png_headers_and_dimensions_checked": true
+    },
+    "limitations": "Offline geometry/material and preview checks only. No engine import, physics, collision, in-game lighting, performance, continuous self-intersection or licence provenance certification."
+  },
+  "result": {
+    "tool": "jev_verify",
+    "model": "jev-1.14.0",
+    "provider": "typesafe",
+    "auto_accept": 0.8,
+    "subject_at": 0.5,
+    "summary": {
+      "verified": 3,
+      "contradicted": 0,
+      "unsupported": 0,
+      "needs_review": 0
+    },
+    "results": [
+      {
+        "id": "claim0",
+        "claim": "The anonymous audit supports saying that 13 static files satisfy the two triangle caps, the stated dimensional envelopes and the reported 1024-pixel texture/pivot checks.",
+        "verdict": "verified",
+        "probabilities": {
+          "supports": 0.96,
+          "contradicts": 0.03,
+          "says_nothing": 0.01
+        },
+        "confidence": 0.94,
+        "action": "auto",
+        "supporting_evidence": null,
+        "same_subject": 0.94
+      },
+      {
+        "id": "claim1",
+        "claim": "The report supports saying that six previews were produced from re-imported files.",
+        "verdict": "verified",
+        "probabilities": {
+          "supports": 1,
+          "contradicts": 0,
+          "says_nothing": 0
+        },
+        "confidence": 1,
+        "action": "auto",
+        "supporting_evidence": null,
+        "same_subject": 0.99
+      },
+      {
+        "id": "claim2",
+        "claim": "The supplied evidence does not establish engine integration, collision correctness, in-game visual quality or performance.",
+        "verdict": "verified",
+        "probabilities": {
+          "supports": 1,
+          "contradicts": 0,
+          "says_nothing": 0
+        },
+        "confidence": 1,
+        "action": "auto",
+        "supporting_evidence": null,
+        "same_subject": 0.69
+      }
+    ],
+    "usage": {
+      "input_tokens": 1427,
+      "output_tokens": 187
+    }
+  }
+}

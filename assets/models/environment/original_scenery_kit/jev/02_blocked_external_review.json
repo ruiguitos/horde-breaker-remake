@@ -1,0 +1,12 @@
+{
+  "attempted_tool": "jev_gate",
+  "response_source": "automatic_approval_review",
+  "jev_verdict_produced": false,
+  "isError": true,
+  "content": [
+    {
+      "type": "text",
+      "text": "This action was rejected due to unacceptable risk.\nReason: This JEV gate would externally transmit the full private generator and validator source plus detailed project evidence; the user authorized JEV generally, but not disclosure of this complete sensitive payload, and a sanitized review would suffice.\nDo not bypass this rejection through a workaround or indirect execution. Continue with a safer alternative, or carry out checks to prove that the action is authorized or low risk before trying again. Complete unaffected work without asking for confirmation. Report anything that remains blocked, clarify why it was blocked by auto-review, inform the user of the risk and ask for approval."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "tool": "jev_review",
+  "model": "jev-1.14.0",
+  "provider": "typesafe",
+  "truncated": false,
+  "safe_to_apply": 0.12,
+  "scores": {
+    "correctness": {
+      "score": 1.06,
+      "confidence": 0.59,
+      "probabilities": {"0": 0.11, "1": 0.73, "2": 0.16}
+    },
+    "spec_match": {
+      "score": 1.36,
+      "confidence": 0.27,
+      "probabilities": {"0": 0.07, "1": 0.51, "2": 0.42}
+    },
+    "test_gap": {
+      "score": 1.68,
+      "confidence": 0.51,
+      "probabilities": {"0": 0.09, "1": 0.15, "2": 0.76}
+    },
+    "blast_radius": {
+      "score": 1.16,
+      "confidence": 0.31,
+      "probabilities": {"0": 0.15, "1": 0.54, "2": 0.31}
+    }
+  },
+  "weights": {"correctness": 0.4, "spec_match": 0.3, "test_gap": 0.15, "blast_radius": 0.15},
+  "thresholds": {"auto_accept": 0.8, "review_at": 0.5, "composite_floor": 0.7},
+  "action": "escalate",
+  "composite": 0.5030000000000001,
+  "reason_codes": ["confidence_below_review", "safe_to_apply_below_review"],
+  "limiting_rubrics": ["spec_match"],
+  "usage": {"input_tokens": 1097, "output_tokens": 79}
+}

@@ -1,0 +1,85 @@
+{
+  "license": "CC0-1.0",
+  "original_work": true,
+  "external_assets": false,
+  "models": {
+    "dead_tree": {
+      "kit": "beach_horror",
+      "notes": "Bare salt-killed tree, exposed roots, snapped tapering limbs. Target height 3-5 m.",
+      "triangles": 570,
+      "limit": 2500
+    },
+    "driftwood": {
+      "kit": "beach_horror",
+      "notes": "Bleached driftwood with split ends and worn branch stubs.",
+      "triangles": 302,
+      "limit": 2500
+    },
+    "stranded_hull": {
+      "kit": "beach_horror",
+      "notes": "Open 5.2 m wooden hull, missing planks, visible ribs and rotten thwarts. No intact deck or hidden filler mesh.",
+      "triangles": 1794,
+      "limit": 2500
+    },
+    "crooked_dock_post": {
+      "kit": "beach_horror",
+      "notes": "Leaning timber mooring pile with frayed crown and rope wraps.",
+      "triangles": 638,
+      "limit": 2500
+    },
+    "fallen_fishing_net": {
+      "kit": "beach_horror",
+      "notes": "Loose folded rope net with actual open cells, perimeter rope and four wooden floats; no alpha cutout.",
+      "triangles": 1828,
+      "limit": 2500
+    },
+    "window_shutters": {
+      "kit": "coastal_facade",
+      "notes": "Painted timber frame, cross mullions, opaque salt-clouded glazing and two open shutters.",
+      "triangles": 448,
+      "limit": 800
+    },
+    "door_frame": {
+      "kit": "coastal_facade",
+      "notes": "Weathered plank door with limewashed frame, cross bracing and iron latch.",
+      "triangles": 512,
+      "limit": 800
+    },
+    "canvas_awning": {
+      "kit": "coastal_facade",
+      "notes": "Faded striped canvas, slight sag, scalloped edge and steel support arms. Double-sided valance geometry.",
+      "triangles": 300,
+      "limit": 800
+    },
+    "small_balcony": {
+      "kit": "coastal_facade",
+      "notes": "Small timber platform, rusted iron balusters and two wall braces; no opaque railing filler.",
+      "triangles": 612,
+      "limit": 800
+    },
+    "exterior_stair": {
+      "kit": "coastal_facade",
+      "notes": "Seven stone treads, timber stringers and two steel handrails; projects outward from the wall.",
+      "triangles": 508,
+      "limit": 800
+    },
+    "tavern_sign": {
+      "kit": "coastal_facade",
+      "notes": "Hanging timber tavern sign perpendicular to wall, iron cantilever and original fish emblem. No font dependency.",
+      "triangles": 210,
+      "limit": 800
+    },
+    "wall_lantern": {
+      "kit": "coastal_facade",
+      "notes": "Unlit iron wall lantern with opaque frosted glazing. No light node, emission or transparent sorting dependency.",
+      "triangles": 178,
+      "limit": 800
+    },
+    "chimney": {
+      "kit": "coastal_facade",
+      "notes": "Limewashed wall chimney with exposed masonry courses, projecting crown and genuinely open flue.",
+      "triangles": 296,
+      "limit": 800
+    }
+  }
+}

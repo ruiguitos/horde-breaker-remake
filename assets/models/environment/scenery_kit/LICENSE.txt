@@ -1,0 +1,10 @@
+SPDX-License-Identifier: CC0-1.0
+
+The geometry, procedural textures, renders and generation/validation scripts
+in this directory are original work dedicated to the public domain under
+CC0 1.0 Universal. No third-party assets, fonts or downloaded textures are used.
+
+CC0 legal code: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+The test wall, floor, cameras and lights are preview staging only and are not
+included in the delivered GLB files. No endorsement or warranty is provided.

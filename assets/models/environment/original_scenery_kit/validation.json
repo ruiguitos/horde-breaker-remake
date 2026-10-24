@@ -1,0 +1,1004 @@
+{
+  "passed": true,
+  "license": "CC0-1.0",
+  "kits": {
+    "beach_horror": {
+      "passed": true,
+      "models": {
+        "dead_tree": {
+          "passed": true,
+          "file": "dead_tree.glb",
+          "sha256": "79b49d0819cdb7650e98c103158ccd11e7f111b98d7997256b813e9410b7bdf1",
+          "bytes": 1745924,
+          "triangles": 570,
+          "triangle_limit": 2500,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            3.005075693130493,
+            4.296706199645996,
+            1.8004462718963623
+          ],
+          "bounds_min_m": [
+            -1.5025378465652466,
+            0.0,
+            -0.9002231359481812
+          ],
+          "bounds_max_m": [
+            1.5025378465652466,
+            4.296706199645996,
+            0.9002231359481812
+          ],
+          "pivot": {
+            "type": "base centre",
+            "ground_y_m": 0.0,
+            "centre_xz_m": [
+              0.0,
+              0.0
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 4.709897830605819e-06,
+          "forward": "-Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        },
+        "driftwood": {
+          "passed": true,
+          "file": "driftwood.glb",
+          "sha256": "e4c7bdb963c9ee92f626e92c3b042e2b53773bbd1d8e93f5d994346c973b4dcb",
+          "bytes": 1731528,
+          "triangles": 302,
+          "triangle_limit": 2500,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            3.1354594230651855,
+            0.5961875319480896,
+            1.0121434926986694
+          ],
+          "bounds_min_m": [
+            -1.5677297115325928,
+            0.0,
+            -0.5060717463493347
+          ],
+          "bounds_max_m": [
+            1.5677297115325928,
+            0.5961875319480896,
+            0.5060717463493347
+          ],
+          "pivot": {
+            "type": "base centre",
+            "ground_y_m": 0.0,
+            "centre_xz_m": [
+              0.0,
+              0.0
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 1.60000283943392e-05,
+          "forward": "-Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        },
+        "stranded_hull": {
+          "passed": true,
+          "file": "stranded_hull.glb",
+          "sha256": "370e50804d0d7c2777884fd39622d956318c3d798b29ae7389eb39944eebb2ca",
+          "bytes": 1860924,
+          "triangles": 1794,
+          "triangle_limit": 2500,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            2.071282148361206,
+            1.1982505321502686,
+            5.272280216217041
+          ],
+          "bounds_min_m": [
+            -1.035641074180603,
+            0.0,
+            -2.6361401081085205
+          ],
+          "bounds_max_m": [
+            1.035641074180603,
+            1.1982505321502686,
+            2.6361401081085205
+          ],
+          "pivot": {
+            "type": "base centre",
+            "ground_y_m": 0.0,
+            "centre_xz_m": [
+              0.0,
+              0.0
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 5.542578166328049e-05,
+          "forward": "-Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        },
+        "crooked_dock_post": {
+          "passed": true,
+          "file": "crooked_dock_post.glb",
+          "sha256": "fc149caf32af98cf7a4af1c04ab13d7e33f45699ad18ce9fb6d35fa5e5868f40",
+          "bytes": 1745080,
+          "triangles": 638,
+          "triangle_limit": 2500,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            0.5572482347488403,
+            2.048046112060547,
+            0.3899443745613098
+          ],
+          "bounds_min_m": [
+            -0.27862411737442017,
+            0.0,
+            -0.1949721872806549
+          ],
+          "bounds_max_m": [
+            0.27862411737442017,
+            2.048046112060547,
+            0.1949721872806549
+          ],
+          "pivot": {
+            "type": "base centre",
+            "ground_y_m": 0.0,
+            "centre_xz_m": [
+              0.0,
+              0.0
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 5.9144069020167004e-06,
+          "forward": "-Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        },
+        "fallen_fishing_net": {
+          "passed": true,
+          "file": "fallen_fishing_net.glb",
+          "sha256": "7182e46fb2d45882484c2617f9359284d703935243e809138eaaed7d628be291",
+          "bytes": 1809820,
+          "triangles": 1828,
+          "triangle_limit": 2500,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            2.432000160217285,
+            0.24280720949172974,
+            1.799147605895996
+          ],
+          "bounds_min_m": [
+            -1.2160000801086426,
+            0.0,
+            -0.899573802947998
+          ],
+          "bounds_max_m": [
+            1.2160000801086426,
+            0.24280720949172974,
+            0.899573802947998
+          ],
+          "pivot": {
+            "type": "base centre",
+            "ground_y_m": 0.0,
+            "centre_xz_m": [
+              0.0,
+              0.0
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 8.313819193402861e-05,
+          "forward": "-Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        }
+      },
+      "renders": {
+        "dead_tree": {
+          "path": "renders/dead_tree.png",
+          "sha256": "251be54988f14ff437758c509db219abbda4a0e7c188de3b8a7f01002285308c",
+          "dimensions_px": [
+            1200,
+            1100
+          ]
+        },
+        "driftwood": {
+          "path": "renders/driftwood.png",
+          "sha256": "4b020dfa7f33600d23ebb4bf14a65ec320004372bfc0f05a2af68203a6bb79d9",
+          "dimensions_px": [
+            1200,
+            1100
+          ]
+        },
+        "stranded_hull": {
+          "path": "renders/stranded_hull.png",
+          "sha256": "bf90080b9fbd91c54d0a48f96d2b5004d725a23b7c22d9a0f386a3b8006354c7",
+          "dimensions_px": [
+            1200,
+            1100
+          ]
+        },
+        "crooked_dock_post": {
+          "path": "renders/crooked_dock_post.png",
+          "sha256": "6093d7ef52002c80e53c1fa0a7487f8f1f6d7996c50790f14740b82d124815b1",
+          "dimensions_px": [
+            1200,
+            1100
+          ]
+        },
+        "fallen_fishing_net": {
+          "path": "renders/fallen_fishing_net.png",
+          "sha256": "4ccfc3efdd01d07ed7a95900f03f6eacdf389f396b1019cf71b9b6f34644dd51",
+          "dimensions_px": [
+            1200,
+            1100
+          ]
+        }
+      }
+    },
+    "coastal_facade": {
+      "passed": true,
+      "models": {
+        "window_shutters": {
+          "passed": true,
+          "file": "window_shutters.glb",
+          "sha256": "0241f2ffc10b36186b2e3bdf7b9e0c64bb42a075ff6dd82eb4cf49d3c2c5bae3",
+          "bytes": 1762464,
+          "triangles": 448,
+          "triangle_limit": 800,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            1.909940242767334,
+            1.5899999141693115,
+            0.2701713442802429
+          ],
+          "bounds_min_m": [
+            -0.954970121383667,
+            -0.7949999570846558,
+            0.0
+          ],
+          "bounds_max_m": [
+            0.954970121383667,
+            0.7949999570846558,
+            0.2701713442802429
+          ],
+          "pivot": {
+            "type": "rear mounting face centre",
+            "rear_z_m": 0.0,
+            "mounting_face_centre_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mounting_face_size_xy_m": [
+              1.375999927520752,
+              1.565999984741211
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 0.0001247075441699317,
+          "forward": "+Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        },
+        "door_frame": {
+          "passed": true,
+          "file": "door_frame.glb",
+          "sha256": "94721d78e9d4cc027ebebc8a150d8accafae6e2b8232aefe637f003014839301",
+          "bytes": 1768592,
+          "triangles": 512,
+          "triangle_limit": 800,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            1.2300000190734863,
+            2.2700001001358032,
+            0.20045310258865356
+          ],
+          "bounds_min_m": [
+            -0.6150000095367432,
+            -1.1349999904632568,
+            0.0
+          ],
+          "bounds_max_m": [
+            0.6150000095367432,
+            1.1350001096725464,
+            0.20045310258865356
+          ],
+          "pivot": {
+            "type": "rear mounting face centre",
+            "rear_z_m": 0.0,
+            "mounting_face_centre_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mounting_face_size_xy_m": [
+              1.2059999704360962,
+              2.246000051498413
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 1.3856221733483331e-05,
+          "forward": "+Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        },
+        "canvas_awning": {
+          "passed": true,
+          "file": "canvas_awning.glb",
+          "sha256": "aaa1e30e0acc6525cf4686328135a14c871041eb515ffbf745678399e6817480",
+          "bytes": 1747576,
+          "triangles": 300,
+          "triangle_limit": 800,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            2.119999885559082,
+            0.5999999940395355,
+            1.205588459968567
+          ],
+          "bounds_min_m": [
+            -1.059999942779541,
+            -0.3700000047683716,
+            0.0
+          ],
+          "bounds_max_m": [
+            1.059999942779541,
+            0.22999998927116394,
+            1.205588459968567
+          ],
+          "pivot": {
+            "type": "rear mounting face centre",
+            "rear_z_m": 0.0,
+            "mounting_face_centre_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mounting_face_size_xy_m": [
+              2.0899999141693115,
+              0.4599999785423279
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 0.0001402956643903087,
+          "forward": "+Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        },
+        "small_balcony": {
+          "passed": true,
+          "file": "small_balcony.glb",
+          "sha256": "8b5b4cf5150238e344b7144197bf059b08f2d6de74dda0265e2e775d6ed3abd4",
+          "bytes": 1776124,
+          "triangles": 612,
+          "triangle_limit": 800,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            1.899999976158142,
+            1.3625001311302185,
+            0.9300000071525574
+          ],
+          "bounds_min_m": [
+            -0.949999988079071,
+            -0.550000011920929,
+            0.0
+          ],
+          "bounds_max_m": [
+            0.949999988079071,
+            0.8125001192092896,
+            0.9300000071525574
+          ],
+          "pivot": {
+            "type": "rear mounting face centre",
+            "rear_z_m": 0.0,
+            "mounting_face_centre_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mounting_face_size_xy_m": [
+              1.899999976158142,
+              1.100000023841858
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 1.3856187320976378e-05,
+          "forward": "+Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        },
+        "exterior_stair": {
+          "passed": true,
+          "file": "exterior_stair.glb",
+          "sha256": "367134217079c5cac3b11a5dc28a6f4971cfbb8556f55b2c2bf4d617f260e727",
+          "bytes": 1766484,
+          "triangles": 508,
+          "triangle_limit": 800,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            1.2200000286102295,
+            2.3941010236740112,
+            1.8157591819763184
+          ],
+          "bounds_min_m": [
+            -0.6100000143051147,
+            -1.7881795167922974,
+            0.0
+          ],
+          "bounds_max_m": [
+            0.6100000143051147,
+            0.6059215068817139,
+            1.8157591819763184
+          ],
+          "pivot": {
+            "type": "rear mounting face centre",
+            "rear_z_m": 0.0,
+            "mounting_face_centre_m": [
+              0.0,
+              -2.9802322387695312e-08,
+              0.0
+            ],
+            "mounting_face_size_xy_m": [
+              1.2200000286102295,
+              1.0999999642372131
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 3.6221647869403576e-05,
+          "forward": "+Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        },
+        "tavern_sign": {
+          "passed": true,
+          "file": "tavern_sign.glb",
+          "sha256": "ae275bb337a90dae8f7b5a520cf211827e6390da1cbf3474796f9ea83b483a86",
+          "bytes": 1736476,
+          "triangles": 210,
+          "triangle_limit": 800,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            0.10999999940395355,
+            0.6059999763965607,
+            0.800000011920929
+          ],
+          "bounds_min_m": [
+            -0.054999999701976776,
+            -0.3659999966621399,
+            0.0
+          ],
+          "bounds_max_m": [
+            0.054999999701976776,
+            0.23999997973442078,
+            0.800000011920929
+          ],
+          "pivot": {
+            "type": "rear mounting face centre",
+            "rear_z_m": 0.0,
+            "mounting_face_centre_m": [
+              0.0,
+              -7.450580596923828e-09,
+              0.0
+            ],
+            "mounting_face_size_xy_m": [
+              0.10999999940395355,
+              0.47999997437000275
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 1.3856238939752831e-05,
+          "forward": "+Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        },
+        "wall_lantern": {
+          "passed": true,
+          "file": "wall_lantern.glb",
+          "sha256": "6eff3c01620952459f3b681c1c7bce03aa56c733cd717a43bcf5fe51f3e376b1",
+          "bytes": 1731480,
+          "triangles": 178,
+          "triangle_limit": 800,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            0.3199999928474426,
+            0.6205940842628479,
+            0.5600000023841858
+          ],
+          "bounds_min_m": [
+            -0.1599999964237213,
+            -0.3474999666213989,
+            0.0
+          ],
+          "bounds_max_m": [
+            0.1599999964237213,
+            0.273094117641449,
+            0.5600000023841858
+          ],
+          "pivot": {
+            "type": "rear mounting face centre",
+            "rear_z_m": 0.0,
+            "mounting_face_centre_m": [
+              0.0,
+              7.450580596923828e-09,
+              0.0
+            ],
+            "mounting_face_size_xy_m": [
+              0.10799999535083771,
+              0.3279999941587448
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 3.117690539965329e-05,
+          "forward": "+Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        },
+        "chimney": {
+          "passed": true,
+          "file": "chimney.glb",
+          "sha256": "b77566b734c36fcfab483c1dd5cb6027dbedfc3fa4b0e9d2be2d04fbcd455da7",
+          "bytes": 1744932,
+          "triangles": 296,
+          "triangle_limit": 800,
+          "mesh_count": 1,
+          "primitive_count": 1,
+          "dimensions_xyz_m": [
+            0.6800000071525574,
+            1.600000023841858,
+            0.6800000071525574
+          ],
+          "bounds_min_m": [
+            -0.3400000035762787,
+            -0.6325000524520874,
+            0.0
+          ],
+          "bounds_max_m": [
+            0.3400000035762787,
+            0.9674999713897705,
+            0.6800000071525574
+          ],
+          "pivot": {
+            "type": "rear mounting face centre",
+            "rear_z_m": 0.0,
+            "mounting_face_centre_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mounting_face_size_xy_m": [
+              0.6679999828338623,
+              1.253000020980835
+            ]
+          },
+          "material_names": [
+            "Weathered_scenery_PBR_1K"
+          ],
+          "pbr_channels": [
+            "sRGB albedo",
+            "linear roughness (ORM G)",
+            "linear metallic (ORM B)",
+            "tangent normal"
+          ],
+          "textures": [
+            {
+              "name": "scenery_normal",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 495658
+            },
+            {
+              "name": "scenery_albedo",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 782695
+            },
+            {
+              "name": "scenery_orm",
+              "width": 1024,
+              "height": 1024,
+              "bytes": 434313
+            }
+          ],
+          "minimum_triangle_area_m2": 3.117662794745223e-05,
+          "forward": "+Z",
+          "cameras": 0,
+          "lights": 0,
+          "animations": 0,
+          "bones": 0
+        }
+      },
+      "renders": {
+        "facade_assembly": {
+          "path": "renders/facade_assembly.png",
+          "sha256": "09a09717338b3f256ab462b8cdb840c916f4fcdf18c5f464cf3b08aa63921273",
+          "dimensions_px": [
+            1200,
+            1100
+          ]
+        }
+      }
+    }
+  },
+  "validator": "Independent raw GLB geometry/material inspection; Blender source reopen",
+  "limits": [
+    "No Godot import, integration, collision, LOD or GPU performance test.",
+    "Bounds/pivots are measured from actual exported geometry. Front orientation is the authoring/export convention.",
+    "No continuous self-intersection, structural strength or physics certification.",
+    "Original procedural PBR maps; glass is intentionally opaque/frosted, lantern has no real light."
+  ],
+  "source_reopened": true,
+  "source_sha256": "74710f452acbed01addde02ef86559d2fb0291abe63252c98d3dcea9114d718d",
+  "source_unit_scale": 1.0,
+  "godot_executed": false,
+  "external_assets_downloaded": false
+}
