@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="Registry" format=3]
+[gd_resource type="Resource" script_class="Registry" format=3 uid="uid://y8psqw8ecfdt"]
 
-[ext_resource type="Script" path="res://addons/yard/registry.gd" id="1_l2i0a"]
+[ext_resource type="Script" uid="uid://dqtv77mng5dyh" path="res://addons/yard/registry.gd" id="1_l2i0a"]
 
 [resource]
 script = ExtResource("1_l2i0a")
@@ -14,8 +14,8 @@ _uids_to_string_ids = Dictionary[StringName, StringName]({
 &"uid://qyxwk66tcfre": &"shotgun"
 })
 _string_ids_to_uids = Dictionary[StringName, StringName]({
-&"marksman": &"uid://bldi83as4farn",
 &"machine_gun": &"uid://daw6t4bmt2n8g",
+&"marksman": &"uid://bldi83as4farn",
 &"rifle": &"uid://6ghxtfj36a8j",
 &"shotgun": &"uid://qyxwk66tcfre",
 &"smg": &"uid://caqregr32ifx6"

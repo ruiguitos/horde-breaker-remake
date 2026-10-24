@@ -1,12 +1,13 @@
-[gd_resource type="Resource" script_class="Registry" format=3]
+[gd_resource type="Resource" script_class="Registry" format=3 uid="uid://blow851rikskc"]
 
-[ext_resource type="Script" path="res://addons/yard/registry.gd" id="1_iy5hg"]
+[ext_resource type="Script" uid="uid://dqtv77mng5dyh" path="res://addons/yard/registry.gd" id="1_iy5hg"]
 
 [resource]
 script = ExtResource("1_iy5hg")
 _class_restriction = &"PerkData"
 _scan_directory = "res://game/data/perks/"
 _uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://0m2tt6a8c342": &"surveyor_2",
 &"uid://3xd1wwpvu3ht": &"long_breaker",
 &"uid://56wng762urdn": &"crowd_anchor",
 &"uid://5w5vrdcw4caw": &"body_count",
@@ -14,39 +15,38 @@ _uids_to_string_ids = Dictionary[StringName, StringName]({
 &"uid://cwehc575wai4h": &"thick_skin",
 &"uid://d0wt54cacykqt": &"demolitions",
 &"uid://d1mk31bg77twy": &"pack_rat",
-&"uid://d9w40iyxj29j": &"heavy_impact",
-&"uid://dh8ob6pzlwts": &"kill_chain",
-&"uid://enu769rl3g0v": &"quick_draw",
-&"uid://flq98ftlrlb6": &"intimidating_cry",
+&"uid://dh8ob6p0lwts": &"kill_chain_2",
+&"uid://eaw40iyxj3aj": &"heavy_impact_2",
+&"uid://enu77arl3g0v": &"quick_draw_2",
+&"uid://flra8ftlrlb6": &"intimidating_cry_2",
 &"uid://k2e4vvxsu3oo": &"opening_volley",
 &"uid://kf20i87p74ak": &"concussion_blast",
 &"uid://m8ay5hvjv2xa": &"trail_rations",
 &"uid://n7i4baopjmx3": &"steady_grip",
-&"uid://q8e46zx653vu": &"bulwark",
-&"uid://q9unzx0qgew4": &"fleet_footed",
+&"uid://q8e460x653vu": &"bulwark_2",
+&"uid://raun0x0qgew4": &"fleet_footed_2",
 &"uid://sbiq0wmtow6g": &"skirmisher",
-&"uid://ttqbna5xbtuv": &"recovery",
-&"uid://zm2tt6a8c342": &"surveyor"
+&"uid://ttqbna5xbtuv": &"recovery"
 })
 _string_ids_to_uids = Dictionary[StringName, StringName]({
 &"body_count": &"uid://5w5vrdcw4caw",
-&"bulwark": &"uid://q8e46zx653vu",
+&"bulwark_2": &"uid://q8e460x653vu",
 &"concussion_blast": &"uid://kf20i87p74ak",
 &"crowd_anchor": &"uid://56wng762urdn",
 &"demolitions": &"uid://d0wt54cacykqt",
-&"fleet_footed": &"uid://q9unzx0qgew4",
+&"fleet_footed_2": &"uid://raun0x0qgew4",
 &"head_hunter": &"uid://b6ddxb643fhnc",
-&"heavy_impact": &"uid://d9w40iyxj29j",
-&"intimidating_cry": &"uid://flq98ftlrlb6",
-&"kill_chain": &"uid://dh8ob6pzlwts",
+&"heavy_impact_2": &"uid://eaw40iyxj3aj",
+&"intimidating_cry_2": &"uid://flra8ftlrlb6",
+&"kill_chain_2": &"uid://dh8ob6p0lwts",
 &"long_breaker": &"uid://3xd1wwpvu3ht",
 &"opening_volley": &"uid://k2e4vvxsu3oo",
 &"pack_rat": &"uid://d1mk31bg77twy",
-&"quick_draw": &"uid://enu769rl3g0v",
+&"quick_draw_2": &"uid://enu77arl3g0v",
 &"recovery": &"uid://ttqbna5xbtuv",
 &"skirmisher": &"uid://sbiq0wmtow6g",
 &"steady_grip": &"uid://n7i4baopjmx3",
-&"surveyor": &"uid://zm2tt6a8c342",
+&"surveyor_2": &"uid://0m2tt6a8c342",
 &"thick_skin": &"uid://cwehc575wai4h",
 &"trail_rations": &"uid://m8ay5hvjv2xa"
 })
@@ -55,27 +55,27 @@ _property_index = Dictionary[StringName, Dictionary]({
 1: {
 &"body_count": true,
 &"crowd_anchor": true,
-&"fleet_footed": true,
+&"fleet_footed_2": true,
 &"head_hunter": true,
 &"long_breaker": true,
 &"thick_skin": true
 },
 2: {
-&"heavy_impact": true,
+&"heavy_impact_2": true,
 &"pack_rat": true,
-&"quick_draw": true,
+&"quick_draw_2": true,
 &"recovery": true,
 &"skirmisher": true,
 &"steady_grip": true
 },
 3: {
-&"bulwark": true,
+&"bulwark_2": true,
 &"concussion_blast": true,
 &"demolitions": true,
-&"intimidating_cry": true,
-&"kill_chain": true,
+&"intimidating_cry_2": true,
+&"kill_chain_2": true,
 &"opening_volley": true,
-&"surveyor": true,
+&"surveyor_2": true,
 &"trail_rations": true
 }
 }
