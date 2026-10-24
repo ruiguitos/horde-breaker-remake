@@ -11,8 +11,11 @@ Practical notes for this machine (Windows):
 - Tests: `<godot> --headless --path . --script res://tests/<test>.gd`;
   a test passes when its output has no `TEST FAIL` and no `SCRIPT ERROR`.
 - After adding a `class_name`, run `<godot> --headless --path . --import`.
-  It deletes three tracked dlls; restore them right after:
-  `git checkout -- "addons/orchestrator/~orchestrator.windows.64.editor.dll" "addons/terrabrush/bin/~libterrabrush.windows.debug.x86_64.dll" "addons/terrain_3d/bin/~libterrain.windows.debug.x86_64.dll"`
+  Only two addon libraries are tracked today; if the import removes them,
+  restore them right after:
+  `git checkout -- addons/terrain_3d/bin/libterrain.windows.debug.x86_64.dll addons/terrain_3d/bin/libterrain.windows.release.x86_64.dll`
+  (The Orchestrator and TerraBrush libraries no longer exist; the old restore
+  command in this file referred to them and failed.)
 - Never use `git stash`. Never commit `game/world/handmade/world_test_handmade*`
   (the user's own files). Commit the `.uid` files Godot creates.
 - Commit and push to `master` only when the user asks; Conventional Commits
