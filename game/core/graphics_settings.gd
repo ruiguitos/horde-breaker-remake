@@ -55,10 +55,14 @@ static func apply_display(profile: Profile) -> void:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
 		_:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-			var screen: Vector2i = DisplayServer.screen_get_size()
-			var size := Vector2i(mini(profile.resolution.x, screen.x), mini(profile.resolution.y, screen.y))
+			# The window's own screen: with two monitors of different sizes, the
+			# primary's size is the wrong limit and the window lands off-centre.
+			var screen_index: int = DisplayServer.window_get_current_screen()
+			var screen: Vector2i = DisplayServer.screen_get_size(screen_index)
+			var usable: Rect2i = DisplayServer.screen_get_usable_rect(screen_index)
+			var size := Vector2i(mini(profile.resolution.x, screen.x), mini(profile.resolution.y, usable.size.y))
 			DisplayServer.window_set_size(size)
-			DisplayServer.window_set_position(DisplayServer.screen_get_position() + (screen - size) / 2)
+			DisplayServer.window_set_position(usable.position + (usable.size - size) / 2)
 
 
 ## Quality preset, render scale and anti-aliasing on the root viewport, plus
