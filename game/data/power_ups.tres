@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="Registry" format=3 uid="uid://74rqrvqgs3b7"]
+[gd_resource type="Resource" script_class="Registry" format=3]
 
-[ext_resource type="Script" uid="uid://dqtv77mng5dyh" path="res://addons/yard/registry.gd" id="1_pwreg"]
+[ext_resource type="Script" path="res://addons/yard/registry.gd" id="1_pwreg"]
 
 [resource]
 script = ExtResource("1_pwreg")

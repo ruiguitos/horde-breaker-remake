@@ -756,6 +756,12 @@ Cada pasta tem um registo **YARD** com o mesmo nome (por exemplo
 | `missions/` | Missões: nome e texto |
 - No editor, o separador **Registry** mostra cada registo como uma folha de
   cálculo: mudas o dano, o custo ou o texto sem tocar em código.
+- **Armadilha dos registos (2026-10-24):** o Godot 4.7 volta a gravar estes
+  `.tres` com `uid=` no cabeçalho e reordena os mapas de ids. Essa reordenação
+  parte as consultas por índice (`EnemyKind`, a ordem das missões) e o
+  `tests/test_data.gd` falha. Se ele começar a falhar depois de abrires o
+  editor, restaura os registos com `git checkout -- game/data/*.tres` em vez de
+  commitar a re-gravação.
 - Um ficheiro novo na pasta entra sozinho no registo.
 - O `order` define a ordem: teclas das armas e listas do Armory.
 - Numa arma, `unlock_cost` 0 quer dizer arma inicial e mais de 0 é o preço em

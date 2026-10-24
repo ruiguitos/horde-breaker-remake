@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="Registry" format=3 uid="uid://cn53rcpppmyf7"]
+[gd_resource type="Resource" script_class="Registry" format=3]
 
-[ext_resource type="Script" uid="uid://dqtv77mng5dyh" path="res://addons/yard/registry.gd" id="1_b3tet"]
+[ext_resource type="Script" path="res://addons/yard/registry.gd" id="1_b3tet"]
 
 [resource]
 script = ExtResource("1_b3tet")
@@ -8,23 +8,23 @@ _class_restriction = &"MissionData"
 _scan_directory = "res://game/data/missions/"
 _uids_to_string_ids = Dictionary[StringName, StringName]({
 &"uid://bw6f5my5mabib": &"activate",
-&"uid://cescort0cart": &"escort",
-&"uid://cfuelrun0can": &"fuel_run",
-&"uid://cintel0srch0": &"intel_search",
-&"uid://cnests0hive0": &"nests",
-&"uid://csabot0blast": &"sabotage",
-&"uid://csignal0lite": &"signals",
 &"uid://cyhxl6e4hyajv": &"defend",
 &"uid://dodo2x6r60i0p": &"holdout",
-&"uid://rusxddmqgoqc": &"rescue",
-&"uid://uj1nc8fvgrvo": &"hold_sequence_2"
+&"uid://c4hqseq7p0ints": &"hold_sequence",
+&"uid://cfuelrun0can": &"fuel_run",
+&"uid://cnests0hive0": &"nests",
+&"uid://cintel0srch0": &"intel_search",
+&"uid://csignal0lite": &"signals",
+&"uid://csabot0blast": &"sabotage",
+&"uid://cescort0cart": &"escort",
+&"uid://rusxddmqgoqc": &"rescue"
 })
 _string_ids_to_uids = Dictionary[StringName, StringName]({
 &"activate": &"uid://bw6f5my5mabib",
 &"defend": &"uid://cyhxl6e4hyajv",
 &"escort": &"uid://cescort0cart",
 &"fuel_run": &"uid://cfuelrun0can",
-&"hold_sequence_2": &"uid://uj1nc8fvgrvo",
+&"hold_sequence": &"uid://c4hqseq7p0ints",
 &"holdout": &"uid://dodo2x6r60i0p",
 &"intel_search": &"uid://cintel0srch0",
 &"nests": &"uid://cnests0hive0",
