@@ -1,0 +1,436 @@
+{
+  "passed": true,
+  "model": "recruit_realistic",
+  "license_new_work": "CC0-1.0",
+  "units": "metres",
+  "forward": "-Z",
+  "triangles": 41538,
+  "mesh_nodes": 1,
+  "dimensions_m": [
+    2.1959862257448615,
+    2.0250003366040783,
+    0.7278545363318969
+  ],
+  "bounds_min_m": [
+    -1.1417583225024075,
+    -1.2446743366707758e-07,
+    -0.2921543327965796
+  ],
+  "bounds_max_m": [
+    1.054227903242454,
+    2.0250002121366446,
+    0.43570020353531724
+  ],
+  "bone_count": 53,
+  "materials": [
+    "field_ripstop",
+    "carrier_cordura",
+    "helmet_composite",
+    "boot_leather",
+    "tread_rubber",
+    "weathered_skin",
+    "eye_dark"
+  ],
+  "material_count": 7,
+  "textures": [
+    {
+      "name": "field_ripstop_normal",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "field_ripstop_albedo",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "field_ripstop_orm",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "carrier_cordura_normal",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "carrier_cordura_albedo",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "carrier_cordura_orm",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "helmet_composite_normal",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "helmet_composite_albedo",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "helmet_composite_orm",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "boot_leather_normal",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "boot_leather_albedo",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "boot_leather_orm",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "tread_rubber_normal",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "name": "tread_rubber_albedo",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "name": "tread_rubber_orm",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "name": "weathered_skin_normal",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "weathered_skin_albedo",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "weathered_skin_orm",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "eye_dark_normal",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "name": "eye_dark_albedo",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "name": "eye_dark_orm",
+      "width": 256,
+      "height": 256
+    }
+  ],
+  "external_textures": [
+    {
+      "file": "textures/boot_leather_albedo.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/boot_leather_metalness.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/boot_leather_normal.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/boot_leather_orm.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/boot_leather_roughness.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/carrier_cordura_albedo.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/carrier_cordura_metalness.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/carrier_cordura_normal.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/carrier_cordura_orm.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/carrier_cordura_roughness.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/eye_dark_albedo.png",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "file": "textures/eye_dark_metalness.png",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "file": "textures/eye_dark_normal.png",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "file": "textures/eye_dark_orm.png",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "file": "textures/eye_dark_roughness.png",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "file": "textures/field_ripstop_albedo.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/field_ripstop_metalness.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/field_ripstop_normal.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/field_ripstop_orm.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/field_ripstop_roughness.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/hardware_steel_albedo.png",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "textures/hardware_steel_metalness.png",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "textures/hardware_steel_normal.png",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "textures/hardware_steel_orm.png",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "textures/hardware_steel_roughness.png",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "textures/helmet_composite_albedo.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/helmet_composite_metalness.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/helmet_composite_normal.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/helmet_composite_orm.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/helmet_composite_roughness.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/tread_rubber_albedo.png",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "textures/tread_rubber_metalness.png",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "textures/tread_rubber_normal.png",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "textures/tread_rubber_orm.png",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "textures/tread_rubber_roughness.png",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "textures/weathered_skin_albedo.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/weathered_skin_metalness.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/weathered_skin_normal.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/weathered_skin_orm.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/weathered_skin_roughness.png",
+      "width": 1024,
+      "height": 1024
+    }
+  ],
+  "pbr_channels": [
+    "albedo",
+    "roughness",
+    "metalness",
+    "tangent_normal"
+  ],
+  "pbr_export": "Roughness in G and metalness in B of ORM; separate PNG channels also delivered.",
+  "glb_sha256": "a9525e17e8f3174ae3629a4ba27c91932612e646240c2da5e11258bc63bf97e0",
+  "glb_bytes": 21181884,
+  "original_sha256": "2a9d61ca90977f6dc0da5f09cea1de9892d630a2cf25862e909515fbe6b08cf3",
+  "no_cameras_lights": true,
+  "godot_executed": false,
+  "rig_contract": {
+    "exact_names": true,
+    "exact_parent_names": true,
+    "max_rest_matrix_component_error": 0.0,
+    "names": [
+      "DEF-f_index.01.L",
+      "DEF-f_index.01.R",
+      "DEF-f_index.02.L",
+      "DEF-f_index.02.R",
+      "DEF-f_index.03.L",
+      "DEF-f_index.03.R",
+      "DEF-f_middle.01.L",
+      "DEF-f_middle.01.R",
+      "DEF-f_middle.02.L",
+      "DEF-f_middle.02.R",
+      "DEF-f_middle.03.L",
+      "DEF-f_middle.03.R",
+      "DEF-f_pinky.01.L",
+      "DEF-f_pinky.01.R",
+      "DEF-f_pinky.02.L",
+      "DEF-f_pinky.02.R",
+      "DEF-f_pinky.03.L",
+      "DEF-f_pinky.03.R",
+      "DEF-f_ring.01.L",
+      "DEF-f_ring.01.R",
+      "DEF-f_ring.02.L",
+      "DEF-f_ring.02.R",
+      "DEF-f_ring.03.L",
+      "DEF-f_ring.03.R",
+      "DEF-foot.L",
+      "DEF-foot.R",
+      "DEF-forearm.L",
+      "DEF-forearm.R",
+      "DEF-hand.L",
+      "DEF-hand.R",
+      "DEF-head",
+      "DEF-hips",
+      "DEF-neck",
+      "DEF-shin.L",
+      "DEF-shin.R",
+      "DEF-shoulder.L",
+      "DEF-shoulder.R",
+      "DEF-spine.001",
+      "DEF-spine.002",
+      "DEF-spine.003",
+      "DEF-thigh.L",
+      "DEF-thigh.R",
+      "DEF-thumb.01.L",
+      "DEF-thumb.01.R",
+      "DEF-thumb.02.L",
+      "DEF-thumb.02.R",
+      "DEF-thumb.03.L",
+      "DEF-thumb.03.R",
+      "DEF-toe.L",
+      "DEF-toe.R",
+      "DEF-upper_arm.L",
+      "DEF-upper_arm.R",
+      "root"
+    ],
+    "root_origin_m": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "ual_basis_preserved": true,
+    "feet_ground_error_m": 1.2446743366707758e-07
+  },
+  "source_blend_sha256": "a6ddfbff2a8af5a222308aeac594e8d96ded7c8f39894284171cc8c4ac6efcca",
+  "source_reopened": true,
+  "provenance": {
+    "base_model": "assets/models/characters/recruit/recruit_v03.glb",
+    "new_textures": "Original deterministic procedural maps; no downloaded inputs.",
+    "character_rig": "Existing UAL-compatible CC0 rig, unchanged."
+  },
+  "limits": [
+    "Offline structural and sampled geometric validation; no Godot import or gameplay test.",
+    "No full triangle intersection or cloth simulation proof.",
+    "No LODs, performance benchmark or full UAL clip playback validation.",
+    "Visual candidate with original procedural textures; head and proportions remain partly stylized, not a scanned or photorealistic human."
+  ]
+}

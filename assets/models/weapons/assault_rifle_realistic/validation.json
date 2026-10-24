@@ -1,0 +1,240 @@
+{
+  "passed": true,
+  "model": "assault_rifle_realistic",
+  "license_new_work": "CC0-1.0",
+  "units": "metres",
+  "forward": "-Z",
+  "triangles": 7482,
+  "mesh_nodes": 86,
+  "dimensions_m": [
+    0.08153524249792099,
+    0.3669999986886978,
+    0.9608000218868256
+  ],
+  "bounds_min_m": [
+    -0.032999999821186066,
+    -0.164000004529953,
+    -0.6200000047683716
+  ],
+  "bounds_max_m": [
+    0.048535242676734924,
+    0.2029999941587448,
+    0.340800017118454
+  ],
+  "bone_count": 0,
+  "materials": [
+    "gunmetal",
+    "steel",
+    "bore",
+    "polymer"
+  ],
+  "material_count": 4,
+  "textures": [
+    {
+      "name": "gunmetal_normal",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "gunmetal_albedo",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "gunmetal_orm",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "steel_normal",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "steel_albedo",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "steel_orm",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "bore_normal",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "name": "bore_albedo",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "name": "bore_orm",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "name": "polymer_normal",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "polymer_albedo",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "polymer_orm",
+      "width": 2048,
+      "height": 2048
+    }
+  ],
+  "external_textures": [
+    {
+      "file": "textures/bore_albedo.png",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "file": "textures/bore_metalness.png",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "file": "textures/bore_normal.png",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "file": "textures/bore_orm.png",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "file": "textures/bore_roughness.png",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "file": "textures/gunmetal_albedo.png",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "file": "textures/gunmetal_metalness.png",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "file": "textures/gunmetal_normal.png",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "file": "textures/gunmetal_orm.png",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "file": "textures/gunmetal_roughness.png",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "file": "textures/polymer_albedo.png",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "file": "textures/polymer_metalness.png",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "file": "textures/polymer_normal.png",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "file": "textures/polymer_orm.png",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "file": "textures/polymer_roughness.png",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "file": "textures/steel_albedo.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/steel_metalness.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/steel_normal.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/steel_orm.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "textures/steel_roughness.png",
+      "width": 1024,
+      "height": 1024
+    }
+  ],
+  "pbr_channels": [
+    "albedo",
+    "roughness",
+    "metalness",
+    "tangent_normal"
+  ],
+  "pbr_export": "Roughness in G and metalness in B of ORM; separate PNG channels also delivered.",
+  "glb_sha256": "42bce673b808637416ab3297c9a84af9f41fc177d51a38e34c2d706d5e307c5f",
+  "glb_bytes": 28468524,
+  "original_sha256": "d6b19d2586366484a9fc5e117200000e5106147e9c65c1759680677b583505db",
+  "no_cameras_lights": true,
+  "godot_executed": false,
+  "contact_contract": {
+    "grip_origin_m": [
+      0,
+      0,
+      0
+    ],
+    "support_m": [
+      0.0,
+      0.07718001306056976,
+      -0.25999999046325684
+    ],
+    "support_surface_error_m": 7.957223324694951e-09,
+    "muzzle_m": [
+      0.0,
+      0.10499999672174454,
+      -0.6200000047683716
+    ],
+    "max_original_surface_vertex_error_m": 0.0,
+    "original_part_names_preserved": true
+  },
+  "source_blend_sha256": "80e47f448ff2a8eac9f9dc11422ad96e19e1ea6302c1b48eaf711693d04a1aef",
+  "source_reopened": true,
+  "provenance": {
+    "base_model": "assets/models/weapons/tactical_original/assault_rifle.glb",
+    "new_textures": "Original deterministic procedural maps; no downloaded inputs.",
+    "character_rig": null
+  },
+  "limits": [
+    "Offline structural and sampled geometric validation; no Godot import or gameplay test.",
+    "No full triangle intersection or cloth simulation proof.",
+    "No LODs, performance benchmark or full UAL clip playback validation."
+  ]
+}

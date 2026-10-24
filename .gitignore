@@ -30,3 +30,9 @@ docs/design/menus_review/*.import
 
 # Python caches (tools/real_island and the Blender helpers)
 __pycache__/
+
+# Local delivery folder of the 2026-10-23 visual target: the rifle GLB and its
+# textures are duplicated in assets/models/weapons/assault_rifle_realistic/, and
+# the recruit study was rejected (see docs/design/art/visual_target_20261023/).
+# Its sources and records were copied into the repository; the rest stays on disk.
+assets/models/visual_target_20261023/
