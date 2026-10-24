@@ -26,10 +26,13 @@ com data e os handoffs fechados vivem em `docs/history/` (não são listas).
 
 - [ ] Playtest com pessoas reais: 3 pessoas, uma run do arquipélago no Threat 1
   com o Recruit, telemetria em `user://runs/`. É a maior lacuna do projeto.
-- [ ] Medir FPS no PC (RTX 5060 8 GB) com 150 inimigos em jogo completo
-  (terreno, HUD, boss e efeitos) e preencher `game/README.md`.
-- [ ] Medir o custo da arma realista (frame time, draw calls, VRAM) com 150
-  inimigos. O GLB tem 28 MB e texturas 2K.
+- [x] Medir FPS no PC (RTX 5060 8 GB) com 150 inimigos: 5,1–5,2 ms de média
+  e p99 de ~12 ms nas três câmaras, a 1600×900; números em `game/README.md`.
+  `tools/dev/bench_frame.gd` repete a medição.
+- [x] Medir o custo da arma realista: +0,02 ms na média, dentro do ruído, e o
+  mesmo número de draw calls.
+- [ ] Medir o que a primeira medição não cobriu: Berlenga, vulcão com o
+  Behemoth, cartas elementais em pico e 1080p/1440p/4K.
 - [ ] Equilíbrio a jogar: curva de XP (quadrática, ×10; ver
   `docs/tech/COMBAT_CATALOG.md`), power-ups, dano corpo a corpo limitado a 25
   por frame, duração do boss, dificuldade entre ilhas.

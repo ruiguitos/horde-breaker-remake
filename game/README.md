@@ -805,6 +805,29 @@ Porquê separar `island_run` (regras) de `island` (cena): assim os testes
 correm o jogo inteiro sem janela (`tests/test_island_run.gd` tem um bot que
 joga 90 s). E qualquer bug de regras reproduz-se em headless.
 
+## Desempenho medido
+
+Primeira medição do jogo completo, a 2026-10-24, com o `tools/dev/bench_frame.gd`:
+`beach_01`, 150 inimigos em volta do jogador, terreno, mar, HUD, armas e
+efeitos. RTX 5060 8 GB, Forward+, 1600×900, vsync desligado, 600 amostras
+por configuração, depois de 3 s de aquecimento.
+
+| Câmara | Arma | Média | p50 | p95 | p99 | Pior | Draw calls |
+|---|---|---:|---:|---:|---:|---:|---:|
+| 1.ª pessoa | atual | 5,14 ms (195 fps) | 3,68 | 10,54 | 12,26 | 19,03 | 1 306 |
+| 3.ª pessoa | atual | 5,22 ms (192 fps) | 3,79 | 9,85 | 12,32 | 20,74 | 1 305 |
+| Fixa | atual | 5,18 ms (193 fps) | 3,74 | 10,05 | 11,82 | 20,62 | 1 304 |
+| 1.ª pessoa | realista | 5,16 ms (194 fps) | 3,71 | 10,13 | 12,01 | 21,88 | 1 305 |
+
+O rifle realista não custa nada de mensurável: +0,02 ms na média, dentro do
+ruído, e o mesmo número de draw calls.
+
+**Limites:** o jogador não se move e não há boss, cartas nem efeitos
+elementais; a resolução é 1600×900, não 1080p nem 4K. O pior fotograma
+(19–22 ms) vem das pausas de compilação de shaders e do carregamento, não do
+combate. Com o pico de horda a 150, o orçamento de 16,6 ms tem folga; ainda
+falta medir a Berlenga, o vulcão com o Behemoth e as resoluções maiores.
+
 ## O que ainda não existe
 
 Ver `TODO.md` na raiz.
