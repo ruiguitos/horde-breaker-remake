@@ -1,9 +1,14 @@
 # Horde Breaker — GDD v2 ("Expedition Breaker")
 
-Estado: **proposta** (2026-10-05). Baseia-se em `docs/DECISIONS.md`, no
-`BRAINSTORM.md` (incluindo as respostas do utilizador na secção 10) e nos
-documentos de `docs/legacy/`. Nada aqui é decisão até entrar em
-`DECISIONS.md`; os pontos a confirmar estão na secção 6.
+Estado: **proposta** (2026-10-05, atualizado a 2026-10-24). Baseia-se em
+`docs/DECISIONS.md`, no `BRAINSTORM.md` (incluindo as respostas do utilizador
+na secção 10) e nos documentos de `docs/legacy/`. Nada aqui é decisão até
+entrar em `DECISIONS.md`; os pontos a confirmar estão na secção 6.
+
+> **O jogo cresceu muito além deste documento.** Hoje tem 5 biomas, 11 missões,
+> 2 classes, 5 armas, cartas, perks e a expedição Berlenga. O estado jogável
+> está em `game/README.md`, e é essa a fonte de verdade. As tabelas abaixo
+> ficam como o âmbito original do vertical slice, não como descrição atual.
 
 ## 1. Pitch e high concept
 
@@ -55,6 +60,10 @@ de só escalar com o tempo, para que o loop de 5 min tenha respiração.
 ## 5. Vertical slice e "não vamos fazer"
 
 **Objetivo do slice:** 10 minutos divertidos em grey-box (primitivas Godot).
+
+> **Substituído na prática (2026-10-24):** o jogo tem hoje os cinco biomas, as
+> onze missões, as duas classes e as cinco armas. A tabela fica como âmbito
+> original.
 
 | Elemento | Conteúdo |
 |---|---|

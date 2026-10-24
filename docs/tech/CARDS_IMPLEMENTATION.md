@@ -1,6 +1,6 @@
 # Cartas — implementação da tarefa 1
 
-Implementação de 2026-10-10, a partir de `CODEX_HANDOFF.md` e da secção C
+Implementação de 2026-10-10, a partir de `docs/history/CODEX_HANDOFF_2026-10-10.md` e da secção C
 de `docs/design/CARDS_WEAPONS_PERKS.md`. São **39 cartas**: as 12 existentes
 reequilibradas, 19 novas sem sistemas adiados, quatro elementos e quatro
 melhorias elementais. Os IDs e UIDs das 12 originais mantêm-se.

@@ -1,6 +1,6 @@
 # Power-ups de abate e ecrã de derrota — 2026-10-10
 
-Implementação da tarefa 2 de `CODEX_HANDOFF.md` e do pedido de melhorar
+Implementação da tarefa 2 de `docs/history/CODEX_HANDOFF_2026-10-10.md` e do pedido de melhorar
 o menu de morte. A tarefa 1 (39 cartas) está descrita em
 [CARDS_IMPLEMENTATION.md](CARDS_IMPLEMENTATION.md). Sem commit nesta fase.
 

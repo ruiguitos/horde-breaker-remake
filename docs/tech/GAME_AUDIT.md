@@ -1,5 +1,10 @@
 # Horde Breaker — auditoria do jogo e trabalho por terminar
 
+> **Como usar (2026-10-24).** Este documento é **evidência e história**, não a
+> lista de trabalho: essa é `TODO.md`. Vários itens da §1 já foram resolvidos e
+> estão marcados na §3 (horda, perfil, noclip, runner). Se houver divergência
+> entre este texto e o código, vale o código e o teste que o cobre.
+
 ## Estado atual — 2026-10-17
 
 **Referência:** `2555d01`. Revisão estática da documentação, código e recursos
@@ -420,7 +425,7 @@ da pausa**; não repetir essa tarefa. Foco, bloqueios de entrada e confirmação
 de abandono já têm implementação e testes.
 Evidência: [hud.gd](../../game/ui/hud.gd), [menu_dialog.gd](../../game/ui/menu_dialog.gd),
 [game_input.gd](../../game/core/game_input.gd), [profile.gd](../../game/core/profile.gd),
-[camp.gd](../../game/states/camp.gd), [CODEX_HANDOFF.md](CODEX_HANDOFF.md).
+[camp.gd](../../game/states/camp.gd), [CODEX_HANDOFF (histórico)](../history/CODEX_HANDOFF_2026-10-10.md).
 
 ## 8. Som e história
 
@@ -465,10 +470,9 @@ Não há evidência nesta auditoria para prometer 60/144 FPS estáveis em combat
 
 ## 10. Documentação que precisa de atualização
 
-- [ ] **D01 / P2:** atualizar [CODEX_HANDOFF.md](CODEX_HANDOFF.md): há estados
-  “sem commit” apesar de as alterações já estarem em Git, e a referência
-  `9b10cf3` não corresponde ao commit atual da correção de mira/spawns.
-  Os commits observados são `7874de1` e `48d0c42`.
+- [x] **D01 / P2:** resolvido a 2026-10-24. O handoff passou a
+  [histórico](../history/CODEX_HANDOFF_2026-10-10.md) e os seus estados
+  “sem commit” ficaram como registo datado; a lista ativa é `TODO.md`.
 - [ ] **D02 / P2:** atualizar [COMBAT_CATALOG.md](COMBAT_CATALOG.md) a partir
   dos recursos atuais e dos efeitos: carregador da AR, nomes/efeitos dos
   power-ups, descrições G03 e fórmulas. Não usar uma proposta como catálogo

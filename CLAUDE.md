@@ -2,7 +2,8 @@
 
 Remake do Horde Breaker (repositório original: `ruiguitos/horde-breaker`).
 O jogo está a ser **reformulado a partir dos documentos de design**, não do
-código antigo. Estado atual: **arquipélago jogável** (5 biomas, 9 missões, Berlenga em 4 partes,
+código antigo. Estado atual: **arquipélago jogável** (5 biomas, 10 missões nas
+rotas mais a Holdout da Berlenga, 11 recursos no total; Berlenga em 4 partes;
 Hashima retirada); ver `game/README.md` e `TODO.md`.
 
 ## Idioma

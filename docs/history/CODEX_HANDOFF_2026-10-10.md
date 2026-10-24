@@ -7,7 +7,7 @@ aprovados**, incluindo testes novos/alterados repetidos após a importação.
 Auditorias geométricas, comparação com o repouso original e rebuilds limpos
 aprovados dentro dos limites documentados. Sem commit nem push.
 Estado, limites, comandos e prompt de passagem ao Claude:
-[RELOAD_ARM_CLIPS_RESUME.md](RELOAD_ARM_CLIPS_RESUME.md).
+[RELOAD_ARM_CLIPS_RESUME_2026-10-21.md](RELOAD_ARM_CLIPS_RESUME_2026-10-21.md).
 
 O utilizador passou estas tarefas do Claude para o Codex, para poupar
 créditos. Fazê-las **por esta ordem, uma de cada vez**. No fim de cada uma:

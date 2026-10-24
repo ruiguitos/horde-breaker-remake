@@ -184,7 +184,7 @@ SMG e 1 097 na MG, dentro dos limites de contacto documentados acima.
 Os rebuilds limpos mantêm os buffers e metadados estáticos originais; a maior
 diferença de componentes da animação foi inferior a 0,000001. As dez poses
 de recarga foram vistas numa captura real do Godot 4.7.2, Compatibility.
-Ver `delivery_validation.json` e [passagem/resultado](../../../../docs/tech/RELOAD_ARM_CLIPS_RESUME.md).
+Ver `delivery_validation.json` e [passagem/resultado](../../../../docs/history/RELOAD_ARM_CLIPS_RESUME_2026-10-21.md).
 
 O JEV recebeu apenas resumos anonimizados dos testes e verificou a coerência
 de duas afirmações sobre seleção de variantes, alcance e limites da evidência.

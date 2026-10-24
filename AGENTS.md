@@ -18,4 +18,5 @@ Practical notes for this machine (Windows):
 - Commit and push to `master` only when the user asks; Conventional Commits
   in English; `git pull --rebase origin master` before pushing.
 
-Current task list: `docs/tech/CODEX_HANDOFF.md`.
+Current task list: `TODO.md`. Handoffs and dated reports live in `docs/history/`
+and are records, not lists.

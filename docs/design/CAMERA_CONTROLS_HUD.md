@@ -4,6 +4,12 @@ Proposta de design (2026-10-05). Parte da decisão fechada **câmara média**
 (`docs/DECISIONS.md`) e da discussão em `BRAINSTORM.md` §6–§7. O que aqui está
 é proposta: as decisões finais ficam na secção 6 e só o utilizador as fecha.
 
+> **Estado a 2026-10-24.** Onde esta página contradiz `docs/DECISIONS.md`,
+> prevalece a decisão. Os controlos em uso estão em `game/README.md` e em
+> `game/core/game_input.gd`; esta página serve para o raciocínio de design,
+> não como referência de bindings nem de HUD atual. As duas correções já
+> aplicadas estão assinaladas abaixo (§4.1 e §6.1).
+
 Restrições assumidas:
 
 - **Headshots (×2) e body shots mantêm-se.** A mira tem de permitir escolher
@@ -340,7 +346,10 @@ mais próximo com linha de tiro, como no original: 8–13 m).
 | Balanceamento | todo o jogo calibrado para dano automático | calibrar para mira manual; a opção aceita perder eficiência |
 | Comando | resolve a dificuldade de mirar com stick | aim slowdown + magnetismo cobrem a maior parte |
 
-**Recomendação: opção, desligada por omissão**, em dois níveis:
+**Substituído a 2026-10-05 pelo utilizador:** o **auto-fire é o modo normal**
+(`docs/DECISIONS.md`), com prioridade pela orientação do personagem e headshots
+mantidos. A opção desligada por omissão e os dois níveis abaixo ficam como
+registo da alternativa rejeitada, não como comportamento do jogo.
 
 1. **"Auto-fire na retícula"** — dispara quando a retícula está sobre um
    inimigo. A mira continua do jogador, por isso um headshot continua a ser
@@ -412,8 +421,9 @@ cumprem, decide a preferência (9). Se nenhum cumprir 1, testar um meio-termo
 5. **Tab para trocar arma**, M para mapa.
 6. **Sem radar por omissão**: câmara + indicadores de borda + som; radar como
    opção.
-7. **Auto-fire como opção desligada por omissão**, em dois níveis; armas de
-   munição limitada nunca disparam sozinhas.
+7. ~~**Auto-fire como opção desligada por omissão**, em dois níveis; armas de
+   munição limitada nunca disparam sozinhas.~~ **Substituído:** o auto-fire é o
+   modo normal (decisão de 2026-10-05).
 8. **Magnetismo do comando aponta ao corpo**, nunca à cabeça.
 9. HUD desenhado para **1152×648** com texto mínimo de 16 px e forma + cor em
    todos os estados.
@@ -422,8 +432,8 @@ cumprem, decide a preferência (9). Se nenhum cumprir 1, testar um meio-termo
 
 ### 6.2 Perguntas para o utilizador
 
-1. Auto-fire: concordas com "opção, desligada por omissão"? Ou queres que
-   seja por omissão (o que puxa o jogo para a direção A)?
+1. ~~Auto-fire: concordas com "opção, desligada por omissão"?~~ **Respondido a
+   2026-10-05:** auto-fire é o modo normal.
 2. Yaw livre com o rato a rodar sempre a câmara está bem, ou preferes rodar
    só com botão premido?
 3. O breaker deve ir na direção do **movimento** ou da **mira**?

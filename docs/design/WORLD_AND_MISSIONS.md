@@ -4,6 +4,13 @@ Proposta de 2026-10-05 para a direção A+B ("Expedition Breaker"), câmara
 média e horda de ~80–150 inimigos ativos. **Nada aqui é decisão** até entrar
 em `docs/DECISIONS.md`; as propostas estão na secção 7.
 
+> **Parcialmente substituído (2026-10-24).** O mapa em grafo da §1.1 deu lugar
+> a rotas sorteadas entre ilhas (decisão de 2026-10-14). Os templates da §3
+> foram implementados com outros números: o Activate usa 8 s por gerador, não
+> 20 s, e há 11 missões. O estado real está em `game/README.md` e em
+> `docs/design/OBJECTIVES_PROPOSAL.md`. O que continua válido são as regras de
+> layout da §2.1 e as fichas de identidade das ilhas da §4.
+
 Fontes: `BRAINSTORM.md` (secções 2, 4 e 10) e, como referência histórica,
 `legacy/ARCHIPELAGO_GAMEPLAY_PLAN.md`, `legacy/MAP_DESIGN.md`,
 `legacy/HUD_AND_OUTER_MISSIONS.md` e `legacy/PROJECT_AUDIT.md`.
