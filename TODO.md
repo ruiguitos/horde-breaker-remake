@@ -44,19 +44,30 @@ com data e os handoffs fechados vivem em `docs/history/` (não são listas).
 
 ## Animação e arte
 
-- [ ] Fase 1 da animação (rig atual, custo baixo): ligar os clips UAL que já
-  estão instalados e sem uso — `Pistol_Aim_Up/Neutral/Down`, `Pistol_Reload`,
-  `Interact`, `PickUp_Table`, `Jump_Land`, `Hit_Head` — e dar *wind-up* de
-  0,3 s ao ataque da horda.
-- [ ] Sway/lag da arma em primeira pessoa (o ADS, o carregador e o *charge*
-  já existem em `view_model.gd`).
-- [ ] Poses em código que faltam: explosão do Bloater e fase de raiva do
-  Behemoth (`boss_enraged`), em `zombie.gdshader`.
+- [ ] Braços com a mira: a UAL não tem pega de rifle, e os clipes de pistola
+  partiriam a pega de duas mãos (`docs/tech/LOCOMOTION.md`, *Camada de tronco*).
+- [ ] Ver no editor o aviso de 0,3 s dos Shamblers e Runners (inclinação, braços
+  e avanço a 25 %) e a Fuel Run com o aviso ligado.
+- [ ] Aviso do golpe no Crawler: o `crawler_body.gdshader` tem de levantar os
+  braços antes de o Crawler ter aviso.
+
+Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LOCOMOTION.md`):
+
+- `Pistol_Reload`: a pega de duas mãos tem de ceder durante a recarga, e falta decidir se a mão esquerda vai ao carregador.
+- `Interact`: `interact()` só trata dos bidões da Fuel Run; não há noção de "segurar E".
+- `PickUp_Table`: não há sinais apanhados; `interact()` só trata dos bidões.
+- `Jump_Land`: o jogo não tem queda normal (`_fly` só sobe em noclip) e o Breaker não tem ar; falta definir o que é "degrau alto".
+- `Hit_Head`: `react_hit()` não recebe a zona do dano, por isso não há origem de dano na cabeça.
+- [ ] Ver no editor o peso da arma em primeira pessoa (atraso ao rodar a
+  câmara, `LAG_PER_RATE`). Por fazer: o sway de posição ao andar e ao acelerar.
+- [ ] Ver no editor a explosão do Bloater (corpo a inchar 0,35 s e bola de fogo
+  no mesmo tempo) e a pose de fase 2 do Behemoth (`ENRAGED_POSE`, a afinar).
 - [ ] Ver no editor o flinch, o roll e a queda na morte do jogador
   (`docs/tech/LOCOMOTION.md`, secção Reações).
 - [ ] Ver a pose de chamada do Screamer e a carga do golpe do Behemoth.
-- [ ] Preset horror: a estrada é a faixa mais clara do ecrã e puxa o olho.
-  Rever material/contraste do caminho à noite.
+- [ ] Ver no editor a estrada escura do preset horror, a cor de cada bioma
+  (`game/data/biomes/*.tres`) a luz do preset horror (1,3; a captura ainda sai escura), e a erva e os seixos da praia, nas ilhas geradas e na beach_01 (até 400 instâncias,
+  60 m; desligados no preset Low). São propostas a confirmar.
 
 ## Modelos (Codex)
 
@@ -70,6 +81,9 @@ com data e os handoffs fechados vivem em `docs/history/` (não são listas).
   molde; a malha não entra. Guardar para quando houver base mesh.
 
 ## Conteúdo e apresentação
+
+- [ ] Ver no editor a árvore de perks a 1600 × 900 (ícones de 18 px, pips em linha)
+  e o painel LOADOUT com os renders (`docs/tech/WEAPON_MODELS.md`).
 
 - [ ] Props realistas restantes (`docs/tech/REALISTIC_PROPS.md`): rever a
   utilidade antes de integrar; já há alternativas procedurais.

@@ -44,10 +44,13 @@ func _run() -> void:
 		_check(_sky(normal).get("lights_enabled") == true, "a normal island keeps the Sky3D sun")
 		_check(normal.get("_horror_light") == null, "a normal island has no backlight of its own")
 		_check(normal.get("camera_mode") == Profile.CameraMode.FIRST_PERSON, "a normal island follows the profile's camera")
+		_check(_sky(normal).environment.ambient_light_energy < 1.2, "a normal island keeps its own scene light, under the horror preset's (%.2f)" % _sky(normal).environment.ambient_light_energy)
 		_check(_ambience_count(normal) == 1, "a normal island has only the sea ambience")
 		_check(not normal.music.silenced(), "a normal island plays its music from the start")
 		_check(not normal.hud.minimal and not normal.hud._survivor_row.visible and not normal.hud._boss_row.visible, "a normal island has the full HUD, with its survivor and boss rows still hidden")
 		_check(normal.get("_player").get("_gun_node").get("variant") == &"", "a normal island holds the current rifle")
+		var normal_surface: MeshInstance3D = normal.find_child("Roads", true, false).find_child("Surface", true, false) as MeshInstance3D
+		_check(normal_surface != null and normal_surface.material_override is StandardMaterial3D and (normal_surface.material_override as StandardMaterial3D).albedo_color.get_luminance() > 0.4, "a normal island keeps its usual, light road surface")
 		await _free(normal)
 	var rifle_island: Node = await _island(&"normal", &"realistic")
 	if rifle_island != null:
@@ -56,6 +59,8 @@ func _run() -> void:
 		await _free(rifle_island)
 	var horror: Node = await _island(&"horror")
 	if horror != null:
+		var horror_surface: MeshInstance3D = horror.find_child("Roads", true, false).find_child("Surface", true, false) as MeshInstance3D
+		_check(horror_surface != null and horror_surface.material_override is StandardMaterial3D and absf((horror_surface.material_override as StandardMaterial3D).albedo_color.get_luminance() - 0.3) < 0.03, "the horror preset's road is dark asphalt, about 0.30")
 		await _horror_checks(horror)
 		await _free(horror)
 	quit(1 if _failures > 0 else 0)
@@ -69,6 +74,7 @@ func _horror_checks(horror: Node) -> void:
 	_check(sky.get("lights_enabled") == false and sky.get("fog_enabled") == false, "the horror preset turns off the Sky3D sun and its own fog pass")
 	var env: Environment = sky.environment
 	_check(env.fog_enabled and is_equal_approx(env.fog_density, float(preset["HORROR_FOG_DENSITY"])) and env.fog_height_density < 0.0, "the horror mist is in layers: thin far away, denser by the ground")
+	_check(is_equal_approx(env.ambient_light_energy, float(preset["HORROR_AMBIENT_ENERGY"])), "the horror preset lifts its scene light to %.2f (was Sky3D's 1.0)" % env.ambient_light_energy)
 	var light: DirectionalLight3D = horror.get("_horror_light")
 	_check(light != null and light.light_energy > 0.0 and light.light_energy < 0.6, "the horror preset has a weak cold backlight")
 	_check(light != null and not light.shadow_enabled, "the backlight casts no shadows at the start")
@@ -114,8 +120,8 @@ func _horror_checks(horror: Node) -> void:
 	var fallback: bool = false
 	for child in horror.get_children():
 		if child is WorldEnvironment and child.get("current_time") == null:
-			fallback = is_equal_approx(child.environment.fog_density, float(preset["HORROR_FOG_DENSITY"]))
-	_check(fallback, "the fallback sky of the horror preset has the same mist")
+			fallback = is_equal_approx(child.environment.fog_density, float(preset["HORROR_FOG_DENSITY"])) and is_equal_approx(child.environment.ambient_light_energy, float(preset["HORROR_AMBIENT_ENERGY"]))
+	_check(fallback, "the fallback sky of the horror preset has the same mist and scene light")
 
 
 ## The minimal HUD: the listed parts are transparent, the kept ones stay, the game's own
@@ -145,9 +151,11 @@ func _hud_checks(horror: Node) -> void:
 	for part: String in LOGIC_OWNED:
 		after.append((hud.get(part) as Control).visible)
 	var full_ok: bool = true
+	# The XP and the counters rest at 85 % (the HUD's visual weights); the minimap box and the rest at full strength.
 	for part: String in HIDDEN:
-		full_ok = full_ok and (hud.get(part) as Control).modulate.a == 1.0
-	_check(not hud.minimal and full_ok, "F4 brings the full HUD back (the minimap shows again)")
+		var rest: float = 0.85 if part in ["_xp_bar", "_xp_text", "_xp_bonus", "_stats", "_survivor_row"] else 1.0
+		full_ok = full_ok and absf((hud.get(part) as Control).modulate.a - rest) < 0.001
+	_check(not hud.minimal and full_ok, "F4 brings the full HUD back (the minimap shows again, the XP and counters at 85 %)")
 	_check(before == after, "F4 leaves the game's own visibility alone (radio, survivor, boss, XP bonus)")
 	horror._unhandled_input(key)  # minimal again
 	await _settle(1)

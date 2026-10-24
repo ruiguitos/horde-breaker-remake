@@ -459,3 +459,35 @@ Mais tarde, o nível de dificuldade (Hazard do DRG) pode significar
    (à Mission Control do DRG) ou só texto neutro por agora?
 7. **Ilhas extra** (Ironworks, Mourning, Shipwreck): ficam reservadas para
    depois, ou cortamos já para a lista "não vamos fazer"?
+
+## Gráficos da cena: estrada, bioma e praia (2026-10-24)
+
+- **Estrada no preset horror:** só o preset horror a escurece (asfalto quase
+  escuro: asfalto de albedo 0,30, luminância perto de 0,30; antes 0,20). Nas ilhas normais fica como estava. O céu e o
+  nevoeiro não mudam. As ilhas feitas à mão têm a estrada em malhas
+  (`Roads/Surface`); as geradas usam o gestor de estradas do addon. Ambas passam por
+  `IslandRoads.darken()`, chamada em `Island._ready()` depois de `_build_world()`.
+- **Luz do preset horror:** a luz ambiente da cena sobe de 1,0 (o valor do Sky3D) para 1,3
+  (`HORROR_AMBIENT_ENERGY`, em `game/world/island.gd`). Na captura da `beach_01` no mesmo
+  enquadramento, a média de luminância passou de 15,6 % para 15,9 % (estrada 13,1 % para
+  13,7 %, figura 15,9 % para 16,3 %). Com 1,6 foi 16,1 %: neste caminho a luz ambiente dá
+  pouco. A causa da imagem ainda escura não está verificada (a contribuição do céu do
+  Sky3D ou a contra-luz são hipóteses). A exposição fica em 1,0 (`Visuals.apply_post`),
+  por isso não foi ajustada.
+- **Cor por bioma, discreta:** a gradação de cada bioma (`game/data/biomes/*.tres`)
+  tem tintas até 0,25. O porto fica cinzento (tintas abaixo de 0,1), o vulcão laranja
+  com sombras escuras, a praia quente e clara, a selva fria e verde. Só muda a cor;
+  texturas e a legibilidade dos avisos ficam iguais. Os valores são propostas a
+  confirmar no editor.
+- **Vegetação rasteira na praia:** erva e seixos em dois MultiMesh
+  (`game/world/beach_vegetation.gd`). No máximo 400 instâncias num raio de 60 m do
+  jogador, em chão aberto do bioma (sem estrada, pontes, edifícios nem água; a pintura do terreno não é lida). Os locais são
+  sorteados uma vez por ilha, com seed fixa, por isso não tremem ao andar. Desligada
+  no preset Low. Medido em headless (`tests/test_scenery_graphics.gd`): mapa de praia com
+  estradas marcadas 231 ms (inclui o plano das estradas), construção da vegetação
+  6,9 ms, colocação 0,35 ms, 400 instâncias (301 erva, 99 seixos) de 2400 locais. O custo de frame na GPU não foi medido. A vegetação vale para as ilhas geradas e para as
+  feitas à mão: `Island._build_beach_cover()` é chamada em `_build_world()`, depois de o
+  chão e as estradas estarem no mapa, nos dois caminhos. Na `beach_01`
+  (`tests/test_beach_cover_handmade.gd`): 2400 locais, nenhum sobre estrada, deck, edifício
+  ou água; 400 instâncias no raio (299 erva, 101 seixos). Uma ilha de selva feita à mão
+  não tem vegetação.

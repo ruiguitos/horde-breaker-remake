@@ -223,6 +223,8 @@ var _building_boxes: Array[AABB] = []
 var _building_detail_mats: Array[StandardMaterial3D] = []
 var _slam_ring: MeshInstance3D
 var _explosions: Array[MeshInstance3D] = []
+var _explosion_rate: PackedFloat32Array = PackedFloat32Array()  ## growth per second, per fireball in _explosions
+var _vegetation: BeachVegetation  ## the grass and pebbles of a beach island (null elsewhere)
 var _tracers: Array[PackedVector3Array] = []
 var _tracer_life: float = 0.0
 var _debris_pos := PackedVector3Array()
@@ -275,6 +277,8 @@ func _ready() -> void:
 	if context != null:
 		run.load_context(context)
 	_build_world()
+	if _horror():
+		IslandRoads.darken(self)
 	sfx = Sfx.new()
 	add_child(sfx)
 	fx = Fx.new()
@@ -354,6 +358,7 @@ func _build_world() -> void:
 		_use_handmade_world()
 	else:
 		_build_generated_world()
+	_build_beach_cover()  # both kinds of island have their roads in the map by now
 	_build_lava()
 	for c in run.map.caches:
 		var crate := MeshInstance3D.new()
@@ -652,6 +657,16 @@ func _use_handmade_world() -> void:
 	_building_boxes.append_array(_handmade.object_boxes())
 
 
+## Grass and pebbles on a beach, on either kind of island. Built after the ground and the roads:
+## the cover keeps off the roads (the map's cover marks them, whether the island is hand-made or generated).
+## Each island has its own seed, so its cover differs from the next one's.
+func _build_beach_cover() -> void:
+	if run.map.biome != &"beach":
+		return
+	_vegetation = BeachVegetation.for_map(run.map, run.run_seed)
+	add_child(_vegetation)
+
+
 ## Terrain3D ground (sloping sea floor, colour-mapped land). False when the
 ## addon is unavailable, so the flat tile ground is used instead.
 func _build_terrain(cells: Array[Vector2i], coast: PackedInt32Array, rng: RandomNumberGenerator) -> bool:
@@ -835,6 +850,7 @@ const HORROR_FOG_SKY_AFFECT: float = 0.3  ## the sky is hardly fogged
 const HORROR_FOG_COLOUR: Color = Color(0.36, 0.41, 0.47)
 const HORROR_LIGHT_COLOUR: Color = Color(0.7, 0.8, 0.95)
 const HORROR_LIGHT_ENERGY: float = 0.35  ## a weak backlight, not a sun
+const HORROR_AMBIENT_ENERGY: float = 1.3  ## the scene's own light, up from Sky3D's 1.0: it read underexposed
 const HORROR_LIGHT_PITCH: float = -7.0  ## degrees below the horizontal
 const HORROR_MUSIC_DELAY: float = 60.0
 var _horror_light: DirectionalLight3D  ## the preset's backlight (see _process)
@@ -882,6 +898,7 @@ func _apply_horror_light(env: Environment) -> void:
 	env.fog_height_density = HORROR_FOG_HEIGHT_DENSITY
 	env.fog_sky_affect = HORROR_FOG_SKY_AFFECT
 	env.fog_light_color = HORROR_FOG_COLOUR
+	env.ambient_light_energy = HORROR_AMBIENT_ENERGY
 
 
 ## HORROR preset, on either sky: a weak cold backlight. _process keeps it behind the
@@ -1959,13 +1976,17 @@ func _process(delta: float) -> void:
 			_camera.fov = fov  # field of view changed in Settings (pause)
 	_draw_player_and_camera()
 	_update_mouse_mode()
+	if _vegetation != null:
+		_vegetation.follow(run.player_pos)
+	# Before the enemies: a Bloater's death registers its corpse here, so it is drawn this frame,
+	# with the same age as its fireball.
+	_draw_effects(delta)
 	_draw_enemies()
 	_draw_orbs()
 	_draw_grenades()
 	_draw_clouds()
 	_draw_power_up()
 	_draw_rocks()
-	_draw_effects(delta)
 	_draw_mission()
 	_fade_occluders(delta)
 	if showcase:
@@ -2032,7 +2053,7 @@ func _play_audio() -> void:
 			sfx.play(&"headshot", -4.0, 0.1, 50)
 		else:
 			sfx.play(&"kill", -8.0, 0.15, 50)
-	if not run.explosions.is_empty():
+	if not run.explosions.is_empty() or not run.bloat_pops.is_empty():
 		sfx.play(&"explosion", 0.0, 0.1, 80)
 	if run.dash_time > 0.0 and not _audio_dashing:
 		sfx.play(&"breaker", -2.0)
@@ -2464,6 +2485,11 @@ func _draw_player_and_camera() -> void:
 	soldier.carrying = run.is_carrying()
 	soldier.aim_pitch = -_tp_pitch if camera_mode != Profile.CameraMode.FIXED else 0.0
 	soldier.grounded = not run.noclip and _fly < 0.01
+	# The body kicks back with the player's own shots, before this frame's pose. Ricochets start far from the player.
+	for seg: PackedVector3Array in run.tracers:
+		if Vector2(seg[0].x - run.player_pos.x, seg[0].z - run.player_pos.z).length() < 1.0:
+			soldier.recoil()
+			break
 	soldier.animate(_walk_speed, Time.get_ticks_msec() / 1000.0, run.sprinting or run.dash_time > 0.0, animation_delta)
 	_player.position = _view_pos()
 	_player.basis = Basis.looking_at(run.facing, Vector3.UP)
@@ -2504,6 +2530,7 @@ func _draw_enemies() -> void:
 	# Every enemy kind is drawn by ZombieHordeView, with its models (ZombieHordeView.handles).
 	_zombies.scream_age = run.scream_age
 	_zombies.slam_windup = 1.0 - run.slam_time / GameData.BOSS_SLAM_WINDUP if run.slam_time > 0.0 else 0.0
+	_zombies.boss_enraged = run.boss_enraged
 	_zombies.draw(run.horde, run.map, now, 0.0 if paused else get_process_delta_time())
 
 
@@ -2758,23 +2785,36 @@ func _draw_effects(delta: float) -> void:
 			bi += 1
 
 	for e in run.explosions:
-		var boom := MeshInstance3D.new()
-		boom.mesh = _sphere(3.0)
-		boom.position = _on_ground(e) + Vector3(0, 0.5, 0)
-		var bm := _mat(Color(1, 0.55, 0.1, 0.55), true)
-		bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		boom.material_override = bm
-		boom.scale = Vector3.ONE * 0.2
-		add_child(boom)
-		_explosions.append(boom)
+		_add_boom(e, 5.0)
+	# A Bloater's fireball grows over the same time its body swells (ZombieHordeView.POP_TIME).
+	for e in run.bloat_pops:
+		_add_boom(e, 0.8 / ZombieHordeView.POP_TIME)
 	run.explosions.clear()
+	run.bloat_pops.clear()
+	# Fireballs freeze in a pause, as the corpses do, so a Bloater's body and its burst stay in step.
+	var boom_dt: float = 0.0 if paused else delta
 	for k in range(_explosions.size() - 1, -1, -1):
 		var b: MeshInstance3D = _explosions[k]
-		b.scale += Vector3.ONE * delta * 5.0
+		b.scale += Vector3.ONE * boom_dt * _explosion_rate[k]
 		(b.material_override as StandardMaterial3D).albedo_color.a = 0.55 * (1.0 - b.scale.x)
 		if b.scale.x >= 1.0:
 			b.queue_free()
 			_explosions.remove_at(k)
+			_explosion_rate.remove_at(k)
+
+
+## A fireball at `e` that grows by `rate` per second from 0.2 to full size (1.0) and fades.
+func _add_boom(e: Vector3, rate: float) -> void:
+	var boom := MeshInstance3D.new()
+	boom.mesh = _sphere(3.0)
+	boom.position = _on_ground(e) + Vector3(0, 0.5, 0)
+	var bm := _mat(Color(1, 0.55, 0.1, 0.55), true)
+	bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	boom.material_override = bm
+	boom.scale = Vector3.ONE * 0.2
+	add_child(boom)
+	_explosions.append(boom)
+	_explosion_rate.append(rate)
 
 
 func _add_debris(p: Vector3, v: Vector3, c: Color, size: float = 1.0) -> void:

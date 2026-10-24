@@ -102,6 +102,28 @@ static func build(parent: Node3D, paths: Array[PackedVector3Array]) -> Node3D:
 	return manager
 
 
+## The road's surface in the horror preset: dark asphalt, so the road stops being the lightest
+## strip on the screen. The sky and the fog keep their own look.
+static func horror_material() -> StandardMaterial3D:
+	var asphalt := StandardMaterial3D.new()
+	asphalt.albedo_color = Color(0.3, 0.3, 0.33)
+	asphalt.roughness = 0.95
+	return asphalt
+
+
+## Darkens the road surface under `root`. A generated road manager (built by build()) takes the asphalt
+## for its road surfaces, and its lamps keep their own materials. A hand-made island's road is a mesh
+## named "Surface" under "Roads", which carries its own material, so that mesh gets the asphalt.
+static func darken(root: Node) -> void:
+	var asphalt: StandardMaterial3D = horror_material()
+	for roads: Node in root.find_children("Roads", "Node3D", true, false):
+		if "material_resource" in roads:
+			roads.set("material_resource", asphalt)
+		else:
+			for surface: Node in roads.find_children("Surface", "MeshInstance3D", true, false):
+				(surface as MeshInstance3D).material_override = asphalt
+
+
 ## Street lamps on alternate sides of the road: a pole, an emissive bulb and
 ## a warm OmniLight (3D light; the Lit addon only lights 2D scenes).
 static func _add_lamps(parent: Node3D, path: PackedVector3Array) -> void:
