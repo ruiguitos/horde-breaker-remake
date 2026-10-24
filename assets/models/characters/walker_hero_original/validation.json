@@ -1,0 +1,423 @@
+{
+  "passed": true,
+  "license": "CC0-1.0",
+  "lods": {
+    "walker_lod0.glb": {
+      "passed": true,
+      "file": "walker_lod0.glb",
+      "sha256": "ebf4f3d1e0447f8a646374cab6b51b005396f5e29aa6d7470244336315789fcf",
+      "bytes": 3847644,
+      "triangles": 6923,
+      "triangle_limit": 8000,
+      "mesh_count": 2,
+      "material_count": 1,
+      "material_names": [
+        "Walker_PBR_1K"
+      ],
+      "textures": [
+        {
+          "name": "walker_normal",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1281259
+        },
+        {
+          "name": "walker_albedo",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 967792
+        },
+        {
+          "name": "walker_orm",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1098125
+        }
+      ],
+      "dimensions_m": [
+        0.7058846552449304,
+        1.9499996480977466,
+        0.34099978040462514
+      ],
+      "bounds_min_m": [
+        -0.35316101640020847,
+        5.0898810145520615e-08,
+        -0.20099981434201525
+      ],
+      "bounds_max_m": [
+        0.3527236388447219,
+        1.9499996989965567,
+        0.1399999660626099
+      ],
+      "skull_center_rest_m": [
+        1.8626450590253363e-08,
+        1.7999997496605005,
+        0.030012074893045915
+      ],
+      "skull_error_m": 1.2077502178845369e-05,
+      "bone_count": 23,
+      "bone_names": [
+        "DEF-foot.L",
+        "DEF-foot.R",
+        "DEF-forearm.L",
+        "DEF-forearm.R",
+        "DEF-hand.L",
+        "DEF-hand.R",
+        "DEF-head",
+        "DEF-hips",
+        "DEF-neck",
+        "DEF-shin.L",
+        "DEF-shin.R",
+        "DEF-shoulder.L",
+        "DEF-shoulder.R",
+        "DEF-spine.001",
+        "DEF-spine.002",
+        "DEF-spine.003",
+        "DEF-thigh.L",
+        "DEF-thigh.R",
+        "DEF-toe.L",
+        "DEF-toe.R",
+        "DEF-upper_arm.L",
+        "DEF-upper_arm.R",
+        "root"
+      ],
+      "bone_parents": {
+        "root": "Rig",
+        "DEF-hips": "root",
+        "DEF-spine.001": "DEF-hips",
+        "DEF-spine.002": "DEF-spine.001",
+        "DEF-spine.003": "DEF-spine.002",
+        "DEF-neck": "DEF-spine.003",
+        "DEF-head": "DEF-neck",
+        "DEF-shoulder.L": "DEF-spine.003",
+        "DEF-upper_arm.L": "DEF-shoulder.L",
+        "DEF-forearm.L": "DEF-upper_arm.L",
+        "DEF-hand.L": "DEF-forearm.L",
+        "DEF-shoulder.R": "DEF-spine.003",
+        "DEF-upper_arm.R": "DEF-shoulder.R",
+        "DEF-forearm.R": "DEF-upper_arm.R",
+        "DEF-hand.R": "DEF-forearm.R",
+        "DEF-thigh.L": "DEF-hips",
+        "DEF-shin.L": "DEF-thigh.L",
+        "DEF-foot.L": "DEF-shin.L",
+        "DEF-toe.L": "DEF-foot.L",
+        "DEF-thigh.R": "DEF-hips",
+        "DEF-shin.R": "DEF-thigh.R",
+        "DEF-foot.R": "DEF-shin.R",
+        "DEF-toe.R": "DEF-foot.R"
+      },
+      "omitted_bones": [
+        "DEF-f_index.01.L",
+        "DEF-f_index.01.R",
+        "DEF-f_index.02.L",
+        "DEF-f_index.02.R",
+        "DEF-f_index.03.L",
+        "DEF-f_index.03.R",
+        "DEF-f_middle.01.L",
+        "DEF-f_middle.01.R",
+        "DEF-f_middle.02.L",
+        "DEF-f_middle.02.R",
+        "DEF-f_middle.03.L",
+        "DEF-f_middle.03.R",
+        "DEF-f_pinky.01.L",
+        "DEF-f_pinky.01.R",
+        "DEF-f_pinky.02.L",
+        "DEF-f_pinky.02.R",
+        "DEF-f_pinky.03.L",
+        "DEF-f_pinky.03.R",
+        "DEF-f_ring.01.L",
+        "DEF-f_ring.01.R",
+        "DEF-f_ring.02.L",
+        "DEF-f_ring.02.R",
+        "DEF-f_ring.03.L",
+        "DEF-f_ring.03.R",
+        "DEF-thumb.01.L",
+        "DEF-thumb.01.R",
+        "DEF-thumb.02.L",
+        "DEF-thumb.02.R",
+        "DEF-thumb.03.L",
+        "DEF-thumb.03.R"
+      ],
+      "clips": {
+        "walk": {
+          "duration_s": 1.100000023841858,
+          "samples": 111,
+          "loop": true,
+          "root_matrix_error": 0.0,
+          "min_ground_clearance_m": -1.2100831903822464e-06,
+          "max_skull_deviation_from_rest_m": 0.08779769077813612,
+          "ground_speed_mps": 1.0,
+          "stride_m": 1.1,
+          "stance_speed_error_mps": 4.009388296094274e-05,
+          "stance_intervals_checked": 126,
+          "loop_matrix_error": 1.7881393432617188e-07
+        },
+        "run": {
+          "duration_s": 0.6399999856948853,
+          "samples": 65,
+          "loop": true,
+          "root_matrix_error": 0.0,
+          "min_ground_clearance_m": -2.47874998899502e-06,
+          "max_skull_deviation_from_rest_m": 0.20098298369168788,
+          "ground_speed_mps": 5.0,
+          "stride_m": 3.2,
+          "stance_speed_error_mps": 5.883816286908755e-05,
+          "stance_intervals_checked": 34,
+          "loop_matrix_error": 0.0
+        },
+        "attack": {
+          "duration_s": 1.0,
+          "samples": 101,
+          "loop": false,
+          "root_matrix_error": 0.0,
+          "min_ground_clearance_m": -1.8202161726404227e-08,
+          "max_skull_deviation_from_rest_m": 0.07973809420637251,
+          "contact_time_s": 0.6,
+          "right_fingertip_at_contact_m": [
+            0.23999996483325958,
+            1.2500001192092896,
+            -0.7200000286102295
+          ],
+          "contact_plane_z_m": -0.72,
+          "peak_reach_time_s": 0.6
+        },
+        "death": {
+          "duration_s": 1.2000000476837158,
+          "samples": 121,
+          "loop": false,
+          "root_matrix_error": 0.0,
+          "min_ground_clearance_m": -2.887205470739816e-06,
+          "max_skull_deviation_from_rest_m": 1.8707324249978443,
+          "hold_from_s": 1.0,
+          "hold_error_m": 2.2145790801175735e-07,
+          "final_max_height_m": 0.35505427395395484
+        }
+      },
+      "units": "metres",
+      "forward": "-Z",
+      "pivot_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "nominal_game_height_m": 1.7,
+      "height_resolution": "User approved visual height ~1.95 m to retain the current skull target.",
+      "godot_executed": false
+    },
+    "walker_lod1.glb": {
+      "passed": true,
+      "file": "walker_lod1.glb",
+      "sha256": "5d9a5af9d894854ad199e1c03ddbda877c2c33e48c7ec70b86a54838efd9e9b6",
+      "bytes": 3599112,
+      "triangles": 1619,
+      "triangle_limit": 2000,
+      "mesh_count": 2,
+      "material_count": 1,
+      "material_names": [
+        "Walker_PBR_1K"
+      ],
+      "textures": [
+        {
+          "name": "walker_normal",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1281259
+        },
+        {
+          "name": "walker_albedo",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 967792
+        },
+        {
+          "name": "walker_orm",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 1098125
+        }
+      ],
+      "dimensions_m": [
+        0.7069533202761316,
+        1.9500086024914125,
+        0.3399310587487094
+      ],
+      "bounds_min_m": [
+        -0.3537903875251217,
+        1.534298334981911e-07,
+        -0.1999999666272403
+      ],
+      "bounds_max_m": [
+        0.35316293275100985,
+        1.950008755921246,
+        0.1399310921214691
+      ],
+      "skull_center_rest_m": [
+        -0.0011504553258424866,
+        1.8000591635633256,
+        0.030090406675290157
+      ],
+      "skull_error_m": 0.0011555176982295608,
+      "bone_count": 23,
+      "bone_names": [
+        "DEF-foot.L",
+        "DEF-foot.R",
+        "DEF-forearm.L",
+        "DEF-forearm.R",
+        "DEF-hand.L",
+        "DEF-hand.R",
+        "DEF-head",
+        "DEF-hips",
+        "DEF-neck",
+        "DEF-shin.L",
+        "DEF-shin.R",
+        "DEF-shoulder.L",
+        "DEF-shoulder.R",
+        "DEF-spine.001",
+        "DEF-spine.002",
+        "DEF-spine.003",
+        "DEF-thigh.L",
+        "DEF-thigh.R",
+        "DEF-toe.L",
+        "DEF-toe.R",
+        "DEF-upper_arm.L",
+        "DEF-upper_arm.R",
+        "root"
+      ],
+      "bone_parents": {
+        "root": "Rig",
+        "DEF-hips": "root",
+        "DEF-spine.001": "DEF-hips",
+        "DEF-spine.002": "DEF-spine.001",
+        "DEF-spine.003": "DEF-spine.002",
+        "DEF-neck": "DEF-spine.003",
+        "DEF-head": "DEF-neck",
+        "DEF-shoulder.L": "DEF-spine.003",
+        "DEF-upper_arm.L": "DEF-shoulder.L",
+        "DEF-forearm.L": "DEF-upper_arm.L",
+        "DEF-hand.L": "DEF-forearm.L",
+        "DEF-shoulder.R": "DEF-spine.003",
+        "DEF-upper_arm.R": "DEF-shoulder.R",
+        "DEF-forearm.R": "DEF-upper_arm.R",
+        "DEF-hand.R": "DEF-forearm.R",
+        "DEF-thigh.L": "DEF-hips",
+        "DEF-shin.L": "DEF-thigh.L",
+        "DEF-foot.L": "DEF-shin.L",
+        "DEF-toe.L": "DEF-foot.L",
+        "DEF-thigh.R": "DEF-hips",
+        "DEF-shin.R": "DEF-thigh.R",
+        "DEF-foot.R": "DEF-shin.R",
+        "DEF-toe.R": "DEF-foot.R"
+      },
+      "omitted_bones": [
+        "DEF-f_index.01.L",
+        "DEF-f_index.01.R",
+        "DEF-f_index.02.L",
+        "DEF-f_index.02.R",
+        "DEF-f_index.03.L",
+        "DEF-f_index.03.R",
+        "DEF-f_middle.01.L",
+        "DEF-f_middle.01.R",
+        "DEF-f_middle.02.L",
+        "DEF-f_middle.02.R",
+        "DEF-f_middle.03.L",
+        "DEF-f_middle.03.R",
+        "DEF-f_pinky.01.L",
+        "DEF-f_pinky.01.R",
+        "DEF-f_pinky.02.L",
+        "DEF-f_pinky.02.R",
+        "DEF-f_pinky.03.L",
+        "DEF-f_pinky.03.R",
+        "DEF-f_ring.01.L",
+        "DEF-f_ring.01.R",
+        "DEF-f_ring.02.L",
+        "DEF-f_ring.02.R",
+        "DEF-f_ring.03.L",
+        "DEF-f_ring.03.R",
+        "DEF-thumb.01.L",
+        "DEF-thumb.01.R",
+        "DEF-thumb.02.L",
+        "DEF-thumb.02.R",
+        "DEF-thumb.03.L",
+        "DEF-thumb.03.R"
+      ],
+      "clips": {
+        "walk": {
+          "duration_s": 1.100000023841858,
+          "samples": 111,
+          "loop": true,
+          "root_matrix_error": 0.0,
+          "min_ground_clearance_m": -1.2121090885192792e-06,
+          "max_skull_deviation_from_rest_m": 0.08782589764017174,
+          "ground_speed_mps": 1.0,
+          "stride_m": 1.1,
+          "stance_speed_error_mps": 4.009388296094274e-05,
+          "stance_intervals_checked": 126,
+          "loop_matrix_error": 1.7881393432617188e-07
+        },
+        "run": {
+          "duration_s": 0.6399999856948853,
+          "samples": 65,
+          "loop": true,
+          "root_matrix_error": 0.0,
+          "min_ground_clearance_m": -2.478749967430049e-06,
+          "max_skull_deviation_from_rest_m": 0.2011962212224189,
+          "ground_speed_mps": 5.0,
+          "stride_m": 3.2,
+          "stance_speed_error_mps": 6.4278089437086e-05,
+          "stance_intervals_checked": 34,
+          "loop_matrix_error": 0.0
+        },
+        "attack": {
+          "duration_s": 1.0,
+          "samples": 101,
+          "loop": false,
+          "root_matrix_error": 0.0,
+          "min_ground_clearance_m": -2.5652736106079117e-08,
+          "max_skull_deviation_from_rest_m": 0.08033217636629557,
+          "contact_time_s": 0.6,
+          "right_fingertip_at_contact_m": [
+            0.2399998903274536,
+            1.2500001192092896,
+            -0.7200000286102295
+          ],
+          "contact_plane_z_m": -0.72,
+          "peak_reach_time_s": 0.6
+        },
+        "death": {
+          "duration_s": 1.2000000476837158,
+          "samples": 121,
+          "loop": false,
+          "root_matrix_error": 0.0,
+          "min_ground_clearance_m": -2.8872055671604632e-06,
+          "max_skull_deviation_from_rest_m": 1.8708300526224442,
+          "hold_from_s": 1.0,
+          "hold_error_m": 1.7881393432617188e-07,
+          "final_max_height_m": 0.3482925827694951
+        }
+      },
+      "units": "metres",
+      "forward": "-Z",
+      "pivot_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "nominal_game_height_m": 1.7,
+      "height_resolution": "User approved visual height ~1.95 m to retain the current skull target.",
+      "godot_executed": false
+    }
+  },
+  "validation_tool": "Blender / independent glTF channel evaluation",
+  "source_reopened": true,
+  "source_sha256": "4f54ff0180fcceccb05caea5314252aa3a4d56f6c7f5394c390a52a2fe7ba3f5",
+  "bones_omitted_except_requested_fingers": [],
+  "source_materials_original": true,
+  "visual_status": "Original procedural mesh and PBR surface treatment; realistic hero-level anatomical sculpting and authored fabric detail remain unfinished. Technical pass does not certify visual realism.",
+  "limits": [
+    "Offline validation only; no Godot import, horde integration or GPU performance measurement.",
+    "Skull centre is the anatomical cranium bounds centre; jaw/hair do not redefine the aim landmark.",
+    "Names and parents match UAL; Walker-specific bind axes/proportions require retargeting for unrelated UAL clips.",
+    "Sampled at 100 Hz; not a continuous collision or self-intersection proof.",
+    "Attack contact uses a reference plane; no player collider or actual damage was simulated."
+  ]
+}
