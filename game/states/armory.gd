@@ -529,7 +529,8 @@ func _weapons() -> void:
 		title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		names.add_child(title)
 		names.add_child(UiTheme.label("PRIMARY" if weapon.primary else "SECONDARY", 13, UiTheme.ACCENT, true))
-		card.add_child(UiTheme.label("%d DAMAGE / %.1f SHOTS PER SECOND / %d M" % [int(weapon.damage), weapon.fire_rate, int(weapon.range_m)], 16, UiTheme.MUTED, true))
+		var damage_text: String = "%d PELLETS · %d DAMAGE EACH" % [weapon.pellets, int(weapon.damage)] if weapon.pellets > 1 else "%d DAMAGE" % int(weapon.damage)
+		card.add_child(UiTheme.label("%s / %.1f SHOTS PER SECOND / %d M" % [damage_text, weapon.fire_rate, int(weapon.range_m)], 16, UiTheme.MUTED, true))
 		card.add_child(UiTheme.label(weapon.role, 16))
 		var cost: int = maxi(0, GameData.weapon_cost(weapon.id))
 		var owned: bool = cost == 0 or profile.unlocked_weapons.has(weapon.id)
@@ -973,6 +974,22 @@ func _perk_actions_focused() -> bool:
 	return focus != null and _summary.is_ancestor_of(focus)
 
 
+## A weapon's picture in the loadout: its three-quarter render of the real model
+## (tools/dev/weapon_icon_render.gd), or the silhouette while that render is missing.
+func _weapon_picture(id: StringName) -> Control:
+	var path: String = "res://game/ui/art/weapons/%s.png" % id
+	if not ResourceLoader.exists(path):
+		return Art.weapon_image(id, 118, 40, SILHOUETTE)
+	var picture := TextureRect.new()
+	picture.name = "WeaponPicture"
+	picture.texture = load(path)
+	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	picture.custom_minimum_size = Vector2(118, 46)
+	picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return picture
+
+
 func _loadout() -> void:
 	_summary.add_theme_constant_override("separation", 6)
 	var title := UiTheme.title("LOADOUT", 28)
@@ -985,7 +1002,7 @@ func _loadout() -> void:
 		var weapon_row := HBoxContainer.new()
 		weapon_row.add_theme_constant_override("separation", 10)
 		_summary.add_child(weapon_row)
-		weapon_row.add_child(Art.weapon_image(id, 118, 40, SILHOUETTE))
+		weapon_row.add_child(_weapon_picture(id))
 		var weapon_name := UiTheme.label(weapon.display_name.to_upper(), 13, UiTheme.TEXT)
 		weapon_name.autowrap_mode = TextServer.AUTOWRAP_OFF
 		weapon_name.add_theme_font_override("font", UiTheme._spaced(UiTheme.mono_font(), 1))

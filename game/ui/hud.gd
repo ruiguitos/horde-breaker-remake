@@ -757,6 +757,7 @@ func _build_field_hud(field: Control) -> void:
 	_alerts.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_alerts.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_place(field, _alerts, Control.PRESET_CENTER_BOTTOM, Vector2(-170, -200), Vector2(340, 80))
+	_apply_weights()
 
 
 ## Ring + [name, key, state] column. Returns [ring, name, key, state].
@@ -1527,7 +1528,7 @@ func set_minimal(on: bool) -> void:
 		return
 	minimal = on
 	for control: Control in _minimal_controls():
-		control.modulate.a = 0.0 if on else 1.0  # the logic sets its own alpha again from the next frame
+		control.modulate.a = 0.0 if on else _rest_alpha(control)  # the logic sets its own alpha again from the next frame
 
 
 func _process(_delta: float) -> void:
@@ -1535,6 +1536,36 @@ func _process(_delta: float) -> void:
 		return
 	for control: Control in _minimal_controls():
 		control.modulate.a = 0.0  # after refresh() and the radio, which may write alpha too
+
+
+## Visual weight: health, ammo, the breaker and the warnings keep a strong outline. The XP, the
+## counters and the minimap's legend sit at SOFT_ALPHA, with a lighter outline.
+const SOFT_ALPHA: float = 0.85
+
+
+func _soft_controls() -> Array[Control]:
+	var out: Array[Control] = []
+	for control: Control in [_xp_bar, _xp_text, _xp_bonus, _stats, _survivor_row, _legend]:
+		if control != null:
+			out.append(control)
+	return out
+
+
+## The alpha a control rests at outside the minimal HUD.
+func _rest_alpha(control: Control) -> float:
+	return SOFT_ALPHA if control in _soft_controls() else 1.0
+
+
+## Once the field HUD is built: the soft controls at SOFT_ALPHA, their text outlines and the
+## gauges' track borders lighter (text 0.8 -> 0.4 alpha, gauge borders 0.6 -> 0.3).
+func _apply_weights() -> void:
+	for control: Control in _soft_controls():
+		control.modulate.a = SOFT_ALPHA
+	for label: Label in [_xp_text, _xp_bonus, _stats, _survivor_text]:
+		label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.4))
+		label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.3))
+	for bar: ProgressBar in [_xp_bar, _survivor_bar]:
+		(bar.get_theme_stylebox("background") as StyleBoxFlat).border_color = Color(0, 0, 0, 0.3)
 
 
 func _minimal_controls() -> Array[Control]:

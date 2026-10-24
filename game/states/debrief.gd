@@ -437,7 +437,7 @@ func _intel_panel(parent: Control) -> void:
 	if not context.won and int(b["lost"]) > 0:
 		# Under the total, not in the sum: dying keeps the Intel but loses
 		# the extraction bonus.
-		var lost := UiTheme.label("Lost on death: %d Intel (no ×%.1f extraction bonus)" % [int(b["lost"]), GameData.EXTRACTION_INTEL_MULTIPLIER], 14, UiTheme.DANGER)
+		var lost := UiTheme.label("Extraction bonus not earned: %d Intel (no ×%.1f)" % [int(b["lost"]), GameData.EXTRACTION_INTEL_MULTIPLIER], 14, UiTheme.DANGER)
 		lost.name = "RowLost"
 		box.add_child(lost)
 	var gap := Control.new()

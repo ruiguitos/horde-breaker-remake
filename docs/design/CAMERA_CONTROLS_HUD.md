@@ -442,3 +442,14 @@ cumprem, decide a preferência (9). Se nenhum cumprir 1, testar um meio-termo
 6. Jogas mais com teclado/rato ou comando? Define que esquema afinar primeiro.
 7. Números de dano: ligados por omissão ou opção?
 8. Co-op está no horizonte? Muda ping, câmara partilhada e HUD.
+
+## Peso visual do HUD (2026-10-24)
+
+Peso só onde importa: vida, munição, breaker e avisos mantêm o contorno forte.
+O XP, os contadores (kills e sobreviventes) e a legenda do minimapa ficam a 85 %
+de opacidade, com o contorno do texto e a borda das barras mais leves. Em
+`game/ui/hud.gd`: `SOFT_ALPHA` e `_apply_weights()`; na legenda, `minimap.gd`.
+O HUD mínimo do preset horror não muda: esconde estes controlos e, ao sair dele,
+eles voltam a 85 %. `tests/test_hud_weights.gd` verifica os valores, e
+`test_horror_preset.gd` a volta ao HUD completo. Os 85 % e o contorno mais leve
+são valores a confirmar no editor.

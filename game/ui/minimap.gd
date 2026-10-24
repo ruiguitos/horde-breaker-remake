@@ -445,5 +445,5 @@ class Legend extends Control:
 			var icon := at + Vector2(7, ROW * 0.5)
 			Minimap.draw_marker(self, _entries[i][0], icon, 1.3 if _entries[i][0] != &"hostile" else 2.2)
 			var base := at + Vector2(17, ROW * 0.5 + FONT_SIZE * 0.36)
-			draw_string_outline(font, base, _entries[i][1], HORIZONTAL_ALIGNMENT_LEFT, col_w - 18, FONT_SIZE, 4, Color(0, 0, 0, 0.85))
+			draw_string_outline(font, base, _entries[i][1], HORIZONTAL_ALIGNMENT_LEFT, col_w - 18, FONT_SIZE, 4, Color(0, 0, 0, 0.4))
 			draw_string(font, base, _entries[i][1], HORIZONTAL_ALIGNMENT_LEFT, col_w - 18, FONT_SIZE, UiTheme.TEXT_MUTED.lightened(0.15))

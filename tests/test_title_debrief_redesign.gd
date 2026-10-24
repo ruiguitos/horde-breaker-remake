@@ -229,7 +229,9 @@ func _debrief_tests(won: bool) -> void:
 	_check((card2.find_child("Intel", true, false) as Label).text == "+125", "%s: the card shows the island's Intel" % tag)
 	if not won:
 		_check((grid.get_child(2).find_child("Place", true, false) as Label).text == "NOT REACHED", "lost: the third island was not reached")
-		_check(debrief.find_child("RowLost", true, false) != null, "lost: the panel shows what death cost")
+		var lost_row: Label = debrief.find_child("RowLost", true, false) as Label
+		_check(lost_row != null and lost_row.text.begins_with("Extraction bonus not earned: ") and "Lost on death" not in lost_row.text,
+			"lost: the panel says the extraction bonus was not earned, without pointing at death (%s)" % [lost_row.text if lost_row != null else "no row"])
 	# Intel numbers (after the count-up) agree with the profile.
 	await create_timer(1.0).timeout
 	var b: Dictionary = debrief.call("intel_breakdown")

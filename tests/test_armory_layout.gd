@@ -69,8 +69,9 @@ func _run() -> void:
 	for node: StringName in nodes:
 		var a: Label = nodes[node].find_child("OptionA", true, false)
 		var b: Label = nodes[node].find_child("OptionB", true, false)
-		_check(a.get_global_rect().end.x <= b.get_global_rect().position.x and absf(a.global_position.y - b.global_position.y) < 1.0,
-			"alternatives are side by side in " + String(node))
+		var frame: Rect2 = (nodes[node] as Button).get_global_rect()
+		_check(b.global_position.y >= a.global_position.y + a.size.y - 1.0 and frame.encloses(a.get_global_rect()) and frame.encloses(b.get_global_rect()),
+			"alternatives are stacked, A above B, both inside " + String(node))
 		(nodes[node] as Button).grab_focus()
 		await _settle()
 		_check(_fits(armory), "all perk effects/actions/hints fit for " + String(node))

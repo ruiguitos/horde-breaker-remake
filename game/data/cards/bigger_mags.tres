@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource("1_igqtp")
-title = "Bigger Mags"
-description = "+15% maximum special weapon ammo per rank. Does not refill ammo."
+title = "Ammo Reserves"
+description = "+15% maximum reserve ammo per rank for weapons with a finite reserve. Does not refill ammo."
 max_stacks = 5
 tags = Array[StringName]([&"ammo"])
 requires_finite_weapon = true

@@ -571,4 +571,5 @@ func _test_supplies() -> void:
 		menu.queue_free()
 		await process_frame
 	print("TEST: CARD CATALOG COMPLETE (%d failures)" % _failures)
+	await create_timer(0.3).timeout  # the menus' sound players release on the next audio mix: let them go before quitting
 	quit(1 if _failures > 0 else 0)

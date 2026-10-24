@@ -39,6 +39,8 @@ func _run_all() -> void:
 	_test_kill_chain_direct_only()
 	_test_skirmisher_sprint_fire()
 	await _test_armory_screen()
+	await _test_perk_layout_1600()
+	await _test_perk_containment()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
 	if _failures == 0:
 		print("TEST: perk tree OK (%d checks)" % _checks)
@@ -556,6 +558,97 @@ func _test_skirmisher_sprint_fire() -> void:
 
 
 # --- Armory screen ------------------------------------------------------------
+
+## The perk tree at 1600 x 900: every name on one line (none trimmed), each A/B letter inside its
+## node, and the rank pips in one row under the two alternatives.
+func _test_perk_layout_1600() -> void:
+	var original: Vector2i = root.size
+	root.size = Vector2i(1600, 900)
+	await _settle()
+	var profile := _profile(500)
+	profile.unlocked_classes = [&"recruit", &"vanguard"]
+	var armory := Control.new()
+	armory.set_script(load("res://game/states/armory.gd"))
+	armory.set("profile", profile)
+	root.add_child(armory)
+	await _settle()
+	armory.call("_select_category", "PERKS")
+	await _settle()
+	var nodes: Dictionary = armory.get("_perk_buttons")
+	var trimmed: Array[String] = []
+	var loose_pips: Array[String] = []
+	var missing_letters: int = 0
+	for node: StringName in nodes:
+		var button: Button = nodes[node]
+		for option: String in ["A", "B"]:
+			var line: Label = button.find_child("Option" + option, true, false) as Label
+			var size: int = line.get_theme_font_size("font_size")
+			var wanted: float = line.get_theme_font("font").get_string_size(line.text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
+			if wanted > line.size.x + 0.5:
+				trimmed.append("%s %s (%.0f of %.0f px)" % [node, line.text, wanted, line.size.x])
+			if button.find_child("Letter" + option, true, false) == null:
+				missing_letters += 1
+		var pips: Control = button.find_child("Pips", true, false)
+		var pip_rows: Array[float] = []
+		for pip: Node in pips.get_children():
+			if pip is ColorRect:
+				pip_rows.append((pip as Control).global_position.y)
+		var alternatives: Control = button.find_child("Alternatives", true, false)
+		var below: bool = pips.global_position.y >= alternatives.global_position.y + alternatives.size.y - 1.0
+		if pip_rows.is_empty() or pip_rows.any(func(y: float) -> bool: return not is_equal_approx(y, pip_rows[0])) or not below:
+			loose_pips.append(String(node))
+	_check(trimmed.is_empty(), "at 1600 x 900 every perk name fits its cell on one line (%s)" % [trimmed])
+	_check(missing_letters == 0, "each alternative carries its A or B letter")
+	_check(loose_pips.is_empty(), "the rank pips run in one row under the alternatives (%s)" % [loose_pips])
+	armory.free()
+	root.size = original
+	await _settle()
+
+
+## Every part of every node stays inside its node at 1600 x 900, the tick and the rank count included,
+## with an equipped perk and with the Vanguard's perk names (the longer ones), and no name is trimmed.
+func _test_perk_containment() -> void:
+	var original: Vector2i = root.size
+	root.size = Vector2i(1600, 900)
+	await _settle()
+	var profile := _profile(500)
+	profile.unlocked_classes = [&"recruit", &"vanguard"]
+	profile.buy_rank(&"combat_1")
+	profile.toggle_equip(&"head_hunter")
+	profile.selected_class = &"vanguard"
+	var armory := Control.new()
+	armory.set_script(load("res://game/states/armory.gd"))
+	armory.set("profile", profile)
+	root.add_child(armory)
+	await _settle()
+	armory.call("_select_category", "PERKS")
+	await _settle()
+	var nodes: Dictionary = armory.get("_perk_buttons")
+	var outside: Array[String] = []
+	var trimmed: Array[String] = []
+	var ticked: bool = false
+	for node: StringName in nodes:
+		var button: Button = nodes[node]
+		var frame: Rect2 = button.get_global_rect()
+		for child: Node in button.find_children("*", "Control", true, false):
+			var control: Control = child as Control
+			if control.is_visible_in_tree() and not frame.encloses(control.get_global_rect()):
+				outside.append("%s %s" % [node, control.name])
+			if control.name == "Mark" and node == &"combat_1":
+				ticked = true
+		for option: String in ["A", "B"]:
+			var line: Label = button.find_child("Option" + option, true, false) as Label
+			var font_size: int = line.get_theme_font_size("font_size")
+			var wanted: float = line.get_theme_font("font").get_string_size(line.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+			if wanted > line.size.x + 0.5:
+				trimmed.append("%s %s" % [node, line.text])
+	_check(ticked, "the equipped perk shows its tick inside its node")
+	_check(outside.is_empty(), "with Vanguard and an equipped perk, every part of every node stays inside it (%s)" % [outside])
+	_check(trimmed.is_empty(), "with Vanguard names, none is trimmed at 1600 x 900 (%s)" % [trimmed])
+	armory.free()
+	root.size = original
+	await _settle()
+
 
 func _test_armory_screen() -> void:
 	var profile := _profile(500)
