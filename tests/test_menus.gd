@@ -92,7 +92,8 @@ func _run_tests() -> void:
 	_check(not is_instance_valid(dialog), "Escape closes settings")
 	_check(profile.saves == saves_before + 1, "settings save on close")
 	_check(root.gui_get_focus_owner() == start, "settings restore prior focus")
-	armory.call("_archive")
+	# The Armory no longer carries the archive: the title screen does.
+	armory.set("_dialog", MenuDialog.archive(armory, profile))
 	await _settle()
 	dialog = armory.get("_dialog")
 	var archive_scroll: ScrollContainer = dialog.find_children("*", "ScrollContainer", true, false)[0] as ScrollContainer

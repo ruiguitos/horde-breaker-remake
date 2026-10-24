@@ -16,10 +16,9 @@ func _initialize() -> void:
 	call_deferred("_run")
 
 
-## Whether a pixel differs from the panel colour (the gun is dark, so this is the test for "gun").
-func _off_panel(pixel: Color) -> bool:
-	var panel: Color = Color("0f2830")
-	return Vector3(pixel.r - panel.r, pixel.g - panel.g, pixel.b - panel.b).length() > 0.12
+## The picture has a transparent background, so a pixel with alpha is the gun.
+func _is_gun(pixel: Color) -> bool:
+	return pixel.a > 0.1
 
 
 func _run() -> void:
@@ -30,22 +29,20 @@ func _run() -> void:
 		if texture == null:
 			continue
 		var image: Image = texture.get_image()
-		_check(image.get_size() == Vector2i(240, 96), "%s render is 240 x 96 (%s)" % [id, image.get_size()])
-		# The gun is dark on the dark panel, so count the pixels that differ from the panel colour.
-		var panel: Color = Color("0f2830")
+		_check(image.get_size() == Vector2i(480, 192), "%s render is 480 x 192 (%s)" % [id, image.get_size()])
+		# The background is transparent: a pixel with alpha is the gun.
 		var gun: int = 0
 		for y in range(0, image.get_height(), 2):
 			for x in range(0, image.get_width(), 2):
-				var pixel: Color = image.get_pixel(x, y)
-				if Vector3(pixel.r - panel.r, pixel.g - panel.g, pixel.b - panel.b).length() > 0.12:
+				if _is_gun(image.get_pixel(x, y)):
 					gun += 1
-		_check(gun > 60, "%s render shows the gun, not an empty panel (%d pixels off the panel colour)" % [id, gun])
+		_check(gun > 60, "%s render shows the gun, not an empty picture (%d opaque pixels)" % [id, gun])
 		var touching: int = 0
 		for x in image.get_width():
-			if _off_panel(image.get_pixel(x, 0)) or _off_panel(image.get_pixel(x, image.get_height() - 1)):
+			if _is_gun(image.get_pixel(x, 0)) or _is_gun(image.get_pixel(x, image.get_height() - 1)):
 				touching += 1
 		for y in image.get_height():
-			if _off_panel(image.get_pixel(0, y)) or _off_panel(image.get_pixel(image.get_width() - 1, y)):
+			if _is_gun(image.get_pixel(0, y)) or _is_gun(image.get_pixel(image.get_width() - 1, y)):
 				touching += 1
 		_check(touching == 0, "%s render keeps the whole gun inside the frame (%d edge pixels touched)" % [id, touching])
 

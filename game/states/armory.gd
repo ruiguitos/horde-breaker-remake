@@ -97,10 +97,6 @@ func _ready() -> void:
 	var gap := Control.new()
 	gap.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	nav.add_child(gap)
-	var archive := UiTheme.button(nav, "INTEL ARCHIVE", _archive)
-	archive.name = "IntelArchive"
-	archive.icon = Art.icon(&"folder", 20)
-	_nav_style(archive, 19)
 	var main_menu := UiTheme.button(nav, "MAIN MENU", func() -> void: back_requested.emit())
 	main_menu.name = "MainMenu"
 	main_menu.icon = Art.icon(&"home", 20)
@@ -520,7 +516,7 @@ func _weapons() -> void:
 		var card := UiTheme.panel(list)
 		var top := HBoxContainer.new()
 		card.add_child(top)
-		top.add_child(Art.weapon_image(weapon.id, 150, 50, SILHOUETTE))
+		top.add_child(Art.weapon_image(weapon.id, 220, 88, Color.WHITE))
 		var names := VBoxContainer.new()
 		names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		names.add_theme_constant_override("separation", 0)
@@ -1174,13 +1170,6 @@ func _divider(parent: Control) -> void:
 	var line := HSeparator.new()
 	line.add_theme_constant_override("separation", 4)
 	parent.add_child(line)
-
-
-func _archive() -> void:
-	if not is_instance_valid(_dialog):
-		_dialog = MenuDialog.archive(self, profile)
-		profile.mark_archive_read()
-		profile.save()
 
 
 func _act(changed: bool) -> void:
