@@ -69,7 +69,11 @@ func _controller_changed(_device: int, _connected: bool) -> void:
 		_show(tab)
 
 
-func _show(t: String) -> void:
+## Rebuilds the tab's content. `keep_scroll` and `focus_name` are for a rebuild
+## that must not move the view: pressing REBIND used to jump back to the top of the
+## list, because the tab was rebuilt and the scroll reset.
+func _show(t: String, keep_scroll: bool = false, focus_name: String = "") -> void:
+	var keep: int = _body_scroll.scroll_vertical if keep_scroll else 0
 	tab = t
 	_body_scroll.scroll_vertical = 0
 	for b in _tab_buttons:
@@ -82,9 +86,27 @@ func _show(t: String) -> void:
 		"GRAPHICS": _graphics()
 		"AUDIO": _audio()
 		"CONTROLS": _controls()
+	if keep_scroll:
+		call_deferred("_restore_scroll_focus", keep, focus_name)
+		return
 	call_deferred("_trap_focus")
 	# Keep focus on the tab that was pressed (the trap focuses the first one).
 	call_deferred("_focus_tab", t)
+
+
+## After a rebuild that must not move the view: the same scroll offset, and focus
+## on the same control (the REBIND button the player just pressed).
+func _restore_scroll_focus(scroll: int, control_name: String) -> void:
+	if not is_instance_valid(_body_scroll):
+		return
+	_body_scroll.scroll_vertical = scroll
+	var target: Control = null
+	if control_name != "":
+		target = _body.find_child(control_name, true, false) as Control
+	if target != null and target.is_visible_in_tree():
+		target.grab_focus()
+	else:
+		_trap_focus()
 
 
 ## Tabs read as parts of one panel: the selected tab has an amber base rule and
@@ -244,7 +266,9 @@ func _icon_label() -> RichTextLabel:
 ## Waits for the next key or mouse button (G.U.I.D.E input detector).
 func _start_rebind(action: StringName) -> void:
 	_capturing = action
-	_show("CONTROLS")
+	# Rebuild only the button label, keeping the scroll and the focus where they were:
+	# a plain _show() reset the list to the top, which read as "it jumped to the menu above".
+	_show("CONTROLS", true, "Rebind_" + String(action))
 	if not InputIcons.available() or not has_node("/root/GUIDE"):
 		return
 	if _detector == null:
@@ -267,7 +291,7 @@ func _on_detected(action: StringName, input: Resource) -> void:
 		GameInput.apply_overrides(profile.key_bindings)
 		profile.save()
 	_capturing = &""
-	_show("CONTROLS")
+	_show("CONTROLS", true, "Rebind_" + String(action) if action != &"" else "")
 
 
 func _input(event: InputEvent) -> void:
@@ -372,3 +396,4 @@ func _percent_row(label_text: String, value: int, min_value: int, setter: Callab
 
 func _close() -> void:
 	close()
+
