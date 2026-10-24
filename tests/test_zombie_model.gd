@@ -332,7 +332,7 @@ func _test_view() -> void:
 	var look0: Vector4 = ZombieModel.instance_look(h.speeds[0])
 	_check(first[12] == ZombieModel.Status.NONE and first[13] == look0.y and first[14] == look0.z and first[15] == look0.w,
 		"instance colour = (status, mask, colours, wear) of the zombie's rolled look")
-	# Hit flash -> flinch; stun -> stagger; just attacked in reach -> lunge.
+	# Hit flash -> flinch; stun -> stagger; a blow on its way -> the lean-in (lunge channel).
 	h.flash[0] = 0.1
 	view.draw(h, map, 1.1, 0.016)
 	_check(_instance(view, v0, 0)[19] > 0.9 and _instance(view, v0, 0)[12] == ZombieModel.Status.FLASH, "a hit flinches the zombie and flashes it")
@@ -343,9 +343,9 @@ func _test_view() -> void:
 	h.stun[0] = 0.0
 	h.positions[0] = h.target + Vector3(0, 0, -1.0)
 	h.velocities[0] = Vector3.ZERO
-	h.attack_cd[0] = h.types[GameData.EnemyKind.WALKER].attack_interval - 0.15
+	h.windup[0] = Horde.ATTACK_WINDUP * 0.2  # 80 % of the wind-up has run: the lean-in is near its peak
 	view.draw(h, map, 1.3, 0.016)
-	_check(_instance(view, v0, 0)[18] > 0.5, "a zombie that just hit the player lunges")
+	_check(_instance(view, v0, 0)[18] > 0.5, "a zombie winding up its blow leans in")
 	h.freeze_time[0] = 2.0
 	view.draw(h, map, 1.4, 0.016)
 	var frozen: PackedFloat32Array = _instance(view, v0, 0)

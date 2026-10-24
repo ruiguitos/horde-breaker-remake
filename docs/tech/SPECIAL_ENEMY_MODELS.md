@@ -109,13 +109,20 @@ Duas ações do jogo aparecem agora no corpo dos especiais, pelo canal `act`
   braços de 0 a 1 e baixa-os no impacto.
 
 Um inimigo atordoado mantém o atordoamento: a pose de ação não sobrepõe o
-`act` −1. Não alterado nesta etapa: a explosão do Bloater (não verifiquei se
-já coincide com a morte) e a fase de enraivecimento do Behemoth
-(`boss_enraged`), que não tem pose própria. Os valores da pose são constantes
-para afinar a olho no editor.
+`act` −1.
+
+- **Explosão do Bloater:** o corpo não cai. Incha de 1,0 a 1,4 do tamanho em
+  0,35 s (`ZombieHordeView.POP_TIME`) e rebenta no fim. A bola de fogo
+  (`island.gd`, lista `bloat_pops` de `IslandRun`) cresce no mesmo tempo, por isso
+  as duas começam e acabam juntas. O dano continua instantâneo, na morte, como antes.
+- **Fase de raiva do Behemoth** (`boss_enraged`, abaixo de metade da vida): mantém
+  a pose de ação com `act` 0,4 (`ENRAGED_POSE`). Uma carga de golpe maior prevalece.
+
+Os valores das poses são constantes para afinar a olho no editor.
 
 Teste: `tests/test_special_poses.gd` (chamada no instante, desvanecimento,
-atordoamento, carga do golpe e os outros tipos sem reação).
+atordoamento, carga do golpe, os outros tipos sem reação, a fase de raiva, e o
+inchaço do corpo do Bloater que rebenta em `POP_TIME`).
 
 ## Limites
 

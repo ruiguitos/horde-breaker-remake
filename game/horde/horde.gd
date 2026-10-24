@@ -7,6 +7,15 @@ extends RefCounted
 
 ## Collision radius against walls and other enemies (visual size may differ).
 const RADIUS: float = 0.35
+## Seconds from the start of a common enemy's blow to its damage (telegraphs): the body
+## leans in and the arms rise meanwhile. The damage lands only if the player is still in reach
+## then. Reach, damage and interval do not change.
+const ATTACK_WINDUP: float = 0.3
+## Share of its speed an enemy keeps while its blow is on its way: it keeps coming in, so the
+## lunge still reads, and enemies do not stand still around the player.
+const WINDUP_SPEED_SHARE: float = 0.25
+## Seconds the arms take to come back down after a blow lands (the view reads windup < 0).
+const ATTACK_RECOVERY: float = 0.15
 
 var field: FlowField
 var types: Array[GameData.EnemyType] = GameData.enemy_types()
@@ -17,6 +26,9 @@ var speeds: PackedFloat32Array = PackedFloat32Array()
 var kinds: PackedByteArray = PackedByteArray()
 var hp: PackedFloat32Array = PackedFloat32Array()
 var stun: PackedFloat32Array = PackedFloat32Array()
+## Seconds left until this enemy's blow lands; 0 = no blow on its way. A stun, a freeze,
+## a topple or a death cancels it.
+var windup: PackedFloat32Array = PackedFloat32Array()
 var attack_cd: PackedFloat32Array = PackedFloat32Array()
 var flash: PackedFloat32Array = PackedFloat32Array()
 ## Status data moves with the enemy during swap removal.
@@ -68,6 +80,7 @@ func add(pos: Vector3, kind: int, rng: RandomNumberGenerator) -> int:
 	kinds.append(kind)
 	hp.append(t.hp * hp_scale)
 	stun.append(0.0)
+	windup.append(0.0)
 	attack_cd.append(rng.randf_range(0.0, t.attack_interval))
 	flash.append(0.0)
 	burn_time.append(0.0)
@@ -84,6 +97,21 @@ func add(pos: Vector3, kind: int, rng: RandomNumberGenerator) -> int:
 	return count - 1
 
 
+## The blow lands: the damage goes to the player, and a grabber holds on.
+func _strike(i: int, p: Vector3, t: GameData.EnemyType) -> void:
+	damage_to_player += t.damage
+	damage_from = p
+	if t.grabs and grabbed_by == -1:
+		grabbed_by = i
+
+
+## Common melee enemies (walkers and runners) wind their blows up for ATTACK_WINDUP.
+## The others strike at once: the Crawler (its own shader does not raise the arms yet), the Bloater, the Screamer and the boss have poses and
+## timing of their own, and the Brute and the Grabber keep theirs until a balance pass.
+static func telegraphs(kind: int) -> bool:
+	return kind == GameData.EnemyKind.WALKER or kind == GameData.EnemyKind.RUNNER
+
+
 ## O(1) removal: the last enemy takes index i. Callers that keep indices must
 ## remove from the highest index down.
 func remove(i: int) -> void:
@@ -94,6 +122,7 @@ func remove(i: int) -> void:
 	kinds[i] = kinds[last]
 	hp[i] = hp[last]
 	stun[i] = stun[last]
+	windup[i] = windup[last]
 	attack_cd[i] = attack_cd[last]
 	flash[i] = flash[last]
 	burn_time[i] = burn_time[last]
@@ -109,6 +138,7 @@ func remove(i: int) -> void:
 	kinds.resize(last)
 	hp.resize(last)
 	stun.resize(last)
+	windup.resize(last)
 	attack_cd.resize(last)
 	flash.resize(last)
 	burn_time.resize(last)
@@ -172,31 +202,47 @@ func tick(dt: float) -> void:
 		if freeze_time[i] > 0.0:
 			velocities[i] = Vector3.ZERO
 			stun[i] = maxf(0.0, stun[i] - dt)
+			windup[i] = 0.0
 			if grabbed_by == i:
 				grabbed_by = -1
 			continue  # frozen enemies neither move, separate, attack nor grab
 		if crawl_delay[i] > 0.0:
 			# Toppling after the legs went: no steps, no attacks, until it crawls.
 			crawl_delay[i] = maxf(0.0, crawl_delay[i] - dt)
+			windup[i] = 0.0
 			velocities[i] = Vector3.ZERO
 			continue
 		var tx: float = target.x - p.x
 		var tz: float = target.z - p.z
 		var to_target2: float = tx * tx + tz * tz
 		var desired := Vector3.ZERO
+		var winding := false  # a blow on its way: the enemy keeps walking, at WINDUP_SPEED_SHARE
 		if stun[i] > 0.0:
 			stun[i] -= dt
+			windup[i] = 0.0  # a stunned enemy's blow does not come out
 		else:
 			# Attack when in reach; otherwise follow the flow field.
+			if windup[i] < 0.0:  # the arms coming back down after a blow
+				windup[i] = minf(0.0, windup[i] + dt)
 			attack_cd[i] -= dt
-			if to_target2 <= reach * reach:
+			winding = windup[i] > 0.0
+			if winding:
+				# The blow lands at the end of the wind-up if the player is still in reach then:
+				# one who has stepped out has dodged it. The cooldown is left as it is.
+				windup[i] -= dt
+				if windup[i] <= 0.0:
+					windup[i] = -ATTACK_RECOVERY
+					if hp[i] > 0.0 and to_target2 <= reach * reach:  # a killed enemy's blow does not come out
+						_strike(i, p, t)
+			elif to_target2 <= reach * reach:
 				if attack_cd[i] <= 0.0:
 					attack_cd[i] = t.attack_interval
-					damage_to_player += t.damage
-					damage_from = p
-					if t.grabs and grabbed_by == -1:
-						grabbed_by = i
-			else:
+					if telegraphs(kinds[i]):
+						windup[i] = ATTACK_WINDUP
+						winding = true  # the walk starts on the first tick of the blow
+					else:
+						_strike(i, p, t)
+			if winding or to_target2 > reach * reach:
 				var cx: int = floori(p.x / cs)
 				var cz: int = floori(p.z / cs)
 				var dir := Vector2.ZERO
@@ -212,7 +258,7 @@ func tick(dt: float) -> void:
 				if t.keep_away > 0.0 and to_target2 < t.keep_away * t.keep_away:
 					desired = -Vector3(tx, 0.0, tz).normalized() * speeds[i]
 		# Separation against the 3x3 neighbouring hash cells.
-		desired *= speed_multiplier(i)
+		desired *= speed_multiplier(i) * (WINDUP_SPEED_SHARE if winding else 1.0)
 		var push_x: float = 0.0
 		var push_z: float = 0.0
 		var hx: int = floori(p.x / cs)

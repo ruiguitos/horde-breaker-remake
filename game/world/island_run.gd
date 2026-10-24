@@ -346,6 +346,9 @@ var death_keys: PackedFloat32Array = PackedFloat32Array()
 ## Walkers whose legs a grenade took this frame (x, z): they became Crawlers.
 var leg_losses: PackedVector2Array = PackedVector2Array()
 var explosions: PackedVector3Array = PackedVector3Array()
+## Bloaters that burst this frame (x, z ground points). Kept apart from `explosions` because
+## their fireball and body swell over ZombieHordeView.POP_TIME, not the usual blast time.
+var bloat_pops: PackedVector3Array = PackedVector3Array()
 var messages: PackedStringArray = PackedStringArray()
 ## Radio events (Story.RADIO keys), consumed by the HUD.
 var radio: Array[StringName] = []
@@ -2904,7 +2907,7 @@ func _damage(i: int, amount: float, from: Vector3, headshot: bool, breaker: bool
 		death_keys.append(horde.speeds[i])
 		popups.append(Vector4(p.x, p.z, amount, 1.0 if headshot else 0.0))
 		if t.explodes and not _nuking:
-			explosions.append(p)
+			bloat_pops.append(p)
 			if player_pos.distance_to(p) <= GameData.BLOATER_RADIUS and dash_time <= 0.0:
 				_take_player_damage(GameData.BLOATER_PLAYER_DAMAGE, &"bloater")
 			for j in horde.query_radius(p, GameData.BLOATER_RADIUS):
@@ -2998,6 +3001,7 @@ func _apply_cold(i: int) -> void:
 		horde.cold_stacks[i] = 0
 		horde.cold_time[i] = 0.0
 		horde.freeze_time[i] = 1.0 + 0.25 * stacks(&"deep_freeze")
+		horde.windup[i] = 0.0  # frozen mid-blow: the blow does not come out, even if the freeze ends before the next tick
 		if horde.grabbed_by == i:
 			horde.grabbed_by = -1
 

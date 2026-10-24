@@ -215,8 +215,42 @@ ocultam ambos os indicadores de mira. `test_view_model.gd` verifica o
 alinhamento e a visibilidade da arma; `test_camera_aim.gd` verifica os
 controlos reais da interface, incluindo a volta à terceira pessoa.
 
+**Peso da arma (2026-10-24):** a arma fica atrás da vista quando a câmara roda.
+Com a taxa de rotação da câmara (`ViewModel._turn_rate`), a arma desvia-se em
+sentido contrário à volta, 0,006 m por rad/s, até 0,03 m (`LAG_PER_RATE`,
+`LAG_MAX`), e volta ao repouso com constante de tempo de 0,11 s (`LAG_RESPONSE` 9/s; a 1 %
+do desvio, cerca de meio segundo depois). Com a
+mira em baixo o desvio desaparece, para não mexer na linha de mira. O atraso
+lê só a rotação, não a posição, porque o tremor de impacto da câmara mexe na
+posição e a arma reagiria a ele. Quando a arma fica escondida (terceira pessoa)
+ou passa a outra câmara, o atraso volta a zero, para que a volta feita entretanto
+não conte como um atraso. Fica por ver no editor se 0,006 m/(rad/s) se
+lê como peso sem atrapalhar a mira de quadril. `test_view_model.gd` verifica o
+atraso, o regresso, a mira em ADS e o limite.
+
 Capturas verificadas no Godot com GPU, incluindo a ilha e o HUD:
 [Machine Gun](../design/weapon_ads/machine_gun_island.png),
 [marksman](../design/weapon_ads/marksman_island.png) e
 [AR sem «+»](../design/weapon_ads/rifle_island.png).
 Condições e validação em [weapon_ads/README.md](../design/weapon_ads/README.md).
+
+## Painel de loadout: renders dos modelos reais (2026-10-24)
+
+O painel LOADOUT do armeiro mostrava silhuetas vetoriais. Agora mostra um render
+3/4 de cada arma, feito a partir do modelo que o jogador segura
+(`WeaponModel.build_parts`). Os PNG estão em `game/ui/art/weapons/<id>.png`,
+240 × 96, com a cor do painel como fundo. Gera-os
+`tools/dev/weapon_icon_render.gd`, numa janela (o render precisa da GPU):
+
+    godot --path . --script res://tools/dev/weapon_icon_render.gd
+
+Depois corre-se o import, para os PNG ganharem os ficheiros `.import`; repete-se
+sempre que os PNG mudam, porque `load()` lê a cópia importada, não o PNG novo.
+Se o PNG de uma arma faltar, o painel usa a silhueta antiga. `test_weapon_pictures.gd`
+verifica os cinco renders, as imagens no loadout, o texto da Shotgun e o título
+«Ammo Reserves».
+
+Árvore de perks a 1600 × 900: os nomes ficam numa linha (cortados com reticências
+só se não couberem), as duas alternativas empilham-se com a letra A/B, o ícone e o
+nome, e os pips correm em linha por baixo. O ícone desceu de 30 para 18 px para
+caber a altura da árvore a 1152 × 648; fica por ver no editor se 18 px se lê bem.

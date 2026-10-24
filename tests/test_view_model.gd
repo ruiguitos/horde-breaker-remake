@@ -4,6 +4,8 @@ extends SceneTree
 ## the charging handle move through a reload and return to rest afterwards.
 ## Run: godot --headless --path . --script res://tests/test_view_model.gd
 
+const DT: float = 1.0 / 60.0
+
 var _failures: int = 0
 
 
@@ -85,4 +87,97 @@ func _initialize() -> void:
 	_check(mag.position.is_equal_approx(rest), "smg: the magazine is back at rest after the reload")
 	vm.free()
 
+	call_deferred("_weight_checks")
+
+
+## Weight: the gun trails a turn of the camera, settles back when the turn stops, keeps the sight
+## line while aiming, and its drift is capped by LAG_MAX however fast the turn is. Deferred: the
+## gun reads its camera's transform, which needs the camera in the tree.
+func _weight_checks() -> void:
+	var camera := Node3D.new()
+	root.add_child(camera)
+	var weighted: ViewModel = ViewModel.create(&"recruit")
+	camera.add_child(weighted)
+	weighted.update(DT, 0.0, 0.0, 0.0)
+	var resting: Vector3 = weighted.position
+	for k in 30:
+		camera.rotation.y += 2.0 * DT
+		weighted.update(DT, 0.0, 0.0, 0.0)
+	var trail: Vector3 = weighted.position - resting
+	_check(absf(trail.x - 0.012) < 0.002 and absf(trail.y) < 0.0005,
+		"turning left at 2 rad/s, the gun trails to the right by about 12 mm (%.4f m)" % trail.x)
+	for k in 60:
+		weighted.update(DT, 0.0, 0.0, 0.0)
+	_check(weighted.position.distance_to(resting) < 0.0005, "the gun settles back when the turn stops")
+	for k in 30:
+		camera.rotation.x += 2.0 * DT
+		weighted.update(DT, 0.0, 0.0, 0.0)
+	var lift: Vector3 = weighted.position - resting
+	_check(lift.y < -0.01 and absf(lift.x) < 0.0005, "looking up at 2 rad/s, the gun drops (%.4f m)" % lift.y)
+	for k in 60:
+		weighted.update(DT, 0.0, 0.0, 0.0)
+	weighted.aim = 1.0
+	for k in 30:
+		camera.rotation.y += 2.0 * DT
+		weighted.update(DT, 0.0, 0.0, 0.0)
+	var sight: Vector3 = weighted.position - weighted._ads_rest
+	_check(absf(sight.x) < 0.0005 and absf(sight.y) < 0.0005, "aiming down the sights, a turn does not move the sight line")
+	weighted.aim = 0.0
+	for k in 60:
+		camera.rotation.y += 20.0 * DT
+		weighted.update(DT, 0.0, 0.0, 0.0)
+	var spun: Vector2 = Vector2(weighted.position.x - weighted._hip_rest.x, weighted.position.y - weighted._hip_rest.y)
+	_check(spun.length() <= ViewModel.LAG_MAX + 0.0005 and spun.length() > 0.02,
+		"a very fast turn drifts the gun, capped at LAG_MAX (%.4f m)" % spun.length())
+	# Back from third person (hidden, not updated), the gun starts from rest: no false 90 degree turn.
+	var second := Node3D.new()
+	root.add_child(second)
+	var follower: ViewModel = ViewModel.create(&"recruit")
+	second.add_child(follower)
+	follower.update(DT, 0.0, 0.0, 0.0)
+	var settled: Vector3 = follower.position
+	for k in 30:
+		second.rotation.y += 2.0 * DT
+		follower.update(DT, 0.0, 0.0, 0.0)
+	_check(follower._lag.length() > 0.01, "a second gun trails its turn as well (%.4f m)" % follower._lag.length())
+	follower.visible = false
+	second.rotation.y += PI / 2.0
+	follower.visible = true
+	follower.update(DT, 0.0, 0.0, 0.0)
+	_check(follower.position.distance_to(settled) < 0.0005 and follower._lag.length() < 0.0001,
+		"back from hiding, a 90 degree turn made meanwhile does not drift the gun (%.5f m)" % follower._lag.length())
+
+	# Moved to another camera: its orientation is not a turn of this one.
+	var third := Node3D.new()
+	root.add_child(third)
+	third.rotation.y = 1.0
+	second.remove_child(follower)
+	third.add_child(follower)
+	follower.update(DT, 0.0, 0.0, 0.0)
+	_check(follower._lag.length() < 0.0001, "moved to another camera, the gun starts from rest")
+
+	# A zero or negative frame time keeps the sample and never pushes the drift past where it was.
+	for k in 30:
+		third.rotation.y += 2.0 * DT
+		follower.update(DT, 0.0, 0.0, 0.0)
+	var drifted: float = follower._lag.length()
+	follower.update(0.0, 0.0, 0.0, 0.0)
+	follower.update(-DT, 0.0, 0.0, 0.0)
+	_check(absf(follower._lag.length() - drifted) < 0.000001, "a zero or negative frame time leaves the drift alone (%.5f m)" % drifted)
+	third.rotation.y += 2.0 * DT
+	follower.update(DT, 0.0, 0.0, 0.0)
+	_check(follower._lag.length() > drifted, "the turn keeps counting after a zero frame time")
+
+	# A fast diagonal spin: the drift stays within LAG_MAX on every frame, not only at the end.
+	var peak: float = 0.0
+	for k in 60:
+		third.rotation.y += 20.0 * DT
+		third.rotation.x += 5.0 * DT
+		follower.update(DT, 0.0, 0.0, 0.0)
+		peak = maxf(peak, follower._lag.length())
+	_check(peak <= ViewModel.LAG_MAX + 0.0005 and peak > 0.02, "every frame of a fast diagonal spin stays within LAG_MAX (peak %.4f m)" % peak)
+
+	third.free()
+	second.free()
+	camera.free()
 	quit(1 if _failures > 0 else 0)

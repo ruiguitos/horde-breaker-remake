@@ -223,6 +223,16 @@ vermelho perigo, amarelo especial a matar primeiro.
 | 9 | **Crawler** (revisto 2026-10-17) | ameaça baixa; um Walker que perde as pernas | corpo rente ao chão, braços a arrastar (modelo do Walker em pose de rastejar) | rasteja a 40 % da velocidade do Walker, sem corrida; alcance e dano do Walker (8 / 1 s) | granada (os Walkers que sobrevivem podem ficar sem pernas); cabeça mais baixa, a mira ajusta-se | 30 (o do Walker) | 0,72–1,04 | 8 |
 | 10 | **The Breaker** (boss) | clímax de ilha | Brute ×1,5 com espinhos (cones) vermelhos | fases: cargas, pisões em área, invoca Shamblers | combina tudo; pontos fracos nas costas | 3000 | 2,0 | 35 / 20 área |
 
+Aviso do golpe (2026-10-24): Shambler e Runner inclinam-se e levantam
+os braços durante 0,3 s antes de o golpe entrar. O dano, o alcance e o intervalo
+mantêm-se. O golpe entra só se o jogador ainda estiver ao alcance no fim do aviso;
+se já saiu, o golpe falha, sem dano, e o intervalo segue como se tivesse acertado.
+Se o inimigo for atordoado, congelado ou morto a meio, o golpe não sai. Durante o
+aviso o inimigo continua a andar a 25 % da velocidade: a investida lê-se pela
+inclinação e pelos braços. Crawler, Brute, Grabber, Bloater, Screamer e boss
+mantêm o tempo que tinham: o Crawler só terá aviso quando o shader dele levantar
+os braços.
+
 Vertical slice: **Shambler, Runner, Brute, Grabber** (+ o boss só se sobrar
 tempo). O Grabber é o teste do breaker: se soltar não for satisfatório, o
 breaker está mal.

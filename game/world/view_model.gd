@@ -39,6 +39,12 @@ const GUN_SCALE: float = 1.0
 const HIP_OFFSETS: Dictionary = {&"machine_gun": Vector3(0, -0.06, 0)}
 ## Largest pull towards the eye (metres); at it the gun is also lowered.
 const MAX_PULL: float = 0.3
+## Weight: the gun trails a turn of the view. It drifts LAG_PER_RATE metres per radian per
+## second of turn (opposite to the turn, as a heavy gun does), at most LAG_MAX, and follows
+## that drift at LAG_RESPONSE per second, so it settles back when the turn stops.
+const LAG_PER_RATE: float = 0.006
+const LAG_MAX: float = 0.03
+const LAG_RESPONSE: float = 9.0
 
 var class_id: StringName = &"recruit"
 var weapon_id: StringName = &""
@@ -56,6 +62,10 @@ var _hip_rest: Vector3 = REST
 var _magazine: Array[String] = []  ## node names of the parts that drop in a reload
 var _charge: Array[String] = []  ## node names of the charging handle or bolt
 var _base: Dictionary = {}  ## node name -> rest position of an animated part
+var _lag: Vector2 = Vector2.ZERO  ## the gun's drift behind the view (x right, y up), metres
+var _view_basis: Basis = Basis.IDENTITY  ## the camera's orientation at the last update
+var _has_view_basis: bool = false
+var _sampled_camera_id: int = 0  ## instance id of the camera that _view_basis came from (0: none)
 ## 0 = hip, 1 = aiming down sights (set by the island each frame).
 var aim: float = 0.0
 ## Reload progress 0..1 (0 when not reloading or the gun has no timed reload).
@@ -235,7 +245,11 @@ func update(delta: float, pull_back: float, walk: float, t: float) -> void:
 		_flash.rotation.z = randf() * TAU
 	var bob := Vector3(sin(t * 9.0) * 0.008, -absf(cos(t * 9.0)) * 0.01, 0) * walk
 	var near: float = clampf(pull_back / MAX_PULL, 0.0, 1.0)
-	position = _hip_rest.lerp(_ads_rest, aim) + bob + Vector3(0, -pull_back * 0.3, pull_back + _kick * 0.035)
+	# Weight: the drift follows the view's turn; aiming down the sights steadies the gun.
+	var turn: Vector2 = _turn_rate(delta)
+	_lag = _lag.lerp((Vector2(turn.y, -turn.x) * LAG_PER_RATE).limit_length(LAG_MAX), 1.0 - exp(-LAG_RESPONSE * maxf(delta, 0.0)))
+	var drift: Vector2 = _lag * (1.0 - aim)
+	position = _hip_rest.lerp(_ads_rest, aim) + bob + Vector3(drift.x, drift.y, 0.0) + Vector3(0, -pull_back * 0.3, pull_back + _kick * 0.035)
 	rotation.x = _kick * 0.06 - near * 1.1  # negative: the barrel points down
 	if _gun != null:
 		_gun.visible = not is_scoped()
@@ -243,6 +257,38 @@ func update(delta: float, pull_back: float, walk: float, t: float) -> void:
 	_animate_parts()
 	if _arms != null:
 		_arms.set_reload(reload)
+
+
+## The camera's turn since the last update, as (pitch, yaw) in radians per second. Zero on
+## the first update, and when the gun is not under a camera (the tests build it alone).
+func _turn_rate(delta: float) -> Vector2:
+	var camera := get_parent() as Node3D
+	var camera_id: int = camera.get_instance_id() if camera != null else 0
+	if camera_id != _sampled_camera_id:  # another camera: its orientation is not a turn of this one
+		_sampled_camera_id = camera_id
+		_reset_turn()
+	if camera == null or delta <= 0.0:
+		return Vector2.ZERO
+	var now: Basis = camera.global_transform.basis
+	var turn := Vector2.ZERO
+	if _has_view_basis:
+		var step: Vector3 = (_view_basis.inverse() * now).get_euler()
+		turn = Vector2(step.x, step.y) / delta
+	_view_basis = now
+	_has_view_basis = true
+	return turn
+
+
+## The next sample starts from rest: the gun is not updated while it is hidden (third
+## person), so its last camera sample is stale and must not read as a turn.
+func _reset_turn() -> void:
+	_has_view_basis = false
+	_lag = Vector2.ZERO
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_VISIBILITY_CHANGED:
+		_reset_turn()
 
 
 ## The magazine drops and the charging handle is pulled during a reload; every

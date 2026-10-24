@@ -29,6 +29,12 @@ const FALL_TIME: float = 0.8
 const CORPSE_TIME: float = 5.0
 const SINK_TIME: float = 1.2
 const MAX_CORPSES: int = 40
+## A Bloater's corpse swells to (1 + POP_GROWTH) of its size over POP_TIME, then bursts; the
+## fireball (island.gd) grows over the same time. The damage itself is instant, at the death.
+const POP_TIME: float = 0.35
+const POP_GROWTH: float = 0.4
+## The Behemoth's enraged pose (the lunge channel): arms up and forward while it is enraged.
+const ENRAGED_POSE: float = 0.4
 ## Old-capsule chunks were tinted with the kind colour; zombie chunks are flesh.
 const DEBRIS_COLOR: Color = Color(0.45, 0.12, 0.1)
 ## Hit flash time set by IslandRun._damage (flinch scales with it).
@@ -46,6 +52,8 @@ const SCREAM_POSE_TIME: float = 0.8
 ## of the pose, so the body acts out the call and the slam.
 var scream_age: float = 99.0
 var slam_windup: float = 0.0
+## The Behemoth is in its second phase (IslandRun.boss_enraged): it holds ENRAGED_POSE.
+var boss_enraged: bool = false
 var _mm: Array[MultiMesh] = []
 ## All variants' instance data in one array (a packed array inside an Array
 ## would be copied on every write): variant v starts at _base[v] instances.
@@ -152,6 +160,7 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 	var burn: PackedFloat32Array = h.burn_time
 	var poison: PackedFloat32Array = h.poison_time
 	var cold: PackedByteArray = h.cold_stacks
+	var windup: PackedFloat32Array = h.windup
 	var attack_cd: PackedFloat32Array = h.attack_cd
 	var reach: float = GameData.ATTACK_REACH + GameData.PLAYER_RADIUS + 0.3
 	var reach2: float = reach * reach
@@ -209,7 +218,14 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 		# they stay planted when it slows, turns or is blocked; a walker keeps time.
 		var phase: float = offset + h.travel[i] * TAU / ZombieModel.CRAWL_STRIDE if kinds[i] == GameData.EnemyKind.CRAWLER else offset + now * (3.0 + base_speed * 2.6)
 		var act: float = 0.0
-		if close:
+		if windup[i] > 0.0:
+			# A blow on its way: the body leans in and the arms rise, reaching the pose as it lands.
+			act = smoothstep(0.0, 1.0, 1.0 - windup[i] / Horde.ATTACK_WINDUP)
+		elif windup[i] < 0.0:
+			# The blow has landed: the arms come back down.
+			act = -windup[i] / Horde.ATTACK_RECOVERY
+		elif close and not Horde.telegraphs(kinds[i]):
+			# The blows that do not wind up keep their short lunge after they land.
 			var since: float = t.attack_interval - attack_cd[i]
 			if since >= 0.0 and since < 0.35:
 				act = sin(since / 0.35 * PI)
@@ -237,6 +253,8 @@ func draw(h: Horde, map: IslandMap, now: float, delta: float) -> void:
 					act = maxf(act, scream_pulse)
 				elif kinds[i] == GameData.EnemyKind.BOSS:
 					act = maxf(act, slam_windup)
+					if boss_enraged:
+						act = maxf(act, ENRAGED_POSE)
 		if flash[i] > 0.0:
 			status = ZombieModel.Status.FLASH
 		if kinds[i] == GameData.EnemyKind.CRAWLER and crawl_delay[i] > 0.0:
@@ -309,13 +327,22 @@ func on_death(d: Vector4, ground: Vector3, from: Vector3, key: float) -> void:
 	_corpse_headless.append(1 if d.w > 0.5 else 0)
 
 
+## A Bloater's corpse does not lie down: it bursts at POP_TIME. Others lie for CORPSE_TIME.
+func _is_bloater(info: Vector4) -> bool:
+	return int(info.x) == variant_for(GameData.EnemyKind.BLOATER, 0.0)
+
+
+func _corpse_time(info: Vector4) -> float:
+	return POP_TIME if _is_bloater(info) else CORPSE_TIME
+
+
 func _draw_corpses(delta: float) -> void:
 	var c: int = _corpse_pos.size() - 1
 	while c >= 0:
 		var info: Vector4 = _corpse_info[c]
 		info.w += delta
 		_corpse_info[c] = info
-		if info.w > CORPSE_TIME:
+		if info.w > _corpse_time(info):
 			_corpse_pos.remove_at(c)
 			_corpse_info.remove_at(c)
 			_corpse_look.remove_at(c)
@@ -325,10 +352,12 @@ func _draw_corpses(delta: float) -> void:
 		var cp: Vector4 = _corpse_pos[k]
 		var info: Vector4 = _corpse_info[k]
 		var sink: float = clampf((info.w - (CORPSE_TIME - SINK_TIME)) / SINK_TIME, 0.0, 1.0) * 0.45
-		var fall: float = clampf(info.w / FALL_TIME, 0.0, 1.0)
+		var burst: bool = _is_bloater(info)
+		var fall: float = 0.0 if burst else clampf(info.w / FALL_TIME, 0.0, 1.0)
 		var w: float = (4.0 if _corpse_headless[k] != 0 else 2.0) + fall
+		var grow: float = 1.0 + POP_GROWTH * clampf(info.w / POP_TIME, 0.0, 1.0) if burst else 1.0
 		var look: Vector3 = _corpse_look[k]
-		_write(int(info.x), Vector3(cp.x, cp.y - sink, cp.z), cp.w, info.y, info.z, Color(ZombieModel.Status.NONE, look.x, look.y, look.z), Vector4(0, 0, 0, w))
+		_write(int(info.x), Vector3(cp.x, cp.y - sink, cp.z), cp.w, info.y * grow, info.z * grow, Color(ZombieModel.Status.NONE, look.x, look.y, look.z), Vector4(0, 0, 0, w))
 
 
 ## Grows the MultiMeshes (powers of two, so it rarely happens) and lays the

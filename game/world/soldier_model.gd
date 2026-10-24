@@ -38,6 +38,15 @@ const IDLE_CLIP: StringName = &"UAL/Idle_Loop"
 const HIT_CLIP: StringName = &"UAL/Hit_Chest"
 const ROLL_CLIP: StringName = &"UAL/Roll"
 const DEATH_CLIP: StringName = &"UAL/Death01"
+## The aim poses, in blend order: Down (-1), Neutral (0), Up (+1). Each is one static pose.
+const AIM_CLIPS: Array[StringName] = [&"UAL/Pistol_Aim_Down", &"UAL/Pistol_Aim_Neutral", &"UAL/Pistol_Aim_Up"]
+const AIM_UP_MAX: float = deg_to_rad(10.0)  ## the shoulder camera's upward limit (island.gd tp_pitch_min)
+const AIM_DOWN_MAX: float = deg_to_rad(45.0)  ## its downward limit (island.gd tp_pitch_max)
+const AIM_TRUNK_AMOUNT: float = 0.6  ## share of the aim pose on the trunk; the rest keeps the idle breathing and the walk's sway
+## The bones the aim pose and the recoil move: the trunk tracks the clips animate (the GLB has no DEF-spine). Never the hips, the legs or the arms: the legs belong to the feet, the arms to the rifle hold.
+const TRUNK_BONES: Array[StringName] = [&"DEF-spine.002", &"DEF-spine.003", &"DEF-neck", &"DEF-head"]
+const RECOIL_KICK: float = deg_to_rad(3.0)  ## rad of trunk kick back on each shot of the player
+const RECOIL_DECAY: float = 12.0  ## 1/s, how fast the kick fades
 const HIT_COOLDOWN: float = 0.35  ## s between two flinches: a crowd must not flinch every frame
 const DEATH_FADE: float = 4.0  ## 1/s: the death pose takes over in 0.25 s
 const MOVE_MIN: float = 0.35  ## m/s: slower than this is standing
@@ -122,6 +131,7 @@ var _dashing: bool = false
 var _dead: bool = false
 var _death_amount: float = 0.0  ## 0 = locomotion, 1 = the death clip alone
 var _hit_cooldown: float = 0.0
+var _kick: float = 0.0  ## rad, the trunk's kick back from the last shot (recoil())
 
 
 static func create(id: StringName, variant: StringName = &"") -> SoldierModel:
@@ -284,6 +294,17 @@ func _locomotion_tree() -> AnimationNodeBlendTree:
 	dash.fadein_time = 0.03
 	dash.fadeout_time = 0.1
 	var death := AnimationNodeBlend2.new()
+	# The aim pose, on the trunk only: aim_trunk takes AIM_TRUNK_AMOUNT of the aim clips over the
+	# locomotion for TRUNK_BONES. Every other bone passes through, so the legs and the rifle hold never see it.
+	var aim := AnimationNodeBlendSpace1D.new()
+	aim.min_space = -1.0
+	aim.max_space = 1.0
+	for i in AIM_CLIPS.size():
+		aim.add_blend_point(_clip(AIM_CLIPS[i]), float(i) - 1.0, -1, StringName(String(AIM_CLIPS[i]).trim_prefix("UAL/")))
+	var aim_trunk := AnimationNodeBlend2.new()
+	aim_trunk.filter_enabled = true
+	for bone: StringName in TRUNK_BONES:
+		aim_trunk.set_filter_path(NodePath(".:" + bone), true)
 	blend_tree.add_node(&"idle", idle, Vector2(0, 0))
 	blend_tree.add_node(&"gait", gait, Vector2(0, 160))
 	blend_tree.add_node(&"rate", rate, Vector2(200, 160))
@@ -294,10 +315,14 @@ func _locomotion_tree() -> AnimationNodeBlendTree:
 	blend_tree.add_node(&"hit_clip", _clip(HIT_CLIP), Vector2(560, 200))
 	blend_tree.add_node(&"roll_clip", _clip(ROLL_CLIP), Vector2(680, 200))
 	blend_tree.add_node(&"death_clip", _clip(DEATH_CLIP), Vector2(800, 200))
+	blend_tree.add_node(&"aim", aim, Vector2(400, 300))
+	blend_tree.add_node(&"aim_trunk", aim_trunk, Vector2(540, 300))
 	blend_tree.connect_node(&"rate", 0, &"gait")
 	blend_tree.connect_node(&"move", 0, &"idle")
 	blend_tree.connect_node(&"move", 1, &"rate")
-	blend_tree.connect_node(&"hit", 0, &"move")
+	blend_tree.connect_node(&"aim_trunk", 0, &"move")
+	blend_tree.connect_node(&"aim_trunk", 1, &"aim")
+	blend_tree.connect_node(&"hit", 0, &"aim_trunk")
 	blend_tree.connect_node(&"hit", 1, &"hit_clip")
 	blend_tree.connect_node(&"dash", 0, &"hit")
 	blend_tree.connect_node(&"dash", 1, &"roll_clip")
@@ -388,11 +413,31 @@ func react_hit() -> bool:
 	return true
 
 
+## A shot of the player's own: the trunk kicks back, and animate() lets the kick fade.
+func recoil() -> void:
+	if _dashing:
+		return  # the roll takes the body during a dash
+	if _tree == null or _dead:
+		return
+	_kick = RECOIL_KICK
+
+
+## The aim pose for a barrel pitch (rad, positive = up): +1 is Up at AIM_UP_MAX, 0 Neutral,
+## -1 Down at AIM_DOWN_MAX. Past a limit it holds the end pose.
+static func aim_position(pitch: float) -> float:
+	if pitch >= 0.0:
+		return clampf(pitch / AIM_UP_MAX, 0.0, 1.0)
+	return -clampf(-pitch / AIM_DOWN_MAX, 0.0, 1.0)
+
+
 ## The Breaker's dash rolls the body; the roll fades out when the dash ends.
 func set_dashing(on: bool) -> void:
 	if _tree == null or on == _dashing or _dead:
 		return
 	_dashing = on
+	if on:
+		_kick = 0.0
+		_rig.kick = 0.0  # applied already: the rig keeps it until the next animate()
 	var request: int = AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE if on else AnimationNodeOneShot.ONE_SHOT_REQUEST_FADE_OUT
 	_tree.set(&"parameters/dash/request", request)
 
@@ -404,6 +449,8 @@ func die() -> void:
 		return
 	set_dashing(false)
 	_dead = true
+	_kick = 0.0
+	_rig.kick = 0.0  # the rig is still posing for the death's first 0.25 s: no kick in it
 
 
 func is_dead() -> bool:
@@ -412,6 +459,7 @@ func is_dead() -> bool:
 
 func animate(speed: float, t: float, sprinting: bool = false, delta: float = 0.0) -> void:
 	_hit_cooldown = maxf(0.0, _hit_cooldown - delta)
+	_kick = lerpf(_kick, 0.0, 1.0 - exp(-RECOIL_DECAY * delta))
 	if _tree != null:
 		if not is_inside_tree() or delta <= 0.0:
 			return
@@ -529,6 +577,8 @@ func _apply_locomotion() -> void:
 	_tree.set(&"parameters/gait/blend_position", _gait)
 	_tree.set(&"parameters/rate/scale", _rate)
 	_tree.set(&"parameters/move/blend_amount", _move)
+	_tree.set(&"parameters/aim/blend_position", aim_position(aim_pitch))
+	_tree.set(&"parameters/aim_trunk/blend_amount", AIM_TRUNK_AMOUNT)
 	_mount_gun(carrying)
 	_support.active = not carrying
 	if grounded and not _feet.active:
@@ -537,6 +587,7 @@ func _apply_locomotion() -> void:
 	var fwd: Vector3 = -global_basis.z
 	_rig.legs_offset = wrapf(_legs_yaw - atan2(-fwd.x, -fwd.z), -PI, PI)
 	_rig.aim_pitch = aim_pitch
+	_rig.kick = _kick
 	_rig.aim_weight = 1.0 - _carry
 	_rig.carry_weight = _carry
 	_rig.carry_hand = CARRY_HAND
@@ -602,6 +653,7 @@ class LocomotionRig extends SkeletonModifier3D:
 	var legs_offset: float = 0.0
 	var aim_pitch: float = 0.0
 	var aim_weight: float = 1.0
+	var kick: float = 0.0  ## rad, the trunk's kick back on a shot (SoldierModel.recoil)
 	var carry_weight: float = 0.0
 	var carry_hand := Vector3.ZERO  ## in the body's space
 	var _b: Dictionary = {}
@@ -627,6 +679,9 @@ class LocomotionRig extends SkeletonModifier3D:
 		var want: Vector3 = forward.rotated(forward.cross(up).normalized(), aim_pitch)
 		if aim_weight > 0.0 and muzzle != null and muzzle.is_inside_tree():
 			_aim(sk, up, want)
+		if absf(kick) > 0.0001:
+			# Leans the trunk back, about the lateral axis the aim pitch turns about.
+			_rotate(sk, _b["DEF-spine.002"], forward.cross(up).normalized(), kick * (1.0 - carry_weight))
 		_look(sk, forward, want)
 
 	## The head looks where the gun points (85 %): the jog and sprint clips

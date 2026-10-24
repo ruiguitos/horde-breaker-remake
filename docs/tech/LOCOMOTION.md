@@ -233,6 +233,95 @@ Três clips pontuais da UAL, nos dois rigs, sobrepostos à locomoção em
 flinch que acaba sozinho, roll do dash, morte sem novos flinches e pose que
 não deriva em 3 s (0,0000 m).
 
+## Camada de tronco: mira e recuo (2026-10-24)
+
+Primeira parte da Fase 1 da animação (`TODO.md`). Duas coisas, ambas só no tronco:
+
+- **Mira:** `Pistol_Aim_Down`, `Neutral` e `Up` são poses estáticas de 0,17 s. Um
+  `BlendSpace1D` escolhe a pose pelo pitch da mira (+10° para cima e −45° para
+  baixo, os limites da câmara em terceira pessoa). Um `Blend2` filtrado
+  (`aim_trunk`) põe 60 % dessa pose em `DEF-spine.002`, `.003`, pescoço e cabeça.
+  Fica por cima da locomoção, por isso o andar conserva parte do balanço do tronco.
+- **Recuo:** cada disparo do jogador chama `recoil()`, que inclina o tronco 3°
+  para trás; a meia-vida do recuo é de 0,06 s. Aplica-se no `LocomotionRig`,
+  depois da mira e antes do olhar da cabeça. Fica suprimido durante o dash, na
+  morte e com a carga de combustível, onde a mão já está posicionada.
+
+Não mexem nas pernas (`foot_contact.gd`) nem nos braços. A pega de duas mãos
+(`recruit_rifle_hold.gd`) escreve ombros, braços, antebraços e mãos em pose
+absoluta, e o `Pistol_Shoot` não move a coluna, por isso o recuo é código e não
+clipe. O preview do armeiro e o da escolha de classe usam mira em repouso, por
+isso o tronco deles também fica 60 % na pose neutra.
+
+Os braços mantêm as poses locais, mas acompanham o tronco na cena: quando o
+tronco se inclina, a arma sobe com ele, e o `LocomotionRig` volta a apontar o
+cano à mira.
+
+Testes: `_test_aim_layer` em `tests/test_recruit_animation.gd` e `_test_recoil`
+em `tests/test_soldier_reactions.gd`. Leem a pose no sinal `skeleton_updated`,
+porque uma leitura logo após `animate()` ainda é anterior aos modificadores.
+
+Ficou por fazer, à espera de decisão:
+
+- **Braços com a mira:** precisam de uma pega de rifle, que a UAL não tem. Os
+  clipes de pistola partiriam a pega de duas mãos.
+- **Recarga do corpo (`Pistol_Reload`):** a pega tem de ceder durante a recarga,
+  e o apoio da mão esquerda também. Falta decidir se a mão esquerda vai ao carregador.
+- **Interagir (`Interact`) e apanhar (`PickUp_Table`):** `interact()` só trata dos
+  bidões da Fuel Run. Não há noção de "segurar E" nem de sinais apanhados.
+- **Aterragem (`Jump_Land`):** o jogo não tem queda normal (`_fly` só sobe em
+  noclip), e o Breaker não tem ar. Falta definir o que é "degrau alto".
+- **`Hit_Head`:** `react_hit()` não recebe a zona do dano, por isso não há origem
+  de dano na cabeça para disparar o clipe.
+
+## Aviso do golpe da horda (2026-10-24)
+
+Não é um clipe nem o rig do jogador. O aviso de 0,3 s dos Shamblers e Runners é
+código da horda (`ATTACK_WINDUP` em `game/horde/horde.gd`), e a pose é a de
+`game/world/zombie_horde_view.gd`: inclinação e braços no aviso, braços a descer
+em 0,15 s depois do golpe. Durante o aviso:
+
+- **Esquiva:** o golpe só acerta se o jogador estiver no alcance (1,5 m) quando o
+  aviso acaba. Se já saiu, falha, sem dano nem agarrão, e o intervalo de ataque
+  segue como se tivesse acertado.
+- **Avanço:** o inimigo continua a andar a `WINDUP_SPEED_SHARE` (25 %) da
+  velocidade. Medido em regime estacionário: 23,7 %. A investida lê-se pela
+  inclinação e pelos braços.
+- **Cancelamentos:** atordoar, congelar, perder as pernas e morrer a meio cancelam
+  o golpe.
+
+Verificação: `tests/test_horde_windup.gd`, 24 verificações a passar. Cobrem o tempo
+do aviso e o intervalo, os cancelamentos, a esquiva, o acerto com o jogador ainda
+em alcance, o cooldown que não muda quando se falha, o movimento já no primeiro tick
+e a velocidade de 25 %.
+
+Bot da Fuel Run, seis seeds, o mesmo bot e o mesmo limite de 900 s. "Parado" é o
+aviso antes desta correção (o inimigo fica imóvel e o golpe acerta mesmo fora de
+alcance). "Sem aviso" é o estado de 2026-10-24 antes do aviso. Largadas são as vezes
+em que o bot pousa o bidão por haver mais de 12 inimigos a 6 m; é o indicador de
+anel de corpos.
+
+| Seed (mapa) | Sem aviso | Aviso parado | Aviso com esquiva e avanço |
+|---|---|---|---|
+| 404 (Town) | 159 s | 155 s, 7 largadas | 154 s, 8 largadas |
+| 505 (Beach) | 188 s, 11 largadas | falha a 900 s, 2/3, 134 largadas | 203 s, 14 largadas |
+| 11 (Beach) | 251 s, 13 largadas | falha a 900 s, 1/3, 6 largadas | 439 s, 53 largadas |
+| 12 (Beach) | 637 s, 84 largadas | 472 s, 54 largadas | 310 s, 22 largadas |
+| 13 (Town) | 187 s, 11 largadas | 175 s, 8 largadas | 193 s, 11 largadas |
+| 14 (Beach) | falha a 900 s, 2/3, 135 largadas | 779 s, 115 largadas | 254 s, 15 largadas |
+
+Com a correção as seis seeds chegam à extração (154 a 439 s). A seed 505, a que o
+teste fixa, passa de 2/3 bidões em 900 s para 3/3 em 203 s. As largadas caem em 505
+e 14 e sobem em 11 e 13. Não medi a densidade do anel diretamente, e não separei a
+esquiva do avanço, por isso a causa fica como hipótese apoiada nos números.
+
+Limites que ficam:
+
+- Sem campo de fluxo calculado, o inimigo fica parado durante o aviso. É uma
+  limitação herdada da navegação; o arranque normal já tem o campo pronto.
+- O Crawler não tem aviso, porque `crawler_body.gdshader` não levanta os braços.
+- A pose não foi vista no ecrã; a verificação é de testes headless.
+
 ## Validação
 
 `tests/test_recruit_animation.gd` cobre: fases alinhadas das três marchas,

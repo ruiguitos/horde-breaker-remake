@@ -26,6 +26,7 @@ func _initialize() -> void:
 func _run_tests() -> void:
 	for class_id: StringName in [&"recruit", &"vanguard"]:
 		await _test_soldier(class_id)
+		await _test_aim_layer(class_id)
 	await _test_locomotion(&"recruit")
 	var preview := ClassPreview.create(&"vanguard")
 	preview.size = Vector2(320, 420)
@@ -193,6 +194,84 @@ func _test_locomotion(class_id: StringName) -> void:
 	skeleton.skeleton_updated.disconnect(_on_skeleton_updated)
 	_probe = {}
 	soldier.free()
+
+
+## The aim pose sits on the trunk only: aiming up or down bends the trunk, and the legs
+## stay where the locomotion puts them. The barrel pitch maps to the blend, clamped past the limits.
+func _test_aim_layer(class_id: StringName) -> void:
+	_check(SoldierModel.aim_position(0.0) == 0.0 and SoldierModel.aim_position(SoldierModel.AIM_UP_MAX) == 1.0 and SoldierModel.aim_position(-SoldierModel.AIM_DOWN_MAX) == -1.0 and SoldierModel.aim_position(1.0) == 1.0 and SoldierModel.aim_position(-1.0) == -1.0, "%s: the aim pitch maps to the Down, Neutral and Up poses and clamps past them" % class_id)
+	var probe := SoldierModel.create(class_id)
+	root.add_child(probe)
+	await process_frame
+	var tree: AnimationTree = probe.find_child(String(class_id).capitalize() + "AnimationTree", true, false)
+	var trunk := (tree.tree_root as AnimationNodeBlendTree).get_node(&"aim_trunk") as AnimationNodeBlend2
+	var on_trunk: bool = true
+	for bone: String in ["DEF-spine.002", "DEF-spine.003", "DEF-neck", "DEF-head"]:
+		on_trunk = on_trunk and trunk.is_path_filtered(NodePath(".:" + bone))
+	var off_trunk: bool = true
+	for bone: String in ["DEF-hips", "DEF-thigh.L", "DEF-shin.R", "DEF-upper_arm.L", "DEF-hand.R"]:
+		off_trunk = off_trunk and not trunk.is_path_filtered(NodePath(".:" + bone))
+	_check(on_trunk and off_trunk, "%s: the aim layer moves the trunk, neck and head, and never the hips, legs or arms" % class_id)
+	var aim := (tree.tree_root as AnimationNodeBlendTree).get_node(&"aim") as AnimationNodeBlendSpace1D
+	var clip_at: Dictionary = {}
+	for point in aim.get_blend_point_count():
+		clip_at[aim.get_blend_point_position(point)] = (aim.get_blend_point_node(point) as AnimationNodeAnimation).animation
+	_check(clip_at.get(-1.0) == &"UAL/Pistol_Aim_Down" and clip_at.get(0.0) == &"UAL/Pistol_Aim_Neutral" and clip_at.get(1.0) == &"UAL/Pistol_Aim_Up", "%s: Down sits at -1, Neutral at 0 and Up at +1, so the aim picks the right pose" % class_id)
+	_check(trunk.filter_enabled, "%s: the aim layer is filtered, so it cannot reach the legs or the arms" % class_id)
+	probe.free()
+	# Two models advanced the same frames: one aims up, one down. Comparing them at one time
+	# keeps the idle's own breathing out of the comparison.
+	var up := SoldierModel.create(class_id)
+	var down := SoldierModel.create(class_id)
+	root.add_child(up)
+	root.add_child(down)
+	await process_frame
+	up.aim_pitch = SoldierModel.AIM_UP_MAX
+	down.aim_pitch = -SoldierModel.AIM_DOWN_MAX
+	var up_skeleton: Skeleton3D = up.find_child("Skeleton3D", true, false)
+	var down_skeleton: Skeleton3D = down.find_child("Skeleton3D", true, false)
+	var spine: int = up_skeleton.find_bone("DEF-spine.002")
+	var thigh: int = up_skeleton.find_bone("DEF-thigh.L")
+	_posed.clear()
+	up_skeleton.skeleton_updated.connect(_record_pose.bind(up_skeleton, "up", spine, thigh))
+	down_skeleton.skeleton_updated.connect(_record_pose.bind(down_skeleton, "down", spine, thigh))
+	await _settle(up, 30)
+	await _settle(down, 30)
+	var bend: float = (_posed["up:spine"] as Quaternion).angle_to(_posed["down:spine"] as Quaternion)
+	_check(bend > deg_to_rad(4.0), "%s: aiming up and down bends the trunk apart (%.1f deg)" % [class_id, rad_to_deg(bend)])
+	_check((_posed["up:thigh"] as Quaternion).is_equal_approx(_posed["down:thigh"] as Quaternion), "%s: the legs do not follow the aim" % class_id)
+	# Walking still moves the legs under the layer: both models walk the same frames.
+	var stepped: Quaternion = _posed["up:thigh"]
+	await _walk(up, down, 6)
+	_check((_posed["up:thigh"] as Quaternion).angle_to(stepped) > deg_to_rad(2.0), "%s: walking still moves the legs under the aim layer" % class_id)
+	_check((_posed["up:thigh"] as Quaternion).is_equal_approx(_posed["down:thigh"] as Quaternion), "%s: walking, the legs match under both aims" % class_id)
+	up.free()
+	down.free()
+
+
+var _posed: Dictionary = {}
+
+
+## The pose the modifiers give a skeleton on its update: a read after an await can still be the
+## pose before them, so the checks read what this recorded.
+func _record_pose(skeleton: Skeleton3D, key: String, spine: int, thigh: int) -> void:
+	_posed[key + ":spine"] = skeleton.get_bone_pose_rotation(spine)
+	_posed[key + ":thigh"] = skeleton.get_bone_pose_rotation(thigh)
+
+
+## Walks both models forward, as island.gd moves the body: the position changes and animate() reads the speed from it.
+func _walk(up_model: SoldierModel, down_model: SoldierModel, frames: int) -> void:
+	for i in frames:
+		for model: SoldierModel in [up_model, down_model]:
+			model.position += Vector3(0, 0, -6.0 / 60.0)
+			model.animate(1.0, 0.0, false, 1.0 / 60.0)
+		await process_frame
+
+
+func _settle(soldier: SoldierModel, frames: int) -> void:
+	for i in frames:
+		soldier.animate(0.0, 0.0, false, 1.0 / 60.0)
+		await process_frame  # the modifiers pose the skeleton at the end of the frame
 
 
 func _test_soldier(class_id: StringName) -> void:

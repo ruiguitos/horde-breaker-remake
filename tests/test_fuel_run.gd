@@ -533,4 +533,5 @@ func _test_scene() -> void:
 		# Back on it next loop: stepping away above re-enabled walking pickup.
 	island.queue_free()
 	await process_frame
+	await create_timer(0.3).timeout  # the island's sound players release on the next audio mix: let them go before quitting
 	_finish()
