@@ -206,6 +206,11 @@ em memória, nos estados `normal`, `danger`, `boss`, `third_person` ou
 godot --path . --resolution 1152x648 --windowed --script res://tools/dev/hud_preview.gd -- <caminho-absoluto.png> normal
 ```
 
+**HUD mínimo** (só o preset HORROR do sandbox DEV): esconde o rádio, o objetivo, o
+minimapa, o XP, os contadores, os alertas, as setas de ameaça e a informação de
+classe; mantém vida, escudo, munição (com o nome da arma), breaker, granada e mira.
+F4 alterna com o HUD completo (builds de desenvolvimento).
+
 ## Mapas (ilhas)
 
 Cada ilha é gerada a partir de uma *seed*, sem cenas feitas à mão.
@@ -698,6 +703,14 @@ Pack ao fim de 3 min") em vez de impressões.
 - Hit-stop de 80 ms ao matar um Brute: o jogo congela por um instante para o
   golpe "pesar".
 
+## Modelo alternativo da Assault Rifle (teste visual)
+
+`assets/models/weapons/assault_rifle_realistic/` tem o mesmo conjunto de peças, a pega,
+o apoio e a boca do cano da arma atual, com texturas PBR próprias (2K). Só aparece no
+sandbox DEV, pelo item «Assault Rifle (realistic test)» da arma primária; o modelo por omissão continua a ser o de
+`assets/models/weapons/tactical_original/`. A origem e a licença estão em
+`assets/LICENSES.md`, e o contrato das peças é verificado em `tests/test_weapon_models.gd`.
+
 ## Som
 
 - **Sons gravados** do pack Ovani (`assets/audio/ovani_sfx_starter_vol1/`):
@@ -708,6 +721,12 @@ Pack ao fim de 3 min") em vez de impressões.
   faltar, o jogo usa o som sintetizado.
 - **Ambiente por bioma** (`audio/ambience.gd`): ondas na praia e nos menus,
   floresta na selva, vento na vila e no porto, tremor no vulcão.
+- **Passos por superfície** (`audio/sfx.gd`, `play_step`): quatro sons sintetizados
+  (areia, pedra, madeira e metal). A superfície vem do mapa (`IslandMap.surface_at`):
+  pontes e cais são madeira, as estradas são pedra, e o resto segue o bioma (areia na
+  praia e na selva, pedra na vila e no vulcão, metal no porto). Um som por pé assente,
+  e só ao andar no chão: nunca em noclip, no ar, parado, a rodar no sítio, a rolar com
+  o breaker, nem logo depois de parar.
 - Assault Rifle, SMG, Machine Gun e Shotgun usam sons sintetizados;
   a SMG e a Machine Gun têm timbres próprios.
 - Volumes em `world/island.gd::_play_audio`.
@@ -716,7 +735,8 @@ Pack ao fim de 3 min") em vez de impressões.
 (lá menor, 120 BPM), um calmo (drone e acorde) e um de combate (o mesmo
 drone com bombo, baixo e chimbal). Tocam sempre juntos e o volume de cada um
 segue o diretor: relax → calmo, crescer → mistura, pico e boss → combate.
-Como as transições são cross-fades, não há cortes.
+Como as transições são cross-fades, não há cortes. No preset HORROR do sandbox DEV,
+a música só começa ao fim de 60 s (ficam o mar e o vento).
 
 ## Onde mexer nos valores
 

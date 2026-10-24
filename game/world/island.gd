@@ -280,8 +280,12 @@ func _ready() -> void:
 	fx = Fx.new()
 	add_child(fx)
 	music = Music.new()
+	if _horror():
+		music.mute_for(HORROR_MUSIC_DELAY)  # the first minute is ambience only
 	add_child(music)
 	add_child(Ambience.create(run.map.biome, -14.0 if not showcase else -18.0))
+	if _horror():
+		add_child(Ambience.create(&"town", -15.0))  # wind over the sea, on top of the waves
 	if showcase:
 		_player.visible = false
 		sfx.process_mode = Node.PROCESS_MODE_DISABLED
@@ -290,6 +294,8 @@ func _ready() -> void:
 		camera_mode = Profile.CameraMode.FIXED
 		return
 	camera_mode = profile.camera_mode if profile != null else Profile.CameraMode.THIRD_PERSON
+	if _horror():
+		camera_mode = Profile.CameraMode.THIRD_PERSON  # the preset starts on the shoulder camera
 	_tp_yaw = atan2(-run.facing.x, -run.facing.z)
 	# Centre crosshair for the first / third-person cameras (auto-fire shoots
 	# what it is on).
@@ -316,6 +322,7 @@ func _ready() -> void:
 	hud = Hud.new()
 	hud.profile = profile if profile != null else Profile.new()
 	hud.context = context
+	hud.set_minimal(_horror())
 	hud.add_child(UiSfx.new())
 	hud.card_chosen.connect(func(i: int) -> void: run.choose_card(i))
 	hud.reroll_requested.connect(func() -> void: run.reroll_cards())
@@ -471,8 +478,9 @@ func _build_world() -> void:
 	_slam_ring.visible = false
 
 	# Low-poly contractor in the selected class's kit (SoldierModel).
-	var soldier := SoldierModel.create(run.player_class)
+	var soldier := SoldierModel.create(run.player_class, _rifle_variant())
 	soldier.ground_height = ground_height
+	soldier.footstep.connect(_on_footstep)
 	_player = soldier
 	_muzzle = OmniLight3D.new()
 	_muzzle.light_color = Color(1, 0.8, 0.4)
@@ -504,7 +512,7 @@ func _build_world() -> void:
 	_camera = Camera3D.new()
 	_camera.fov = _camera_fov(camera_mode == Profile.CameraMode.FIRST_PERSON)
 	add_child(_camera)
-	_view_model = ViewModel.create(run.player_class)
+	_view_model = ViewModel.create(run.player_class, _rifle_variant())
 	_view_model.visible = false
 	_camera.add_child(_view_model)
 	if _terrain != null:
@@ -582,7 +590,10 @@ func _build_generated_world() -> void:
 		_building_boxes.append(AABB(Vector3(r.position.x, 0, r.position.y), Vector3(r.size.x, h, r.size.y)))
 
 	_build_props(rng)
-	IslandRoads.build(self, IslandRoads.plan(run.map))
+	var road_paths: Array[PackedVector3Array] = IslandRoads.plan(run.map)
+	IslandRoads.build(self, road_paths)
+	if IslandRoads.available():
+		run.map.mark_roads(road_paths)  # footstep surfaces: stone along the roads
 	if _is_volcano():
 		# The volcano itself, rising from the sea north of the island.
 		var cone := MeshInstance3D.new()
@@ -812,6 +823,21 @@ func _build_primitive_rocks(rng: RandomNumberGenerator) -> void:
 const SKY3D_SCRIPT: String = "res://addons/sky_3d/src/Sky3D.gd"
 ## Starting hour per island: morning, golden afternoon, dusk on the volcano.
 const ISLAND_HOURS: Array[float] = [9.0, 16.5, 16.25]
+## The HORROR preset (DEV sandbox, beach_01 only): the hour it stays at, the mist,
+## the cold backlight, and how long the island is silent (see _apply_horror_light,
+## _horror_sun and _ready). At 04:24 the Sky3D sun is about 25 degrees below the
+## horizon and the sky is steel blue; at 05:00 the clouds turn pink (measured).
+const HORROR_HOUR: float = 4.4
+const HORROR_FOG_DENSITY: float = 0.008  ## haze far away: thin
+const HORROR_FOG_HEIGHT: float = 0.0  ## metres: the layer starts at the ground
+const HORROR_FOG_HEIGHT_DENSITY: float = -0.15  ## how much denser the layer is near the ground
+const HORROR_FOG_SKY_AFFECT: float = 0.3  ## the sky is hardly fogged
+const HORROR_FOG_COLOUR: Color = Color(0.36, 0.41, 0.47)
+const HORROR_LIGHT_COLOUR: Color = Color(0.7, 0.8, 0.95)
+const HORROR_LIGHT_ENERGY: float = 0.35  ## a weak backlight, not a sun
+const HORROR_LIGHT_PITCH: float = -7.0  ## degrees below the horizontal
+const HORROR_MUSIC_DELAY: float = 60.0
+var _horror_light: DirectionalLight3D  ## the preset's backlight (see _process)
 
 
 func _build_sky3d(island_i: int) -> bool:
@@ -829,8 +855,45 @@ func _build_sky3d(island_i: int) -> bool:
 		sky.set("ambient_energy", 1.8)
 	var env: Environment = sky.environment
 	_apply_biome_fog(env, false)
+	if _horror():
+		_apply_horror_sky(sky)
 	GraphicsSettings.apply_environment(env)
 	return true
+
+
+## HORROR preset, Sky3D path: a dawn that stays put, and the preset's light (see
+## _apply_horror_light). The Sky3D sun is switched off: its position follows the
+## clock, and at 05:30 it sits below the horizon.
+func _apply_horror_sky(sky: WorldEnvironment) -> void:
+	sky.set("current_time", HORROR_HOUR)
+	sky.set("game_time_enabled", false)
+	sky.set("lights_enabled", false)
+	sky.set("fog_enabled", false)  # Sky3D's own fog pass is off: the mist is the Environment's
+	_apply_horror_light(sky.environment)
+	add_child(_horror_sun())
+
+
+## HORROR preset, on either sky: the mist in layers. The haze far away is thin, and
+## the layer near the ground is denser (fog_height_density); the sky stays clear.
+func _apply_horror_light(env: Environment) -> void:
+	env.fog_enabled = true
+	env.fog_density = HORROR_FOG_DENSITY
+	env.fog_height = HORROR_FOG_HEIGHT
+	env.fog_height_density = HORROR_FOG_HEIGHT_DENSITY
+	env.fog_sky_affect = HORROR_FOG_SKY_AFFECT
+	env.fog_light_color = HORROR_FOG_COLOUR
+
+
+## HORROR preset, on either sky: a weak cold backlight. _process keeps it behind the
+## figures from the camera's side, so they read as silhouettes.
+func _horror_sun() -> DirectionalLight3D:
+	var sun := DirectionalLight3D.new()
+	sun.set_meta(&"no_shadows", true)  # kept off by every later apply_sun(): shadows would turn with the camera
+	GraphicsSettings.apply_sun(sun)
+	sun.light_color = HORROR_LIGHT_COLOUR
+	sun.light_energy = HORROR_LIGHT_ENERGY
+	_horror_light = sun
+	return sun
 
 
 ## Fallback: flat procedural sky and a fixed sun (no addon needed).
@@ -845,11 +908,16 @@ func _build_simple_sky(island_i: int) -> void:
 	if _is_volcano():
 		env.environment.ambient_light_color = Color(0.42, 0.34, 0.32)
 	_apply_biome_fog(env.environment, true)
+	if _horror():
+		_apply_horror_light(env.environment)
 	if not env.environment.fog_enabled or float(bio["fog"]) > 0.0:
 		env.environment.background_mode = Environment.BG_SKY
 		env.environment.sky = Visuals.sky(Color(bio["sky"]).lightened(0.15), Color(bio["sky"]).darkened(0.35))
 	GraphicsSettings.apply_environment(env.environment)
 	add_child(env)
+	if _horror():
+		add_child(_horror_sun())  # the preset's sun replaces the fixed one
+		return
 	var sun := DirectionalLight3D.new()
 	GraphicsSettings.apply_sun(sun)
 	match island_i:
@@ -1774,6 +1842,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		run.interact()  # Fuel Run: pick up / put down a can
 	elif event.is_action_pressed(&"weapon_next"):
 		run.cycle_weapon()
+	elif event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F4 and _horror() and OS.is_debug_build():
+		hud.set_minimal(not hud.minimal)  # the horror preset's full or minimal HUD (F4 is free: F3 is debug)
 	elif event.is_action_pressed(&"debug"):
 		hud.debug_visible = not hud.debug_visible
 	elif event.is_action_pressed(&"noclip") and OS.is_debug_build():  # development builds only
@@ -1782,8 +1852,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed(&"dev_menu") and _dev_menu != null:
 		_dev_menu.toggle()
 	elif event.is_action_pressed(&"camera_toggle"):
-		# V cycles First person -> Third person -> Fixed.
-		_set_camera_mode((camera_mode + 1) % Profile.CAMERA_MODE_NAMES.size())
+		# V cycles First person -> Third person -> Fixed. The horror preset changes the run only, not the profile.
+		_set_camera_mode((camera_mode + 1) % Profile.CAMERA_MODE_NAMES.size(), not _horror())
 	else:
 		for i in run.weapons.size():
 			if event.is_action_pressed(StringName("weapon_%d" % (i + 1))):
@@ -1877,8 +1947,12 @@ func _mouse_aim() -> Vector3:
 
 func _process(delta: float) -> void:
 	_play_audio()  # before drawing: the draw functions consume the run's events
-	if profile != null and not showcase and profile.camera_mode != camera_mode:
+	if profile != null and not showcase and not _horror() and profile.camera_mode != camera_mode:
 		_set_camera_mode(profile.camera_mode, false)  # changed in Settings (pause)
+	if _horror_light != null:
+		# The backlight is on the far side of the view, so it travels towards the camera. The yaw is the
+		# camera's own, set by the input before the cameras move: no frame behind.
+		_horror_light.rotation = Vector3(deg_to_rad(HORROR_LIGHT_PITCH), _tp_yaw + PI, 0.0)
 	if profile != null and _camera != null:
 		var fov: float = _camera_fov(camera_mode == Profile.CameraMode.FIRST_PERSON) * lerpf(1.0, ADS_FOV_RATIO, _ads)
 		if _camera.fov != fov:
@@ -1923,7 +1997,9 @@ func _play_audio() -> void:
 	var target: float = [0.5, 1.0, 0.0][run.director.phase]
 	if run.objective == IslandRun.Objective.BOSS:
 		target = 1.0
-	music.update_mix(target if not run.is_over() else 0.0, get_process_delta_time())
+	# The music stands still while the game does (pause, card choices): the horror silence counts game time.
+	var music_clock: float = 0.0 if paused or not run.card_choices.is_empty() else get_process_delta_time()
+	music.update_mix(target if not run.is_over() else 0.0, music_clock)
 	if not run.tracers.is_empty():
 		var wid: StringName = run.weapons[run.weapon_index].id
 		sfx.play(wid, -10.0 if wid == &"marksman" else -6.0, 0.06, 40)
@@ -2063,6 +2139,16 @@ func _camera_fov(first: bool) -> float:
 	if profile == null:
 		return fp_fov if first else camera_fov
 	return Profile.field_of_view(profile.fov, first)
+
+
+## Whether this run is the DEV sandbox's HORROR preset (see DevSandbox).
+func _horror() -> bool:
+	return context != null and context.atmosphere == &"horror"
+
+
+## The assault rifle's GLB variant of this run (RunContext.rifle_model; &"" is the current model).
+func _rifle_variant() -> StringName:
+	return context.rifle_model if context != null else &""
 
 
 ## Switches the island camera (V cycles; Settings > Controls sets it too).
@@ -2309,6 +2395,12 @@ func _camera_floor(cam: Vector3) -> float:
 	for offset: Vector3 in [Vector3(0.3, 0, 0), Vector3(-0.3, 0, 0), Vector3(0, 0, 0.3), Vector3(0, 0, -0.3)]:
 		top = maxf(top, ground_height(cam + offset))
 	return top + TP_GROUND_CLEARANCE
+
+
+## One footstep (SoldierModel.footstep): the sound of the surface under the foot.
+func _on_footstep(point: Vector3) -> void:
+	if run != null and sfx != null:
+		sfx.play_step(run.map.surface_at(point))
 
 
 ## Ground height at a world point as drawn: the island map's height, or

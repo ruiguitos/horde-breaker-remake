@@ -14,6 +14,8 @@ static var _calm: AudioStreamWAV
 static var _combat: AudioStreamWAV
 
 var intensity: float = 0.0  ## 0 = calm, 1 = full combat (smoothed)
+var _silent_for: float = 0.0  ## seconds of silence left (see mute_for)
+var _gain: float = 1.0  ## 0 while silent, back to 1 over two seconds after it
 
 var _calm_player := AudioStreamPlayer.new()
 var _combat_player := AudioStreamPlayer.new()
@@ -27,22 +29,46 @@ func _ready() -> void:
 	_combat_player.bus = Profile.BUS_MUSIC
 	_calm_player.stream = _calm
 	_combat_player.stream = _combat
+	_apply()  # the volumes first: a muted music never starts audible
 	add_child(_calm_player)
 	add_child(_combat_player)
 	_calm_player.play()
 	_combat_player.play()
-	_apply()
+
+
+## The two loops stop when the music leaves the tree (see Sfx._exit_tree).
+func _exit_tree() -> void:
+	_calm_player.stop()
+	_combat_player.stop()
 
 
 ## Moves the mix towards `target` (0..1) at a fixed rate per second.
 func update_mix(target: float, delta: float) -> void:
 	intensity = move_toward(intensity, clampf(target, 0.0, 1.0), delta * 0.5)
+	# The silence can end part-way through this step: only the rest of the step fades in.
+	var silent: float = minf(_silent_for, delta)
+	_silent_for -= silent
+	_gain = move_toward(_gain, 1.0, (delta - silent) * 0.5) if _silent_for <= 0.0 else 0.0
 	_apply()
 
 
+## Silence for `seconds` from now (the horror preset: ambience only at first); the
+## music then fades back in over two seconds. Call it before the node enters the
+## tree, so that its first frame is silent too.
+func mute_for(seconds: float) -> void:
+	_silent_for = seconds
+	_gain = 0.0
+
+
+func silenced() -> bool:
+	return _silent_for > 0.0
+
+
 func _apply() -> void:
-	_calm_player.volume_db = linear_to_db(maxf(0.001, 0.55 * (1.0 - intensity * 0.7)))
-	_combat_player.volume_db = linear_to_db(maxf(0.001, 0.6 * intensity))
+	var calm: float = maxf(0.001, 0.55 * (1.0 - intensity * 0.7))
+	var combat: float = maxf(0.001, 0.6 * intensity)
+	_calm_player.volume_db = linear_to_db(calm * _gain) if _gain > 0.0 else -80.0
+	_combat_player.volume_db = linear_to_db(combat * _gain) if _gain > 0.0 else -80.0
 
 
 static func _build(combat: bool) -> AudioStreamWAV:

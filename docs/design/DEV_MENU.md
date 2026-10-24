@@ -56,9 +56,18 @@ Um painel que monta uma corrida à medida, com o mesmo caminho de `_test_island`
 - missão;
 - classe (Recruit ou Vanguard) e perks equipados;
 - arma primária e secundária;
+- arma primária, incluindo a assault rifle com o modelo realista («Assault Rifle (realistic test)»),
+  para teste visual; o modelo por omissão continua a ser o atual;
 - ameaça (1 a 5) e seed.
 
 «Start» arranca a corrida. O atalho «DEV · TEST ISLAND» mantém-se como acesso rápido.
+
+O botão «HORROR (beach_01)» arranca a mesma configuração na ilha beach_01, com a
+atmosfera do preset HORROR: madrugada parada às 04:24 (céu azul-aço, sem rosa), nevoeiro
+em camadas (fino ao longe, mais denso junto ao chão), uma contraluz fria atrás das figuras,
+câmara de ombro só nessa corrida, vento sobre o mar, sem música no primeiro minuto e
+HUD mínimo: vida, escudo, munição, breaker, granada e mira. F4 alterna o HUD completo e
+o mínimo (só em builds de desenvolvimento). Como as outras corridas do sandbox, não grava nada.
 
 ### Zona 2: painel dentro da ilha (tecla proposta: F2)
 

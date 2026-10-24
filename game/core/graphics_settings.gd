@@ -103,7 +103,8 @@ static func apply_environment(env: Environment) -> void:
 
 
 static func apply_sun(sun: DirectionalLight3D) -> void:
-	sun.shadow_enabled = quality >= MEDIUM
+	# A light marked "no_shadows" (the horror preset's backlight) keeps them off at every quality.
+	sun.shadow_enabled = quality >= MEDIUM and not sun.has_meta(&"no_shadows")
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS if quality == MEDIUM else DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
 	sun.directional_shadow_max_distance = [40.0, 60.0, 90.0, 140.0][quality]
 	sun.shadow_blur = 1.5 if quality >= HIGH else 1.0

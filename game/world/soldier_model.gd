@@ -10,6 +10,10 @@ extends Node3D
 ## cycle backwards (backpedal), while the spine turns back so the rifle keeps
 ## pointing where the soldier aims (the body's facing, level).
 
+## A footstep: a foot came down while the body is on the ground and walking (see
+## _on_feet_planted). `point` is the foot's landmark in world space.
+signal footstep(point: Vector3)
+
 const RECRUIT_MODEL: String = "res://assets/models/characters/recruit/recruit_v03.glb"
 const RECRUIT_ANIMATIONS: String = "res://assets/models/characters/recruit/recruit_animations.tres"
 const VANGUARD_MODEL: String = "res://assets/models/characters/vanguard/vanguard_v01.glb"
@@ -38,6 +42,7 @@ const HIT_COOLDOWN: float = 0.35  ## s between two flinches: a crowd must not fl
 const DEATH_FADE: float = 4.0  ## 1/s: the death pose takes over in 0.25 s
 const MOVE_MIN: float = 0.35  ## m/s: slower than this is standing
 const TELEPORT: float = 3.0  ## m in one frame: a respawn, not a step
+const STEP_WINDOW: float = 0.05  ## s: a footstep needs the body moving this recently
 const VELOCITY_SMOOTH: float = 18.0  ## 1/s, measured velocity filter
 const MOVE_SMOOTH: float = 12.0  ## 1/s, idle <-> moving blend
 const GAIT_SMOOTH: float = 8.0  ## 1/s, walk / jog / sprint blend
@@ -73,6 +78,8 @@ var _leg_r: Node3D
 var _arm_pivot: Node3D
 var _mats: Dictionary = {}
 var weapon_id: StringName = &""
+## The gun's GLB variant (WeaponModel.VARIANTS); &"" is the weapon's own model.
+var weapon_variant: StringName = &""
 var _gun_node: Node3D
 var _shadow_only: bool = false
 ## Imported model instead of boxes; null for the placeholder.
@@ -100,6 +107,7 @@ var aim_pitch: float = 0.0
 # Locomotion state (all smoothed in animate()).
 var _has_last: bool = false
 var _last_pos := Vector3.ZERO
+var _walked_ago: float = INF  ## s since the body last moved at walking pace (STEP_WINDOW)
 var _velocity := Vector3.ZERO
 var _legs_yaw: float = 0.0  ## world yaw the hips point to
 var _backward: bool = false
@@ -116,9 +124,10 @@ var _death_amount: float = 0.0  ## 0 = locomotion, 1 = the death clip alone
 var _hit_cooldown: float = 0.0
 
 
-static func create(id: StringName) -> SoldierModel:
+static func create(id: StringName, variant: StringName = &"") -> SoldierModel:
 	var s := SoldierModel.new()
 	s.class_id = id if PALETTES.has(id) else &"recruit"
+	s.weapon_variant = variant  # before _build(): the rifle in the hands is built there
 	s._build()
 	return s
 
@@ -234,6 +243,7 @@ func _build_model(scene: PackedScene) -> void:
 	_feet.name = "FootContact"
 	_feet.set("body", self)
 	_skeleton.add_child(_feet)
+	_feet.connect(&"planted", _on_feet_planted)
 	set_weapon(&"rifle")
 
 
@@ -338,7 +348,7 @@ func set_weapon(id: StringName) -> void:
 		_gun_node = null
 	for part in _rifle_parts:
 		part.visible = false
-	var gun := WeaponModel.build(id)
+	var gun := WeaponModel.build(id, weapon_variant)
 	_gun_node = gun
 	if _support != null:
 		_support.set("weapon", gun)
@@ -421,6 +431,14 @@ func animate(speed: float, t: float, sprinting: bool = false, delta: float = 0.0
 	_arm_pivot.position.y = SHOULDER_Y + absf(sin(t * 9.0)) * 0.03 * speed
 
 
+## A foot came down (foot_contact.gd): a footstep only while the body is on the
+## ground and really walking. Not in noclip or in the air, not while dashing, and
+## not just after a stop, while the smoothed speed still drives the legs.
+func _on_feet_planted(point: Vector3) -> void:
+	if grounded and not _dashing and _walked_ago < STEP_WINDOW:
+		footstep.emit(point)
+
+
 ## Stride (m per cycle) of the gait blend at `g`.
 static func gait_stride(g: float) -> float:
 	var i: int = clampi(floori(g), 0, GAITS.size() - 2)
@@ -453,6 +471,8 @@ func _update_locomotion(sprinting: bool, delta: float) -> void:
 			_legs_yaw = body_yaw
 	_has_last = true
 	_last_pos = here
+	# A footstep needs the body moving now: the smoothed speed below outlives a stop.
+	_walked_ago = 0.0 if step.length() / delta > MOVE_MIN else _walked_ago + delta
 	_velocity = _velocity.lerp(step / delta, 1.0 - exp(-VELOCITY_SMOOTH * delta))
 	var speed: float = _velocity.length()
 	var moving: bool = speed > MOVE_MIN
@@ -511,6 +531,8 @@ func _apply_locomotion() -> void:
 	_tree.set(&"parameters/move/blend_amount", _move)
 	_mount_gun(carrying)
 	_support.active = not carrying
+	if grounded and not _feet.active:
+		_feet.call("reset")  # the legs start over after noclip or a flight
 	_feet.active = grounded
 	var fwd: Vector3 = -global_basis.z
 	_rig.legs_offset = wrapf(_legs_yaw - atan2(-fwd.x, -fwd.z), -PI, PI)

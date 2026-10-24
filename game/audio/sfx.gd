@@ -41,6 +41,14 @@ const AMBIENCE: Dictionary = {
 	&"menu": "Environment/Ocean Loop.wav",
 }
 const POOL_SIZE: int = 16
+## Footstep sound per surface (IslandMap.surface_at), and how much each step varies.
+const STEP_SOUNDS: Dictionary = {&"sand": &"step_sand", &"stone": &"step_stone", &"wood": &"step_wood", &"metal": &"step_metal"}
+const STEP_VOLUME_DB: float = -12.0
+const STEP_VOLUME_JITTER_DB: float = 1.5
+const STEP_PITCH_JITTER: float = 0.06
+
+## Sent for each sound that starts (the tests listen to it).
+signal played(sound: StringName, volume_db: float, pitch: float)
 
 ## Generated once and shared by every island.
 static var _streams: Dictionary = {}
@@ -61,6 +69,13 @@ func _ready() -> void:
 		_players.append(p)
 
 
+## A sound still playing when the island goes keeps its playback until the mixer runs
+## again: stop the pool when it leaves the tree, so nothing is in use at exit.
+func _exit_tree() -> void:
+	for p: AudioStreamPlayer in _players:
+		p.stop()
+
+
 ## Plays a sound. min_gap_ms limits how often the same sound can start.
 func play(sound: StringName, volume_db: float = 0.0, pitch_jitter: float = 0.08, min_gap_ms: int = 30) -> void:
 	if not _streams.has(sound):
@@ -75,6 +90,14 @@ func play(sound: StringName, volume_db: float = 0.0, pitch_jitter: float = 0.08,
 	p.volume_db = volume_db
 	p.pitch_scale = 1.0 + randf_range(-pitch_jitter, pitch_jitter)
 	p.play()
+	played.emit(sound, volume_db, p.pitch_scale)
+
+
+## One footstep on `surface` (IslandMap.surface_at). Volume and pitch vary a little
+## from step to step, and a step never waits for the one before it.
+func play_step(surface: StringName) -> void:
+	var sound: StringName = STEP_SOUNDS.get(surface, &"step_sand")
+	play(sound, STEP_VOLUME_DB + randf_range(-STEP_VOLUME_JITTER_DB, STEP_VOLUME_JITTER_DB), STEP_PITCH_JITTER, 0)
 
 
 ## Replaces synthesised sounds with recorded ones where the file exists.
@@ -109,6 +132,11 @@ static func _build_all() -> void:
 	_streams[&"generator"] = _make_chord([392.0, 587.33, 783.99], 0.6)
 	_streams[&"scream"] = _make(0.8, 500.0, 1400.0, 0.35, 2.5, 0.0)
 	_streams[&"slam_warn"] = _make(0.5, 55.0, 110.0, 0.2, 2.0, 0.0)
+	# Footsteps: a noise burst filtered for the surface, with tones for its body.
+	_streams[&"step_sand"] = _make_step(0.16, [], 0.0, 1.0, 26.0, 1800.0)
+	_streams[&"step_stone"] = _make_step(0.12, [1400.0, 2300.0], 60.0, 0.7, 45.0, 6000.0)
+	_streams[&"step_wood"] = _make_step(0.16, [190.0, 430.0], 22.0, 0.35, 60.0, 2500.0)
+	_streams[&"step_metal"] = _make_step(0.4, [1150.0, 1870.0, 2730.0], 9.0, 0.25, 70.0, 9000.0)
 
 
 ## One sound: a sine sweep (freq_from -> freq_to) mixed with white noise,
@@ -131,6 +159,27 @@ static func _make(seconds: float, freq_from: float, freq_to: float, noise: float
 		var tone: float = sin(phase) * (1.0 - noise) if freq_from > 0.0 else 0.0
 		var sample: float = tone + rng.randf_range(-1.0, 1.0) * noise + sin(thump_phase) * body * exp(-12.0 * t)
 		data.encode_s16(i * 2, int(clampf(sample * env * 0.6, -1.0, 1.0) * 32767.0))
+	return _wav(data)
+
+
+## One footstep: noise low-passed at `cutoff` Hz and decaying, plus decaying tones
+## for the body of the sound (a knock for wood, a ring for metal).
+static func _make_step(seconds: float, tones: Array, tone_decay: float, noise: float, noise_decay: float, cutoff: float) -> AudioStreamWAV:
+	var n: int = int(seconds * MIX_RATE)
+	var data := PackedByteArray()
+	data.resize(n * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(cutoff) + tones.size()
+	var alpha: float = 1.0 - exp(-TAU * cutoff / MIX_RATE)  # one-pole low-pass
+	var smooth: float = 0.0
+	for i in n:
+		var t: float = float(i) / MIX_RATE
+		smooth += alpha * (rng.randf_range(-1.0, 1.0) - smooth)
+		var sample: float = smooth * noise * exp(-noise_decay * t)
+		for j in tones.size():
+			sample += sin(TAU * float(tones[j]) * t) * exp(-tone_decay * t) / float(j + 1)
+		var env: float = minf(1.0, t * 800.0)  # 1 ms attack avoids clicks
+		data.encode_s16(i * 2, int(clampf(sample * env * 0.5, -1.0, 1.0) * 32767.0))
 	return _wav(data)
 
 

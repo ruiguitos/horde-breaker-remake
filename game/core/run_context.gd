@@ -33,6 +33,10 @@ var modifier: StringName = &"calm"
 var biome: StringName = &"beach"
 ## Mission of the island being played: activate, defend or rescue.
 var mission: StringName = &"activate"
+## DEV preset of this run: &"horror" (beach_01 at dawn, see island.gd), else &"normal".
+var atmosphere: StringName = &"normal"
+## The assault rifle's model in this run: &"realistic" for the DEV visual test, &"" for the current one.
+var rifle_model: StringName = &""
 ## Story pages recovered during this run.
 var lore_found: int = 0
 var perks: Array[StringName] = []

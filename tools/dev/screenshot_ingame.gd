@@ -1,7 +1,9 @@
 extends SceneTree
 ## In-game picture of a hand-made island: island.tscn with the scene set as
 ## handmade_scene, third-person camera, after a few seconds of play.
-##   xvfb-run ... godot --path . --rendering-driver opengl3 --script res://tools/dev/screenshot_ingame.gd -- <scene> <out.png> [x z]
+##   xvfb-run ... godot --path . --rendering-driver opengl3 --script res://tools/dev/screenshot_ingame.gd -- <scene> <out.png> [x z] [horror]
+## "horror" starts the DEV sandbox's HORROR atmosphere (night, mist, cold backlight, shoulder camera);
+## "realistic" holds the realistic assault rifle (the DEV sandbox's visual test).
 
 var _island: Node
 var _frame: int = 0
@@ -14,6 +16,12 @@ func _initialize() -> void:
 	_out = args[1] if args.size() > 1 else "user://ingame.png"
 	_island = (load("res://game/world/island.tscn") as PackedScene).instantiate()
 	_island.set("handmade_scene", load(args[0]))
+	if args.has("horror") or args.has("realistic"):
+		var ctx := RunContext.new(1)
+		ctx.biome = &"beach"
+		ctx.atmosphere = &"horror" if args.has("horror") else &"normal"
+		ctx.rifle_model = &"realistic" if args.has("realistic") else &""
+		_island.set("context", ctx)
 	root.add_child(_island)
 	if args.size() > 3:
 		_pose = Vector3(float(args[2]), 0, float(args[3]))

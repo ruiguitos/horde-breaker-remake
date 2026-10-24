@@ -24,3 +24,8 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	volume_db = move_toward(volume_db, target_db, delta * 10.0)
+
+
+## A loop still playing when its island goes is reported at exit as a resource in use.
+func _exit_tree() -> void:
+	stop()

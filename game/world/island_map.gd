@@ -84,6 +84,15 @@ var lava_radius: PackedFloat32Array = PackedFloat32Array()
 var handmade: bool = false
 ## Ground height per cell (row-major); empty on generated (flat) islands.
 var heights: PackedFloat32Array = PackedFloat32Array()
+## Walking surfaces, for footstep sounds (see surface_at): one byte per cell, row-major
+## like `field`. Empty until a map sets it; the cells not marked are the biome's ground.
+var cover: PackedByteArray = PackedByteArray()
+const COVER_ROAD: int = 1
+const COVER_DECK: int = 2
+## Surface of the open ground in each biome.
+const GROUND_SURFACE: Dictionary = {&"beach": &"sand", &"jungle": &"sand", &"town": &"stone", &"port": &"metal", &"volcano": &"stone"}
+## Half the width of a generated road, in cells (about 5 m across).
+const ROAD_HALF_WIDTH: int = 2
 
 
 ## Ground height under a world point (0 on flat, generated islands):
@@ -102,6 +111,39 @@ func ground_y(p: Vector3) -> float:
 	var a: float = lerpf(heights[z0 * w + x0], heights[z0 * w + x0 + 1], tx)
 	var b: float = lerpf(heights[(z0 + 1) * w + x0], heights[(z0 + 1) * w + x0 + 1], tx)
 	return maxf(lerpf(a, b, tz), -0.3)  # never under the sea surface
+
+
+## The surface under a world point, for footstep sounds: decks (bridges, piers)
+## are wood, roads are stone, and the rest of the ground follows the biome.
+func surface_at(p: Vector3) -> StringName:
+	var c: Vector2i = field.world_to_cell(p)
+	if not cover.is_empty() and c.x >= 0 and c.y >= 0 and c.x < field.width and c.y < field.height:
+		var kind: int = cover[c.y * field.width + c.x]
+		if kind == COVER_DECK:
+			return &"wood"
+		if kind == COVER_ROAD:
+			return &"stone"
+	return GROUND_SURFACE.get(biome, &"sand")
+
+
+## Generated islands: the road paths of IslandRoads.plan() become road cells. The
+## built road curves a little between the path's points; the cells are close enough.
+func mark_roads(paths: Array[PackedVector3Array]) -> void:
+	if cover.is_empty():
+		cover.resize(field.width * field.height)
+	for path in paths:
+		for k in range(path.size() - 1):
+			var a: Vector3 = path[k]
+			var b: Vector3 = path[k + 1]
+			var steps: int = maxi(1, ceili(a.distance_to(b) * 2.0))  # a sample every half metre
+			for s in range(steps + 1):
+				var c: Vector2i = field.world_to_cell(a.lerp(b, float(s) / steps))
+				for dz in range(-ROAD_HALF_WIDTH, ROAD_HALF_WIDTH + 1):
+					for dx in range(-ROAD_HALF_WIDTH, ROAD_HALF_WIDTH + 1):
+						var x: int = c.x + dx
+						var z: int = c.y + dz
+						if x >= 0 and z >= 0 and x < field.width and z < field.height:
+							cover[z * field.width + x] = COVER_ROAD
 
 
 static func build(rng_seed: int = 7, biome: StringName = &"beach") -> IslandMap:

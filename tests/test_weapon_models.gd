@@ -33,6 +33,7 @@ func _initialize() -> void:
 			_check(false, "weapon tests finished in time")
 			_finish())
 	_test_models()
+	_test_realistic_rifle()
 	_test_soldiers()
 	_test_view_model()
 	call_deferred("_scene_tests")
@@ -77,6 +78,69 @@ func _test_models() -> void:
 	_check(fallback.weapon_id == &"rifle", "unknown ids fall back to the rifle")
 	fallback.free()
 	_check(WeaponModel.material("gunmetal") == WeaponModel.material("gunmetal"), "materials are shared between guns")
+
+
+## The realistic rifle (DEV visual test, WeaponModel.VARIANTS): the same parts, muzzle,
+## grip and support point as the current rifle, and its own textures; the current
+## rifle keeps its Poly Haven maps.
+func _test_realistic_rifle() -> void:
+	_check(WeaponModel.model_path(&"rifle", &"realistic").ends_with("assault_rifle_realistic.glb"), "the realistic variant is its own GLB")
+	_check(WeaponModel.model_path(&"rifle") == WeaponModel.MODEL_DIR + "assault_rifle.glb", "the rifle without a variant is the current GLB")
+	_check(WeaponModel.model_path(&"smg", &"realistic") == WeaponModel.model_path(&"smg"), "a variant replaces only the rifle")
+	var current := WeaponModel.build_parts(&"rifle")
+	var real := WeaponModel.build_parts(&"rifle", &"realistic")
+	var same_parts: bool = real.parts.size() == current.parts.size()
+	for part_name: String in current.parts:
+		same_parts = same_parts and real.parts.has(part_name)
+	_check(same_parts, "the realistic rifle has the same %d named parts" % current.parts.size())
+	_check(real.muzzle.position.distance_to(Vector3(0, 0.105, -0.62)) < 0.001, "the realistic muzzle is at (0, 0.105, -0.62)")
+	_check(real.support_point.distance_to(Vector3(0, 0.07718, -0.26)) < 0.0001, "the realistic support point is at (0, 0.07718, -0.26)")
+	_check(absf(real.length - current.length) < 0.001, "the realistic rifle is as long as the current one (%.3f m)" % real.length)
+	var textured: int = 0
+	for part_name: String in real.parts:
+		var material := (real.parts[part_name] as MeshInstance3D).get_surface_override_material(0) as StandardMaterial3D
+		if material != null and material.albedo_texture != null and material.normal_texture != null:
+			textured += 1
+	_check(textured == real.parts.size(), "every part of the realistic rifle has its own albedo and normal maps (%d of %d)" % [textured, real.parts.size()])
+	var poly_haven: StandardMaterial3D = (current.parts["Upper receiver"] as MeshInstance3D).get_surface_override_material(0) as StandardMaterial3D
+	_check(poly_haven != null and poly_haven.normal_texture != null, "the current rifle keeps its Poly Haven normal map")
+	var world := WeaponModel.build(&"rifle", &"realistic")
+	var geometry := world.find_child("Geometry", true, false) as MeshInstance3D
+	_check(geometry != null and geometry.mesh.get_surface_count() >= 4 and world.muzzle.position.distance_to(Vector3(0, 0.105, -0.62)) < 0.001, "the realistic rifle in the world is batched with its muzzle")
+	var charging: Array = ViewModel._parts_named(real, ["Charging handle"])
+	_check(charging.size() == 2 and charging.has("Charging handle stem") and charging.has("Charging handle T latch"), "the charging handle prefix finds both of the realistic rifle's parts")
+	var unknown := WeaponModel.build_parts(&"rifle", &"nonexistent")
+	var unknown_normal: Texture2D = (unknown.parts["Upper receiver"] as MeshInstance3D).get_surface_override_material(0).normal_texture
+	_check(unknown.variant == &"" and unknown_normal != null and unknown_normal.resource_path.ends_with("_nor_gl.res"), "an unknown variant is the current rifle, with its Poly Haven maps")
+	unknown.free()
+	var poly: StandardMaterial3D = (current.parts["Upper receiver"] as MeshInstance3D).get_surface_override_material(0)
+	_check(poly.normal_texture != null and poly.normal_texture.resource_path.ends_with("blue_metal_plate_nor_gl.res") and poly.albedo_texture == null, "the current rifle's normal map is the Poly Haven blue metal plate, and its colour stays the Blender one")
+	var first := WeaponModel.build(&"rifle")
+	var second := WeaponModel.build(&"rifle", &"realistic")
+	var third := WeaponModel.build(&"rifle")
+	_check(_world_texture(first, false) and not _world_texture(first, true) and _world_texture(second, true) and _world_texture(third, false) and not _world_texture(third, true), "the cache keeps the current and the realistic rifle apart, in either order")
+	first.free()
+	second.free()
+	third.free()
+	var soldier := SoldierModel.create(&"recruit", &"realistic")
+	_check(soldier.weapon_variant == &"realistic" and soldier.get("_gun_node").get("variant") == &"realistic", "a soldier built with the realistic variant holds it in the world")
+	soldier.free()
+	var view := ViewModel.create(&"recruit", &"realistic")
+	_check(view.get("_model").get("variant") == &"realistic", "a first-person view built with the realistic variant shows it")
+	view.free()
+	world.free()
+	real.free()
+	current.free()
+
+
+## Whether any surface of the world copy of `w` has an albedo (or else a normal) texture.
+func _world_texture(w: WeaponModel, albedo: bool) -> bool:
+	var geometry := w.find_child("Geometry", true, false) as MeshInstance3D
+	for s in geometry.mesh.get_surface_count():
+		var material := geometry.mesh.surface_get_material(s) as StandardMaterial3D
+		if material != null and ((material.albedo_texture != null) if albedo else (material.normal_texture != null)):
+			return true
+	return false
 
 
 func _test_soldiers() -> void:
@@ -169,6 +233,12 @@ func _scene_tests() -> void:
 	_check(walkers + zombies.corpse_count() == 4 and drawn == 6
 		and zombies.instance_count(ZombieHordeView.variant_for(GameData.EnemyKind.BRUTE, 0.0)) == 2,
 		"island draws 4 walkers (%d alive + %d corpses) and 2 distinct brute models" % [walkers, zombies.corpse_count()])
+	# Wait until the island is really gone, and a moment for the audio thread to release its stopped sounds:
+	# a node still alive at quit keeps its sounds in use, which the engine reports at exit.
 	island.queue_free()
-	await _settle(2)
+	var frames: int = 0
+	while is_instance_valid(island) and frames < 120:
+		await process_frame
+		frames += 1
+	await create_timer(0.3).timeout
 	_finish()

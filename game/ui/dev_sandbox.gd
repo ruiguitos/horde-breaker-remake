@@ -3,10 +3,15 @@ extends RefCounted
 ## DEV SANDBOX on the title screen (docs/design/DEV_MENU.md, zona 1): a one-island
 ## test built from a form (island, mission, class, weapons, threat, seed). Debug
 ## builds only; the run saves nothing (DevOptions.dev_run). The island is played
-## with no run around it, like TEST ISLAND.
+## with no run around it, like TEST ISLAND. HORROR starts beach_01 with the horror
+## atmosphere (island.gd), with the rest of the form.
 
 const CLASSES: Array[StringName] = [&"recruit", &"vanguard"]
 const THREATS: Array[int] = [1, 2, 3, 4, 5]
+## The island of the HORROR preset (island.gd gives it the horror atmosphere).
+const HORROR_PATH: String = HandmadeIsland.ISLANDS_DIR + "beach_01.tscn"
+## The primary-weapon item for the assault rifle with the realistic model (WeaponModel.VARIANTS).
+const REALISTIC_RIFLE: StringName = &"rifle_realistic"
 
 
 ## The weapons the form offers for the primary slot (`primary` true) or the secondary.
@@ -45,6 +50,8 @@ static func apply(config: Dictionary, base: RunContext) -> RunContext:
 	base.rng_seed = int(config["seed"])
 	base.biome = StringName(String(config["path"]).get_file().get_slice("_", 0))
 	base.mission = StringName(config["mission"])
+	base.atmosphere = StringName(config.get("atmosphere", &"normal"))
+	base.rifle_model = StringName(config.get("rifle_model", &""))
 	return base
 
 
@@ -64,7 +71,11 @@ static func open(parent: Node, on_start: Callable) -> MenuDialog:
 	var island := _choice(grid, "Island", _island_items(), start["path"])
 	var mission := _choice(grid, "Mission", _mission_items(), start["mission"])
 	var class_id := _choice(grid, "Class", _class_items(), start["class"])
-	var primary := _choice(grid, "Primary weapon", _weapon_items(true), start["primary"])
+	# The realistic rifle is a primary weapon of its own in the list (a visual test of the same weapon),
+	# so the form keeps its height at 960 x 540.
+	var primaries: Array = _weapon_items(true)
+	primaries.insert(1, ["Assault Rifle (realistic test)", REALISTIC_RIFLE])
+	var primary := _choice(grid, "Primary weapon", primaries, start["primary"])
 	var secondary := _choice(grid, "Secondary weapon", _weapon_items(false), start["secondary"])
 	var threat := _choice(grid, "Threat", _threat_items(), start["threat"])
 	var row := HBoxContainer.new()
@@ -79,19 +90,35 @@ static func open(parent: Node, on_start: Callable) -> MenuDialog:
 	seed_box.step = 1
 	seed_box.value = start["seed"]
 	row.add_child(seed_box)
-	var go := UiTheme.button(row, "START ISLAND", func() -> void:
-		var config := {
+	# The form's values as a config.
+	var read_config := func() -> Dictionary:
+		var picked: StringName = primary.get_item_metadata(primary.selected)
+		var config: Dictionary = {
 			"path": island.get_item_metadata(island.selected),
 			"mission": mission.get_item_metadata(mission.selected),
 			"class": class_id.get_item_metadata(class_id.selected),
-			"primary": primary.get_item_metadata(primary.selected),
+			"primary": &"rifle" if picked == REALISTIC_RIFLE else picked,
 			"secondary": secondary.get_item_metadata(secondary.selected),
 			"threat": threat.get_item_metadata(threat.selected),
 			"seed": int(seed_box.value),
 		}
+		# Only the realistic rifle adds a key: the START config keeps its usual keys otherwise.
+		if picked == REALISTIC_RIFLE:
+			config["rifle_model"] = &"realistic"
+		return config
+	var go := UiTheme.button(row, "START ISLAND", func() -> void:
+		var config: Dictionary = read_config.call()
 		dialog.close()
 		on_start.call(config))
 	go.name = "StartIsland"
+	# The HORROR preset: beach_01 with the same mission, class, weapons, threat and seed.
+	var horror := UiTheme.button(row, "HORROR (beach_01)", func() -> void:
+		var config: Dictionary = read_config.call()
+		config["path"] = HORROR_PATH
+		config["atmosphere"] = &"horror"
+		dialog.close()
+		on_start.call(config))
+	horror.name = "StartHorror"
 	return dialog
 
 

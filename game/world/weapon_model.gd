@@ -35,6 +35,12 @@ const FILES: Dictionary = {
 	&"rifle": "assault_rifle.glb", &"smg": "smg.glb", &"machine_gun": "machine_gun.glb",
 	&"shotgun": "shotgun.glb", &"marksman": "marksman.glb",
 }
+## Alternative GLBs of a weapon, by variant (DEV sandbox, visual test; see DevSandbox).
+## A variant brings its own materials and textures, so it skips the Poly Haven maps
+## of TEXTURED. The weapon's own GLB (FILES) is the default.
+const VARIANTS: Dictionary = {
+	&"realistic": {&"rifle": "res://assets/models/weapons/assault_rifle_realistic/assault_rifle_realistic.glb"},
+}
 ## Palm contact on the underside of each model's forearm, in grip space.
 const SUPPORT_POINTS: Dictionary = {
 	&"rifle": Vector3(0, 0.077180013, -0.26), &"smg": Vector3(0, 0.065170571, -0.23),
@@ -51,11 +57,13 @@ var length: float = 0.0  ## muzzle to butt (metres)
 ## build_parts only: each named part of the GLB by its node name.
 var parts: Dictionary = {}
 var support_point: Vector3  ## left palm contact, in grip space
+var variant: StringName = &""  ## the VARIANTS entry this copy is built from; &"" is the default
 
 
-static func build(id: StringName) -> WeaponModel:
+static func build(id: StringName, variant: StringName = &"") -> WeaponModel:
 	var w := WeaponModel.new()
 	w.weapon_id = id if id in IDS else &"rifle"
+	w.variant = effective_variant(w.weapon_id, variant)
 	w.name = "Weapon_" + String(w.weapon_id)
 	w._build()
 	return w
@@ -64,12 +72,13 @@ static func build(id: StringName) -> WeaponModel:
 ## First person: the same GLB with each named part kept as its own node (the
 ## magazine, charging handle and sights can move and be aimed at). The world
 ## copy above is batched and cannot be animated, so only the view model uses this.
-static func build_parts(id: StringName) -> WeaponModel:
+static func build_parts(id: StringName, variant: StringName = &"") -> WeaponModel:
 	var w := WeaponModel.new()
 	w.weapon_id = id if id in IDS else &"rifle"
+	w.variant = effective_variant(w.weapon_id, variant)
 	w.name = "Weapon_" + String(w.weapon_id)
 	w.support_point = SUPPORT_POINTS[w.weapon_id]
-	var packed := load(MODEL_DIR + String(FILES[w.weapon_id])) as PackedScene
+	var packed := load(model_path(w.weapon_id, w.variant)) as PackedScene
 	assert(packed != null, "Missing imported weapon GLB for " + String(w.weapon_id))
 	var source := packed.instantiate() as Node3D
 	var box: AABB = AABB()
@@ -80,7 +89,7 @@ static func build_parts(id: StringName) -> WeaponModel:
 		mi.mesh = part.mesh
 		mi.transform = _in_root(part, source)
 		for surface: int in part.mesh.get_surface_count():
-			mi.set_surface_override_material(surface, _surface_material(w.weapon_id, part.get_active_material(surface)))
+			mi.set_surface_override_material(surface, _surface_material(w.weapon_id, part.get_active_material(surface), w.variant))
 		w.add_child(mi)
 		w.parts[mi.name] = mi
 		var part_box: AABB = mi.transform * part.mesh.get_aabb()
@@ -134,12 +143,27 @@ static func _add_surface_maps(m: StandardMaterial3D, d: Dictionary) -> void:
 	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 
 
+## The variant a weapon is really built from: a variant without this weapon (or an
+## unknown one) is the weapon's own model, with its own materials.
+static func effective_variant(id: StringName, variant: StringName) -> StringName:
+	return variant if VARIANTS.get(variant, {}).has(id) else &""
+
+
+## The GLB a weapon is built from: its variant's file when the variant has one.
+static func model_path(id: StringName, variant: StringName = &"") -> String:
+	var alternative: Dictionary = VARIANTS.get(variant, {})
+	if alternative.has(id):
+		return String(alternative[id])
+	return MODEL_DIR + String(FILES[id])
+
+
 ## Read each imported scene once; combine only its static surfaces with the
 ## same original material. UVs, normals, tangents and triangle counts survive.
-static func _asset(id: StringName) -> Dictionary:
-	if _assets.has(id):
-		return _assets[id]
-	var path: String = MODEL_DIR + String(FILES[id])
+static func _asset(id: StringName, variant: StringName = &"") -> Dictionary:
+	var key: String = "%s/%s" % [variant, id]
+	if _assets.has(key):
+		return _assets[key]
+	var path: String = model_path(id, variant)
 	var packed := load(path) as PackedScene
 	assert(packed != null, "Missing imported weapon GLB: " + path)
 	var source := packed.instantiate() as Node3D
@@ -148,7 +172,7 @@ static func _asset(id: StringName) -> Dictionary:
 	var groups: Dictionary = {}
 	for part: MeshInstance3D in source.find_children("*", "MeshInstance3D", true, false):
 		for surface: int in part.mesh.get_surface_count():
-			var mat: Material = _surface_material(id, part.get_active_material(surface))
+			var mat: Material = _surface_material(id, part.get_active_material(surface), variant)
 			if not groups.has(mat):
 				var tool := SurfaceTool.new()
 				tool.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -159,15 +183,16 @@ static func _asset(id: StringName) -> Dictionary:
 	for mat: Material in groups:
 		(groups[mat] as SurfaceTool).commit(merged)
 	var data: Dictionary = {"mesh": merged, "muzzle": _in_root(source_muzzle, source)}
-	_assets[id] = data
+	_assets[key] = data
 	source.free()
 	return data
 
 
 ## The textured material for a GLB material with a Poly Haven set (by name);
-## the GLB material itself for the rest, and for weapons not in TEXTURED.
-static func _surface_material(id: StringName, mat: Material) -> Material:
-	if not TEXTURED.has(id) or not mat is StandardMaterial3D:
+## the GLB material itself for the rest, for weapons not in TEXTURED, and for
+## every variant (a variant brings its own maps).
+static func _surface_material(id: StringName, mat: Material, variant: StringName = &"") -> Material:
+	if variant != &"" or not TEXTURED.has(id) or not mat is StandardMaterial3D:
 		return mat
 	var key: String = String(mat.resource_name)
 	if not MATERIALS.has(key) or String(MATERIALS[key]["id"]) == "":
@@ -199,7 +224,7 @@ static func _in_root(node: Node3D, root: Node3D) -> Transform3D:
 
 func _build() -> void:
 	support_point = SUPPORT_POINTS[weapon_id]
-	var data: Dictionary = _asset(weapon_id)
+	var data: Dictionary = _asset(weapon_id, variant)
 	var geometry := MeshInstance3D.new()
 	geometry.name = "Geometry"
 	geometry.mesh = data.mesh as ArrayMesh

@@ -42,6 +42,7 @@ const ROMAN: Array[String] = ["0", "I", "II", "III", "IV", "V", "VI"]
 const MARKER_BG := Color(0.04, 0.1, 0.125, 0.86)
 
 var debug_visible: bool = false
+var minimal: bool = false  ## the minimal HUD of the horror preset (see set_minimal)
 var profile: Profile
 var context: RunContext  ## set by the island; null when the island runs alone (F6)
 var _pause_dialog: MenuDialog
@@ -1515,6 +1516,37 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 # --- Per-frame update -----------------------------------------------------------
+
+## The minimal HUD (the horror preset): health, shield, ammo, the two abilities and
+## the crosshair (the island's) stay; everything else is hidden. It is applied every
+## frame, after refresh() and the radio, which show their panels themselves.
+## Only the transparency changes here: the logic's own visibility (the radio's, the
+## marker's, the survivor's) stays as it is, so it is right when the full HUD returns.
+func set_minimal(on: bool) -> void:
+	if on == minimal:
+		return
+	minimal = on
+	for control: Control in _minimal_controls():
+		control.modulate.a = 0.0 if on else 1.0  # the logic sets its own alpha again from the next frame
+
+
+func _process(_delta: float) -> void:
+	if not minimal:
+		return
+	for control: Control in _minimal_controls():
+		control.modulate.a = 0.0  # after refresh() and the radio, which may write alpha too
+
+
+func _minimal_controls() -> Array[Control]:
+	var out: Array[Control] = []
+	for control: Control in [_objective_box, _survivor_row, _boss_row, _map_box, _radio_panel,
+			_xp_bar, _xp_text, _xp_bonus, _info, _stats, _power_up_timers, _sprint_row,
+			_weapon_slots, _fire_status, _switch_hint, _threats, _hit_arc, _messages,
+			_marker_pill, _alerts]:
+		if control != null:
+			out.append(control)
+	return out
+
 
 func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = false, island_text: String = "") -> void:
 	_run = run

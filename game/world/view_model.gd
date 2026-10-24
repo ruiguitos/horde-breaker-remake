@@ -42,6 +42,7 @@ const MAX_PULL: float = 0.3
 
 var class_id: StringName = &"recruit"
 var weapon_id: StringName = &""
+var variant: StringName = &""  ## the gun's GLB variant (WeaponModel.VARIANTS); &"" is the weapon's own model
 var tip: Node3D  ## end of the barrel: muzzle flash and tracer start
 var _gun: Node3D
 var _flash: MeshInstance3D
@@ -61,9 +62,10 @@ var aim: float = 0.0
 var reload: float = 0.0
 
 
-static func create(id: StringName) -> ViewModel:
+static func create(id: StringName, variant: StringName = &"") -> ViewModel:
 	var v := ViewModel.new()
 	v.class_id = id if SoldierModel.PALETTES.has(id) else &"recruit"
+	v.variant = variant  # before set_weapon(): the first gun is built there
 	v.position = REST
 	v.scale = Vector3.ONE * GUN_SCALE
 	v.set_weapon(&"rifle")
@@ -83,7 +85,7 @@ func set_weapon(id: StringName) -> void:
 		_gun.queue_free()
 	_gun = Node3D.new()
 	add_child(_gun)
-	var model := WeaponModel.build_parts(id)
+	var model := WeaponModel.build_parts(id, variant)
 	model.set_cast_shadow(GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)
 	_gun.add_child(model)
 	_model = model

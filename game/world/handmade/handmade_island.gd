@@ -131,6 +131,14 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	f.blocked = blocked
 	_raise_beside_decks(heights, deck, deck_cells, f)
 	map.heights = heights
+	# Walking surfaces (footstep sounds): road triangles first, then the decks, which win.
+	var cover := PackedByteArray()
+	cover.resize(size * size)
+	cover = _lay_roads(cover)
+	for i in size * size:
+		if deck[i] != 0:
+			cover[i] = IslandMap.COVER_DECK
+	map.cover = cover
 	# Objects. A Scatter (many copies of one rock) blocks under every copy.
 	_objects = PackedByteArray()
 	_objects.resize(size * size)
@@ -444,6 +452,44 @@ func _load_regions(problems: Array[String]) -> Dictionary:
 
 static func _loc(part: String) -> int:
 	return int(part.substr(1)) * (-1 if part.begins_with("-") else 1)
+
+
+## Decor/Roads/: the triangles of each mesh there are road. A cell whose centre lies
+## inside a triangle is road (IslandMap.COVER_ROAD); only the footstep sound reads it.
+func _lay_roads(cover: PackedByteArray) -> PackedByteArray:
+	for node in _children_of("Decor/Roads"):
+		if not node is MeshInstance3D or not (node as MeshInstance3D).mesh is ArrayMesh:
+			continue
+		var mesh := (node as MeshInstance3D).mesh as ArrayMesh
+		var xf: Transform3D = _local(node)
+		for s in mesh.get_surface_count():
+			if mesh.surface_get_primitive_type(s) != Mesh.PRIMITIVE_TRIANGLES:
+				continue
+			var arrays: Array = mesh.surface_get_arrays(s)
+			var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+			var flat := PackedVector2Array()
+			for v in verts:
+				var w: Vector3 = xf * v
+				flat.append(Vector2(w.x, w.z))
+			var order := PackedInt32Array()
+			if arrays[Mesh.ARRAY_INDEX] is PackedInt32Array and not (arrays[Mesh.ARRAY_INDEX] as PackedInt32Array).is_empty():
+				order = arrays[Mesh.ARRAY_INDEX]
+			else:
+				for k in verts.size():
+					order.append(k)
+			for k in range(0, order.size() - 2, 3):
+				var a: Vector2 = flat[order[k]]
+				var b: Vector2 = flat[order[k + 1]]
+				var c: Vector2 = flat[order[k + 2]]
+				var x0: int = clampi(floori(minf(a.x, minf(b.x, c.x))), 0, size - 1)
+				var x1: int = clampi(ceili(maxf(a.x, maxf(b.x, c.x))), 0, size - 1)
+				var z0: int = clampi(floori(minf(a.y, minf(b.y, c.y))), 0, size - 1)
+				var z1: int = clampi(ceili(maxf(a.y, maxf(b.y, c.y))), 0, size - 1)
+				for z in range(z0, z1 + 1):
+					for x in range(x0, x1 + 1):
+						if Geometry2D.point_is_inside_triangle(Vector2(x + 0.5, z + 0.5), a, b, c):
+							cover[z * size + x] = IslandMap.COVER_ROAD
+	return cover
 
 
 ## Bridges/: every cell whose centre lies under a deck gets the height of the
