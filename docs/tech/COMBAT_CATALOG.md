@@ -413,8 +413,8 @@ Walker; Runner mantém a sua percentagem. O diretor não sorteia Behemoth.
 
 ## 5. Perks e outros modificadores
 
-Os perks formam uma árvore de três ramos × três tiers; cada nó tem duas
-alternativas com uma contrapartida e ranks I–III comprados por nó. Só os
+Os perks formam uma árvore de quatro ramos × três tiers (o quarto, Logística, em
+2026-10-24, sem contrapartida); cada nó tem duas alternativas e ranks I–III comprados por nó. Só os
 perks equipados atuam. Três slots (grátis, 100, 250 Intel). Valores por
 rank, custos e regras: [CARDS_WEAPONS_PERKS.md §F2](../design/CARDS_WEAPONS_PERKS.md)
 e `game/data/perks/`. Os perks antigos migram para o rank III da

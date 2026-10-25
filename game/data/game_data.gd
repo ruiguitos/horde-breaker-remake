@@ -284,9 +284,9 @@ const WAR_CRY_COOLDOWN: float = 16.0
 
 ## Meta progression
 const SLOT_COSTS: Array[int] = [0, 100, 250]  ## cost of the 1st, 2nd, 3rd perk slot
-## Perk tree (docs/design/CARDS_WEAPONS_PERKS.md §F2): three branches of
-## three tiers. Intel to buy rank I, II and III of a node, per tier.
-const PERK_BRANCHES: Array[StringName] = [&"combat", &"survival", &"breaker"]
+## Perk tree (docs/design/CARDS_WEAPONS_PERKS.md §F2): four branches of
+## three tiers (Logistics is the fourth). Intel to buy rank I, II and III of a node, per tier.
+const PERK_BRANCHES: Array[StringName] = [&"combat", &"survival", &"breaker", &"logistics"]
 const PERK_TIERS: int = 3
 const PERK_MAX_RANK: int = 3
 const PERK_RANK_COSTS: Array = [[40, 60, 80], [60, 90, 120], [100, 140, 180]]

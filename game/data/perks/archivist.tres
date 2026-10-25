@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://lg7arc8vh3ta"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Archivist"
+description = "Every supply cache keeps a few more of the enemy's files."
+branch = "logistics"
+tier = 2
+option = 0
+benefit = "Supply caches give {v} Intel"
+benefit_values = PackedFloat32Array(10, 20, 30)
+order = 22

@@ -10,7 +10,7 @@ extends Resource
 @export var title: String = ""
 ## One-line play style shown in the Armory detail panel.
 @export_multiline var description: String = ""
-@export_enum("combat", "survival", "breaker") var branch: String = "combat"
+@export_enum("combat", "survival", "breaker", "logistics") var branch: String = "combat"
 @export_range(1, 3) var tier: int = 1
 ## 0 = alternative A, 1 = alternative B.
 @export_range(0, 1) var option: int = 0

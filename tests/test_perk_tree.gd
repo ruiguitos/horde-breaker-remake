@@ -38,12 +38,18 @@ func _run_all() -> void:
 	_test_body_count_cards()
 	_test_kill_chain_direct_only()
 	_test_skirmisher_sprint_fire()
+	_test_logistics_costs()
+	_test_logistics_effects()
+	_test_logistics_integration()
+	await _test_logistics_one_click()
 	await _test_armory_screen()
 	await _test_perk_layout_1600()
 	await _test_perk_containment()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
 	if _failures == 0:
 		print("TEST: perk tree OK (%d checks)" % _checks)
+	# Freed armories and their sounds are released by the audio thread a few hundred ms later.
+	await create_timer(0.3).timeout
 	quit(1 if _failures > 0 else 0)
 
 
@@ -103,15 +109,23 @@ func _profile(intel: int = 2000) -> Profile:
 
 func _test_catalog() -> void:
 	var nodes: Array[StringName] = GameData.perk_nodes()
-	_check(nodes.size() == 9 and nodes[0] == &"combat_1" and nodes[8] == &"breaker_3", "9 nodes: 3 branches x 3 tiers")
+	_check(nodes.size() == 12 and nodes[0] == &"combat_1" and nodes[8] == &"breaker_3" and nodes[11] == &"logistics_3",
+		"12 nodes: 4 branches x 3 tiers, Logistics last")
 	var complete: bool = true
 	for node in nodes:
+		var logistics: bool = GameData.perk_node_branch(node) == &"logistics"
 		for option in 2:
 			for player_class in GameData.CLASSES:
 				var perk: GameData.Perk = GameData.perk_for(node, option, player_class)
-				complete = complete and perk != null and perk.benefit_values.size() == 3 and perk.penalty_values.size() == 3 \
-					and perk.benefit != "" and perk.penalty != ""
-	_check(complete, "every node has A and B for every class, with 3 rank values and a trade-off")
+				if perk == null or perk.benefit_values.size() != 3 or perk.benefit == "":
+					complete = false
+					continue
+				# The three old branches give every alternative a trade-off; Logistics gives benefits only.
+				if logistics:
+					complete = complete and perk.penalty == "" and perk.penalty_values.is_empty()
+				else:
+					complete = complete and perk.penalty != "" and perk.penalty_values.size() == 3
+	_check(complete, "every node has A and B for every class with 3 rank values; combat, survival and breaker add a trade-off, logistics none")
 	for id: StringName in [&"thick_skin", &"pack_rat", &"head_hunter", &"long_breaker", &"demolitions"]:
 		_check(GameData.perk(id) != null and GameData.perk(id).option == 0, "old perk id %s kept as alternative A" % id)
 	_check(GameData.perk_text("Headshot cone {v}°", 13.0) == "Headshot cone 13°" and GameData.perk_text("{v} HP", 0.4) == "0.4 HP",
@@ -305,6 +319,179 @@ func _test_redeploy() -> void:
 
 
 # --- Effects: each benefit and trade-off ----------------------------------------
+
+## Logistics (the fourth branch): the same costs and prerequisites as the others.
+func _test_logistics_costs() -> void:
+	var p := _profile(1000)
+	_check(p.rank_problem(&"logistics_2").begins_with("Requires") and not p.buy_rank(&"logistics_2") and p.intel == 1000,
+		"logistics II needs rank I of logistics I")
+	_check(p.buy_rank(&"logistics_1") and p.intel == 960, "logistics I costs 40")
+	_check(p.buy_rank(&"logistics_2") and p.intel == 900 and p.buy_rank(&"logistics_3") and p.intel == 800,
+		"logistics II costs 60 and III costs 100 once the tier above has rank I")
+	_check(p.rank_problem(&"logistics_1") == "" and p.node_rank(&"logistics_1") == 1 and p.equipped_perks.is_empty(),
+		"buying logistics ranks never equips")
+
+
+## Each logistics alternative acts on the system it names, at its rank, and only when equipped.
+func _test_logistics_effects() -> void:
+	var weapon: int = -1
+	var probe := _run({})
+	for w in probe.weapons.size():
+		if probe.weapons[w].max_ammo > 0 and weapon == -1:
+			weapon = w
+	# Supply Run III: a cache heals 30 HP and restocks half of a finite weapon's ammo.
+	var supply := _run({&"supply_run": 3})
+	supply.hp = 50.0
+	supply.ammo[weapon] = 0
+	supply.call("_logistics_on_cache")
+	_check(is_equal_approx(supply.hp, 80.0), "Supply Run III: a supply cache heals 30 HP (%.0f)" % supply.hp)
+	_check(supply.ammo[weapon] == int(supply.max_ammo(weapon) * 50.0 / 100.0), "Supply Run III: a cache restocks 50%% of the finite ammo (%d)" % supply.ammo[weapon])
+	var plain := _run({})
+	plain.hp = 50.0
+	plain.call("_logistics_on_cache")
+	_check(is_equal_approx(plain.hp, 50.0), "without Supply Run a cache adds no healing of its own")
+	# Archivist II: each cache gives 20 Intel on top of its own.
+	var archivist := _run({&"archivist": 2})
+	archivist.cache_intel = 0
+	archivist.call("_logistics_on_cache")
+	_check(archivist.cache_intel == 20, "Archivist II: a cache gives 20 Intel (%d)" % archivist.cache_intel)
+	# First Find II: the first two caches of the island give a card screen each; later ones give none.
+	var find := _run({&"first_find": 2})
+	find._pending_levels = 0
+	for k in 3:
+		find.call("_logistics_on_cache")
+	_check(find._pending_levels == 2 and find.cache_cards_left == 0, "First Find II: the first two caches give a card, the third does not (%d)" % find._pending_levels)
+	# Spare Rerolls II: the island's first card screen gets two more redraws, and only that one.
+	var spare := _run({&"spare_rerolls": 2})
+	spare._pending_levels = 2
+	spare._roll_cards_if_needed()
+	var first: int = spare.rerolls
+	spare.choose_card(0)  # the next screen opens at once
+	_check(first == GameData.REROLLS_PER_SCREEN + 2 and spare.rerolls == GameData.REROLLS_PER_SCREEN and spare.spare_rerolls_left == 0,
+		"Spare Rerolls II: the first card screen has %d rerolls, the next one the usual %d" % [first, spare.rerolls])
+	# Quick Hands I: a cache takes 25% less time to open (0.5 s of standing there gives 0.625 s of progress).
+	var quick := _run({&"quick_hands": 1})
+	quick.player_pos = quick.map.caches[0]
+	quick.call("_update_caches", 0.5)
+	_check(is_equal_approx(quick.cache_progress[0], 0.625), "Quick Hands I: interactions run 25%% faster (%.3f)" % quick.cache_progress[0])
+	var slow := _run({})
+	slow.player_pos = slow.map.caches[0]
+	slow.call("_update_caches", 0.5)
+	_check(is_equal_approx(slow.cache_progress[0], 0.5), "without Quick Hands the same interaction runs at normal speed")
+	# Resupply Drop I: a drop refills 30% more than the usual third.
+	var drop := _run({&"resupply_drop": 1})
+	drop.ammo[weapon] = 0
+	drop.call("_refill_third", drop.resupply_mult())
+	var boosted: int = drop.ammo[weapon]
+	drop.ammo[weapon] = 0
+	drop.call("_refill_third")
+	_check(is_equal_approx(drop.resupply_mult(), 1.3) and boosted == int(drop.max_ammo(weapon) / 3.0 * drop.resupply_mult()) and drop.ammo[weapon] == drop.max_ammo(weapon) / 3,
+		"Resupply Drop I: a generator, signal or escort stop refills 30%% more; other refills stay the same (%d / %d)" % [boosted, drop.ammo[weapon]])
+
+
+## Logistics through the real updates: a cache that opens (once), a generator that comes online, the
+## per-island counters on a second island, the rank values of each perk, and a lower used rank.
+func _test_logistics_integration() -> void:
+	var weapon: int = -1
+	var probe := _run({})
+	for w in probe.weapons.size():
+		if probe.weapons[w].max_ammo > 0 and weapon == -1:
+			weapon = w
+	# A cache opens once: its Supply Run, Archivist and First Find rewards land exactly once.
+	var cache := _run({&"supply_run": 1, &"archivist": 1, &"first_find": 1})
+	cache.player_pos = cache.map.caches[0]
+	cache.call("_update_caches", GameData.CACHE_OPEN_TIME + 0.1)
+	cache.call("_update_caches", 1.0)
+	var supply_lines: int = 0
+	var archivist_lines: int = 0
+	for line: String in cache.messages:
+		supply_lines += 1 if line.begins_with("Supply Run") else 0
+		archivist_lines += 1 if line.begins_with("Archivist") else 0
+	_check(supply_lines == 1 and archivist_lines == 1 and cache._pending_levels == 1,
+		"a cache opened by standing there pays each logistics reward once (%d, %d, %d card screens)" % [supply_lines, archivist_lines, cache._pending_levels])
+	# A generator held for its time comes online once, with a 30% bigger drop (Resupply Drop I).
+	var gen := _run({&"resupply_drop": 1})
+	if gen.map.generators.size() >= GameData.GENERATOR_COUNT and weapon != -1:
+		gen.player_pos = gen.map.generators[0]
+		gen.ammo[weapon] = 0
+		gen.call("_update_generators", GameData.GENERATOR_HOLD_SECONDS)
+		_check(gen.ammo[weapon] == int(gen.max_ammo(weapon) / 2.0 * 1.3), "a generator that comes online refills 30%% more (%d)" % gen.ammo[weapon])
+	# The next island starts its counters again (First Find, Spare Rerolls), and a bonus reroll adds to the first screen.
+	var ctx := RunContext.new(5)
+	var ids: Array[StringName] = [&"first_find", &"spare_rerolls"]
+	ctx.apply_perks(ids, {&"first_find": 2, &"spare_rerolls": 2})
+	var first := IslandRun.new(ctx.island_seed())
+	first.load_context(ctx)
+	first.call("_logistics_on_cache")
+	first.call("_logistics_on_cache")
+	var second := IslandRun.new(ctx.island_seed())
+	second.load_context(ctx)
+	_check(first.cache_cards_left == 0 and second.cache_cards_left == 2 and second.spare_rerolls_left == 2,
+		"each island starts with its own First Find (2) and Spare Rerolls (2) counters")
+	second._pending_levels = 1
+	second.bonus_rerolls = 1
+	second._roll_cards_if_needed()
+	_check(second.rerolls == GameData.REROLLS_PER_SCREEN + 1 + 2 and second.spare_rerolls_left == 0,
+		"Spare Rerolls adds to the Extra Reroll bonus on the first screen (%d rerolls)" % second.rerolls)
+	# Each logistics perk has its values at ranks I, II and III.
+	var values: Dictionary = {
+		&"supply_run": [[10, 20, 30], [20, 35, 50]], &"quick_hands": [[25, 35, 45], []], &"archivist": [[10, 20, 30], []],
+		&"resupply_drop": [[30, 45, 60], []], &"first_find": [[1, 2, 3], []], &"spare_rerolls": [[1, 2, 3], []],
+	}
+	var table_ok: bool = true
+	for id: StringName in values:
+		var perk: GameData.Perk = GameData.perk(id)
+		for rank in range(1, 4):
+			table_ok = table_ok and perk != null and is_equal_approx(perk.value(rank), values[id][0][rank - 1])
+			if values[id][1].size() == 3:
+				table_ok = table_ok and is_equal_approx(perk.value_2(rank), values[id][1][rank - 1])
+	_check(table_ok, "the six logistics perks have their rank I/II/III values")
+	# A bought rank III used at rank I acts at rank I (Use Rank), like every other perk.
+	var profile := _profile(1000)
+	for k in 3:
+		profile.buy_rank(&"logistics_1")
+	profile.toggle_equip(&"supply_run")
+	profile.set_use_rank(&"logistics_1", 1)
+	_check(profile.equipped_perk_ranks()[&"supply_run"] == 1, "a bought rank III used at rank I equips at rank I")
+
+
+## One click on a node that is not owned yet buys its rank I; an owned node opens its actions instead;
+## a locked node buys nothing; a click with too little Intel buys nothing.
+func _test_logistics_one_click() -> void:
+	var profile := _profile(500)
+	profile.unlocked_classes = [&"recruit", &"vanguard"]
+	var armory := Control.new()
+	armory.set_script(load("res://game/states/armory.gd"))
+	armory.set("profile", profile)
+	root.add_child(armory)
+	await _settle()
+	armory.call("_select_category", "PERKS")
+	await _settle()
+	(armory.get("_perk_buttons")[&"logistics_2"] as Button).pressed.emit()
+	await _settle()
+	_check(profile.node_rank(&"logistics_2") == 0 and profile.intel == 500, "a locked node is not bought by a click")
+	_check((armory.find_child("PerkRequirement", true, false) as Label) != null, "a locked node says what it needs")
+	(armory.get("_perk_buttons")[&"logistics_1"] as Button).pressed.emit()
+	await _settle()
+	_check(profile.node_rank(&"logistics_1") == 1 and profile.intel == 460, "one click buys logistics I (40 Intel)")
+	(armory.get("_perk_buttons")[&"logistics_1"] as Button).pressed.emit()
+	await _settle()
+	_check(profile.node_rank(&"logistics_1") == 1 and profile.intel == 460, "a click on an owned node buys no rank: its actions open")
+	(armory.get("_perk_buttons")[&"logistics_2"] as Button).pressed.emit()
+	await _settle()
+	_check(profile.node_rank(&"logistics_2") == 1 and profile.intel == 400, "the next tier is one click away once the tier above is owned")
+	profile.intel = 30
+	(armory.get("_perk_buttons")[&"logistics_3"] as Button).pressed.emit()
+	await _settle()
+	_check(profile.node_rank(&"logistics_3") == 0 and profile.intel == 30, "a click without enough Intel buys nothing")
+	var equip: Button = null
+	(armory.get("_perk_buttons")[&"logistics_1"] as Button).pressed.emit()
+	await _settle()
+	equip = armory.find_child("PerkEquip", true, false) as Button
+	_check(equip != null and not equip.disabled, "equipping still works from the actions of an owned node")
+	armory.free()
+	await _settle()
+
 
 func _test_combat_effects() -> void:
 	var base := _run({})
@@ -664,7 +851,7 @@ func _test_armory_screen() -> void:
 	armory.call("_select_category", "PERKS")
 	await _settle()
 	var nodes: Dictionary = armory.get("_perk_buttons")
-	_check(nodes.size() == 9, "nine nodes in three columns")
+	_check(nodes.size() == 12, "twelve nodes in four columns")
 	var screen := root.get_visible_rect()
 	var inside: bool = true
 	for node: StringName in nodes:

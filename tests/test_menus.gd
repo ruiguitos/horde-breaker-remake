@@ -59,13 +59,17 @@ func _run_tests() -> void:
 	await _settle()
 	node.pressed.emit()
 	await _settle()
-	var upgrade: Button = armory.find_child("PerkUpgrade", true, false) as Button
-	_check(root.gui_get_focus_owner() == upgrade, "A on a perk node focuses its upgrade action")
-	upgrade.pressed.emit()
-	await _settle()
+	# A on a new node buys its rank I at once (one click); it never equips.
 	_check(profile.node_rank(&"survival_1") == 1 and profile.intel == 40 and profile.equipped_perks.is_empty(),
-		"perk rank purchase uses existing economy and never equips")
+		"A on a new perk node buys its rank I with the existing economy and never equips")
+	# A on the owned node opens its actions: the next rank is out of reach with 40 Intel, so equip has the focus.
+	node = armory.find_child("PerkNode_survival_1", true, false) as Button
+	node.pressed.emit()
+	await _settle()
+	var upgrade: Button = armory.find_child("PerkUpgrade", true, false) as Button
 	var equip: Button = armory.find_child("PerkEquip", true, false) as Button
+	_check(upgrade != null and upgrade.disabled and root.gui_get_focus_owner() == equip,
+		"A on an owned perk node focuses its first available action (equip)")
 	equip.pressed.emit()
 	await _settle()
 	_check(profile.equipped_perks == [&"thick_skin"], "owned perk equips")
@@ -175,6 +179,6 @@ func _run_tests() -> void:
 	island.queue_free()
 	await _settle()
 	# Allow the audio mixer to release playbacks from the freed UI/world.
-	await create_timer(0.1).timeout
+	await create_timer(0.3).timeout
 	print("TEST: menus %d checks / %d failures" % [_checks, _failures])
 	quit(1 if _failures > 0 else 0)

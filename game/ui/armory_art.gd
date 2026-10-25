@@ -38,6 +38,7 @@ const FOLDER := "<path " + F + " d='M4 11c0-1.7 1.3-3 3-3h11l4 4h19c1.7 0 3 1.3 
 const HOME := "<path " + F + " d='M24 5L3 24h6.5v19H21V32h6v11h11.5V24H45z'/>"
 const PLUS := "<path " + SB + " stroke-width='3.6' d='M24 9v30M9 24h30'/>"
 const UPGRADE := "<g " + SB + " stroke-width='4.4'><path d='M11 24l13-11 13 11M11 37l13-11 13 11'/></g>"
+const CRATE := "<g " + S + "><path d='M6 13h36v24H6zM6 21h36M6 29h36M24 13v24'/></g>"
 
 # --- 120 x 40 weapon silhouettes (side view, muzzle to the right) --------------
 const W_RIFLE := "<path " + F + " d='M2 15h15l8 3.5V27h-6l-10 8H3.5l4-9.5H2z'/><path " + F + " d='M24 13.5h43v12H24zM67 15h26v8H67zM93 17.3h20v3.2H93zM111 15.8h7v6.2h-7z'/><path " + F + " d='M47 25.5h9.5l4 12.5H52zM31 25.5h7.5l-3 11H28z'/><path " + F + " d='M35 8h20v3H35zM37 8h3v6h-3zM87 9h3v6h-3z'/>"
@@ -59,6 +60,8 @@ static func icon(id: StringName, size: int = 40) -> Texture2D:
 		&"bulwark": BULWARK, &"intimidating_cry": MEGAPHONE, &"grenade": GRENADE,
 		&"war_cry": MEGAPHONE, &"folder": FOLDER, &"home": HOME, &"plus": PLUS,
 		&"upgrade": UPGRADE,
+		&"logistics": CRATE, &"supply_run": CRATE, &"quick_hands": RUNNER, &"archivist": FOLDER,
+		&"resupply_drop": BULLETS, &"first_find": PLUS, &"spare_rerolls": UPGRADE,
 	}
 	if WEAPONS.has(id):
 		return weapon(id, size * 3, size)

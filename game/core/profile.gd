@@ -428,6 +428,9 @@ func rank_problem(node: StringName) -> String:
 	var cost: int = next_rank_cost(node)
 	if cost < 0:
 		return "Max rank"
+	# A node needs both alternatives for this class, or buying it would leave an empty panel.
+	if GameData.perk_for(node, 0, selected_class) == null or GameData.perk_for(node, 1, selected_class) == null:
+		return "No perk for this class"
 	var tier: int = GameData.perk_node_tier(node)
 	if tier > 1:
 		var before: StringName = GameData.perk_node(GameData.perk_node_branch(node), tier - 1)

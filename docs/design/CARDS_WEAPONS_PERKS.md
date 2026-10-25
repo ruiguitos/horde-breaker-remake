@@ -235,6 +235,23 @@ Valores separados por `/` correspondem a **I/II/III**, totais, não incrementos.
 
 Head Hunter conserva a equivalência nas câmaras com mira: multiplicador do raio de cabeça = cone/9. Skirmisher: o bónus de velocidade não se aplica em sprint (o sprint já dispara para todos desde 2026-10-14).
 
+### Logística: quarto ramo (2026-10-24)
+
+Um quarto ramo ligado a caixas, objetivos, Intel e munição. Mesmos custos (40/60/80, 60/90/120, 100/140/180) e mesmas regras de rank. Só o ramo Logística não tem contrapartida: o pedido define apenas benefícios. Os valores do rank I são os pedidos; os dos ranks II e III são propostas a validar em playtest.
+
+| Nó | Alternativa A | Alternativa B |
+|---|---|---|
+| **Logistics I** | **Supply Run:** caixas curam +10/20/30 HP e repõem +20/35/50% da munição máxima. | **Quick Hands:** objetivos e interações +25/35/45% mais depressa: geradores, sinais, sabotagem, reparações e caixas. |
+| **Logistics II** | **Archivist:** cada caixa dá +10/20/30 Intel. | **Resupply Drop:** munição reposta por gerador, sinal e paragem de escolta +30/45/60%. A entrega da escolta não muda. |
+| **Logistics III** | **First Find:** as primeiras 1/2/3 caixas de cada ilha dão uma carta (um ecrã de escolha, como um nível). | **Spare Rerolls:** +1/2/3 redraws no primeiro ecrã de carta de cada ilha. |
+
+Decisões:
+
+- **"Extrair cedo" não existe no código.** A extração só acontece no fim da última ilha. Sair antes (Armory, Boat) não dá o bónus, de propósito. Por isso a alternativa B do tier III é o reroll por ilha, como o pedido permitia.
+- **Quick Hands** não acelera o temporizador de defesa nem a paragem da escolta: não têm progresso de objetivo.
+- **Sem carta elegível**, a caixa de First Find cura 20 HP, como já acontece a um nível sem cartas disponíveis.
+- **Compra num clique:** um nó ainda não comprado, com o tier acima e Intel suficientes, compra o rank I ao carregar. Um nó com rank abre as ações (equipar, remover, usar rank). Um nó bloqueado mostra o que lhe falta.
+
 ### 2. Intel, ranks e slots
 
 | Tier | Comprar I | Comprar II | Comprar III |

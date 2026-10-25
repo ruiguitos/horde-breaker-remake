@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://lg7sup6rn1ka"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Supply Run"
+description = "Supply caches patch you up and restock your ammo."
+branch = "logistics"
+tier = 1
+option = 0
+benefit = "Supply caches heal {v} HP"
+benefit_values = PackedFloat32Array(10, 20, 30)
+benefit_2 = "Supply caches restock {v}% ammo"
+benefit_2_values = PackedFloat32Array(20, 35, 50)
+order = 20

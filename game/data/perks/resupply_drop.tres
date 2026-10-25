@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://lg7rsd2pkw5m"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Resupply Drop"
+description = "Ammo drops from generators, signals and escort stops come in heavier."
+branch = "logistics"
+tier = 2
+option = 1
+benefit = "Generator, signal and escort-stop ammo +{v}%"
+benefit_values = PackedFloat32Array(30, 45, 60)
+order = 23

@@ -309,6 +309,10 @@ var survivor_found: bool = false
 var survivor_lost: bool = false
 var cache_progress: PackedFloat32Array = PackedFloat32Array()  ## >= CACHE_OPEN_TIME = opened
 var cache_intel: int = 0
+## Logistics perks, per island (set by load_context, not carried over): caches still giving a card
+## (First Find) and the redraws of this island's first card screen (Spare Rerolls).
+var cache_cards_left: int = 0
+var spare_rerolls_left: int = 0
 var damage_taken: float = 0.0
 var _hp_at_step_start: float = 0.0
 var cards_picked: Array[StringName] = []
@@ -473,6 +477,8 @@ func load_context(ctx: RunContext) -> void:
 	_last_damage_time = time_alive
 	landed_time = time_alive
 	bonus_rerolls = ctx.bonus_rerolls
+	cache_cards_left = int(perk_value(&"first_find"))
+	spare_rerolls_left = int(perk_value(&"spare_rerolls"))
 	horde.hp_scale = (1.0 + 0.3 * ctx.island_index) * GameData.threat_hp(threat)
 	_reset_nest_hp()  # nests scale like every enemy
 	director.max_alive = GameData.MAX_ALIVE + GameData.threat_extra_alive(threat)
@@ -1481,11 +1487,21 @@ func _update_carry(to: Vector3, radius: float) -> int:
 
 
 ## A third of every finite weapon's ammo back (a delivery, a held point, a
-## lit signal).
-func _refill_third() -> void:
+## lit signal). `mult` scales the refill (Resupply Drop: generators, signals, escort stops).
+func _refill_third(mult: float = 1.0) -> void:
 	for w in weapons.size():
 		if weapons[w].max_ammo > 0:
-			ammo[w] = mini(max_ammo(w), ammo[w] + max_ammo(w) / 3)
+			ammo[w] = mini(max_ammo(w), ammo[w] + int(max_ammo(w) / 3.0 * mult))
+
+
+## Ammo multiplier of a drop (Resupply Drop): 1.0 without the perk.
+func resupply_mult() -> float:
+	return 1.0 + perk_value(&"resupply_drop") / 100.0
+
+
+## Progress speed of objectives and interactions (Quick Hands): 1.0 without the perk.
+func objective_speed() -> float:
+	return 1.0 + perk_value(&"quick_hands") / 100.0
 
 
 ## Light the Signals numbers, from the mission's data (signals.tres).
@@ -3153,8 +3169,9 @@ func _roll_cards_if_needed() -> void:
 	_pending_levels -= 1
 	if _draw_cards([]):
 		# A new level-up screen: one free reroll, plus any Extra Reroll.
-		rerolls = GameData.REROLLS_PER_SCREEN + bonus_rerolls
+		rerolls = GameData.REROLLS_PER_SCREEN + bonus_rerolls + spare_rerolls_left
 		bonus_rerolls = 0
+		spare_rerolls_left = 0  # Spare Rerolls: this island's first card screen only
 	else:
 		# Every card maxed: levelling up still heals.
 		_heal_player(20.0)
@@ -3316,7 +3333,7 @@ func _update_hold_sequence(dt: float) -> void:
 		hold_started = true
 		director.trigger_peak(hold_seconds() + 10.0)
 		messages.append("Point %d of %d: hold it!" % [hold_index + 1, hold_points.size()])
-	hold_progress += dt
+	hold_progress += dt * objective_speed()
 	if hold_progress < hold_seconds():
 		return
 	hold_index += 1
@@ -3354,7 +3371,7 @@ func _update_intel_search(dt: float) -> void:
 					search_started[k] = true
 					director.trigger_peak(search_spike_seconds())
 					messages.append("Searching...")
-				search_progress[k] += dt
+				search_progress[k] += dt * objective_speed()
 				if search_progress[k] >= search_seconds():
 					search_progress[k] = search_seconds()
 					if search_has_intel[k]:
@@ -3379,7 +3396,7 @@ func _update_intel_search(dt: float) -> void:
 					transmit_started = true
 					director.trigger_peak(transmit_seconds() + 10.0)
 					messages.append("Transmitting: hold the uplink!")
-				transmit_progress += dt
+				transmit_progress += dt * objective_speed()
 				if transmit_progress >= transmit_seconds():
 					transmit_progress = transmit_seconds()
 					intel_phase = INTEL_DONE
@@ -3423,12 +3440,12 @@ func _update_signals(dt: float) -> void:
 			signal_started = true
 			director.trigger_peak(signal_spike_seconds())
 			messages.append("Lighting %s: hold on!" % signal_name(signal_index).to_lower())
-		signal_progress += dt
+		signal_progress += dt * objective_speed()
 		if signal_progress >= signal_seconds():
 			signal_index += 1
 			signal_progress = 0.0
 			signal_started = false
-			_refill_third()
+			_refill_third(resupply_mult())
 			if signal_index < signal_pos.size():
 				messages.append("%s lit. %s is marked: find its fuel!" % [signal_name(signal_index - 1), signal_name(signal_index)])
 				radio.append(&"signal_lit")
@@ -3449,7 +3466,7 @@ func _update_sabotage(dt: float) -> void:
 				power_started = true
 				director.trigger_peak(power_spike_seconds())
 				messages.append("Cutting the power: hold the switch!")
-			power_progress += dt
+			power_progress += dt * objective_speed()
 			if power_progress >= power_seconds():
 				power_progress = power_seconds()
 				sabotage_phase = SAB_CHARGES
@@ -3463,7 +3480,7 @@ func _update_sabotage(dt: float) -> void:
 				charge_started[k] = true
 				director.trigger_peak(charge_spike_seconds())
 				messages.append("Planting charge %d of %d: hold on!" % [charges_planted() + 1, charge_pos.size()])
-			charge_progress[k] += dt
+			charge_progress[k] += dt * objective_speed()
 			if charge_progress[k] >= charge_seconds():
 				charge_progress[k] = charge_seconds()
 				charge_planted[k] = true
@@ -3537,7 +3554,7 @@ func _update_escort(dt: float) -> void:
 	if escort_broken:
 		escort_status = ESC_BROKEN
 		if _flat_dist(player_pos, escort_pos) <= repair_radius():
-			repair_progress += dt
+			repair_progress += dt * objective_speed()
 			if repair_progress >= repair_seconds():
 				escort_broken = false
 				repair_progress = 0.0
@@ -3549,7 +3566,7 @@ func _update_escort(dt: float) -> void:
 			escort_status = ESC_STOPPED
 		if stop_left <= 0.0:
 			stop_index += 1
-			_refill_third()
+			_refill_third(resupply_mult())
 			messages.append("Stop %d done. Moving on!" % stops_done())
 		site = escort_pos
 		return
@@ -3673,13 +3690,13 @@ func _update_generators(dt: float) -> void:
 				generator_started[g] = true
 				director.trigger_peak(GameData.GENERATOR_HOLD_SECONDS + 10.0)
 				messages.append("Generator starting: hold the zone!")
-			generator_progress[g] += dt
+			generator_progress[g] += dt * objective_speed()
 			if generator_progress[g] >= GameData.GENERATOR_HOLD_SECONDS:
 				messages.append("Generator online")
 				radio.append(&"generator")
 				for w in weapons.size():
 					if weapons[w].max_ammo > 0:
-						ammo[w] = mini(max_ammo(w), ammo[w] + max_ammo(w) / 2)
+						ammo[w] = mini(max_ammo(w), ammo[w] + int(max_ammo(w) / 2.0 * resupply_mult()))
 
 
 ## Lava pools burn the player (unless dashing) and enemies alike.
@@ -3708,7 +3725,7 @@ func _update_caches(dt: float) -> void:
 		if cache_progress[c] >= GameData.CACHE_OPEN_TIME:
 			continue
 		if player_pos.distance_to(map.caches[c]) <= GameData.CACHE_RADIUS:
-			cache_progress[c] += dt
+			cache_progress[c] += dt * objective_speed()
 			if cache_progress[c] >= GameData.CACHE_OPEN_TIME:
 				_open_cache()
 		else:
@@ -3737,6 +3754,28 @@ func _open_cache() -> void:
 		_:
 			cache_intel += 10
 			messages.append("Cache: Intel (+10)")
+	_logistics_on_cache()
+
+
+## Logistics perks on every supply cache, on top of its own reward: Supply Run heals and restocks,
+## Archivist adds Intel, and First Find gives a card screen for the island's first caches.
+func _logistics_on_cache() -> void:
+	var heal: float = perk_value(&"supply_run")
+	if heal > 0.0:
+		_heal_player(heal)
+		messages.append("Supply Run: +%d HP" % int(heal))
+	var restock: float = perk_value_2(&"supply_run")
+	if restock > 0.0:
+		for w in weapons.size():
+			if weapons[w].max_ammo > 0:
+				ammo[w] = mini(max_ammo(w), ammo[w] + int(max_ammo(w) * restock / 100.0))
+	var intel: int = int(perk_value(&"archivist"))
+	if intel > 0:
+		cache_intel += intel
+		messages.append("Archivist: +%d Intel" % intel)
+	if cache_cards_left > 0:
+		cache_cards_left -= 1
+		_pending_levels += 1
 
 
 ## Index of the boss in the horde, or -1 (indices change when enemies die).

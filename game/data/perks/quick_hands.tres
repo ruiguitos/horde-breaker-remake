@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PerkData" format=3 uid="uid://lg7qhd4ndsx2"]
+
+[ext_resource type="Script" path="res://game/data/resources/perk_data.gd" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+title = "Quick Hands"
+description = "Objectives and interactions go faster: generators, signals, sabotage, repairs and caches."
+branch = "logistics"
+tier = 1
+option = 1
+benefit = "Objectives and interactions {v}% faster"
+benefit_values = PackedFloat32Array(25, 35, 45)
+order = 21

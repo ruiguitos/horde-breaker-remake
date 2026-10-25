@@ -5,7 +5,7 @@ extends RefCounted
 ##   picked + owned  -> teal outline (tick when it is equipped)
 ##   picked, rank 0  -> light outline, full colour
 ##   not picked      -> muted
-##   locked tier     -> muted, small padlock on each alternative
+##   locked tier     -> muted, a padlock in place of each alternative's icon
 ## The state word (EQUIPPED / OWNED / NEW / LOCKED) stays in a hidden
 ## "State" label and in the tooltip, for tests and screen readers.
 
@@ -117,9 +117,21 @@ static func _alternative(perk: GameData.Perk, option: int, on: bool, owned: bool
 	letter.name = "Letter" + "AB"[option]
 	letter.autowrap_mode = TextServer.AUTOWRAP_OFF
 	line_row.add_child(letter)
-	line_row.add_child(Art.image(perk.id if perk != null else &"", ICON_SIZE, tint))
+	if locked:
+		# The padlock takes the icon's place, so a locked name keeps the width of an unlocked one.
+		var padlock := TextureRect.new()
+		padlock.name = "Padlock"
+		padlock.texture = UiTheme.lock_icon()
+		padlock.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		padlock.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		padlock.custom_minimum_size = Vector2(ICON_SIZE, ICON_SIZE)
+		padlock.modulate = tint
+		padlock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		line_row.add_child(padlock)
+	else:
+		line_row.add_child(Art.image(perk.id if perk != null else &"", ICON_SIZE, tint))
 	# One line, never broken: a name too long for its cell is trimmed with an ellipsis.
-	var line := UiTheme.label(perk.title.to_upper() if perk != null else "—", 13, tint)
+	var line := UiTheme.label(perk.title.to_upper() if perk != null else "—", 12, tint)
 	line.name = "Option" + "AB"[option]
 	line.add_theme_font_override("font", UiTheme.heading_font())
 	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -128,9 +140,9 @@ static func _alternative(perk: GameData.Perk, option: int, on: bool, owned: bool
 	line.clip_text = true
 	line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	line_row.add_child(line)
-	# Marks: tick on the equipped pick, padlock on locked tiers. At the end of the line, so it
-	# takes its own width and never covers the name.
-	var mark_texture: Texture2D = UiTheme.tick_icon() if on and equipped else (UiTheme.lock_icon() if locked else null)
+	# Mark: tick on the equipped pick. At the end of the line, so it takes its own width and never
+	# covers the name. (A locked alternative shows its padlock in the icon's place instead.)
+	var mark_texture: Texture2D = UiTheme.tick_icon() if on and equipped else null
 	if mark_texture != null:
 		var mark := TextureRect.new()
 		mark.name = "Mark"

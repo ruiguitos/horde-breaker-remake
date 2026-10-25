@@ -20,6 +20,12 @@ _uids_to_string_ids = Dictionary[StringName, StringName]({
 &"uid://flq98ftlrlb6": &"intimidating_cry",
 &"uid://k2e4vvxsu3oo": &"opening_volley",
 &"uid://kf20i87p74ak": &"concussion_blast",
+&"uid://lg7arc8vh3ta": &"archivist",
+&"uid://lg7ffd9qt6zb": &"first_find",
+&"uid://lg7qhd4ndsx2": &"quick_hands",
+&"uid://lg7rsd2pkw5m": &"resupply_drop",
+&"uid://lg7spr3hw8yc": &"spare_rerolls",
+&"uid://lg7sup6rn1ka": &"supply_run",
 &"uid://m8ay5hvjv2xa": &"trail_rations",
 &"uid://n7i4baopjmx3": &"steady_grip",
 &"uid://q8e46zx653vu": &"bulwark",
@@ -29,11 +35,13 @@ _uids_to_string_ids = Dictionary[StringName, StringName]({
 &"uid://zm2tt6a8c342": &"surveyor"
 })
 _string_ids_to_uids = Dictionary[StringName, StringName]({
+&"archivist": &"uid://lg7arc8vh3ta",
 &"body_count": &"uid://5w5vrdcw4caw",
 &"bulwark": &"uid://q8e46zx653vu",
 &"concussion_blast": &"uid://kf20i87p74ak",
 &"crowd_anchor": &"uid://56wng762urdn",
 &"demolitions": &"uid://d0wt54cacykqt",
+&"first_find": &"uid://lg7ffd9qt6zb",
 &"fleet_footed": &"uid://q9unzx0qgew4",
 &"head_hunter": &"uid://b6ddxb643fhnc",
 &"heavy_impact": &"uid://d9w40iyxj29j",
@@ -43,9 +51,13 @@ _string_ids_to_uids = Dictionary[StringName, StringName]({
 &"opening_volley": &"uid://k2e4vvxsu3oo",
 &"pack_rat": &"uid://d1mk31bg77twy",
 &"quick_draw": &"uid://enu769rl3g0v",
+&"quick_hands": &"uid://lg7qhd4ndsx2",
 &"recovery": &"uid://ttqbna5xbtuv",
+&"resupply_drop": &"uid://lg7rsd2pkw5m",
 &"skirmisher": &"uid://sbiq0wmtow6g",
+&"spare_rerolls": &"uid://lg7spr3hw8yc",
 &"steady_grip": &"uid://n7i4baopjmx3",
+&"supply_run": &"uid://lg7sup6rn1ka",
 &"surveyor": &"uid://zm2tt6a8c342",
 &"thick_skin": &"uid://cwehc575wai4h",
 &"trail_rations": &"uid://m8ay5hvjv2xa"
@@ -58,13 +70,17 @@ _property_index = Dictionary[StringName, Dictionary]({
 &"fleet_footed": true,
 &"head_hunter": true,
 &"long_breaker": true,
+&"quick_hands": true,
+&"supply_run": true,
 &"thick_skin": true
 },
 2: {
+&"archivist": true,
 &"heavy_impact": true,
 &"pack_rat": true,
 &"quick_draw": true,
 &"recovery": true,
+&"resupply_drop": true,
 &"skirmisher": true,
 &"steady_grip": true
 },
@@ -72,9 +88,11 @@ _property_index = Dictionary[StringName, Dictionary]({
 &"bulwark": true,
 &"concussion_blast": true,
 &"demolitions": true,
+&"first_find": true,
 &"intimidating_cry": true,
 &"kill_chain": true,
 &"opening_volley": true,
+&"spare_rerolls": true,
 &"surveyor": true,
 &"trail_rations": true
 }

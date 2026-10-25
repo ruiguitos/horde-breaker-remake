@@ -84,10 +84,10 @@ func _ready() -> void:
 	_build_header(screen)
 	var body := HBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	body.add_theme_constant_override("separation", 18)
+	body.add_theme_constant_override("separation", 14)
 	screen.add_child(body)
 	var nav := VBoxContainer.new()
-	nav.custom_minimum_size.x = 160
+	nav.custom_minimum_size.x = 150
 	nav.add_theme_constant_override("separation", 10)
 	body.add_child(nav)
 	for category in ["CLASS", "WEAPONS", "PERKS"]:
@@ -569,8 +569,9 @@ func _choose_weapon(id: StringName) -> void:
 ## focused node's detail (benefit, trade-off, rank and the actions) takes
 ## the summary column. D-pad moves between nodes, LB/RB (Q/E) switch A/B,
 ## A opens the actions, B goes back to the tree.
-const BRANCH_COLORS: Dictionary = {&"combat": UiTheme.INFO, &"survival": UiTheme.SUCCESS, &"breaker": UiTheme.ACCENT}
-const NUMERAL_WIDTH := 28.0
+const BRANCH_COLORS: Dictionary = {&"combat": UiTheme.INFO, &"survival": UiTheme.SUCCESS, &"breaker": UiTheme.ACCENT,
+	&"logistics": Color("c49a6c")}  ## warm sand: the fourth branch, apart from the amber of the actions
+const NUMERAL_WIDTH := 24.0  ## the tier numeral's column: four branches need the width
 
 
 func _perks() -> void:
@@ -585,7 +586,7 @@ func _perks() -> void:
 	var grid := HBoxContainer.new()
 	grid.name = "PerkTree"
 	grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	grid.add_theme_constant_override("separation", 8)
+	grid.add_theme_constant_override("separation", 4)  # four branches: the gaps are narrow
 	_content.add_child(grid)
 	_perk_buttons.clear()
 	for branch in GameData.PERK_BRANCHES:
@@ -615,8 +616,8 @@ func _perks() -> void:
 			var row := HBoxContainer.new()
 			row.add_theme_constant_override("separation", 2)
 			column.add_child(row)
-			var numeral := UiTheme.title(GameData.RANK_NAMES[tier], 15)
-			numeral.add_theme_font_override("font", UiTheme.mono_bold_font())  # serifed numerals
+			var numeral := UiTheme.title(GameData.RANK_NAMES[tier], 13)
+			numeral.add_theme_font_override("font", UiTheme.mono_bold_font())  # serifed numerals, smaller for four branches
 			numeral.add_theme_color_override("font_color", UiTheme.INFO.lerp(UiTheme.TEXT, 0.4))
 			numeral.custom_minimum_size.x = NUMERAL_WIDTH
 			numeral.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -713,9 +714,14 @@ func _focus_perk(node: StringName) -> void:
 	_perk_detail()
 
 
-## A on a node: focus its first available action (upgrade, else equip).
+## A on a node. A node not owned yet buys its rank I at once when it can be bought (its tier above
+## is owned and there is enough Intel). An owned node opens its actions: equip, remove, rank. A locked
+## node only shows why it cannot be bought yet.
 func _open_perk_actions(node: StringName) -> void:
 	_focus_perk(node)
+	if profile.node_rank(node) == 0 and profile.rank_problem(node) == "":
+		_act(profile.buy_rank(node))
+		return
 	for action_name in ["PerkUpgrade", "PerkEquip", "PerkUseRank"]:
 		var action := _summary.find_child(action_name, true, false) as Button
 		if action != null and not action.disabled:
@@ -897,7 +903,8 @@ func _effects(parent: VBoxContainer, perk: GameData.Perk, rank: int) -> void:
 	_effect_row(parent, true, perk.benefit, perk.value(rank))
 	if perk.benefit_2 != "":
 		_effect_row(parent, true, perk.benefit_2, perk.value_2(rank))
-	_effect_row(parent, false, perk.penalty, perk.cost_value(rank))
+	if perk.penalty != "":  # Logistics perks have no trade-off
+		_effect_row(parent, false, perk.penalty, perk.cost_value(rank))
 
 
 ## One effect: "▲ Headshot cone ........ 13°". The value is pulled out of
