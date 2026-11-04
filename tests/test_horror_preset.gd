@@ -78,6 +78,8 @@ func _horror_checks(horror: Node) -> void:
 	var light: DirectionalLight3D = horror.get("_horror_light")
 	_check(light != null and light.light_energy > 0.0 and light.light_energy < 0.6, "the horror preset has a weak cold backlight")
 	_check(light != null and not light.shadow_enabled, "the backlight casts no shadows at the start")
+	# Sky3D's sky shader reads the first two directional lights as its sun and moon, and draws them in the sky.
+	_check(light != null and light.sky_mode == DirectionalLight3D.SKY_MODE_LIGHT_ONLY, "the backlight lights the figures but is not drawn in the sky (light only)")
 	if light != null:
 		GraphicsSettings.apply_sun(light)  # what apply_graphics() does to every light
 		_check(not light.shadow_enabled, "the backlight casts no shadows after the graphics settings are applied")

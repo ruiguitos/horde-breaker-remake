@@ -906,6 +906,9 @@ func _apply_horror_light(env: Environment) -> void:
 func _horror_sun() -> DirectionalLight3D:
 	var sun := DirectionalLight3D.new()
 	sun.set_meta(&"no_shadows", true)  # kept off by every later apply_sun(): shadows would turn with the camera
+	# Light only: in the default mode a light can also feed the sky shader's sun or moon (SkyMaterial.gdshader
+	# reads LIGHT0 and LIGHT1), which would draw this backlight in the sky, tied to the camera's yaw.
+	sun.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_ONLY
 	GraphicsSettings.apply_sun(sun)
 	sun.light_color = HORROR_LIGHT_COLOUR
 	sun.light_energy = HORROR_LIGHT_ENERGY
