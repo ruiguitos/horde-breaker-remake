@@ -1,0 +1,63 @@
+# Project configuration: the single source of truth for the Claude Code Game
+# Studios framework (schema: .claude/docs/effects-map.md). Personal overrides go
+# in project.local.yaml (gitignored). Adaptations: docs/tech/AGENT_FRAMEWORK.md.
+schema_version: 1
+
+framework:
+  version: "1.2.0"
+  last_upgraded: "2026-11-04"
+
+modes:
+  rigor: minimal            # 2026-11-04: default kept, set explicitly
+  automation: collaborative # 2026-11-04: skills ask before every write
+
+project:
+  name: "Horde Breaker Remake"
+  genre: "Horde shooter (island expeditions)"
+  version: "0.1.0"
+  kind: game
+
+engine:
+  name: "Godot"
+  version: "4.7"
+  language: "GDScript"
+  rendering: "Forward+"
+  physics: "Jolt"
+  # The Godot code lives in game/, not in the framework's default src/.
+  code_root: "game"
+
+specialists:
+  code: "godot-gdscript-specialist"
+  shader: "godot-shader-specialist"
+  ui: "godot-specialist"
+  additional: ["godot-gdextension-specialist"]
+
+platform:
+  multiplayer: false
+  online: false
+  targets: [PC]
+  primary_input: "Keyboard/Mouse"
+  gamepad_support: "Full"
+  touch_support: "None"
+  cert_tier: none
+
+performance:
+  target_framerate: 60
+  frame_budget_ms: 16.67
+  enforce: warn
+
+naming:
+  classes: PascalCase
+  variables: snake_case
+  constants: SCREAMING_SNAKE
+  signals: past_tense
+  files: snake_case
+  scenes: snake_case
+
+features:
+  session_state: on
+  read_guard: on
+  read_guard_kb: 40
+
+updates:
+  check: true

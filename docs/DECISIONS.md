@@ -45,6 +45,8 @@ registadas as decisões dessa data.
 | 2026-10-16 | **Campo de visão (FOV)** em Definições > Gráficos: 60°–120°, 60° por defeito. Aplica-se à **primeira pessoa**; a **terceira pessoa e a câmara fixa** ficam limitadas a **75°**. | Pedido do utilizador. A câmara fixa conta como terceira pessoa. |
 | 2026-10-14 | Plugins: **remover o Orchestrator**. | Não usado. Remoção a fazer com o editor fechado (a DLL fica bloqueada enquanto está aberto). NAP Map Generator: não usado e sem licença, remoção recomendada. |
 | 2026-10-18 | **Sem escolha de plataforma para os ícones de comando** em Definições > Controlos: os ícones seguem sempre o comando ligado (Auto). | Pedido do utilizador. Remove a preferência `controller_icons` do perfil; perfis antigos ignoram-na. Mantém a identificação automática e a regra «sem comando, Xbox». Ver [SETTINGS_INPUT.md](tech/SETTINGS_INPUT.md). |
+| 2026-11-04 | **Claude Code Game Studios 1.2.0 instalado** em `.claude/` (MIT), com as adaptações de [AGENT_FRAMEWORK.md](tech/AGENT_FRAMEWORK.md). | Pedido do utilizador («podemos implementar»), apesar da recomendação de não integrar um framework desta dimensão num projeto a solo. Lacunas conhecidas no mesmo documento. |
+| 2026-11-04 | **godot-mcp testado localmente, sem adoção decidida.** Registo só para este projeto (escopo local), fora do repositório. | Pedido do utilizador («podemos testar agora»). Critério de decisão em [spikes/godot_mcp/README.md](../spikes/godot_mcp/README.md). |
 
 ## Em aberto
 

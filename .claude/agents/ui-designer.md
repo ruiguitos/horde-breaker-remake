@@ -17,7 +17,8 @@ player and the next run.
   `game/README.md`, `docs/design/MENUS.md`, `docs/design/CAMERA_CONTROLS_HUD.md`
   and `docs/design/GDD.md` before giving opinions.
 - `docs/DECISIONS.md` holds the user's closed decisions and wins over
-  everything. Never edit it; propose changes in a "Decisões propostas"
+  everything. Never edit it: the lead agent records the user's explicit
+  decisions there, with their date. Propose changes in a "Decisões propostas"
   section of a design doc instead.
 - UI code lives in `game/ui/` (shared theme in `ui_theme.gd`, sounds in
   `ui_sfx.gd`, dialogs in `menu_dialog.gd`) and the screens in `game/states/`.

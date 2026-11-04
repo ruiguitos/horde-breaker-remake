@@ -35,3 +35,12 @@ __pycache__/
 # the recruit study was rejected (see docs/design/art/visual_target_20261023/).
 # Its sources and records were copied into the repository; the rest stays on disk.
 assets/models/visual_target_20261023/
+
+# Claude Code Game Studios: local config and per-session state (never commit)
+.claude/settings.local.json
+CLAUDE.local.md
+project.local.yaml
+production/session-logs/
+production/session-state/
+.scratch/
+.claude/agent-memory/

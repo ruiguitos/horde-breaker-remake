@@ -41,6 +41,8 @@ assets/        assets de terceiros (áudio, animações…; ver assets/LICENSES.
 addons/        addons Godot (Terrain3D, TerraBrush, Sky3D, Phantom Camera)
 tools/         ferramentas (tools/cloud/ = setup das sessões na cloud)
 docs/          DECISIONS, design/, tech/, legacy/
+.claude/       framework de agentes e skills (ver abaixo)
+production/   estado de sessão do framework (gitignored)
 ```
 
 ## Comandos
@@ -54,6 +56,21 @@ godot --headless --path . --script res://spikes/<nome>/tests/<t>.gd # testes de 
 Testes: `extends SceneTree`, lógica em `_initialize()`, imprimem `TEST: ...` ou
 `TEST FAIL: ...` e chamam `quit(0|1)` em **todos** os caminhos (um teste sem
 `quit()` pendura a sessão).
+
+## Framework de agentes (Claude Code Game Studios)
+
+Instalado a 2026-11-04: Claude Code Game Studios 1.2.0 (MIT; licença em
+`.claude/LICENSE`). Agentes em `.claude/agents/`, skills em `.claude/skills/`,
+hooks em `.claude/hooks/`, configuração em `project.yaml`. Adaptações, lacunas e
+decisões pendentes: `docs/tech/AGENT_FRAMEWORK.md`.
+
+- Estas regras prevalecem sobre o framework. O código de Godot fica em `game/`
+  (`engine.code_root` em `project.yaml`), e os testes são os `extends SceneTree`
+  descritos acima, não gdUnit4.
+- Os skills de design esperam `design/`; o design deste projeto está em `docs/design/`.
+- O protocolo do framework que pede autorização antes de cada escrita não foi
+  importado para este ficheiro. Está em aberto: ver `docs/tech/AGENT_FRAMEWORK.md`.
+- Versão do Godot e snapshot de APIs: `docs/engine-reference/godot/VERSION.md` (fixado em 4.7). Ler antes de usar qualquer API do Godot; ver também `docs/engine-reference/godot/breaking-changes.md`.
 
 ## Regras para agentes
 

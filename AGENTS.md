@@ -3,7 +3,7 @@
 Read `CLAUDE.md` first: it holds the project rules and applies to every
 agent (Godot 4.7, typed GDScript, in-game text in English, user-facing
 docs in European Portuguese, free licences only, `docs/DECISIONS.md` is
-never edited by agents).
+edited only by the lead agent (Claude Code), to record decisions the user has stated explicitly, with their date. Subagents and Codex never edit it: they propose changes in their own documents).
 
 Practical notes for this machine (Windows):
 - Godot: `C:/Users/Rui/Downloads/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe`.
