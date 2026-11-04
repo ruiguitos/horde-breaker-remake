@@ -13,6 +13,13 @@ const DEFAULT_TIMEOUT_SECONDS: int = 600
 ## Each test writes its engine log here. The exit code comes from the process and
 ## the result lines from this file: create_process does not capture the output.
 const LOG_DIR: String = "user://test_logs"
+## Exit codes of a Godot process that quits after a crash: 5 and 139 (SIGSEGV), and the
+## Windows access violation (-1073741819, which is 3221225477 unsigned).
+const CRASH_EXIT_CODES: Array[int] = [5, 139, -1073741819, 3221225477]
+## Tests that may exit with a crash code at quit, once they have printed their results.
+## Empty: in the suite of 2026-11-04 no test crashed at quit (83 of 83 exit 0). Add a test
+## here only with its reason, and only after the crash is measured.
+const KNOWN_SHUTDOWN_CRASH: Array[String] = []
 
 
 func _initialize() -> void:
@@ -49,8 +56,9 @@ func _initialize() -> void:
 		var elapsed := Time.get_ticks_msec() - start
 		var code := OS.get_process_exit_code(pid) if pid != -1 else -1
 		var log_text := FileAccess.get_file_as_string(log_file)
-		var verdict: String = verdict_for(code, log_text, timed_out, timeout_seconds) if pid != -1 else "FAIL (could not start)"
-		var ok: bool = verdict == "PASS" or verdict == "PASS (exit code at quit)"
+		var known: bool = KNOWN_SHUTDOWN_CRASH.has(test_path)
+		var verdict: String = verdict_for(code, log_text, timed_out, timeout_seconds, known) if pid != -1 else "FAIL (could not start)"
+		var ok: bool = verdict.begins_with("PASS")
 		print("%s %s (%d ms, exit %d) %s" % ["PASS" if ok else "FAIL", test_path, elapsed, code, verdict if verdict != "PASS" else ""])
 		if not ok:
 			failed.append(test_path)
@@ -69,26 +77,28 @@ func _initialize() -> void:
 
 ## Verdict for one run. A run killed at the timeout always fails; otherwise the
 ## log decides (see classify).
-static func verdict_for(code: int, log_text: String, timed_out: bool, timeout_seconds: int) -> String:
+static func verdict_for(code: int, log_text: String, timed_out: bool, timeout_seconds: int, known_shutdown_crash: bool = false) -> String:
 	if timed_out:
 		return "FAIL (timeout after %d s)" % timeout_seconds
-	return classify(code, log_text)
+	return classify(code, log_text, known_shutdown_crash)
 
 
-## Verdict for one test run. A test passes when its log has no error markers,
-## it reached its own result lines, and it exited 0 - or exited with a known
-## Windows exit code at quit after finishing (the engine's shutdown quirk).
-## A script error, a parse error or a TEST FAIL always fails the test, even
-## with exit 0. A run that never printed a result line did not finish, even
-## with exit 0 and no output: silence is not a pass.
-static func classify(code: int, log_text: String) -> String:
+## Verdict for one test run. A test passes when it exits 0, its log has no error
+## markers, and it printed its result lines. Any other exit code fails it, a crash
+## after the results included: the exit code cannot tell a crash at quit from a crash
+## in the middle of the test, and the second one is what this gate must catch. The one
+## exception is a test listed in KNOWN_SHUTDOWN_CRASH (known_shutdown_crash = true),
+## which may crash at quit once it has printed its results. A script error, a parse
+## error or a TEST FAIL always fails the test, even with exit 0. A run that never
+## printed a result line did not finish, even with exit 0 and no output.
+static func classify(code: int, log_text: String, known_shutdown_crash: bool = false) -> String:
 	if log_text.contains("TEST FAIL") or log_text.contains("SCRIPT ERROR") or log_text.contains("Parse Error"):
 		return "FAIL (test or script error)"
 	var finished: bool = log_text.contains("TEST: ")
 	if code == 0:
 		return "PASS" if finished else "FAIL (exit 0 without results)"
-	if finished and code in [5, 139, -1073741819, 3221225477]:
-		return "PASS (exit code at quit)"
+	if known_shutdown_crash and finished and code in CRASH_EXIT_CODES:
+		return "PASS (exit code at quit, known)"
 	return "FAIL (exit %d)" % code
 
 

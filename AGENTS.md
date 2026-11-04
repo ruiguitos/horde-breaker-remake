@@ -7,9 +7,11 @@ edited only by the lead agent (Claude Code), to record decisions the user has st
 
 Practical notes for this machine (Windows):
 - Godot: `C:/Users/Rui/Downloads/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe`.
-  Exit codes 5/139 when Godot quits are a known Windows quirk, not a failure.
+  A crash exit code (5, 139, -1073741819) fails a test, even after its results,
+  unless the test is listed in `KNOWN_SHUTDOWN_CRASH` in `tests/run_all.gd`.
 - Tests: `<godot> --headless --path . --script res://tests/<test>.gd`;
-  a test passes when its output has no `TEST FAIL` and no `SCRIPT ERROR`.
+  a test passes when it exits 0, prints at least one `TEST: ` line, and its output
+  has no `TEST FAIL`, `SCRIPT ERROR` or `Parse Error`.
 - After adding a `class_name`, run `<godot> --headless --path . --import`.
   Only two addon libraries are tracked today; if the import removes them,
   restore them right after:
