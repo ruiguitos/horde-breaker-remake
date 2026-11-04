@@ -3,7 +3,7 @@
 # Runs from the SessionStart hook; locally it does nothing unless FORCE_GODOT_SETUP=1.
 set -euo pipefail
 
-GODOT_VERSION="${GODOT_VERSION:-4.7-stable}"
+GODOT_VERSION="${GODOT_VERSION:-4.7.2-stable}"
 INSTALL_DIR="${HOME}/.local/bin"
 GODOT_BIN="${INSTALL_DIR}/godot"
 
