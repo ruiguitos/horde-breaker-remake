@@ -58,6 +58,9 @@ com data e os handoffs fechados vivem em `docs/history/` (não são listas).
 - [ ] Crawler com o GLB: ritmo do passo em jogo, leitura dos headshots (alvo a
   0,685 m), tombamento e morte. Custo medido: +0,52 ms com 150 crawlers.
 
+- [ ] Ver a jogar a horda depois da correção de 2026-11-10: os inimigos já não devem vir em fila nem
+  sempre do mesmo lado em terreno aberto (`tests/test_horde_spread.gd` mede-o; falta o olho).
+
 ## Animação e arte
 
 - [ ] Braços com a mira: a UAL não tem pega de rifle, e os clipes de pistola
@@ -87,6 +90,9 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
 
 ## Modelos (Codex)
 
+- [ ] Ronda de modelos pedida em 2026-11-10: quatro armas realistas e seis inimigos.
+  Pedidos e contratos em `docs/tech/MODELS_ROUND_BRIEF.md`; à espera das entregas do Codex.
+
 - [ ] `crawler.glb`: reconfirmar os testes e ver no editor. Todos os crawlers
   partilham cabeça e corpo; 4 814 triângulos cada (walker 708).
 - [ ] Empunhaduras de primeira pessoa: ver no editor as mangas, a mão direita
@@ -97,6 +103,14 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
   molde; a malha não entra. Guardar para quando houver base mesh.
 
 ## Conteúdo e apresentação
+
+- [ ] Objetivos variados nas ilhas feitas à mão: bolsas de marcadores candidatos por missão,
+  com a seed a escolher (começar pelos geradores da `beach_01`); Exfil com vários pontos de
+  extração, um sorteado e revelado aos 10:00; boss a nascer num `Arena_`. Proposto em 2026-11-10,
+  por aprovar.
+- [ ] HUD e menus: proposta de 2026-11-10 (placas escuras por trás do texto do HUD, minimapa sem
+  legenda fixa, habilidades compactas, XP numa linha fina; cartas e debrief com menos vazio).
+  Por aprovar antes de mexer em `game/ui/hud.gd`.
 
 - [ ] Ver no editor a árvore de perks a 1600 × 900 (ícones de 18 px, pips em linha)
   e o painel LOADOUT com os renders (`docs/tech/WEAPON_MODELS.md`).

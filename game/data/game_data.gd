@@ -393,6 +393,14 @@ const HORDE_CAP: int = 300
 const EXFIL_OPEN_SECONDS: float = 600.0
 const SPAWN_MIN_DIST: float = 28.0
 const SPAWN_MAX_DIST: float = 45.0
+## A spawn draws up to this many free spots and keeps the one on the side (sector) used least
+## lately, so the horde does not keep coming from one side of the free ground.
+const SPAWN_CANDIDATES: int = 3
+## Each spawn multiplies every sector's recent count by this (the memory fades in about ten spawns).
+const SPAWN_SECTOR_DECAY: float = 0.9
+## Half-width (metres) of the lanes enemies keep beside a path's cell centres, each its own, so
+## they do not walk a corridor in single file. A lane that would touch a wall is not used.
+const HORDE_LANE_WIDTH: float = 0.3
 const ATTACK_REACH: float = 1.1
 
 ## Mission

@@ -201,6 +201,26 @@ func direction_at(p: Vector3) -> Vector2:
 	return result
 
 
+## True when every neighbour of (cx, cz) on the target's side (sx and sz are -1, 0 or 1: the signs of
+## the way to the target cell) is free and nearer the target. Then walking straight at the target
+## only enters cells that are nearer it, so an agent may leave the grid's directions there. The
+## distances count 4-neighbour steps, and their directions alone send every agent along a diagonal
+## and then down the target's row or column, in a line.
+func open_towards(cx: int, cz: int, sx: int, sz: int) -> bool:
+	if cx < 1 or cz < 1 or cx >= width - 1 or cz >= height - 1:
+		return false
+	var d: int = dist[cz * width + cx]
+	if d >= UNREACHABLE:
+		return false
+	if sx != 0 and (blocked[cz * width + cx + sx] != 0 or dist[cz * width + cx + sx] >= d):
+		return false
+	if sz != 0 and (blocked[(cz + sz) * width + cx] != 0 or dist[(cz + sz) * width + cx] >= d):
+		return false
+	if sx != 0 and sz != 0 and (blocked[(cz + sz) * width + cx + sx] != 0 or dist[(cz + sz) * width + cx + sx] >= d):
+		return false
+	return sx != 0 or sz != 0
+
+
 func _compute_direction(cx: int, cz: int) -> Vector2:
 	var d: int = dist[cz * width + cx]
 	if d == 0 or d >= UNREACHABLE:

@@ -228,6 +228,8 @@ Cada ilha é gerada a partir de uma *seed*, sem cenas feitas à mão.
 | `ui/minimap.gd` | Minimapa |
 | `data/biomes/*.tres` | Cores, nevoeiro e palmeiras de cada bioma (YARD) |
 
+**De onde vem a horda (2026-11-10).** As distâncias da grelha contam passos em quatro direções. Seguidas à letra, punham todos os inimigos na diagonal e depois em fila sobre a linha ou a coluna do jogador: medido, 68 % dos que se aproximavam (ao acaso seriam cerca de 11 %). Agora, em terreno aberto, cada inimigo anda a direito para o jogador (`FlowField.open_towards`); junto a paredes segue a grelha, numa faixa lateral só sua (`GameData.HORDE_LANE_WIDTH`). O spawn sorteia até três sítios livres e fica com o do lado menos usado ultimamente (`SPAWN_CANDIDATES`), para um anel aberto não despejar tudo do mesmo lado. Junto à costa só há terra de um lado, e aí os inimigos continuam a vir desse lado. Teste: `tests/test_horde_spread.gd`.
+
 **Tamanho:** as ilhas têm 256 × 256 m (uma região do Terrain3D). Nas ilhas
 geradas o tamanho é `const SIZE` em `world/island_map.gd`.
 - Crescem com o tamanho: a costa, a posição do cais e dos geradores, e o

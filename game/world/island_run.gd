@@ -17,6 +17,8 @@ var _element_rng := RandomNumberGenerator.new()
 ## Spawn positions have their own RNG (derived from the run seed), so the
 ## same seed gives the same spawn spots whatever else used `rng`.
 var _spawn_rng := RandomNumberGenerator.new()
+## Recent spawns per sector around the player (see _note_spawn_sector).
+var _sector_load: PackedFloat32Array = PackedFloat32Array([0, 0, 0, 0, 0, 0, 0, 0])
 ## Leg loss rolls after grenade blasts (seeded from the run seed; tests seed it).
 var limb_rng := RandomNumberGenerator.new()
 ## 0-based island being played (from the RunContext); Crawlers start on the next one.
@@ -3989,13 +3991,27 @@ func _spawn_enemy() -> void:
 	# Uniform over the free ground of the ring (rejection sampling): no side
 	# is favoured beyond how much free ground it has (measured: see
 	# test_island_run's spawn histogram).
+	# Of the first free spots drawn, the one on the side used least lately: free ground on one side
+	# only (a coast, a wall) still gets every spawn, but an open ring does not pile them on one side.
+	var best: Vector3 = Vector3.INF
+	var best_load: float = INF
+	var found: int = 0
 	for attempt in 12:
 		var ang: float = _spawn_rng.randf() * TAU
 		var dist: float = _spawn_rng.randf_range(GameData.SPAWN_MIN_DIST, GameData.SPAWN_MAX_DIST)
 		var p: Vector3 = player_pos + Vector3(cos(ang), 0, sin(ang)) * dist
 		if can_spawn_at(p):
-			horde.add(p, director.pick_kind(), rng)
-			return
+			var load: float = _sector_load[spawn_sector(player_pos, p)]
+			if load < best_load:
+				best = p
+				best_load = load
+			found += 1
+			if found >= GameData.SPAWN_CANDIDATES:
+				break
+	if found > 0:
+		_note_spawn_sector(best)
+		horde.add(best, director.pick_kind(), rng)
+		return
 	# Near the edge of a play area, on a narrow path or a pier most of the
 	# ring is blocked and 12 random tries can all miss: scan rings (out to
 	# 60 m) so the pressure keeps up there too.
@@ -4005,7 +4021,15 @@ func _spawn_enemy() -> void:
 	if spot == Vector3.INF:
 		spawn_failures += 1
 		return
+	_note_spawn_sector(spot)
 	horde.add(spot, director.pick_kind(), rng)
+
+
+## Records a spawn at `p` in its sector's recent count; the older ones fade.
+func _note_spawn_sector(p: Vector3) -> void:
+	for s in SPAWN_SECTORS:
+		_sector_load[s] *= GameData.SPAWN_SECTOR_DECAY
+	_sector_load[spawn_sector(player_pos, p)] += 1.0
 
 
 ## "m:ss" for a number of seconds (rounded up: 0:01 until it is over).

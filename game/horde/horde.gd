@@ -43,6 +43,8 @@ var crawl_delay: PackedFloat32Array = PackedFloat32Array()
 ## Metres walked along the ground since the enemy spawned, from the real moves
 ## (walls included). A Crawler's hands follow it, so they stay planted.
 var travel: PackedFloat32Array = PackedFloat32Array()
+## This enemy's lane: metres to the side of a path's cell centres (GameData.HORDE_LANE_WIDTH at most).
+var lane: PackedFloat32Array = PackedFloat32Array()
 var count: int = 0
 var target: Vector3 = Vector3.ZERO
 
@@ -64,6 +66,7 @@ var _hashed: PackedInt32Array = PackedInt32Array()  ## cells written by the last
 var _hash_dirty: bool = true
 var _stamp: PackedInt32Array = PackedInt32Array()
 var _query_id: int = 0
+var _added: int = 0  ## enemies added so far: the lanes come from it
 
 
 func _init(flow_field: FlowField) -> void:
@@ -90,6 +93,9 @@ func add(pos: Vector3, kind: int, rng: RandomNumberGenerator) -> int:
 	freeze_time.append(0.0)
 	crawl_delay.append(0.0)
 	travel.append(0.0)
+	# The golden ratio spreads the lanes evenly without drawing from the run's random numbers.
+	_added += 1
+	lane.append((fposmod(_added * 0.6180339887, 1.0) * 2.0 - 1.0) * GameData.HORDE_LANE_WIDTH)
 	_next.append(-1)
 	_stamp.append(0)
 	count += 1
@@ -132,6 +138,7 @@ func remove(i: int) -> void:
 	freeze_time[i] = freeze_time[last]
 	crawl_delay[i] = crawl_delay[last]
 	travel[i] = travel[last]
+	lane[i] = lane[last]
 	positions.resize(last)
 	velocities.resize(last)
 	speeds.resize(last)
@@ -148,6 +155,7 @@ func remove(i: int) -> void:
 	freeze_time.resize(last)
 	crawl_delay.resize(last)
 	travel.resize(last)
+	lane.resize(last)
 	_next.resize(last)
 	_stamp.resize(last)
 	count = last
@@ -249,10 +257,21 @@ func tick(dt: float) -> void:
 				if Vector2i(cx, cz) == target_cell:
 					dir = Vector2(tx, tz).normalized()
 				else:
-					# Steer at the centre of the next cell: keeps enemies off wall corners.
 					var step: Vector2 = field.direction_at(p)
 					if step != Vector2.ZERO:
-						dir = Vector2((cx + step.x + 0.5) * cs - p.x, (cz + step.y + 0.5) * cs - p.z).normalized()
+						if field.open_towards(cx, cz, signi(target_cell.x - cx), signi(target_cell.y - cz)):
+							# Open ground on the target's side: straight at it, from wherever this enemy is.
+							dir = Vector2(tx, tz).normalized()
+						else:
+							# Steer at the centre of the next cell (keeps enemies off wall corners),
+							# moved to this enemy's lane where the lane is clear of walls.
+							var ax: float = (cx + step.x + 0.5) * cs
+							var az: float = (cz + step.y + 0.5) * cs
+							var side: Vector2 = Vector2(-step.y, step.x).normalized() * lane[i]
+							if not overlaps_wall(field, ax + side.x, az + side.y, RADIUS):
+								ax += side.x
+								az += side.y
+							dir = Vector2(ax - p.x, az - p.z).normalized()
 				desired = Vector3(dir.x, 0.0, dir.y) * speeds[i]
 				# Ranged specials back off instead of closing in.
 				if t.keep_away > 0.0 and to_target2 < t.keep_away * t.keep_away:
