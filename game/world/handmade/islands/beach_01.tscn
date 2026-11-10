@@ -857,6 +857,18 @@ gizmo_extents = 3.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 132, 7, 46)
 gizmo_extents = 3.0
 
+[node name="Generator4" type="Marker3D" parent="Markers" unique_id=740120011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 165, 0.8, 125)
+gizmo_extents = 3.0
+
+[node name="Generator5" type="Marker3D" parent="Markers" unique_id=740120012]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, 0.71, 180)
+gizmo_extents = 3.0
+
+[node name="Generator6" type="Marker3D" parent="Markers" unique_id=740120013]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170, 0.96, 60)
+gizmo_extents = 3.0
+
 [node name="Cache1" type="Marker3D" parent="Markers" unique_id=956320395]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 92, 0.85850036, 62)
 gizmo_extents = 3.0

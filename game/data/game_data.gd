@@ -405,6 +405,9 @@ const ATTACK_REACH: float = 1.1
 
 ## Mission
 const GENERATOR_COUNT: int = 3
+## A map with more Generator markers than GENERATOR_COUNT is a pool: each run draws its generators
+## from it by seed, at least this far apart (metres) when the pool allows it.
+const GENERATOR_MIN_SPACING: float = 50.0
 const GENERATOR_HOLD_SECONDS: float = 8.0
 const GENERATOR_RADIUS: float = 3.5
 const BOAT_RADIUS: float = 4.0

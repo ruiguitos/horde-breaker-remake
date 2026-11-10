@@ -101,7 +101,9 @@ Breaker UI Proposals", as 7 propostas abaixo. A decisão foi registada em
      Reroll dá +1 no ecrã seguinte (decidido pelo utilizador em 2026-10-14).
    - O baralho tem de crescer muito ("mais e mais cartas"). Fica para uma
      proposta de design própria.
-5. **HUD sem fundos escuros:**
+5. **HUD sem fundos escuros** (**substituído em 2026-11-10**: o utilizador aprovou placas
+   escuras por trás dos blocos do HUD, porque o texto solto se lia mal em cenário claro;
+   o minimapa continua sem fundo, só a legenda tem placa; `Hud._plate`)**:**
    - texto com sombra diretamente sobre o jogo;
    - o marcador do gerador e os outros marcadores do mundo mantêm a sua
      pastilha;

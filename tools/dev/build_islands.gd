@@ -151,6 +151,7 @@ func _reset(b: StringName) -> void:
 func _design_beach() -> void:
 	markers = {
 		"Generator1": Vector2(55, 117), "Generator2": Vector2(206, 88), "Generator3": Vector2(132, 46),
+		"Generator4": Vector2(165, 125), "Generator5": Vector2(90, 180), "Generator6": Vector2(170, 60),  # a pool: each run draws 3
 		"Cache1": Vector2(92, 62), "Cache2": Vector2(184, 176), "Cache3": Vector2(60, 186), "Cache4": Vector2(186, 60),
 		"Choke_Bridge": Vector2(128, 149), "Choke_DuneGap": Vector2(197, 95), "Choke_BluffRamp": Vector2(128, 80),
 		"Arena_Crossroads": Vector2(128, 113), "Arena_Village": Vector2(55, 117),

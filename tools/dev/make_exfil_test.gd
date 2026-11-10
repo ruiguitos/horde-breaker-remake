@@ -114,7 +114,8 @@ func _build() -> void:
 		_piece(item)
 		placed += 1
 	# Markers.
-	var marks: Dictionary = {"Boat": Vector3(128, 0, 4), "PlayerStart": Vector3(128, 0, 16), "ExfilPoint": Vector3(128, 0, 246)}
+	var marks: Dictionary = {"Boat": Vector3(128, 0, 4), "PlayerStart": Vector3(128, 0, 16), "ExfilPoint": Vector3(128, 0, 246),
+		"ExfilPoint2": Vector3(12, 0, 128), "ExfilPoint3": Vector3(244, 0, 128)}  # the run draws one of the three
 	for key: String in marks:
 		var m := Marker3D.new()
 		m.name = key

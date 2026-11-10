@@ -104,17 +104,16 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
 
 ## Conteúdo e apresentação
 
-- [ ] Objetivos variados nas ilhas feitas à mão: bolsas de marcadores candidatos por missão,
-  com a seed a escolher (começar pelos geradores da `beach_01`); Exfil com vários pontos de
-  extração, um sorteado e revelado aos 10:00; boss a nascer num `Arena_`. Proposto em 2026-11-10,
-  por aprovar.
-- [ ] HUD e menus: proposta de 2026-11-10 (placas escuras por trás do texto do HUD, minimapa sem
-  legenda fixa, habilidades compactas, XP numa linha fina; cartas e debrief com menos vazio).
-  Por aprovar antes de mexer em `game/ui/hud.gd`.
-
+- [ ] Objetivos variados: feito em 2026-11-10 na `beach_01` (seis geradores, cada run usa três,
+  `IslandRun.pick_generators`) e no Exfil (três pontos de extração, um por seed, revelado aos
+  10:00); teste em `tests/test_objective_pools.gd`. Por fazer: ver os três sítios novos da
+  `beach_01` no editor (165,125; 90,180; 170,60), as outras quatro ilhas, bolsas para as outras
+  missões e o boss a nascer num `Arena_`.
+- [ ] HUD: placas escuras por trás dos blocos, feito em 2026-11-10 (`Hud._plate`); ver a jogar.
+  Por fazer, da mesma proposta: minimapa sem legenda fixa, habilidades compactas, XP numa linha
+  fina, abates só na pausa; cartas de level-up e debrief com menos vazio.
 - [ ] Ver no editor a árvore de perks a 1600 × 900 (ícones de 18 px, pips em linha)
   e o painel LOADOUT com os renders (`docs/tech/WEAPON_MODELS.md`).
-
 - [ ] Props realistas restantes (`docs/tech/REALISTIC_PROPS.md`): rever a
   utilidade antes de integrar; já há alternativas procedurais.
 - [ ] Equilibrar classes a jogar (as seis cartas com preço já estão no Intel;

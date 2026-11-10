@@ -2843,3 +2843,11 @@ gizmo_extents = 3.0
 [node name="ExfilPoint" type="Marker3D" parent="Markers" unique_id=119853332]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 0, 246)
 gizmo_extents = 3.0
+
+[node name="ExfilPoint2" type="Marker3D" parent="Markers" unique_id=740120021]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 128)
+gizmo_extents = 3.0
+
+[node name="ExfilPoint3" type="Marker3D" parent="Markers" unique_id=740120022]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 244, 0, 128)
+gizmo_extents = 3.0

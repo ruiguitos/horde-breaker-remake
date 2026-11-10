@@ -191,7 +191,9 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	var route: Array = []  # same, for the EscortRoute_* markers
 	var stops: Array = []  # same, for the EscortStop_* markers
 	for node in _children_of("Markers"):
-		if node.name.begins_with("Generator"):
+		if node.name.begins_with("ExfilPoint"):
+			map.exfil_points.append(_flat(_local(node).origin))  # the EXFIL mode draws one of them
+		elif node.name.begins_with("Generator"):
 			map.generators.append(_flat(_local(node).origin))
 		elif node.name.begins_with("Cache"):
 			map.caches.append(_flat(_local(node).origin))
@@ -256,8 +258,9 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 		var node: Node3D = get_node_or_null("Markers/" + spot[0])
 		if node != null:
 			map.set(spot[1], _flat(_local(node).origin))
-	if mission in [&"", &"activate"] and map.generators.size() != GameData.GENERATOR_COUNT:
-		problems.append("Markers: %d generators found, the Activate mission needs %d." % [map.generators.size(), GameData.GENERATOR_COUNT])
+	# More Generator markers than the mission needs are a pool: the run draws from them by seed.
+	if mission in [&"", &"activate"] and map.generators.size() < GameData.GENERATOR_COUNT:
+		problems.append("Markers: %d generators found, the Activate mission needs at least %d." % [map.generators.size(), GameData.GENERATOR_COUNT])
 	# Reachability from the player start (the horde and the player walk the grid).
 	var start_cell: Vector2i = f.world_to_cell(map.player_start)
 	if f.is_blocked(start_cell.x, start_cell.y):

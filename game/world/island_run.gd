@@ -388,6 +388,7 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMa
 	_spawn_rng.seed = rng_seed ^ 0x5350574e
 	limb_rng.seed = rng_seed ^ 0x4c494d42
 	map = custom_map if custom_map != null else IslandMap.build(rng_seed, biome)
+	map.generators = pick_generators(map.generators, rng_seed)
 	field = map.field
 	horde = Horde.new(field)
 	if field.max_distance > 0:
@@ -790,6 +791,43 @@ func _crawler_share() -> float:
 	return GameData.CRAWLER_SPAWN_SHARE
 
 
+## This run's generators out of a map's pool: GameData.GENERATOR_COUNT of them, drawn by seed and at
+## least GameData.GENERATOR_MIN_SPACING apart when the pool allows it (the best-spread draw otherwise),
+## in the pool's order. A map with no more than the count keeps them all, as before.
+static func pick_generators(pool: Array[Vector3], seed_value: int) -> Array[Vector3]:
+	var want: int = GameData.GENERATOR_COUNT
+	if pool.size() <= want:
+		return pool
+	var draw := RandomNumberGenerator.new()
+	draw.seed = seed_value ^ 0x47454e53
+	var best: Array[int] = []
+	var best_gap: float = -1.0
+	for attempt in 24:
+		var order: Array[int] = []
+		for i in pool.size():
+			order.append(i)
+		for i in range(order.size() - 1, 0, -1):  # Fisher-Yates with the draw's own numbers
+			var j: int = draw.randi_range(0, i)
+			var swap: int = order[i]
+			order[i] = order[j]
+			order[j] = swap
+		var picks: Array[int] = order.slice(0, want)
+		var gap: float = INF
+		for a in want:
+			for b in range(a + 1, want):
+				gap = minf(gap, pool[picks[a]].distance_to(pool[picks[b]]))
+		if gap > best_gap:
+			best_gap = gap
+			best = picks
+		if gap >= GameData.GENERATOR_MIN_SPACING:
+			break
+	best.sort()
+	var out: Array[Vector3] = []
+	for i in best:
+		out.append(pool[i])
+	return out
+
+
 func set_mission(id: StringName) -> void:
 	mission = id
 	var marker: Vector3 = map.rescue_target if mission == &"rescue" else map.defend_zone
@@ -939,6 +977,12 @@ func set_mission(id: StringName) -> void:
 		site = sabotage_goal()
 	if mission == &"exfil":
 		exfil_pos = map.exfil  # the beacon's point; the boat if the map has none
+		if map.exfil_points.size() > 1:
+			# Several ExfilPoint markers: this run's one, by seed. It shows only when the extraction opens,
+			# so the point cannot be camped from the start.
+			var draw := RandomNumberGenerator.new()
+			draw.seed = run_seed ^ 0x4558464c
+			exfil_pos = map.exfil_points[draw.randi_range(0, map.exfil_points.size() - 1)]
 	_reset_escort()
 
 

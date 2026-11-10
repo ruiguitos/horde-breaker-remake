@@ -163,6 +163,7 @@ var _pause_hints: Label
 var _resume_button: Button
 var _abandon_button: Button
 var _gamepad: bool = false
+var _plates: Array[Control] = []  ## blocks with a plate behind them (see _plate)
 
 
 ## Small vector glyphs keep the HUD sharp without downloaded assets. Each is
@@ -584,6 +585,37 @@ func _keycap(text: String) -> Label:
 	return label
 
 
+## Padding (px) of a plate around its block, and its colours: the menus' panel, see-through.
+const PLATE_PAD: float = 10.0
+const PLATE_BG := Color(UiTheme.PANEL, 0.66)
+const PLATE_LINE := Color(UiTheme.LINE, 0.8)
+
+
+## A dark plate behind a HUD block, as the menus' panels: the text was loose over the world and
+## hard to read on bright ground. It is drawn by `box` itself, behind its children, so the tree and
+## the layout do not change. `content`: the controls it wraps (their visible ones); `box` if empty.
+func _plate(box: Control, content: Array[Control] = []) -> void:
+	var style := StyleBoxFlat.new()
+	style.bg_color = PLATE_BG
+	style.border_color = PLATE_LINE
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(4)
+	_plates.append(box)
+	box.draw.connect(func() -> void:
+		var rect := Rect2()
+		var any: bool = false
+		var inverse: Transform2D = box.get_global_transform().affine_inverse()
+		var wrapped: Array[Control] = content if not content.is_empty() else ([box] as Array[Control])
+		for c: Control in wrapped:
+			if not c.is_visible_in_tree() or c.size.x <= 0.0 or c.size.y <= 0.0:
+				continue
+			var r: Rect2 = inverse * c.get_global_rect()
+			rect = r if not any else rect.merge(r)
+			any = true
+		if any:
+			box.draw_style_box(style, rect.grow(PLATE_PAD)))
+
+
 ## Thin bar with a see-through dark track: a gauge, not a panel.
 func _meter(parent: Control, color: Color, height: float) -> ProgressBar:
 	var bar := ProgressBar.new()
@@ -757,6 +789,12 @@ func _build_field_hud(field: Control) -> void:
 	_alerts.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_alerts.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_place(field, _alerts, Control.PRESET_CENTER_BOTTOM, Vector2(-170, -200), Vector2(340, 80))
+	_plate(_objective_box, [words, _objective_pips, _survivor_row, _boss_row])
+	_plate(_map_box, [_legend])  # the key only: the map's dark island would vanish on a plate
+	_plate(_status_panel)
+	_plate(_radio_panel)
+	_plate(_abilities_panel, [tiles, _sprint_row])
+	_plate(_weapon_panel)
 	_apply_weights()
 
 
@@ -1679,6 +1717,8 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_update_objective(run, island_text)
 
 	_update_radio(run)
+	for box: Control in _plates:
+		box.queue_redraw()  # the blocks' content changes size (objective text, sprint row)
 	if _minimap.run != run:
 		_minimap.set_run(run)
 		_legend.run = run
@@ -1983,7 +2023,7 @@ func _update_radio(run: IslandRun) -> void:
 	# Longer lines grow upwards, keeping a clear gap above the status block.
 	var radio_h: float = _radio_panel.get_combined_minimum_size().y
 	_radio_panel.size.y = radio_h
-	_radio_panel.position.y = _status_panel.position.y - 12.0 - radio_h
+	_radio_panel.position.y = _status_panel.position.y - 12.0 - PLATE_PAD * 2.0 - radio_h  # the two plates do not touch
 
 
 ## Is a marker for `goal` (simulation point) wanted now? Near goals always;
