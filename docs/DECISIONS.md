@@ -47,6 +47,8 @@ registadas as decisões dessa data.
 | 2026-10-18 | **Sem escolha de plataforma para os ícones de comando** em Definições > Controlos: os ícones seguem sempre o comando ligado (Auto). | Pedido do utilizador. Remove a preferência `controller_icons` do perfil; perfis antigos ignoram-na. Mantém a identificação automática e a regra «sem comando, Xbox». Ver [SETTINGS_INPUT.md](tech/SETTINGS_INPUT.md). |
 | 2026-11-04 | **Claude Code Game Studios 1.2.0 instalado** em `.claude/` (MIT), com as adaptações de [AGENT_FRAMEWORK.md](tech/AGENT_FRAMEWORK.md). | Pedido do utilizador («podemos implementar»), apesar da recomendação de não integrar um framework desta dimensão num projeto a solo. Lacunas conhecidas no mesmo documento. |
 | 2026-11-04 | **godot-mcp testado localmente, sem adoção decidida.** Registo só para este projeto (escopo local), fora do repositório. | Pedido do utilizador («podemos testar agora»). Critério de decisão em [spikes/godot_mcp/README.md](../spikes/godot_mcp/README.md). |
+| 2026-11-10 | **Modo Exfil fica no jogo**: hordas sem fim, extração aos 10 minutos, num mapa próprio (`game/world/handmade/test/exfil_test.tscn`). | Pedido do utilizador («quero o modo exfil»). Hoje entra pelo sandbox DEV; os valores do diretor são hipóteses de playtest. Ver [DEV_MENU.md](design/DEV_MENU.md) e `TODO.md`. |
+| 2026-11-10 | **Co-op: fica pendente, para implementar mais tarde.** Deixa de estar excluído; não se começa agora. | Pedido do utilizador. Atualiza a exclusão do `GDD.md` §5. Proposta técnica em [COOP_PROPOSAL.md](design/COOP_PROPOSAL.md); a forma (local, LAN, online) está por decidir. |
 
 ## Em aberto
 

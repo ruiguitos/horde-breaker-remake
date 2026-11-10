@@ -20,6 +20,14 @@ var specials_mult: float = 1.0
 ## island and on boss islands).
 var crawler_share: float = 0.0
 
+## EXFIL (see IslandRun): no build-ups, peaks or relief. The spawn target climbs in steps of
+## EXFIL_STEP_ALIVE every EXFIL_STEP_SECONDS, up to EXFIL_STEPS steps; specials rise at the same pace.
+var exfil: bool = false
+const EXFIL_STEP_SECONDS: float = 90.0
+const EXFIL_STEP_ALIVE: int = 25
+const EXFIL_STEPS: int = 4
+const EXFIL_RATE: float = 4.5  ## spawns per second, the peak's rate
+
 var _spawn_accum: float = 0.0
 var _peak_length: float = 15.0
 var _rng := RandomNumberGenerator.new()
@@ -40,12 +48,19 @@ func trigger_peak(length: float = 18.0) -> void:
 	_peak_length = length
 
 
+## The EXFIL step reached: 0 for the first 90 s, then 1 to EXFIL_STEPS.
+func exfil_step() -> int:
+	return mini(int(elapsed / EXFIL_STEP_SECONDS), EXFIL_STEPS)
+
+
 ## Returns how many enemies to spawn this frame.
 func update(dt: float, alive: int, damage_taken: float, enemies_near: int) -> int:
 	elapsed += dt
 	intensity += damage_taken * 1.5 + enemies_near * 0.4 * dt
 	intensity = maxf(0.0, intensity - 6.0 * dt)
 	intensity = minf(intensity, 100.0)
+	if exfil:
+		return _exfil_spawns(dt, alive)
 	match phase:
 		Phase.RELAX:
 			phase_time -= dt
@@ -78,6 +93,28 @@ func update(dt: float, alive: int, damage_taken: float, enemies_near: int) -> in
 	return clampi(n, 0, maxi(0, cap - alive))
 
 
+## How far the specials have risen, 0 to 1: over the first 300 s; in EXFIL, over the same steps as the target.
+func specials_share() -> float:
+	if exfil:
+		return float(exfil_step()) / EXFIL_STEPS
+	return clampf(elapsed / 300.0, 0.0, 1.0)
+
+
+## The EXFIL target alive now: 150 for the first step, +25 each step, 250 at most (under HORDE_CAP).
+## IslandRun also reads it as max_alive, the limit its own spawns check.
+func exfil_target() -> int:
+	return mini(GameData.MAX_ALIVE + EXFIL_STEP_ALIVE * exfil_step(), GameData.HORDE_CAP)
+
+
+## EXFIL spawns: one steady rate, filling the target of the current step (never more than HORDE_CAP).
+func _exfil_spawns(dt: float, alive: int) -> int:
+	var target: int = exfil_target()
+	_spawn_accum += EXFIL_RATE * dt
+	var n: int = int(_spawn_accum)
+	_spawn_accum -= n
+	return clampi(n, 0, maxi(0, target - alive))
+
+
 func _set_phase(p: Phase) -> void:
 	phase = p
 	phase_time = _rng.randf_range(10.0, 15.0) if p == Phase.RELAX else 0.0
@@ -85,7 +122,7 @@ func _set_phase(p: Phase) -> void:
 
 ## `crawlers` = false keeps Crawlers out of this pick (nests do that for now).
 func pick_kind(crawlers: bool = true) -> int:
-	var specials: float = clampf(elapsed / 300.0, 0.0, 1.0)
+	var specials: float = specials_share()
 	var roll: float = _rng.randf() * 100.0
 	var share: float = crawler_share if crawlers else 0.0
 	if roll < share:

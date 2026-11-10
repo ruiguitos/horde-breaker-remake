@@ -389,6 +389,8 @@ const MAX_ALIVE: int = 150  ## base enemies alive; Threat, Swarm and Hazard Pay 
 ## The one exception is the island's boss, which spawns once and is never
 ## replaced: it can take a slot one past the limit (IslandRun._spawn_boss).
 const HORDE_CAP: int = 300
+## EXFIL mode (DEV sandbox only): the extraction opens this many seconds into the island.
+const EXFIL_OPEN_SECONDS: float = 600.0
 const SPAWN_MIN_DIST: float = 28.0
 const SPAWN_MAX_DIST: float = 45.0
 const ATTACK_REACH: float = 1.1

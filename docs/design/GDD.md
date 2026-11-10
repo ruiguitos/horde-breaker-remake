@@ -83,7 +83,7 @@ de só escalar com o tempo, para que o loop de 5 min tenha respiração.
 | Skill tree grande, mastery, variantes, várias moedas | Camadas de "+X %" difíceis de equilibrar; perks em slots + Intel chegam. |
 | Scrap (no slice) | O "1 de 3" no barco dá a decisão sem uma moeda a explicar. Reavaliar só se o playtest pedir gastos na run. |
 | Salto, agachar | O breaker é o verbo de movimento especial; menos inputs, mais legível. (O sprint saiu desta lista a 2026-10-05 e dispara desde 2026-10-14.) |
-| Co-op / online | Rede é cara e o autor não tem experiência; single-player primeiro. |
+| Co-op / online | Rede é cara e o autor não tem experiência; single-player primeiro. **Substituído em 2026-11-10**: o co-op fica pendente, para mais tarde (`DECISIONS.md`, `COOP_PROPOSAL.md`). |
 | Assets externos, animação complexa, arte final | Primitivas e desmembramento por partes da cápsula; arte só após o jogo ser divertido. |
 | Barco controlável / física naval | A viagem é um ecrã; não serve nenhum pilar. |
 | Mais classes antes do slice | Cada classe nova multiplica armas, perks e equilíbrio. |

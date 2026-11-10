@@ -21,6 +21,19 @@ com data e os handoffs fechados vivem em `docs/history/` (não são listas).
   (156 MB). Apagar ou manter como arquivo.
 - [ ] **Volcano**: aprovar o desenho da cena feita à mão (`volcano_01.tscn`),
   o acabamento e os landmarks.
+- [ ] **Modo Exfil**: os degraus do diretor (90 s, +25 vivos, teto 250) e o
+  ritmo de especiais são propostas de playtest. A telemetria fica no `island_log`
+  da run; o ficheiro de telemetria não é escrito nas corridas do sandbox (regra
+  existente). Decidir se o modo deve gravar.
+- [ ] **Mapa do Exfil**: a arena (`assets/models/environment/extraction_test_arena/`,
+  `layout.json`) está em caixas de placeholder com as pegadas do `build_layout.py`;
+  as alturas são suposições (paredes 3 m, cobertura baixa 1,2 m, contentores 2,6 m,
+  pilares 6 m, beacon 3 m). Os 8 módulos GLB ainda não foram entregues: quando
+  chegarem, substituir as caixas em `Buildings/` e `Decor/` sem redesenhar a geometria.
+  Falta verificar no editor a altura do cais, o beacon e as gargantas.
+  Limite conhecido: a grelha não tem altura de passagem, por isso a plataforma
+  bloqueia (é cobertura) e a rampa não leva a ela. O próprio layout diz que
+  isto exige integração no motor.
 
 ## Validação (precisa de jogar ou de hardware)
 
@@ -106,7 +119,9 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
 
 ## Fora do plano (não fazer sem decisão nova)
 
-- Origin jogável, co-op e mapa de rotas em grafo: expansões, fora do ciclo
+- Origin jogável e mapa de rotas em grafo: expansões, fora do ciclo
   single-player aprovado. A rota entre ilhas é sorteada desde 2026-10-14.
+- Co-op: pendente desde 2026-11-10 (decisão do utilizador), para começar mais
+  tarde. Falta decidir a forma (local, LAN, online); `docs/design/COOP_PROPOSAL.md`.
 - VAT para zombies: proposta de `BRAINSTORM.md` §8; o shader anima por pivôs e
   a necessidade não foi demonstrada.

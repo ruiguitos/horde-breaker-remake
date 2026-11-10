@@ -1,0 +1,8 @@
+CC0 1.0 Universal — SPDX-License-Identifier: CC0-1.0
+
+To the extent possible under law, the authors have waived all copyright
+and related or neighboring rights to this original extraction test arena,
+including its geometry, generated textures, scripts, layout and renders.
+This work is provided without warranty.
+
+https://creativecommons.org/publicdomain/zero/1.0/

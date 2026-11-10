@@ -107,7 +107,8 @@ func _test_island(path: String, mission: StringName) -> void:
 ## nothing: DevOptions.dev_run stays on until the title is shown again.
 func _sandbox(config: Dictionary) -> void:
 	context = DevSandbox.apply(config, _fresh_context())
-	_test_path = String(config["path"])
+	# An EXFIL run is a run (debrief, Intel multiplier), not a test: its map comes from _enter_island.
+	_test_path = "" if context.mode == &"exfil" else String(config["path"])
 	_test_scene = null
 	DevOptions.dev_run = true
 	_go(GameFlow.ISLAND)
@@ -200,6 +201,8 @@ func _leave_between_islands(to_title: bool) -> void:
 ## all of it happens synchronously inside this call.
 func _enter_island() -> void:
 	var part_path: String = _test_path if _test_path != "" else context.part_scene()
+	if context.mode == &"exfil":
+		part_path = DevSandbox.EXFIL_PATH  # the EXFIL mode always plays its own map, whatever the seed
 	var paths := PackedStringArray([ISLAND_SCENE])
 	if part_path != "":
 		paths.append(part_path)

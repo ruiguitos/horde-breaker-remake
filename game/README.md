@@ -246,6 +246,12 @@ o noclip, desces suavemente até ao chão.
 
 ## Ilhas feitas à mão
 
+Fora de `islands/` fica `world/handmade/test/exfil_test.tscn`, o mapa do modo Exfil (sandbox DEV):
+256 m, costa suave, e a arena de `assets/models/environment/extraction_test_arena/layout.json`
+(668 peças) em caixas de placeholder com as pegadas do `build_layout.py`. Os GLB dos módulos
+ainda não existem. Gera-se com `tools/dev/make_exfil_test.gd`; `Check map` e
+`tests/test_exfil_map.gd` validam-no.
+
 As quatro ilhas da rota já são feitas à mão, em
 `game/world/handmade/islands/` (256 m cada). Só o vulcão (3.ª ilha, boss)
 continua gerado.

@@ -10,6 +10,9 @@ const CLASSES: Array[StringName] = [&"recruit", &"vanguard"]
 const THREATS: Array[int] = [1, 2, 3, 4, 5]
 ## The island of the HORROR preset (island.gd gives it the horror atmosphere).
 const HORROR_PATH: String = HandmadeIsland.ISLANDS_DIR + "beach_01.tscn"
+## The map of the EXFIL mode: every EXFIL run plays this scene, whatever the seed (test/, never drawn).
+const EXFIL_PATH: String = "res://game/world/handmade/test/exfil_test.tscn"
+const MODES: Array[StringName] = [&"expedition", &"exfil"]
 ## The primary-weapon item for the assault rifle with the realistic model (WeaponModel.VARIANTS).
 const REALISTIC_RIFLE: StringName = &"rifle_realistic"
 
@@ -52,6 +55,11 @@ static func apply(config: Dictionary, base: RunContext) -> RunContext:
 	base.mission = StringName(config["mission"])
 	base.atmosphere = StringName(config.get("atmosphere", &"normal"))
 	base.rifle_model = StringName(config.get("rifle_model", &""))
+	base.mode = StringName(config.get("mode", &"expedition"))
+	if base.mode == &"exfil":
+		# No mission is made or drawn; the map is EXFIL_PATH, a coast, so the biome is beach.
+		base.mission = &"exfil"
+		base.biome = &"beach"
 	return base
 
 
@@ -90,6 +98,8 @@ static func open(parent: Node, on_start: Callable) -> MenuDialog:
 	seed_box.step = 1
 	seed_box.value = start["seed"]
 	row.add_child(seed_box)
+	# The mode sits with the seed, so the two-column grid keeps its height (the form must fit 960 x 540).
+	var mode := _choice(row, "Mode", _mode_items(), &"expedition")
 	# The form's values as a config.
 	var read_config := func() -> Dictionary:
 		var picked: StringName = primary.get_item_metadata(primary.selected)
@@ -102,9 +112,11 @@ static func open(parent: Node, on_start: Callable) -> MenuDialog:
 			"threat": threat.get_item_metadata(threat.selected),
 			"seed": int(seed_box.value),
 		}
-		# Only the realistic rifle adds a key: the START config keeps its usual keys otherwise.
+		# Only the realistic rifle and the EXFIL mode add a key: the START config keeps its usual keys otherwise.
 		if picked == REALISTIC_RIFLE:
 			config["rifle_model"] = &"realistic"
+		if mode.get_item_metadata(mode.selected) == &"exfil":
+			config["mode"] = &"exfil"
 		return config
 	var go := UiTheme.button(row, "START ISLAND", func() -> void:
 		var config: Dictionary = read_config.call()
@@ -162,6 +174,10 @@ static func _weapon_items(primary: bool) -> Array:
 		if w.primary == primary:
 			out.append([w.display_name, w.id])
 	return out
+
+
+static func _mode_items() -> Array:
+	return [["Mode: Expedition", &"expedition"], ["Mode: Exfil (endless, extract at 10:00)", &"exfil"]]
 
 
 static func _threat_items() -> Array:

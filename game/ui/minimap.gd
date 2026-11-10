@@ -204,7 +204,7 @@ func _draw() -> void:
 		_mark(&"survivor" if run.escort_survivor else &"cart", _px(run.escort_pos), Vector2(run.escort_dir.x, run.escort_dir.z))
 	elif run.mission == &"rescue" and not run.survivor_lost:
 		_mark(&"survivor", _px(run.survivor_pos))
-	if run.has_exfil():
+	if run.exfil_beacon_on():
 		_mark(&"exfil", _px(run.exfil_pos))
 	for g in GameData.GENERATOR_COUNT:
 		if run.mission != &"activate":
@@ -406,7 +406,7 @@ static func legend_entries(r: IslandRun) -> Array[Array]:
 		out.append([&"cache", "CACHE"])
 	if r.has_exit():
 		out.append([&"exit", "EXIT"])
-	if r.has_exfil():
+	if r.exfil_beacon_on():
 		out.append([&"exfil", "EXFIL"])
 	if r.power_ups.ground_kind != &"":
 		out.append([&"power_up", "POWER-UP"])

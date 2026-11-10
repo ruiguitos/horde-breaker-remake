@@ -35,6 +35,9 @@ var biome: StringName = &"beach"
 var mission: StringName = &"activate"
 ## DEV preset of this run: &"horror" (beach_01 at dawn, see island.gd), else &"normal".
 var atmosphere: StringName = &"normal"
+## Game mode: &"expedition" (the normal run) or &"exfil" (DEV sandbox only: endless waves, the
+## extraction opens at EXFIL_OPEN_SECONDS). No mission is made for exfil.
+var mode: StringName = &"expedition"
 ## The assault rifle's model in this run: &"realistic" for the DEV visual test, &"" for the current one.
 var rifle_model: StringName = &""
 ## Story pages recovered during this run.
@@ -142,8 +145,9 @@ func island_count() -> int:
 	return expedition_parts.size() if is_expedition() else ISLAND_COUNT
 
 
+## An EXFIL run is one island: its extraction is the run's end (the debrief), not the boat.
 func is_last_island() -> bool:
-	return island_index >= island_count() - 1
+	return mode == &"exfil" or island_index >= island_count() - 1
 
 
 func is_expedition() -> bool:

@@ -195,12 +195,14 @@ static func summary(run: IslandRun, ctx: RunContext) -> Dictionary:
 	var last: bool = ctx != null and ctx.is_last_island()
 	var expedition: bool = ctx != null and ctx.is_expedition()
 	var title_text: String = "ISLAND CLEARED"
-	if run.mission == &"holdout" or last:
+	if run.mission == &"holdout" or last:  # an EXFIL run is its last island (RunContext.is_last_island)
 		title_text = "EXTRACTED"
 	elif expedition or run.has_exit():
 		title_text = "PART CLEARED"
 	var place: String = "FIELD TEST"
-	if expedition:
+	if run.mode == &"exfil":
+		place = "EXFIL · MAP %s" % String(GameData.BIOMES[run.map.biome]["name"]).to_upper()
+	elif expedition:
 		place = "%s · PART %d OF %d" % [ctx.part_name().to_upper(), ctx.island_index + 1, ctx.island_count()]
 	elif ctx != null:
 		place = "ISLAND %d OF %d · %s" % [ctx.island_index + 1, ctx.island_count(), String(GameData.BIOMES[run.map.biome]["name"]).to_upper()]

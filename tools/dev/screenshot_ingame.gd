@@ -16,11 +16,15 @@ func _initialize() -> void:
 	_out = args[1] if args.size() > 1 else "user://ingame.png"
 	_island = (load("res://game/world/island.tscn") as PackedScene).instantiate()
 	_island.set("handmade_scene", load(args[0]))
-	if args.has("horror") or args.has("realistic"):
+	if args.has("horror") or args.has("realistic") or args.has("exfil"):
 		var ctx := RunContext.new(1)
 		ctx.biome = &"beach"
 		ctx.atmosphere = &"horror" if args.has("horror") else &"normal"
 		ctx.rifle_model = &"realistic" if args.has("realistic") else &""
+		if args.has("exfil"):
+			# The EXFIL test map declares mission "exfil", which only the EXFIL mode builds.
+			ctx.mode = &"exfil"
+			ctx.mission = &"exfil"
 		_island.set("context", ctx)
 	root.add_child(_island)
 	if args.size() > 3:

@@ -1751,6 +1751,13 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 	match run.objective:
 		IslandRun.Objective.GENERATORS:
 			match run.mission:
+				&"exfil":
+					# No mission: the run's clock in the objective's place, then the extraction.
+					if run.exfil_open():
+						_objective.text = "EXFIL AVAILABLE"
+						detail += " · GET TO THE EXFIL POINT"
+					else:
+						_objective.text = "SURVIVE · " + IslandRun.clock_text(run.exfil_clock)
 				&"defend":
 					_objective.text = "DEFEND THE UPLINK"
 					detail += " · %d OF %d s" % [int(run.defend_time), int(GameData.DEFEND_TIME)]
@@ -2031,6 +2038,10 @@ func _update_marker(run: IslandRun, camera: Camera3D) -> void:
 	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"rescue":
 		goal = run.survivor_pos
 		goal_name = "Survivor"
+	elif run.objective == IslandRun.Objective.GENERATORS and run.mission == &"exfil":
+		if run.exfil_open():  # EXFIL: the beacon's point is the goal once the extraction has opened
+			goal = run.extraction_point()
+			goal_name = run.extraction_name()
 	elif run.objective == IslandRun.Objective.GENERATORS:
 		var best: float = INF
 		for g in GameData.GENERATOR_COUNT:

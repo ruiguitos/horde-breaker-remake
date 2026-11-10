@@ -58,9 +58,19 @@ Um painel que monta uma corrida à medida, com o mesmo caminho de `_test_island`
 - arma primária e secundária;
 - arma primária, incluindo a assault rifle com o modelo realista («Assault Rifle (realistic test)»),
   para teste visual; o modelo por omissão continua a ser o atual;
-- ameaça (1 a 5) e seed.
+- ameaça (1 a 5) e seed;
+- modo: Expedition (a corrida normal) ou **Exfil** (2026-10-25, ver abaixo).
 
 «Start» arranca a corrida. O atalho «DEV · TEST ISLAND» mantém-se como acesso rápido.
+
+**Modo Exfil** (só este sandbox; a corrida normal não muda). Não há missão nem sorteio: a
+pressão do diretor sobe em degraus de 90 s (alvo de vivos 150, 175, 200, 225, 250; teto 300),
+com os especiais a subir no mesmo ritmo e sem fases de alívio. O HUD mostra «SURVIVE · m:ss» no
+lugar do objetivo. Aos 10:00 (600 s) a extração abre («EXFIL AVAILABLE») e o marcador de saída
+aparece no minimapa; chegar ao ponto termina a run como extração (com o ×1,5 de Intel). Morrer
+termina a run, como sempre. O mapa é sempre `game/world/handmade/test/exfil_test.tscn`, qualquer
+que seja a seed (a cena fica fora de `islands/`, nunca sorteada). A telemetria da ilha regista
+o modo e os segundos sobrevividos (`island_log`: «mode», «survived»).
 
 O botão «HORROR (beach_01)» arranca a mesma configuração na ilha beach_01, com a
 atmosfera do preset HORROR: madrugada parada às 04:24 (céu azul-aço, sem rosa), nevoeiro

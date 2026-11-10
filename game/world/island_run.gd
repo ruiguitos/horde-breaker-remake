@@ -141,6 +141,11 @@ var generator_started: Array[bool] = []
 ## The last island ends with a boss fight before the return to the boat.
 var has_boss: bool = false
 var mission: StringName = &"activate"
+## Game mode of this island: &"expedition" (the normal run) or &"exfil" (DEV sandbox): endless
+## waves, no mission, and the extraction opens at GameData.EXFIL_OPEN_SECONDS.
+var mode: StringName = &"expedition"
+## EXFIL: seconds this island has run (the HUD clock; paused time does not count).
+var exfil_clock: float = 0.0
 ## Defend / rescue / holdout site: the map's RescueTarget / DefendZone
 ## marker when it has one, else the generator spot farthest from the boat.
 var site: Vector3 = Vector3.ZERO
@@ -432,12 +437,14 @@ func sight_is_blocked(x: int, z: int) -> bool:
 func load_context(ctx: RunContext) -> void:
 	perks = ctx.perks.duplicate()
 	perk_ranks = ctx.perk_ranks.duplicate()
+	mode = ctx.mode
+	director.exfil = mode == &"exfil"
 	set_mission(ctx.mission)
 	exit_label = next_part_name(ctx)
 	radio.append(escort_cue(&"land_escort") if mission == &"escort" else StringName("land_" + String(mission)))
 	# The last island has the Behemoth; the expedition's holdout is itself
 	# the finale (hold the fort, then the boat), so it has none.
-	has_boss = ctx.is_last_island() and mission != &"holdout"
+	has_boss = ctx.is_last_island() and mission != &"holdout" and mode != &"exfil"
 	if has_boss:
 		radio.append(&"land_boss")
 	player_class = ctx.player_class
@@ -502,7 +509,7 @@ func load_context(ctx: RunContext) -> void:
 		if weapons[w].max_ammo > 0:
 			ammo[w] = max_ammo(w) if ctx.ammo.size() != ammo.size() else mini(ammo[w], max_ammo(w))
 	# A head start makes the director spawn more specials on later islands.
-	director.elapsed = 120.0 * ctx.island_index
+	director.elapsed = 0.0 if mode == &"exfil" else 120.0 * ctx.island_index  # EXFIL's steps start at 0 s
 	_island_index = ctx.island_index
 	director.crawler_share = _crawler_share()
 
@@ -532,6 +539,7 @@ func save_to_context(ctx: RunContext) -> void:
 		"island": ctx.island_index + 1, "modifier": String(modifier),
 		"result": "cleared" if objective == Objective.WON else "died",
 		"seconds": snappedf(time_alive - ctx.time_alive, 0.1),
+		"mode": String(mode), "survived": snappedf(exfil_clock if mode == &"exfil" else time_alive - ctx.time_alive, 0.1),
 		"kills": kills - _kills_at_start, "headshots": headshots - ctx.headshots,
 		"damage_taken": int(damage_taken), "hp_left": int(hp), "level": level,
 		"intel": intel_earned(), "intel_hazard": intel_hazard_share(), "caches_opened": caches_opened(),
@@ -927,6 +935,8 @@ func set_mission(id: StringName) -> void:
 			charge_planted.append(false)
 		exfil_pos = map.exfil
 		site = sabotage_goal()
+	if mission == &"exfil":
+		exfil_pos = map.exfil  # the beacon's point; the boat if the map has none
 	_reset_escort()
 
 
@@ -1658,7 +1668,7 @@ func holds_done() -> int:
 ## next part), so the extraction is there, on foot, not at the boat. The
 ## holdout (the final) always ends on the rescue boat.
 func has_exit() -> bool:
-	return map.exit.x >= 0.0 and mission != &"holdout"
+	return map.exit.x >= 0.0 and mission != &"holdout" and mode != &"exfil"
 
 
 ## Where the island ends: the Exit on expedition parts, else the boat (the
@@ -1672,7 +1682,17 @@ func extraction_point() -> Vector3:
 ## Sabotage with an ExfilPoint marker: the run ends there, not at the boat
 ## (an expedition's Exit still wins: the way on to the next part).
 func has_exfil() -> bool:
-	return mission == &"sabotage" and exfil_pos.x >= 0.0 and not has_exit()
+	return (mission == &"sabotage" or mission == &"exfil") and exfil_pos.x >= 0.0 and not has_exit()
+
+
+## EXFIL: the extraction has opened (EXFIL_OPEN_SECONDS into the island).
+func exfil_open() -> bool:
+	return mode == &"exfil" and exfil_clock >= GameData.EXFIL_OPEN_SECONDS
+
+
+## The exfil beacon on the minimap: always on a Sabotage's point; on EXFIL only once it has opened.
+func exfil_beacon_on() -> bool:
+	return has_exfil() and (mission != &"exfil" or exfil_open())
 
 
 ## Short name of the extraction point (HUD marker).
@@ -1949,6 +1969,9 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	var near: int = horde.query_radius(player_pos, 6.0).size()
 	director.crawler_share = _crawler_share()
 	var to_spawn: int = director.update(dt, horde.count, horde.damage_to_player, near)
+	if mode == &"exfil":
+		# After the director has moved its clock: the spawn gate below reads this, and it is the step's target.
+		director.max_alive = director.exfil_target()
 	if power_ups.spawn_delay > 0.0:
 		to_spawn = 0
 	for k in to_spawn:
@@ -2187,6 +2210,12 @@ func dev_skip_to_boss() -> bool:
 func dev_skip_to_end() -> bool:
 	if is_over():
 		return false
+	if mode == &"exfil":
+		# The DEV skip opens the extraction now, then stands the player on the point: the run ends there.
+		exfil_clock = maxf(exfil_clock, GameData.EXFIL_OPEN_SECONDS)
+		player_pos = extraction_point()
+		_update_exfil(0.0)
+		return true
 	if objective == Objective.GENERATORS:
 		dev_complete_main_task()
 		_update_mission(0.0)
@@ -2281,7 +2310,8 @@ func _regenerate(dt: float) -> void:
 ## Every heal in the island goes through here (Thick Skin's trade-off).
 func _heal_player(amount: float) -> void:
 	amount *= 1.0 - perk_cost(&"thick_skin") / 100.0
-	if amount > 0.0 and hp < max_hp:
+	# Never from 0 or below: a hit that has just killed stays a death, whatever heals in the same step.
+	if amount > 0.0 and hp > 0.0 and hp < max_hp:
 		hp = minf(max_hp, hp + amount)
 
 
@@ -3206,6 +3236,9 @@ func _draw_cards(avoid: Array[GameData.Card]) -> bool:
 
 
 func _update_mission(dt: float) -> void:
+	if mode == &"exfil":
+		_update_exfil(dt)  # no mission: the clock and the extraction only
+		return
 	if mission == &"sabotage" and sabotage_phase == SAB_FUSE:
 		_update_fuse(dt)  # burns on through the boss fight and the way out
 	match objective:
@@ -3285,6 +3318,18 @@ func _update_mission(dt: float) -> void:
 				objective = Objective.WON
 				if mission == &"sabotage" and sabotage_phase == SAB_FUSE:
 					_detonate(false)  # out before the blast: it goes off behind you
+
+
+## EXFIL: the clock runs. At EXFIL_OPEN_SECONDS the extraction opens, and reaching its point then
+## ends the run as an extraction (WON, with the usual Intel multiplier). Before that the point does
+## nothing; dying ends the run as always (step()).
+func _update_exfil(dt: float) -> void:
+	var was_open: bool = exfil_open()
+	exfil_clock += dt
+	if exfil_open() and not was_open:
+		messages.append("Extraction open: make for the exfil point!")
+	if exfil_open() and player_pos.distance_to(extraction_point()) <= GameData.BOAT_RADIUS:
+		objective = Objective.WON
 
 
 ## The main task (and the boss) is done: head for the extraction point. The
@@ -3971,6 +4016,10 @@ static func clock_text(seconds: float) -> String:
 
 ## Objective text for the HUD.
 func objective_text() -> String:
+	if mode == &"exfil" and objective == Objective.GENERATORS:
+		if exfil_open():
+			return "Get to the exfil point!"
+		return "Survive: extraction opens in %s" % clock_text(GameData.EXFIL_OPEN_SECONDS - exfil_clock)
 	match objective:
 		Objective.GENERATORS:
 			if mission == &"defend":
