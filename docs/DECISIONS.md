@@ -49,6 +49,9 @@ registadas as decisões dessa data.
 | 2026-11-04 | **godot-mcp testado localmente, sem adoção decidida.** Registo só para este projeto (escopo local), fora do repositório. | Pedido do utilizador («podemos testar agora»). Critério de decisão em [spikes/godot_mcp/README.md](../spikes/godot_mcp/README.md). |
 | 2026-11-10 | **Modo Exfil fica no jogo**: hordas sem fim, extração aos 10 minutos, num mapa próprio (`game/world/handmade/test/exfil_test.tscn`). | Pedido do utilizador («quero o modo exfil»). Hoje entra pelo sandbox DEV; os valores do diretor são hipóteses de playtest. Ver [DEV_MENU.md](design/DEV_MENU.md) e `TODO.md`. |
 | 2026-11-10 | **Co-op: fica pendente, para implementar mais tarde.** Deixa de estar excluído; não se começa agora. | Pedido do utilizador. Atualiza a exclusão do `GDD.md` §5. Proposta técnica em [COOP_PROPOSAL.md](design/COOP_PROPOSAL.md); a forma (local, LAN, online) está por decidir. |
+| 2026-11-10 | **Identidade visual dos menus: direção A, «field dossier»** (papel, tinta, máquina de escrever, carimbos, fotografias presas à página). | Escolha do utilizador entre três propostas ([canvas](https://claude.ai/artifact/2cu377QK5KrYFTiU1Tqndf)). Substitui a paleta B «Atlantic & azulejo» nos menus fora da ilha; o HUD e os diálogos mantêm o `UiTheme`. Começa pelo título (`game/ui/dossier.gd`); armory, perks, armas, barco e debrief a seguir. |
+| 2026-11-10 | **HUD com placas escuras** por trás dos blocos. | Aprovado pelo utilizador. Substitui o «HUD sem fundos escuros» de [MENUS.md](design/MENUS.md). |
+| 2026-11-10 | **Ilhas com aspeto natural**: trocar as formas geométricas por modelos variados, e a vista geral do mapa antes de partir mostra a ilha real. | Pedido do utilizador. Piloto na `beach_01`; plano em `TODO.md`. |
 
 ## Em aberto
 

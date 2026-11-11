@@ -1,8 +1,8 @@
 extends Node
-## Title: a solid left column (brand, logo, menu) next to the harbour art.
-## The profile stats and the input hints sit in a bar along the bottom of
-## the art, so nothing floats over the picture (docs/design/MENUS.md,
-## "Redesenho de outubro de 2026", point 2).
+## Title: the first page of the company's case file (the "field dossier" look, Dossier): a sheet
+## of paper on the left (brand, name, the numbered menu) and the harbour art clipped beside it as
+## a photograph, with its caption and a stamp. The profile stats and the input hints sit in a
+## strip along the bottom, so nothing floats over the picture (docs/design/MENUS.md).
 
 signal play_requested
 ## QUICK REDEPLOY: the last run again (main.gd checks it can still be played).
@@ -31,14 +31,13 @@ func _ready() -> void:
 	add_child(layer)
 	_root = Control.new()
 	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_root.theme = UiTheme.get_theme()
+	_root.theme = Dossier.theme()
 	layer.add_child(_root)
-	# The art fills the screen; the opaque column covers its left part, so
-	# what shows is the boat and the pier (as in the mockup).
-	UiTheme.backdrop(_root, UiTheme.HARBOR)
-	var column := ColorRect.new()
-	column.color = UiTheme.BG
-	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var desk := Dossier.sheet(Dossier.DESK)
+	desk.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_root.add_child(desk)
+	_build_exhibit()
+	var column := Dossier.sheet()
 	column.set_anchors_preset(Control.PRESET_LEFT_WIDE)
 	column.offset_right = COLUMN_WIDTH
 	_root.add_child(column)
@@ -47,6 +46,22 @@ func _ready() -> void:
 	_deploy_button.grab_focus()
 	_root.add_child(UiSfx.new())
 	add_child(Ambience.create(&"menu", -12.0))
+
+
+## The harbour art as a clipped photograph, with its caption under it.
+func _build_exhibit() -> void:
+	var photo := Dossier.photo(UiTheme.HARBOR)
+	photo.name = "Exhibit"
+	photo.set_anchors_preset(Control.PRESET_FULL_RECT)
+	photo.offset_left = COLUMN_WIDTH + 34
+	photo.offset_top = 30
+	photo.offset_right = -34
+	photo.offset_bottom = -(FOOTER_HEIGHT + 58)
+	_root.add_child(photo)
+	var caption := Dossier.typed("EXHIBIT A · ARRIVAL, PIER 2", 13, Dossier.PAPER_DARK)
+	caption.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	caption.position = Vector2(COLUMN_WIDTH + 38, -(FOOTER_HEIGHT + 40))
+	_root.add_child(caption)
 
 
 func _build_menu() -> void:
@@ -62,10 +77,13 @@ func _build_menu() -> void:
 	box.add_theme_constant_override("separation", 12)
 	margin.add_child(box)
 	box.add_child(_caption("SALVAGE & CO. / HALVARD OPERATIONS"))
-	var logo := UiTheme.texture(UiTheme.WORDMARK, true)
-	logo.custom_minimum_size.y = 150
+	# The name is typed on the page: the wordmark's pale letters are made for a dark ground.
+	var logo := Dossier.typed("HORDE
+BREAKER", 58, Dossier.INK, true)
+	logo.name = "Wordmark"
+	logo.add_theme_constant_override("line_spacing", -12)
 	box.add_child(logo)
-	box.add_child(_caption("ISLAND EXPEDITION / ZOMBIE HORDE SHOOTER", 12))
+	box.add_child(_caption("FILE 0417 · ISLAND EXPEDITION", 12))
 	box.add_child(HSeparator.new())
 	var menu := VBoxContainer.new()
 	menu.add_theme_constant_override("separation", 11)
@@ -85,10 +103,15 @@ func _build_menu() -> void:
 	gap.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(gap)
+	# The company's stamp, on the page (its red does not read on the dark desk).
+	var stamp := Dossier.stamp("RECOVERY MANDATORY", 16)
+	stamp.name = "Stamp"
+	stamp.size_flags_horizontal = Control.SIZE_SHRINK_END
+	box.add_child(stamp)
 	var bottom := HBoxContainer.new()
 	box.add_child(bottom)
-	var motto := UiTheme.label("Recovery is mandatory.
-Survival is encouraged.", 15, UiTheme.TEXT_MUTED)
+	var motto := Dossier.typed("Recovery is mandatory.
+Survival is encouraged.", 13, Dossier.INK_MUTED)
 	motto.name = "Motto"
 	motto.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	motto.size_flags_vertical = Control.SIZE_SHRINK_END
@@ -99,7 +122,7 @@ Survival is encouraged.", 15, UiTheme.TEXT_MUTED)
 
 ## Mono caption with a little tracking, like the mockup's brand lines.
 func _caption(text: String, font_size: int = 13) -> Label:
-	var l := UiTheme.label(text, font_size, UiTheme.TEXT_MUTED)
+	var l := Dossier.typed(text, font_size, Dossier.INK_MUTED)
 	var font := FontVariation.new()
 	font.base_font = UiTheme.mono_font()
 	font.spacing_glyph = 1
@@ -110,7 +133,7 @@ func _caption(text: String, font_size: int = 13) -> Label:
 func _menu_button(parent: Control, text: String, action: Callable) -> Button:
 	var b := UiTheme.button(parent, text, action)
 	b.custom_minimum_size.y = 46
-	b.add_theme_font_size_override("font_size", 21)
+	b.add_theme_font_size_override("font_size", 17)
 	return b
 
 
@@ -152,13 +175,13 @@ func _deploy_entry(parent: Control) -> Button:
 	text.add_theme_constant_override("separation", 0)
 	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(text)
-	text.add_child(_inner_label("DEPLOY", UiTheme.title_font(), 26, UiTheme.ON_ACCENT))
-	text.add_child(_inner_label("Armory, then choose your run", UiTheme.body_bold_font(), 13, Color(UiTheme.ON_ACCENT, 0.8)))
+	text.add_child(_inner_label("01  DEPLOY", UiTheme.mono_bold_font(), 24, Dossier.PAPER))
+	text.add_child(_inner_label("Armory, then choose your run", UiTheme.mono_font(), 12, Dossier.PAPER_DARK))
 	var arrow := TextureRect.new()
 	arrow.texture = _chevron()
 	arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	arrow.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
-	arrow.modulate = UiTheme.ON_ACCENT
+	arrow.modulate = Dossier.PAPER
 	row.add_child(arrow)
 	return b
 
@@ -166,14 +189,14 @@ func _deploy_entry(parent: Control) -> Button:
 ## QUICK REDEPLOY: the last run's class and run type on the right; disabled
 ## with the reason when there is no previous run.
 func _redeploy_entry(parent: Control) -> Button:
-	var b := _menu_button(parent, "QUICK REDEPLOY", func() -> void: quick_redeploy_requested.emit())
+	var b := _menu_button(parent, "02  QUICK REDEPLOY", func() -> void: quick_redeploy_requested.emit())
 	b.name = "QuickRedeploy"
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var row := _overlay(b)
 	row.alignment = BoxContainer.ALIGNMENT_END
 	var problem: String = profile.redeploy_problem()
 	var detail: String = _redeploy_detail(problem)
-	var summary := _inner_label(detail, UiTheme.mono_font(), 12, UiTheme.TEXT_MUTED)
+	var summary := _inner_label(detail, UiTheme.mono_font(), 11, Dossier.INK_MUTED)
 	summary.name = "Summary"
 	summary.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	summary.size_flags_vertical = Control.SIZE_FILL
@@ -198,16 +221,16 @@ func _redeploy_detail(problem: String) -> String:
 
 ## INTEL ARCHIVE with a "N NEW" badge for files not seen yet.
 func _archive_entry(parent: Control) -> void:
-	var b := _menu_button(parent, "INTEL ARCHIVE", _archive)
+	var b := _menu_button(parent, "03  INTEL ARCHIVE", _archive)
 	b.name = "IntelArchive"
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var row := _overlay(b)
 	row.alignment = BoxContainer.ALIGNMENT_END
-	_archive_badge = _inner_label("%d NEW" % profile.unread_files(), UiTheme.mono_bold_font(), 12, UiTheme.BG)
+	_archive_badge = _inner_label("%d NEW" % profile.unread_files(), UiTheme.mono_bold_font(), 12, Dossier.PAPER)
 	_archive_badge.name = "Badge"
 	_archive_badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var pill := StyleBoxFlat.new()
-	pill.bg_color = UiTheme.INFO
+	pill.bg_color = Dossier.STAMP
 	pill.set_corner_radius_all(3)
 	pill.content_margin_left = 7
 	pill.content_margin_right = 7
@@ -230,10 +253,11 @@ func _dev_entry() -> Button:
 	b.theme_type_variation = &"QuietButton"
 	b.add_theme_font_override("font", UiTheme.mono_font())
 	b.add_theme_font_size_override("font_size", 12)
+	b.add_theme_color_override("font_color", Dossier.INK_MUTED)
 	var dashed := MarkedBox.new(StyleBoxFlat.new())
 	dashed.base.bg_color = Color.TRANSPARENT
 	dashed.dashed = true
-	dashed.dash_color = UiTheme.LINE.lightened(0.2)
+	dashed.dash_color = Dossier.INK_MUTED
 	dashed.dash_width = 1.0
 	dashed.dash_length = 4.0
 	dashed.dash_gap = 3.0
@@ -255,8 +279,8 @@ func _build_footer() -> void:
 	bar.offset_left = COLUMN_WIDTH
 	bar.offset_top = -FOOTER_HEIGHT
 	var style := StyleBoxFlat.new()
-	style.bg_color = UiTheme.BG
-	style.border_color = UiTheme.LINE
+	style.bg_color = Dossier.PAPER_DARK
+	style.border_color = Dossier.PAPER_LINE
 	style.border_width_top = 1
 	style.content_margin_left = 26
 	style.content_margin_right = 26
@@ -265,7 +289,7 @@ func _build_footer() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 18)
 	bar.add_child(row)
-	for stat: Array in [["INTEL", profile.intel, UiTheme.ACCENT], ["RUNS", profile.runs, UiTheme.TEXT], ["EXTRACTIONS", profile.extractions, UiTheme.TEXT]]:
+	for stat: Array in [["INTEL", profile.intel, Dossier.STAMP], ["RUNS", profile.runs, Dossier.INK], ["EXTRACTIONS", profile.extractions, Dossier.INK]]:
 		var cell := RichTextLabel.new()
 		cell.name = "Stat" + String(stat[0]).capitalize()
 		cell.bbcode_enabled = true
@@ -278,6 +302,7 @@ func _build_footer() -> void:
 		cell.add_theme_font_override("bold_font", UiTheme.mono_bold_font())
 		cell.add_theme_font_size_override("normal_font_size", 14)
 		cell.add_theme_font_size_override("bold_font_size", 14)
+		cell.add_theme_color_override("default_color", Dossier.INK_MUTED)
 		cell.text = "%s [b][color=#%s]%d[/color][/b]" % [stat[0], (stat[2] as Color).to_html(false), stat[1]]
 		row.add_child(cell)
 	var gap := Control.new()
@@ -306,7 +331,7 @@ func _hint(parent: Control, bindings: Array, word: String) -> void:
 	icons.add_theme_font_size_override("normal_font_size", 13)
 	hint.add_child(icons)
 	InputIcons.fill(icons, bindings)
-	var label := UiTheme.label(word, 13, UiTheme.TEXT_MUTED, true)
+	var label := Dossier.typed(word, 13, Dossier.INK_MUTED)
 	label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	hint.add_child(label)

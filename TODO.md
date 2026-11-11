@@ -104,6 +104,17 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
 
 ## Conteúdo e apresentação
 
+- [ ] Menus na direção A («field dossier», decisão de 2026-11-10): o título está feito
+  (`game/ui/dossier.gd`, captura em `docs/design/dossier_20261111/`). Por fazer: armory, perks
+  (quadro de fichas), armas (formulário de requisição), barco, debrief e cartas. Decidir se entra
+  uma fonte de máquina de escrever (hoje IBM Plex Mono; a Special Elite é Apache 2.0, fora da
+  lista de licenças aceites).
+- [ ] Ilhas com aspeto natural (decisão de 2026-11-10), piloto na `beach_01`: 1) pôr as 13 peças
+  do `scenery_kit` nos edifícios e na praia; 2) variar a vegetação com as peças do kit de
+  natureza por usar; 3) várias texturas no terreno e costa menos regular; 4) medir desenho e
+  grelha. Faltam modelos para casas, contentores, barco e pontes (hoje caixas): Codex ou kits CC0.
+- [ ] Vista geral do mapa antes de partir: desenhar a ilha real a partir da grelha da cena
+  (`HandmadeIsland.grid_image`) em vez das manchas de `game/ui/route_map.gd`.
 - [ ] Objetivos variados: feito em 2026-11-10 na `beach_01` (seis geradores, cada run usa três,
   `IslandRun.pick_generators`) e no Exfil (três pontos de extração, um por seed, revelado aos
   10:00); teste em `tests/test_objective_pools.gd`. Por fazer: ver os três sítios novos da
