@@ -19,7 +19,7 @@ const CLASS_ROLES: Dictionary = {
 	&"vanguard": ["FRONTLINE CONTRACTOR", "Tough frontline.", "7 m stun, −40% damage."],
 }
 ## Pale steel for weapon silhouettes, as in the mockup.
-const SILHOUETTE := Color("b9d3d1")
+const SILHOUETTE := Dossier.INK
 const HEADER_HEIGHT := 72.0
 const NBSP := "\u00a0"  ## no-break space
 const BLUR_SHADER := """
@@ -57,12 +57,16 @@ var _notice: String = ""
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	theme = UiTheme.get_theme()
+	theme = Dossier.theme()
 	_shelter = Shelter.new()
 	_shelter.class_id = profile.selected_class
 	_shelter.name = "ArmoryShelter"
-	_shelter.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(_shelter)
+	# The desk under the file. The shelter's 3D scene is a photograph clipped to the class sheet
+	# (_classes), not a backdrop: it is in the tree only while that sheet shows.
+	var desk := Dossier.sheet(Dossier.DESK)
+	desk.name = "Desk"
+	desk.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(desk)
 	_shade = ColorRect.new()
 	_shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -72,15 +76,13 @@ func _ready() -> void:
 	_blur.shader.code = BLUR_SHADER
 	# Soft dark edges: the class name (left) and the cards (bottom) stay
 	# readable over the 3D scene without boxes behind them.
-	add_child(_gradient("VignetteLeft", Vector2(0, 0), Vector2(1, 0), [0.0, 0.42], [0.72, 0.0]))
-	add_child(_gradient("VignetteBottom", Vector2(0, 0), Vector2(0, 1), [0.62, 1.0], [0.0, 0.7]))
 	_build_header_band()
 	var screen := UiTheme.screen(self)
 	var margin := screen.get_parent() as MarginContainer
 	for edge in ["left", "right", "bottom"]:
 		margin.add_theme_constant_override("margin_" + edge, 20)
 	margin.add_theme_constant_override("margin_top", 10)
-	screen.add_theme_constant_override("separation", 10)
+	screen.add_theme_constant_override("separation", 22)  # the sheets sit clear of the header band and of the hints
 	_build_header(screen)
 	var body := HBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -108,8 +110,8 @@ func _ready() -> void:
 	summary_panel.name = "LoadoutPanel"
 	summary_panel.custom_minimum_size.x = 292
 	var panel_box := StyleBoxFlat.new()
-	panel_box.bg_color = Color(0.02, 0.06, 0.075, 0.95)
-	panel_box.border_color = UiTheme.LINE
+	panel_box.bg_color = Dossier.PAPER
+	panel_box.border_color = Dossier.LINE
 	panel_box.set_border_width_all(1)
 	panel_box.set_corner_radius_all(3)
 	panel_box.content_margin_left = 14
@@ -149,14 +151,14 @@ func _build_header_band() -> void:
 	band.name = "HeaderBand"
 	band.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	band.offset_bottom = HEADER_HEIGHT
-	band.color = Color(0.02, 0.045, 0.058, 0.94)
+	band.color = Dossier.PAPER
 	band.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(band)
 	var rule := ColorRect.new()
 	rule.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	rule.offset_top = HEADER_HEIGHT
 	rule.offset_bottom = HEADER_HEIGHT + 1
-	rule.color = UiTheme.LINE
+	rule.color = Dossier.LINE
 	rule.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(rule)
 	for right in [false, true]:
@@ -184,8 +186,8 @@ func _build_header(screen: VBoxContainer) -> void:
 	var lead := Control.new()
 	lead.custom_minimum_size.x = HEADER_HEIGHT - 14
 	header.add_child(lead)
-	var brand := UiTheme.label("SALVAGE & CO.\nHALVARD OPERATIONS", 14, UiTheme.TEXT)
-	brand.add_theme_font_override("font", UiTheme._spaced(UiTheme.mono_font(), 2))
+	var brand := Dossier.label("SALVAGE & CO.\nHALVARD OPERATIONS", 14, Dossier.TEXT)
+	brand.add_theme_font_override("font", UiTheme._spaced(Dossier.typed_font(), 2))
 	brand.autowrap_mode = TextServer.AUTOWRAP_OFF
 	brand.custom_minimum_size.x = 200
 	brand.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -200,12 +202,12 @@ func _build_header(screen: VBoxContainer) -> void:
 	title_row.add_theme_constant_override("separation", 22)
 	centre.add_child(title_row)
 	title_row.add_child(_rule(72))
-	_header_title = UiTheme.title("ARMORY", 34)
+	_header_title = Dossier.title("ARMORY", 34)
 	_header_title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	title_row.add_child(_header_title)
 	title_row.add_child(_rule(72))
-	_header_subtitle = UiTheme.label("CONTRACTOR UPGRADES", 12, UiTheme.SUCCESS)
-	_header_subtitle.add_theme_font_override("font", UiTheme._spaced(UiTheme.mono_font(), 2))
+	_header_subtitle = Dossier.label("CONTRACTOR UPGRADES", 12, Dossier.SUCCESS)
+	_header_subtitle.add_theme_font_override("font", UiTheme._spaced(Dossier.typed_font(), 2))
 	_header_subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	centre.add_child(_header_subtitle)
 	var intel_row := HBoxContainer.new()
@@ -213,14 +215,14 @@ func _build_header(screen: VBoxContainer) -> void:
 	intel_row.alignment = BoxContainer.ALIGNMENT_END
 	intel_row.add_theme_constant_override("separation", 12)
 	header.add_child(intel_row)
-	var intel_word := UiTheme.label("INTEL", 14, UiTheme.MUTED)
-	intel_word.add_theme_font_override("font", UiTheme._spaced(UiTheme.mono_font(), 2))
+	var intel_word := Dossier.label("INTEL", 14, Dossier.MUTED)
+	intel_word.add_theme_font_override("font", UiTheme._spaced(Dossier.typed_font(), 2))
 	intel_word.autowrap_mode = TextServer.AUTOWRAP_OFF
 	intel_word.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	intel_row.add_child(intel_word)
-	_intel = UiTheme.title("", 30)
+	_intel = Dossier.title("", 30)
 	_intel.name = "IntelBalance"
-	_intel.add_theme_font_override("font", UiTheme.mono_bold_font())
+	_intel.add_theme_font_override("font", Dossier.typed_font())
 	_intel.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_intel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	intel_row.add_child(_intel)
@@ -233,7 +235,7 @@ func _rule(width: float) -> ColorRect:
 	var line := ColorRect.new()
 	line.custom_minimum_size = Vector2(width, 2)
 	line.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	line.color = UiTheme.SUCCESS.darkened(0.25)
+	line.color = Dossier.SUCCESS.darkened(0.25)
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return line
 
@@ -261,7 +263,7 @@ func _gradient(label: String, from: Vector2, to: Vector2, offsets: Array, alphas
 func _nav_style(b: Button, font_size: int) -> void:
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	b.custom_minimum_size.y = 42
-	b.add_theme_font_size_override("font_size", font_size)
+	b.add_theme_font_size_override("font_size", roundi(font_size * Dossier.TYPED_SCALE))
 	b.add_theme_constant_override("h_separation", 14)
 
 
@@ -279,6 +281,8 @@ func _select_category(category: String) -> void:
 func _rebuild() -> void:
 	var focused := get_viewport().gui_get_focus_owner()
 	var focus_name: String = String(focused.name) if focused != null else ""
+	if _shelter.get_parent() != null:
+		_shelter.get_parent().remove_child(_shelter)  # kept: _clear would free it with its sheet
 	_clear(_content)
 	_clear(_summary)
 	_clear(_summary_footer)
@@ -287,8 +291,7 @@ func _rebuild() -> void:
 	_header_title.text = "PERKS" if perks else "ARMORY"
 	_header_subtitle.visible = perks
 	# Perks: the shelter stays as a blurred, dimmed backdrop.
-	_shade.material = _blur if perks else null
-	_shade.color = Color(0.02, 0.05, 0.065, 0.6 if _category == "WEAPONS" else 0.0)
+	_shade.color = Color.TRANSPARENT
 	_shelter.call("set_class", profile.selected_class)
 	_shelter.call("set_weapon", profile.selected_primary)
 	_shelter.call("show_character", _category == "CLASS")
@@ -340,27 +343,34 @@ func _role(id: StringName, index: int) -> String:
 
 
 func _classes() -> void:
-	_content.add_theme_constant_override("separation", 0)
+	_content.add_theme_constant_override("separation", 10)
 	var info: Dictionary = GameData.CLASS_INFO[profile.selected_class]
-	var heading := UiTheme.title(String(info["name"]).to_upper(), 46)
+	var heading := Dossier.title(String(info["name"]).to_upper(), 46)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	heading.add_theme_constant_override("outline_size", 6)
 	heading.add_theme_color_override("font_outline_color", Color(UiTheme.BG, 0.6))
+	heading.add_theme_color_override("font_color", Dossier.PAPER)  # over the shelter, not on a sheet
 	_content.add_child(heading)
-	var role := UiTheme.label(_role(profile.selected_class, 0), 16, UiTheme.SUCCESS)
+	var role := Dossier.label(_role(profile.selected_class, 0), 16, Dossier.PAPER_DARK)
 	role.name = "ClassRole"
-	role.add_theme_font_override("font", UiTheme._spaced(UiTheme.mono_font(), 2))
+	role.add_theme_font_override("font", UiTheme._spaced(Dossier.typed_font(), 2))
 	role.autowrap_mode = TextServer.AUTOWRAP_OFF
 	role.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	# A dark outline keeps the role legible over any part of the shelter.
 	role.add_theme_constant_override("outline_size", 6)
 	role.add_theme_color_override("font_outline_color", Color(UiTheme.BG, 0.85))
 	_content.add_child(role)
-	var hero := Control.new()
+	# The contractor's photograph: the shelter's 3D scene in a pale border, clipped to the file.
+	var hero := PanelContainer.new()
 	hero.name = "CharacterSpace"
 	hero.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	hero.add_theme_stylebox_override("panel", Dossier.sheet_box(Dossier.PHOTO_BORDER, 10.0))
 	_content.add_child(hero)
-	hero.add_child(_ability_card(info))
+	hero.add_child(_shelter)
+	var over := Control.new()
+	over.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hero.add_child(over)
+	over.add_child(_ability_card(info))
 	var choices := HBoxContainer.new()
 	choices.name = "ClassChoices"
 	choices.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -382,8 +392,8 @@ func _ability_card(info: Dictionary) -> PanelContainer:
 	ability.offset_right = -2
 	ability.offset_bottom = -10
 	var box := StyleBoxFlat.new()
-	box.bg_color = Color(0.02, 0.06, 0.075, 0.92)
-	box.border_color = UiTheme.LINE
+	box.bg_color = Dossier.PAPER
+	box.border_color = Dossier.LINE
 	box.set_border_width_all(1)
 	box.set_corner_radius_all(3)
 	box.content_margin_left = 10
@@ -395,18 +405,18 @@ func _ability_card(info: Dictionary) -> PanelContainer:
 	row.add_theme_constant_override("separation", 10)
 	ability.add_child(row)
 	var recruit: bool = profile.selected_class == &"recruit"
-	var symbol := Art.image(&"grenade" if recruit else &"war_cry", 34, UiTheme.TEXT)
+	var symbol := Art.image(&"grenade" if recruit else &"war_cry", 34, Dossier.TEXT)
 	symbol.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(symbol)
 	var detail := VBoxContainer.new()
 	detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	detail.add_theme_constant_override("separation", 0)
 	row.add_child(detail)
-	var ability_name := UiTheme.title(String(info["ability"]).to_upper(), 18)
+	var ability_name := Dossier.title(String(info["ability"]).to_upper(), 18)
 	ability_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	ability_name.autowrap_mode = TextServer.AUTOWRAP_OFF
 	detail.add_child(ability_name)
-	var effect := UiTheme.label(_role(profile.selected_class, 2), 12, UiTheme.MUTED, true)
+	var effect := Dossier.label(_role(profile.selected_class, 2), 12, Dossier.MUTED, true)
 	effect.autowrap_mode = TextServer.AUTOWRAP_OFF
 	detail.add_child(effect)
 	var key := UiTheme.icon_hint(row, [GameInput.current_binding(&"ability", profile.key_bindings)], ["joy:%d" % JOY_BUTTON_LEFT_SHOULDER], "")
@@ -433,8 +443,8 @@ func _class_card(id: StringName) -> Button:
 	b.tooltip_text = String(class_info["text"])
 	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 		var box := StyleBoxFlat.new()
-		box.bg_color = Color(0.03, 0.085, 0.1, 0.94) if not selected else Color(0.04, 0.13, 0.14, 0.95)
-		box.border_color = UiTheme.SUCCESS if selected else UiTheme.LINE
+		box.bg_color = Dossier.PAPER if not selected else Dossier.PAPER_DARK
+		box.border_color = Dossier.SUCCESS if selected else Dossier.LINE
 		if state.begins_with("hover"):
 			box.border_color = box.border_color.lightened(0.3)
 			box.bg_color = box.bg_color.lightened(0.04)
@@ -466,19 +476,20 @@ func _class_card(id: StringName) -> Button:
 	var mark := TextureRect.new()
 	mark.name = "SelectedTick" if selected else "LockMark"
 	mark.texture = UiTheme.tick_icon() if selected else UiTheme.lock_icon()
-	mark.modulate = UiTheme.SUCCESS if selected else UiTheme.MUTED
+	mark.modulate = Dossier.SUCCESS if selected else Dossier.MUTED
 	mark.custom_minimum_size = Vector2(18, 18)
 	mark.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	mark.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mark.self_modulate.a = 1.0 if selected or not owned else 0.0
 	text.add_child(mark)
-	var title := UiTheme.title(String(class_info["name"]).to_upper(), 22)
+	var title := Dossier.title(String(class_info["name"]).to_upper(), 22)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
-	title.add_theme_color_override("font_color", UiTheme.TEXT if owned or not b.disabled else UiTheme.MUTED)
+	title.clip_text = true
+	title.add_theme_color_override("font_color", Dossier.TEXT if owned or not b.disabled else Dossier.MUTED)
 	text.add_child(title)
-	var line := UiTheme.label(_role(id, 1) if owned else "%d INTEL" % cost, 11, UiTheme.MUTED if owned else UiTheme.ACCENT, true)
+	var line := Dossier.label(_role(id, 1) if owned else "%d INTEL" % cost, 11, Dossier.MUTED if owned else Dossier.ACCENT, true)
 	line.autowrap_mode = TextServer.AUTOWRAP_OFF
 	line.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	text.add_child(line)
@@ -507,50 +518,147 @@ func _scroll_list() -> VBoxContainer:
 
 func _weapons() -> void:
 	_content.add_theme_constant_override("separation", 8)
-	var heading := UiTheme.title("WEAPONS", 36)
+	# The issue form (the dossier's weapons page): the list of items on one sheet, the focused item's
+	# photograph and figures on the other. A press issues (equips) or unlocks, as before.
+	var pages := HBoxContainer.new()
+	pages.name = "IssueForm"
+	pages.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	pages.add_theme_constant_override("separation", 14)
+	_content.add_child(pages)
+	var form := PanelContainer.new()
+	form.custom_minimum_size.x = 250
+	form.add_theme_stylebox_override("panel", Dossier.sheet_box(Dossier.PAPER, 12.0))
+	pages.add_child(form)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	form.add_child(scroll)
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 2)
+	scroll.add_child(list)
+	var heading := Dossier.title("ISSUE FORM", 26)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_content.add_child(heading)
-	_content.add_child(UiTheme.label("Equip one primary and one secondary. Unlocking keeps the weapon permanently.", 16, UiTheme.MUTED))
-	var list := _scroll_list()
-	for weapon in GameData.weapons():
-		var card := UiTheme.panel(list)
-		var top := HBoxContainer.new()
-		card.add_child(top)
-		top.add_child(Art.weapon_image(weapon.id, 220, 88, Color.WHITE))
-		var names := VBoxContainer.new()
-		names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		names.add_theme_constant_override("separation", 0)
-		top.add_child(names)
-		var title := UiTheme.title(weapon.display_name.to_upper(), 22)
-		title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		names.add_child(title)
-		names.add_child(UiTheme.label("PRIMARY" if weapon.primary else "SECONDARY", 13, UiTheme.ACCENT, true))
-		var damage_text: String = "%d PELLETS · %d DAMAGE EACH" % [weapon.pellets, int(weapon.damage)] if weapon.pellets > 1 else "%d DAMAGE" % int(weapon.damage)
-		card.add_child(UiTheme.label("%s / %.1f SHOTS PER SECOND / %d M" % [damage_text, weapon.fire_rate, int(weapon.range_m)], 16, UiTheme.MUTED, true))
-		card.add_child(UiTheme.label(weapon.role, 16))
-		var cost: int = maxi(0, GameData.weapon_cost(weapon.id))
-		var owned: bool = cost == 0 or profile.unlocked_weapons.has(weapon.id)
-		var selected: bool = weapon.id in profile.weapon_loadout()
-		var b := UiTheme.button(card, "EQUIPPED" if selected else "EQUIP" if owned else "UNLOCK / %d INTEL" % cost, _choose_weapon.bind(weapon.id))
-		b.name = "Weapon_" + String(weapon.id)
-		b.disabled = selected or not owned and profile.intel < cost
-		if selected:
-			b.theme_type_variation = &"SelectedButton"
+	list.add_child(heading)
+	var sheet := PanelContainer.new()
+	sheet.name = "ItemSheet"
+	sheet.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sheet.add_theme_stylebox_override("panel", Dossier.sheet_box(Dossier.PAPER, 18.0))
+	pages.add_child(sheet)
+	var detail := VBoxContainer.new()
+	detail.add_theme_constant_override("separation", 10)
+	sheet.add_child(detail)
+	for primary: bool in [true, false]:
+		list.add_child(Dossier.label("PRIMARY" if primary else "SECONDARY", 12, Dossier.MUTED, true))
+		for weapon in GameData.weapons():
+			if weapon.primary != primary:
+				continue
+			var cost: int = maxi(0, GameData.weapon_cost(weapon.id))
+			var owned: bool = cost == 0 or profile.unlocked_weapons.has(weapon.id)
+			var selected: bool = weapon.id in profile.weapon_loadout()
+			var b := UiTheme.button(list, weapon.display_name, _choose_weapon.bind(weapon.id))
+			b.name = "Weapon_" + String(weapon.id)
+			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			b.theme_type_variation = &"PrimaryButton" if selected else &""
+			_compact(b, 38, 17)
+			var state := Dossier.typed("ISSUED" if selected else "ISSUE" if owned else "%d INTEL" % cost, 12,
+				Dossier.PAPER if selected else Dossier.OLIVE if owned else Dossier.STAMP if profile.intel < cost else Dossier.INK_MUTED)
+			state.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			state.offset_right = -10
+			state.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			state.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			b.add_child(state)
+			if not owned and profile.intel < cost:
+				b.tooltip_text = "Not enough Intel."
+			b.focus_entered.connect(_show_weapon.bind(detail, weapon.id))
+			b.mouse_entered.connect(_show_weapon.bind(detail, weapon.id))
+	_show_weapon(detail, profile.selected_primary)
 	# Priced cards: Intel buys them, and they join the level-up offers.
-	var cards_heading := UiTheme.title("CARDS", 28)
-	cards_heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	list.add_child(cards_heading)
-	list.add_child(UiTheme.label("Bought cards join the level-up offers in every run.", 16, UiTheme.MUTED))
+	list.add_child(HSeparator.new())
+	list.add_child(Dossier.label("ADDENDUM · CARDS", 12, Dossier.MUTED, true))
 	for card in GameData.cards():
 		if card.unlock_cost <= 0:
 			continue
-		var panel := UiTheme.panel(list)
-		panel.add_child(UiTheme.title(card.title.to_upper(), 22))
-		panel.add_child(UiTheme.label(card.description, 16, UiTheme.MUTED, true))
 		var bought: bool = profile.owns_card(card.id)
-		var buy := UiTheme.button(panel, "BOUGHT" if bought else "UNLOCK / %d INTEL" % card.unlock_cost, _choose_card.bind(card.id))
+		var buy := UiTheme.button(list, card.title, _choose_card.bind(card.id))
 		buy.name = "Card_" + String(card.id)
+		buy.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		_compact(buy, 34, 15)
 		buy.disabled = bought or profile.intel < card.unlock_cost
+		buy.tooltip_text = card.description
+		var price := Dossier.typed("BOUGHT" if bought else "%d INTEL" % card.unlock_cost, 11, Dossier.OLIVE if bought else Dossier.INK_MUTED)
+		price.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		price.offset_right = -10
+		price.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		price.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		buy.add_child(price)
+
+
+## The issue form's second sheet: the item's number, name, photograph, figures and role.
+func _show_weapon(detail: VBoxContainer, id: StringName) -> void:
+	if not is_instance_valid(detail):
+		return
+	_clear(detail)
+	var weapon: Variant = null
+	var number: int = 0
+	for w in GameData.weapons():
+		number += 1
+		if w.id == id:
+			weapon = w
+			break
+	if weapon == null:
+		return
+	var names := VBoxContainer.new()
+	names.add_theme_constant_override("separation", 2)
+	detail.add_child(names)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 12)
+	names.add_child(head)
+	var item := Dossier.label("ITEM %02d · %s" % [number, "PRIMARY" if weapon.primary else "SECONDARY"], 12, Dossier.MUTED, true)
+	item.autowrap_mode = TextServer.AUTOWRAP_OFF
+	item.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	item.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(item)
+	var title := Dossier.title(String(weapon.display_name).to_upper(), 34)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	title.autowrap_mode = TextServer.AUTOWRAP_OFF
+	names.add_child(title)
+	if maxi(0, GameData.weapon_cost(id)) == 0:
+		var issue := Dossier.stamp("STANDARD ISSUE", 11, 0.0)
+		issue.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		head.add_child(issue)
+	var photo := PanelContainer.new()
+	photo.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	photo.add_theme_stylebox_override("panel", Dossier.sheet_box(Dossier.PHOTO_BORDER, 10.0))
+	detail.add_child(photo)
+	var ground := ColorRect.new()
+	ground.color = Dossier.DESK.lightened(0.18)
+	ground.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	photo.add_child(ground)
+	var path: String = "res://game/ui/art/weapons/%s.png" % id
+	if ResourceLoader.exists(path):
+		var picture := UiTheme.texture(path, true)
+		picture.name = "ItemPhoto"
+		photo.add_child(picture)
+	else:
+		photo.add_child(Art.weapon_image(id, 320, 120, Dossier.PAPER))
+	var figures := GridContainer.new()
+	figures.columns = 4
+	figures.add_theme_constant_override("h_separation", 18)
+	detail.add_child(figures)
+	var damage: String = "%d × %d" % [int(weapon.damage), weapon.pellets] if weapon.pellets > 1 else "%d" % int(weapon.damage)
+	for figure: Array in [["DAMAGE", damage], ["SHOTS / S", "%.1f" % weapon.fire_rate], ["RANGE", "%d m" % int(weapon.range_m)],
+			["MAGAZINE", "%d" % weapon.magazine if weapon.magazine > 0 else "—"]]:
+		var cell := VBoxContainer.new()
+		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		cell.add_theme_constant_override("separation", 0)
+		figures.add_child(cell)
+		var caption := Dossier.label(figure[0], 10, Dossier.MUTED, true)
+		caption.autowrap_mode = TextServer.AUTOWRAP_OFF
+		cell.add_child(caption)
+		cell.add_child(Dossier.typed(figure[1], 22))
+	detail.add_child(HSeparator.new())
+	detail.add_child(Dossier.label(String(weapon.role), 15, Dossier.MUTED))
 
 
 func _choose_card(id: StringName) -> void:
@@ -569,25 +677,34 @@ func _choose_weapon(id: StringName) -> void:
 ## focused node's detail (benefit, trade-off, rank and the actions) takes
 ## the summary column. D-pad moves between nodes, LB/RB (Q/E) switch A/B,
 ## A opens the actions, B goes back to the tree.
-const BRANCH_COLORS: Dictionary = {&"combat": UiTheme.INFO, &"survival": UiTheme.SUCCESS, &"breaker": UiTheme.ACCENT,
-	&"logistics": Color("c49a6c")}  ## warm sand: the fourth branch, apart from the amber of the actions
+const BRANCH_COLORS: Dictionary = {&"combat": Dossier.INFO, &"survival": Dossier.SUCCESS, &"breaker": Dossier.ACCENT,
+	&"logistics": Color("7a5a2c")}  ## warm sand: the fourth branch, apart from the amber of the actions
 const NUMERAL_WIDTH := 24.0  ## the tier numeral's column: four branches need the width
 
 
 func _perks() -> void:
 	_content.add_theme_constant_override("separation", 8)
 	if _notice != "":
-		var notice := UiTheme.label(_notice, 14, UiTheme.DANGER)
+		var notice := Dossier.label(_notice, 14, Dossier.DANGER)
 		notice.name = "PerkNotice"
 		notice.autowrap_mode = TextServer.AUTOWRAP_OFF
 		notice.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		notice.tooltip_text = _notice
 		_content.add_child(notice)
+	# The pin board: the four branches are columns of cards pinned to cork.
+	var board := PanelContainer.new()
+	board.name = "PerkBoard"
+	board.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var cork := Dossier.sheet_box(Dossier.CORK, 8.0)
+	cork.content_margin_left = 2  # the four columns need the width: the names must not be trimmed
+	cork.content_margin_right = 2
+	board.add_theme_stylebox_override("panel", cork)
+	_content.add_child(board)
 	var grid := HBoxContainer.new()
 	grid.name = "PerkTree"
 	grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	grid.add_theme_constant_override("separation", 4)  # four branches: the gaps are narrow
-	_content.add_child(grid)
+	board.add_child(grid)
 	_perk_buttons.clear()
 	for branch in GameData.PERK_BRANCHES:
 		if branch != GameData.PERK_BRANCHES[0]:
@@ -603,8 +720,8 @@ func _perks() -> void:
 		branch_header.alignment = BoxContainer.ALIGNMENT_CENTER
 		branch_header.add_theme_constant_override("separation", 8)
 		column.add_child(branch_header)
-		branch_header.add_child(Art.image(branch, 30, UiTheme.INFO.lerp(UiTheme.TEXT, 0.35)))
-		var branch_title := UiTheme.title(String(branch).to_upper(), 27)
+		branch_header.add_child(Art.image(branch, 30, Dossier.INK))
+		var branch_title := Dossier.title(String(branch).to_upper(), 27)
 		branch_title.autowrap_mode = TextServer.AUTOWRAP_OFF
 		branch_header.add_child(branch_title)
 		var under := HSeparator.new()
@@ -616,9 +733,9 @@ func _perks() -> void:
 			var row := HBoxContainer.new()
 			row.add_theme_constant_override("separation", 2)
 			column.add_child(row)
-			var numeral := UiTheme.title(GameData.RANK_NAMES[tier], 13)
-			numeral.add_theme_font_override("font", UiTheme.mono_bold_font())  # serifed numerals, smaller for four branches
-			numeral.add_theme_color_override("font_color", UiTheme.INFO.lerp(UiTheme.TEXT, 0.4))
+			var numeral := Dossier.title(GameData.RANK_NAMES[tier], 13)
+			numeral.add_theme_font_override("font", Dossier.typed_font())  # serifed numerals, smaller for four branches
+			numeral.add_theme_color_override("font_color", Dossier.INK)
 			numeral.custom_minimum_size.x = NUMERAL_WIDTH
 			numeral.autowrap_mode = TextServer.AUTOWRAP_OFF
 			row.add_child(numeral)
@@ -636,8 +753,8 @@ func _perks() -> void:
 	var strip := PanelContainer.new()
 	strip.name = "EquippedStrip"
 	var strip_box := StyleBoxFlat.new()
-	strip_box.bg_color = Color(0.02, 0.06, 0.075, 0.92)
-	strip_box.border_color = UiTheme.LINE
+	strip_box.bg_color = Dossier.PAPER
+	strip_box.border_color = Dossier.LINE
 	strip_box.set_border_width_all(1)
 	strip_box.set_corner_radius_all(3)
 	strip_box.set_content_margin_all(10)
@@ -650,7 +767,7 @@ func _perks() -> void:
 	strip.add_child(equipped)
 	var bottom := HBoxContainer.new()
 	equipped.add_child(bottom)
-	var slots_heading := UiTheme.title("EQUIPPED PERKS   %d / %d" % [profile.equipped_perks.size(), profile.slots], 18)
+	var slots_heading := Dossier.title("EQUIPPED PERKS   %d / %d" % [profile.equipped_perks.size(), profile.slots], 18)
 	slots_heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	slots_heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom.add_child(slots_heading)
@@ -676,7 +793,7 @@ func _connector() -> Control:
 	centre.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(centre)
 	var link := ColorRect.new()
-	link.color = UiTheme.LINE.lightened(0.15)
+	link.color = Dossier.LINE.lightened(0.15)
 	link.custom_minimum_size = Vector2(2, 0)
 	link.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	link.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -747,7 +864,7 @@ func _perk_detail() -> void:
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	titles.add_theme_constant_override("separation", 2)
 	heading.add_child(titles)
-	var name_label := UiTheme.title(perk.title.to_upper(), 26)
+	var name_label := Dossier.title(perk.title.to_upper(), 26)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -756,13 +873,13 @@ func _perk_detail() -> void:
 	var standing: String = "RANK %s OF III" % GameData.RANK_NAMES[rank] if rank > 0 else "NOT OWNED"
 	if perk.class_filter != &"":
 		standing = "%s ONLY" % String(GameData.CLASS_INFO[perk.class_filter]["name"]).to_upper()
-	var where := UiTheme.label("%s %s  /  %s" % [String(branch).to_upper(), GameData.RANK_NAMES[tier], standing], 11, BRANCH_COLORS[branch].lerp(UiTheme.TEXT, 0.3), true)
+	var where := Dossier.label("%s %s  /  %s" % [String(branch).to_upper(), GameData.RANK_NAMES[tier], standing], 11, BRANCH_COLORS[branch].lerp(Dossier.TEXT, 0.3), true)
 	where.autowrap_mode = TextServer.AUTOWRAP_OFF
 	titles.add_child(where)
 	titles.add_child(_pips(rank, Vector2(14, 8), false))
 	# A class-only perk does nothing for another class: say so, do not hide it.
 	if perk != null and perk.class_filter != &"" and perk.class_filter != profile.selected_class:
-		var warning := UiTheme.label("NO EFFECT WITH THIS CLASS: works only with the %s" % String(GameData.CLASS_INFO[perk.class_filter]["name"]).to_upper(), 13, UiTheme.DANGER)
+		var warning := Dossier.label("NO EFFECT WITH THIS CLASS: works only with the %s" % String(GameData.CLASS_INFO[perk.class_filter]["name"]).to_upper(), 13, Dossier.DANGER)
 		warning.name = "ClassWarning"
 		warning.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		titles.add_child(warning)
@@ -806,7 +923,7 @@ func _perk_detail() -> void:
 		_effects(next, perk, rank + 1)
 	var problem: String = profile.rank_problem(node)
 	if problem != "" and problem != "Max rank":
-		var why := UiTheme.label(problem, 13, UiTheme.DANGER, true)
+		var why := Dossier.label(problem, 13, Dossier.DANGER, true)
 		why.name = "PerkRequirement"
 		_summary.add_child(why)
 	var spring := Control.new()
@@ -825,11 +942,11 @@ func _perk_detail() -> void:
 	var equipped: bool = profile.equipped_in(node) != &""
 	var full: bool = not equipped and profile.equipped_perks.size() >= profile.slots
 	if equipped:
-		var status := UiTheme.label("EQUIPPED", 16, UiTheme.TEXT)
+		var status := Dossier.label("EQUIPPED", 16, Dossier.TEXT)
 		status.name = "PerkEquipped"
-		status.add_theme_font_override("font", UiTheme._spaced(UiTheme.heading_font(), 1))
+		status.add_theme_font_override("font", UiTheme._spaced(Dossier.typed_font(), 1))
 		status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		var badge := UiTheme._ticked(UiTheme._box(Color(UiTheme.SUCCESS, 0.14), UiTheme.SUCCESS, 1, 3))
+		var badge := UiTheme._ticked(UiTheme._box(Color(Dossier.SUCCESS, 0.14), Dossier.SUCCESS, 1, 3))
 		badge.base.content_margin_top = 3
 		badge.base.content_margin_bottom = 3
 		badge.place = MarkedBox.Place.LEFT
@@ -853,7 +970,7 @@ func _perk_detail() -> void:
 		use.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		use.tooltip_text = "Free: play with a lower purchased rank (milder trade-off)."
 		_compact(use, 30, 16)
-	var note := UiTheme.label("Switching alternatives is free.", 11, UiTheme.MUTED, true)
+	var note := Dossier.label("Switching alternatives is free.", 11, Dossier.MUTED, true)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_summary.add_child(note)
 
@@ -869,13 +986,13 @@ func _corner_tick(button: Button) -> void:
 			var plain: StyleBoxFlat = (style as MarkedBox).base.duplicate()
 			plain.content_margin_left = 6
 			plain.content_margin_right = 6
-			plain.border_color = UiTheme.SUCCESS
+			plain.border_color = Dossier.SUCCESS
 			plain.set_border_width_all(2)
 			button.add_theme_stylebox_override(state, plain)
 	var tick := TextureRect.new()
 	tick.name = "SelectedTick"
 	tick.texture = UiTheme.tick_icon()
-	tick.modulate = UiTheme.SUCCESS
+	tick.modulate = Dossier.SUCCESS
 	tick.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	tick.position = Vector2(6, 5)
 	tick.size = Vector2(16, 16)
@@ -887,11 +1004,11 @@ func _corner_tick(button: Button) -> void:
 func _section(parent: Control, text: String, value: String) -> Label:
 	var row := HBoxContainer.new()
 	parent.add_child(row)
-	var head := UiTheme.title(text, 15)
+	var head := Dossier.title(text, 15)
 	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	head.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(head)
-	var right := UiTheme.label(value, 11, UiTheme.MUTED, true)
+	var right := Dossier.label(value, 11, Dossier.MUTED, true)
 	right.autowrap_mode = TextServer.AUTOWRAP_OFF
 	right.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(right)
@@ -918,12 +1035,12 @@ func _effect_row(parent: VBoxContainer, benefit: bool, format: String, value: fl
 	row.tooltip_text = ("▲ " if benefit else "▼ ") + GameData.perk_text(format, value)
 	row.mouse_filter = Control.MOUSE_FILTER_PASS
 	parent.add_child(row)
-	var colour: Color = UiTheme.SUCCESS if benefit else UiTheme.DANGER
-	var what := UiTheme.label(("▲ " if benefit else "▼ ") + parts[0], 12, UiTheme.TEXT)
+	var colour: Color = Dossier.SUCCESS if benefit else Dossier.DANGER
+	var what := Dossier.label(("▲ " if benefit else "▼ ") + parts[0], 12, Dossier.TEXT)
 	what.name = "Effect"
 	what.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(what)
-	var amount := UiTheme.label(parts[1], 12, colour, true)
+	var amount := Dossier.label(parts[1], 12, colour, true)
 	amount.name = "Value"
 	amount.autowrap_mode = TextServer.AUTOWRAP_OFF
 	amount.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -955,7 +1072,7 @@ func _pips(rank: int, size: Vector2, vertical: bool) -> BoxContainer:
 		var pip := ColorRect.new()
 		pip.custom_minimum_size = size
 		pip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		pip.color = UiTheme.ACCENT if k <= rank else UiTheme.LINE
+		pip.color = Dossier.ACCENT if k <= rank else Dossier.LINE
 		pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		pips.add_child(pip)
 	return pips
@@ -995,30 +1112,30 @@ func _weapon_picture(id: StringName) -> Control:
 
 func _loadout() -> void:
 	_summary.add_theme_constant_override("separation", 6)
-	var title := UiTheme.title("LOADOUT", 28)
+	var title := Dossier.title("LOADOUT", 28)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_summary.add_child(title)
 	_divider(_summary)
 	for id in profile.weapon_loadout():
 		var weapon: GameData.Weapon = GameData.weapon(id)
-		_summary.add_child(UiTheme.label("PRIMARY" if weapon.primary else "SECONDARY", 12, UiTheme.MUTED, true))
+		_summary.add_child(Dossier.label("PRIMARY" if weapon.primary else "SECONDARY", 12, Dossier.MUTED, true))
 		var weapon_row := HBoxContainer.new()
 		weapon_row.add_theme_constant_override("separation", 10)
 		_summary.add_child(weapon_row)
 		weapon_row.add_child(_weapon_picture(id))
-		var weapon_name := UiTheme.label(weapon.display_name.to_upper(), 13, UiTheme.TEXT)
+		var weapon_name := Dossier.label(weapon.display_name.to_upper(), 13, Dossier.TEXT)
 		weapon_name.autowrap_mode = TextServer.AUTOWRAP_OFF
-		weapon_name.add_theme_font_override("font", UiTheme._spaced(UiTheme.mono_font(), 1))
+		weapon_name.add_theme_font_override("font", UiTheme._spaced(Dossier.typed_font(), 1))
 		weapon_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		weapon_name.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		weapon_row.add_child(weapon_name)
 		_divider(_summary)
-	var perks_head := UiTheme.title("PERKS   %d / %d" % [profile.equipped_perks.size(), profile.slots], 18)
+	var perks_head := Dossier.title("PERKS   %d / %d" % [profile.equipped_perks.size(), profile.slots], 18)
 	perks_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_summary.add_child(perks_head)
 	_slot_strip(_summary, false)
 	_divider(_summary)
-	var threat := UiTheme.title("THREAT LEVEL", 18)
+	var threat := Dossier.title("THREAT LEVEL", 18)
 	threat.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_summary.add_child(threat)
 	var levels := HBoxContainer.new()
@@ -1030,7 +1147,7 @@ func _loadout() -> void:
 			_act(true))
 		b.name = "Threat_%d" % t
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.add_theme_font_override("font", UiTheme.mono_bold_font())
+		b.add_theme_font_override("font", Dossier.typed_font())
 		b.disabled = t > profile.max_threat
 		b.tooltip_text = "Extract on your highest Threat to unlock the next level."
 		if t == profile.threat:
@@ -1038,20 +1155,20 @@ func _loadout() -> void:
 		_compact(b, 40, 20)
 		if b.disabled:
 			# Locked level: a solid box with a padlock, still clearly a level.
-			var locked := MarkedBox.new(UiTheme._box(Color(0.02, 0.05, 0.06, 0.9), UiTheme.LINE, 1, 3))
+			var locked := MarkedBox.new(UiTheme._box(Dossier.PAPER_DARK, Dossier.LINE, 1, 3))
 			locked.mark_texture = UiTheme.lock_icon()
-			locked.mark_color = UiTheme.MUTED
+			locked.mark_color = Dossier.MUTED
 			locked.place = MarkedBox.Place.LEFT
 			locked.sync_margins()
 			b.add_theme_stylebox_override("disabled", locked)
 	var multiplier := HBoxContainer.new()
 	_summary.add_child(multiplier)
-	var word := UiTheme.label("INTEL MULTIPLIER", 13, UiTheme.MUTED, true)
+	var word := Dossier.label("INTEL MULTIPLIER", 13, Dossier.MUTED, true)
 	word.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	multiplier.add_child(word)
-	var factor := UiTheme.label("×%.2f" % GameData.threat_intel(profile.threat), 15, UiTheme.TEXT)
+	var factor := Dossier.label("×%.2f" % GameData.threat_intel(profile.threat), 15, Dossier.TEXT)
 	factor.name = "IntelMultiplier"
-	factor.add_theme_font_override("font", UiTheme.mono_bold_font())
+	factor.add_theme_font_override("font", Dossier.typed_font())
 	factor.autowrap_mode = TextServer.AUTOWRAP_OFF
 	multiplier.add_child(factor)
 
@@ -1074,9 +1191,9 @@ func _slot_strip(parent: Control, interactive: bool) -> void:
 		slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		slot.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		var dashed: bool = perk == null
-		var border: Color = UiTheme.SUCCESS.darkened(0.2) if perk != null else UiTheme.LINE.lightened(0.25)
+		var border: Color = Dossier.SUCCESS.darkened(0.2) if perk != null else Dossier.LINE.lightened(0.25)
 		for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
-			var box: StyleBox = UiTheme.card_box(Color(0.03, 0.085, 0.1, 0.9), border.lightened(0.3) if state.begins_with("hover") else border, 1, dashed)
+			var box: StyleBox = UiTheme.card_box(Dossier.PAPER, border.lightened(0.3) if state.begins_with("hover") else border, 1, dashed)
 			slot.add_theme_stylebox_override(state, box)
 		var rank_name: String = GameData.RANK_NAMES[profile.use_rank(perk.node())] if perk != null else ""
 		slot.tooltip_text = perk.title + " / " + perk.description if perk != null else ("Purchase the next perk slot." if locked else "Equip a perk in the Perks tab.")
@@ -1103,10 +1220,10 @@ func _slot_strip(parent: Control, interactive: bool) -> void:
 			var symbol: Texture2D = Art.icon(perk.id, 30) if perk != null else (UiTheme.lock_icon() if locked else Art.icon(&"plus", 26))
 			slot.icon = symbol
 			slot.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			slot.add_theme_color_override("icon_normal_color", UiTheme.TEXT if perk != null else UiTheme.MUTED)
+			slot.add_theme_color_override("icon_normal_color", Dossier.TEXT if perk != null else Dossier.MUTED)
 			slot.pressed.connect(_select_category.bind("PERKS"))
 			cell.add_child(slot)
-			var caption := UiTheme.label("RANK " + rank_name if perk != null else ("LOCKED" if locked else "EMPTY"), 11, UiTheme.MUTED, true)
+			var caption := Dossier.label("RANK " + rank_name if perk != null else ("LOCKED" if locked else "EMPTY"), 11, Dossier.MUTED, true)
 			caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			caption.autowrap_mode = TextServer.AUTOWRAP_OFF
 			cell.add_child(caption)
@@ -1126,10 +1243,10 @@ func _wide_slot(slot: Button, perk: GameData.Perk, locked: bool, rank_name: Stri
 	var square := PanelContainer.new()
 	square.custom_minimum_size = Vector2(50, 0)
 	square.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	square.add_theme_stylebox_override("panel", UiTheme.card_box(Color(0.02, 0.05, 0.06, 0.8), UiTheme.LINE, 1, perk == null))
+	square.add_theme_stylebox_override("panel", UiTheme.card_box(Color(0.02, 0.05, 0.06, 0.8), Dossier.LINE, 1, perk == null))
 	row.add_child(square)
 	var symbol: StringName = perk.id if perk != null else &"plus"
-	var image := Art.image(symbol, 30 if perk != null else 22, UiTheme.TEXT if perk != null else UiTheme.MUTED)
+	var image := Art.image(symbol, 30 if perk != null else 22, Dossier.TEXT if perk != null else Dossier.MUTED)
 	if locked:
 		image.texture = UiTheme.lock_icon()
 	square.add_child(image)
@@ -1141,18 +1258,18 @@ func _wide_slot(slot: Button, perk: GameData.Perk, locked: bool, rank_name: Stri
 	row.add_child(text)
 	var cost: int = GameData.SLOT_COSTS[index]
 	var name_text: String = perk.title.to_upper() if perk != null else ("LOCKED / %d INTEL" % cost if locked else "EMPTY")
-	var title := UiTheme.title(name_text, 16)
+	var title := Dossier.title(name_text, 16)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	title.add_theme_color_override("font_color", UiTheme.TEXT if perk != null else UiTheme.MUTED)
+	title.add_theme_color_override("font_color", Dossier.TEXT if perk != null else Dossier.MUTED)
 	text.add_child(title)
 	if perk != null:
 		var rank_row := HBoxContainer.new()
 		rank_row.add_theme_constant_override("separation", 10)
 		rank_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		text.add_child(rank_row)
-		var numeral := UiTheme.title(rank_name, 16)
+		var numeral := Dossier.title(rank_name, 16)
 		numeral.custom_minimum_size.x = 18
 		numeral.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		rank_row.add_child(numeral)
@@ -1162,7 +1279,7 @@ func _wide_slot(slot: Button, perk: GameData.Perk, locked: bool, rank_name: Stri
 ## Dense detail actions keep their focus/state styles, with smaller padding.
 func _compact(button: Button, height: float, font_size: int) -> void:
 	button.custom_minimum_size.y = height
-	button.add_theme_font_size_override("font_size", font_size)
+	button.add_theme_font_size_override("font_size", roundi(font_size * Dossier.TYPED_SCALE))
 	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 		var style: StyleBox = button.get_theme_stylebox(state).duplicate()
 		style.content_margin_top = 4

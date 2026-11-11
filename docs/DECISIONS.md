@@ -52,6 +52,8 @@ registadas as decisões dessa data.
 | 2026-11-10 | **Identidade visual dos menus: direção A, «field dossier»** (papel, tinta, máquina de escrever, carimbos, fotografias presas à página). | Escolha do utilizador entre três propostas ([canvas](https://claude.ai/artifact/2cu377QK5KrYFTiU1Tqndf)). Substitui a paleta B «Atlantic & azulejo» nos menus fora da ilha; o HUD e os diálogos mantêm o `UiTheme`. Começa pelo título (`game/ui/dossier.gd`); armory, perks, armas, barco e debrief a seguir. |
 | 2026-11-10 | **HUD com placas escuras** por trás dos blocos. | Aprovado pelo utilizador. Substitui o «HUD sem fundos escuros» de [MENUS.md](design/MENUS.md). |
 | 2026-11-10 | **Ilhas com aspeto natural**: trocar as formas geométricas por modelos variados, e a vista geral do mapa antes de partir mostra a ilha real. | Pedido do utilizador. Piloto na `beach_01`; plano em `TODO.md`. |
+| 2026-11-11 | **Fonte Special Elite (Apache 2.0) aceite** para os menus, e a Libre Franklin (OFL). | Exceção à lista de licenças (CC0, MIT, OFL), pedida para a letra de máquina de escrever do mockup A. Registadas em `assets/LICENSES.md`. |
+| 2026-11-11 | **Menus refeitos como dossier**: a cena 3D do abrigo deixa de ser fundo e passa a fotografia presa à ficha da classe. | Escolha do utilizador. Mesa escura, folhas de papel, quadro de cortiça nos perks e formulário de requisição nas armas (`game/ui/dossier.gd`, `game/states/armory.gd`). |
 
 ## Em aberto
 

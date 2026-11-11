@@ -63,20 +63,17 @@ func _check_screens(armory: Control, profile: Profile) -> void:
 		all_textured = all_textured and (picture as TextureRect).texture != null
 	_check(all_textured, "every loadout picture has its texture")
 
+	# The issue form (2026-11-11): a list of items and one item's sheet, with its figures. The
+	# shotgun's damage reads "damage × pellets"; a single-pellet weapon reads its damage alone.
 	armory.call("_select_category", "WEAPONS")
-	var pellets: Array[String] = []
-	var plain: Array[String] = []
-	for label: Node in armory.find_children("*", "Label", true, false):
-		var text: String = (label as Label).text
-		if "PELLETS" in text:
-			pellets.append(text)
-		elif " DAMAGE /" in text:
-			plain.append(text)
 	var shotgun: GameData.Weapon = GameData.weapon(&"shotgun")
-	var wanted: String = "%d PELLETS · %d DAMAGE EACH / " % [shotgun.pellets, int(shotgun.damage)]
-	_check(pellets.size() == 1 and pellets[0].begins_with(wanted),
-		"the Shotgun reads its pellets and damage each (%s, wanted '%s')" % [pellets, wanted])
-	_check(not plain.is_empty(), "the other weapons keep their plain damage line (%d cards)" % plain.size())
+	var rifle: GameData.Weapon = GameData.weapon(&"rifle")
+	var sheet: VBoxContainer = armory.find_child("ItemSheet", true, false).get_child(0) as VBoxContainer
+	armory.call("_show_weapon", sheet, &"shotgun")
+	var wanted: String = "%d × %d" % [int(shotgun.damage), shotgun.pellets]
+	_check(_texts(sheet).has(wanted), "the Shotgun's sheet reads its damage and pellets ('%s')" % wanted)
+	armory.call("_show_weapon", sheet, &"rifle")
+	_check(_texts(sheet).has("%d" % int(rifle.damage)) and not _texts(sheet).has(wanted), "a single-pellet weapon reads its plain damage")
 	var fallback: Control = armory.call("_weapon_picture", &"no_such_weapon")
 	_check(fallback is TextureRect and fallback.name != "WeaponPicture" and (fallback as TextureRect).texture != null,
 		"a weapon with no render falls back to its silhouette")
@@ -86,3 +83,11 @@ func _check_screens(armory: Control, profile: Profile) -> void:
 	_check(card.title == "Ammo Reserves" and card.description.begins_with("+15% maximum reserve ammo per rank"),
 		"Bigger Mags is called Ammo Reserves, and its description names the reserve")
 	quit(1 if _failures > 0 else 0)
+
+
+## The texts of every Label under `node`.
+func _texts(node: Node) -> Array[String]:
+	var out: Array[String] = []
+	for label: Node in node.find_children("*", "Label", true, false):
+		out.append((label as Label).text)
+	return out

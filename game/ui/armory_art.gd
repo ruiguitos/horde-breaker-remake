@@ -84,7 +84,7 @@ static func weapon(id: StringName, width: int = 120, height: int = 40) -> Textur
 		"<g transform='translate(%f %f) scale(%f)'>%s</g>" % [offset.x, offset.y, k, body], width, height)
 
 
-static func image(id: StringName, size: int, color: Color = UiTheme.TEXT) -> TextureRect:
+static func image(id: StringName, size: int, color: Color = Dossier.TEXT) -> TextureRect:
 	var image := TextureRect.new()
 	image.texture = icon(id, size)
 	image.custom_minimum_size = Vector2(size, size)
@@ -96,7 +96,7 @@ static func image(id: StringName, size: int, color: Color = UiTheme.TEXT) -> Tex
 
 
 ## A weapon silhouette as a TextureRect, tinted.
-static func weapon_image(id: StringName, width: int, height: int, color: Color = UiTheme.TEXT) -> TextureRect:
+static func weapon_image(id: StringName, width: int, height: int, color: Color = Dossier.TEXT) -> TextureRect:
 	var image := TextureRect.new()
 	image.texture = weapon(id, width, height)
 	image.custom_minimum_size = Vector2(width, height)

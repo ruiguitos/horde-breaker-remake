@@ -104,11 +104,12 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
 
 ## Conteúdo e apresentação
 
-- [ ] Menus na direção A («field dossier», decisão de 2026-11-10): o título está feito
-  (`game/ui/dossier.gd`, captura em `docs/design/dossier_20261111/`). Por fazer: armory, perks
-  (quadro de fichas), armas (formulário de requisição), barco, debrief e cartas. Decidir se entra
-  uma fonte de máquina de escrever (hoje IBM Plex Mono; a Special Elite é Apache 2.0, fora da
-  lista de licenças aceites).
+- [ ] Menus na direção A («field dossier»): feitos o título e o armory (classe com a fotografia
+  3D, armas como formulário de requisição, perks num quadro de cortiça), com a Special Elite e a
+  Libre Franklin; capturas em `docs/design/dossier_20261111/`. Por fazer: barco, debrief, cartas,
+  diálogos (run, definições, arquivo) e pausa, que ainda usam o tema escuro. Nos cartões dos
+  perks os nomes continuam na Barlow Condensed: dois nomes à máquina não cabem num cartão;
+  o mockup tem um nome por cartão, e isso pede mudar o cartão (`game/ui/perk_node_view.gd`).
 - [ ] Ilhas com aspeto natural (decisão de 2026-11-10), piloto na `beach_01`: 1) pôr as 13 peças
   do `scenery_kit` nos edifícios e na praia; 2) variar a vegetação com as peças do kit de
   natureza por usar; 3) várias texturas no terreno e costa menos regular; 4) medir desenho e

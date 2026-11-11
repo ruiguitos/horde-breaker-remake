@@ -31,7 +31,7 @@ func _ready() -> void:
 	add_child(layer)
 	_root = Control.new()
 	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_root.theme = Dossier.theme()
+	_root.theme = Dossier.lined_theme()
 	layer.add_child(_root)
 	var desk := Dossier.sheet(Dossier.DESK)
 	desk.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -124,7 +124,7 @@ Survival is encouraged.", 13, Dossier.INK_MUTED)
 func _caption(text: String, font_size: int = 13) -> Label:
 	var l := Dossier.typed(text, font_size, Dossier.INK_MUTED)
 	var font := FontVariation.new()
-	font.base_font = UiTheme.mono_font()
+	font.base_font = Dossier.typed_font()
 	font.spacing_glyph = 1
 	l.add_theme_font_override("font", font)
 	return l
@@ -175,8 +175,8 @@ func _deploy_entry(parent: Control) -> Button:
 	text.add_theme_constant_override("separation", 0)
 	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(text)
-	text.add_child(_inner_label("01  DEPLOY", UiTheme.mono_bold_font(), 24, Dossier.PAPER))
-	text.add_child(_inner_label("Armory, then choose your run", UiTheme.mono_font(), 12, Dossier.PAPER_DARK))
+	text.add_child(_inner_label("01  DEPLOY", Dossier.typed_font(), 24, Dossier.PAPER))
+	text.add_child(_inner_label("Armory, then choose your run", Dossier.typed_font(), 12, Dossier.PAPER_DARK))
 	var arrow := TextureRect.new()
 	arrow.texture = _chevron()
 	arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -196,7 +196,7 @@ func _redeploy_entry(parent: Control) -> Button:
 	row.alignment = BoxContainer.ALIGNMENT_END
 	var problem: String = profile.redeploy_problem()
 	var detail: String = _redeploy_detail(problem)
-	var summary := _inner_label(detail, UiTheme.mono_font(), 11, Dossier.INK_MUTED)
+	var summary := _inner_label(detail, Dossier.typed_font(), 11, Dossier.INK_MUTED)
 	summary.name = "Summary"
 	summary.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	summary.size_flags_vertical = Control.SIZE_FILL
@@ -226,7 +226,7 @@ func _archive_entry(parent: Control) -> void:
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var row := _overlay(b)
 	row.alignment = BoxContainer.ALIGNMENT_END
-	_archive_badge = _inner_label("%d NEW" % profile.unread_files(), UiTheme.mono_bold_font(), 12, Dossier.PAPER)
+	_archive_badge = _inner_label("%d NEW" % profile.unread_files(), Dossier.typed_font(), 12, Dossier.PAPER)
 	_archive_badge.name = "Badge"
 	_archive_badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var pill := StyleBoxFlat.new()
@@ -251,7 +251,7 @@ func _dev_entry() -> Button:
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.size_flags_vertical = Control.SIZE_SHRINK_END
 	b.theme_type_variation = &"QuietButton"
-	b.add_theme_font_override("font", UiTheme.mono_font())
+	b.add_theme_font_override("font", Dossier.typed_font())
 	b.add_theme_font_size_override("font_size", 12)
 	b.add_theme_color_override("font_color", Dossier.INK_MUTED)
 	var dashed := MarkedBox.new(StyleBoxFlat.new())
@@ -298,8 +298,8 @@ func _build_footer() -> void:
 		cell.scroll_active = false
 		cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		cell.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		cell.add_theme_font_override("normal_font", UiTheme.mono_font())
-		cell.add_theme_font_override("bold_font", UiTheme.mono_bold_font())
+		cell.add_theme_font_override("normal_font", Dossier.typed_font())
+		cell.add_theme_font_override("bold_font", Dossier.typed_font())
 		cell.add_theme_font_size_override("normal_font_size", 14)
 		cell.add_theme_font_size_override("bold_font_size", 14)
 		cell.add_theme_color_override("default_color", Dossier.INK_MUTED)
@@ -327,7 +327,7 @@ func _hint(parent: Control, bindings: Array, word: String) -> void:
 	icons.scroll_active = false
 	icons.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	icons.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	icons.add_theme_font_override("normal_font", UiTheme.mono_font())
+	icons.add_theme_font_override("normal_font", Dossier.typed_font())
 	icons.add_theme_font_size_override("normal_font_size", 13)
 	hint.add_child(icons)
 	InputIcons.fill(icons, bindings)

@@ -45,6 +45,8 @@ incluindo fontes, licenças e indicação das modificações. Ver
 | `assets/audio/ovani_sfx_starter_vol1/` | Sound FX Starter Pack Vol. 1 (só os 21 sons usados; o resto foi retirado, recuperável no histórico) | Ovani Sound | Royalty-free (`Royalty-Free License (Link).pdf`; https://ovanisound.com/policies/terms-of-service) |
 | `assets/fonts/barlow_condensed/`, `assets/fonts/barlow/` | Barlow Condensed (SemiBold, Bold, ExtraBold) e Barlow (Regular, Medium, SemiBold): títulos e corpo dos menus e do HUD | The Barlow Project Authors (Jeremy Tribby), via github.com/google/fonts | OFL 1.1 (`OFL.txt` em cada pasta) |
 | `assets/fonts/ibm_plex_mono/` | IBM Plex Mono (Regular, SemiBold): números e teclas | IBM Corp., via github.com/google/fonts | OFL 1.1 (`OFL.txt`) |
+| `assets/fonts/special_elite/` | Special Elite (Regular): a letra de máquina de escrever dos menus «field dossier» | Astigmatic (Brian J. Bonislawsky), via github.com/google/fonts | Apache 2.0 (`LICENSE.txt`); exceção aceite pelo utilizador em 2026-11-11 |
+| `assets/fonts/libre_franklin/` | Libre Franklin (variável, peso 400–600): texto corrido dos menus «field dossier» | The Libre Franklin Project Authors, via github.com/google/fonts | OFL 1.1 (`OFL.txt`) |
 
 Removidos na integração (não servem ao jogo): versões Unity/Unreal da
 biblioteca de animações, a demo do Terrain3D, ficheiros `__MACOSX` e, do
