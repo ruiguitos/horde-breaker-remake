@@ -883,28 +883,19 @@ func _perk_detail() -> void:
 		warning.name = "ClassWarning"
 		warning.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		titles.add_child(warning)
-	var options := HBoxContainer.new()
-	options.add_theme_constant_override("separation", 4)
-	_summary.add_child(options)
+	# The other alternative, in one line: Q / E (LB / RB) switches, free. No buttons for it here.
 	var picked: int = profile.perk_option(node)
-	for option in 2:
-		var alt: GameData.Perk = GameData.perk_for(node, option, profile.selected_class)
-		var ob := UiTheme.button(options, alt.title.to_upper() if alt != null else "—", _pick_option.bind(node, option))
-		ob.name = "PerkOption_" + "AB"[option]
-		ob.alignment = HORIZONTAL_ALIGNMENT_CENTER
-		ob.icon = Art.icon(alt.id, 26)
-		ob.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		ob.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-		ob.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		ob.clip_text = true
-		ob.tooltip_text = alt.title + " / " + alt.description + "\nSwitching A ↔ B is free, in the armory only. Ranks belong to the node."
-		UiTheme.set_selected(ob, option == picked)
-		_compact(ob, 48, 14)
-		_corner_tick(ob)
+	var other: GameData.Perk = GameData.perk_for(node, 1 - picked, profile.selected_class)
+	if other != null:
+		var swap := Dossier.label("Alternative: %s" % other.title, 12, Dossier.MUTED)
+		swap.name = "PerkOther"
+		swap.tooltip_text = other.description
+		swap.mouse_filter = Control.MOUSE_FILTER_PASS
+		_summary.add_child(swap)
 	_divider(_summary)
-	# Not owned yet: nothing is active, and NEXT RANK below is rank I.
-	_section(_summary, "CURRENT EFFECT", "RANK " + GameData.RANK_NAMES[profile.use_rank(node)] if rank > 0 else "NONE / NOT OWNED")
+	# Not owned yet: nothing is active, so only NEXT RANK (rank I) shows.
 	if rank > 0:
+		_section(_summary, "CURRENT EFFECT", "RANK " + GameData.RANK_NAMES[profile.use_rank(node)])
 		var effects := VBoxContainer.new()
 		effects.name = "PerkEffects"
 		effects.add_theme_constant_override("separation", 0)
@@ -941,18 +932,6 @@ func _perk_detail() -> void:
 		_compact(upgrade, 36, 18)
 	var equipped: bool = profile.equipped_in(node) != &""
 	var full: bool = not equipped and profile.equipped_perks.size() >= profile.slots
-	if equipped:
-		var status := Dossier.label("EQUIPPED", 16, Dossier.TEXT)
-		status.name = "PerkEquipped"
-		status.add_theme_font_override("font", UiTheme._spaced(Dossier.typed_font(), 1))
-		status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		var badge := UiTheme._ticked(UiTheme._box(Color(Dossier.SUCCESS, 0.14), Dossier.SUCCESS, 1, 3))
-		badge.base.content_margin_top = 3
-		badge.base.content_margin_bottom = 3
-		badge.place = MarkedBox.Place.LEFT
-		badge.sync_margins()
-		status.add_theme_stylebox_override("normal", badge)
-		_summary.add_child(status)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 4)
 	_summary.add_child(row)
@@ -961,6 +940,7 @@ func _perk_detail() -> void:
 	equip.name = "PerkEquip"
 	equip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	equip.disabled = not equipped and (rank == 0 or full)
+	equip.visible = rank > 0 or equipped  # nothing to equip before the first rank: one button then
 	equip.tooltip_text = "Free: perks can be equipped and removed at any time in the armory."
 	_compact(equip, 30, 16)
 	if rank >= 2:
@@ -970,9 +950,6 @@ func _perk_detail() -> void:
 		use.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		use.tooltip_text = "Free: play with a lower purchased rank (milder trade-off)."
 		_compact(use, 30, 16)
-	var note := Dossier.label("Switching alternatives is free.", 11, Dossier.MUTED, true)
-	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_summary.add_child(note)
 
 
 ## Tall cards show the SELECTED tick in their top-left corner, so it does
