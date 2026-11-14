@@ -1,0 +1,118 @@
+{
+  "nodes": [
+    {
+      "id": "n0",
+      "type": "file",
+      "file": "00 Início.md",
+      "x": 0,
+      "y": 0,
+      "width": 460,
+      "height": 300,
+      "color": "1"
+    },
+    {
+      "id": "n1",
+      "type": "file",
+      "file": "01 Projeto/Projeto.md",
+      "x": -650,
+      "y": -420,
+      "width": 460,
+      "height": 300,
+      "color": "2"
+    },
+    {
+      "id": "n2",
+      "type": "file",
+      "file": "02 Conteúdo/Conteúdo.md",
+      "x": 0,
+      "y": -420,
+      "width": 460,
+      "height": 300,
+      "color": "3"
+    },
+    {
+      "id": "n3",
+      "type": "file",
+      "file": "03 Sistemas/Sistemas.md",
+      "x": 650,
+      "y": -420,
+      "width": 460,
+      "height": 300,
+      "color": "4"
+    },
+    {
+      "id": "n4",
+      "type": "file",
+      "file": "04 Arte e interface/Arte e interface.md",
+      "x": -650,
+      "y": 420,
+      "width": 460,
+      "height": 300,
+      "color": "5"
+    },
+    {
+      "id": "n5",
+      "type": "file",
+      "file": "05 Desenvolvimento/Desenvolvimento.md",
+      "x": 0,
+      "y": 420,
+      "width": 460,
+      "height": 300,
+      "color": "6"
+    },
+    {
+      "id": "n6",
+      "type": "file",
+      "file": "80 Trabalho/Painel de trabalho.md",
+      "x": 650,
+      "y": 420,
+      "width": 460,
+      "height": 300,
+      "color": "1"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNode": "n0",
+      "fromSide": "top",
+      "toNode": "n1",
+      "toSide": "bottom"
+    },
+    {
+      "id": "e2",
+      "fromNode": "n0",
+      "fromSide": "top",
+      "toNode": "n2",
+      "toSide": "bottom"
+    },
+    {
+      "id": "e3",
+      "fromNode": "n0",
+      "fromSide": "top",
+      "toNode": "n3",
+      "toSide": "bottom"
+    },
+    {
+      "id": "e4",
+      "fromNode": "n0",
+      "fromSide": "bottom",
+      "toNode": "n4",
+      "toSide": "top"
+    },
+    {
+      "id": "e5",
+      "fromNode": "n0",
+      "fromSide": "bottom",
+      "toNode": "n5",
+      "toSide": "top"
+    },
+    {
+      "id": "e6",
+      "fromNode": "n0",
+      "fromSide": "bottom",
+      "toNode": "n6",
+      "toSide": "top"
+    }
+  ]
+}

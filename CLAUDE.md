@@ -86,7 +86,10 @@ decisões pendentes: `docs/tech/AGENT_FRAMEWORK.md`.
   comercial) e registados em `assets/LICENSES.md`. Exceção aceite pelo
   utilizador: dados do OpenStreetMap (ODbL), com atribuição. Também aceite:
   as texturas do céu noturno do Sky3D (CC BY 4.0, ESO/S. Brunier), com
-  créditos no ecrã de créditos. Addons em `addons/`,
+  créditos no ecrã de créditos. Exceção aceite a 2026-11-14: Assets2Godot
+  (GPLv2), apenas como ferramenta do editor, excluída da exportação; isto
+  não autoriza assets de outras licenças. Ver `docs/tech/ASSETS2GODOT.md`.
+  Addons em `addons/`,
   assets do jogo em `assets/`. O jogo tem de continuar a funcionar sem GPU
   (testes headless).
 - Spikes ficam em `spikes/<nome>/` e não dependem uns dos outros nem de `game/`.

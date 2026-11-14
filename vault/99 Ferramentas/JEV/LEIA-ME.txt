@@ -1,0 +1,10 @@
+JEV — organização do cofre, 2026-11-14
+
+01_verificacao_documentacao.json guarda o pedido anónimo, a evidência mínima
+e a resposta integral da ferramenta. O JEV confirmou três afirmações sobre
+a distinção entre dados e validação, a proteção de notas pessoais e os
+limites da cobertura verificada.
+
+Não foi enviado código privado, documentação integral ou informação pessoal.
+O parecer é consultivo: o JEV não executou os testes locais nem abriu o
+Obsidian ou o Godot. Os testes locais estão em ../validation_report.json.

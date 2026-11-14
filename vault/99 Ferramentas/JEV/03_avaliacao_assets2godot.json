@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-14",
+  "scope": "Assessment only; public addon documentation/source and generic licence policy. No installation or game changes.",
+  "request": {
+    "claims": [
+      "The public evidence supports recommending an isolated editor-workflow trial, not claiming that this addon improves game performance or is already compatible with the local project.",
+      "Hiding the BlendKit provider tab alone does not disable the helper process; the inspected source has a separate client-enabled setting that defaults to true.",
+      "The GPLv2 licence of the tool is distinct from downloaded asset licences; this evidence does not justify saying the whole game automatically becomes GPL."
+    ],
+    "evidence": [
+      {
+        "id": "public-product-docs",
+        "text": "Assets2Godot0.8.2 listing: GPLv2, alpha, Godot4.4+. Editor asset browser for Poly Haven and ambientCG CC0 catalogues, BlendKit and local sources. Blender recommended for .blend/material conversion. README says CI tests4.4.1 and4.7.x, not proof for a particular existing project. Downloads go into a shared gitignored provider parent; assets may be explicitly staged into the project. No claim of automatic triangle-budget enforcement or game FPS improvement."
+      },
+      {
+        "id": "public-plugin-source",
+        "text": "Source plugin.gd declares SETTING_CLIENT_ENABLED='blendkit/client/enabled'; client_enabled := true. _enter_tree initializes settings and calls connection.start() if client_enabled. set_client_enabled(false) invokes connection.stop(). Comment for provider visibility says hiding a daemon provider leaves its Client running; the local index needs it."
+      },
+      {
+        "id": "licence-boundaries",
+        "text": "GNU FAQ explains that using GPL tools does not generally impose GPL on independently supplied data or code, while copying tool code into output can change that. This is not a case-specific legal determination. The project's approved licence list currently names CC0, MIT, OFL and commercial royalty-free with specific exceptions; GPLv2 is not explicitly listed."
+      },
+      {
+        "id": "recommendation-scope",
+        "text": "Proposed trial: separate editor project, use CC0 sources first, explicitly disable optional helper, import one model and one material at controlled resolution, inspect paths and costs, confirm files referenced by game scenes are versioned staged assets rather than ignored downloads. No install or engine test has been performed."
+      }
+    ]
+  },
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"tool\": \"jev_verify\",\n  \"model\": \"jev-1.14.0\",\n  \"provider\": \"typesafe\",\n  \"auto_accept\": 0.8,\n  \"subject_at\": 0.5,\n  \"summary\": {\n    \"verified\": 3,\n    \"contradicted\": 0,\n    \"unsupported\": 0,\n    \"needs_review\": 0\n  },\n  \"results\": [\n    {\n      \"id\": \"claim0\",\n      \"claim\": \"The public evidence supports recommending an isolated editor-workflow trial, not claiming that this addon improves game performance or is already compatible with the local project.\",\n      \"verdict\": \"verified\",\n      \"probabilities\": {\n        \"supports\": 1,\n        \"contradicts\": 0,\n        \"says_nothing\": 0\n      },\n      \"confidence\": 1,\n      \"action\": \"auto\",\n      \"supporting_evidence\": \"recommendation-scope\",\n      \"same_subject\": 0.44\n    },\n    {\n      \"id\": \"claim1\",\n      \"claim\": \"Hiding the BlendKit provider tab alone does not disable the helper process; the inspected source has a separate client-enabled setting that defaults to true.\",\n      \"verdict\": \"verified\",\n      \"probabilities\": {\n        \"supports\": 1,\n        \"contradicts\": 0,\n        \"says_nothing\": 0\n      },\n      \"confidence\": 1,\n      \"action\": \"auto\",\n      \"supporting_evidence\": \"public-plugin-source\",\n      \"same_subject\": 0.79\n    },\n    {\n      \"id\": \"claim2\",\n      \"claim\": \"The GPLv2 licence of the tool is distinct from downloaded asset licences; this evidence does not justify saying the whole game automatically becomes GPL.\",\n      \"verdict\": \"verified\",\n      \"probabilities\": {\n        \"supports\": 1,\n        \"contradicts\": 0,\n        \"says_nothing\": 0\n      },\n      \"confidence\": 1,\n      \"action\": \"auto\",\n      \"supporting_evidence\": \"licence-boundaries\",\n      \"same_subject\": 0.35\n    }\n  ],\n  \"usage\": {\n    \"input_tokens\": 1885,\n    \"output_tokens\": 392\n  }\n}"
+      }
+    ]
+  }
+}

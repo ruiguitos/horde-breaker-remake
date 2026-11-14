@@ -1,5 +1,6 @@
 # Godot
 .godot/
+/Assets2Godot/
 *.import.tmp
 /build/
 

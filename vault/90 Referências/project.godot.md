@@ -1,0 +1,81 @@
+---
+titulo: "project.godot"
+tipo: "referencia"
+estado: "referencia_a_confrontar"
+atualizado: "2026-11-14"
+tags: ["horde-breaker", "referencia"]
+fontes: ["project.godot"]
+---
+
+# project.godot
+
+> [!warning] Cópia de consulta
+> Esta é uma cópia de consulta. A fonte continua no repositório; mudanças nesta cópia não alteram o original.
+
+Fonte: `project.godot` · SHA-256: `aa5b2fb428c9f17fda4f92971a0e21a152317b13521b1a9567639367dedc3e7e`
+
+```ini
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Horde Breaker Remake"
+config/version="0.1.0"
+run/main_scene="res://game/main.tscn"
+config/features=PackedStringArray("4.7", "Forward Plus")
+boot_splash/bg_color=Color(0.07, 0.08, 0.07, 1)
+boot_splash/show_image=false
+boot_splash+/general/enabled=true
+boot_splash+/general/run_in_editor_playtest=true
+boot_splash+/general/wait_for_scene_load=false
+boot_splash+/timing/minimum_display_time_seconds=1.6
+boot_splash+/timing/fade_in_time=0.2
+boot_splash+/timing/fade_out_time=0.5
+boot_splash+/background/mode=1
+boot_splash+/background/color=Color(0.07, 0.08, 0.07, 1)
+boot_splash+/background/image="res://game/ui/art/harbor.png"
+boot_splash+/background/animation=1
+boot_splash+/background/animation_duration=6.0
+boot_splash+/background/darken_amount=0.55
+boot_splash+/logo/logo_type=0
+boot_splash+/logo/image="res://game/ui/art/wordmark.png"
+boot_splash+/logo/size_percent=42.0
+boot_splash+/logo/animation=4
+boot_splash+/progress_bar/show=true
+boot_splash+/progress_bar/position=1
+boot_splash+/progress_bar/width_percent=36.0
+boot_splash+/progress_bar/height_px=6
+boot_splash+/progress_bar/color=Color(1, 0.72, 0.2, 1)
+boot_splash+/progress_bar/background_color=Color(1, 1, 1, 0.15)
+
+[assets2godot]
+
+allow_blendkit_client=false
+
+[autoload]
+
+BootSplashPlus="*res://addons/boot_splash_plus/boot_splash_plus_runtime.gd"
+GUIDE="*res://addons/guide/guide.gd"
+DialogueManager="*res://addons/dialogue_manager/dialogue_manager.gd"
+PhantomCameraManager="*res://addons/phantom_camera/scripts/managers/phantom_camera_manager.gd"
+
+[display]
+
+window/stretch/mode="canvas_items"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/Color grading/plugin.cfg", "res://addons/dialogue_manager/plugin.cfg", "res://addons/guide/plugin.cfg", "res://addons/phantom_camera/plugin.cfg", "res://addons/road-generator/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/terrain_3d/plugin.cfg", "res://addons/yard/plugin.cfg", "res://addons/assets2godot/plugin.cfg")
+
+[internationalization]
+
+locale/translations_pot_files=PackedStringArray("res://game/data/dialogue/briefing.dialogue", "res://game/data/dialogue/origin.dialogue", "res://game/data/dialogue/radio.dialogue", "res://game/ui/loading_screen.gd", "res://game/ui/dialogue_box.gd", "res://game/main.gd")
+```

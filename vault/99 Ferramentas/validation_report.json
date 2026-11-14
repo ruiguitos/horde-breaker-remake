@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "date": "2026-11-14",
+  "markdown_notes": 259,
+  "source_reference_notes": 90,
+  "catalogue_notes": 108,
+  "catalogue_coverage": {
+    "weapons": 5,
+    "classes": 2,
+    "enemies": 8,
+    "cards": 39,
+    "perks": 26,
+    "power_ups": 7,
+    "missions": 11,
+    "biomes": 5,
+    "modifiers": 5
+  },
+  "source_files_hashed": 382,
+  "wiki_links_checked": 812,
+  "canvas_nodes": 7,
+  "canvas_edges": 6,
+  "update_safety": {
+    "check_mode_read_only": true,
+    "unchanged_run_idempotent": true,
+    "edited_note_preserved": true,
+    "personal_note_preserved": true
+  },
+  "errors": [],
+  "warnings": [],
+  "godot_executed": false,
+  "obsidian_ui_tested": false
+}

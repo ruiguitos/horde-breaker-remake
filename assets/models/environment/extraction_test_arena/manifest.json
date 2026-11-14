@@ -1,0 +1,106 @@
+{
+  "license": "CC0-1.0",
+  "units": "metres",
+  "up_axis": "Y",
+  "original_geometry": true,
+  "original_procedural_textures": true,
+  "texture_size": [
+    1024,
+    1024
+  ],
+  "dimension_order": "X width/length, Y height, Z depth; see each module",
+  "models": {
+    "concrete_wall": {
+      "triangles": 144,
+      "expected_dimensions_xyz_m": [
+        4,
+        2.4,
+        0.4
+      ],
+      "pivot": "lower-left corner of rear mounting face; bounds X>=0,Y>=0,Z>=0",
+      "notes": "Closed cast concrete, bevelled edges, original pore/formwork normal map; front +Z.",
+      "light_mount": null
+    },
+    "low_cover": {
+      "triangles": 144,
+      "expected_dimensions_xyz_m": [
+        4,
+        1.1,
+        0.4
+      ],
+      "pivot": "lower-left corner of rear mounting face; bounds X>=0,Y>=0,Z>=0",
+      "notes": "Closed cast concrete, bevelled edges, original pore/formwork normal map; front +Z.",
+      "light_mount": null
+    },
+    "shipping_container": {
+      "triangles": 2972,
+      "expected_dimensions_xyz_m": [
+        6,
+        2.6,
+        2.4
+      ],
+      "pivot": "southwest ground corner; X length, +Z depth",
+      "notes": "Sealed six-metre cargo container, corrugated sides, two closed end doors with locking rods and oxidised fittings.",
+      "light_mount": null
+    },
+    "platform": {
+      "triangles": 116,
+      "expected_dimensions_xyz_m": [
+        8,
+        1.2,
+        8
+      ],
+      "pivot": "southwest ground corner",
+      "notes": "Full solid plinth with marked deck edges; no hollow undercroft.",
+      "light_mount": null
+    },
+    "ramp": {
+      "triangles": 8,
+      "expected_dimensions_xyz_m": [
+        8,
+        1.2,
+        4
+      ],
+      "pivot": "low-edge left corner at ground; rises toward +Z",
+      "notes": "Closed triangular-prism ramp, 4 m horizontal run, 8 m clear width, 1.2 m rise.",
+      "light_mount": null
+    },
+    "landmark_pillar": {
+      "triangles": 364,
+      "expected_dimensions_xyz_m": [
+        1.2,
+        6,
+        1.2
+      ],
+      "pivot": "southwest ground corner",
+      "notes": "Six-metre concrete marker with steel cap and hazard bands, visible above 2.4 m walls.",
+      "light_mount": null
+    },
+    "extraction_beacon": {
+      "triangles": 784,
+      "expected_dimensions_xyz_m": [
+        2,
+        3.5,
+        2
+      ],
+      "pivot": "ground centre of square base",
+      "notes": "Steel tripod, nine-rung ladder and amber rotating-beacon optical head; no light, no animation.",
+      "light_mount": [
+        0,
+        3.2,
+        0
+      ]
+    },
+    "dock": {
+      "triangles": 1816,
+      "expected_dimensions_xyz_m": [
+        10,
+        1.5,
+        3
+      ],
+      "pivot": "southwest bottom corner; X length, +Z width",
+      "notes": "Closed timber deck and eight posts; 0.30 m deck, 1.50 m post tops, no gaps in plan collision projection.",
+      "light_mount": null
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-14",
+  "scope": "Read-only startup diagnosis; anonymous observations and public plugin behaviour only.",
+  "request": {
+    "claims": [
+      "The supplied observations establish unmet startup prerequisites for this installed chat plugin; they do not establish a problem with the user's Markdown notes.",
+      "The hard-coded Unix-style executable search path is a Windows compatibility concern, not evidence that installing Docker alone will fix every failure."
+    ],
+    "evidence": [
+      {
+        "id": "local-observations",
+        "text": "Installed plugin brAIn version1.0.3. docker.exe is unavailable through command lookup; its standard Windows installation path is absent; no Docker Desktop/backend process is running. No listener on localhost port9000. Plugin settings file is absent; code defaults the API key to empty. No secret values were collected. Exact Obsidian error text was not captured."
+      },
+      {
+        "id": "public-plugin-behaviour",
+        "text": "The plugin README lists Docker as a requirement and asks users to configure their OpenAI API key, ingest vault documents, then open the chat. Installed code calls docker --version and starts a Docker-hosted web service before polling localhost:9000. Its child-process environment sets PATH to /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin, and the plugin catches startup errors then shows a generic server-not-running notice."
+      }
+    ]
+  },
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"tool\": \"jev_verify\",\n  \"model\": \"jev-1.14.0\",\n  \"provider\": \"typesafe\",\n  \"auto_accept\": 0.8,\n  \"subject_at\": 0.5,\n  \"summary\": {\n    \"verified\": 2,\n    \"contradicted\": 0,\n    \"unsupported\": 0,\n    \"needs_review\": 0\n  },\n  \"results\": [\n    {\n      \"id\": \"claim0\",\n      \"claim\": \"The supplied observations establish unmet startup prerequisites for this installed chat plugin; they do not establish a problem with the user's Markdown notes.\",\n      \"verdict\": \"verified\",\n      \"probabilities\": {\n        \"supports\": 0.91,\n        \"contradicts\": 0.01,\n        \"says_nothing\": 0.08\n      },\n      \"confidence\": 0.86,\n      \"action\": \"auto\",\n      \"supporting_evidence\": \"local-observations\",\n      \"same_subject\": 0.72\n    },\n    {\n      \"id\": \"claim1\",\n      \"claim\": \"The hard-coded Unix-style executable search path is a Windows compatibility concern, not evidence that installing Docker alone will fix every failure.\",\n      \"verdict\": \"verified\",\n      \"probabilities\": {\n        \"supports\": 1,\n        \"contradicts\": 0,\n        \"says_nothing\": 0\n      },\n      \"confidence\": 1,\n      \"action\": \"auto\",\n      \"supporting_evidence\": \"public-plugin-behaviour\",\n      \"same_subject\": 0.72\n    }\n  ],\n  \"usage\": {\n    \"input_tokens\": 1264,\n    \"output_tokens\": 223\n  }\n}"
+      }
+    ]
+  }
+}

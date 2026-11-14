@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-14",
+  "scope": "Sanitized documentation claim verification; no private source files or full notes sent.",
+  "request": {
+    "claims": [
+      "The supplied note excerpts distinguish configured/observed data from runtime or playtest validation, and distinguish proposals/archive from accepted decisions.",
+      "The supplied update guidance and tests support saying that generated notes can be refreshed while preserving user-edited and personal notes.",
+      "The anonymous audit supports the stated catalogue/link coverage; it does not certify every project statement or the visual result in the note-taking application."
+    ],
+    "evidence": [
+      {
+        "id": "anonymous-note-excerpts",
+        "text": "Values were read from resource files and defaults. These are base data; runtime modifiers and logic may change them. A resource existing, a scene being on disk, and a feature validated in play are different things. Source copies are consultation snapshots and do not update the originals. Dated decisions prevail over old proposals. Archived reports are not active backlogs. The active task list remains in its original file. No code/game tests or application UI checks were run for this documentation task."
+      },
+      {
+        "id": "update-guidance",
+        "text": "The updater refreshes unchanged generated notes only, skips user-edited notes, preserves unknown personal notes, deletes nothing, and does not write back to source documents. Dry-run is read-only. Manifest records content and source hashes. This is a snapshot workflow, not real-time synchronization."
+      },
+      {
+        "id": "local-audit",
+        "text": "Local validation passed: 257 Markdown notes; 108 catalogue fiches covering 5 weapons, 2 classes, 8 enemies, 39 cards, 26 perks, 7 power-ups, 11 missions, 5 biomes and 5 modifiers; 802 wikilinks resolved; Canvas has 7 valid file nodes and 6 valid edges; no errors or warnings. Temporary-directory tests passed for read-only dry-run, unchanged rerun idempotence, preserved edited note and preserved personal note. Actual second generation: 0 written, 262 unchanged generated files. Validation explicitly records engine_executed=false and app_ui_tested=false."
+      }
+    ]
+  },
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"tool\": \"jev_verify\",\n  \"model\": \"jev-1.14.0\",\n  \"provider\": \"typesafe\",\n  \"auto_accept\": 0.8,\n  \"subject_at\": 0.5,\n  \"summary\": {\n    \"verified\": 3,\n    \"contradicted\": 0,\n    \"unsupported\": 0,\n    \"needs_review\": 0\n  },\n  \"results\": [\n    {\n      \"id\": \"claim0\",\n      \"claim\": \"The supplied note excerpts distinguish configured/observed data from runtime or playtest validation, and distinguish proposals/archive from accepted decisions.\",\n      \"verdict\": \"verified\",\n      \"probabilities\": {\n        \"supports\": 1,\n        \"contradicts\": 0,\n        \"says_nothing\": 0\n      },\n      \"confidence\": 1,\n      \"action\": \"auto\",\n      \"supporting_evidence\": \"anonymous-note-excerpts\",\n      \"same_subject\": 0.88\n    },\n    {\n      \"id\": \"claim1\",\n      \"claim\": \"The supplied update guidance and tests support saying that generated notes can be refreshed while preserving user-edited and personal notes.\",\n      \"verdict\": \"verified\",\n      \"probabilities\": {\n        \"supports\": 1,\n        \"contradicts\": 0,\n        \"says_nothing\": 0\n      },\n      \"confidence\": 1,\n      \"action\": \"auto\",\n      \"supporting_evidence\": \"update-guidance\",\n      \"same_subject\": 0.94\n    },\n    {\n      \"id\": \"claim2\",\n      \"claim\": \"The anonymous audit supports the stated catalogue/link coverage; it does not certify every project statement or the visual result in the note-taking application.\",\n      \"verdict\": \"verified\",\n      \"probabilities\": {\n        \"supports\": 0.98,\n        \"contradicts\": 0.01,\n        \"says_nothing\": 0.01\n      },\n      \"confidence\": 0.97,\n      \"action\": \"auto\",\n      \"supporting_evidence\": \"local-audit\",\n      \"same_subject\": 0.9\n    }\n  ],\n  \"usage\": {\n    \"input_tokens\": 1811,\n    \"output_tokens\": 354\n  }\n}"
+      }
+    ]
+  }
+}

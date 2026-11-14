@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-14",
+  "plugin": "brAIn",
+  "installed_version": "1.0.3",
+  "diagnostic_scope": "Read-only inspection; exact UI exception not captured and plugin startup not retriggered.",
+  "observed": {
+    "docker_command_available": false,
+    "docker_standard_windows_installation_found": false,
+    "docker_desktop_or_backend_process_found": false,
+    "plugin_settings_file_exists": false,
+    "api_key_persisted_in_plugin_settings": false,
+    "local_port_9000_listening": false,
+    "plugin_overrides_child_process_path_with_unix_paths": true
+  },
+  "conclusions": [
+    "The Docker-hosted chat service cannot start with the observed prerequisites missing.",
+    "The plugin defaults to an empty API key when no settings file is present.",
+    "The hard-coded child process PATH is an additional Windows compatibility concern; dependency installation alone is not a verified complete fix."
+  ],
+  "source": "https://github.com/lusob/obsidian-brain",
+  "files_modified_by_diagnosis": "Reports only; no plugin, note or credential configuration changed.",
+  "secret_values_read_or_recorded": false,
+  "runtime_fix_validated": false
+}

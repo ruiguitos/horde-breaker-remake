@@ -1,0 +1,120 @@
+{
+  "name": "bk_client",
+  "version": "1.13.12",
+  "binaries": [
+    {
+      "os": "windows",
+      "arch": "amd64",
+      "filename": "bk_client-windows-x86_64.exe",
+      "size": 13516288,
+      "sha256": "01691a3a43b0919ba31f7b9a207701b78b1e925cdd6a3b4acb1cef3ad5bfd440"
+    },
+    {
+      "os": "windows",
+      "arch": "arm64",
+      "filename": "bk_client-windows-arm64.exe",
+      "size": 12594688,
+      "sha256": "14961e19ad3783b416d853d806c68660c24cadb078d61efece06c198e7af471d"
+    },
+    {
+      "os": "darwin",
+      "arch": "amd64",
+      "filename": "bk_client-macos-x86_64",
+      "size": 13216864,
+      "sha256": "1c1cd9ed22b9ec68f20ca3fbc8fe06e3411377300297e7b8332ccfb921ad140c"
+    },
+    {
+      "os": "darwin",
+      "arch": "arm64",
+      "filename": "bk_client-macos-arm64",
+      "size": 12555618,
+      "sha256": "4eb4349b1786b72a95bc54fa7c44d63cab12df6c92c968b2770c738478b9c70d"
+    },
+    {
+      "os": "linux",
+      "arch": "amd64",
+      "filename": "bk_client-linux-x86_64",
+      "size": 15610119,
+      "sha256": "ee5847ac532b2c790fdfc486aa1e592d1d34064e09ce9f037e3a4ebdbbc70558"
+    },
+    {
+      "os": "linux",
+      "arch": "arm64",
+      "filename": "bk_client-linux-arm64",
+      "size": 14811399,
+      "sha256": "28d6e0205a2e6418e43c17aab175f2cf20eeb9060bd332b17d52a4a0bb94a663"
+    }
+  ],
+  "tools": [
+    {
+      "id": "export_glb",
+      "name": "Export glTF/GLB",
+      "description": "Re-exports the active scene to a self-contained .glb file. Enables the bundled glTF add-on if needed.",
+      "software": "blender",
+      "params": [
+        {
+          "name": "output_path",
+          "type": "string",
+          "required": true,
+          "description": "Destination .glb path."
+        },
+        {
+          "name": "yup",
+          "type": "boolean",
+          "default": true,
+          "description": "Export using +Y up (glTF convention)."
+        },
+        {
+          "name": "draco",
+          "type": "boolean",
+          "default": false,
+          "description": "Apply Draco mesh compression."
+        },
+        {
+          "name": "export_apply",
+          "type": "boolean",
+          "default": true,
+          "description": "Apply modifiers before exporting."
+        }
+      ]
+    },
+    {
+      "id": "export_usd",
+      "name": "Export USD",
+      "description": "Opens a downloaded Blendkit .blend, unpacks its packed textures, flattens shader node groups and exports a self-contained UsdPreviewSurface .usd file. Optionally also emits standalone MaterialX (.mtlx) materials plus a name-keyed mapping JSON alongside the .usd.",
+      "software": "blender",
+      "params": [
+        {
+          "name": "blend_path",
+          "type": "string",
+          "required": true,
+          "description": "Input .blend file to open."
+        },
+        {
+          "name": "out_usd",
+          "type": "string",
+          "required": true,
+          "description": "Destination .usd path."
+        },
+        {
+          "name": "max_resolution",
+          "type": "string",
+          "default": "ORIGINAL",
+          "description": "Texture resolution cap: 512/1024/2048/4096/8192/ORIGINAL. Picks the textures subfolder suffix."
+        },
+        {
+          "name": "export_mtlx",
+          "type": "bool",
+          "default": true,
+          "description": "Also export one standalone .mtlx per material into <stem>_mtlx/ and write <stem>.materials.json mapping material names to their .mtlx files (for high-fidelity material binding in Maya/USD). Requires the MaterialX Python module bundled with Blender 4.1+; skipped gracefully if unavailable."
+        },
+        {
+          "name": "normal_map_target",
+          "type": "string",
+          "default": "preserve",
+          "description": "Normal-map handling: preserve for standard MaterialX, directx for encoded green-channel conversion, or unreal for Unreal's signed normal sampling and explicit normal/bump blending. USD records convention metadata and native Preview Surface scale/bias decoding."
+        }
+      ]
+    }
+  ]
+}

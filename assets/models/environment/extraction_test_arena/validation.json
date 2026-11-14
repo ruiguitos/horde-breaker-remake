@@ -1,0 +1,853 @@
+{
+  "passed": true,
+  "license": "CC0-1.0",
+  "godot_run": false,
+  "modules": {
+    "concrete_wall": {
+      "passed": true,
+      "file": "concrete_wall.glb",
+      "sha256": "2baed7fdef1a6febc18634ecd68ee12cb32608debf817ce42277e0718366d68f",
+      "triangles": 144,
+      "triangle_limit": 3000,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "dimensions_xyz_m": [
+        4.0,
+        2.4,
+        0.4
+      ],
+      "bounds_min_xyz_m": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "bounds_max_xyz_m": [
+        4.0,
+        2.4,
+        0.4
+      ],
+      "pivot": {
+        "local_position_m": [
+          0,
+          0,
+          0
+        ],
+        "type": "lower-left corner of rear mounting face; bounds X>=0,Y>=0,Z>=0",
+        "identity_mesh_transform": true
+      },
+      "material_names": [
+        "Extraction_arena_PBR_1K"
+      ],
+      "textures": [
+        {
+          "name": "arena_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "3f157f1bd82b118d5cea2283d502cde9a99be9fd1015eb4ed0f306f70c53479a"
+        },
+        {
+          "name": "arena_albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "cace7b669b87bc05edf468ba36b957d6049600ec331ade98cc2db9294710a845"
+        },
+        {
+          "name": "arena_orm",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "c29ae07a345c2d56a6b5bbd3371147877b6e322c8e2f0e7f65983718d4136dbd"
+        }
+      ],
+      "pbr_channels": [
+        "sRGB albedo",
+        "tangent normal",
+        "linear ORM: R=1,G=roughness,B=metallic"
+      ],
+      "uv_check": {
+        "inside_0_1": true,
+        "nondegenerate_triangles": true,
+        "shared_role_atlas_uvs_overlap_intentionally": true
+      },
+      "normals_and_tangents": {
+        "exported": true,
+        "normalised": true,
+        "maximum_normal_tangent_dot": 7.078051567077637e-05
+      },
+      "minimum_triangle_area_m2": 5.542564401214163e-05,
+      "plan_projection": {
+        "filled_rectangle": true,
+        "verified_ground_face_area_m2": 1.600000023841858,
+        "footprint_xz_m": [
+          0.0,
+          -0.0,
+          4.0,
+          0.4
+        ]
+      },
+      "lights": 0,
+      "cameras": 0,
+      "animations": 0,
+      "armatures": 0,
+      "light_mount": null,
+      "source_topology": {
+        "closed_components": 4,
+        "positive_component_volumes": true,
+        "minimum_component_volume_m3": 0.057599999010562904,
+        "combined_component_volume_m3_not_boolean_union": 4.051336198155903
+      }
+    },
+    "low_cover": {
+      "passed": true,
+      "file": "low_cover.glb",
+      "sha256": "5588edc343162016f1f6e49ace98dabf2341714b4036f7f4605e0a7ea800db04",
+      "triangles": 144,
+      "triangle_limit": 3000,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "dimensions_xyz_m": [
+        4.0,
+        1.1,
+        0.4
+      ],
+      "bounds_min_xyz_m": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "bounds_max_xyz_m": [
+        4.0,
+        1.1,
+        0.4
+      ],
+      "pivot": {
+        "local_position_m": [
+          0,
+          0,
+          0
+        ],
+        "type": "lower-left corner of rear mounting face; bounds X>=0,Y>=0,Z>=0",
+        "identity_mesh_transform": true
+      },
+      "material_names": [
+        "Extraction_arena_PBR_1K"
+      ],
+      "textures": [
+        {
+          "name": "arena_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "3f157f1bd82b118d5cea2283d502cde9a99be9fd1015eb4ed0f306f70c53479a"
+        },
+        {
+          "name": "arena_albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "cace7b669b87bc05edf468ba36b957d6049600ec331ade98cc2db9294710a845"
+        },
+        {
+          "name": "arena_orm",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "c29ae07a345c2d56a6b5bbd3371147877b6e322c8e2f0e7f65983718d4136dbd"
+        }
+      ],
+      "pbr_channels": [
+        "sRGB albedo",
+        "tangent normal",
+        "linear ORM: R=1,G=roughness,B=metallic"
+      ],
+      "uv_check": {
+        "inside_0_1": true,
+        "nondegenerate_triangles": true,
+        "shared_role_atlas_uvs_overlap_intentionally": true
+      },
+      "normals_and_tangents": {
+        "exported": true,
+        "normalised": true,
+        "maximum_normal_tangent_dot": 7.078051567077637e-05
+      },
+      "minimum_triangle_area_m2": 5.5425093409295536e-05,
+      "plan_projection": {
+        "filled_rectangle": true,
+        "verified_ground_face_area_m2": 1.600000023841858,
+        "footprint_xz_m": [
+          0.0,
+          -0.0,
+          4.0,
+          0.4
+        ]
+      },
+      "lights": 0,
+      "cameras": 0,
+      "animations": 0,
+      "armatures": 0,
+      "light_mount": null,
+      "source_topology": {
+        "closed_components": 4,
+        "positive_component_volumes": true,
+        "minimum_component_volume_m3": 0.03561272613566758,
+        "combined_component_volume_m3_not_boolean_union": 1.8820340073012192
+      }
+    },
+    "shipping_container": {
+      "passed": true,
+      "file": "shipping_container.glb",
+      "sha256": "9300ee944a1ffdb47c78dc96680754ad80d8ddcf9aac53a58383981c0a4dfdca",
+      "triangles": 2972,
+      "triangle_limit": 3000,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "dimensions_xyz_m": [
+        6.0,
+        2.6,
+        2.4
+      ],
+      "bounds_min_xyz_m": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "bounds_max_xyz_m": [
+        6.0,
+        2.6,
+        2.4
+      ],
+      "pivot": {
+        "local_position_m": [
+          0,
+          0,
+          0
+        ],
+        "type": "southwest ground corner; X length, +Z depth",
+        "identity_mesh_transform": true
+      },
+      "material_names": [
+        "Extraction_arena_PBR_1K"
+      ],
+      "textures": [
+        {
+          "name": "arena_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "3f157f1bd82b118d5cea2283d502cde9a99be9fd1015eb4ed0f306f70c53479a"
+        },
+        {
+          "name": "arena_albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "cace7b669b87bc05edf468ba36b957d6049600ec331ade98cc2db9294710a845"
+        },
+        {
+          "name": "arena_orm",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "c29ae07a345c2d56a6b5bbd3371147877b6e322c8e2f0e7f65983718d4136dbd"
+        }
+      ],
+      "pbr_channels": [
+        "sRGB albedo",
+        "tangent normal",
+        "linear ORM: R=1,G=roughness,B=metallic"
+      ],
+      "uv_check": {
+        "inside_0_1": true,
+        "nondegenerate_triangles": true,
+        "shared_role_atlas_uvs_overlap_intentionally": true
+      },
+      "normals_and_tangents": {
+        "exported": true,
+        "normalised": true,
+        "maximum_normal_tangent_dot": 8.48621129989624e-05
+      },
+      "minimum_triangle_area_m2": 2.200198558455213e-05,
+      "plan_projection": {
+        "filled_rectangle": true,
+        "verified_ground_face_area_m2": 14.40000057220459,
+        "footprint_xz_m": [
+          0.0,
+          -0.0,
+          6.0,
+          2.4
+        ]
+      },
+      "lights": 0,
+      "cameras": 0,
+      "animations": 0,
+      "armatures": 0,
+      "light_mount": null,
+      "source_topology": {
+        "closed_components": 69,
+        "positive_component_volumes": true,
+        "minimum_component_volume_m3": 0.000589995900809289,
+        "combined_component_volume_m3_not_boolean_union": 35.9874429233902
+      }
+    },
+    "platform": {
+      "passed": true,
+      "file": "platform.glb",
+      "sha256": "a1c6a062f9ebdec83cc568a0beaf9cf6d69bc46ca81cb49242afb3ba37efd5a5",
+      "triangles": 116,
+      "triangle_limit": 3000,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "dimensions_xyz_m": [
+        8.0,
+        1.2,
+        8.0
+      ],
+      "bounds_min_xyz_m": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "bounds_max_xyz_m": [
+        8.0,
+        1.2,
+        8.0
+      ],
+      "pivot": {
+        "local_position_m": [
+          0,
+          0,
+          0
+        ],
+        "type": "southwest ground corner",
+        "identity_mesh_transform": true
+      },
+      "material_names": [
+        "Extraction_arena_PBR_1K"
+      ],
+      "textures": [
+        {
+          "name": "arena_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "3f157f1bd82b118d5cea2283d502cde9a99be9fd1015eb4ed0f306f70c53479a"
+        },
+        {
+          "name": "arena_albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "cace7b669b87bc05edf468ba36b957d6049600ec331ade98cc2db9294710a845"
+        },
+        {
+          "name": "arena_orm",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "c29ae07a345c2d56a6b5bbd3371147877b6e322c8e2f0e7f65983718d4136dbd"
+        }
+      ],
+      "pbr_channels": [
+        "sRGB albedo",
+        "tangent normal",
+        "linear ORM: R=1,G=roughness,B=metallic"
+      ],
+      "uv_check": {
+        "inside_0_1": true,
+        "nondegenerate_triangles": true,
+        "shared_role_atlas_uvs_overlap_intentionally": true
+      },
+      "normals_and_tangents": {
+        "exported": true,
+        "normalised": true,
+        "maximum_normal_tangent_dot": 7.078051567077637e-05
+      },
+      "minimum_triangle_area_m2": 0.0005412682862609938,
+      "plan_projection": {
+        "filled_rectangle": true,
+        "verified_ground_face_area_m2": 64.0,
+        "footprint_xz_m": [
+          0.0,
+          -0.0,
+          8.0,
+          8.0
+        ]
+      },
+      "lights": 0,
+      "cameras": 0,
+      "animations": 0,
+      "armatures": 0,
+      "light_mount": null,
+      "source_topology": {
+        "closed_components": 7,
+        "positive_component_volumes": true,
+        "minimum_component_volume_m3": 0.021615968551486703,
+        "combined_component_volume_m3_not_boolean_union": 79.33861203151021
+      }
+    },
+    "ramp": {
+      "passed": true,
+      "file": "ramp.glb",
+      "sha256": "56d5bc51cebe6c95e4a71cba9174d24e3ed98967898f20a96f388684eb7c1546",
+      "triangles": 8,
+      "triangle_limit": 3000,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "dimensions_xyz_m": [
+        8.0,
+        1.2,
+        4.0
+      ],
+      "bounds_min_xyz_m": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "bounds_max_xyz_m": [
+        8.0,
+        1.2,
+        4.0
+      ],
+      "pivot": {
+        "local_position_m": [
+          0,
+          0,
+          0
+        ],
+        "type": "low-edge left corner at ground; rises toward +Z",
+        "identity_mesh_transform": true
+      },
+      "material_names": [
+        "Extraction_arena_PBR_1K"
+      ],
+      "textures": [
+        {
+          "name": "arena_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "3f157f1bd82b118d5cea2283d502cde9a99be9fd1015eb4ed0f306f70c53479a"
+        },
+        {
+          "name": "arena_albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "cace7b669b87bc05edf468ba36b957d6049600ec331ade98cc2db9294710a845"
+        },
+        {
+          "name": "arena_orm",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "c29ae07a345c2d56a6b5bbd3371147877b6e322c8e2f0e7f65983718d4136dbd"
+        }
+      ],
+      "pbr_channels": [
+        "sRGB albedo",
+        "tangent normal",
+        "linear ORM: R=1,G=roughness,B=metallic"
+      ],
+      "uv_check": {
+        "inside_0_1": true,
+        "nondegenerate_triangles": true,
+        "shared_role_atlas_uvs_overlap_intentionally": true
+      },
+      "normals_and_tangents": {
+        "exported": true,
+        "normalised": true,
+        "maximum_normal_tangent_dot": 0.0
+      },
+      "minimum_triangle_area_m2": 2.4000000953674316,
+      "plan_projection": {
+        "filled_rectangle": true,
+        "verified_ground_face_area_m2": 32.0,
+        "footprint_xz_m": [
+          0.0,
+          -0.0,
+          8.0,
+          4.0
+        ]
+      },
+      "lights": 0,
+      "cameras": 0,
+      "animations": 0,
+      "armatures": 0,
+      "light_mount": null,
+      "source_topology": {
+        "closed_components": 1,
+        "positive_component_volumes": true,
+        "minimum_component_volume_m3": 19.200000762939453,
+        "combined_component_volume_m3_not_boolean_union": 19.200000762939453
+      }
+    },
+    "landmark_pillar": {
+      "passed": true,
+      "file": "landmark_pillar.glb",
+      "sha256": "fddc9a82453faf88e2fb1eada096db89b7fa01e8be15091fe5ab1f68689e747a",
+      "triangles": 364,
+      "triangle_limit": 3000,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "dimensions_xyz_m": [
+        1.2,
+        6.0,
+        1.2
+      ],
+      "bounds_min_xyz_m": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "bounds_max_xyz_m": [
+        1.2,
+        6.0,
+        1.2
+      ],
+      "pivot": {
+        "local_position_m": [
+          0,
+          0,
+          0
+        ],
+        "type": "southwest ground corner",
+        "identity_mesh_transform": true
+      },
+      "material_names": [
+        "Extraction_arena_PBR_1K"
+      ],
+      "textures": [
+        {
+          "name": "arena_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "3f157f1bd82b118d5cea2283d502cde9a99be9fd1015eb4ed0f306f70c53479a"
+        },
+        {
+          "name": "arena_albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "cace7b669b87bc05edf468ba36b957d6049600ec331ade98cc2db9294710a845"
+        },
+        {
+          "name": "arena_orm",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "c29ae07a345c2d56a6b5bbd3371147877b6e322c8e2f0e7f65983718d4136dbd"
+        }
+      ],
+      "pbr_channels": [
+        "sRGB albedo",
+        "tangent normal",
+        "linear ORM: R=1,G=roughness,B=metallic"
+      ],
+      "uv_check": {
+        "inside_0_1": true,
+        "nondegenerate_triangles": true,
+        "shared_role_atlas_uvs_overlap_intentionally": true
+      },
+      "normals_and_tangents": {
+        "exported": true,
+        "normalised": true,
+        "maximum_normal_tangent_dot": 7.078051567077637e-05
+      },
+      "minimum_triangle_area_m2": 7.793718232393784e-06,
+      "plan_projection": {
+        "filled_rectangle": true,
+        "verified_ground_face_area_m2": 1.4400001144409202,
+        "footprint_xz_m": [
+          0.0,
+          -0.0,
+          1.2,
+          1.2
+        ]
+      },
+      "lights": 0,
+      "cameras": 0,
+      "animations": 0,
+      "armatures": 0,
+      "light_mount": null,
+      "source_topology": {
+        "closed_components": 9,
+        "positive_component_volumes": true,
+        "minimum_component_volume_m3": 0.0027863332942009295,
+        "combined_component_volume_m3_not_boolean_union": 6.6782886283734415
+      }
+    },
+    "extraction_beacon": {
+      "passed": true,
+      "file": "extraction_beacon.glb",
+      "sha256": "681e312e463ae05d47404f3de6f9b5c9bfc7a54b898e3e35f871509251fad9fe",
+      "triangles": 784,
+      "triangle_limit": 3000,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "dimensions_xyz_m": [
+        2.0,
+        3.5,
+        2.0
+      ],
+      "bounds_min_xyz_m": [
+        -1.0,
+        0.0,
+        -1.0
+      ],
+      "bounds_max_xyz_m": [
+        1.0,
+        3.5,
+        1.0
+      ],
+      "pivot": {
+        "local_position_m": [
+          0,
+          0,
+          0
+        ],
+        "type": "ground centre of square base",
+        "identity_mesh_transform": true
+      },
+      "material_names": [
+        "Extraction_arena_PBR_1K"
+      ],
+      "textures": [
+        {
+          "name": "arena_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "3f157f1bd82b118d5cea2283d502cde9a99be9fd1015eb4ed0f306f70c53479a"
+        },
+        {
+          "name": "arena_albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "cace7b669b87bc05edf468ba36b957d6049600ec331ade98cc2db9294710a845"
+        },
+        {
+          "name": "arena_orm",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "c29ae07a345c2d56a6b5bbd3371147877b6e322c8e2f0e7f65983718d4136dbd"
+        }
+      ],
+      "pbr_channels": [
+        "sRGB albedo",
+        "tangent normal",
+        "linear ORM: R=1,G=roughness,B=metallic"
+      ],
+      "uv_check": {
+        "inside_0_1": true,
+        "nondegenerate_triangles": true,
+        "shared_role_atlas_uvs_overlap_intentionally": true
+      },
+      "normals_and_tangents": {
+        "exported": true,
+        "normalised": true,
+        "maximum_normal_tangent_dot": 0.00012575089931488037
+      },
+      "minimum_triangle_area_m2": 3.1177040900014126e-05,
+      "plan_projection": {
+        "filled_rectangle": true,
+        "verified_ground_face_area_m2": 4.0,
+        "footprint_xz_m": [
+          -1.0,
+          -1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "lights": 0,
+      "cameras": 0,
+      "animations": 0,
+      "armatures": 0,
+      "light_mount": [
+        0,
+        3.200000047683716,
+        0
+      ],
+      "source_topology": {
+        "closed_components": 22,
+        "positive_component_volumes": true,
+        "minimum_component_volume_m3": 0.00028000019296688604,
+        "combined_component_volume_m3_not_boolean_union": 0.8142867871681458
+      }
+    },
+    "dock": {
+      "passed": true,
+      "file": "dock.glb",
+      "sha256": "c2ec3ea4f0d8a51c6588d2b0c8970ddcb9dc8b3b7ee219bfcddcbb53ffda27e2",
+      "triangles": 1816,
+      "triangle_limit": 3000,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "dimensions_xyz_m": [
+        10.0,
+        1.5,
+        3.0
+      ],
+      "bounds_min_xyz_m": [
+        0.0,
+        0.0,
+        -0.0
+      ],
+      "bounds_max_xyz_m": [
+        10.0,
+        1.5,
+        3.0
+      ],
+      "pivot": {
+        "local_position_m": [
+          0,
+          0,
+          0
+        ],
+        "type": "southwest bottom corner; X length, +Z width",
+        "identity_mesh_transform": true
+      },
+      "material_names": [
+        "Extraction_arena_PBR_1K"
+      ],
+      "textures": [
+        {
+          "name": "arena_normal",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "3f157f1bd82b118d5cea2283d502cde9a99be9fd1015eb4ed0f306f70c53479a"
+        },
+        {
+          "name": "arena_albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "cace7b669b87bc05edf468ba36b957d6049600ec331ade98cc2db9294710a845"
+        },
+        {
+          "name": "arena_orm",
+          "size": [
+            1024,
+            1024
+          ],
+          "sha256": "c29ae07a345c2d56a6b5bbd3371147877b6e322c8e2f0e7f65983718d4136dbd"
+        }
+      ],
+      "pbr_channels": [
+        "sRGB albedo",
+        "tangent normal",
+        "linear ORM: R=1,G=roughness,B=metallic"
+      ],
+      "uv_check": {
+        "inside_0_1": true,
+        "nondegenerate_triangles": true,
+        "shared_role_atlas_uvs_overlap_intentionally": true
+      },
+      "normals_and_tangents": {
+        "exported": true,
+        "normalised": true,
+        "maximum_normal_tangent_dot": 7.078051567077637e-05
+      },
+      "minimum_triangle_area_m2": 3.117554395999025e-05,
+      "plan_projection": {
+        "filled_rectangle": true,
+        "verified_ground_face_area_m2": 30.0,
+        "footprint_xz_m": [
+          0.0,
+          -0.0,
+          10.0,
+          3.0
+        ]
+      },
+      "lights": 0,
+      "cameras": 0,
+      "animations": 0,
+      "armatures": 0,
+      "light_mount": null,
+      "source_topology": {
+        "closed_components": 42,
+        "positive_component_volumes": true,
+        "minimum_component_volume_m3": 0.0051137251575710235,
+        "combined_component_volume_m3_not_boolean_union": 9.540443779485761
+      }
+    }
+  },
+  "limits": [
+    "No Godot invocation, import or game changes.",
+    "No physics, AI, gameplay, spawn, FPS, controller or traversal verification.",
+    "Joined mounted solids are closed components; internal mounting intersections are not Boolean-union/self-intersection audited.",
+    "Shared tiled role UVs are intentional, not a unique non-overlapping baking atlas.",
+    "Beacon is an unanimated optical assembly plus LightMount; runtime light/rotation require code later."
+  ],
+  "layout": {
+    "passed": true,
+    "instance_count": 668,
+    "pair_count": 222778,
+    "issues": [],
+    "coordinate_units": "metres",
+    "overlap_count": 0,
+    "pair_distances_file": "piece_distances.csv",
+    "distance_method": "Exact Euclidean distance between filled rectangular projections measured from the exported GLBs; cardinal rotations.",
+    "contacts_count": 625,
+    "contacts_are": "Shared assembly boundaries, not passages; no positive area overlap.",
+    "minimum_noncontact_separation_m": 3.5999999999999943,
+    "unclassified_gaps_below_3m": [],
+    "navigation_1m": {
+      "method": "cell-interior intersection; four-neighbour flood-fill, no agent-radius erosion",
+      "start": [
+        128,
+        16
+      ],
+      "reachable_goals": {
+        "arena": true,
+        "extraction": true,
+        "west_gate": true,
+        "east_gate": true
+      },
+      "reachable_cells": 62638
+    },
+    "limits": [
+      "Plan-only geometry checks; not Godot collision, navigation, character motion or spawn tests.",
+      "Corridor reserved rectangles are checked continuously in plan; path turns included by overlapping rectangles.",
+      "Flood-fill is only a secondary 1 m connectivity check, not proof of agent-radius navigation.",
+      "Contacting wall seams and platform/ramp mounting seam are not corridors.",
+      "Side clearance on escape loops is 4 m each side of their defined centre line; reserved total width 8 m."
+    ],
+    "report": "layout_validation.json"
+  },
+  "source_sha256": "268e1ddb9281f2db7ea9f2b19e8f31043169da25478ae8c4a6439d33c0401bfa",
+  "layout_source": {
+    "sha256": "8b8d1f5b7112067f3ab059f50b7bf52f49c17f022021d4dc04bdf61c5aa61d87",
+    "lights": 0,
+    "cameras": 0,
+    "mesh_objects_including_two_preview_ground_boxes": 670
+  }
+}

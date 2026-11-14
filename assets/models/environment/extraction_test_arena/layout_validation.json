@@ -1,0 +1,4385 @@
+{
+  "passed": true,
+  "instance_count": 668,
+  "pair_count": 222778,
+  "issues": [],
+  "coordinate_units": "metres",
+  "overlap_count": 0,
+  "pair_distances_file": "piece_distances.csv",
+  "distance_method": "Exact Euclidean distance between filled rectangular projections measured from the exported GLBs; cardinal rotations.",
+  "contacts_count": 625,
+  "contacts_are": "Shared assembly boundaries, not passages; no positive area overlap.",
+  "minimum_noncontact_separation_m": 3.5999999999999943,
+  "unclassified_gaps_below_3m": [],
+  "gate_widths": [
+    {
+      "name": "ring_42_south",
+      "required_width_m": 4,
+      "clear_width_m": 4.0,
+      "measured_section_coordinate_m": 86.2,
+      "edge_coordinates_m": [
+        126.0,
+        130.0
+      ]
+    },
+    {
+      "name": "ring_42_north",
+      "required_width_m": 4,
+      "clear_width_m": 4.0,
+      "measured_section_coordinate_m": 170.2,
+      "edge_coordinates_m": [
+        126.0,
+        130.0
+      ]
+    },
+    {
+      "name": "ring_42_west",
+      "required_width_m": 4,
+      "clear_width_m": 4.0,
+      "measured_section_coordinate_m": 85.8,
+      "edge_coordinates_m": [
+        126.0,
+        130.0
+      ]
+    },
+    {
+      "name": "ring_42_east",
+      "required_width_m": 4,
+      "clear_width_m": 4.0,
+      "measured_section_coordinate_m": 170.2,
+      "edge_coordinates_m": [
+        126.0,
+        130.0
+      ]
+    },
+    {
+      "name": "ring_78_south",
+      "required_width_m": 12,
+      "clear_width_m": 12.0,
+      "measured_section_coordinate_m": 50.2,
+      "edge_coordinates_m": [
+        122.0,
+        134.0
+      ]
+    },
+    {
+      "name": "ring_78_north",
+      "required_width_m": 12,
+      "clear_width_m": 12.0,
+      "measured_section_coordinate_m": 206.2,
+      "edge_coordinates_m": [
+        122.0,
+        134.0
+      ]
+    },
+    {
+      "name": "ring_78_west",
+      "required_width_m": 12,
+      "clear_width_m": 12.0,
+      "measured_section_coordinate_m": 49.8,
+      "edge_coordinates_m": [
+        122.0,
+        134.0
+      ]
+    },
+    {
+      "name": "ring_78_east",
+      "required_width_m": 12,
+      "clear_width_m": 12.0,
+      "measured_section_coordinate_m": 206.2,
+      "edge_coordinates_m": [
+        122.0,
+        134.0
+      ]
+    },
+    {
+      "name": "ring_104_south",
+      "required_width_m": 16,
+      "clear_width_m": 16.0,
+      "measured_section_coordinate_m": 24.2,
+      "edge_coordinates_m": [
+        120.0,
+        136.0
+      ]
+    },
+    {
+      "name": "ring_104_north",
+      "required_width_m": 16,
+      "clear_width_m": 16.0,
+      "measured_section_coordinate_m": 232.2,
+      "edge_coordinates_m": [
+        120.0,
+        136.0
+      ]
+    },
+    {
+      "name": "ring_104_west",
+      "required_width_m": 16,
+      "clear_width_m": 16.0,
+      "measured_section_coordinate_m": 23.8,
+      "edge_coordinates_m": [
+        120.0,
+        136.0
+      ]
+    },
+    {
+      "name": "ring_104_east",
+      "required_width_m": 16,
+      "clear_width_m": 16.0,
+      "measured_section_coordinate_m": 232.2,
+      "edge_coordinates_m": [
+        120.0,
+        136.0
+      ]
+    },
+    {
+      "name": "ring_124_south",
+      "required_width_m": 24,
+      "clear_width_m": 24.0,
+      "measured_section_coordinate_m": 4.2,
+      "edge_coordinates_m": [
+        116.0,
+        140.0
+      ]
+    },
+    {
+      "name": "ring_124_north",
+      "required_width_m": 24,
+      "clear_width_m": 24.0,
+      "measured_section_coordinate_m": 252.2,
+      "edge_coordinates_m": [
+        116.0,
+        140.0
+      ]
+    },
+    {
+      "name": "ring_124_west",
+      "required_width_m": 24,
+      "clear_width_m": 24.0,
+      "measured_section_coordinate_m": 3.8,
+      "edge_coordinates_m": [
+        116.0,
+        140.0
+      ]
+    },
+    {
+      "name": "ring_124_east",
+      "required_width_m": 24,
+      "clear_width_m": 24.0,
+      "measured_section_coordinate_m": 252.2,
+      "edge_coordinates_m": [
+        116.0,
+        140.0
+      ]
+    }
+  ],
+  "corridors": [
+    {
+      "name": "escape_loop_1_south",
+      "width_m": 8,
+      "clear_rectangle_xz_m": [
+        64,
+        64,
+        192,
+        72
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "escape_loop_1_north",
+      "width_m": 8,
+      "clear_rectangle_xz_m": [
+        64,
+        184,
+        192,
+        192
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "escape_loop_1_west",
+      "width_m": 8,
+      "clear_rectangle_xz_m": [
+        64,
+        64,
+        72,
+        192
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "escape_loop_1_east",
+      "width_m": 8,
+      "clear_rectangle_xz_m": [
+        184,
+        64,
+        192,
+        192
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "escape_loop_2_south",
+      "width_m": 8,
+      "clear_rectangle_xz_m": [
+        34,
+        34,
+        222,
+        42
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "escape_loop_2_north",
+      "width_m": 8,
+      "clear_rectangle_xz_m": [
+        34,
+        214,
+        222,
+        222
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "escape_loop_2_west",
+      "width_m": 8,
+      "clear_rectangle_xz_m": [
+        34,
+        34,
+        42,
+        222
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "escape_loop_2_east",
+      "width_m": 8,
+      "clear_rectangle_xz_m": [
+        214,
+        34,
+        222,
+        222
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "escape_loop_3_south",
+      "width_m": 8,
+      "clear_rectangle_xz_m": [
+        10,
+        10,
+        246,
+        18
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "escape_loop_3_north",
+      "width_m": 8,
+      "clear_rectangle_xz_m": [
+        10,
+        238,
+        246,
+        246
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "escape_loop_3_west",
+      "width_m": 8,
+      "clear_rectangle_xz_m": [
+        10,
+        10,
+        18,
+        246
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "escape_loop_3_east",
+      "width_m": 8,
+      "clear_rectangle_xz_m": [
+        238,
+        10,
+        246,
+        246
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "funnel_south_continuous_throat_route",
+      "width_m": 4,
+      "clear_rectangle_xz_m": [
+        126,
+        16,
+        130,
+        86
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "funnel_north_continuous_throat_route",
+      "width_m": 4,
+      "clear_rectangle_xz_m": [
+        126,
+        170.4,
+        130,
+        247
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "funnel_west_continuous_throat_route",
+      "width_m": 4,
+      "clear_rectangle_xz_m": [
+        16,
+        126,
+        86,
+        130
+      ],
+      "blocking_instances": []
+    },
+    {
+      "name": "funnel_east_continuous_throat_route",
+      "width_m": 4,
+      "clear_rectangle_xz_m": [
+        170.4,
+        126,
+        248,
+        130
+      ],
+      "blocking_instances": []
+    }
+  ],
+  "navigation_1m": {
+    "method": "cell-interior intersection; four-neighbour flood-fill, no agent-radius erosion",
+    "start": [
+      128,
+      16
+    ],
+    "reachable_goals": {
+      "arena": true,
+      "extraction": true,
+      "west_gate": true,
+      "east_gate": true
+    },
+    "reachable_cells": 62638
+  },
+  "nearest_neighbours": [
+    {
+      "instance": 0,
+      "module": "concrete_wall",
+      "nearest_instance": 2,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 1,
+      "module": "concrete_wall",
+      "nearest_instance": 5,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 2,
+      "module": "concrete_wall",
+      "nearest_instance": 0,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 3,
+      "module": "concrete_wall",
+      "nearest_instance": 7,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 4,
+      "module": "concrete_wall",
+      "nearest_instance": 0,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 5,
+      "module": "concrete_wall",
+      "nearest_instance": 1,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 6,
+      "module": "concrete_wall",
+      "nearest_instance": 2,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 7,
+      "module": "concrete_wall",
+      "nearest_instance": 3,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 8,
+      "module": "concrete_wall",
+      "nearest_instance": 4,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 9,
+      "module": "concrete_wall",
+      "nearest_instance": 5,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 10,
+      "module": "concrete_wall",
+      "nearest_instance": 6,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 11,
+      "module": "concrete_wall",
+      "nearest_instance": 7,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 12,
+      "module": "concrete_wall",
+      "nearest_instance": 8,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 13,
+      "module": "concrete_wall",
+      "nearest_instance": 9,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 14,
+      "module": "concrete_wall",
+      "nearest_instance": 10,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 15,
+      "module": "concrete_wall",
+      "nearest_instance": 11,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 16,
+      "module": "concrete_wall",
+      "nearest_instance": 12,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 17,
+      "module": "concrete_wall",
+      "nearest_instance": 13,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 18,
+      "module": "concrete_wall",
+      "nearest_instance": 14,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 19,
+      "module": "concrete_wall",
+      "nearest_instance": 15,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 20,
+      "module": "concrete_wall",
+      "nearest_instance": 16,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 21,
+      "module": "concrete_wall",
+      "nearest_instance": 17,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 22,
+      "module": "concrete_wall",
+      "nearest_instance": 18,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 23,
+      "module": "concrete_wall",
+      "nearest_instance": 19,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 24,
+      "module": "concrete_wall",
+      "nearest_instance": 20,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 25,
+      "module": "concrete_wall",
+      "nearest_instance": 21,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 26,
+      "module": "concrete_wall",
+      "nearest_instance": 22,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 27,
+      "module": "concrete_wall",
+      "nearest_instance": 23,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 28,
+      "module": "concrete_wall",
+      "nearest_instance": 24,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 29,
+      "module": "concrete_wall",
+      "nearest_instance": 25,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 30,
+      "module": "concrete_wall",
+      "nearest_instance": 26,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 31,
+      "module": "concrete_wall",
+      "nearest_instance": 27,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 32,
+      "module": "concrete_wall",
+      "nearest_instance": 28,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 33,
+      "module": "concrete_wall",
+      "nearest_instance": 29,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 34,
+      "module": "concrete_wall",
+      "nearest_instance": 30,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 35,
+      "module": "concrete_wall",
+      "nearest_instance": 31,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 36,
+      "module": "concrete_wall",
+      "nearest_instance": 32,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 37,
+      "module": "concrete_wall",
+      "nearest_instance": 33,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 38,
+      "module": "concrete_wall",
+      "nearest_instance": 34,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 39,
+      "module": "concrete_wall",
+      "nearest_instance": 35,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 40,
+      "module": "concrete_wall",
+      "nearest_instance": 44,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 41,
+      "module": "concrete_wall",
+      "nearest_instance": 45,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 42,
+      "module": "concrete_wall",
+      "nearest_instance": 46,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 43,
+      "module": "concrete_wall",
+      "nearest_instance": 47,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 44,
+      "module": "concrete_wall",
+      "nearest_instance": 40,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 45,
+      "module": "concrete_wall",
+      "nearest_instance": 41,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 46,
+      "module": "concrete_wall",
+      "nearest_instance": 42,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 47,
+      "module": "concrete_wall",
+      "nearest_instance": 43,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 48,
+      "module": "concrete_wall",
+      "nearest_instance": 44,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 49,
+      "module": "concrete_wall",
+      "nearest_instance": 45,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 50,
+      "module": "concrete_wall",
+      "nearest_instance": 46,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 51,
+      "module": "concrete_wall",
+      "nearest_instance": 47,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 52,
+      "module": "concrete_wall",
+      "nearest_instance": 48,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 53,
+      "module": "concrete_wall",
+      "nearest_instance": 49,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 54,
+      "module": "concrete_wall",
+      "nearest_instance": 50,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 55,
+      "module": "concrete_wall",
+      "nearest_instance": 51,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 56,
+      "module": "concrete_wall",
+      "nearest_instance": 52,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 57,
+      "module": "concrete_wall",
+      "nearest_instance": 53,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 58,
+      "module": "concrete_wall",
+      "nearest_instance": 54,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 59,
+      "module": "concrete_wall",
+      "nearest_instance": 55,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 60,
+      "module": "concrete_wall",
+      "nearest_instance": 56,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 61,
+      "module": "concrete_wall",
+      "nearest_instance": 57,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 62,
+      "module": "concrete_wall",
+      "nearest_instance": 58,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 63,
+      "module": "concrete_wall",
+      "nearest_instance": 59,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 64,
+      "module": "concrete_wall",
+      "nearest_instance": 60,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 65,
+      "module": "concrete_wall",
+      "nearest_instance": 61,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 66,
+      "module": "concrete_wall",
+      "nearest_instance": 62,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 67,
+      "module": "concrete_wall",
+      "nearest_instance": 63,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 68,
+      "module": "concrete_wall",
+      "nearest_instance": 64,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 69,
+      "module": "concrete_wall",
+      "nearest_instance": 65,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 70,
+      "module": "concrete_wall",
+      "nearest_instance": 66,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 71,
+      "module": "concrete_wall",
+      "nearest_instance": 67,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 72,
+      "module": "concrete_wall",
+      "nearest_instance": 68,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 73,
+      "module": "concrete_wall",
+      "nearest_instance": 69,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 74,
+      "module": "concrete_wall",
+      "nearest_instance": 70,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 75,
+      "module": "concrete_wall",
+      "nearest_instance": 71,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 76,
+      "module": "concrete_wall",
+      "nearest_instance": 3,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 77,
+      "module": "concrete_wall",
+      "nearest_instance": 73,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 78,
+      "module": "concrete_wall",
+      "nearest_instance": 1,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 79,
+      "module": "concrete_wall",
+      "nearest_instance": 75,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 80,
+      "module": "concrete_wall",
+      "nearest_instance": 82,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 81,
+      "module": "concrete_wall",
+      "nearest_instance": 85,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 82,
+      "module": "concrete_wall",
+      "nearest_instance": 80,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 83,
+      "module": "concrete_wall",
+      "nearest_instance": 87,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 84,
+      "module": "concrete_wall",
+      "nearest_instance": 80,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 85,
+      "module": "concrete_wall",
+      "nearest_instance": 81,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 86,
+      "module": "concrete_wall",
+      "nearest_instance": 82,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 87,
+      "module": "concrete_wall",
+      "nearest_instance": 83,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 88,
+      "module": "concrete_wall",
+      "nearest_instance": 84,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 89,
+      "module": "concrete_wall",
+      "nearest_instance": 85,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 90,
+      "module": "concrete_wall",
+      "nearest_instance": 86,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 91,
+      "module": "concrete_wall",
+      "nearest_instance": 87,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 92,
+      "module": "concrete_wall",
+      "nearest_instance": 88,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 93,
+      "module": "concrete_wall",
+      "nearest_instance": 89,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 94,
+      "module": "concrete_wall",
+      "nearest_instance": 90,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 95,
+      "module": "concrete_wall",
+      "nearest_instance": 91,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 96,
+      "module": "concrete_wall",
+      "nearest_instance": 92,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 97,
+      "module": "concrete_wall",
+      "nearest_instance": 93,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 98,
+      "module": "concrete_wall",
+      "nearest_instance": 94,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 99,
+      "module": "concrete_wall",
+      "nearest_instance": 95,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 100,
+      "module": "concrete_wall",
+      "nearest_instance": 96,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 101,
+      "module": "concrete_wall",
+      "nearest_instance": 97,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 102,
+      "module": "concrete_wall",
+      "nearest_instance": 98,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 103,
+      "module": "concrete_wall",
+      "nearest_instance": 99,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 104,
+      "module": "concrete_wall",
+      "nearest_instance": 100,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 105,
+      "module": "concrete_wall",
+      "nearest_instance": 101,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 106,
+      "module": "concrete_wall",
+      "nearest_instance": 102,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 107,
+      "module": "concrete_wall",
+      "nearest_instance": 103,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 108,
+      "module": "concrete_wall",
+      "nearest_instance": 104,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 109,
+      "module": "concrete_wall",
+      "nearest_instance": 105,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 110,
+      "module": "concrete_wall",
+      "nearest_instance": 106,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 111,
+      "module": "concrete_wall",
+      "nearest_instance": 107,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 112,
+      "module": "concrete_wall",
+      "nearest_instance": 108,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 113,
+      "module": "concrete_wall",
+      "nearest_instance": 109,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 114,
+      "module": "concrete_wall",
+      "nearest_instance": 110,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 115,
+      "module": "concrete_wall",
+      "nearest_instance": 111,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 116,
+      "module": "concrete_wall",
+      "nearest_instance": 112,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 117,
+      "module": "concrete_wall",
+      "nearest_instance": 113,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 118,
+      "module": "concrete_wall",
+      "nearest_instance": 114,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 119,
+      "module": "concrete_wall",
+      "nearest_instance": 115,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 120,
+      "module": "concrete_wall",
+      "nearest_instance": 116,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 121,
+      "module": "concrete_wall",
+      "nearest_instance": 117,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 122,
+      "module": "concrete_wall",
+      "nearest_instance": 118,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 123,
+      "module": "concrete_wall",
+      "nearest_instance": 119,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 124,
+      "module": "concrete_wall",
+      "nearest_instance": 120,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 125,
+      "module": "concrete_wall",
+      "nearest_instance": 121,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 126,
+      "module": "concrete_wall",
+      "nearest_instance": 122,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 127,
+      "module": "concrete_wall",
+      "nearest_instance": 123,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 128,
+      "module": "concrete_wall",
+      "nearest_instance": 124,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 129,
+      "module": "concrete_wall",
+      "nearest_instance": 125,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 130,
+      "module": "concrete_wall",
+      "nearest_instance": 126,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 131,
+      "module": "concrete_wall",
+      "nearest_instance": 127,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 132,
+      "module": "concrete_wall",
+      "nearest_instance": 128,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 133,
+      "module": "concrete_wall",
+      "nearest_instance": 129,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 134,
+      "module": "concrete_wall",
+      "nearest_instance": 130,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 135,
+      "module": "concrete_wall",
+      "nearest_instance": 131,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 136,
+      "module": "concrete_wall",
+      "nearest_instance": 132,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 137,
+      "module": "concrete_wall",
+      "nearest_instance": 133,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 138,
+      "module": "concrete_wall",
+      "nearest_instance": 134,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 139,
+      "module": "concrete_wall",
+      "nearest_instance": 135,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 140,
+      "module": "concrete_wall",
+      "nearest_instance": 136,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 141,
+      "module": "concrete_wall",
+      "nearest_instance": 137,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 142,
+      "module": "concrete_wall",
+      "nearest_instance": 138,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 143,
+      "module": "concrete_wall",
+      "nearest_instance": 139,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 144,
+      "module": "concrete_wall",
+      "nearest_instance": 140,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 145,
+      "module": "concrete_wall",
+      "nearest_instance": 141,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 146,
+      "module": "concrete_wall",
+      "nearest_instance": 142,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 147,
+      "module": "concrete_wall",
+      "nearest_instance": 143,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 148,
+      "module": "concrete_wall",
+      "nearest_instance": 144,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 149,
+      "module": "concrete_wall",
+      "nearest_instance": 145,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 150,
+      "module": "concrete_wall",
+      "nearest_instance": 146,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 151,
+      "module": "concrete_wall",
+      "nearest_instance": 147,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 152,
+      "module": "concrete_wall",
+      "nearest_instance": 156,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 153,
+      "module": "concrete_wall",
+      "nearest_instance": 157,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 154,
+      "module": "concrete_wall",
+      "nearest_instance": 158,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 155,
+      "module": "concrete_wall",
+      "nearest_instance": 159,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 156,
+      "module": "concrete_wall",
+      "nearest_instance": 152,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 157,
+      "module": "concrete_wall",
+      "nearest_instance": 153,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 158,
+      "module": "concrete_wall",
+      "nearest_instance": 154,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 159,
+      "module": "concrete_wall",
+      "nearest_instance": 155,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 160,
+      "module": "concrete_wall",
+      "nearest_instance": 156,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 161,
+      "module": "concrete_wall",
+      "nearest_instance": 157,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 162,
+      "module": "concrete_wall",
+      "nearest_instance": 158,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 163,
+      "module": "concrete_wall",
+      "nearest_instance": 159,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 164,
+      "module": "concrete_wall",
+      "nearest_instance": 160,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 165,
+      "module": "concrete_wall",
+      "nearest_instance": 161,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 166,
+      "module": "concrete_wall",
+      "nearest_instance": 162,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 167,
+      "module": "concrete_wall",
+      "nearest_instance": 163,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 168,
+      "module": "concrete_wall",
+      "nearest_instance": 164,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 169,
+      "module": "concrete_wall",
+      "nearest_instance": 165,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 170,
+      "module": "concrete_wall",
+      "nearest_instance": 166,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 171,
+      "module": "concrete_wall",
+      "nearest_instance": 167,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 172,
+      "module": "concrete_wall",
+      "nearest_instance": 168,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 173,
+      "module": "concrete_wall",
+      "nearest_instance": 169,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 174,
+      "module": "concrete_wall",
+      "nearest_instance": 170,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 175,
+      "module": "concrete_wall",
+      "nearest_instance": 171,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 176,
+      "module": "concrete_wall",
+      "nearest_instance": 172,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 177,
+      "module": "concrete_wall",
+      "nearest_instance": 173,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 178,
+      "module": "concrete_wall",
+      "nearest_instance": 174,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 179,
+      "module": "concrete_wall",
+      "nearest_instance": 175,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 180,
+      "module": "concrete_wall",
+      "nearest_instance": 176,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 181,
+      "module": "concrete_wall",
+      "nearest_instance": 177,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 182,
+      "module": "concrete_wall",
+      "nearest_instance": 178,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 183,
+      "module": "concrete_wall",
+      "nearest_instance": 179,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 184,
+      "module": "concrete_wall",
+      "nearest_instance": 180,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 185,
+      "module": "concrete_wall",
+      "nearest_instance": 181,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 186,
+      "module": "concrete_wall",
+      "nearest_instance": 182,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 187,
+      "module": "concrete_wall",
+      "nearest_instance": 183,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 188,
+      "module": "concrete_wall",
+      "nearest_instance": 184,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 189,
+      "module": "concrete_wall",
+      "nearest_instance": 185,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 190,
+      "module": "concrete_wall",
+      "nearest_instance": 186,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 191,
+      "module": "concrete_wall",
+      "nearest_instance": 187,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 192,
+      "module": "concrete_wall",
+      "nearest_instance": 188,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 193,
+      "module": "concrete_wall",
+      "nearest_instance": 189,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 194,
+      "module": "concrete_wall",
+      "nearest_instance": 190,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 195,
+      "module": "concrete_wall",
+      "nearest_instance": 191,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 196,
+      "module": "concrete_wall",
+      "nearest_instance": 192,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 197,
+      "module": "concrete_wall",
+      "nearest_instance": 193,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 198,
+      "module": "concrete_wall",
+      "nearest_instance": 194,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 199,
+      "module": "concrete_wall",
+      "nearest_instance": 195,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 200,
+      "module": "concrete_wall",
+      "nearest_instance": 196,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 201,
+      "module": "concrete_wall",
+      "nearest_instance": 197,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 202,
+      "module": "concrete_wall",
+      "nearest_instance": 198,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 203,
+      "module": "concrete_wall",
+      "nearest_instance": 199,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 204,
+      "module": "concrete_wall",
+      "nearest_instance": 200,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 205,
+      "module": "concrete_wall",
+      "nearest_instance": 201,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 206,
+      "module": "concrete_wall",
+      "nearest_instance": 202,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 207,
+      "module": "concrete_wall",
+      "nearest_instance": 203,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 208,
+      "module": "concrete_wall",
+      "nearest_instance": 204,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 209,
+      "module": "concrete_wall",
+      "nearest_instance": 205,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 210,
+      "module": "concrete_wall",
+      "nearest_instance": 206,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 211,
+      "module": "concrete_wall",
+      "nearest_instance": 207,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 212,
+      "module": "concrete_wall",
+      "nearest_instance": 208,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 213,
+      "module": "concrete_wall",
+      "nearest_instance": 209,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 214,
+      "module": "concrete_wall",
+      "nearest_instance": 210,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 215,
+      "module": "concrete_wall",
+      "nearest_instance": 211,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 216,
+      "module": "concrete_wall",
+      "nearest_instance": 212,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 217,
+      "module": "concrete_wall",
+      "nearest_instance": 213,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 218,
+      "module": "concrete_wall",
+      "nearest_instance": 214,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 219,
+      "module": "concrete_wall",
+      "nearest_instance": 215,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 220,
+      "module": "concrete_wall",
+      "nearest_instance": 83,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 221,
+      "module": "concrete_wall",
+      "nearest_instance": 217,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 222,
+      "module": "concrete_wall",
+      "nearest_instance": 81,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 223,
+      "module": "concrete_wall",
+      "nearest_instance": 219,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 224,
+      "module": "concrete_wall",
+      "nearest_instance": 226,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 225,
+      "module": "concrete_wall",
+      "nearest_instance": 229,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 226,
+      "module": "concrete_wall",
+      "nearest_instance": 224,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 227,
+      "module": "concrete_wall",
+      "nearest_instance": 231,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 228,
+      "module": "concrete_wall",
+      "nearest_instance": 224,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 229,
+      "module": "concrete_wall",
+      "nearest_instance": 225,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 230,
+      "module": "concrete_wall",
+      "nearest_instance": 226,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 231,
+      "module": "concrete_wall",
+      "nearest_instance": 227,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 232,
+      "module": "concrete_wall",
+      "nearest_instance": 228,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 233,
+      "module": "concrete_wall",
+      "nearest_instance": 229,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 234,
+      "module": "concrete_wall",
+      "nearest_instance": 230,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 235,
+      "module": "concrete_wall",
+      "nearest_instance": 231,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 236,
+      "module": "concrete_wall",
+      "nearest_instance": 232,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 237,
+      "module": "concrete_wall",
+      "nearest_instance": 233,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 238,
+      "module": "concrete_wall",
+      "nearest_instance": 234,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 239,
+      "module": "concrete_wall",
+      "nearest_instance": 235,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 240,
+      "module": "concrete_wall",
+      "nearest_instance": 236,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 241,
+      "module": "concrete_wall",
+      "nearest_instance": 237,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 242,
+      "module": "concrete_wall",
+      "nearest_instance": 238,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 243,
+      "module": "concrete_wall",
+      "nearest_instance": 239,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 244,
+      "module": "concrete_wall",
+      "nearest_instance": 240,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 245,
+      "module": "concrete_wall",
+      "nearest_instance": 241,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 246,
+      "module": "concrete_wall",
+      "nearest_instance": 242,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 247,
+      "module": "concrete_wall",
+      "nearest_instance": 243,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 248,
+      "module": "concrete_wall",
+      "nearest_instance": 244,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 249,
+      "module": "concrete_wall",
+      "nearest_instance": 245,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 250,
+      "module": "concrete_wall",
+      "nearest_instance": 246,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 251,
+      "module": "concrete_wall",
+      "nearest_instance": 247,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 252,
+      "module": "concrete_wall",
+      "nearest_instance": 248,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 253,
+      "module": "concrete_wall",
+      "nearest_instance": 249,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 254,
+      "module": "concrete_wall",
+      "nearest_instance": 250,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 255,
+      "module": "concrete_wall",
+      "nearest_instance": 251,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 256,
+      "module": "concrete_wall",
+      "nearest_instance": 252,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 257,
+      "module": "concrete_wall",
+      "nearest_instance": 253,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 258,
+      "module": "concrete_wall",
+      "nearest_instance": 254,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 259,
+      "module": "concrete_wall",
+      "nearest_instance": 255,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 260,
+      "module": "concrete_wall",
+      "nearest_instance": 256,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 261,
+      "module": "concrete_wall",
+      "nearest_instance": 257,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 262,
+      "module": "concrete_wall",
+      "nearest_instance": 258,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 263,
+      "module": "concrete_wall",
+      "nearest_instance": 259,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 264,
+      "module": "concrete_wall",
+      "nearest_instance": 260,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 265,
+      "module": "concrete_wall",
+      "nearest_instance": 261,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 266,
+      "module": "concrete_wall",
+      "nearest_instance": 262,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 267,
+      "module": "concrete_wall",
+      "nearest_instance": 263,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 268,
+      "module": "concrete_wall",
+      "nearest_instance": 264,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 269,
+      "module": "concrete_wall",
+      "nearest_instance": 265,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 270,
+      "module": "concrete_wall",
+      "nearest_instance": 266,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 271,
+      "module": "concrete_wall",
+      "nearest_instance": 267,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 272,
+      "module": "concrete_wall",
+      "nearest_instance": 268,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 273,
+      "module": "concrete_wall",
+      "nearest_instance": 269,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 274,
+      "module": "concrete_wall",
+      "nearest_instance": 270,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 275,
+      "module": "concrete_wall",
+      "nearest_instance": 271,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 276,
+      "module": "concrete_wall",
+      "nearest_instance": 272,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 277,
+      "module": "concrete_wall",
+      "nearest_instance": 273,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 278,
+      "module": "concrete_wall",
+      "nearest_instance": 274,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 279,
+      "module": "concrete_wall",
+      "nearest_instance": 275,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 280,
+      "module": "concrete_wall",
+      "nearest_instance": 276,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 281,
+      "module": "concrete_wall",
+      "nearest_instance": 277,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 282,
+      "module": "concrete_wall",
+      "nearest_instance": 278,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 283,
+      "module": "concrete_wall",
+      "nearest_instance": 279,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 284,
+      "module": "concrete_wall",
+      "nearest_instance": 280,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 285,
+      "module": "concrete_wall",
+      "nearest_instance": 281,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 286,
+      "module": "concrete_wall",
+      "nearest_instance": 282,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 287,
+      "module": "concrete_wall",
+      "nearest_instance": 283,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 288,
+      "module": "concrete_wall",
+      "nearest_instance": 284,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 289,
+      "module": "concrete_wall",
+      "nearest_instance": 285,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 290,
+      "module": "concrete_wall",
+      "nearest_instance": 286,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 291,
+      "module": "concrete_wall",
+      "nearest_instance": 287,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 292,
+      "module": "concrete_wall",
+      "nearest_instance": 288,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 293,
+      "module": "concrete_wall",
+      "nearest_instance": 289,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 294,
+      "module": "concrete_wall",
+      "nearest_instance": 290,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 295,
+      "module": "concrete_wall",
+      "nearest_instance": 291,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 296,
+      "module": "concrete_wall",
+      "nearest_instance": 292,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 297,
+      "module": "concrete_wall",
+      "nearest_instance": 293,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 298,
+      "module": "concrete_wall",
+      "nearest_instance": 294,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 299,
+      "module": "concrete_wall",
+      "nearest_instance": 295,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 300,
+      "module": "concrete_wall",
+      "nearest_instance": 296,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 301,
+      "module": "concrete_wall",
+      "nearest_instance": 297,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 302,
+      "module": "concrete_wall",
+      "nearest_instance": 298,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 303,
+      "module": "concrete_wall",
+      "nearest_instance": 299,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 304,
+      "module": "concrete_wall",
+      "nearest_instance": 300,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 305,
+      "module": "concrete_wall",
+      "nearest_instance": 301,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 306,
+      "module": "concrete_wall",
+      "nearest_instance": 302,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 307,
+      "module": "concrete_wall",
+      "nearest_instance": 303,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 308,
+      "module": "concrete_wall",
+      "nearest_instance": 304,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 309,
+      "module": "concrete_wall",
+      "nearest_instance": 305,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 310,
+      "module": "concrete_wall",
+      "nearest_instance": 306,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 311,
+      "module": "concrete_wall",
+      "nearest_instance": 307,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 312,
+      "module": "concrete_wall",
+      "nearest_instance": 308,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 313,
+      "module": "concrete_wall",
+      "nearest_instance": 309,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 314,
+      "module": "concrete_wall",
+      "nearest_instance": 310,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 315,
+      "module": "concrete_wall",
+      "nearest_instance": 311,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 316,
+      "module": "concrete_wall",
+      "nearest_instance": 312,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 317,
+      "module": "concrete_wall",
+      "nearest_instance": 313,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 318,
+      "module": "concrete_wall",
+      "nearest_instance": 314,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 319,
+      "module": "concrete_wall",
+      "nearest_instance": 315,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 320,
+      "module": "concrete_wall",
+      "nearest_instance": 324,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 321,
+      "module": "concrete_wall",
+      "nearest_instance": 325,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 322,
+      "module": "concrete_wall",
+      "nearest_instance": 326,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 323,
+      "module": "concrete_wall",
+      "nearest_instance": 327,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 324,
+      "module": "concrete_wall",
+      "nearest_instance": 320,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 325,
+      "module": "concrete_wall",
+      "nearest_instance": 321,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 326,
+      "module": "concrete_wall",
+      "nearest_instance": 322,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 327,
+      "module": "concrete_wall",
+      "nearest_instance": 323,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 328,
+      "module": "concrete_wall",
+      "nearest_instance": 324,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 329,
+      "module": "concrete_wall",
+      "nearest_instance": 325,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 330,
+      "module": "concrete_wall",
+      "nearest_instance": 326,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 331,
+      "module": "concrete_wall",
+      "nearest_instance": 327,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 332,
+      "module": "concrete_wall",
+      "nearest_instance": 328,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 333,
+      "module": "concrete_wall",
+      "nearest_instance": 329,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 334,
+      "module": "concrete_wall",
+      "nearest_instance": 330,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 335,
+      "module": "concrete_wall",
+      "nearest_instance": 331,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 336,
+      "module": "concrete_wall",
+      "nearest_instance": 332,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 337,
+      "module": "concrete_wall",
+      "nearest_instance": 333,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 338,
+      "module": "concrete_wall",
+      "nearest_instance": 334,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 339,
+      "module": "concrete_wall",
+      "nearest_instance": 335,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 340,
+      "module": "concrete_wall",
+      "nearest_instance": 336,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 341,
+      "module": "concrete_wall",
+      "nearest_instance": 337,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 342,
+      "module": "concrete_wall",
+      "nearest_instance": 338,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 343,
+      "module": "concrete_wall",
+      "nearest_instance": 339,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 344,
+      "module": "concrete_wall",
+      "nearest_instance": 340,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 345,
+      "module": "concrete_wall",
+      "nearest_instance": 341,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 346,
+      "module": "concrete_wall",
+      "nearest_instance": 342,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 347,
+      "module": "concrete_wall",
+      "nearest_instance": 343,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 348,
+      "module": "concrete_wall",
+      "nearest_instance": 344,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 349,
+      "module": "concrete_wall",
+      "nearest_instance": 345,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 350,
+      "module": "concrete_wall",
+      "nearest_instance": 346,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 351,
+      "module": "concrete_wall",
+      "nearest_instance": 347,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 352,
+      "module": "concrete_wall",
+      "nearest_instance": 348,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 353,
+      "module": "concrete_wall",
+      "nearest_instance": 349,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 354,
+      "module": "concrete_wall",
+      "nearest_instance": 350,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 355,
+      "module": "concrete_wall",
+      "nearest_instance": 351,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 356,
+      "module": "concrete_wall",
+      "nearest_instance": 352,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 357,
+      "module": "concrete_wall",
+      "nearest_instance": 353,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 358,
+      "module": "concrete_wall",
+      "nearest_instance": 354,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 359,
+      "module": "concrete_wall",
+      "nearest_instance": 355,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 360,
+      "module": "concrete_wall",
+      "nearest_instance": 356,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 361,
+      "module": "concrete_wall",
+      "nearest_instance": 357,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 362,
+      "module": "concrete_wall",
+      "nearest_instance": 358,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 363,
+      "module": "concrete_wall",
+      "nearest_instance": 359,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 364,
+      "module": "concrete_wall",
+      "nearest_instance": 360,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 365,
+      "module": "concrete_wall",
+      "nearest_instance": 361,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 366,
+      "module": "concrete_wall",
+      "nearest_instance": 362,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 367,
+      "module": "concrete_wall",
+      "nearest_instance": 363,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 368,
+      "module": "concrete_wall",
+      "nearest_instance": 364,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 369,
+      "module": "concrete_wall",
+      "nearest_instance": 365,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 370,
+      "module": "concrete_wall",
+      "nearest_instance": 366,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 371,
+      "module": "concrete_wall",
+      "nearest_instance": 367,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 372,
+      "module": "concrete_wall",
+      "nearest_instance": 368,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 373,
+      "module": "concrete_wall",
+      "nearest_instance": 369,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 374,
+      "module": "concrete_wall",
+      "nearest_instance": 370,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 375,
+      "module": "concrete_wall",
+      "nearest_instance": 371,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 376,
+      "module": "concrete_wall",
+      "nearest_instance": 372,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 377,
+      "module": "concrete_wall",
+      "nearest_instance": 373,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 378,
+      "module": "concrete_wall",
+      "nearest_instance": 374,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 379,
+      "module": "concrete_wall",
+      "nearest_instance": 375,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 380,
+      "module": "concrete_wall",
+      "nearest_instance": 376,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 381,
+      "module": "concrete_wall",
+      "nearest_instance": 377,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 382,
+      "module": "concrete_wall",
+      "nearest_instance": 378,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 383,
+      "module": "concrete_wall",
+      "nearest_instance": 379,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 384,
+      "module": "concrete_wall",
+      "nearest_instance": 380,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 385,
+      "module": "concrete_wall",
+      "nearest_instance": 381,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 386,
+      "module": "concrete_wall",
+      "nearest_instance": 382,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 387,
+      "module": "concrete_wall",
+      "nearest_instance": 383,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 388,
+      "module": "concrete_wall",
+      "nearest_instance": 384,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 389,
+      "module": "concrete_wall",
+      "nearest_instance": 385,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 390,
+      "module": "concrete_wall",
+      "nearest_instance": 386,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 391,
+      "module": "concrete_wall",
+      "nearest_instance": 387,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 392,
+      "module": "concrete_wall",
+      "nearest_instance": 388,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 393,
+      "module": "concrete_wall",
+      "nearest_instance": 389,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 394,
+      "module": "concrete_wall",
+      "nearest_instance": 390,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 395,
+      "module": "concrete_wall",
+      "nearest_instance": 391,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 396,
+      "module": "concrete_wall",
+      "nearest_instance": 392,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 397,
+      "module": "concrete_wall",
+      "nearest_instance": 393,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 398,
+      "module": "concrete_wall",
+      "nearest_instance": 394,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 399,
+      "module": "concrete_wall",
+      "nearest_instance": 395,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 400,
+      "module": "concrete_wall",
+      "nearest_instance": 396,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 401,
+      "module": "concrete_wall",
+      "nearest_instance": 397,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 402,
+      "module": "concrete_wall",
+      "nearest_instance": 398,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 403,
+      "module": "concrete_wall",
+      "nearest_instance": 399,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 404,
+      "module": "concrete_wall",
+      "nearest_instance": 400,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 405,
+      "module": "concrete_wall",
+      "nearest_instance": 401,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 406,
+      "module": "concrete_wall",
+      "nearest_instance": 402,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 407,
+      "module": "concrete_wall",
+      "nearest_instance": 403,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 408,
+      "module": "concrete_wall",
+      "nearest_instance": 404,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 409,
+      "module": "concrete_wall",
+      "nearest_instance": 405,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 410,
+      "module": "concrete_wall",
+      "nearest_instance": 406,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 411,
+      "module": "concrete_wall",
+      "nearest_instance": 407,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 412,
+      "module": "concrete_wall",
+      "nearest_instance": 227,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 413,
+      "module": "concrete_wall",
+      "nearest_instance": 409,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 414,
+      "module": "concrete_wall",
+      "nearest_instance": 225,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 415,
+      "module": "concrete_wall",
+      "nearest_instance": 411,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 416,
+      "module": "concrete_wall",
+      "nearest_instance": 418,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 417,
+      "module": "concrete_wall",
+      "nearest_instance": 421,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 418,
+      "module": "concrete_wall",
+      "nearest_instance": 416,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 419,
+      "module": "concrete_wall",
+      "nearest_instance": 423,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 420,
+      "module": "concrete_wall",
+      "nearest_instance": 416,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 421,
+      "module": "concrete_wall",
+      "nearest_instance": 417,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 422,
+      "module": "concrete_wall",
+      "nearest_instance": 418,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 423,
+      "module": "concrete_wall",
+      "nearest_instance": 419,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 424,
+      "module": "concrete_wall",
+      "nearest_instance": 420,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 425,
+      "module": "concrete_wall",
+      "nearest_instance": 421,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 426,
+      "module": "concrete_wall",
+      "nearest_instance": 422,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 427,
+      "module": "concrete_wall",
+      "nearest_instance": 423,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 428,
+      "module": "concrete_wall",
+      "nearest_instance": 424,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 429,
+      "module": "concrete_wall",
+      "nearest_instance": 425,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 430,
+      "module": "concrete_wall",
+      "nearest_instance": 426,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 431,
+      "module": "concrete_wall",
+      "nearest_instance": 427,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 432,
+      "module": "concrete_wall",
+      "nearest_instance": 428,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 433,
+      "module": "concrete_wall",
+      "nearest_instance": 429,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 434,
+      "module": "concrete_wall",
+      "nearest_instance": 430,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 435,
+      "module": "concrete_wall",
+      "nearest_instance": 431,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 436,
+      "module": "concrete_wall",
+      "nearest_instance": 432,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 437,
+      "module": "concrete_wall",
+      "nearest_instance": 433,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 438,
+      "module": "concrete_wall",
+      "nearest_instance": 434,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 439,
+      "module": "concrete_wall",
+      "nearest_instance": 435,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 440,
+      "module": "concrete_wall",
+      "nearest_instance": 436,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 441,
+      "module": "concrete_wall",
+      "nearest_instance": 437,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 442,
+      "module": "concrete_wall",
+      "nearest_instance": 438,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 443,
+      "module": "concrete_wall",
+      "nearest_instance": 439,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 444,
+      "module": "concrete_wall",
+      "nearest_instance": 440,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 445,
+      "module": "concrete_wall",
+      "nearest_instance": 441,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 446,
+      "module": "concrete_wall",
+      "nearest_instance": 442,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 447,
+      "module": "concrete_wall",
+      "nearest_instance": 443,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 448,
+      "module": "concrete_wall",
+      "nearest_instance": 444,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 449,
+      "module": "concrete_wall",
+      "nearest_instance": 445,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 450,
+      "module": "concrete_wall",
+      "nearest_instance": 446,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 451,
+      "module": "concrete_wall",
+      "nearest_instance": 447,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 452,
+      "module": "concrete_wall",
+      "nearest_instance": 448,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 453,
+      "module": "concrete_wall",
+      "nearest_instance": 449,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 454,
+      "module": "concrete_wall",
+      "nearest_instance": 450,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 455,
+      "module": "concrete_wall",
+      "nearest_instance": 451,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 456,
+      "module": "concrete_wall",
+      "nearest_instance": 452,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 457,
+      "module": "concrete_wall",
+      "nearest_instance": 453,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 458,
+      "module": "concrete_wall",
+      "nearest_instance": 454,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 459,
+      "module": "concrete_wall",
+      "nearest_instance": 455,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 460,
+      "module": "concrete_wall",
+      "nearest_instance": 456,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 461,
+      "module": "concrete_wall",
+      "nearest_instance": 457,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 462,
+      "module": "concrete_wall",
+      "nearest_instance": 458,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 463,
+      "module": "concrete_wall",
+      "nearest_instance": 459,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 464,
+      "module": "concrete_wall",
+      "nearest_instance": 460,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 465,
+      "module": "concrete_wall",
+      "nearest_instance": 461,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 466,
+      "module": "concrete_wall",
+      "nearest_instance": 462,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 467,
+      "module": "concrete_wall",
+      "nearest_instance": 463,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 468,
+      "module": "concrete_wall",
+      "nearest_instance": 464,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 469,
+      "module": "concrete_wall",
+      "nearest_instance": 465,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 470,
+      "module": "concrete_wall",
+      "nearest_instance": 466,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 471,
+      "module": "concrete_wall",
+      "nearest_instance": 467,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 472,
+      "module": "concrete_wall",
+      "nearest_instance": 468,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 473,
+      "module": "concrete_wall",
+      "nearest_instance": 469,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 474,
+      "module": "concrete_wall",
+      "nearest_instance": 470,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 475,
+      "module": "concrete_wall",
+      "nearest_instance": 471,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 476,
+      "module": "concrete_wall",
+      "nearest_instance": 472,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 477,
+      "module": "concrete_wall",
+      "nearest_instance": 473,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 478,
+      "module": "concrete_wall",
+      "nearest_instance": 474,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 479,
+      "module": "concrete_wall",
+      "nearest_instance": 475,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 480,
+      "module": "concrete_wall",
+      "nearest_instance": 476,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 481,
+      "module": "concrete_wall",
+      "nearest_instance": 477,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 482,
+      "module": "concrete_wall",
+      "nearest_instance": 478,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 483,
+      "module": "concrete_wall",
+      "nearest_instance": 479,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 484,
+      "module": "concrete_wall",
+      "nearest_instance": 480,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 485,
+      "module": "concrete_wall",
+      "nearest_instance": 481,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 486,
+      "module": "concrete_wall",
+      "nearest_instance": 482,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 487,
+      "module": "concrete_wall",
+      "nearest_instance": 483,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 488,
+      "module": "concrete_wall",
+      "nearest_instance": 484,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 489,
+      "module": "concrete_wall",
+      "nearest_instance": 485,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 490,
+      "module": "concrete_wall",
+      "nearest_instance": 486,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 491,
+      "module": "concrete_wall",
+      "nearest_instance": 487,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 492,
+      "module": "concrete_wall",
+      "nearest_instance": 488,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 493,
+      "module": "concrete_wall",
+      "nearest_instance": 489,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 494,
+      "module": "concrete_wall",
+      "nearest_instance": 490,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 495,
+      "module": "concrete_wall",
+      "nearest_instance": 491,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 496,
+      "module": "concrete_wall",
+      "nearest_instance": 492,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 497,
+      "module": "concrete_wall",
+      "nearest_instance": 493,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 498,
+      "module": "concrete_wall",
+      "nearest_instance": 494,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 499,
+      "module": "concrete_wall",
+      "nearest_instance": 495,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 500,
+      "module": "concrete_wall",
+      "nearest_instance": 496,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 501,
+      "module": "concrete_wall",
+      "nearest_instance": 497,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 502,
+      "module": "concrete_wall",
+      "nearest_instance": 498,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 503,
+      "module": "concrete_wall",
+      "nearest_instance": 499,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 504,
+      "module": "concrete_wall",
+      "nearest_instance": 500,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 505,
+      "module": "concrete_wall",
+      "nearest_instance": 501,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 506,
+      "module": "concrete_wall",
+      "nearest_instance": 502,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 507,
+      "module": "concrete_wall",
+      "nearest_instance": 503,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 508,
+      "module": "concrete_wall",
+      "nearest_instance": 504,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 509,
+      "module": "concrete_wall",
+      "nearest_instance": 505,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 510,
+      "module": "concrete_wall",
+      "nearest_instance": 506,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 511,
+      "module": "concrete_wall",
+      "nearest_instance": 507,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 512,
+      "module": "concrete_wall",
+      "nearest_instance": 508,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 513,
+      "module": "concrete_wall",
+      "nearest_instance": 509,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 514,
+      "module": "concrete_wall",
+      "nearest_instance": 510,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 515,
+      "module": "concrete_wall",
+      "nearest_instance": 511,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 516,
+      "module": "concrete_wall",
+      "nearest_instance": 512,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 517,
+      "module": "concrete_wall",
+      "nearest_instance": 513,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 518,
+      "module": "concrete_wall",
+      "nearest_instance": 514,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 519,
+      "module": "concrete_wall",
+      "nearest_instance": 515,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 520,
+      "module": "concrete_wall",
+      "nearest_instance": 516,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 521,
+      "module": "concrete_wall",
+      "nearest_instance": 517,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 522,
+      "module": "concrete_wall",
+      "nearest_instance": 518,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 523,
+      "module": "concrete_wall",
+      "nearest_instance": 519,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 524,
+      "module": "concrete_wall",
+      "nearest_instance": 520,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 525,
+      "module": "concrete_wall",
+      "nearest_instance": 521,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 526,
+      "module": "concrete_wall",
+      "nearest_instance": 522,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 527,
+      "module": "concrete_wall",
+      "nearest_instance": 523,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 528,
+      "module": "concrete_wall",
+      "nearest_instance": 532,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 529,
+      "module": "concrete_wall",
+      "nearest_instance": 533,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 530,
+      "module": "concrete_wall",
+      "nearest_instance": 534,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 531,
+      "module": "concrete_wall",
+      "nearest_instance": 535,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 532,
+      "module": "concrete_wall",
+      "nearest_instance": 528,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 533,
+      "module": "concrete_wall",
+      "nearest_instance": 529,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 534,
+      "module": "concrete_wall",
+      "nearest_instance": 530,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 535,
+      "module": "concrete_wall",
+      "nearest_instance": 531,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 536,
+      "module": "concrete_wall",
+      "nearest_instance": 532,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 537,
+      "module": "concrete_wall",
+      "nearest_instance": 533,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 538,
+      "module": "concrete_wall",
+      "nearest_instance": 534,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 539,
+      "module": "concrete_wall",
+      "nearest_instance": 535,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 540,
+      "module": "concrete_wall",
+      "nearest_instance": 536,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 541,
+      "module": "concrete_wall",
+      "nearest_instance": 537,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 542,
+      "module": "concrete_wall",
+      "nearest_instance": 538,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 543,
+      "module": "concrete_wall",
+      "nearest_instance": 539,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 544,
+      "module": "concrete_wall",
+      "nearest_instance": 540,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 545,
+      "module": "concrete_wall",
+      "nearest_instance": 541,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 546,
+      "module": "concrete_wall",
+      "nearest_instance": 542,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 547,
+      "module": "concrete_wall",
+      "nearest_instance": 543,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 548,
+      "module": "concrete_wall",
+      "nearest_instance": 544,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 549,
+      "module": "concrete_wall",
+      "nearest_instance": 545,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 550,
+      "module": "concrete_wall",
+      "nearest_instance": 546,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 551,
+      "module": "concrete_wall",
+      "nearest_instance": 547,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 552,
+      "module": "concrete_wall",
+      "nearest_instance": 548,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 553,
+      "module": "concrete_wall",
+      "nearest_instance": 549,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 554,
+      "module": "concrete_wall",
+      "nearest_instance": 550,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 555,
+      "module": "concrete_wall",
+      "nearest_instance": 551,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 556,
+      "module": "concrete_wall",
+      "nearest_instance": 552,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 557,
+      "module": "concrete_wall",
+      "nearest_instance": 553,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 558,
+      "module": "concrete_wall",
+      "nearest_instance": 554,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 559,
+      "module": "concrete_wall",
+      "nearest_instance": 555,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 560,
+      "module": "concrete_wall",
+      "nearest_instance": 556,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 561,
+      "module": "concrete_wall",
+      "nearest_instance": 557,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 562,
+      "module": "concrete_wall",
+      "nearest_instance": 558,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 563,
+      "module": "concrete_wall",
+      "nearest_instance": 559,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 564,
+      "module": "concrete_wall",
+      "nearest_instance": 560,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 565,
+      "module": "concrete_wall",
+      "nearest_instance": 561,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 566,
+      "module": "concrete_wall",
+      "nearest_instance": 562,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 567,
+      "module": "concrete_wall",
+      "nearest_instance": 563,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 568,
+      "module": "concrete_wall",
+      "nearest_instance": 564,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 569,
+      "module": "concrete_wall",
+      "nearest_instance": 565,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 570,
+      "module": "concrete_wall",
+      "nearest_instance": 566,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 571,
+      "module": "concrete_wall",
+      "nearest_instance": 567,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 572,
+      "module": "concrete_wall",
+      "nearest_instance": 568,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 573,
+      "module": "concrete_wall",
+      "nearest_instance": 569,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 574,
+      "module": "concrete_wall",
+      "nearest_instance": 570,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 575,
+      "module": "concrete_wall",
+      "nearest_instance": 571,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 576,
+      "module": "concrete_wall",
+      "nearest_instance": 572,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 577,
+      "module": "concrete_wall",
+      "nearest_instance": 573,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 578,
+      "module": "concrete_wall",
+      "nearest_instance": 574,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 579,
+      "module": "concrete_wall",
+      "nearest_instance": 575,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 580,
+      "module": "concrete_wall",
+      "nearest_instance": 576,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 581,
+      "module": "concrete_wall",
+      "nearest_instance": 577,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 582,
+      "module": "concrete_wall",
+      "nearest_instance": 578,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 583,
+      "module": "concrete_wall",
+      "nearest_instance": 579,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 584,
+      "module": "concrete_wall",
+      "nearest_instance": 580,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 585,
+      "module": "concrete_wall",
+      "nearest_instance": 581,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 586,
+      "module": "concrete_wall",
+      "nearest_instance": 582,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 587,
+      "module": "concrete_wall",
+      "nearest_instance": 583,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 588,
+      "module": "concrete_wall",
+      "nearest_instance": 584,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 589,
+      "module": "concrete_wall",
+      "nearest_instance": 585,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 590,
+      "module": "concrete_wall",
+      "nearest_instance": 586,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 591,
+      "module": "concrete_wall",
+      "nearest_instance": 587,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 592,
+      "module": "concrete_wall",
+      "nearest_instance": 588,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 593,
+      "module": "concrete_wall",
+      "nearest_instance": 589,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 594,
+      "module": "concrete_wall",
+      "nearest_instance": 590,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 595,
+      "module": "concrete_wall",
+      "nearest_instance": 591,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 596,
+      "module": "concrete_wall",
+      "nearest_instance": 592,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 597,
+      "module": "concrete_wall",
+      "nearest_instance": 593,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 598,
+      "module": "concrete_wall",
+      "nearest_instance": 594,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 599,
+      "module": "concrete_wall",
+      "nearest_instance": 595,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 600,
+      "module": "concrete_wall",
+      "nearest_instance": 596,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 601,
+      "module": "concrete_wall",
+      "nearest_instance": 597,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 602,
+      "module": "concrete_wall",
+      "nearest_instance": 598,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 603,
+      "module": "concrete_wall",
+      "nearest_instance": 599,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 604,
+      "module": "concrete_wall",
+      "nearest_instance": 600,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 605,
+      "module": "concrete_wall",
+      "nearest_instance": 601,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 606,
+      "module": "concrete_wall",
+      "nearest_instance": 602,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 607,
+      "module": "concrete_wall",
+      "nearest_instance": 603,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 608,
+      "module": "concrete_wall",
+      "nearest_instance": 604,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 609,
+      "module": "concrete_wall",
+      "nearest_instance": 605,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 610,
+      "module": "concrete_wall",
+      "nearest_instance": 606,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 611,
+      "module": "concrete_wall",
+      "nearest_instance": 607,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 612,
+      "module": "concrete_wall",
+      "nearest_instance": 608,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 613,
+      "module": "concrete_wall",
+      "nearest_instance": 609,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 614,
+      "module": "concrete_wall",
+      "nearest_instance": 610,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 615,
+      "module": "concrete_wall",
+      "nearest_instance": 611,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 616,
+      "module": "concrete_wall",
+      "nearest_instance": 612,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 617,
+      "module": "concrete_wall",
+      "nearest_instance": 613,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 618,
+      "module": "concrete_wall",
+      "nearest_instance": 614,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 619,
+      "module": "concrete_wall",
+      "nearest_instance": 615,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 620,
+      "module": "concrete_wall",
+      "nearest_instance": 616,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 621,
+      "module": "concrete_wall",
+      "nearest_instance": 617,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 622,
+      "module": "concrete_wall",
+      "nearest_instance": 618,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 623,
+      "module": "concrete_wall",
+      "nearest_instance": 619,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 624,
+      "module": "concrete_wall",
+      "nearest_instance": 620,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 625,
+      "module": "concrete_wall",
+      "nearest_instance": 621,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 626,
+      "module": "concrete_wall",
+      "nearest_instance": 622,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 627,
+      "module": "concrete_wall",
+      "nearest_instance": 623,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 628,
+      "module": "concrete_wall",
+      "nearest_instance": 624,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 629,
+      "module": "concrete_wall",
+      "nearest_instance": 625,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 630,
+      "module": "concrete_wall",
+      "nearest_instance": 626,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 631,
+      "module": "concrete_wall",
+      "nearest_instance": 627,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 632,
+      "module": "concrete_wall",
+      "nearest_instance": 628,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 633,
+      "module": "concrete_wall",
+      "nearest_instance": 629,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 634,
+      "module": "concrete_wall",
+      "nearest_instance": 630,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 635,
+      "module": "concrete_wall",
+      "nearest_instance": 631,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 636,
+      "module": "concrete_wall",
+      "nearest_instance": 419,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 637,
+      "module": "concrete_wall",
+      "nearest_instance": 633,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 638,
+      "module": "concrete_wall",
+      "nearest_instance": 417,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 639,
+      "module": "concrete_wall",
+      "nearest_instance": 635,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 640,
+      "module": "low_cover",
+      "nearest_instance": 641,
+      "distance_m": 5.6
+    },
+    {
+      "instance": 641,
+      "module": "low_cover",
+      "nearest_instance": 640,
+      "distance_m": 5.6
+    },
+    {
+      "instance": 642,
+      "module": "low_cover",
+      "nearest_instance": 640,
+      "distance_m": 6.0
+    },
+    {
+      "instance": 643,
+      "module": "low_cover",
+      "nearest_instance": 644,
+      "distance_m": 5.6
+    },
+    {
+      "instance": 644,
+      "module": "low_cover",
+      "nearest_instance": 643,
+      "distance_m": 5.6
+    },
+    {
+      "instance": 645,
+      "module": "low_cover",
+      "nearest_instance": 643,
+      "distance_m": 6.0
+    },
+    {
+      "instance": 646,
+      "module": "low_cover",
+      "nearest_instance": 647,
+      "distance_m": 5.6
+    },
+    {
+      "instance": 647,
+      "module": "low_cover",
+      "nearest_instance": 646,
+      "distance_m": 5.6
+    },
+    {
+      "instance": 648,
+      "module": "low_cover",
+      "nearest_instance": 646,
+      "distance_m": 6.0
+    },
+    {
+      "instance": 649,
+      "module": "low_cover",
+      "nearest_instance": 650,
+      "distance_m": 5.6
+    },
+    {
+      "instance": 650,
+      "module": "low_cover",
+      "nearest_instance": 649,
+      "distance_m": 5.6
+    },
+    {
+      "instance": 651,
+      "module": "low_cover",
+      "nearest_instance": 649,
+      "distance_m": 6.0
+    },
+    {
+      "instance": 652,
+      "module": "landmark_pillar",
+      "nearest_instance": 4,
+      "distance_m": 7.6
+    },
+    {
+      "instance": 653,
+      "module": "landmark_pillar",
+      "nearest_instance": 68,
+      "distance_m": 7.6
+    },
+    {
+      "instance": 654,
+      "module": "landmark_pillar",
+      "nearest_instance": 70,
+      "distance_m": 8.0
+    },
+    {
+      "instance": 655,
+      "module": "landmark_pillar",
+      "nearest_instance": 69,
+      "distance_m": 8.8
+    },
+    {
+      "instance": 656,
+      "module": "shipping_container",
+      "nearest_instance": 13,
+      "distance_m": 5.6
+    },
+    {
+      "instance": 657,
+      "module": "shipping_container",
+      "nearest_instance": 57,
+      "distance_m": 5.6
+    },
+    {
+      "instance": 658,
+      "module": "shipping_container",
+      "nearest_instance": 12,
+      "distance_m": 9.6
+    },
+    {
+      "instance": 659,
+      "module": "shipping_container",
+      "nearest_instance": 56,
+      "distance_m": 9.6
+    },
+    {
+      "instance": 660,
+      "module": "shipping_container",
+      "nearest_instance": 19,
+      "distance_m": 7.6
+    },
+    {
+      "instance": 661,
+      "module": "shipping_container",
+      "nearest_instance": 664,
+      "distance_m": 6.0
+    },
+    {
+      "instance": 662,
+      "module": "shipping_container",
+      "nearest_instance": 18,
+      "distance_m": 7.2
+    },
+    {
+      "instance": 663,
+      "module": "shipping_container",
+      "nearest_instance": 62,
+      "distance_m": 7.2
+    },
+    {
+      "instance": 664,
+      "module": "platform",
+      "nearest_instance": 665,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 665,
+      "module": "ramp",
+      "nearest_instance": 664,
+      "distance_m": 0.0
+    },
+    {
+      "instance": 666,
+      "module": "extraction_beacon",
+      "nearest_instance": 525,
+      "distance_m": 11.045361
+    },
+    {
+      "instance": 667,
+      "module": "dock",
+      "nearest_instance": 524,
+      "distance_m": 10.0
+    }
+  ],
+  "limits": [
+    "Plan-only geometry checks; not Godot collision, navigation, character motion or spawn tests.",
+    "Corridor reserved rectangles are checked continuously in plan; path turns included by overlapping rectangles.",
+    "Flood-fill is only a secondary 1 m connectivity check, not proof of agent-radius navigation.",
+    "Contacting wall seams and platform/ramp mounting seam are not corridors.",
+    "Side clearance on escape loops is 4 m each side of their defined centre line; reserved total width 8 m."
+  ]
+}

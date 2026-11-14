@@ -1,0 +1,99 @@
+{
+  "passed": true,
+  "file": "dock.glb",
+  "sha256": "c2ec3ea4f0d8a51c6588d2b0c8970ddcb9dc8b3b7ee219bfcddcbb53ffda27e2",
+  "triangles": 1816,
+  "triangle_limit": 3000,
+  "mesh_count": 1,
+  "primitive_count": 1,
+  "dimensions_xyz_m": [
+    10.0,
+    1.5,
+    3.0
+  ],
+  "bounds_min_xyz_m": [
+    0.0,
+    0.0,
+    -0.0
+  ],
+  "bounds_max_xyz_m": [
+    10.0,
+    1.5,
+    3.0
+  ],
+  "pivot": {
+    "local_position_m": [
+      0,
+      0,
+      0
+    ],
+    "type": "southwest bottom corner; X length, +Z width",
+    "identity_mesh_transform": true
+  },
+  "material_names": [
+    "Extraction_arena_PBR_1K"
+  ],
+  "textures": [
+    {
+      "name": "arena_normal",
+      "size": [
+        1024,
+        1024
+      ],
+      "sha256": "3f157f1bd82b118d5cea2283d502cde9a99be9fd1015eb4ed0f306f70c53479a"
+    },
+    {
+      "name": "arena_albedo",
+      "size": [
+        1024,
+        1024
+      ],
+      "sha256": "cace7b669b87bc05edf468ba36b957d6049600ec331ade98cc2db9294710a845"
+    },
+    {
+      "name": "arena_orm",
+      "size": [
+        1024,
+        1024
+      ],
+      "sha256": "c29ae07a345c2d56a6b5bbd3371147877b6e322c8e2f0e7f65983718d4136dbd"
+    }
+  ],
+  "pbr_channels": [
+    "sRGB albedo",
+    "tangent normal",
+    "linear ORM: R=1,G=roughness,B=metallic"
+  ],
+  "uv_check": {
+    "inside_0_1": true,
+    "nondegenerate_triangles": true,
+    "shared_role_atlas_uvs_overlap_intentionally": true
+  },
+  "normals_and_tangents": {
+    "exported": true,
+    "normalised": true,
+    "maximum_normal_tangent_dot": 7.078051567077637e-05
+  },
+  "minimum_triangle_area_m2": 3.117554395999025e-05,
+  "plan_projection": {
+    "filled_rectangle": true,
+    "verified_ground_face_area_m2": 30.0,
+    "footprint_xz_m": [
+      0.0,
+      -0.0,
+      10.0,
+      3.0
+    ]
+  },
+  "lights": 0,
+  "cameras": 0,
+  "animations": 0,
+  "armatures": 0,
+  "light_mount": null,
+  "source_topology": {
+    "closed_components": 42,
+    "positive_component_volumes": true,
+    "minimum_component_volume_m3": 0.0051137251575710235,
+    "combined_component_volume_m3_not_boolean_union": 9.540443779485761
+  }
+}

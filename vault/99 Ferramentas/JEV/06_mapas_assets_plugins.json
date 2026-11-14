@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-14",
+  "scope": "Verificação documental, não teste de compatibilidade ou desempenho.",
+  "request": {
+    "claims": [
+      "Terrain3D v1.0.2-stable documents that its foliage MultiMesh instances do not automatically create physics collisions and that complex multi-mesh objects require preparation or another placement method.",
+      "The current official ProtonScatter listing labels the addon MIT and unstable; its author's README states that most demo textures were made from Textures.com images with separate redistribution conditions. It should not be described as tested in this project's Godot 4.7."
+    ],
+    "evidence": [
+      {
+        "id": "terrain-versioned-doc",
+        "text": "Source https://raw.githubusercontent.com/TokisanGames/Terrain3D/v1.0.2-stable/doc/docs/instancer.md : Simple Objects says MultiMesh supports one mesh and suggests combining complex objects or another placement tool. No Collision says GPU-rendered instances are unknown to CPU physics, recommends grass or objects not needing collision, and describes instance collision as a future possibility."
+      },
+      {
+        "id": "proton-listing",
+        "text": "Source https://store.godotengine.org/asset/hungryproton/protonscatter/ checked 2026-11-14: Changelog version 4.2.0; licence MIT; minimum Godot 4.4; publisher marked version unstable. These data do not assert testing in Godot 4.7."
+      },
+      {
+        "id": "proton-author-readme",
+        "text": "Source https://github.com/HungryProton/scatter README License: addon MIT; demo 3D assets MIT; most bundled demo textures created using Textures.com images; prohibits redistributing those textures standalone and allows use as part of a larger project subject to source terms."
+      }
+    ]
+  },
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"tool\": \"jev_verify\",\n  \"model\": \"jev-1.14.0\",\n  \"provider\": \"typesafe\",\n  \"auto_accept\": 0.8,\n  \"subject_at\": 0.5,\n  \"summary\": {\n    \"verified\": 2,\n    \"contradicted\": 0,\n    \"unsupported\": 0,\n    \"needs_review\": 0\n  },\n  \"results\": [\n    {\n      \"id\": \"claim0\",\n      \"claim\": \"Terrain3D v1.0.2-stable documents that its foliage MultiMesh instances do not automatically create physics collisions and that complex multi-mesh objects require preparation or another placement method.\",\n      \"verdict\": \"verified\",\n      \"probabilities\": {\n        \"supports\": 1,\n        \"contradicts\": 0,\n        \"says_nothing\": 0\n      },\n      \"confidence\": 1,\n      \"action\": \"auto\",\n      \"supporting_evidence\": \"terrain-versioned-doc\",\n      \"same_subject\": 0.93\n    },\n    {\n      \"id\": \"claim1\",\n      \"claim\": \"The current official ProtonScatter listing labels the addon MIT and unstable; its author's README states that most demo textures were made from Textures.com images with separate redistribution conditions. It should not be described as tested in this project's Godot 4.7.\",\n      \"verdict\": \"verified\",\n      \"probabilities\": {\n        \"supports\": 0.98,\n        \"contradicts\": 0.01,\n        \"says_nothing\": 0.01\n      },\n      \"confidence\": 0.97,\n      \"action\": \"auto\",\n      \"supporting_evidence\": \"proton-listing\",\n      \"same_subject\": 0.84\n    }\n  ],\n  \"usage\": {\n    \"input_tokens\": 1393,\n    \"output_tokens\": 247\n  }\n}"
+      }
+    ]
+  }
+}
