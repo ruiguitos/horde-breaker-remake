@@ -1,0 +1,36 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TEST: dressed beach has no navigation problems
+TEST: blocking cells are identical to the original beach
+TEST: road and bridge walking surfaces are unchanged
+TEST: all gameplay ground heights are unchanged
+TEST: every objective, choke, arena, spawn and boat marker is unchanged
+TEST: the normal route island includes its persistent visual layer
+TEST: prepared realistic outcrops dress the already-blocked coast
+TEST: the coast contains actual wreckage, netting and timber
+TEST: village facades contain authored windows, doors and coastal details
+TEST: every solid coastal prop, outcrop and horror tree stays off playable surfaces
+TEST: coastal props and trees stand on their actual ground, with no floating bases
+TEST: original blocking rocks remain visible at their full gameplay silhouette
+TEST: removing the visual layer preserves the original navigation and obstacle boxes
+TEST: village plaster has real colour and normal textures
+TEST: all facade, roof, bridge and rock materials survive a fresh scene load
+TEST: the pilot terrain has separate sand, rock and ground textures
+TEST: the beach owns its terrain material set
+TEST: all terrain array textures match in 1K dimensions and GPU format
+TEST: town keeps its original shared terrain assets
+TEST: jungle keeps its original shared terrain assets
+TEST: port keeps its original shared terrain assets
+TEST: volcano keeps its original shared terrain assets
+TEST: the visual scene is not accidentally included as another route island
+WARNING: instance_reset_physics_interpolation() is deprecated.
+   at: _instance_reset_physics_interpolation_bind_compat_104269 (servers/rendering/rendering_server.compat.inc:62)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://game/world/island.gd:269)
+       [1] _run (res://tests/test_beach_dressing.gd:122)
+TEST: dead-tree dressing follows the actual normal gameplay preset
+TEST: the actual camera also avoids the decorative props in normal
+TEST: the pilot uses tapered grass blades instead of solid rectangular cards
+TEST: dead-tree dressing follows the actual horror gameplay preset
+TEST: the actual camera also avoids the decorative props in horror
+TEST: the pilot uses tapered grass blades instead of solid rectangular cards

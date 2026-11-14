@@ -1,0 +1,109 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: Terrain3DAssets#7066:_update_texture_files:276: ID 0 albedo texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+WARNING: Terrain3DAssets#7066:_update_texture_files:307: ID 0 normal texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+WARNING: instance_reset_physics_interpolation() is deprecated.
+   at: _instance_reset_physics_interpolation_bind_compat_104269 (servers/rendering/rendering_server.compat.inc:62)
+ERROR: Terrain3D#1509:_grab_camera:155: Cannot find the active camera. Set it manually with Terrain3D.set_camera(). Stopping _physics_process()
+   at: push_error (core/variant/variant_utility.cpp:1023)
+TEST: beach_01 has no problems []
+TEST: beach_01: 1 bridge(s), walkable decks over water
+TEST: beach_01 has road meshes
+TEST: town_01 has no problems []
+TEST: town_01: 3 bridge(s), walkable decks over water
+TEST: town_01 has road meshes
+TEST: jungle_01 has no problems []
+TEST: jungle_01: 1 bridge(s), walkable decks over water
+TEST: jungle_01 has road meshes
+TEST: port_01 has no problems []
+TEST: port_01: 1 bridge(s), walkable decks over water
+TEST: port_01 has road meshes
+TEST: Berlenga whole.scn has no problems []
+TEST: 1466 m island, 3 generators, 6 caches
+TEST: grid of 2149156 cells converted in 1155 ms
+TEST: horde paths limited to 120 m around the player
+TEST: 19 bridge decks (13 on the fort's pier), 19 walkable in the middle
+TEST: Beach routes no longer pick the Berlenga ["res://game/world/handmade/islands/beach_01.tscn"]
+TEST: big map: field finished 19 times in 10 s, 45 enemies, 0.83 ms per step
+TEST: a straggler 400 m away is replaced (45 -> 52 enemies)
+TEST: the Berlenga expedition has 4 parts
+TEST: part_1 (escort) has no problems []
+TEST: part_1 (escort): mission 'escort', play area of 12 points
+TEST: part_1 (escort): 253347 walkable cells, its part of the island only
+TEST: part_1 (escort): its 17 markers are reachable from the start
+TEST: part_1 (escort): EscortSurvivor, 10 route markers, 2 EscortStop markers
+TEST: part_1 (escort): 0 HoldPoint markers, in order
+TEST: part_1 (escort): 0 signal markers (lighthouse: false), 0 Fuel markers
+TEST: part_1 (escort): 3 markers within 10 m of the design (furthest EscortSurvivor, 0.7 m)
+TEST: part_1 (escort): Exit at (832, 592), 4.3 m from the crossing (835, 589), 212 m walk from the start
+TEST: part_1 (escort): natural boundary dressing (743 stones and boulders), none over a walkable cell (0)
+TEST: part_1 (escort): stores only its differences from base.scn (73 KB)
+TEST: part_2 (signals) has no problems []
+TEST: part_2 (signals): mission 'signals', play area of 19 points
+TEST: part_2 (signals): 276060 walkable cells, its part of the island only
+TEST: part_2 (signals): its 9 markers are reachable from the start
+TEST: part_2 (signals): 0 HoldPoint markers, in order
+TEST: part_2 (signals): 3 signal markers (lighthouse: true), 3 Fuel markers
+TEST: part_2 (signals): 7 markers within 10 m of the design (furthest Fuel_2, 5.5 m)
+TEST: part_2 (signals): Exit at (518, 803), 4.3 m from the crossing (521, 800), 520 m walk from the start
+TEST: part_2 (signals): the Caminho do Forte is shut at the part's edge
+TEST: part_2 (signals): natural boundary dressing (6510 stones and boulders), none over a walkable cell (0)
+TEST: part_2 (signals): stores only its differences from base.scn (210 KB)
+TEST: part_3 (hold_sequence) has no problems []
+TEST: part_3 (hold_sequence): mission 'hold_sequence', play area of 14 points
+TEST: part_3 (hold_sequence): 170836 walkable cells, its part of the island only
+TEST: part_3 (hold_sequence): its 6 markers are reachable from the start
+TEST: part_3 (hold_sequence): 3 HoldPoint markers, in order
+TEST: part_3 (hold_sequence): 0 signal markers (lighthouse: false), 0 Fuel markers
+TEST: part_3 (hold_sequence): 4 markers within 10 m of the design (furthest HoldPoint_1, 0.7 m)
+TEST: part_3 (hold_sequence): Exit at (526, 824), 4.3 m from the crossing (523, 822), 28 m walk from the start
+TEST: part_3 (hold_sequence): natural boundary dressing (5346 stones and boulders), none over a walkable cell (0)
+TEST: part_3 (hold_sequence): stores only its differences from base.scn (179 KB)
+TEST: part_4 (holdout) has no problems []
+TEST: part_4 (holdout): mission 'holdout', play area of 12 points
+TEST: part_4 (holdout): 44479 walkable cells, its part of the island only
+TEST: part_4 (holdout): its 3 markers are reachable from the start
+TEST: part_4 (holdout): 0 HoldPoint markers, in order
+TEST: part_4 (holdout): 0 signal markers (lighthouse: false), 0 Fuel markers
+TEST: part_4 (holdout): 2 markers within 10 m of the design (furthest DefendZone, 0.7 m)
+TEST: part_4 (holdout): no Exit, the boat on the pier deck at (623, 1019), 0.7 m high, reachable
+TEST: part_4 (holdout): the boat's +Z (0.48, -0.88) points out over open water for 20 m
+TEST: part_4 (holdout): the Caminho do Forte is shut at the part's edge
+TEST: part_4 (holdout): natural boundary dressing (4735 stones and boulders), none over a walkable cell (0)
+TEST: part_4 (holdout): stores only its differences from base.scn (167 KB)
+TEST: the parts share one terrain folder ["res://game/world/handmade/expeditions/berlenga/terrain"]
+TEST: parts 1 and 2 share 287 walkable cells, all at their crossing
+TEST: parts 1 and 3 share no walkable cell (0)
+TEST: parts 1 and 4 share no walkable cell (0)
+TEST: parts 2 and 3 share 260 walkable cells, all at their crossing
+TEST: parts 2 and 4 share no walkable cell (0)
+TEST: parts 3 and 4 share 280 walkable cells, all at their crossing
+TEST: port_hashima.scn is removed
+TEST: Port routes pick port_01 only ["res://game/world/handmade/islands/port_01.tscn"]
+TEST: a Port Sabotage lands on port_01 (no preferred island)
+TEST: template has no problems []
+TEST: 160 x 160 grid with heights
+TEST: sea blocks, the middle is open ground
+TEST: gentle hill is walkable (8.0 m)
+TEST: plateau top open, its cliff edge blocks
+TEST: house blocks its 8 x 6 footprint ([P: (64, 87), S: (8, 6)])
+TEST: tree blocks only its trunk cell
+TEST: markers: boat, 3 generators, 1 cache
+TEST: IslandRun walks on the hand-made map
+TEST: reports missing boat and unreachable generator (["Missing Markers/Boat: using the bottom centre.", "Boat at (80, 149) cannot be reached from the start.", "Generator at (5, 5) cannot be reached from the start."])
+WARNING: Terrain3DAssets#3360:_update_texture_files:276: ID 0 albedo texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://game/world/island.gd:269)
+       [1] _process (res://tests/test_handmade.gd:48)
+WARNING: Terrain3DAssets#3360:_update_texture_files:307: ID 0 normal texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://game/world/island.gd:269)
+       [1] _process (res://tests/test_handmade.gd:48)
+TEST: island scene uses the hand-made map and its models
+TEST: ground_y follows the terrain (hill 8 m, beach 0 m)
+TEST: player stands on the hill (y 7.97)
+TEST: the volcano biome has its hand-made island (volcano_01)

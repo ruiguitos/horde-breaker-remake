@@ -775,6 +775,14 @@ func _build_scene() -> void:
 		var p: Vector2 = markers[m]
 		mk.position = Vector3(p.x, height_at(p.x, p.y), p.y)
 		_add(mk, "Markers")
+	if biome == &"beach" and not _roadgen:
+		# Independent authoring pass: no changes to layout RNG, markers or heights.
+		var dressing_builder: Script = load("res://tools/dev/beach_dressing.gd")
+		var dressing_problems: Array[String] = dressing_builder.apply(_root)
+		if not dressing_problems.is_empty():
+			push_error("Beach visual authoring failed: %s" % dressing_problems)
+			_failed = true
+			return
 	var packed := PackedScene.new()
 	packed.pack(_root)
 	var err := ResourceSaver.save(packed, out + name + ".tscn")

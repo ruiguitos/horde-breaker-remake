@@ -1,0 +1,63 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TEST: all three sandbox buttons send a config (3)
+TEST: START sends the form's seven values and no atmosphere or test rifle
+TEST: HORROR sends beach_01 with the horror atmosphere
+TEST: HORROR keeps the form's mission, class and seed
+TEST: the realistic rifle is sent as the rifle with its test model
+TEST: the horror config starts a beach run with the horror atmosphere
+TEST: the realistic rifle is set on the run and the atmosphere stays normal
+TEST: a muted music is silent from its first frame
+TEST: the muted music stays silent until 60 s
+TEST: the fade starts when the silence ends (gain 0.25)
+TEST: the fade has finished by 62.5 s
+TEST: the music plays at its usual volume once it is back (-5.19 dB)
+WARNING: instance_reset_physics_interpolation() is deprecated.
+   at: _instance_reset_physics_interpolation_bind_compat_104269 (servers/rendering/rendering_server.compat.inc:62)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://game/world/island.gd:269)
+       [1] _island (res://tests/test_horror_preset.gd:247)
+       [2] _run (res://tests/test_horror_preset.gd:41)
+       [3] _music_alone (res://tests/test_horror_preset.gd:231)
+       [4] _free (res://tests/test_horror_preset.gd:269)
+TEST: a normal island starts at its own hour (9:00 on the beach)
+TEST: a normal island keeps the Sky3D sun
+TEST: a normal island has no backlight of its own
+TEST: a normal island follows the profile's camera
+TEST: a normal island keeps its own scene light, under the horror preset's (1.00)
+TEST: a normal island has only the sea ambience
+TEST: a normal island plays its music from the start
+TEST: a normal island has the full HUD, with its survivor and boss rows still hidden
+TEST: a normal island holds the current rifle
+TEST: a normal island keeps its usual, light road surface
+TEST: the sandbox's realistic rifle reaches the first-person view model
+TEST: the sandbox's realistic rifle reaches the soldier in the world
+TEST: the horror preset's road is dark asphalt, about 0.30
+TEST: the horror preset starts at 04:24 (the sky stays steel blue; 05:00 turns pink)
+TEST: the horror clock is frozen
+TEST: the horror preset turns off the Sky3D sun and its own fog pass
+TEST: the horror mist is in layers: thin far away, denser by the ground
+TEST: the horror preset lifts its scene light to 1.30 (was Sky3D's 1.0)
+TEST: the horror preset has a weak cold backlight
+TEST: the backlight casts no shadows at the start
+TEST: the backlight lights the figures but is not drawn in the sky (light only)
+TEST: the backlight casts no shadows after the graphics settings are applied
+TEST: the backlight is a few degrees below the horizontal
+TEST: the backlight travels towards the camera for each yaw, on the frame the yaw changes
+TEST: the horror preset starts on the shoulder camera, whatever the profile says
+TEST: the horror preset adds a wind layer over the sea
+TEST: the horror preset has no music at the start
+TEST: the horror music is silent from the first frame
+TEST: a paused island keeps its silence (59.83 s left)
+TEST: V changes the horror run's camera without a new profile choice
+TEST: the horror preset starts with the minimal HUD
+TEST: the minimal HUD makes the radio, objective, minimap, XP, counters and marker transparent
+TEST: the minimal HUD keeps health, shield, ammo and the abilities on screen
+TEST: F4 brings the full HUD back (the minimap shows again, the XP and counters at 85 %)
+TEST: F4 leaves the game's own visibility alone (radio, survivor, boss, XP bonus)
+TEST: F4 again returns the minimal HUD
+TEST: the minimal HUD makes the marker transparent even while the game fades it
+TEST: the horror preset is still silent one second before its music
+TEST: the horror preset's music starts when the silence ends
+TEST: the horror preset's music has faded in two seconds later
+TEST: the fallback sky of the horror preset has the same mist and scene light

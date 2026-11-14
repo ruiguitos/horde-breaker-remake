@@ -1,0 +1,23 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Vulkan 1.4.357 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 5060
+
+WARNING: Terrain3DAssets#4138:_update_texture_files:276: ID 0 albedo texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://game/world/island.gd:269)
+WARNING: Terrain3DAssets#4138:_update_texture_files:307: ID 0 normal texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://game/world/island.gd:269)
+WARNING: instance_reset_physics_interpolation() is deprecated.
+   at: _instance_reset_physics_interpolation_bind_compat_104269 (servers/rendering/rendering_server.compat.inc:62)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://game/world/island.gd:269)
+BENCH camera=fixed rifle=current samples=480 alive=144..149 draws=1336 mean=5.60ms p50=4.02 p95=12.05 p99=15.23 max=21.07 (178.7 fps mean)
+BENCH_TEXTURE_BYTES=207238656
+WARNING: 15 RIDs of type "Compute" were leaked.
+   at: _free_rids (servers/rendering/rendering_device.cpp:8686)
+WARNING: 15 RIDs of type "Shader" were leaked.
+   at: _free_rids (servers/rendering/rendering_device.cpp:8686)
+WARNING: 10 RIDs of type "Sampler" were leaked.
+   at: _free_rids (servers/rendering/rendering_device.cpp:8686)

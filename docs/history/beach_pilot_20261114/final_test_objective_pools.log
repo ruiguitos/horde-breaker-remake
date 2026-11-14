@@ -1,0 +1,41 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TEST: a draw is 3 generators, at least 50 m apart
+TEST: different seeds draw different generators (15 layouts in 40 seeds)
+TEST: the same seed draws the same generators
+TEST: a map with exactly three generators keeps them all
+WARNING: instance_reset_physics_interpolation() is deprecated.
+   at: _instance_reset_physics_interpolation_bind_compat_104269 (servers/rendering/rendering_server.compat.inc:62)
+   GDScript backtrace (most recent call first):
+       [0] _map (res://tests/test_objective_pools.gd:25)
+       [1] _run (res://tests/test_objective_pools.gd:53)
+ERROR: Terrain3D#6713:_grab_camera:155: Cannot find the active camera. Set it manually with Terrain3D.set_camera(). Stopping _physics_process()
+   at: push_error (core/variant/variant_utility.cpp:1023)
+TEST: beach_01 has a pool of 6 generators and Check map finds no problem ([])
+TEST: a run on beach_01 uses three of its six generators ([(132.5, 0.0, 46.5), (165.5, 0.0, 125.5), (90.5, 0.0, 180.5)])
+WARNING: Terrain3DAssets#9174:_update_texture_files:276: ID 0 albedo texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _map (res://tests/test_objective_pools.gd:25)
+       [1] _run (res://tests/test_objective_pools.gd:64)
+       [2] _map (res://tests/test_objective_pools.gd:30)
+WARNING: Terrain3DAssets#9174:_update_texture_files:307: ID 0 normal texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _map (res://tests/test_objective_pools.gd:25)
+       [1] _run (res://tests/test_objective_pools.gd:64)
+       [2] _map (res://tests/test_objective_pools.gd:30)
+WARNING: Terrain3D#3271:_notification:869: free_editor_textures requires `Assets` be saved to a file. Do so, or disable the former to turn off this warning
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _map (res://tests/test_objective_pools.gd:25)
+       [1] _run (res://tests/test_objective_pools.gd:64)
+       [2] _map (res://tests/test_objective_pools.gd:30)
+ERROR: Terrain3D#3271:_grab_camera:155: Cannot find the active camera. Set it manually with Terrain3D.set_camera(). Stopping _physics_process()
+   at: push_error (core/variant/variant_utility.cpp:1023)
+TEST: the EXFIL map has 3 extraction points and Check map finds no problem ([])
+TEST: an EXFIL run extracts at one of the map's points, hidden until 10:00
+TEST: the same seed extracts at the same point
+TEST: over 24 seeds every extraction point is drawn (3 of 3)
+TEST: every extraction point is reachable on foot and over 100 m from the start
+TEST: objective pools, 0 failures

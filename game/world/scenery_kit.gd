@@ -4,9 +4,8 @@ extends RefCounted
 ## material, so the thirteen GLBs do not each carry a copy of the same 1K atlas
 ## (about 22 MB of duplicated textures, and thirteen copies in VRAM).
 ##
-## The pieces are not wired into the island yet: placing them in the hand-made
-## scenes is the user's decision (TODO.md). tools/dev/scenery_kit_preview.gd
-## uses this file to show the whole kit in engine.
+## The beach pilot bakes these pieces into Decor/Dressing with a shared atlas.
+## tools/dev/scenery_kit_preview.gd can show the whole kit in engine.
 ##
 ## No class_name on purpose: adding one needs `--import`, and the kit can be
 ## copied and previewed without touching the project's class registry.
@@ -34,7 +33,7 @@ static func material() -> ORMMaterial3D:
 	m.normal_enabled = true
 	m.normal_texture = load(DIR + "textures/scenery_normal.png") as Texture2D
 	m.ao_enabled = true
-	m.ao_texture = load(DIR + "textures/scenery_orm.png") as Texture2D
+	m.orm_texture = load(DIR + "textures/scenery_orm.png") as Texture2D
 	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 	_material = m
 	return m

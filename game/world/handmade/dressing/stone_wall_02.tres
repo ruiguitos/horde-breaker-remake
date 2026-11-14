@@ -1,0 +1,14 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/stone_wall_02_diffuse.res" id="1_gx8cv"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/stone_wall_02_nor_gl.res" id="2_4k4qx"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/stone_wall_02_rough.res" id="3_jm5w3"]
+
+[resource]
+albedo_texture = ExtResource("1_gx8cv")
+roughness_texture = ExtResource("3_jm5w3")
+normal_enabled = true
+normal_texture = ExtResource("2_4k4qx")
+uv1_scale = Vector3(0.35, 0.35, 0.35)
+uv1_triplanar = true
+texture_filter = 5

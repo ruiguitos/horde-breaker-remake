@@ -110,10 +110,13 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
   diálogos (run, definições, arquivo) e pausa, que ainda usam o tema escuro. Nos cartões dos
   perks os nomes continuam na Barlow Condensed: dois nomes à máquina não cabem num cartão;
   o mockup tem um nome por cartão, e isso pede mudar o cartão (`game/ui/perk_node_view.gd`).
-- [ ] Ilhas com aspeto natural (decisão de 2026-11-10), piloto na `beach_01`: 1) pôr as 13 peças
-  do `scenery_kit` nos edifícios e na praia; 2) variar a vegetação com as peças do kit de
-  natureza por usar; 3) várias texturas no terreno e costa menos regular; 4) medir desenho e
-  grelha. Faltam modelos para casas, contentores, barco e pontes (hoje caixas): Codex ou kits CC0.
+- [ ] Ilhas com aspeto natural (decisão de 2026-11-10): piloto visual da `beach_01`
+  implementado a 2026-11-14 — fachadas com 7 das 8 peças do kit (escada excluída para não
+  sugerir acesso novo), 5 peças de praia, materiais PBR, quatro camadas de terreno,
+  rochas costeiras e erva em lâminas. Grelha, alturas e marcadores preservados.
+  Ver `docs/tech/BEACH_VISUAL_PILOT.md`. Falta aprovação visual a jogar, remodelar
+  casas/barco/pontes ainda geométricos, vegetação de maior porte e costa menos regular;
+  só depois estender a town/jungle/port/volcano. Não alterar layouts nesta fase.
 - [ ] Vista geral do mapa antes de partir: desenhar a ilha real a partir da grelha da cena
   (`HandmadeIsland.grid_image`) em vez das manchas de `game/ui/route_map.gd`.
 - [ ] Objetivos variados: feito em 2026-11-10 na `beach_01` (seis geradores, cada run usa três,

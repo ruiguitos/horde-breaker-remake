@@ -1,0 +1,79 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TEST: new profiles start with the shoulder camera
+TEST: old save third_person = true -> THIRD_PERSON
+TEST: old save third_person = false -> FIXED
+TEST: save without a camera setting -> THIRD_PERSON
+TEST: camera_mode wins over the old bool
+TEST: out-of-range camera_mode is clamped
+TEST: camera_mode saves and loads (no third_person key)
+TEST: crosshair at the ground with an enemy 8 m ahead: no shots
+TEST: crosshair at the sky: no shots
+TEST: crosshair 45 degrees to the side: no shots
+TEST: crosshair on the chest: target, body shot
+TEST: crosshair on an enemy: auto-fire shoots
+TEST: crosshair on the head: headshot
+TEST: crosshair just outside the cone: no target
+TEST: the enemy under the crosshair wins over a nearer one beside it
+TEST: turning the crosshair to the other enemy retargets
+TEST: fixed camera: body cone picks the enemy ahead (headshot)
+TEST: fixed camera: auto-fire shoots without a crosshair
+TEST: fixed camera: an enemy 90 degrees off is outside the body cone
+TEST: marker: target straight ahead is shown
+TEST: marker: target ~27 degrees off is shown
+TEST: marker: target 90 degrees to the side is hidden
+TEST: marker: target behind is hidden
+TEST: marker: target 8 m behind is shown (near)
+TEST: marker: looking down at your feet keeps the target ahead
+TEST: marker, fixed camera: hidden when the body faces away
+TEST: marker, fixed camera: shown when the body faces it
+TEST: open ground: the shoulder camera targets the enemy ahead
+TEST: building between the camera and the target (player's line clear): no target, no shots
+TEST: a camera inside a blocked cell sees out of it
+TEST: crosshair on the enemy up on a mound picks it, not the nearer one below
+TEST: crosshair shot: the enemy at another height on the same flat line is not damaged
+TEST: fixed camera keeps the flat hitscan (nearest on the line)
+TEST: crosshair shot: no pierce through a wall
+TEST: crosshair + Piercing Rounds: pierces into the next body on the ray (pierce 2), not a third
+TEST: crosshair + Ricochet: the bounce reaches the neighbours
+TEST: crosshair + Fire Rounds: hits set enemies on fire
+TEST: crosshair + Insta-Kill: one hit kills
+TEST: a pellet beside the body axis stops at a wall on its own path (1 hit(s) open, 0 walled)
+TEST: sea between the camera and the target does not hide it: target picked and shot
+WARNING: instance_reset_physics_interpolation() is deprecated.
+   at: _instance_reset_physics_interpolation_bind_compat_104269 (servers/rendering/rendering_server.compat.inc:62)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://game/world/island.gd:269)
+       [1] _scene_tests (res://tests/test_camera_aim.gd:345)
+TEST: first person: camera at eye height (1.72 m), gun and crosshair shown, body shadow only
+TEST: AR: aiming hides the HUD crosshair
+TEST: AR: lowering the sights keeps the crosshair hidden until hip fire
+TEST: AR: hip fire restores the crosshair
+TEST: marksman: scope reticle replaces the HUD crosshair
+TEST: menus hide both aiming overlays
+TEST: third person keeps its crosshair even after using the scope
+TEST: no laser sight (1 line mesh)
+TEST: found free ground around the player
+TEST: first person, crosshair at the ground: no shots (0)
+TEST: first person, crosshair on the enemy: shots (5)
+TEST: first person: tracers start at the gun's tip
+TEST: marker hidden when its target is behind (92 m)
+TEST: marker shown when looked at
+TEST: near objective (8 m) behind the camera: marker stays, on the lower screen edge ([P: (482.5, 468.0), S: (187.0, 30.0)])
+TEST: first person: the aim ray follows this frame's yaw/pitch
+TEST: first person: a grenade aimed at the feet lands near them (1.5 m)
+TEST: grenade aimed at the sky: thrown far ahead
+TEST: first person at a wall: gun pulled back (0.30 m) and lowered (-63 deg)
+TEST: turning away from the wall raises the gun again
+TEST: V: first -> third person (gun hidden, body drawn)
+TEST: third person: tracers start at the soldier's gun
+TEST: third person: the camera sits over the right shoulder
+TEST: third person: a grenade aimed at the feet lands near them (2.1 m)
+TEST: third person while strafing: the shown camera is the aiming camera (worst gap 0.000 m)
+TEST: V: third person -> fixed (no crosshair aim)
+TEST: V: fixed -> first person
+TEST: a Settings change reaches the island
+WARNING: 6 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 1 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

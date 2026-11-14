@@ -1,0 +1,32 @@
+{
+  "asset": "coast_sand_01",
+  "author": "Rob Tuytel",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/coast_sand_01",
+  "files": [
+    {
+      "map": "diffuse",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/coast_sand_01/coast_sand_01_diff_1k.jpg",
+      "bytes": 960614,
+      "sha256": "58af2e40100f7f405703a86d593af64379f822c4786850def23ecfc921450d54"
+    },
+    {
+      "map": "nor_gl",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/coast_sand_01/coast_sand_01_nor_gl_1k.jpg",
+      "bytes": 1146826,
+      "sha256": "fe4d045aec99e71e80f682fcf0ad958d2dff1fe614b73178b304d1bac047b54a"
+    },
+    {
+      "map": "rough",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/coast_sand_01/coast_sand_01_rough_1k.jpg",
+      "bytes": 383892,
+      "sha256": "cbc3e0bf2214e04318a643c9dc81f50f33cc5f7b935a20016c5d9efd9a6d1696"
+    },
+    {
+      "map": "displacement",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/coast_sand_01/coast_sand_01_disp_1k.jpg",
+      "bytes": 325269,
+      "sha256": "e7f08f61db1de5b3efa8b8856544f69e66a69cdfa94c535d3e5759d23effec71"
+    }
+  ]
+}

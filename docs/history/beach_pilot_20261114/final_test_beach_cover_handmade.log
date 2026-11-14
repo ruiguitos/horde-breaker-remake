@@ -1,0 +1,32 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: instance_reset_physics_interpolation() is deprecated.
+   at: _instance_reset_physics_interpolation_bind_compat_104269 (servers/rendering/rendering_server.compat.inc:62)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://game/world/island.gd:269)
+       [1] _island (res://tests/test_beach_cover_handmade.gd:106)
+       [2] _run (res://tests/test_beach_cover_handmade.gd:27)
+TEST: beach_01 is a hand-made beach island
+TEST: beach_01 has road cells for the cover to keep off (1783)
+TEST: a hand-made beach has its grass and pebbles
+TEST: every place of the hand-made beach is open ground, off the roads and decks and above the sea (2400 places, 0 bad)
+TEST: the hand-made beach shows 299 grass and 101 pebbles, all listed (400 origins)
+TEST: every shown instance stands within 60 m of the player (0 outside)
+TEST: no shown instance is on a road or deck cell, in the sea or on a blocked cell (0 bad)
+TEST: on Low the hand-made beach has no grass or pebbles
+TEST: back on High, the same places get the same cover (299 grass, 101 pebbles)
+WARNING: Terrain3DAssets#8384:_update_texture_files:276: ID 0 albedo texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://game/world/island.gd:269)
+       [1] _island (res://tests/test_beach_cover_handmade.gd:106)
+       [2] _run (res://tests/test_beach_cover_handmade.gd:31)
+       [3] _free (res://tests/test_beach_cover_handmade.gd:125)
+WARNING: Terrain3DAssets#8384:_update_texture_files:307: ID 0 normal texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://game/world/island.gd:269)
+       [1] _island (res://tests/test_beach_cover_handmade.gd:106)
+       [2] _run (res://tests/test_beach_cover_handmade.gd:31)
+       [3] _free (res://tests/test_beach_cover_handmade.gd:125)
+TEST: a hand-made jungle island has no grass or pebbles (biome jungle)

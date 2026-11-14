@@ -1,0 +1,41 @@
+{
+  "source": "https://polyhaven.com/a/boulder_01",
+  "author": "Rico Cilliers",
+  "license": "CC0-1.0",
+  "source_triangles": 66122,
+  "source_vertices": 67042,
+  "triangles": 3984,
+  "dimensions_blender_m": [
+    1.2835348844528198,
+    1.8320698738098145,
+    0.9958889484405518
+  ],
+  "pivot": "base centre",
+  "materials": 1,
+  "textures": [
+    {
+      "name": "boulder_01_diff",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "name": "boulder_01_nor_gl",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "name": "boulder_01_rough",
+      "size": [
+        1024,
+        1024
+      ]
+    }
+  ],
+  "bytes": 3008220,
+  "sha256": "41b842356d6f9b2551e4e48bae04f8446b032adc01e2480ae8828490d103dca8",
+  "validation_limit": "Offline geometry/export checks; engine import and appearance checked separately."
+}

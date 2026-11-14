@@ -1,0 +1,20 @@
+{
+  "grid_png_bytes_identical": true,
+  "grid_png_sha256": "e00c1feaa06640219054aad011bed7d719d027b33336998e53188536a34d080d",
+  "boulder_triangles": 3984,
+  "boulder_sha256": "41b842356d6f9b2551e4e48bae04f8446b032adc01e2480ae8828490d103dca8",
+  "engine": "Godot 4.7.2 Forward+",
+  "full_suite": {
+    "passed": 89,
+    "total": 89,
+    "exit_code": 0,
+    "duration_ms": 1098084
+  },
+  "targeted_retests": {
+    "passed": 8,
+    "total": 8
+  },
+  "authoring_repeat_changed_files": [],
+  "scope": "beach_01 visual pilot; human playtest and other islands pending",
+  "jev_action": "escalate; advisory; see vault/99 Ferramentas/JEV/07_beach_visual_pilot.json"
+}

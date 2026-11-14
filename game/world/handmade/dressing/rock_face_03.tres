@@ -1,0 +1,14 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/rock_face_03_diffuse.res" id="1_sucjo"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/rock_face_03_nor_gl.res" id="2_q0eh0"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/rock_face_03_rough.res" id="3_sdh72"]
+
+[resource]
+albedo_texture = ExtResource("1_sucjo")
+roughness_texture = ExtResource("3_sdh72")
+normal_enabled = true
+normal_texture = ExtResource("2_q0eh0")
+uv1_scale = Vector3(0.45, 0.45, 0.45)
+uv1_triplanar = true
+texture_filter = 5

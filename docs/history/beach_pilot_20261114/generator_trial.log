@@ -1,0 +1,33 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: instance_reset_physics_interpolation() is deprecated.
+   at: _instance_reset_physics_interpolation_bind_compat_104269 (servers/rendering/rendering_server.compat.inc:62)
+ERROR: Terrain3D#2030:_grab_camera:155: Cannot find the active camera. Set it manually with Terrain3D.set_camera(). Stopping _physics_process()
+   at: push_error (core/variant/variant_utility.cpp:1023)
+WARNING: Terrain3DAssets#0944:_update_texture_files:276: ID 0 albedo texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _build_scene (res://.scratch/beach_visual_20261114/generator_trial.gd:747)
+       [1] _process (res://.scratch/beach_visual_20261114/generator_trial.gd:112)
+WARNING: Terrain3DAssets#0944:_update_texture_files:307: ID 0 normal texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _build_scene (res://.scratch/beach_visual_20261114/generator_trial.gd:747)
+       [1] _process (res://.scratch/beach_visual_20261114/generator_trial.gd:112)
+Terrain3DRegion#9573:save:226: Writing region (0, 0) to res://.scratch/beach_visual_20261114/generator_trial/beach_01_data/terrain3d_00_00.res
+WARNING: Terrain3DAssets#0944:_update_texture_files:276: ID 0 albedo texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _build_scene (res://.scratch/beach_visual_20261114/generator_trial.gd:755)
+       [1] _process (res://.scratch/beach_visual_20261114/generator_trial.gd:112)
+WARNING: Terrain3DAssets#0944:_update_texture_files:307: ID 0 normal texture is not connected to a file.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _build_scene (res://.scratch/beach_visual_20261114/generator_trial.gd:755)
+       [1] _process (res://.scratch/beach_visual_20261114/generator_trial.gd:112)
+Terrain3DRegion#1199:save:226: Writing region (0, 0) to res://.scratch/beach_visual_20261114/generator_trial/beach_01_data/terrain3d_00_00.res
+beach_01: OK, walkable 28457, buildings 27, trees 100, problems []
+  Choke_Bridge closed: every goal still reachable
+  Choke_DuneGap closed: every goal still reachable
+  Choke_BluffRamp closed: every goal still reachable
+  audit: no objects in odd places

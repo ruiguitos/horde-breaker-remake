@@ -274,6 +274,13 @@ onde estão (não mudam o jogo).
 O script verifica as duas rotas: fecha cada gargalo à vez e confirma que o
 barco, os geradores e as caches continuam acessíveis.
 
+**Piloto visual beach_01 (2026-11-14):** fachadas e terreno PBR, destroços e
+rochas costeiros, erva em lâminas; grelha, alturas e marcadores anteriores
+preservados. `Decor/Dressing` instancia a cena de decoração fora de `islands/`.
+A reaplicação substitui essa camada; editar o script de autoria para conservar
+mudanças. Guia, capturas, medições e limites em `docs/tech/BEACH_VISUAL_PILOT.md`.
+As restantes ilhas ainda não receberam esta passagem visual.
+
 ### Berlenga Grande (ilha real)
 
 A Berlenga é a ilha real, com 1,5 km, feita a partir de dados abertos:

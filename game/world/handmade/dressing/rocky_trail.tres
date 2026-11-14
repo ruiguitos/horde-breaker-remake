@@ -1,0 +1,14 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/rocky_trail_albedo_height.res" id="1_xd62p"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/rocky_trail_normal_rough.res" id="2_cspbh"]
+
+[resource]
+albedo_texture = ExtResource("1_xd62p")
+roughness_texture = ExtResource("2_cspbh")
+roughness_texture_channel = 3
+normal_enabled = true
+normal_texture = ExtResource("2_cspbh")
+uv1_scale = Vector3(0.22, 0.22, 0.22)
+uv1_triplanar = true
+texture_filter = 5

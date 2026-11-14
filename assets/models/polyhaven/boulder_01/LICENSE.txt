@@ -1,0 +1,4 @@
+Boulder 01 by Rico Cilliers / Poly Haven. CC0-1.0.
+Source: https://polyhaven.com/a/boulder_01
+License: https://polyhaven.com/license
+Modified for this project: reduced geometry, largest source mesh only, base-centred pivot.

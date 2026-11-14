@@ -1,0 +1,44 @@
+[gd_resource type="Terrain3DAssets" format=3]
+
+[ext_resource type="Texture2D" path="res://game/world/handmade/dressing/coast_sand_01_albedo_height.res" id="1_y5bix"]
+[ext_resource type="Texture2D" path="res://game/world/handmade/dressing/coast_sand_01_normal_rough.res" id="2_18lty"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/rock_face_03_albedo_height.res" id="3_1myaq"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/rock_face_03_normal_rough.res" id="4_p3bx8"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/aerial_grass_rock_albedo_height.res" id="5_ii3y0"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/aerial_grass_rock_normal_rough.res" id="6_isco3"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/rocky_trail_albedo_height.res" id="7_c5qib"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/rocky_trail_normal_rough.res" id="8_rof41"]
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_y5bix"]
+name = "Shore"
+albedo_texture = ExtResource("1_y5bix")
+normal_texture = ExtResource("2_18lty")
+uv_scale = 0.15
+detiling_rotation = 0.3
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_18lty"]
+name = "Cliffs"
+id = 1
+albedo_texture = ExtResource("3_1myaq")
+normal_texture = ExtResource("4_p3bx8")
+uv_scale = 0.2
+detiling_rotation = 0.3
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_1myaq"]
+name = "Scrub"
+id = 2
+albedo_texture = ExtResource("5_ii3y0")
+normal_texture = ExtResource("6_isco3")
+uv_scale = 0.12
+detiling_rotation = 0.3
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_p3bx8"]
+name = "Track"
+id = 3
+albedo_texture = ExtResource("7_c5qib")
+normal_texture = ExtResource("8_rof41")
+uv_scale = 0.3
+detiling_rotation = 0.3
+
+[resource]
+texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_y5bix"), SubResource("Terrain3DTextureAsset_18lty"), SubResource("Terrain3DTextureAsset_1myaq"), SubResource("Terrain3DTextureAsset_p3bx8")])

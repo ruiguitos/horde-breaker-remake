@@ -1,0 +1,14 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/clay_roof_tiles_02_diffuse.res" id="1_215db"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/clay_roof_tiles_02_nor_gl.res" id="2_yolk2"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/clay_roof_tiles_02_rough.res" id="3_u5ypl"]
+
+[resource]
+albedo_texture = ExtResource("1_215db")
+roughness_texture = ExtResource("3_u5ypl")
+normal_enabled = true
+normal_texture = ExtResource("2_yolk2")
+uv1_scale = Vector3(0.5, 0.5, 0.5)
+uv1_triplanar = true
+texture_filter = 5

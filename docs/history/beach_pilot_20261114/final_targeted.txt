@@ -1,0 +1,8 @@
+test_beach_dressing exit=0 passed=True
+test_camera_aim exit=0 passed=True
+test_beach_cover_handmade exit=0 passed=True
+test_handmade exit=0 passed=True
+test_horror_preset exit=0 passed=True
+test_scenery_graphics exit=0 passed=True
+test_smoke exit=0 passed=True
+test_objective_pools exit=0 passed=True

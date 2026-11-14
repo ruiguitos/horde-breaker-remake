@@ -1,0 +1,132 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[38;2;199;200;201mYARD - Yet Another Resource Database. Plugin loaded.[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+WARNING: UID duplicate detected between res://Arts/StoreImages/icon.png and res://Arts/Images/icon.png.
+   at: _process_file_system (editor/file_system/editor_file_system.cpp:1405)
+WARNING: UID duplicate detected between res://Arts/StoreImages/icon.svg and res://Arts/Images/icon.svg.
+   at: _process_file_system (editor/file_system/editor_file_system.cpp:1405)
+WARNING: UID duplicate detected between res://Arts/StoreImages/image_1.png and res://Arts/Images/image_1.png.
+   at: _process_file_system (editor/file_system/editor_file_system.cpp:1405)
+WARNING: UID duplicate detected between res://Arts/StoreImages/image_2.png and res://Arts/Images/image_2.png.
+   at: _process_file_system (editor/file_system/editor_file_system.cpp:1405)
+WARNING: UID duplicate detected between res://Arts/StoreImages/image_3.png and res://Arts/Images/image_3.png.
+   at: _process_file_system (editor/file_system/editor_file_system.cpp:1405)
+WARNING: UID duplicate detected between res://Arts/StoreImages/preview.png and res://Arts/Images/preview.png.
+   at: _process_file_system (editor/file_system/editor_file_system.cpp:1405)
+[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (5 steps)[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  16% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  33% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  50% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  66% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[92m[ DONE ][39m [1mupdate_scripts_classes[22m
+[0m
+[   0% ] [90m[1m_update_scan_actions[22m | Started Scanning actions... (22 steps)[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | scene_data.glsl[39m[0m
+[   4% ] [90m[1m_update_scan_actions[22m | after_bridge_fixed.png[39m[0m
+[   8% ] [90m[1m_update_scan_actions[22m | after_grid.png[39m[0m
+[  13% ] [90m[1m_update_scan_actions[22m | after_shore_third.png[39m[0m
+[  17% ] [90m[1m_update_scan_actions[22m | after_tower_third.png[39m[0m
+[  21% ] [90m[1m_update_scan_actions[22m | after_village_first.png[39m[0m
+[  26% ] [90m[1m_update_scan_actions[22m | after_village_fixed.png[39m[0m
+[  30% ] [90m[1m_update_scan_actions[22m | after_village_third.png[39m[0m
+[  34% ] [90m[1m_update_scan_actions[22m | before_bridge_fixed.png[39m[0m
+[  39% ] [90m[1m_update_scan_actions[22m | before_grid.png[39m[0m
+[  43% ] [90m[1m_update_scan_actions[22m | before_shore_third.png[39m[0m
+[  47% ] [90m[1m_update_scan_actions[22m | before_tower_third.png[39m[0m
+[  52% ] [90m[1m_update_scan_actions[22m | before_village_first.png[39m[0m
+[  56% ] [90m[1m_update_scan_actions[22m | before_village_fixed.png[39m[0m
+[  60% ] [90m[1m_update_scan_actions[22m | before_village_third.png[39m[0m
+[  65% ] [90m[1m_update_scan_actions[22m | horror_bridge_fixed.png[39m[0m
+[  69% ] [90m[1m_update_scan_actions[22m | horror_grid.png[39m[0m
+[  73% ] [90m[1m_update_scan_actions[22m | horror_shore_third.png[39m[0m
+[  78% ] [90m[1m_update_scan_actions[22m | horror_tower_third.png[39m[0m
+[  82% ] [90m[1m_update_scan_actions[22m | horror_village_first.png[39m[0m
+[  86% ] [90m[1m_update_scan_actions[22m | horror_village_fixed.png[39m[0m
+[  91% ] [90m[1m_update_scan_actions[22m | horror_village_third.png[39m[0m
+[92m[ DONE ][39m [1m_update_scan_actions[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (21 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   4% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   9% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  13% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  18% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  22% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  27% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  31% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  36% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  40% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  45% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  50% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  54% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  59% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  63% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  68% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  72% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  77% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  81% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  86% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  90% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing pre-reimport operations...[39m[0m
+[   0% ] [90m[1mreimport[22m | horror_village_third.png[39m[0m
+[   4% ] [90m[1mreimport[22m | horror_village_fixed.png[39m[0m
+[   9% ] [90m[1mreimport[22m | horror_village_first.png[39m[0m
+[  13% ] [90m[1mreimport[22m | horror_tower_third.png[39m[0m
+[  18% ] [90m[1mreimport[22m | horror_shore_third.png[39m[0m
+[  22% ] [90m[1mreimport[22m | horror_grid.png[39m[0m
+[  27% ] [90m[1mreimport[22m | horror_bridge_fixed.png[39m[0m
+[  31% ] [90m[1mreimport[22m | before_village_third.png[39m[0m
+[  36% ] [90m[1mreimport[22m | before_village_fixed.png[39m[0m
+[  40% ] [90m[1mreimport[22m | before_village_first.png[39m[0m
+[  45% ] [90m[1mreimport[22m | before_tower_third.png[39m[0m
+[  50% ] [90m[1mreimport[22m | before_shore_third.png[39m[0m
+[  54% ] [90m[1mreimport[22m | before_grid.png[39m[0m
+[  59% ] [90m[1mreimport[22m | before_bridge_fixed.png[39m[0m
+[  63% ] [90m[1mreimport[22m | after_village_third.png[39m[0m
+[  68% ] [90m[1mreimport[22m | after_village_fixed.png[39m[0m
+[  72% ] [90m[1mreimport[22m | after_village_first.png[39m[0m
+[  77% ] [90m[1mreimport[22m | after_tower_third.png[39m[0m
+[  81% ] [90m[1mreimport[22m | after_shore_third.png[39m[0m
+[  86% ] [90m[1mreimport[22m | after_grid.png[39m[0m
+[  90% ] [90m[1mreimport[22m | after_bridge_fixed.png[39m[0m
+[  95% ] [90m[1mreimport[22m | Finalizing Asset Import...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (21 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing post-reimport operations...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Started Loading editor (5 steps)[39m[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Loading editor layout...[39m[0m
+[  16% ] [90m[1mloading_editor_layout[22m | Loading docks...[39m[0m
+[  33% ] [90m[1mloading_editor_layout[22m | Reopening scenes...[39m[0m
+[  50% ] [90m[1mloading_editor_layout[22m | Loading central editor layout...[39m[0m
+[  66% ] [90m[1mloading_editor_layout[22m | Loading plugin window layout...[39m[0m
+[  83% ] [90m[1mloading_editor_layout[22m | Editor layout ready.[39m[0m
+[92m[ DONE ][39m [1mloading_editor_layout[22m
+[0m
+WARNING: 1 RID of type "CanvasItem" was leaked.
+ERROR: 1 RID allocations of type 'N13RendererDummy15MaterialStorage13DummyMaterialE' were leaked at exit.
+   at: _free_rids (servers/rendering/renderer_canvas_cull.cpp:2733)
+ERROR: Pages in use exist at exit in PagedAllocator: N20RasterizerSceneDummy21GeometryInstanceDummyE
+   at: ~PagedAllocator (./core/templates/paged_allocator.h:170)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+ERROR: 1 RID allocations of type 'N13RendererDummy15MaterialStorage11DummyShaderE' were leaked at exit.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+ERROR: 1 RID allocations of type 'N13RendererDummy9DummyMeshE' were leaked at exit.
+ERROR: 1 RID allocations of type 'PN13RendererDummy14TextureStorage12DummyTextureE' were leaked at exit.
+ERROR: 1 RID allocations of type 'N17RendererSceneCull8InstanceE' were leaked at exit.
+WARNING: 10 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 2 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

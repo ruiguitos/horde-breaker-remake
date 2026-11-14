@@ -1,0 +1,19 @@
+{
+  "exit_code": 0,
+  "changed_files": [],
+  "sha256": {
+    "game/world/handmade/islands/beach_01.tscn": "596aede997395977b78e961fa4c2f2dcd177e22ba921a3eabc78da3a8fb26299",
+    "game/world/handmade/islands/beach_01_data/terrain3d_00_00.res": "76dacdb30ecb14655850a39e6ef23bd4a4c159c90a2f89f4fa63a55fe7012d85",
+    "game/world/handmade/dressing/beach_01_dressing.tscn": "672831acf76698af92823a7a436ec1351f133665998ed6d6dcb4e53ca2e22ec4",
+    "game/world/handmade/dressing/beach_01_ground.tres": "a604e5e5981654cf8c2811aabd08f127baf178638b97601b7547dd5007e29ad6",
+    "game/world/handmade/dressing/clay_roof_tiles_02.tres": "35faa7163a531dbdfc2eacb310cfdee1f7ac88407015970f3438c876cb7978c7",
+    "game/world/handmade/dressing/coast_sand_01_albedo_height.res": "232525d476916e031195e7c01a041d37d83ad36eea9215db2e2460d48b839b7d",
+    "game/world/handmade/dressing/coast_sand_01_normal_rough.res": "f7064997dc5bab5f5d32e13da4b33e61475e58592b474b89d3834fb0e82ec25b",
+    "game/world/handmade/dressing/coast_sand_01_source.json": "512d168e4d5ff4075c7b0af2084d467a511a2d065767141471a3ce2bea85cd92",
+    "game/world/handmade/dressing/rocky_trail.tres": "640109501edface95f1c23acd03b2817a521d97aac18598c1dae5ef8a2c92584",
+    "game/world/handmade/dressing/rock_face_03.tres": "13fce8eab6791d266e80dba15b5a752c5f955914dec9375833f11ffe34a5dc03",
+    "game/world/handmade/dressing/stone_wall_02.tres": "1d1d2be69cb043d346ea721c960026f9de15eda57fdcdc4275203dbbc79f1780",
+    "game/world/handmade/dressing/weathered_planks.tres": "cd276cfe2935db0d88958b247dbdebb4162a2d0e9e003a4fa344417a6dd12572",
+    "game/world/handmade/dressing/white_plaster_02.tres": "e3640f7ac9350bb0e93b2bd81da448afa66f7b0bbcb862530f9f44072c8a5d24"
+  }
+}

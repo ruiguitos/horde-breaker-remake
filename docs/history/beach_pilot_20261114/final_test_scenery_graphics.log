@@ -1,0 +1,72 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TEST: the horror road is dark asphalt, about 0.30 (luminance 0.30)
+TEST: every biome's grading is discreet: no tint above 0.25
+TEST: the port reads grey: its tints are under 0.1 (0.06)
+TEST: the volcano's highlights are orange and visible (hue 0.08, amount 0.20)
+TEST: the jungle's midtones are green (hue 0.33)
+TEST: the beach's highlights are warm (hue 0.16)
+TEST: the beach cover shows 301 grass tufts and 99 pebbles, within 400
+TEST: every shown instance stands within 60 m of the player (0 outside)
+MEASURE beach island: map 270 ms, cover build 7.3 ms, placing 0.37 ms, 2400 places drawn, 400 shown (301 grass, 99 pebbles)
+TEST: on the Low preset the beach has no grass or pebbles
+TEST: back on a higher preset, the cover is placed again
+TEST: on Low, the origins and the counts both read empty
+TEST: after walking 5.5 m without a new placement, every shown instance is within 60 m (0 beyond)
+TEST: every place is open sand off the roads and the decks (0 bad)
+WARNING: Invalid cross-container connection, @Node3D@10 with edge index 0 due to next_pt_init should be empty for this edge's next pt
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _invalidate_edge (res://addons/road-generator/nodes/road_container.gd:1405)
+       [1] validate_edges (res://addons/road-generator/nodes/road_container.gd:776)
+       [2] on_point_update (res://addons/road-generator/nodes/road_container.gd:1160)
+       [3] connect_roadpoint (res://addons/road-generator/nodes/road_point.gd:1009)
+       [4] build (res://game/world/island_roads.gd:100)
+       [5] _run (res://tests/test_scenery_graphics.gd:109)
+WARNING: Invalid cross-container connection, @Node3D@10 with edge index 3 due to prior_pt_init should be empty for this edge's prior pt
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _invalidate_edge (res://addons/road-generator/nodes/road_container.gd:1405)
+       [1] validate_edges (res://addons/road-generator/nodes/road_container.gd:784)
+       [2] on_point_update (res://addons/road-generator/nodes/road_container.gd:1160)
+       [3] connect_roadpoint (res://addons/road-generator/nodes/road_point.gd:1009)
+       [4] build (res://game/world/island_roads.gd:100)
+       [5] _run (res://tests/test_scenery_graphics.gd:109)
+WARNING: Invalid cross-container connection, @Node3D@10 with edge index 1 due to next_pt_init should be empty for this edge's next pt
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _invalidate_edge (res://addons/road-generator/nodes/road_container.gd:1405)
+       [1] validate_edges (res://addons/road-generator/nodes/road_container.gd:776)
+       [2] on_point_update (res://addons/road-generator/nodes/road_container.gd:1160)
+       [3] connect_roadpoint (res://addons/road-generator/nodes/road_point.gd:1009)
+       [4] build (res://game/world/island_roads.gd:100)
+       [5] _run (res://tests/test_scenery_graphics.gd:109)
+WARNING: Invalid cross-container connection, @Node3D@10 with edge index 3 due to prior_pt_init should be empty for this edge's prior pt
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _invalidate_edge (res://addons/road-generator/nodes/road_container.gd:1405)
+       [1] validate_edges (res://addons/road-generator/nodes/road_container.gd:784)
+       [2] on_point_update (res://addons/road-generator/nodes/road_container.gd:1160)
+       [3] connect_roadpoint (res://addons/road-generator/nodes/road_point.gd:1009)
+       [4] build (res://game/world/island_roads.gd:100)
+       [5] _run (res://tests/test_scenery_graphics.gd:109)
+WARNING: Invalid cross-container connection, @Node3D@10 with edge index 1 due to next_pt_init should be empty for this edge's next pt
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _invalidate_edge (res://addons/road-generator/nodes/road_container.gd:1405)
+       [1] validate_edges (res://addons/road-generator/nodes/road_container.gd:776)
+       [2] on_point_update (res://addons/road-generator/nodes/road_container.gd:1160)
+       [3] connect_roadpoint (res://addons/road-generator/nodes/road_point.gd:1009)
+       [4] build (res://game/world/island_roads.gd:100)
+       [5] _run (res://tests/test_scenery_graphics.gd:109)
+WARNING: Invalid cross-container connection, @Node3D@10 with edge index 3 due to prior_pt_init should be empty for this edge's prior pt
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _invalidate_edge (res://addons/road-generator/nodes/road_container.gd:1405)
+       [1] validate_edges (res://addons/road-generator/nodes/road_container.gd:784)
+       [2] on_point_update (res://addons/road-generator/nodes/road_container.gd:1160)
+       [3] connect_roadpoint (res://addons/road-generator/nodes/road_point.gd:1009)
+       [4] build (res://game/world/island_roads.gd:100)
+       [5] _run (res://tests/test_scenery_graphics.gd:109)
+TEST: a generated road takes the dark asphalt as its surface
+TEST: the lamps on a generated road keep their own materials (3 lamps)

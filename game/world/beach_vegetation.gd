@@ -27,13 +27,13 @@ var _shown_origins: PackedVector3Array = PackedVector3Array()  ## origins of the
 
 ## The cover of `map` (a beach island). Places are on open sand only: not on a road, a deck, a building
 ## or in the water.
-static func for_map(map: IslandMap, rng_seed: int) -> BeachVegetation:
+static func for_map(map: IslandMap, rng_seed: int, natural_grass: bool = false) -> BeachVegetation:
 	var out := BeachVegetation.new()
 	out.name = "BeachCover"
 	out._draw_places(map, rng_seed)
 	out._grass = MultiMeshInstance3D.new()
 	out._grass.name = "Grass"
-	out._grass.multimesh = _multimesh(_grass_mesh())
+	out._grass.multimesh = _multimesh(_natural_grass_mesh() if natural_grass else _grass_mesh())
 	out.add_child(out._grass)
 	out._pebbles = MultiMeshInstance3D.new()
 	out._pebbles.name = "Pebbles"
@@ -130,6 +130,7 @@ static func _multimesh(mesh: Mesh) -> MultiMesh:
 
 
 ## A grass tuft: a double-sided card, about 0.45 m tall.
+## Kept for maps outside the authored beach pilot.
 static func _grass_mesh() -> QuadMesh:
 	var card := QuadMesh.new()
 	card.size = Vector2(0.4, 0.45)
@@ -138,6 +139,33 @@ static func _grass_mesh() -> QuadMesh:
 	green.cull_mode = BaseMaterial3D.CULL_DISABLED
 	card.material = green
 	return card
+
+
+## Small tapered blades instead of an opaque rectangular card. Same origin,
+## height, instance budget and placement rules as the original cover.
+static func _natural_grass_mesh() -> ArrayMesh:
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in 9:
+		var angle: float = i * 2.39996
+		var side := Vector3(cos(angle), 0, sin(angle)) * 0.022
+		var base := Vector3(sin(i * 1.7) * 0.09, -0.225, cos(i * 2.3) * 0.09)
+		var bend: Vector3 = base + Vector3(cos(angle) * 0.035, 0.24 + (i % 3) * 0.025, sin(angle) * 0.035)
+		var tip: Vector3 = base + Vector3(cos(angle) * 0.08, 0.36 + (i % 4) * 0.027, sin(angle) * 0.08)
+		var vertices: Array[Vector3] = [base - side, bend - side * 0.55, base + side,
+			base + side, bend - side * 0.55, bend + side * 0.55,
+			bend - side * 0.55, tip, bend + side * 0.55]
+		for vertex: Vector3 in vertices:
+			surface.set_color(Color(0.34, 0.4, 0.18).lerp(Color(0.55, 0.48, 0.25), float(i % 4) / 5.0))
+			surface.add_vertex(vertex)
+	surface.generate_normals()
+	var material := StandardMaterial3D.new()
+	material.vertex_color_use_as_albedo = true
+	material.albedo_color = Color(0.5, 0.55, 0.28)
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	material.roughness = 1.0
+	surface.set_material(material)
+	return surface.commit()
 
 
 ## A pebble: a small flattened sphere.

@@ -1,0 +1,14 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/weathered_planks_diffuse.res" id="1_k4rb6"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/weathered_planks_nor_gl.res" id="2_3o7sr"]
+[ext_resource type="Texture2D" path="res://assets/textures/polyhaven/weathered_planks_rough.res" id="3_4spk6"]
+
+[resource]
+albedo_texture = ExtResource("1_k4rb6")
+roughness_texture = ExtResource("3_4spk6")
+normal_enabled = true
+normal_texture = ExtResource("2_3o7sr")
+uv1_scale = Vector3(0.5, 0.5, 0.5)
+uv1_triplanar = true
+texture_filter = 5

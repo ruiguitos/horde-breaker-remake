@@ -654,7 +654,20 @@ func _use_handmade_world() -> void:
 	var preview: Node3D = _handmade.get_node_or_null("Decor/SeaPreview")
 	if preview != null:
 		preview.visible = false  # the game draws its own animated sea
+	var horror_dressing: Node3D = _handmade.get_node_or_null("Decor/Dressing/HorrorOnly")
+	if horror_dressing != null:
+		horror_dressing.visible = _horror()
 	_building_boxes.append_array(_handmade.object_boxes())
+	var dressing: Node3D = _handmade.get_node_or_null("Decor/Dressing")
+	if dressing != null:
+		for group: String in ["Facades", "Shore", "RockSurfaces", "HorrorOnly"]:
+			var props: Node3D = dressing.get_node(group)
+			if not props.visible:
+				continue
+			for prop: Node3D in props.get_children():
+				var box: AABB = _handmade._box_of(prop)
+				if box.size != Vector3.ZERO:
+					_building_boxes.append(box)  # camera only; never the gameplay grid
 
 
 ## Grass and pebbles on a beach, on either kind of island. Built after the ground and the roads:
@@ -663,7 +676,8 @@ func _use_handmade_world() -> void:
 func _build_beach_cover() -> void:
 	if run.map.biome != &"beach":
 		return
-	_vegetation = BeachVegetation.for_map(run.map, run.run_seed)
+	var natural_grass: bool = _handmade != null and _handmade.get_meta("beach_visual_pilot", false) == true
+	_vegetation = BeachVegetation.for_map(run.map, run.run_seed, natural_grass)
 	add_child(_vegetation)
 
 
