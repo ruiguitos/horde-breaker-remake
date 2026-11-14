@@ -143,6 +143,50 @@ três câmaras. Para novas capturas sem tocar no perfil pessoal:
 & $godot --path . --resolution 1280x720 --windowed --script res://tools/dev/beach_visual_review.gd -- res://game/world/handmade/islands/beach_01.tscn .scratch/beach_review normal
 ```
 
+### Revisão de 2026-11-14 (Claude Code)
+
+**Luz do horror.** As capturas do piloto saíam quase pretas: à hora do preset (04:24) o céu é
+escuro, e a luz ambiente vinha dele. Em `game/world/island.gd` a luz ambiente do preset passou
+a ter cor própria (`HORROR_AMBIENT_COLOUR`, um azul frio), a névoa junto ao chão ficou mais
+fina (`HORROR_FOG_HEIGHT_DENSITY` de -0,15 para -0,07) e a contraluz subiu de 0,35 para 0,5.
+Antes: `horror_bridge_fixed.png`. Depois: `horror_bridge_fixed_v2.png`, na mesma pasta de
+capturas. Testes repetidos: horror_preset, beach_dressing, scenery_graphics,
+beach_cover_handmade e smoke. A suite completa não foi repetida. É uma proposta a confirmar
+a jogar: uma captura parada não mostra a leitura dos inimigos em combate.
+
+**Originais Poly Haven: o que existe e o que se usa.**
+
+| Estado | Assets |
+|---|---|
+| Integrado e usado em jogo | portable_generator, wooden_crate_02, metal_jerrycan_green, concrete_road_barrier_02, boulder_01, coast_sand_01, e os materiais de reboco, telha, pedra, madeira, trilho e erva |
+| Só descarregado (em `assets/source/polyhaven/`, ignorado pelo git) | modular_wooden_pier, venus_a_shetland_fourareen (um barco), modular_fort_01, Barrel_02, barrel_stove, industrial_storage_cart, lifebuoy, vintage_radio_transceiver |
+
+Dois dos pendentes têm original já descarregado: o **barco de extração** (o fourareen, 30 MB em
+glTF) e a **ponte e o cais** (modular_wooden_pier, 312 MB em .blend a 4K). Falta prepará-los
+como se fez ao boulder: reduzir triângulos, texturas a 1K, medir e registar. Não precisam de
+download novo. Para as casas e a torre não há original: ou o Codex as modela, ou escolhe-se um
+kit CC0.
+
+**Barco de extração e cais (2026-11-14).** Preparados com
+`tools/assets/prepare_boat_and_pier.py` (Blender, sem rede) e desenhados por
+`game/world/island.gd` (`_build_pier`, `_boat_spot`) em todas as ilhas com barco, não só na praia.
+
+| Asset | Origem e licença | Triângulos | Texturas | Tamanho no Blender (m) | GLB |
+|---|---|---|---|---|---|
+| Barco: «Venus», um fourareen das Shetland | Scottish Maritime Museum, via Sketchfab, CC0-1.0 | 49996 → 5983 | 2 a 1K (cor e normal) | 5.385 × 1.575 × 1.204 | 473352 bytes |
+| Cais: Modular Wooden Pier, secção 02 | Poly Haven, CC0-1.0 | 11758 → 2484 | 7 a 1K, 2 materiais | 2.503 × 3.39 × 3.837 | 1152396 bytes |
+
+- O barco é desenhado a 1,5× (cerca de 8 m) com 0,35 m de casco debaixo de água. Sem o GLB, o jogo
+  volta à caixa antiga.
+- O marcador `Boat` fica em terra. O cais parte dele e vai até 3,5 m depois da primeira célula de
+  mar, em secções de 2,9 m (8 no máximo); o barco fica amarrado ao lado, na ponta.
+- É decoração: o cais não muda a grelha e não se anda nele. Na Holdout o cais não aparece e o
+  barco chega como antes.
+- Captura: `docs/design/beach_pilot_20261114/boat_and_pier.png`. Nessa captura o barco toca num
+  afloramento do dressing; falta afastar um do outro.
+- A pasta de origem do barco chama-se `assets/source/polyhaven/venus_a_shetland_fourareen`, mas o
+  modelo não é do Poly Haven: a licença que o acompanha indica o Sketchfab.
+
 ### O que continua por fazer
 
 A costa conserva o contorno e o terreno anteriores; há transições de falésia

@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "model": "wooden_pier_section",
+  "credit": "Modular Wooden Pier, Poly Haven, CC0-1.0, https://polyhaven.com/a/modular_wooden_pier",
+  "source_triangles": 11758,
+  "triangles": 2484,
+  "materials": [
+    "modular_wooden_pier_planks",
+    "modular_wooden_pier_poles"
+  ],
+  "textures": [
+    {
+      "name": "modular_wooden_pier_planks_diff.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "modular_wooden_pier_planks_metal.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "modular_wooden_pier_planks_nor_gl.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "modular_wooden_pier_planks_rough.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "modular_wooden_pier_poles_diff.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "modular_wooden_pier_poles_nor_gl.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "modular_wooden_pier_poles_rough.png",
+      "width": 1024,
+      "height": 1024
+    }
+  ],
+  "size_blender_xyz_m": [
+    2.503,
+    3.39,
+    3.837
+  ],
+  "pivot": "centre of the base (lowest point)",
+  "glb_bytes": 1152396,
+  "glb_sha256": "20f635d25d792e1f5a5a46f95c3329acee98c5f23985e1be908d934b750b405f"
+}

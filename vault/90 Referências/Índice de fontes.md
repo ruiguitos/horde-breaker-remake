@@ -11,7 +11,7 @@ fontes: []
 
 ← [[00 Início]]
 
-**89 documentos/configurações copiados** com fonte, hash e data. O código não é copiado integralmente: os dados têm fichas próprias e os scripts têm inventário.
+**97 documentos/configurações copiados** com fonte, hash e data. O código não é copiado integralmente: os dados têm fichas próprias e os scripts têm inventário.
 
 A biblioteca de API do motor não é duplicada inteira; inclui os documentos de versão e breaking changes. Dependências de terceiros e memórias privadas dos agentes não são importadas. Os relatórios históricos e o design antigo ficam assinalados como arquivo ou referências a confrontar.
 
@@ -25,6 +25,7 @@ A biblioteca de API do motor não é duplicada inteira; inclui os documentos de 
 | [[90 Referências/assets/models/characters/arms_firstperson_original/NOTES\|assets/models/characters/arms_firstperson_original/NOTES.md]] | Consultar contexto |
 | [[90 Referências/assets/models/characters/crawler_original/NOTES\|assets/models/characters/crawler_original/NOTES.md]] | Consultar contexto |
 | [[90 Referências/assets/models/characters/weapon_grips_original/NOTES\|assets/models/characters/weapon_grips_original/NOTES.md]] | Consultar contexto |
+| [[90 Referências/assets/models/environment/extraction_test_arena/README\|assets/models/environment/extraction_test_arena/README.md]] | Consultar contexto |
 | [[90 Referências/assets/models/environment/original_scenery_kit/README\|assets/models/environment/original_scenery_kit/README.md]] | Consultar contexto |
 | [[90 Referências/assets/models/environment/original_scenery_kit/jev/README\|assets/models/environment/original_scenery_kit/jev/README.md]] | Consultar contexto |
 | [[90 Referências/assets/models/weapons/tactical_original/NOTES\|assets/models/weapons/tactical_original/NOTES.md]] | Consultar contexto |
@@ -49,6 +50,8 @@ A biblioteca de API do motor não é duplicada inteira; inclui os documentos de 
 | [[90 Referências/docs/design/weapon_grips/README\|docs/design/weapon_grips/README.md]] | Consultar contexto |
 | [[90 Referências/docs/engine-reference/godot/VERSION\|docs/engine-reference/godot/VERSION.md]] | Consultar contexto |
 | [[90 Referências/docs/engine-reference/godot/breaking-changes\|docs/engine-reference/godot/breaking-changes.md]] | Consultar contexto |
+| [[90 Referências/docs/history/2026-11-14_ASSETS2GODOT_HANDOFF\|docs/history/2026-11-14_ASSETS2GODOT_HANDOFF.md]] | Arquivo |
+| [[90 Referências/docs/history/2026-11-14_BEACH_VISUAL_PILOT_HANDOFF\|docs/history/2026-11-14_BEACH_VISUAL_PILOT_HANDOFF.md]] | Arquivo |
 | [[90 Referências/docs/history/ANALISE_AGENTES_2026-11-04\|docs/history/ANALISE_AGENTES_2026-11-04.md]] | Arquivo |
 | [[90 Referências/docs/history/ANALISE_DO_JOGO_2026-10-23\|docs/history/ANALISE_DO_JOGO_2026-10-23.md]] | Arquivo |
 | [[90 Referências/docs/history/CODEX_HANDOFF_2026-10-10\|docs/history/CODEX_HANDOFF_2026-10-10.md]] | Arquivo |
@@ -57,6 +60,8 @@ A biblioteca de API do motor não é duplicada inteira; inclui os documentos de 
 | [[90 Referências/docs/history/README\|docs/history/README.md]] | Arquivo |
 | [[90 Referências/docs/history/RELOAD_ARM_CLIPS_RESUME_2026-10-21\|docs/history/RELOAD_ARM_CLIPS_RESUME_2026-10-21.md]] | Arquivo |
 | [[90 Referências/docs/history/REVIEW_2026-10-05\|docs/history/REVIEW_2026-10-05.md]] | Arquivo |
+| [[90 Referências/docs/history/beach_pilot_20261114/CLAUDE_PLAN\|docs/history/beach_pilot_20261114/CLAUDE_PLAN.md]] | Arquivo |
+| [[90 Referências/docs/history/beach_pilot_20261114/CLAUDE_REVIEW\|docs/history/beach_pilot_20261114/CLAUDE_REVIEW.md]] | Arquivo |
 | [[90 Referências/docs/legacy/ARCHIPELAGO_GAMEPLAY_PLAN\|docs/legacy/ARCHIPELAGO_GAMEPLAY_PLAN.md]] | Arquivo |
 | [[90 Referências/docs/legacy/CONTENT_EXPANSION_PLAN\|docs/legacy/CONTENT_EXPANSION_PLAN.md]] | Arquivo |
 | [[90 Referências/docs/legacy/GDD\|docs/legacy/GDD.md]] | Arquivo |
@@ -74,6 +79,8 @@ A biblioteca de API do motor não é duplicada inteira; inclui os documentos de 
 | [[90 Referências/docs/tech/ARCHITECTURE\|docs/tech/ARCHITECTURE.md]] | Consultar contexto |
 | [[90 Referências/docs/tech/ARMORY_REDESIGN\|docs/tech/ARMORY_REDESIGN.md]] | Consultar contexto |
 | [[90 Referências/docs/tech/ASSETS\|docs/tech/ASSETS.md]] | Consultar contexto |
+| [[90 Referências/docs/tech/ASSETS2GODOT\|docs/tech/ASSETS2GODOT.md]] | Consultar contexto |
+| [[90 Referências/docs/tech/BEACH_VISUAL_PILOT\|docs/tech/BEACH_VISUAL_PILOT.md]] | Consultar contexto |
 | [[90 Referências/docs/tech/CARDS_IMPLEMENTATION\|docs/tech/CARDS_IMPLEMENTATION.md]] | Consultar contexto |
 | [[90 Referências/docs/tech/COMBAT_CATALOG\|docs/tech/COMBAT_CATALOG.md]] | Consultar contexto |
 | [[90 Referências/docs/tech/CRAWLER_MODEL_BRIEF\|docs/tech/CRAWLER_MODEL_BRIEF.md]] | Consultar contexto |
@@ -82,6 +89,7 @@ A biblioteca de API do motor não é duplicada inteira; inclui os documentos de 
 | [[90 Referências/docs/tech/GAME_AUDIT\|docs/tech/GAME_AUDIT.md]] | Consultar contexto |
 | [[90 Referências/docs/tech/LOCOMOTION\|docs/tech/LOCOMOTION.md]] | Consultar contexto |
 | [[90 Referências/docs/tech/MAPS_HANDOFF\|docs/tech/MAPS_HANDOFF.md]] | Consultar contexto |
+| [[90 Referências/docs/tech/MAP_VISUAL_REWORK\|docs/tech/MAP_VISUAL_REWORK.md]] | Consultar contexto |
 | [[90 Referências/docs/tech/MODELS_ROUND_BRIEF\|docs/tech/MODELS_ROUND_BRIEF.md]] | Consultar contexto |
 | [[90 Referências/docs/tech/MULTIPLAYER\|docs/tech/MULTIPLAYER.md]] | Consultar contexto |
 | [[90 Referências/docs/tech/PLUGINS_REVIEW\|docs/tech/PLUGINS_REVIEW.md]] | Consultar contexto |

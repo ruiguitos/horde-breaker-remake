@@ -83,7 +83,7 @@ Inventário estático dos 86 scripts próprios em `game/`; não é prova de exec
 | `game/world/grading.gd` | Grading | RefCounted | 3 |
 | `game/world/handmade/handmade_island.gd` | HandmadeIsland | Node3D | 26 |
 | `game/world/handmade/scatter.gd` | Scatter | MultiMeshInstance3D | 5 |
-| `game/world/island.gd` | — | Node3D | 99 |
+| `game/world/island.gd` | — | Node3D | 100 |
 | `game/world/island_map.gd` | IslandMap | RefCounted | 30 |
 | `game/world/island_props.gd` | IslandProps | RefCounted | 4 |
 | `game/world/island_roads.gd` | IslandRoads | RefCounted | 10 |

@@ -29,6 +29,24 @@ autoria, em vez de esperar que uma edição manual sobreviva à reaplicação.
 
 Entrega e prompt para Claude: `docs/history/2026-11-14_BEACH_VISUAL_PILOT_HANDOFF.md`.
 
+## Revisão de 2026-11-14 (Claude Code)
+
+- **Avaliação do piloto:** as fachadas, as telhas e os materiais resultam; a aldeia já lê como
+  aldeia. Continuam fracos a erva (pequena e rara), o terreno entre casas (uniforme), os
+  volumes das casas, da torre, da ponte e do barco, e as falésias esticadas.
+- **Luz do horror corrigida:** luz ambiente com cor própria, névoa do chão mais fina e
+  contraluz um pouco mais forte. Antes e depois em `docs/design/beach_pilot_20261114/`
+  (`horror_bridge_fixed.png` e `horror_bridge_fixed_v2.png`). Por confirmar a jogar.
+- **Originais já descarregados e por usar:** um barco (fourareen) e um cais modular, que servem
+  o barco de extração e a ponte. Estado de cada asset em
+  [[04 Arte e interface/Assets e licenças]].
+- **Próxima ação:** preparar esses dois originais (triângulos, texturas a 1K, medidas) e
+  pô-los na `beach_01`. Lista ativa: `TODO.md`, secção «Conteúdo e apresentação».
+- **Barco e cais feitos (2026-11-14):** o fourareen e uma secção do cais modular foram
+  preparados (5983 e 2484 triângulos, texturas a 1K) e aparecem no ponto de extração de todas as
+  ilhas com barco. Captura: `docs/design/beach_pilot_20261114/boat_and_pier.png`.
+- Não houve parecer JEV novo nesta revisão; o último é o 07.
+
 Terrain3D, Sky3D, Road Generator e Color Grading já estão ativos. ProtonScatter
 é apenas candidato: a listagem atual está marcada como instável. A pintura
 de vegetação do Terrain3D 1.0.2 não gera colisões; bloquear a horda também

@@ -1,8 +1,8 @@
 {
   "passed": true,
   "date": "2026-11-14",
-  "markdown_notes": 259,
-  "source_reference_notes": 90,
+  "markdown_notes": 267,
+  "source_reference_notes": 98,
   "catalogue_notes": 108,
   "catalogue_coverage": {
     "weapons": 5,
@@ -15,8 +15,8 @@
     "biomes": 5,
     "modifiers": 5
   },
-  "source_files_hashed": 382,
-  "wiki_links_checked": 812,
+  "source_files_hashed": 390,
+  "wiki_links_checked": 823,
   "canvas_nodes": 7,
   "canvas_edges": 6,
   "update_safety": {
@@ -26,7 +26,9 @@
     "personal_note_preserved": true
   },
   "errors": [],
-  "warnings": [],
+  "warnings": [
+    "User-modified note: 04 Arte e interface/Assets e licenças.md"
+  ],
   "godot_executed": false,
   "obsidian_ui_tested": false
 }

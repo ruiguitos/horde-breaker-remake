@@ -29,21 +29,21 @@
       }
     },
     "90 Referências/TODO.md": {
-      "sha256": "30b14962f36057d22c4b2a13ff293fe2bdce01c5f4d4f102bf6c610e9b99031c",
+      "sha256": "efb706f61ecca3b2a331a3ba021740f8336516a90890492d884d94d1566e4771",
       "sources": [
         "TODO.md"
       ],
       "source_hashes": {
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba"
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
       }
     },
     "90 Referências/assets/LICENSES.md": {
-      "sha256": "59f861e72f918a46fdc98904cfa02811d060f659997eeae8ec2587746e9acfbd",
+      "sha256": "74bc9cf5d25fbc12fa3e0a7576db825191cdefc12012adb36e158b09541bc611",
       "sources": [
         "assets/LICENSES.md"
       ],
       "source_hashes": {
-        "assets/LICENSES.md": "effc1a9da9bb2534ff721089bd4b8312919a20c2b5dcc6696bc074a382eeba48"
+        "assets/LICENSES.md": "4af3fe9ae00415da9c94b08ddf0b7ef79815db163b8863767839fc79ccc90b98"
       }
     },
     "90 Referências/assets/models/characters/arms_firstperson_original/NOTES.md": {
@@ -2270,7 +2270,7 @@
       }
     },
     "05 Desenvolvimento/Mapa do código.md": {
-      "sha256": "8c06e467ff090bbd56ab97ad8893fd7af47ef5ae8ca02f2387c5640f0c3ba46c",
+      "sha256": "3ade9ff94ec5ab610a96e6724408a63ecea01638401b6a8fe7b714094f3af28e",
       "sources": [
         "game/audio/ambience.gd",
         "game/audio/music.gd",
@@ -2428,7 +2428,7 @@
         "game/world/grading.gd": "1607e9de7a389de453e256a1755040b49593f9764092a63fc88034891369ec3b",
         "game/world/handmade/handmade_island.gd": "03fe4dbb578d00d5fc3b10718bbccc602796ab580c96c53d09adaf00e481992b",
         "game/world/handmade/scatter.gd": "1c93e13a96500df9ede45d9a49af2a2065d593008d61ed4bf054b7d1864b4555",
-        "game/world/island.gd": "58b3ea93ebe5631f31f8d01bd88e2053d7429e14d6f513044a4fe5f35428f421",
+        "game/world/island.gd": "f702bc1adc85b7155ae39e19d5a996ee401a6ddb983d790edd274475dafd37f9",
         "game/world/island_map.gd": "6a0265ebf027b566ab85efe3104b60e981719484af1b2bff73bfb7e178b9e217",
         "game/world/island_props.gd": "90056241144afe324f6b67e5404f4029a06977663265f458061397c08bbe19bf",
         "game/world/island_roads.gd": "67576f90957bf6543cecc0090768d722dfaa3ed4776068edd7a33edb7163f545",
@@ -2694,7 +2694,7 @@
         "docs/DECISIONS.md"
       ],
       "source_hashes": {
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba",
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
         "docs/DECISIONS.md": "cc0f8756406a674b97a51086e70a7e16dac231de0ec07f39b45963eb03497ea6"
       }
     },
@@ -2728,7 +2728,7 @@
         "tests/run_all.gd"
       ],
       "source_hashes": {
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba",
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
         "docs/DECISIONS.md": "cc0f8756406a674b97a51086e70a7e16dac231de0ec07f39b45963eb03497ea6"
       }
     },
@@ -2741,7 +2741,7 @@
       ],
       "source_hashes": {
         "docs/DECISIONS.md": "cc0f8756406a674b97a51086e70a7e16dac231de0ec07f39b45963eb03497ea6",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba",
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
         "AGENTS.md": "adab8d05f49a29db5299d59d78dd15c51e48b1b98d85d836677727ff67593d50"
       }
     },
@@ -2800,7 +2800,7 @@
       ],
       "source_hashes": {
         "docs/design/BERLENGA_EXPEDITION.md": "df79e195b43b2675965dba505dd05594b7e87d92cfd7c4985f3cb5a600f20e29",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba"
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
       }
     },
     "03 Sistemas/Sistemas.md": {
@@ -2892,7 +2892,7 @@
         "game/world/director.gd": "318e36023d250df214ed4538b0bd84a7e3e21ecc8ae88589c8569db6a91984af",
         "game/world/island_run.gd": "6d9d5ab891f974ea0d0d92457b68dac4e6a16245a27391f7c5e693a48630319c",
         "game/world/zombie_model.gd": "7a92533c946f2efda55c8185675797b6bacbb4091adbf90d263817c76e4a0432",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba",
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
         "docs/tech/SPECIAL_ENEMY_MODELS.md": "8cdd4149b686dafba5de168472ea91633691b7792d793ad257d179af388c2777"
       }
     },
@@ -2907,7 +2907,7 @@
       "source_hashes": {
         "game/data/resources/mission_data.gd": "42e00a30d5b1652f3f145b7f4ddc14de9a9f5c566fa0a06d724dc0f6e909896b",
         "game/world/island_run.gd": "6d9d5ab891f974ea0d0d92457b68dac4e6a16245a27391f7c5e693a48630319c",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba",
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
         "docs/design/OBJECTIVES_PROPOSAL.md": "a575e4aaaaeadf47a08aee4ae1512f9b42488a28c80f44d4c35e10ba36dcbf9d"
       }
     },
@@ -2921,7 +2921,7 @@
       "source_hashes": {
         "docs/DECISIONS.md": "cc0f8756406a674b97a51086e70a7e16dac231de0ec07f39b45963eb03497ea6",
         "docs/design/DEV_MENU.md": "5639235808c5f82c4c73649560a1ded833272f62136277ca18a95a6881097cea",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba"
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
       }
     },
     "03 Sistemas/Perfil e telemetria.md": {
@@ -2936,7 +2936,7 @@
         "game/core/profile.gd": "b1d7db83319d3f35efb9e48e871c3699fab96d0b7b8bfb97b1dcb0ab8a9c85e3",
         "game/core/run_context.gd": "db4b46d58e0852411af03225dcca78e560a10414f49625313c9ce632ce1ea6ba",
         "docs/tech/COMBAT_CATALOG.md": "e594e5445e9ac3fbbb771703d2b502a924f29a536d89ed51a58e1ac3d26c83bc",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba"
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
       }
     },
     "04 Arte e interface/Arte e interface.md": {
@@ -2990,7 +2990,7 @@
       ],
       "source_hashes": {
         "docs/DECISIONS.md": "cc0f8756406a674b97a51086e70a7e16dac231de0ec07f39b45963eb03497ea6",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba",
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
         "docs/design/MENUS.md": "f1c53268bda7159eafb1872543069261404487b31acb303e99c1bcba18daadcc",
         "docs/tech/ARMORY_REDESIGN.md": "093b47b276edd787cdcb476a0c324b58bcc3b73b244c283cb0694a6d922e5a09"
       }
@@ -3026,7 +3026,7 @@
         "docs/tech/WEAPON_MODELS.md": "5291d5164f724f40d374c9c088a6f4dcdd10b648e6840b169b6bcd619f35851d",
         "docs/tech/LOCOMOTION.md": "23d15aec8739b517874feadd8306553227ff74a7d5783631b6b35b7395d5bc3b",
         "docs/tech/MODELS_ROUND_BRIEF.md": "31c2e84843c0babc1d2b0e6e6cf3c8fa43e889015dad76b8db232329e03143ed",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba"
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
       }
     },
     "04 Arte e interface/Ilhas e cenário.md": {
@@ -3039,7 +3039,7 @@
       ],
       "source_hashes": {
         "docs/DECISIONS.md": "cc0f8756406a674b97a51086e70a7e16dac231de0ec07f39b45963eb03497ea6",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba",
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
         "docs/tech/REALISTIC_PROPS.md": "1b8521044d9aca2d3d2585e3045e8e577f151089fc558ad260383aecd044f7bd",
         "docs/tech/MAPS_HANDOFF.md": "6b70d1dcdeadd7fe25e40ed7dd6b5cee1e6b094fdf07def7f3cadd987f90565c"
       }
@@ -3058,7 +3058,7 @@
         "game/audio/music.gd": "73ba1aef61a4e88b8f81722e1763f0d2d6b4f614761382537b1d1afeabe5c281",
         "game/audio/ambience.gd": "57e43e252b862d30783626daf16bf28b3ec8d87bd2ab63916fdfeb9a1fd07609",
         "game/README.md": "29f864b2a11e4740a8a7ea09553072f9e2a5d045a3137d8aacef13057af02c27",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba"
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
       }
     },
     "04 Arte e interface/Assets e licenças.md": {
@@ -3109,7 +3109,7 @@
       ],
       "source_hashes": {
         "AGENTS.md": "adab8d05f49a29db5299d59d78dd15c51e48b1b98d85d836677727ff67593d50",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba"
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
       }
     },
     "05 Desenvolvimento/Desempenho.md": {
@@ -3121,7 +3121,7 @@
       ],
       "source_hashes": {
         "game/README.md": "29f864b2a11e4740a8a7ea09553072f9e2a5d045a3137d8aacef13057af02c27",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba",
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
         "docs/tech/ENGINE_MIGRATION.md": "15cf6ccff834d0f89f7438582cd7cdb9806b45daf8847b5e91f866b5d27db90c"
       }
     },
@@ -3149,7 +3149,7 @@
       ],
       "source_hashes": {
         "project.godot": "aa5b2fb428c9f17fda4f92971a0e21a152317b13521b1a9567639367dedc3e7e",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba",
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
         "tools/export/README.md": "bddf4f37dd845007c61dcbe9386a561a9e87237e8aaac3860d926c37ced1774c",
         "docs/design/DEV_MENU.md": "5639235808c5f82c4c73649560a1ded833272f62136277ca18a95a6881097cea",
         "docs/tech/CREDITS.md": "6e165f2f120c653f46bdd1411032e312d500e5f5b4324b427eb4a4f086d3808f"
@@ -3165,7 +3165,7 @@
       "source_hashes": {
         "CLAUDE.md": "2eaf3ef4d42450666c3d60305b8f059f21ded96b21eab00882326880541d5757",
         "AGENTS.md": "adab8d05f49a29db5299d59d78dd15c51e48b1b98d85d836677727ff67593d50",
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba"
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
       }
     },
     "05 Desenvolvimento/Como usar e atualizar o cofre.md": {
@@ -3175,7 +3175,7 @@
         "AGENTS.md"
       ],
       "source_hashes": {
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba",
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
         "AGENTS.md": "adab8d05f49a29db5299d59d78dd15c51e48b1b98d85d836677727ff67593d50"
       }
     },
@@ -3185,7 +3185,7 @@
         "TODO.md"
       ],
       "source_hashes": {
-        "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba"
+        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
       }
     },
     "80 Trabalho/Ideias e propostas.md": {
@@ -3219,7 +3219,7 @@
       "source_hashes": {}
     },
     "90 Referências/Índice de fontes.md": {
-      "sha256": "914a4bc0515f969487978772a9d7025ee23cfaf42175b3e58bd630ae84d24bef",
+      "sha256": "0ed7ee667ec7a048d85877ae6de8f8e2f596dfa6ce13c81bee5ee67ddd29cd19",
       "sources": [],
       "source_hashes": {}
     },
@@ -3227,17 +3227,90 @@
       "sha256": "a1217d34c9cc028e0e59dd26068ea9a1f464229de95c6d8425f029711fa43f00",
       "sources": [],
       "source_hashes": {}
+    },
+    "90 Referências/assets/models/environment/extraction_test_arena/README.md": {
+      "sha256": "1fcf431e715a7e6c3714db62da8e95a949df7e9c6bde3f33f14703db3781a565",
+      "sources": [
+        "assets/models/environment/extraction_test_arena/README.md"
+      ],
+      "source_hashes": {
+        "assets/models/environment/extraction_test_arena/README.md": "16c35e2b14ef50c103c8a31eb00d84496926d1b29c684580dbfb307fb435470c"
+      }
+    },
+    "90 Referências/docs/history/2026-11-14_ASSETS2GODOT_HANDOFF.md": {
+      "sha256": "032b867797cf241e765cc5ccba8261187ab7b91028c5fee526d6e583b28e89cd",
+      "sources": [
+        "docs/history/2026-11-14_ASSETS2GODOT_HANDOFF.md"
+      ],
+      "source_hashes": {
+        "docs/history/2026-11-14_ASSETS2GODOT_HANDOFF.md": "8a4e3d266ec3e31ba79589f872410c67109daabc566c6a26bddccccbe52e0730"
+      }
+    },
+    "90 Referências/docs/history/2026-11-14_BEACH_VISUAL_PILOT_HANDOFF.md": {
+      "sha256": "b027d7c0c83ef548f3934c761decb2c6eaf80f4d87993da040f3ee18576e6c3e",
+      "sources": [
+        "docs/history/2026-11-14_BEACH_VISUAL_PILOT_HANDOFF.md"
+      ],
+      "source_hashes": {
+        "docs/history/2026-11-14_BEACH_VISUAL_PILOT_HANDOFF.md": "68bd22b4b10ea427410d9749939255a046cc9f22d9138bde0555be292a6b35e8"
+      }
+    },
+    "90 Referências/docs/history/beach_pilot_20261114/CLAUDE_PLAN.md": {
+      "sha256": "67d303340247bce6fbf84aeee574ecc53d06b3e6c9855e01c76c983bcb212d27",
+      "sources": [
+        "docs/history/beach_pilot_20261114/CLAUDE_PLAN.md"
+      ],
+      "source_hashes": {
+        "docs/history/beach_pilot_20261114/CLAUDE_PLAN.md": "0866555f3cde7fa558481cdcff78520482d27024a8b0d1e8d459f9fdd02386c8"
+      }
+    },
+    "90 Referências/docs/history/beach_pilot_20261114/CLAUDE_REVIEW.md": {
+      "sha256": "e2f1b2ee85078fab6d92a6c0f2550fff614ca22330ee5be05e4b78476f8f9233",
+      "sources": [
+        "docs/history/beach_pilot_20261114/CLAUDE_REVIEW.md"
+      ],
+      "source_hashes": {
+        "docs/history/beach_pilot_20261114/CLAUDE_REVIEW.md": "05a5050a72c891daadf8c28e0aab760a9d107695eed8abf8b9e65d6f4afe5798"
+      }
+    },
+    "90 Referências/docs/tech/ASSETS2GODOT.md": {
+      "sha256": "37a921a727a48261d5c7e621dc0556c5aab51e37b7c3b16b3d03db105dcb79de",
+      "sources": [
+        "docs/tech/ASSETS2GODOT.md"
+      ],
+      "source_hashes": {
+        "docs/tech/ASSETS2GODOT.md": "5ab3131998e48a698693aaf2de2899629448f600a6535dbb2312e56aa0e033f3"
+      }
+    },
+    "90 Referências/docs/tech/BEACH_VISUAL_PILOT.md": {
+      "sha256": "b4275239a285a1eee9f0e38fa3f88cef79a14567b2a57b07348ad6bd82c1933c",
+      "sources": [
+        "docs/tech/BEACH_VISUAL_PILOT.md"
+      ],
+      "source_hashes": {
+        "docs/tech/BEACH_VISUAL_PILOT.md": "e64f04d38a4247d5ecbb8e1a372728b5a76f5a7be948b2260c82319c7d6de868"
+      }
+    },
+    "90 Referências/docs/tech/MAP_VISUAL_REWORK.md": {
+      "sha256": "ebe34eb14c1454c87d20219d7cbe18695795b8757c6ea0972efc9f2949e2051a",
+      "sources": [
+        "docs/tech/MAP_VISUAL_REWORK.md"
+      ],
+      "source_hashes": {
+        "docs/tech/MAP_VISUAL_REWORK.md": "0d02cc17e944b755c9408b888b3e2f8c497f8449e28c87c3991edcb0acf291bc"
+      }
     }
   },
   "sources": {
     "AGENTS.md": "adab8d05f49a29db5299d59d78dd15c51e48b1b98d85d836677727ff67593d50",
     "CLAUDE.md": "2eaf3ef4d42450666c3d60305b8f059f21ded96b21eab00882326880541d5757",
     "README.md": "91a76cd3408fb82e1d134bc8ac8ae49c5a5348bdd965f0fff04e25055e03214f",
-    "TODO.md": "0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba",
-    "assets/LICENSES.md": "effc1a9da9bb2534ff721089bd4b8312919a20c2b5dcc6696bc074a382eeba48",
+    "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
+    "assets/LICENSES.md": "4af3fe9ae00415da9c94b08ddf0b7ef79815db163b8863767839fc79ccc90b98",
     "assets/models/characters/arms_firstperson_original/NOTES.md": "8c997ce5713f52e79713ce92d5fde9aacf834d076ac8833b23ca82828e182b01",
     "assets/models/characters/crawler_original/NOTES.md": "4b57bab84dd1ff1b71a80ca69f934884c5a9b834aca2e87fa19370bdd7e1fcbb",
     "assets/models/characters/weapon_grips_original/NOTES.md": "9eeac7c4f875aaf424d037391951b0c40d588dc319e2283b763923506c39d706",
+    "assets/models/environment/extraction_test_arena/README.md": "16c35e2b14ef50c103c8a31eb00d84496926d1b29c684580dbfb307fb435470c",
     "assets/models/environment/original_scenery_kit/README.md": "08d557c554958999ebc2945de1c0350881a7b7c1854b713b1264a740e66ebfbc",
     "assets/models/environment/original_scenery_kit/jev/README.md": "58982424715c2349bb89779be7965f4d1ddfce8c912c8ca5886d788d827ca851",
     "assets/models/weapons/tactical_original/NOTES.md": "99df5dd095d859253dfe2f2273506159241a7925ca8fd1210255c3ec63b61344",
@@ -3262,6 +3335,8 @@
     "docs/design/weapon_grips/README.md": "f2b448d838e2a6f409ff12e6698870b4f7fb098dedc75b60da58f2471019dc82",
     "docs/engine-reference/godot/VERSION.md": "e056f696d9cb5b543e6c69527a564ad42997a15cf1f978830c1658b32cd8b37a",
     "docs/engine-reference/godot/breaking-changes.md": "f0c7c97b8e016df69406da77e3672e91d8de3eddd86cba33be24dcd80edb0368",
+    "docs/history/2026-11-14_ASSETS2GODOT_HANDOFF.md": "8a4e3d266ec3e31ba79589f872410c67109daabc566c6a26bddccccbe52e0730",
+    "docs/history/2026-11-14_BEACH_VISUAL_PILOT_HANDOFF.md": "68bd22b4b10ea427410d9749939255a046cc9f22d9138bde0555be292a6b35e8",
     "docs/history/ANALISE_AGENTES_2026-11-04.md": "def5f2735d8a7b8f8401c3c3cb1ebacddbcdf632f80562b3b3593561b6bfc000",
     "docs/history/ANALISE_DO_JOGO_2026-10-23.md": "a08c14630c9c192d7bad5bfc04ddc7b792f30d15551acf32cb25b9bddac54c04",
     "docs/history/CODEX_HANDOFF_2026-10-10.md": "a54bbf07326b354940bfb44159f7bd6dd8e21f055d1c793116eb5c1bb62dc1c3",
@@ -3270,6 +3345,8 @@
     "docs/history/README.md": "5adb91f20fbb5862ec31dac9fa9e09ee9ab1d1961f7608a018b70b67f180bcc7",
     "docs/history/RELOAD_ARM_CLIPS_RESUME_2026-10-21.md": "6eb8d45a552e975c829b6226bbef339b1e30889fe3892c67b2f38691cdaa35cb",
     "docs/history/REVIEW_2026-10-05.md": "08fe799a838126eec8ecac8984d69c18423071f5dbc041cbe5a5aa3a396b0efa",
+    "docs/history/beach_pilot_20261114/CLAUDE_PLAN.md": "0866555f3cde7fa558481cdcff78520482d27024a8b0d1e8d459f9fdd02386c8",
+    "docs/history/beach_pilot_20261114/CLAUDE_REVIEW.md": "05a5050a72c891daadf8c28e0aab760a9d107695eed8abf8b9e65d6f4afe5798",
     "docs/legacy/ARCHIPELAGO_GAMEPLAY_PLAN.md": "17c258c4a59bbc4a90dd4633b54857c75069622a1545f3c40c8b35f1d9388407",
     "docs/legacy/CONTENT_EXPANSION_PLAN.md": "39cc497304886fd70e4935d0dbfac11bbe1151812d387c9e433e3bd92a090fbe",
     "docs/legacy/GDD.md": "5512621e102533ec64aab5568f653ebb825acccfc32f0de3f5f8613c6b11ac1d",
@@ -3287,6 +3364,8 @@
     "docs/tech/ARCHITECTURE.md": "7ba11e39684d4332ef55b86378d0dd30a3f64fab68c14b9aaf548bc709bc636e",
     "docs/tech/ARMORY_REDESIGN.md": "093b47b276edd787cdcb476a0c324b58bcc3b73b244c283cb0694a6d922e5a09",
     "docs/tech/ASSETS.md": "248e12f46eab984818b026a31e61294948670ede842414023a2c32f622d1a06c",
+    "docs/tech/ASSETS2GODOT.md": "5ab3131998e48a698693aaf2de2899629448f600a6535dbb2312e56aa0e033f3",
+    "docs/tech/BEACH_VISUAL_PILOT.md": "e64f04d38a4247d5ecbb8e1a372728b5a76f5a7be948b2260c82319c7d6de868",
     "docs/tech/CARDS_IMPLEMENTATION.md": "008c2f05451add444cf081851196769a88dd2e6d137c540ffa41db5b37a8d3fc",
     "docs/tech/COMBAT_CATALOG.md": "e594e5445e9ac3fbbb771703d2b502a924f29a536d89ed51a58e1ac3d26c83bc",
     "docs/tech/CRAWLER_MODEL_BRIEF.md": "075d4307ae8e381244ef2689e5764c27ccac83e258e277aef5f5d4d15cb45b18",
@@ -3295,6 +3374,7 @@
     "docs/tech/GAME_AUDIT.md": "6b85b447527b3e7970337537409633fc2c3c0c317740216bed3a12316e69692e",
     "docs/tech/LOCOMOTION.md": "23d15aec8739b517874feadd8306553227ff74a7d5783631b6b35b7395d5bc3b",
     "docs/tech/MAPS_HANDOFF.md": "6b70d1dcdeadd7fe25e40ed7dd6b5cee1e6b094fdf07def7f3cadd987f90565c",
+    "docs/tech/MAP_VISUAL_REWORK.md": "0d02cc17e944b755c9408b888b3e2f8c497f8449e28c87c3991edcb0acf291bc",
     "docs/tech/MODELS_ROUND_BRIEF.md": "31c2e84843c0babc1d2b0e6e6cf3c8fa43e889015dad76b8db232329e03143ed",
     "docs/tech/MULTIPLAYER.md": "56f984c9d73291391ae541679714e8c77607805ac70a6521c7e0b30c3ee12bd1",
     "docs/tech/PLUGINS_REVIEW.md": "742f6eb39458d9ffbcb1947e1cd9e6ec9dc4ba18ab1fbb31a894096469e3087e",
@@ -3495,7 +3575,7 @@
     "game/world/grading.gd": "1607e9de7a389de453e256a1755040b49593f9764092a63fc88034891369ec3b",
     "game/world/handmade/handmade_island.gd": "03fe4dbb578d00d5fc3b10718bbccc602796ab580c96c53d09adaf00e481992b",
     "game/world/handmade/scatter.gd": "1c93e13a96500df9ede45d9a49af2a2065d593008d61ed4bf054b7d1864b4555",
-    "game/world/island.gd": "58b3ea93ebe5631f31f8d01bd88e2053d7429e14d6f513044a4fe5f35428f421",
+    "game/world/island.gd": "f702bc1adc85b7155ae39e19d5a996ee401a6ddb983d790edd274475dafd37f9",
     "game/world/island_map.gd": "6a0265ebf027b566ab85efe3104b60e981719484af1b2bff73bfb7e178b9e217",
     "game/world/island_props.gd": "90056241144afe324f6b67e5404f4029a06977663265f458061397c08bbe19bf",
     "game/world/island_roads.gd": "67576f90957bf6543cecc0090768d722dfaa3ed4776068edd7a33edb7163f545",
@@ -3614,16 +3694,20 @@
     "docs/design/dossier_20261111/armory_perks.png": "2964b7af7eb92fec4b19f2f6d801edd9c4909d9af7e67bec818f869e41534361"
   },
   "report": {
-    "written": [],
+    "written": [
+      "90 Referências/TODO.md",
+      "90 Referências/assets/LICENSES.md",
+      "90 Referências/docs/tech/BEACH_VISUAL_PILOT.md",
+      "05 Desenvolvimento/Mapa do código.md"
+    ],
     "unchanged": [
       "90 Referências/AGENTS - referência.md",
       "90 Referências/CLAUDE - referência.md",
       "90 Referências/README.md",
-      "90 Referências/TODO.md",
-      "90 Referências/assets/LICENSES.md",
       "90 Referências/assets/models/characters/arms_firstperson_original/NOTES.md",
       "90 Referências/assets/models/characters/crawler_original/NOTES.md",
       "90 Referências/assets/models/characters/weapon_grips_original/NOTES.md",
+      "90 Referências/assets/models/environment/extraction_test_arena/README.md",
       "90 Referências/assets/models/environment/original_scenery_kit/README.md",
       "90 Referências/assets/models/environment/original_scenery_kit/jev/README.md",
       "90 Referências/assets/models/weapons/tactical_original/NOTES.md",
@@ -3648,6 +3732,8 @@
       "90 Referências/docs/design/weapon_grips/README.md",
       "90 Referências/docs/engine-reference/godot/VERSION.md",
       "90 Referências/docs/engine-reference/godot/breaking-changes.md",
+      "90 Referências/docs/history/2026-11-14_ASSETS2GODOT_HANDOFF.md",
+      "90 Referências/docs/history/2026-11-14_BEACH_VISUAL_PILOT_HANDOFF.md",
       "90 Referências/docs/history/ANALISE_AGENTES_2026-11-04.md",
       "90 Referências/docs/history/ANALISE_DO_JOGO_2026-10-23.md",
       "90 Referências/docs/history/CODEX_HANDOFF_2026-10-10.md",
@@ -3656,6 +3742,8 @@
       "90 Referências/docs/history/README.md",
       "90 Referências/docs/history/RELOAD_ARM_CLIPS_RESUME_2026-10-21.md",
       "90 Referências/docs/history/REVIEW_2026-10-05.md",
+      "90 Referências/docs/history/beach_pilot_20261114/CLAUDE_PLAN.md",
+      "90 Referências/docs/history/beach_pilot_20261114/CLAUDE_REVIEW.md",
       "90 Referências/docs/legacy/ARCHIPELAGO_GAMEPLAY_PLAN.md",
       "90 Referências/docs/legacy/CONTENT_EXPANSION_PLAN.md",
       "90 Referências/docs/legacy/GDD.md",
@@ -3673,6 +3761,7 @@
       "90 Referências/docs/tech/ARCHITECTURE.md",
       "90 Referências/docs/tech/ARMORY_REDESIGN.md",
       "90 Referências/docs/tech/ASSETS.md",
+      "90 Referências/docs/tech/ASSETS2GODOT.md",
       "90 Referências/docs/tech/CARDS_IMPLEMENTATION.md",
       "90 Referências/docs/tech/COMBAT_CATALOG.md",
       "90 Referências/docs/tech/CRAWLER_MODEL_BRIEF.md",
@@ -3681,6 +3770,7 @@
       "90 Referências/docs/tech/GAME_AUDIT.md",
       "90 Referências/docs/tech/LOCOMOTION.md",
       "90 Referências/docs/tech/MAPS_HANDOFF.md",
+      "90 Referências/docs/tech/MAP_VISUAL_REWORK.md",
       "90 Referências/docs/tech/MODELS_ROUND_BRIEF.md",
       "90 Referências/docs/tech/MULTIPLAYER.md",
       "90 Referências/docs/tech/PLUGINS_REVIEW.md",
@@ -3822,7 +3912,6 @@
       "02 Conteúdo/Modificadores/Modificador - short.md",
       "02 Conteúdo/Modificadores/Modificador - swarm.md",
       "02 Conteúdo/Modificadores.md",
-      "05 Desenvolvimento/Mapa do código.md",
       "05 Desenvolvimento/Inventário de testes.md",
       "02 Conteúdo/Mapas/Mapa - beach_01.md",
       "02 Conteúdo/Mapas/Mapa - jungle_01.md",
@@ -3860,7 +3949,6 @@
       "04 Arte e interface/Modelos e animação.md",
       "04 Arte e interface/Ilhas e cenário.md",
       "04 Arte e interface/Áudio e diálogos.md",
-      "04 Arte e interface/Assets e licenças.md",
       "05 Desenvolvimento/Desenvolvimento.md",
       "05 Desenvolvimento/Arquitetura observada.md",
       "05 Desenvolvimento/Testes e validação.md",
@@ -3879,7 +3967,14 @@
       "90 Referências/Índice de fontes.md",
       "Mapa do projeto.canvas"
     ],
-    "protected_user_edits": [],
-    "source_changes": []
+    "protected_user_edits": [
+      "04 Arte e interface/Assets e licenças.md"
+    ],
+    "source_changes": [
+      "TODO.md",
+      "assets/LICENSES.md",
+      "docs/tech/BEACH_VISUAL_PILOT.md",
+      "game/world/island.gd"
+    ]
   }
 }

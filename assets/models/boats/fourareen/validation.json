@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "model": "fourareen_boat",
+  "credit": "\"Venus\", a Shetland fourareen, Scottish Maritime Museum, CC0-1.0, https://sketchfab.com/3d-models/venus-a-shetland-fourareen-ce4d6915e1d041459e08f2d8da521e86",
+  "source_triangles": 49996,
+  "triangles": 5983,
+  "materials": [
+    "Material_25"
+  ],
+  "textures": [
+    {
+      "name": "Material_25_baseColor.png",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "Material_25_normal.png",
+      "width": 1024,
+      "height": 1024
+    }
+  ],
+  "size_blender_xyz_m": [
+    5.385,
+    1.575,
+    1.204
+  ],
+  "pivot": "centre of the base (lowest point)",
+  "glb_bytes": 473352,
+  "glb_sha256": "0d668c6f112344bfdbd37c09df972b8f57ddfe731fb617d7e17f24e72f4d3b92"
+}

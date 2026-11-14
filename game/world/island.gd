@@ -134,6 +134,8 @@ var _generators: Array[MeshInstance3D] = []
 var _generator_rings: Array[MeshInstance3D] = []
 var _boat_ring: MeshInstance3D
 var _boat: MeshInstance3D
+var _pier: Node3D  ## the pier's sections; null without the prepared models
+var _moor_out: float = 3.0  ## metres from the Boat marker out to the moored boat (see _build_pier)
 ## Expedition parts: a post with a ring at the Exit (the path to the next part).
 var _exit_post: MeshInstance3D
 var _defend_ring: MeshInstance3D
@@ -457,15 +459,25 @@ func _build_world() -> void:
 	_survivor_last = _on_ground(run.survivor_pos)
 
 	var boat := MeshInstance3D.new()
-	var hull := BoxMesh.new()
-	hull.size = Vector3(4, 1.2, 8)
-	boat.mesh = hull
 	boat.position = _boat_spot()
 	boat.rotation.y = atan2(run.map.boat_dir.x, run.map.boat_dir.z)
-	boat.material_override = _mat(Color(0.45, 0.3, 0.18))
+	if ResourceLoader.exists(BOAT_MODEL):
+		# The fourareen (CC0, tools/assets/prepare_boat_and_pier.py): its keel BOAT_DRAFT under the sea.
+		var hull_model: Node3D = (load(BOAT_MODEL) as PackedScene).instantiate()
+		hull_model.name = "BoatModel"
+		hull_model.scale = Vector3.ONE * BOAT_SCALE
+		hull_model.rotation.y = PI * 0.5  # the model lies along X; the boat points along the marker's Z
+		hull_model.position.y = SEA_Y - BOAT_DRAFT - 0.3  # the boat node itself bobs around y 0.3
+		boat.add_child(hull_model)
+	else:
+		var hull := BoxMesh.new()
+		hull.size = Vector3(4, 1.2, 8)
+		boat.mesh = hull
+		boat.material_override = _mat(Color(0.45, 0.3, 0.18))
 	boat.visible = run.shows_boat()
 	add_child(boat)
 	_boat = boat
+	_build_pier()
 	# The extraction ring: at the Exit on expedition parts, else at the boat.
 	_boat_ring = _ring(run.extraction_point(), GameData.BOAT_RADIUS, Color(0.3, 1, 0.4))
 	_boat_ring.visible = false
@@ -859,12 +871,15 @@ const ISLAND_HOURS: Array[float] = [9.0, 16.5, 16.25]
 const HORROR_HOUR: float = 4.4
 const HORROR_FOG_DENSITY: float = 0.008  ## haze far away: thin
 const HORROR_FOG_HEIGHT: float = 0.0  ## metres: the layer starts at the ground
-const HORROR_FOG_HEIGHT_DENSITY: float = -0.15  ## how much denser the layer is near the ground
+const HORROR_FOG_HEIGHT_DENSITY: float = -0.07  ## how much denser the layer is near the ground (was -0.15: it hid the ground itself)
 const HORROR_FOG_SKY_AFFECT: float = 0.3  ## the sky is hardly fogged
 const HORROR_FOG_COLOUR: Color = Color(0.36, 0.41, 0.47)
 const HORROR_LIGHT_COLOUR: Color = Color(0.7, 0.8, 0.95)
-const HORROR_LIGHT_ENERGY: float = 0.35  ## a weak backlight, not a sun
+const HORROR_LIGHT_ENERGY: float = 0.5  ## a weak backlight, not a sun
 const HORROR_AMBIENT_ENERGY: float = 1.3  ## the scene's own light, up from Sky3D's 1.0: it read underexposed
+## The colour of that light. At the preset's hour the sky is almost black, and a light taken from it
+## left the ground and the soldier unreadable (the pilot's captures): a cold fill of its own instead.
+const HORROR_AMBIENT_COLOUR: Color = Color(0.3, 0.36, 0.47)
 const HORROR_LIGHT_PITCH: float = -7.0  ## degrees below the horizontal
 const HORROR_MUSIC_DELAY: float = 60.0
 var _horror_light: DirectionalLight3D  ## the preset's backlight (see _process)
@@ -912,6 +927,8 @@ func _apply_horror_light(env: Environment) -> void:
 	env.fog_height_density = HORROR_FOG_HEIGHT_DENSITY
 	env.fog_sky_affect = HORROR_FOG_SKY_AFFECT
 	env.fog_light_color = HORROR_FOG_COLOUR
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = HORROR_AMBIENT_COLOUR
 	env.ambient_light_energy = HORROR_AMBIENT_ENERGY
 
 
@@ -2898,14 +2915,54 @@ func _draw_nests() -> void:
 		_nest_fills[n].scale = Vector3(maxf(0.001, frac), 1.0, 1.0)
 
 
+## The extraction boat and its pier (prepared models; without them, a box and no pier).
+const BOAT_MODEL: String = "res://assets/models/boats/fourareen/fourareen_boat.glb"
+const PIER_MODEL: String = "res://assets/models/polyhaven/modular_wooden_pier/wooden_pier_section.glb"
+const SEA_Y: float = -0.3  ## the sea's surface, as HandmadeIsland.sea_level
+const BOAT_SCALE: float = 1.5  ## the fourareen is 5.4 m long; the boat reads at about 8 m
+const BOAT_DRAFT: float = 0.35  ## metres of hull under the water
+const BOAT_BESIDE_PIER: float = 3.0  ## metres from the pier's centre line to the boat's
+const PIER_SECTIONS_MAX: int = 8
+const MOOR_PAST_SHORE: float = 3.5  ## the boat's centre, this far past the first sea cell
+const PIER_SECTION_LENGTH: float = 2.9  ## metres between two sections of the modular pier
+const PIER_DECK_HEIGHT: float = 2.6  ## the deck above the base of its poles, in the model
+const PIER_DECK_Y: float = 0.35  ## the deck in the world: just above the shore
+
+
+## A short pier from the Boat marker out to sea, the boat moored beside it. Decoration: the sea
+## cells under it stay blocked, and it shows with the boat.
+func _build_pier() -> void:
+	if not ResourceLoader.exists(PIER_MODEL) or not ResourceLoader.exists(BOAT_MODEL):
+		return
+	_pier = Node3D.new()
+	_pier.name = "Pier"
+	_pier.position = Vector3(run.map.boat.x, PIER_DECK_Y - PIER_DECK_HEIGHT, run.map.boat.z)
+	_pier.rotation.y = atan2(run.map.boat_dir.x, run.map.boat_dir.z)
+	_pier.visible = run.shows_boat() and run.mission != &"holdout"
+	add_child(_pier)
+	# The marker stands on the shore: the pier runs out to where the water is, and the boat moors there.
+	var shore: float = 0.0
+	while shore < 20.0 and not run.field.is_blocked(int(run.map.boat.x + run.map.boat_dir.x * shore), int(run.map.boat.z + run.map.boat_dir.z * shore)):
+		shore += 1.0
+	_moor_out = maxf(3.0, shore + MOOR_PAST_SHORE)
+	var section: PackedScene = load(PIER_MODEL)
+	for k in mini(PIER_SECTIONS_MAX, ceili((_moor_out + 2.0) / PIER_SECTION_LENGTH)):
+		var piece: Node3D = section.instantiate()
+		piece.position.z = PIER_SECTION_LENGTH * (k + 0.5)
+		_pier.add_child(piece)
+	_boat.position = _boat_spot()  # now beside the pier, out where the water is
+
+
 ## Where the boat model floats: moored 3 m out from the Boat marker; the
 ## holdout's rescue boat starts 90 m out to sea and glides in as it arrives.
 func _boat_spot() -> Vector3:
-	var out: float = 3.0
+	var out: float = _moor_out
 	if run.mission == &"holdout":
 		var t: float = run.boat_arrival()
-		out = lerpf(90.0, 3.0, 1.0 - (1.0 - t) * (1.0 - t))  # eases into the pier
+		out = lerpf(90.0, _moor_out, 1.0 - (1.0 - t) * (1.0 - t))  # eases into the pier
 	var p: Vector3 = run.map.boat + run.map.boat_dir * out
+	if _pier != null and _pier.visible:
+		p += Vector3(run.map.boat_dir.z, 0, -run.map.boat_dir.x) * BOAT_BESIDE_PIER  # alongside the pier
 	return Vector3(p.x, 0.3 + sin(Time.get_ticks_msec() * 0.0015) * 0.08, p.z)
 
 
@@ -2968,6 +3025,8 @@ func _draw_mission() -> void:
 	if run.mission == &"holdout":
 		# The rescue boat sails in from the sea to the pier once called.
 		_boat.visible = run.shows_boat()
+		if _pier != null:
+			_pier.visible = _boat.visible and run.mission != &"holdout"
 		_boat.position = _boat_spot()
 	for c in _caches.size():
 		var opened: bool = run.cache_progress[c] >= GameData.CACHE_OPEN_TIME

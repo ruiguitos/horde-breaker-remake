@@ -12,7 +12,7 @@ fontes: ["TODO.md"]
 > [!warning] Cópia de consulta
 > Esta é uma cópia de consulta. A fonte continua no repositório; mudanças nesta cópia não alteram o original. O único backlog ativo é `TODO.md` na raiz; não gerir tarefas nesta cópia.
 
-Fonte: `TODO.md` · SHA-256: `0fca50729debcf6a508be4c24ebf4a426e4c5062530e721b91717fe1f391e1ba`
+Fonte: `TODO.md` · SHA-256: `e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85`
 
 # TODO
 
@@ -133,6 +133,10 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
   Ver `docs/tech/BEACH_VISUAL_PILOT.md`. Falta aprovação visual a jogar, remodelar
   casas/barco/pontes ainda geométricos, vegetação de maior porte e costa menos regular;
   só depois estender a town/jungle/port/volcano. Não alterar layouts nesta fase.
+  Luz do horror corrigida a 2026-11-14 (cor ambiente própria, névoa do chão mais fina): ver a
+  jogar. Barco de extração e cais preparados e em jogo a 2026-11-14 (todas as ilhas com barco):
+  ver a jogar, afastar o barco do afloramento na `beach_01`, e decidir se a ponte usa as
+  mesmas secções do cais. Seguem-se vegetação maior, casas e torre, e falésias.
 - [ ] Vista geral do mapa antes de partir: desenhar a ilha real a partir da grelha da cena
   (`HandmadeIsland.grid_image`) em vez das manchas de `game/ui/route_map.gd`.
 - [ ] Objetivos variados: feito em 2026-11-10 na `beach_01` (seis geradores, cada run usa três,

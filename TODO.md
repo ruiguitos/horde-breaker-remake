@@ -117,6 +117,10 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
   Ver `docs/tech/BEACH_VISUAL_PILOT.md`. Falta aprovação visual a jogar, remodelar
   casas/barco/pontes ainda geométricos, vegetação de maior porte e costa menos regular;
   só depois estender a town/jungle/port/volcano. Não alterar layouts nesta fase.
+  Luz do horror corrigida a 2026-11-14 (cor ambiente própria, névoa do chão mais fina): ver a
+  jogar. Barco de extração e cais preparados e em jogo a 2026-11-14 (todas as ilhas com barco):
+  ver a jogar, afastar o barco do afloramento na `beach_01`, e decidir se a ponte usa as
+  mesmas secções do cais. Seguem-se vegetação maior, casas e torre, e falésias.
 - [ ] Vista geral do mapa antes de partir: desenhar a ilha real a partir da grelha da cena
   (`HandmadeIsland.grid_image`) em vez das manchas de `game/ui/route_map.gd`.
 - [ ] Objetivos variados: feito em 2026-11-10 na `beach_01` (seis geradores, cada run usa três,
