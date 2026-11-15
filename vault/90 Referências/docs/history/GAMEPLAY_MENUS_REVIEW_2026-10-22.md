@@ -2,7 +2,7 @@
 titulo: "docs/history/GAMEPLAY_MENUS_REVIEW_2026-10-22.md"
 tipo: "referencia"
 estado: "relatorio_historico"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["docs/history/GAMEPLAY_MENUS_REVIEW_2026-10-22.md"]
 ---

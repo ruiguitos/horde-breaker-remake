@@ -2,7 +2,7 @@
 titulo: "Biomas"
 tipo: "mapa"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "biomes"]
 fontes: ["game/data/biomes/beach.tres", "game/data/biomes/jungle.tres", "game/data/biomes/port.tres", "game/data/biomes/town.tres", "game/data/biomes/volcano.tres"]
 ---

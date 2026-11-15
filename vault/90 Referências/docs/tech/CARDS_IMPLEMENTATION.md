@@ -2,7 +2,7 @@
 titulo: "docs/tech/CARDS_IMPLEMENTATION.md"
 tipo: "referencia"
 estado: "referencia_a_confrontar"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["docs/tech/CARDS_IMPLEMENTATION.md"]
 ---

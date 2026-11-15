@@ -2,7 +2,7 @@
 titulo: "Power-up — MAX SHIELD"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "power_ups"]
 fontes: ["game/data/power_ups/max_shield.tres", "game/data/resources/power_up_data.gd"]
 ---

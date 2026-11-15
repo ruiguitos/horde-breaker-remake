@@ -2,7 +2,7 @@
 titulo: "Combate e movimento"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["game/data/game_data.gd", "game/world/island_run.gd", "docs/DECISIONS.md", "docs/tech/COMBAT_CATALOG.md"]
 ---

@@ -2,7 +2,7 @@
 titulo: "Missões"
 tipo: "mapa"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "missions"]
 fontes: ["game/data/missions/activate.tres", "game/data/missions/defend.tres", "game/data/missions/escort.tres", "game/data/missions/fuel_run.tres", "game/data/missions/hold_sequence.tres", "game/data/missions/holdout.tres", "game/data/missions/intel_search.tres", "game/data/missions/nests.tres", "game/data/missions/rescue.tres", "game/data/missions/sabotage.tres", "game/data/missions/signals.tres"]
 ---

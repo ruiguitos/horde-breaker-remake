@@ -2,7 +2,7 @@
 titulo: "Classe — Vanguard"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "classes"]
 fontes: ["game/data/classes/vanguard.tres", "game/data/resources/class_data.gd"]
 ---

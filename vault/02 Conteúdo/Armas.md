@@ -2,7 +2,7 @@
 titulo: "Armas"
 tipo: "mapa"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "weapons"]
 fontes: ["game/data/weapons/machine_gun.tres", "game/data/weapons/marksman.tres", "game/data/weapons/rifle.tres", "game/data/weapons/shotgun.tres", "game/data/weapons/smg.tres"]
 ---

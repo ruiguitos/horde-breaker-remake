@@ -2,7 +2,7 @@
 titulo: "Áudio e diálogos"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["game/audio/sfx.gd", "game/audio/music.gd", "game/audio/ambience.gd", "game/README.md", "TODO.md"]
 ---

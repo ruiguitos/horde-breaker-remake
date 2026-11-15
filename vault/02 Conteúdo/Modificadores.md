@@ -2,7 +2,7 @@
 titulo: "Modificadores"
 tipo: "mapa"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "modifiers"]
 fontes: ["game/data/modifiers/calm.tres", "game/data/modifiers/elite.tres", "game/data/modifiers/fog.tres", "game/data/modifiers/short.tres", "game/data/modifiers/swarm.tres"]
 ---

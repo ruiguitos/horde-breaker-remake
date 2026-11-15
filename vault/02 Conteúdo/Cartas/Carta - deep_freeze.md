@@ -2,7 +2,7 @@
 titulo: "Carta — Deep Freeze"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "cards"]
 fontes: ["game/data/cards/deep_freeze.tres", "game/data/resources/card_data.gd"]
 ---

@@ -187,6 +187,20 @@ kit CC0.
 - A pasta de origem do barco chama-se `assets/source/polyhaven/venus_a_shetland_fourareen`, mas o
   modelo não é do Poly Haven: a licença que o acompanha indica o Sketchfab.
 
+**Casas e vegetação (2026-11-15).** No script de autoria (`tools/dev/beach_dressing.gd`):
+
+- Cada casa ganhou um soco de pedra ao longo da base, uma pedra de cunhal em cada canto e um degrau
+  à porta (`_house_volume`), no material de pedra já usado na torre. Sobressaem 6 cm das paredes no
+  máximo e não fazem parte de `Buildings`, por isso a grelha e os caminhos não mudam.
+- 140 plantas baixas do kit de natureza (arbustos, fetos e uma planta de folha larga, até 1,1 m),
+  junto a paredes, falésias e rochas, metade delas à volta das casas e da torre (`_plants`). São
+  decoração: a horda passa por elas, como pela erva, e não dão caixas à câmara.
+- Cada planta é um nó próprio. O writer corre sem janela, e aí um MultiMesh não guarda as posições:
+  na primeira versão as plantas ficaram todas na origem. Custa cerca de 140 draw calls; não medido.
+- Corrigido o renumerar dos ids da cena gravada (`_canonical_scene`): um id já com o nome final
+  juntava dois recursos num só, e as fachadas perdiam as texturas.
+- Captura: `houses_and_plants.png`. Os arbustos saem avermelhados; falta ver a jogar e decidir.
+
 ### O que continua por fazer
 
 A costa conserva o contorno e o terreno anteriores; há transições de falésia

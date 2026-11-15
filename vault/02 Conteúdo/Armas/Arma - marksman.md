@@ -2,7 +2,7 @@
 titulo: "Arma — Marksman Rifle"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "weapons"]
 fontes: ["game/data/weapons/marksman.tres", "game/data/resources/weapon_data.gd"]
 ---

@@ -2,7 +2,7 @@
 titulo: "Classes"
 tipo: "mapa"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "classes"]
 fontes: ["game/data/classes/recruit.tres", "game/data/classes/vanguard.tres"]
 ---

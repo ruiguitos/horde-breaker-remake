@@ -2,7 +2,7 @@
 titulo: "docs/COLLABORATIVE-DESIGN-PRINCIPLE.md"
 tipo: "referencia"
 estado: "referencia_a_confrontar"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["docs/COLLABORATIVE-DESIGN-PRINCIPLE.md"]
 ---

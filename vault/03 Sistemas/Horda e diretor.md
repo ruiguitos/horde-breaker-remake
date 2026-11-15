@@ -2,7 +2,7 @@
 titulo: "Horda e diretor"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["game/world/director.gd", "game/world/island_run.gd", "game/world/zombie_model.gd", "TODO.md", "docs/tech/SPECIAL_ENEMY_MODELS.md"]
 ---

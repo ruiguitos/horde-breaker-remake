@@ -2,7 +2,7 @@
 titulo: "Fontes e divergências"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["docs/DECISIONS.md", "game/README.md", "docs/tech/COMBAT_CATALOG.md", "game/data/resources/perk_data.gd", "game/data/game_data.gd", "tests/run_all.gd"]
 ---

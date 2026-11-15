@@ -2,7 +2,7 @@
 titulo: "Bioma — Coastal Town"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "biomes"]
 fontes: ["game/data/biomes/town.tres", "game/data/resources/biome_data.gd"]
 ---

@@ -2,7 +2,7 @@
 titulo: "Cartas"
 tipo: "mapa"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "cards"]
 fontes: ["game/data/cards/adrenaline.tres", "game/data/cards/aftershock.tres", "game/data/cards/battle_rhythm.tres", "game/data/cards/bigger_mags.tres", "game/data/cards/catch_your_breath.tres", "game/data/cards/chain_lightning.tres", "game/data/cards/concussion.tres", "game/data/cards/crowd_splitter.tres", "game/data/cards/deep_freeze.tres", "game/data/cards/executioner.tres", "game/data/cards/explosive_heads.tres", "game/data/cards/fast_hands.tres", "game/data/cards/fast_learner.tres", "game/data/cards/field_dressing.tres", "game/data/cards/finish_the_job.tres", "game/data/cards/fire_rounds.tres", "game/data/cards/frost_rounds.tres", "game/data/cards/grenadier.tres", "game/data/cards/hollow_points.tres", "game/data/cards/intimidation.tres", "game/data/cards/kill_rations.tres", "game/data/cards/light_boots.tres", "game/data/cards/magnet.tres", "game/data/cards/piercing_rounds.tres", "game/data/cards/point_blank.tres", "game/data/cards/quick_breaker.tres", "game/data/cards/rally.tres", "game/data/cards/ricochet.tres", "game/data/cards/second_breath.tres", "game/data/cards/shockwave.tres", "game/data/cards/steady_aim.tres", "game/data/cards/storm_rounds.tres", "game/data/cards/thick_hide.tres", "game/data/cards/toxic_cloud.tres", "game/data/cards/toxic_rounds.tres", "game/data/cards/vampire.tres", "game/data/cards/wide_blast.tres", "game/data/cards/wildfire.tres", "game/data/cards/wind_rounds.tres"]
 ---

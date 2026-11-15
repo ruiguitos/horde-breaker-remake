@@ -2,7 +2,7 @@
 titulo: "Perk — Archivist"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "perks"]
 fontes: ["game/data/perks/archivist.tres", "game/data/resources/perk_data.gd"]
 ---

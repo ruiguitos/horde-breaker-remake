@@ -2,7 +2,7 @@
 titulo: "Menus e HUD"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["docs/DECISIONS.md", "TODO.md", "docs/design/MENUS.md", "docs/tech/ARMORY_REDESIGN.md"]
 ---

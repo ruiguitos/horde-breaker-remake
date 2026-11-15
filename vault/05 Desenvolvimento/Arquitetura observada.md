@@ -2,7 +2,7 @@
 titulo: "Arquitetura observada"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["project.godot", "docs/tech/ARCHITECTURE.md", "docs/registry/architecture.yaml", "docs/architecture/tr-registry.yaml", "game/world/island_run.gd"]
 ---

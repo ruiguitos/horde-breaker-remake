@@ -2,7 +2,7 @@
 titulo: "Intel e perks"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["game/data/game_data.gd", "game/data/resources/perk_data.gd", "game/core/profile.gd", "docs/design/CARDS_WEAPONS_PERKS.md"]
 ---

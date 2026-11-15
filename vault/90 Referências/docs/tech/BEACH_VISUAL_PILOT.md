@@ -2,7 +2,7 @@
 titulo: "docs/tech/BEACH_VISUAL_PILOT.md"
 tipo: "referencia"
 estado: "referencia_a_confrontar"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["docs/tech/BEACH_VISUAL_PILOT.md"]
 ---
@@ -12,7 +12,7 @@ fontes: ["docs/tech/BEACH_VISUAL_PILOT.md"]
 > [!warning] Cópia de consulta
 > Esta é uma cópia de consulta. A fonte continua no repositório; mudanças nesta cópia não alteram o original.
 
-Fonte: `docs/tech/BEACH_VISUAL_PILOT.md` · SHA-256: `e64f04d38a4247d5ecbb8e1a372728b5a76f5a7be948b2260c82319c7d6de868`
+Fonte: `docs/tech/BEACH_VISUAL_PILOT.md` · SHA-256: `1af86bf78ed7e4dc419f6a86a02f1c854973db18c0faac2fc19104dbaafd956b`
 
 # Piloto visual beach_01
 
@@ -198,10 +198,24 @@ kit CC0.
   mar, em secções de 2,9 m (8 no máximo); o barco fica amarrado ao lado, na ponta.
 - É decoração: o cais não muda a grelha e não se anda nele. Na Holdout o cais não aparece e o
   barco chega como antes.
-- Captura: `docs/design/beach_pilot_20261114/boat_and_pier.png`. Nessa captura o barco toca num
-  afloramento do dressing; falta afastar um do outro.
+- Captura: `docs/design/beach_pilot_20261114/boat_and_pier.png`. O barco amarra do lado do cais
+  mais afastado das rochas (`_clear_side`).
 - A pasta de origem do barco chama-se `assets/source/polyhaven/venus_a_shetland_fourareen`, mas o
   modelo não é do Poly Haven: a licença que o acompanha indica o Sketchfab.
+
+**Casas e vegetação (2026-11-15).** No script de autoria (`tools/dev/beach_dressing.gd`):
+
+- Cada casa ganhou um soco de pedra ao longo da base, uma pedra de cunhal em cada canto e um degrau
+  à porta (`_house_volume`), no material de pedra já usado na torre. Sobressaem 6 cm das paredes no
+  máximo e não fazem parte de `Buildings`, por isso a grelha e os caminhos não mudam.
+- 140 plantas baixas do kit de natureza (arbustos, fetos e uma planta de folha larga, até 1,1 m),
+  junto a paredes, falésias e rochas, metade delas à volta das casas e da torre (`_plants`). São
+  decoração: a horda passa por elas, como pela erva, e não dão caixas à câmara.
+- Cada planta é um nó próprio. O writer corre sem janela, e aí um MultiMesh não guarda as posições:
+  na primeira versão as plantas ficaram todas na origem. Custa cerca de 140 draw calls; não medido.
+- Corrigido o renumerar dos ids da cena gravada (`_canonical_scene`): um id já com o nome final
+  juntava dois recursos num só, e as fachadas perdiam as texturas.
+- Captura: `houses_and_plants.png`. Os arbustos saem avermelhados; falta ver a jogar e decidir.
 
 ### O que continua por fazer
 

@@ -2,7 +2,7 @@
 titulo: "docs/history/ANALISE_AGENTES_2026-11-04.md"
 tipo: "referencia"
 estado: "relatorio_historico"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["docs/history/ANALISE_AGENTES_2026-11-04.md"]
 ---

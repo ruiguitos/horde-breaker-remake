@@ -2,7 +2,7 @@
 titulo: "Situação atual"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["TODO.md", "docs/DECISIONS.md", "tests/run_all.gd"]
 ---

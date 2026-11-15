@@ -2,7 +2,7 @@
 titulo: "docs/history/RELOAD_ARM_CLIPS_RESUME_2026-10-21.md"
 tipo: "referencia"
 estado: "relatorio_historico"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["docs/history/RELOAD_ARM_CLIPS_RESUME_2026-10-21.md"]
 ---

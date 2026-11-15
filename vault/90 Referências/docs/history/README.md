@@ -2,7 +2,7 @@
 titulo: "docs/history/README.md"
 tipo: "referencia"
 estado: "relatorio_historico"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["docs/history/README.md"]
 ---

@@ -2,7 +2,7 @@
 titulo: "Perfil e telemetria"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["game/core/profile.gd", "game/core/run_context.gd", "docs/tech/COMBAT_CATALOG.md", "TODO.md"]
 ---

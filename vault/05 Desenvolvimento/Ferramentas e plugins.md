@@ -2,7 +2,7 @@
 titulo: "Ferramentas e plugins"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["project.godot", "docs/tech/AGENT_FRAMEWORK.md", "docs/tech/PLUGINS_REVIEW.md"]
 ---

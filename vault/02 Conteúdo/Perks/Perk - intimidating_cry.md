@@ -2,7 +2,7 @@
 titulo: "Perk — Intimidating Cry"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "perks"]
 fontes: ["game/data/perks/intimidating_cry.tres", "game/data/resources/perk_data.gd"]
 ---

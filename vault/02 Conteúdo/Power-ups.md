@@ -2,7 +2,7 @@
 titulo: "Power-ups"
 tipo: "mapa"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "power_ups"]
 fontes: ["game/data/power_ups/double_rewards.tres", "game/data/power_ups/extra_reroll.tres", "game/data/power_ups/full_power.tres", "game/data/power_ups/insta_kill.tres", "game/data/power_ups/max_ammo.tres", "game/data/power_ups/max_shield.tres", "game/data/power_ups/nuke.tres"]
 ---

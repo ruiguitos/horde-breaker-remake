@@ -2,7 +2,7 @@
 titulo: "Projeto"
 tipo: "mapa"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "navegacao"]
 fontes: ["CLAUDE.md", "project.godot"]
 ---

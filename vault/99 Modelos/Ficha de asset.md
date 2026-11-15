@@ -2,7 +2,7 @@
 titulo: "Ficha de asset"
 tipo: "modelo"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: []
 ---

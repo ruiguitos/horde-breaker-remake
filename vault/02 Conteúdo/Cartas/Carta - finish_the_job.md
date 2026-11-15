@@ -2,7 +2,7 @@
 titulo: "Carta — Finish the Job"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "cards"]
 fontes: ["game/data/cards/finish_the_job.tres", "game/data/resources/card_data.gd"]
 ---

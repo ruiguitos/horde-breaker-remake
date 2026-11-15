@@ -2,7 +2,7 @@
 titulo: "Power-ups e pickups"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["docs/tech/POWER_UPS_AND_DEFEAT.md", "docs/DECISIONS.md", "game/data/game_data.gd"]
 ---

@@ -2,7 +2,7 @@
 titulo: "Mapas e expedições"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["docs/design/WORLD_AND_MISSIONS.md", "docs/design/BERLENGA_EXPEDITION.md", "docs/design/DEV_MENU.md"]
 ---

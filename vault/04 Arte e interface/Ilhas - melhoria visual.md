@@ -45,6 +45,9 @@ Entrega e prompt para Claude: `docs/history/2026-11-14_BEACH_VISUAL_PILOT_HANDOF
 - **Barco e cais feitos (2026-11-14):** o fourareen e uma secção do cais modular foram
   preparados (5983 e 2484 triângulos, texturas a 1K) e aparecem no ponto de extração de todas as
   ilhas com barco. Captura: `docs/design/beach_pilot_20261114/boat_and_pier.png`.
+- **Casas e plantas (2026-11-15):** soco de pedra, cunhais e degrau em cada casa; 140 plantas
+  baixas junto a paredes, falésias e rochas, metade à volta da aldeia. Captura:
+  `docs/design/beach_pilot_20261114/houses_and_plants.png`.
 - Não houve parecer JEV novo nesta revisão; o último é o 07.
 
 Terrain3D, Sky3D, Road Generator e Color Grading já estão ativos. ProtonScatter

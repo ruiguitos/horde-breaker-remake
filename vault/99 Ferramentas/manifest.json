@@ -1,8 +1,8 @@
 {
-  "date": "2026-11-14",
+  "date": "2026-11-15",
   "notes": {
     "90 Referências/AGENTS - referência.md": {
-      "sha256": "9f14087bc804021505c56d942033117358e9e874d39fc73bfe5afc1a3daa273b",
+      "sha256": "2aa48579ba0cee10c0b08f1da3f244001e972a84a0e67ee14b1c9f813dc1e2f2",
       "sources": [
         "AGENTS.md"
       ],
@@ -11,7 +11,7 @@
       }
     },
     "90 Referências/CLAUDE - referência.md": {
-      "sha256": "2364ed0cc3d78ad057c3e495c0b0f287b4f2bbd0c348f6c26499cf884d1c2c77",
+      "sha256": "f44fa9ad442d1d79521e53c38a26bc0b30fde75dcc39ddeecf81b0aad807462c",
       "sources": [
         "CLAUDE.md"
       ],
@@ -20,7 +20,7 @@
       }
     },
     "90 Referências/README.md": {
-      "sha256": "e985c53d4076af6b1920e91874a86d5c940d8eb411ac756758e3667bf5a5a4ad",
+      "sha256": "8f91116ebc1efe7eb83b3596d535e29d6980c3a8c5d9a15d500b402d19594231",
       "sources": [
         "README.md"
       ],
@@ -29,16 +29,16 @@
       }
     },
     "90 Referências/TODO.md": {
-      "sha256": "efb706f61ecca3b2a331a3ba021740f8336516a90890492d884d94d1566e4771",
+      "sha256": "08c125e1363406c669f76639ed4e8cc27b9e1f753697dd5369aa1547df351007",
       "sources": [
         "TODO.md"
       ],
       "source_hashes": {
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e"
       }
     },
     "90 Referências/assets/LICENSES.md": {
-      "sha256": "74bc9cf5d25fbc12fa3e0a7576db825191cdefc12012adb36e158b09541bc611",
+      "sha256": "e0f20c04f7e3e4a5fd921a3dcf962d891fef363e5f1fc6aa90562dddfeb94c1b",
       "sources": [
         "assets/LICENSES.md"
       ],
@@ -47,7 +47,7 @@
       }
     },
     "90 Referências/assets/models/characters/arms_firstperson_original/NOTES.md": {
-      "sha256": "2291886e31b8acda56a9974c114b8cc486b2005ba7220992905d34457cc44e39",
+      "sha256": "6c7a2fa43fecee5a51ada4aa56e7351103ff72df5725b7c8b8de922a421f1cda",
       "sources": [
         "assets/models/characters/arms_firstperson_original/NOTES.md"
       ],
@@ -56,7 +56,7 @@
       }
     },
     "90 Referências/assets/models/characters/crawler_original/NOTES.md": {
-      "sha256": "078d65d4df939a74816211600a8e44c6f9bc77fecf50b4a58756cb7e49136ca2",
+      "sha256": "29e5942f107cc32c72aeb692a51b4bc32b2d7a2a290985533e15a1fb53903064",
       "sources": [
         "assets/models/characters/crawler_original/NOTES.md"
       ],
@@ -65,7 +65,7 @@
       }
     },
     "90 Referências/assets/models/characters/weapon_grips_original/NOTES.md": {
-      "sha256": "699e603028b6bc6ee7636a73b0b033dd8d9d4d0e3a6ee95fddea1070e7d7dd55",
+      "sha256": "8763413ca3a70465881340e2fb2c6c1f18140edc12e5adfb5343242c387fdd18",
       "sources": [
         "assets/models/characters/weapon_grips_original/NOTES.md"
       ],
@@ -74,7 +74,7 @@
       }
     },
     "90 Referências/assets/models/environment/original_scenery_kit/README.md": {
-      "sha256": "b5f7821f88e6956673c51b7d314ced5aaa286fc37f8b5b78031141265638b5bc",
+      "sha256": "b84362321a777a12bc3873da903e8cf8b9fe3984ca496a54ca139c574fa3913f",
       "sources": [
         "assets/models/environment/original_scenery_kit/README.md"
       ],
@@ -83,7 +83,7 @@
       }
     },
     "90 Referências/assets/models/environment/original_scenery_kit/jev/README.md": {
-      "sha256": "4cb782c02552731d86d48a944943de5911ecc8f4a6a2831c7fa45959624d1223",
+      "sha256": "163a6a975f585e2deb95892ff1e5c77245e8d425aa9394fa0bcfbd4f872f706d",
       "sources": [
         "assets/models/environment/original_scenery_kit/jev/README.md"
       ],
@@ -92,7 +92,7 @@
       }
     },
     "90 Referências/assets/models/weapons/tactical_original/NOTES.md": {
-      "sha256": "18fe5c338874467f34e59d17c64ad3404eb5a98799f9d3cc3cf026561b0a7be7",
+      "sha256": "aa40ee479b10f456f8944f677d0740c0518804d51a57f9a3cbbf7ae6161d286e",
       "sources": [
         "assets/models/weapons/tactical_original/NOTES.md"
       ],
@@ -101,7 +101,7 @@
       }
     },
     "90 Referências/docs/COLLABORATIVE-DESIGN-PRINCIPLE.md": {
-      "sha256": "cca6b373d41a625c836cd475ec48ff60b46dd2ca30946c9a48494498384beb38",
+      "sha256": "6881ed4e1d96f762cf06980dcb9b2bd6b88bba755f6d2e5f40a158893e3e1e9e",
       "sources": [
         "docs/COLLABORATIVE-DESIGN-PRINCIPLE.md"
       ],
@@ -110,7 +110,7 @@
       }
     },
     "90 Referências/docs/DECISIONS.md": {
-      "sha256": "cd052b2fa9ec3977d51baf9cf06466ebb2b54eb93feb8fe8ebf07b9c09163198",
+      "sha256": "37292e4446da6ae75d659355b4fa1bd9955129ebe1bd2abfa28414a15a11e625",
       "sources": [
         "docs/DECISIONS.md"
       ],
@@ -119,7 +119,7 @@
       }
     },
     "90 Referências/docs/WORKFLOW-GUIDE.md": {
-      "sha256": "233556111f08d9b79d41ebbd937c399e460767a4ceeede25b672d2ca06d51aa3",
+      "sha256": "f5a90ff2a39501e1dfaaf8c84e4181511c1fd78e0a02fc6aad686c2043e68e0f",
       "sources": [
         "docs/WORKFLOW-GUIDE.md"
       ],
@@ -128,7 +128,7 @@
       }
     },
     "90 Referências/docs/architecture/tr-registry.yaml.md": {
-      "sha256": "c248474f100a1946171bd2e71c40b4f89574ef57474542a28f46ffb93807f600",
+      "sha256": "5dc6293fbbeb3042d5b912e72d3c240ef0f295fe829253b704e834de2d12bc6f",
       "sources": [
         "docs/architecture/tr-registry.yaml"
       ],
@@ -137,7 +137,7 @@
       }
     },
     "90 Referências/docs/design/BERLENGA_EXPEDITION.md": {
-      "sha256": "d8f2e64a8530dba3ef9cdbdb3744cecf52d48a3e53e96cbf4cc8665857c1745b",
+      "sha256": "c3c938016d1945a8700eae4ca8ed9e1a764f0235225a7fe53867ae2783b4ba27",
       "sources": [
         "docs/design/BERLENGA_EXPEDITION.md"
       ],
@@ -146,7 +146,7 @@
       }
     },
     "90 Referências/docs/design/BRAINSTORM.md": {
-      "sha256": "fac34f91e2e41f6af397356c7f5d2669a551592ee020824901c3a1444b8b497c",
+      "sha256": "a721ff02545ad13624c0efee576a9fd4b8375ed2b220ef63c89160744e2b0711",
       "sources": [
         "docs/design/BRAINSTORM.md"
       ],
@@ -155,7 +155,7 @@
       }
     },
     "90 Referências/docs/design/CAMERA_CONTROLS_HUD.md": {
-      "sha256": "4a4d0fc0bd497f47d332f7d8518e393714904c1bfd121274dae6fd28267dc8b5",
+      "sha256": "c6c6570f50592585049df2dc2b08c036c6e639dd154a9a1ba1ff4361eef7adb3",
       "sources": [
         "docs/design/CAMERA_CONTROLS_HUD.md"
       ],
@@ -164,7 +164,7 @@
       }
     },
     "90 Referências/docs/design/CARDS_WEAPONS_PERKS.md": {
-      "sha256": "33902de20f8c789f6a03d8345bf371490e51ea4c67e92670539fbfdf2b33b337",
+      "sha256": "22833875dad1232c916a6736e5319252a8ac95eb07760cb471210df54155133a",
       "sources": [
         "docs/design/CARDS_WEAPONS_PERKS.md"
       ],
@@ -173,7 +173,7 @@
       }
     },
     "90 Referências/docs/design/COMBAT_AND_ENEMIES.md": {
-      "sha256": "b06e74cd7667886bc325d67652ca7d420573ca9461e85f94c37aea872d403263",
+      "sha256": "a41ab53622b19a22f932db3bf997c01b024d6ed443a37d2461a3b02b5677c8d0",
       "sources": [
         "docs/design/COMBAT_AND_ENEMIES.md"
       ],
@@ -182,7 +182,7 @@
       }
     },
     "90 Referências/docs/design/COOP_PROPOSAL.md": {
-      "sha256": "c0e2fc99d078f8d2be6c8dc14d33390db8d140c35d38f2f8781e57a0cd9ce2a0",
+      "sha256": "e1d05dcae09182840c6e003c78dd3b09390d2a65c9557d24c14ef6fd9e66e0a4",
       "sources": [
         "docs/design/COOP_PROPOSAL.md"
       ],
@@ -191,7 +191,7 @@
       }
     },
     "90 Referências/docs/design/DEV_MENU.md": {
-      "sha256": "094d7d82a1681f7f10e616d983f0a87b47b221bf4cdbd84990837862df60a2b3",
+      "sha256": "89dab977ae35f29cd9488ae24fb8c596b57f9dacff787c44803c0d6ae17b8e78",
       "sources": [
         "docs/design/DEV_MENU.md"
       ],
@@ -200,7 +200,7 @@
       }
     },
     "90 Referências/docs/design/GDD.md": {
-      "sha256": "9db7d3ed73d55c04be604ff35a8ac883ce2d9b28c05ad6dffd5ddced920de7bf",
+      "sha256": "bfd0b4b85899d5f0cd80523e8af6cdcc76c7bd3bedca0e99e15c3b9f1a3cf64d",
       "sources": [
         "docs/design/GDD.md"
       ],
@@ -209,7 +209,7 @@
       }
     },
     "90 Referências/docs/design/MENUS.md": {
-      "sha256": "71023ca4162f147ac81a04d8c04718067e881aeabdd2c27fd1ce29cfc9178aed",
+      "sha256": "b422b3e4babf816eec7261e01030451b2c4a989964bce21e9b254a5865ec963f",
       "sources": [
         "docs/design/MENUS.md"
       ],
@@ -218,7 +218,7 @@
       }
     },
     "90 Referências/docs/design/OBJECTIVES_PROPOSAL.md": {
-      "sha256": "e7f4c2c53693c7e005511525f26248cddfd79693ba98ea35017b61a0ae5d7e75",
+      "sha256": "f7942d02494b838f1ca9de648175c7292b3e98c1f81611d853e7f5509cf5dcb2",
       "sources": [
         "docs/design/OBJECTIVES_PROPOSAL.md"
       ],
@@ -227,7 +227,7 @@
       }
     },
     "90 Referências/docs/design/PROGRESSION_AND_ECONOMY.md": {
-      "sha256": "7799aee3c5ba9ddeeaf81d64201807c721ba27c48dc4a15a4217fab01fa6b991",
+      "sha256": "9f1566c92ab634eb23c7a72cb229254b314df7671638082467ea04656c11aaff",
       "sources": [
         "docs/design/PROGRESSION_AND_ECONOMY.md"
       ],
@@ -236,7 +236,7 @@
       }
     },
     "90 Referências/docs/design/WORLD_AND_MISSIONS.md": {
-      "sha256": "458ca28f796fa0a3dba0edde4f6be10751c3219f98ce96d8cfc9229bd6ca473b",
+      "sha256": "3f9bc85035ec63959f14e5563eae20bcee19ca4f2ff797628cbbb38e5e148e4d",
       "sources": [
         "docs/design/WORLD_AND_MISSIONS.md"
       ],
@@ -245,7 +245,7 @@
       }
     },
     "90 Referências/docs/design/first_person_arms/CODEX_REVIEW.md": {
-      "sha256": "9643bde2038f4b193d947240195fd2cd59e3d15a188f510fbc287e081d826666",
+      "sha256": "bacb4f423e6290ebad633a7e192a11c260a7b8569eca7058c51115827d0fbc17",
       "sources": [
         "docs/design/first_person_arms/CODEX_REVIEW.md"
       ],
@@ -254,7 +254,7 @@
       }
     },
     "90 Referências/docs/design/weapon_ads/README.md": {
-      "sha256": "61d3c3e230e68a930f4e620b790cce6f527d32afa97825d5d25c801c533ce8f0",
+      "sha256": "ccde8faa656256e1f0673e3bb4ebec7daa71e625a2bc732e9aa837ffd96b9b1f",
       "sources": [
         "docs/design/weapon_ads/README.md"
       ],
@@ -263,7 +263,7 @@
       }
     },
     "90 Referências/docs/design/weapon_grips/README.md": {
-      "sha256": "5f114fc805d8e03e705a1b7dfa8fcdfe9205c3d20b5abf14814b0ba9e60ed718",
+      "sha256": "d279162d666a12bdd88b0586509ade9d6eaf934437344467d271f0f24bdd9bbc",
       "sources": [
         "docs/design/weapon_grips/README.md"
       ],
@@ -272,7 +272,7 @@
       }
     },
     "90 Referências/docs/engine-reference/godot/VERSION.md": {
-      "sha256": "2d424afbe3772ff45d44a7d36538a9f598f80021800dceaee5cefa9264fedb85",
+      "sha256": "bb37ae2623f30e63fe67170a986a39bb11206d1790f0213bed4282314a2f973c",
       "sources": [
         "docs/engine-reference/godot/VERSION.md"
       ],
@@ -281,7 +281,7 @@
       }
     },
     "90 Referências/docs/engine-reference/godot/breaking-changes.md": {
-      "sha256": "50a6ae3d39729231f6414e16f9f9099dec8f365094aab682b6665355e18756e4",
+      "sha256": "9f8e631dbc0d2ab6b5af269ae306926f1644694109d1993f0fb2331fc5e2dced",
       "sources": [
         "docs/engine-reference/godot/breaking-changes.md"
       ],
@@ -290,7 +290,7 @@
       }
     },
     "90 Referências/docs/history/ANALISE_AGENTES_2026-11-04.md": {
-      "sha256": "b73f12e2e0b389cfa547390dda7651f788f312dda71a32da787c32a92c60d9e7",
+      "sha256": "8aa0d23ff03e1b5b09e73b7ce80226968442011bd81fa60bd5f93ef87bcb0eec",
       "sources": [
         "docs/history/ANALISE_AGENTES_2026-11-04.md"
       ],
@@ -299,7 +299,7 @@
       }
     },
     "90 Referências/docs/history/ANALISE_DO_JOGO_2026-10-23.md": {
-      "sha256": "31168a456334f30abd410f4a41d40667215187cc49b16322d732cb6a43b84a1c",
+      "sha256": "50c75ada5bf50ce4bf7eb371ff6caced5e2d24941258e6a20cf6e7fc8c070281",
       "sources": [
         "docs/history/ANALISE_DO_JOGO_2026-10-23.md"
       ],
@@ -308,7 +308,7 @@
       }
     },
     "90 Referências/docs/history/CODEX_HANDOFF_2026-10-10.md": {
-      "sha256": "a364cdf4a89855318653e3090e18fe02eb19fd9d82ba606c9254c02dca507496",
+      "sha256": "ef3db0fbb4d3deba36752b74058f5afea72eb102e3b65011113088267d12d2ed",
       "sources": [
         "docs/history/CODEX_HANDOFF_2026-10-10.md"
       ],
@@ -317,7 +317,7 @@
       }
     },
     "90 Referências/docs/history/CODEX_PENDING_2026-10-20.md": {
-      "sha256": "3e29814f1518fb6d718968df0cdf678bd961afd0982d1aeb710c47a18eff656b",
+      "sha256": "673916399a2d5eebb349333533f78df9c08a94941974635ec18a72e801d68128",
       "sources": [
         "docs/history/CODEX_PENDING_2026-10-20.md"
       ],
@@ -326,7 +326,7 @@
       }
     },
     "90 Referências/docs/history/GAMEPLAY_MENUS_REVIEW_2026-10-22.md": {
-      "sha256": "81456f2d7a0e38f9ea6f5fd494e8c4135d54a8f5ae1b400083de57e206423479",
+      "sha256": "2cee730d9117b40595df06b3be3a181aeb03f7b89e56107f318e6ebe809ae7d7",
       "sources": [
         "docs/history/GAMEPLAY_MENUS_REVIEW_2026-10-22.md"
       ],
@@ -335,7 +335,7 @@
       }
     },
     "90 Referências/docs/history/README.md": {
-      "sha256": "b75a3afdc12b7dc3caaf53952b013d2da6ec5379f3a1646b4009bd55089eb067",
+      "sha256": "af8fe6e29e14f15539ae97c1da6408141bc65713c88869c6da32f92eb5754d96",
       "sources": [
         "docs/history/README.md"
       ],
@@ -344,7 +344,7 @@
       }
     },
     "90 Referências/docs/history/RELOAD_ARM_CLIPS_RESUME_2026-10-21.md": {
-      "sha256": "02e0ed4a37fa30c9e81e5185287334385fd4c583a36abc2251f699dedae029b9",
+      "sha256": "a10984b49bf441cdc278f0ef0774f2e7c349a4a26d9ffc740ed847856a0b44c5",
       "sources": [
         "docs/history/RELOAD_ARM_CLIPS_RESUME_2026-10-21.md"
       ],
@@ -353,7 +353,7 @@
       }
     },
     "90 Referências/docs/history/REVIEW_2026-10-05.md": {
-      "sha256": "e4751022525e065238c90db8e3712beb5f4ef09baecc9f7143b3efea4187da51",
+      "sha256": "e52aff9971400d896bba4e196fd3e7778031531cf8eb2321ceb381d705a23751",
       "sources": [
         "docs/history/REVIEW_2026-10-05.md"
       ],
@@ -362,7 +362,7 @@
       }
     },
     "90 Referências/docs/legacy/ARCHIPELAGO_GAMEPLAY_PLAN.md": {
-      "sha256": "a233f9e658e80da7a733d5fc44267b6ed91821f81b158273cbfce59664ee6df1",
+      "sha256": "e0108d36ee853de490e300928520f857b0683ea156ab82797b4f0c453235d141",
       "sources": [
         "docs/legacy/ARCHIPELAGO_GAMEPLAY_PLAN.md"
       ],
@@ -371,7 +371,7 @@
       }
     },
     "90 Referências/docs/legacy/CONTENT_EXPANSION_PLAN.md": {
-      "sha256": "ce38aafaa9aa4ff283c008bc76661a613abbebd12c74fb89175e3f0cff3b4dd3",
+      "sha256": "1898d05c8be7de3f4de62fc335c3d989aa2b71eafd81fd604b8ef313c3121e74",
       "sources": [
         "docs/legacy/CONTENT_EXPANSION_PLAN.md"
       ],
@@ -380,7 +380,7 @@
       }
     },
     "90 Referências/docs/legacy/GDD.md": {
-      "sha256": "94726fc2f7069366e253f581d35ed31cf52a74c22d4fcd1e19d505cc81b9aa4d",
+      "sha256": "fdd0897367e2ab2544d8681bdadd1eca1abfaebe58d45b216e91d389e92ff754",
       "sources": [
         "docs/legacy/GDD.md"
       ],
@@ -389,7 +389,7 @@
       }
     },
     "90 Referências/docs/legacy/HUD_AND_OUTER_MISSIONS.md": {
-      "sha256": "61766682f10382da840eea59bfe67e1d4e990554de2fc70e8f49f182dfd74980",
+      "sha256": "682d1bf1c44a2a4e63556c9441eca8c3bddec1db40bbeff711e2f50da7dfb8d4",
       "sources": [
         "docs/legacy/HUD_AND_OUTER_MISSIONS.md"
       ],
@@ -398,7 +398,7 @@
       }
     },
     "90 Referências/docs/legacy/INSPIRATIONS.md": {
-      "sha256": "17022d62ec04175ab566b80e83113fdada1ecae47fe63a13d9dd562f793f1e18",
+      "sha256": "896c2d079623c5dc56cc16b68c85577fc9629381f906e2ead5c4e2ed3b7c7cc6",
       "sources": [
         "docs/legacy/INSPIRATIONS.md"
       ],
@@ -407,7 +407,7 @@
       }
     },
     "90 Referências/docs/legacy/MAP_DESIGN.md": {
-      "sha256": "39dcd0f3557238dbd1674a9acb0cb61c2e3edd74bd3fdac6c2dd7f3ced1ca443",
+      "sha256": "33f26f657fd71f763d7a39d353234f76b3b42a598c79465e5ca96f933301e49d",
       "sources": [
         "docs/legacy/MAP_DESIGN.md"
       ],
@@ -416,7 +416,7 @@
       }
     },
     "90 Referências/docs/legacy/PROJECT_AUDIT.md": {
-      "sha256": "c192e4bef0c7a6ee7ba30d8ca323739967c7b6f0d0bd2641af5bd711b82928ad",
+      "sha256": "99abc8693fe4085334591dcb5a6cf7e556619d6bb87bf0d2148f73e142a7a7b4",
       "sources": [
         "docs/legacy/PROJECT_AUDIT.md"
       ],
@@ -425,7 +425,7 @@
       }
     },
     "90 Referências/docs/legacy/README.md": {
-      "sha256": "e9ea52c3c6bd280005daa913e48cab6c58d6603c90bd454a02991a961f7a6637",
+      "sha256": "8483dd92494c5aa397dd15187c51bf8fbf681e8b611bf7b3dd69d6d351c7c570",
       "sources": [
         "docs/legacy/README.md"
       ],
@@ -434,7 +434,7 @@
       }
     },
     "90 Referências/docs/legacy/ROADMAP.md": {
-      "sha256": "54dd814e848ea4f31a4a9075eaa26c4c11a0789f9d43551a7ecf4028a837e603",
+      "sha256": "5e4bcce77be0c57af0c33d353fadf9ab4eb7559a20effbd11c0fefb66f347469",
       "sources": [
         "docs/legacy/ROADMAP.md"
       ],
@@ -443,7 +443,7 @@
       }
     },
     "90 Referências/docs/legacy/SCRAP_EXPEDITION_PLAN.md": {
-      "sha256": "4a56f315d5531fc52382b56f927ae17cc8afdce24de2220ddd13fd2beb4a3cb5",
+      "sha256": "67fdcd9eb2dd134cc37f564c4442a6495bf9964a951ec3893522c54d21529c07",
       "sources": [
         "docs/legacy/SCRAP_EXPEDITION_PLAN.md"
       ],
@@ -452,7 +452,7 @@
       }
     },
     "90 Referências/docs/legacy/SKILL_TREE_EXPANSION_PROPOSAL.md": {
-      "sha256": "411e97192471117944d5f21cb127669792989fef87b483179901e094f1e08d33",
+      "sha256": "35a61983c8cecab3640dead1289caa2355dd1f7b9735a983b6b7e6ef82d600a6",
       "sources": [
         "docs/legacy/SKILL_TREE_EXPANSION_PROPOSAL.md"
       ],
@@ -461,7 +461,7 @@
       }
     },
     "90 Referências/docs/registry/architecture.yaml.md": {
-      "sha256": "89252347d504202bed5bafff8be9589325e3e51e7357e6a2aa970502c5a57158",
+      "sha256": "6439f8f25de7d1090472ede991e10d5a48a1fa990883b79da8e3b76a2bdc7adf",
       "sources": [
         "docs/registry/architecture.yaml"
       ],
@@ -470,7 +470,7 @@
       }
     },
     "90 Referências/docs/skill-flow-diagrams.md": {
-      "sha256": "1fb5c05bde956e67b1ab296e737d7e6949b379efa95be2efff8c98474601cd20",
+      "sha256": "7629637ccefc89ea9a2950530a1d3fb7da1983e55c8206725b43cc51d2bf6c05",
       "sources": [
         "docs/skill-flow-diagrams.md"
       ],
@@ -479,7 +479,7 @@
       }
     },
     "90 Referências/docs/tech/AGENT_FRAMEWORK.md": {
-      "sha256": "a75179d6a1430eff573d8f33d289e80708751a3a538192123329f55285f299bc",
+      "sha256": "06d2096628b34c6743edecaa385a1d4b8f04ae0dae9cfee69ed8fe71b7e236de",
       "sources": [
         "docs/tech/AGENT_FRAMEWORK.md"
       ],
@@ -488,7 +488,7 @@
       }
     },
     "90 Referências/docs/tech/ARCHITECTURE.md": {
-      "sha256": "25ec54349f906fdb31777f7fc9b7b8ddc990a2568c1b02ee96bf7b1b1363c6fc",
+      "sha256": "acb142bb2bfcff918e44a6d009dec4446075a7ec88114be08fa2e6ab2d2124cf",
       "sources": [
         "docs/tech/ARCHITECTURE.md"
       ],
@@ -497,7 +497,7 @@
       }
     },
     "90 Referências/docs/tech/ARMORY_REDESIGN.md": {
-      "sha256": "34ebed9c40f4a1213c480ff730cb84942ea64856321cacf8282c9d76e5fdd29c",
+      "sha256": "435414d7f2d6fc00752d70194f64951f0f2561b15a0f22ef9c7f0625c604aac9",
       "sources": [
         "docs/tech/ARMORY_REDESIGN.md"
       ],
@@ -506,7 +506,7 @@
       }
     },
     "90 Referências/docs/tech/ASSETS.md": {
-      "sha256": "7f37eecf33d8cb65a9e862c44c5444de706027077c23e02cc1b76b7c0b0b4874",
+      "sha256": "ff728abaaa5dc064281c591e598e4207333a706a51a43fb09488ce54254ae033",
       "sources": [
         "docs/tech/ASSETS.md"
       ],
@@ -515,7 +515,7 @@
       }
     },
     "90 Referências/docs/tech/CARDS_IMPLEMENTATION.md": {
-      "sha256": "d4fc4f319658ef2062d28615e3eb99ced5093ef81550bb2cee8f21368e712e20",
+      "sha256": "a0d7adada3bc95875c23737f9f7b454ee3f7a7c173754b777e6ea1ac10021cf5",
       "sources": [
         "docs/tech/CARDS_IMPLEMENTATION.md"
       ],
@@ -524,7 +524,7 @@
       }
     },
     "90 Referências/docs/tech/COMBAT_CATALOG.md": {
-      "sha256": "d410191591ded526e37b07e7af9ea045feab74940fa05db141e9d823c2b88727",
+      "sha256": "a385d2e41bb05976026da06b692dc7a820d430842a5ce755289de36469af49b8",
       "sources": [
         "docs/tech/COMBAT_CATALOG.md"
       ],
@@ -533,7 +533,7 @@
       }
     },
     "90 Referências/docs/tech/CRAWLER_MODEL_BRIEF.md": {
-      "sha256": "bc7fa0549e6be33ab1b598bfc1c35f3324d62fdd5190156458408d242c214327",
+      "sha256": "2b4bd5f2108bacfa41884d6caf13c07817039f3410c83539815e7d82108ea275",
       "sources": [
         "docs/tech/CRAWLER_MODEL_BRIEF.md"
       ],
@@ -542,7 +542,7 @@
       }
     },
     "90 Referências/docs/tech/CREDITS.md": {
-      "sha256": "6b96feea334d63547e3c9c07f3b21ae05d4143b5e01a35d8f706cb6baf07b94f",
+      "sha256": "c79114920a611ef44047ccc12252ed7bb861611b2221b272c86fdb7f5252dcab",
       "sources": [
         "docs/tech/CREDITS.md"
       ],
@@ -551,7 +551,7 @@
       }
     },
     "90 Referências/docs/tech/ENGINE_MIGRATION.md": {
-      "sha256": "1b02fc488c0ee6825e22f753ca02fd51100eabed0692a91944e8e837775ada33",
+      "sha256": "733e0080826d491cabe3af9ae9f5dbc09702c2e9b621199349f7ceab4080d5f3",
       "sources": [
         "docs/tech/ENGINE_MIGRATION.md"
       ],
@@ -560,7 +560,7 @@
       }
     },
     "90 Referências/docs/tech/GAME_AUDIT.md": {
-      "sha256": "c0c3561ffa3eefb57f0a94a1ccd9197bdf6df7d1f4d6c86d64c4701ac976db87",
+      "sha256": "25be49f9b42e41063c3021e9c613c814f613ecaff304ff760fc5887c3e081c22",
       "sources": [
         "docs/tech/GAME_AUDIT.md"
       ],
@@ -569,7 +569,7 @@
       }
     },
     "90 Referências/docs/tech/LOCOMOTION.md": {
-      "sha256": "6afa287e8978c4823bf056e4c9235f8f592520883220d5ce8878736962edce9a",
+      "sha256": "92eefb2d5417224dcfaf971f070acb89c2d094f10882364758b2e2a6d3a80a2a",
       "sources": [
         "docs/tech/LOCOMOTION.md"
       ],
@@ -578,7 +578,7 @@
       }
     },
     "90 Referências/docs/tech/MAPS_HANDOFF.md": {
-      "sha256": "335e33aeb99a79d80d81710ab09a0cb1a13a18ac629f58118db899aa8d9abbf2",
+      "sha256": "b954e6211c045151937427b73724bb179420cf4ac612d94fd815bd82f50fafe8",
       "sources": [
         "docs/tech/MAPS_HANDOFF.md"
       ],
@@ -587,7 +587,7 @@
       }
     },
     "90 Referências/docs/tech/MODELS_ROUND_BRIEF.md": {
-      "sha256": "ab6ac8595b8dbaa7fbf5d6ea49ac60e7c9ee5c60150422cf1ae99b702e1f9c8f",
+      "sha256": "621d39c9b10558b3b282f76c6e205c560e666052cb71590732b5924974b2e404",
       "sources": [
         "docs/tech/MODELS_ROUND_BRIEF.md"
       ],
@@ -596,7 +596,7 @@
       }
     },
     "90 Referências/docs/tech/MULTIPLAYER.md": {
-      "sha256": "43db86733ad6cf334931fa7f918ee8f681f0fa20d0dd6607e23810c9aeb4f8af",
+      "sha256": "f41d229e08c04bd164594d147a6f504da893cae93bbc635ec10d4fce929e1ded",
       "sources": [
         "docs/tech/MULTIPLAYER.md"
       ],
@@ -605,7 +605,7 @@
       }
     },
     "90 Referências/docs/tech/PLUGINS_REVIEW.md": {
-      "sha256": "f632259338123a76f4a5240e94e7f8465e18bc9ffef584f747db5ee370f7f561",
+      "sha256": "e1dc7acf3b37aaa48b8091866c752319729746764dfdd6fe3951663afdcae78f",
       "sources": [
         "docs/tech/PLUGINS_REVIEW.md"
       ],
@@ -614,7 +614,7 @@
       }
     },
     "90 Referências/docs/tech/POWER_UPS_AND_DEFEAT.md": {
-      "sha256": "b447961751de536d2e6f936d7d18f175e8106c5051b1fb5bb9a5617d043c21ec",
+      "sha256": "df63dc62632717992855ac51eff11d4cf64ace9a8760467c199a98b0ea70dc07",
       "sources": [
         "docs/tech/POWER_UPS_AND_DEFEAT.md"
       ],
@@ -623,7 +623,7 @@
       }
     },
     "90 Referências/docs/tech/REALISTIC_PROPS.md": {
-      "sha256": "f26bf898a72450b361558404d319c891af01bf034805baba9d199d7fabc9f002",
+      "sha256": "29f7d60188a07d3de39893e86712699bd2659886921609f695c593bf79486d1e",
       "sources": [
         "docs/tech/REALISTIC_PROPS.md"
       ],
@@ -632,7 +632,7 @@
       }
     },
     "90 Referências/docs/tech/RECRUIT_MODEL.md": {
-      "sha256": "6612d1fc77f522eef997ba23dde81a0e49965035bf9f7e55ba40c34e187b7bc0",
+      "sha256": "49df50ed7500f04c4264cedcb0324dda872864c8adacfd116af12289ff9f8ac8",
       "sources": [
         "docs/tech/RECRUIT_MODEL.md"
       ],
@@ -641,7 +641,7 @@
       }
     },
     "90 Referências/docs/tech/SETTINGS_INPUT.md": {
-      "sha256": "73189c9394980a2eb43afe519c223be2dd5cb1f535eaaa76875343572f8a941c",
+      "sha256": "661ccc2e2cbc39fce876f5adafffc170fc3af1da99dcc68bb0ce4c62d8918757",
       "sources": [
         "docs/tech/SETTINGS_INPUT.md"
       ],
@@ -650,7 +650,7 @@
       }
     },
     "90 Referências/docs/tech/SPECIAL_ENEMY_MODELS.md": {
-      "sha256": "94263b4eb7313d196f3b253d9a67d39a3b58d651f0179c580ba531d3fd735df2",
+      "sha256": "bf1dfe35355872d6d68f2fe478e4e1e24a6543b07349d3d6438cdf8210e86e39",
       "sources": [
         "docs/tech/SPECIAL_ENEMY_MODELS.md"
       ],
@@ -659,7 +659,7 @@
       }
     },
     "90 Referências/docs/tech/UNREAL_EXPERIMENT.md": {
-      "sha256": "94cb7c22aca0cff9d88571b45d90b359e92bc2d2a182aad259c82ad500325454",
+      "sha256": "2e8a77c8aab84af475520c77a27ba551658ccedae22582272fd39d06c4568177",
       "sources": [
         "docs/tech/UNREAL_EXPERIMENT.md"
       ],
@@ -668,7 +668,7 @@
       }
     },
     "90 Referências/docs/tech/VANGUARD_MODEL.md": {
-      "sha256": "16e5238aa2aebb0a7db2ad5ee3c3664d4353544ed3083d128c3074f0adc21a54",
+      "sha256": "55eab3887536772e590c352e8ffa9b6849bcb62579071412a1ecd57ca400ac6e",
       "sources": [
         "docs/tech/VANGUARD_MODEL.md"
       ],
@@ -677,7 +677,7 @@
       }
     },
     "90 Referências/docs/tech/WEAPON_ARMS_BRIEF.md": {
-      "sha256": "333c310b0b422a4741ed207b22ad9232ae8bf46fe2ea6461d2c6c473aa4e9da6",
+      "sha256": "76fb69f509398cdb71b2462c6415993a9a891c1ff69747292ee37e248a28c45a",
       "sources": [
         "docs/tech/WEAPON_ARMS_BRIEF.md"
       ],
@@ -686,7 +686,7 @@
       }
     },
     "90 Referências/docs/tech/WEAPON_GRIP_BRIEF.md": {
-      "sha256": "b0bb07587712d12a08be76b68c791deea5aa96a1539707bedad0631772ab28bc",
+      "sha256": "3d1ed2410492e4e7d07c6bb4cbee8d0d037f3bbf3377b6a94644e3b1b458dd98",
       "sources": [
         "docs/tech/WEAPON_GRIP_BRIEF.md"
       ],
@@ -695,7 +695,7 @@
       }
     },
     "90 Referências/docs/tech/WEAPON_MODELS.md": {
-      "sha256": "cedc35099cd4ac15626f3faafe1cfc8f151bfd04a3283d89d0779f21c5d758bf",
+      "sha256": "740464d475673dd6d08fc2b367d4499f245070aa881b1e2910f2734fcd585eab",
       "sources": [
         "docs/tech/WEAPON_MODELS.md"
       ],
@@ -704,7 +704,7 @@
       }
     },
     "90 Referências/docs/tech/ZOMBIE_AND_WEAPON_ART.md": {
-      "sha256": "53246804c0cbca9899ca181d27b137b2a81c98a7066b40d8c3857f3583d3a46c",
+      "sha256": "ec8e137eb33c9ca092ad9b82b67492e117c4dec47cf83d520c2ee6698bdd9577",
       "sources": [
         "docs/tech/ZOMBIE_AND_WEAPON_ART.md"
       ],
@@ -713,7 +713,7 @@
       }
     },
     "90 Referências/game/README.md": {
-      "sha256": "435073169ff1a4975309b740281b8b74a0764a60a816957ba5cd45f43184f810",
+      "sha256": "2f05b8b9e97d631759946e6abe9845eb4ff74f7c47d6ea017ca102dd9ed767a8",
       "sources": [
         "game/README.md"
       ],
@@ -722,7 +722,7 @@
       }
     },
     "90 Referências/game/ui/art/README.md": {
-      "sha256": "192ec218b8840bad6bced84142b0d05a60717bf4de01955814fd53fe26221ce4",
+      "sha256": "adb939c772e8c2b2b3556a185aeb870aab26c92f608501ae79625a70ef127688",
       "sources": [
         "game/ui/art/README.md"
       ],
@@ -731,7 +731,7 @@
       }
     },
     "90 Referências/project.godot.md": {
-      "sha256": "685a9eba473934bc4174b3e0dd549d2aae61f99f5ee24693786aaf4983440625",
+      "sha256": "846effd12d1671bb98d782325a0d0f1795173425eabadb5e818256d3b60c29d5",
       "sources": [
         "project.godot"
       ],
@@ -740,7 +740,7 @@
       }
     },
     "90 Referências/project.yaml.md": {
-      "sha256": "a12b50083057177a3813f5744d904218862399009b12d9d80977c6f514a26621",
+      "sha256": "0376c3129c361d41ed3d6c2f3cc264ec369c03104cd3838b3d1f8fc7083743cb",
       "sources": [
         "project.yaml"
       ],
@@ -749,7 +749,7 @@
       }
     },
     "90 Referências/spikes/camera_medium/README.md": {
-      "sha256": "dd78b49aa60da9f7955a8d7405074bac71b475a4e9695e8a63bc7dbdf7165aba",
+      "sha256": "118021ccec73b06de10ab5eee1597648370bdf84eca7286cbc5feea065f8dcdf",
       "sources": [
         "spikes/camera_medium/README.md"
       ],
@@ -758,7 +758,7 @@
       }
     },
     "90 Referências/spikes/director/README.md": {
-      "sha256": "fcb8f20913370a67fcf363854cd1090afd33a01339e5f950830f2012633fcb58",
+      "sha256": "a4b97ac105a6386f5f4a5ef024bbf3f9b45ee9b313a4833b9e0a9371b134b5e7",
       "sources": [
         "spikes/director/README.md"
       ],
@@ -767,7 +767,7 @@
       }
     },
     "90 Referências/spikes/godot_mcp/README.md": {
-      "sha256": "4a15e04aa329081f1d84889032beae1d9729fdc757cada4d3bda6f51880d7770",
+      "sha256": "07fd6b2d27a28775261138ed1ee7f21683b275536d3b7f05b622b313d04b24cd",
       "sources": [
         "spikes/godot_mcp/README.md"
       ],
@@ -776,7 +776,7 @@
       }
     },
     "90 Referências/spikes/horde_flowfield/README.md": {
-      "sha256": "c3cb8cd54a0a692a699943f04e8a846a192c429a69203d872cabfa4b5c926eb0",
+      "sha256": "d62a0ea57f4dab035b46bb083af114231b91ac8bac072104d8065f39952aab73",
       "sources": [
         "spikes/horde_flowfield/README.md"
       ],
@@ -785,7 +785,7 @@
       }
     },
     "90 Referências/tools/export/README.md": {
-      "sha256": "0df2c9ba9497af244f8e55bae7dd6f648028850eb570c1de151b63b3f9530d76",
+      "sha256": "839d38dfaa0254cb6b54daace63c3b10f47ba509b6af31816772f882a53d9584",
       "sources": [
         "tools/export/README.md"
       ],
@@ -794,7 +794,7 @@
       }
     },
     "90 Referências/tools/real_island/README.md": {
-      "sha256": "96393847144261e56cb0ef47463df7f5f4a45e48fa1afcfb98e984e2c51be665",
+      "sha256": "62ed40fd8c8dd4361c29f44525732e927af5fba4acb87755745fe9ca6ae60058",
       "sources": [
         "tools/real_island/README.md"
       ],
@@ -803,7 +803,7 @@
       }
     },
     "02 Conteúdo/Armas/Arma - machine_gun.md": {
-      "sha256": "5a9de70cf13cd08fc17fa1666a1148e2f5139bd040c1e3ca2fad7ff561003302",
+      "sha256": "5831bc620c8554f149ca8b46380ffb14d562c8117fb357f6106cef320c4ef812",
       "sources": [
         "game/data/weapons/machine_gun.tres",
         "game/data/resources/weapon_data.gd"
@@ -814,7 +814,7 @@
       }
     },
     "02 Conteúdo/Armas/Arma - marksman.md": {
-      "sha256": "411bbebda2b5a51c6a6cd885d368d96db0113a007637342bb3926cd5dc3e6a16",
+      "sha256": "b6c0efe1ed508b813abe993e9ee676b1984db9b4be649329a780e9f921449cdf",
       "sources": [
         "game/data/weapons/marksman.tres",
         "game/data/resources/weapon_data.gd"
@@ -825,7 +825,7 @@
       }
     },
     "02 Conteúdo/Armas/Arma - rifle.md": {
-      "sha256": "c1d0b829d9abe880d418a327eaedddb5b9350dd20672e87e1a54d34f9b854431",
+      "sha256": "e8faa67d29952055dc6d168043b62fddc2e8c1fb11e9fb55d24543f2828d5ed9",
       "sources": [
         "game/data/weapons/rifle.tres",
         "game/data/resources/weapon_data.gd"
@@ -836,7 +836,7 @@
       }
     },
     "02 Conteúdo/Armas/Arma - shotgun.md": {
-      "sha256": "d2489419f936fafeabb42ad9ec0054fee7d5aa1f379ee90ec21d12f4c595f2d0",
+      "sha256": "d8c298275430c963e9af24f167afa8c53c49adefd296ad068d0f7c59d68e4189",
       "sources": [
         "game/data/weapons/shotgun.tres",
         "game/data/resources/weapon_data.gd"
@@ -847,7 +847,7 @@
       }
     },
     "02 Conteúdo/Armas/Arma - smg.md": {
-      "sha256": "2313241f0d7ad270daa130125c0251e26e23a02983172144cbe14d672836c199",
+      "sha256": "7000a7ef48343200d36014dcdf5ed87bfef23b446bdbf1479977346f3c92b4b4",
       "sources": [
         "game/data/weapons/smg.tres",
         "game/data/resources/weapon_data.gd"
@@ -858,7 +858,7 @@
       }
     },
     "02 Conteúdo/Armas.md": {
-      "sha256": "ce8bc19768c76760ec52b93bae5b9a6f35c8f2b2afb17bcc79cd183ffb98d83c",
+      "sha256": "810b7d3e80a0193993ef4a41bdbd665902e3f3d8d287bd3fde094300232034bc",
       "sources": [
         "game/data/weapons/machine_gun.tres",
         "game/data/weapons/marksman.tres",
@@ -875,7 +875,7 @@
       }
     },
     "02 Conteúdo/Classes/Classe - recruit.md": {
-      "sha256": "63e344780752033c3e8f4dfe54dc3a41f20875058fb4fd62ed82743f6997f522",
+      "sha256": "ef2b44b234e82cf74694ec2801dc1b238f7f0facad134b78c49fea18c7f8f0fd",
       "sources": [
         "game/data/classes/recruit.tres",
         "game/data/resources/class_data.gd"
@@ -886,7 +886,7 @@
       }
     },
     "02 Conteúdo/Classes/Classe - vanguard.md": {
-      "sha256": "b91313bc6edf7e854fc3f04502148d73f168f5b2da2135602aaf81e0119d54ff",
+      "sha256": "30550e6a7cb7347ad17724cfeb50a478e948f3c3dd158583695029b9e94dd8e8",
       "sources": [
         "game/data/classes/vanguard.tres",
         "game/data/resources/class_data.gd"
@@ -897,7 +897,7 @@
       }
     },
     "02 Conteúdo/Classes.md": {
-      "sha256": "f1e89e4b1d9966de936ea94017a712b2c7f4cd9ab5035d1f26c6642dbf4724b0",
+      "sha256": "277deed808c908b790da816e0a7051f18f420ab8bf25406995b9ad6e3945e0a9",
       "sources": [
         "game/data/classes/recruit.tres",
         "game/data/classes/vanguard.tres"
@@ -908,7 +908,7 @@
       }
     },
     "02 Conteúdo/Inimigos/Inimigo - behemoth.md": {
-      "sha256": "b616664091396a3eed9e1584e8c7e8e8ec651efcfb2170914fa328b7a3a4e364",
+      "sha256": "60b513a70bea3a65f839079605edd2e2a6d5f76f4fde9528cb2b7eee988e46cd",
       "sources": [
         "game/data/enemies/behemoth.tres",
         "game/data/resources/enemy_data.gd"
@@ -919,7 +919,7 @@
       }
     },
     "02 Conteúdo/Inimigos/Inimigo - bloater.md": {
-      "sha256": "e0694856fd5aa88519ee41cf8df835a2efdca05a8be5f7da9832efca85d87412",
+      "sha256": "5e5687080f7efbf48a7b970e07cc999b30f03de6c7a7cd743880431a5be163bf",
       "sources": [
         "game/data/enemies/bloater.tres",
         "game/data/resources/enemy_data.gd"
@@ -930,7 +930,7 @@
       }
     },
     "02 Conteúdo/Inimigos/Inimigo - brute.md": {
-      "sha256": "bddaec8fb0413d561e50097f4d1cd142510f262a5f98217215c1be3c8813e7c0",
+      "sha256": "708944d407ba399813fd66a366abf0a421525597fb613b24862baf97ddba98aa",
       "sources": [
         "game/data/enemies/brute.tres",
         "game/data/resources/enemy_data.gd"
@@ -941,7 +941,7 @@
       }
     },
     "02 Conteúdo/Inimigos/Inimigo - crawler.md": {
-      "sha256": "14bc89b6572b14579c2569c9c23426d7fe06ab33018714e1d391ddc349fc6cfc",
+      "sha256": "0f180ceb6cfa583771b73703bcbe225c6e39fcd2a168d9dd878a5142640d05f6",
       "sources": [
         "game/data/enemies/crawler.tres",
         "game/data/resources/enemy_data.gd"
@@ -952,7 +952,7 @@
       }
     },
     "02 Conteúdo/Inimigos/Inimigo - grabber.md": {
-      "sha256": "569a43f302ec160165c3c869c5f6317aa8fc1257fc7e2e2f8e9a1278f9ce2cad",
+      "sha256": "6a2cdbacd1c48913060cbc47f153b4ebfd4beaafc7067d9b68d1e2037ea4b154",
       "sources": [
         "game/data/enemies/grabber.tres",
         "game/data/resources/enemy_data.gd"
@@ -963,7 +963,7 @@
       }
     },
     "02 Conteúdo/Inimigos/Inimigo - runner.md": {
-      "sha256": "0e9a955fc70fa741618b32d8be166db5f5a0fe0991070b284f7b437814b1f170",
+      "sha256": "8176dee0b8276fce0a396ec5fb84f67e91d52c9648cfb5aed7f988dbd05fbfc3",
       "sources": [
         "game/data/enemies/runner.tres",
         "game/data/resources/enemy_data.gd"
@@ -974,7 +974,7 @@
       }
     },
     "02 Conteúdo/Inimigos/Inimigo - screamer.md": {
-      "sha256": "9c14a0d778bfc9cb3337739b33eba672d426f3df76fc8937d5416de22f481002",
+      "sha256": "81d1eed449596b5a4df24956abaa65377ae9c006e3fcdd6912545153a4bbea44",
       "sources": [
         "game/data/enemies/screamer.tres",
         "game/data/resources/enemy_data.gd"
@@ -985,7 +985,7 @@
       }
     },
     "02 Conteúdo/Inimigos/Inimigo - walker.md": {
-      "sha256": "1ced066b0966ffa68fa413854765dd10c4194cfd00653cf5bf4b8eae1f3be7fe",
+      "sha256": "6c0cd82f432aa4c371a013d7255b9266fb1fadf6b75947a4979e576ca27d15a2",
       "sources": [
         "game/data/enemies/walker.tres",
         "game/data/resources/enemy_data.gd"
@@ -996,7 +996,7 @@
       }
     },
     "02 Conteúdo/Inimigos.md": {
-      "sha256": "7afad43c05ff62f2f439b4a0c4c1e8a048b660a40ba9d0c9d3e383cdc0ffbe96",
+      "sha256": "7c6d4cdd6fffbd136f912755081108ad652b1f21afc0e00b48ec188494261428",
       "sources": [
         "game/data/enemies/behemoth.tres",
         "game/data/enemies/bloater.tres",
@@ -1019,7 +1019,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - adrenaline.md": {
-      "sha256": "cbbaede5ceb72b4c04c92645c8109f94467c50b0882c95719e3a7d9e13fc158a",
+      "sha256": "48580e1316df97ce9958327a678e4c5db4097babef4f77384f6ef8537f38276e",
       "sources": [
         "game/data/cards/adrenaline.tres",
         "game/data/resources/card_data.gd"
@@ -1030,7 +1030,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - aftershock.md": {
-      "sha256": "2530ac1a114aead13281ff835ba1b55a1cb4024838e0424dde359fb816ca08b0",
+      "sha256": "0a9fe183fb74ad7878c965bb8f32be00b4a3d3b1ddce1fae92f254b61b66217c",
       "sources": [
         "game/data/cards/aftershock.tres",
         "game/data/resources/card_data.gd"
@@ -1041,7 +1041,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - battle_rhythm.md": {
-      "sha256": "883dced2afc1597f9bb9fe0ae9239a010486dfc5ea4778cf9052842b148f2246",
+      "sha256": "2c30e8c7f53edabb94b2c27d9b07720b9183aaf32e2aa58d83716dab52d6ce53",
       "sources": [
         "game/data/cards/battle_rhythm.tres",
         "game/data/resources/card_data.gd"
@@ -1052,7 +1052,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - bigger_mags.md": {
-      "sha256": "dc772779a343dddf0f72738e6642c410d331902442f7b3e75dfe595ad732e9c3",
+      "sha256": "11c39db76596d4e37ccf8a59841acca4c41267aecf4ac894694ddfd94dea2043",
       "sources": [
         "game/data/cards/bigger_mags.tres",
         "game/data/resources/card_data.gd"
@@ -1063,7 +1063,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - catch_your_breath.md": {
-      "sha256": "5d81b143c4968d83b47787ff118f087880af987c906f80ac6cabeea315b41b99",
+      "sha256": "0ea1c23acadcda9b7315945e74092f56a94678a6898da9d302ec630245bd10af",
       "sources": [
         "game/data/cards/catch_your_breath.tres",
         "game/data/resources/card_data.gd"
@@ -1074,7 +1074,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - chain_lightning.md": {
-      "sha256": "6084a52e1c67057e89355d08000dd90483f7b86829fadc270fcdb2c035dd9000",
+      "sha256": "1f59de20454881707c937b7f3213ba5cefd77d148d939420d876a0199d0eae07",
       "sources": [
         "game/data/cards/chain_lightning.tres",
         "game/data/resources/card_data.gd"
@@ -1085,7 +1085,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - concussion.md": {
-      "sha256": "5d861bb76bda03f60cf5f8282b71bad99e64cd307acb98632ca9789d192751c0",
+      "sha256": "2ae648ea26403f7136848c053d9afcfffa53126bb8edc5f0be872dcfacf09b7d",
       "sources": [
         "game/data/cards/concussion.tres",
         "game/data/resources/card_data.gd"
@@ -1096,7 +1096,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - crowd_splitter.md": {
-      "sha256": "9f4ef496130eacc42a9a3433eeec05a1c92a666cff8821f83896ba30c0c79600",
+      "sha256": "456aaa8b41f1da1da14929befb5aa19c4b34aa9e3c23df551b22a29af6921656",
       "sources": [
         "game/data/cards/crowd_splitter.tres",
         "game/data/resources/card_data.gd"
@@ -1107,7 +1107,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - deep_freeze.md": {
-      "sha256": "7506222b6a902b72cdd8beaf5cc364515bfb896382182005d2b845b4e197ef72",
+      "sha256": "bcc713706e8989f755d0977372e2e87fa9884f5981da8e87ef56cf68ef45dd61",
       "sources": [
         "game/data/cards/deep_freeze.tres",
         "game/data/resources/card_data.gd"
@@ -1118,7 +1118,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - executioner.md": {
-      "sha256": "393eb4f672a08c4380e668b311e0e513dcbff04d984c376b734be9b27ac79b59",
+      "sha256": "263c7dd332eec5c9ac4bc6289cd813f3ad15c6be28dc999665bcdc2867ec2404",
       "sources": [
         "game/data/cards/executioner.tres",
         "game/data/resources/card_data.gd"
@@ -1129,7 +1129,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - explosive_heads.md": {
-      "sha256": "8a5550a26a8d994bce0ce74dc5214e751880a1f02ec12c6ee6295db9fe2e6dbe",
+      "sha256": "711c9ba339cfb5cb6e1a3262f2cff78a331cfacb58bd9db7f511cb7a38fb7187",
       "sources": [
         "game/data/cards/explosive_heads.tres",
         "game/data/resources/card_data.gd"
@@ -1140,7 +1140,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - fast_hands.md": {
-      "sha256": "c018965c8856938879996ecb99faa7009204e43b24cba5d1da95026a0ece9f28",
+      "sha256": "83dabf751a5c81e7bc651ec57adaa83d7bfe06c6828927f396c7ce57dddcc429",
       "sources": [
         "game/data/cards/fast_hands.tres",
         "game/data/resources/card_data.gd"
@@ -1151,7 +1151,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - fast_learner.md": {
-      "sha256": "c17852293aa90c86812f85dc072633f63c4210d5da7150cf8cbf1c057d9e1494",
+      "sha256": "6f6819452bb60dea7da90d83688d823b86fefe87c49bf32ddecb2a805e0dfcaf",
       "sources": [
         "game/data/cards/fast_learner.tres",
         "game/data/resources/card_data.gd"
@@ -1162,7 +1162,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - field_dressing.md": {
-      "sha256": "7c064652ce963bcc5e654c68ba6ae5a03cf230556d08aaacdec3e3df04c5d8de",
+      "sha256": "0496b2ccb39e98bc81c1c8c3e8439707521b7419ce26add0464e1cc65f1d9489",
       "sources": [
         "game/data/cards/field_dressing.tres",
         "game/data/resources/card_data.gd"
@@ -1173,7 +1173,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - finish_the_job.md": {
-      "sha256": "700a0a1fee2972f2f26cc9f3d6d076bea5982ce613dfa3dff856c7ef74ecfef8",
+      "sha256": "cad9d20f945322739652d9172c86ac8d1aca625c55d31853c7f7c7ab15321e65",
       "sources": [
         "game/data/cards/finish_the_job.tres",
         "game/data/resources/card_data.gd"
@@ -1184,7 +1184,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - fire_rounds.md": {
-      "sha256": "c463b9e4150ece1f86fdbe8bb68fd6313c97a9887cc424bd24c0b777b79727cc",
+      "sha256": "f2efa8a1bfac29daac170c2eac9f730f904064422cb3742991e34f05ab3163a2",
       "sources": [
         "game/data/cards/fire_rounds.tres",
         "game/data/resources/card_data.gd"
@@ -1195,7 +1195,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - frost_rounds.md": {
-      "sha256": "26313bf6306853ad6eef8d12d3d1bf209644c63dd188ba2c8755525fcffe0ee4",
+      "sha256": "a627011a7bb320ed3cb77bcded3c3aede1914f780f09c8a161e87ebd44767837",
       "sources": [
         "game/data/cards/frost_rounds.tres",
         "game/data/resources/card_data.gd"
@@ -1206,7 +1206,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - grenadier.md": {
-      "sha256": "b55012978ce8b601c4e2baf348debe5ef6891528cc63a898d072c86f8bd1f0a9",
+      "sha256": "ac60f295032c9c014737c01c578dd2b47cb393eab0544dc1299a6bf5783d4888",
       "sources": [
         "game/data/cards/grenadier.tres",
         "game/data/resources/card_data.gd"
@@ -1217,7 +1217,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - hollow_points.md": {
-      "sha256": "d59fa3d4bfb51b35c6a533a24d5bcd49dfaafb855788d7dccfff418aef658f9a",
+      "sha256": "817f6bcd347f695c827c934232bf6ad509d2eae1dc672c6287ebdbde28db3c99",
       "sources": [
         "game/data/cards/hollow_points.tres",
         "game/data/resources/card_data.gd"
@@ -1228,7 +1228,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - intimidation.md": {
-      "sha256": "0b2ff56907e7d5c820b654a907cb910f486e8b97b003ee83d38e9af584d144a6",
+      "sha256": "9b99fe8a3953355df29d5da2f963d9e2b0d0bd08b6d5a8610f8ec086d0365946",
       "sources": [
         "game/data/cards/intimidation.tres",
         "game/data/resources/card_data.gd"
@@ -1239,7 +1239,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - kill_rations.md": {
-      "sha256": "e68cc4ee98a4ccc30002af51bbad1cd8a8ca060ae073732bbaa340b03d7d8878",
+      "sha256": "ec96f9aa8177c37d069ceb739e8b00b784147faccbafa82a275c8c4746889e38",
       "sources": [
         "game/data/cards/kill_rations.tres",
         "game/data/resources/card_data.gd"
@@ -1250,7 +1250,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - light_boots.md": {
-      "sha256": "9fd0eca98830c2d6c3f6d898b5c45d55551773bab701d32da17fdc922d2aaf89",
+      "sha256": "e8ec6f1c1579aee3697bf291097c0ced45495009c9cab7c743043b4ca00d82e8",
       "sources": [
         "game/data/cards/light_boots.tres",
         "game/data/resources/card_data.gd"
@@ -1261,7 +1261,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - magnet.md": {
-      "sha256": "4efa7b33c3e0b99b2eb981055d6828b601ae73091386ff8caac74d586b4af9ac",
+      "sha256": "3ff678ca8b13283278a7d4da9c27b7f4da1b6adc5bda86678a6dd9e2f21398cc",
       "sources": [
         "game/data/cards/magnet.tres",
         "game/data/resources/card_data.gd"
@@ -1272,7 +1272,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - piercing_rounds.md": {
-      "sha256": "a1ba23a064ba88fc5695ae852d4d9b2a701d04546dfabbe7a51408ced69cd208",
+      "sha256": "4e1d0114fcf32d07de228dd949e8bea4c712e1d158473d3c1184ce297c5f667a",
       "sources": [
         "game/data/cards/piercing_rounds.tres",
         "game/data/resources/card_data.gd"
@@ -1283,7 +1283,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - point_blank.md": {
-      "sha256": "01c03c61869e3b3d6ddfe7a3faafb72eaefb936e89ee1cad52ad6f68fa5df83c",
+      "sha256": "a0d74225f5aa427e5b065091890cd8256def7b6ca11a0abd5293540445f000f1",
       "sources": [
         "game/data/cards/point_blank.tres",
         "game/data/resources/card_data.gd"
@@ -1294,7 +1294,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - quick_breaker.md": {
-      "sha256": "ac249a37a04b7ae56cc14cccf16fda2ca865faac7dd2a721ea50f2a5ba8411b5",
+      "sha256": "41522b88a2915e245b40934515f3f8f7c7e07ceab990af448dfe6bcfa4dffee4",
       "sources": [
         "game/data/cards/quick_breaker.tres",
         "game/data/resources/card_data.gd"
@@ -1305,7 +1305,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - rally.md": {
-      "sha256": "e18adf3195978fe4f8d52d19ead2552b490b9ac1c3c7886320e3135f84bbe0fd",
+      "sha256": "b8c36e98a5e9899bf4a5a859fd142129e311c43e0be6e073e19f2e2eabfe1997",
       "sources": [
         "game/data/cards/rally.tres",
         "game/data/resources/card_data.gd"
@@ -1316,7 +1316,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - ricochet.md": {
-      "sha256": "e383d507288edc7556e646120d9a0fb41617cf123efb66c968ea2a3454ae63b5",
+      "sha256": "4caa8818714c7ad83511f1fb242b627e6a05579e60fcb4eb3a6ed792c7468ddb",
       "sources": [
         "game/data/cards/ricochet.tres",
         "game/data/resources/card_data.gd"
@@ -1327,7 +1327,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - second_breath.md": {
-      "sha256": "9bc95b2891ee9e26f69ad2b302910d6422c3e312e600d2ec084be018bc5f25ee",
+      "sha256": "feefcce88c96a5de38d73824ca91e920fe997e3e4520ec65cd0bc4472c291d02",
       "sources": [
         "game/data/cards/second_breath.tres",
         "game/data/resources/card_data.gd"
@@ -1338,7 +1338,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - shockwave.md": {
-      "sha256": "9bf19d517f78630e0995f9ab95cab21d9658ffae6a9606b16243d369bddacab7",
+      "sha256": "4cab55724b87beb96abd243fcbdd80490ca51009327dd8cd8d2a70967c75e45f",
       "sources": [
         "game/data/cards/shockwave.tres",
         "game/data/resources/card_data.gd"
@@ -1349,7 +1349,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - steady_aim.md": {
-      "sha256": "a2e061322ed52493966e321758a57ffdaeac9c9cd46885e496fe5b7f94d69e02",
+      "sha256": "55b002907611d8d1bb812b4642c38d2e2eeadaf3d8b944a23b13bdedf808f8c5",
       "sources": [
         "game/data/cards/steady_aim.tres",
         "game/data/resources/card_data.gd"
@@ -1360,7 +1360,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - storm_rounds.md": {
-      "sha256": "d34c80a3d8cd4d27027d5dbdd86dcecf02f22e1381704b072c4203fd32105f40",
+      "sha256": "4e6b686edc7421fe22bcec7fed181c3dc32561d644d772b438cfaeb8897e23ee",
       "sources": [
         "game/data/cards/storm_rounds.tres",
         "game/data/resources/card_data.gd"
@@ -1371,7 +1371,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - thick_hide.md": {
-      "sha256": "2a737164107846492cc6249c494b300630487a270854a31e1180214f393924f9",
+      "sha256": "c72abf11d24f886d56b4fb7110b5c62ddca0562376364d243dce088811211b63",
       "sources": [
         "game/data/cards/thick_hide.tres",
         "game/data/resources/card_data.gd"
@@ -1382,7 +1382,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - toxic_cloud.md": {
-      "sha256": "ffaaf45f30ac57ddf49132c6afb2d406c7873331db3a24ce6220d3d1e7d2fe3c",
+      "sha256": "b188a60695f3f6310f69ddf56da0d2b732244ea35d9d85e71888ece2a0794bd4",
       "sources": [
         "game/data/cards/toxic_cloud.tres",
         "game/data/resources/card_data.gd"
@@ -1393,7 +1393,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - toxic_rounds.md": {
-      "sha256": "e86c7d0bf5ed7fe3b73787cc16a8e7d9e391d962a2827f1cf1ca4090461b1295",
+      "sha256": "f0220c4468477987bd590eff914d2109059b891559b619677d986d65fbec86e2",
       "sources": [
         "game/data/cards/toxic_rounds.tres",
         "game/data/resources/card_data.gd"
@@ -1404,7 +1404,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - vampire.md": {
-      "sha256": "0f2eb0226eaa58df6cd26a0a9080f596c9f940d4ed842014344d2e7f3f19c5ef",
+      "sha256": "d7f2566292d5b19c1c66601796c6cbc646b0c883ffdede1d42ec453aa493cb53",
       "sources": [
         "game/data/cards/vampire.tres",
         "game/data/resources/card_data.gd"
@@ -1415,7 +1415,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - wide_blast.md": {
-      "sha256": "fccfb6b6f48e370c43896af06f43da531521e6696c39c62a40a11911450397a3",
+      "sha256": "0e139ae70615dd81377d7b8cc41e7664e10624fb0f3e0652bed487e21a3a0783",
       "sources": [
         "game/data/cards/wide_blast.tres",
         "game/data/resources/card_data.gd"
@@ -1426,7 +1426,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - wildfire.md": {
-      "sha256": "a06e8e9e246e9536025dcfd4a722b6c162aa9bb565a53901a6a060b53343d275",
+      "sha256": "4be500a645313960310d432d8643aa9057237d61907d10cfef9b614c2493cf90",
       "sources": [
         "game/data/cards/wildfire.tres",
         "game/data/resources/card_data.gd"
@@ -1437,7 +1437,7 @@
       }
     },
     "02 Conteúdo/Cartas/Carta - wind_rounds.md": {
-      "sha256": "29294cc59b27c77e45c7ebc6224a96195cde8bd2c49f7a8a3bc25bb0333104ef",
+      "sha256": "7b17fd809fd183d8a79e35dee4a306ade76eab5cbf497c2be8dea606ea0d9006",
       "sources": [
         "game/data/cards/wind_rounds.tres",
         "game/data/resources/card_data.gd"
@@ -1448,7 +1448,7 @@
       }
     },
     "02 Conteúdo/Cartas.md": {
-      "sha256": "ea47dc4518a506588759c8c28c9a426678979c1ff5ab31bc4b160596656f7ec8",
+      "sha256": "c832cbcadb9d84bb22e64a55e2c3fa1af666086003ec86591c6bd0013c15da2d",
       "sources": [
         "game/data/cards/adrenaline.tres",
         "game/data/cards/aftershock.tres",
@@ -1533,7 +1533,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - archivist.md": {
-      "sha256": "93346d3e018fadc42aa306aa3e31040d62e5d19c04de2f500a2ad58b263cafe7",
+      "sha256": "5c24be814d16d37b40b537ba46e6da7762dc01b60ed564c510471154cf2a9aca",
       "sources": [
         "game/data/perks/archivist.tres",
         "game/data/resources/perk_data.gd"
@@ -1544,7 +1544,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - body_count.md": {
-      "sha256": "f3e69e11c45f15ccc06f1b846e6fe7ff73e33226053c0eba37b955a5fa3b32cb",
+      "sha256": "0f62c8b96e372d7f477263bc9c93688ffbf2239b02f3288643d444ecfae115ef",
       "sources": [
         "game/data/perks/body_count.tres",
         "game/data/resources/perk_data.gd"
@@ -1555,7 +1555,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - bulwark.md": {
-      "sha256": "b74a993149f0098a8f177d7ee7df82effa62db79b10fff850f24de427b9d8e14",
+      "sha256": "d6ac9c2c1dece1a2d56e1298ef26bafb988be534ce5e51d1e7ed8b0ce418c3d6",
       "sources": [
         "game/data/perks/bulwark.tres",
         "game/data/resources/perk_data.gd"
@@ -1566,7 +1566,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - concussion_blast.md": {
-      "sha256": "e2262e735624d8be380765652ae592f3c0d124e67bfa3b6aa8e0ea7255f430f3",
+      "sha256": "21456aa77328bf42daa1de77b62a88aca993d418acc4269165e714ebcb5da1c1",
       "sources": [
         "game/data/perks/concussion_blast.tres",
         "game/data/resources/perk_data.gd"
@@ -1577,7 +1577,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - crowd_anchor.md": {
-      "sha256": "ff3989d808daafff8c21c0ed852e77e43548575553149b0620e75a219dd4c516",
+      "sha256": "70e847e2591c52b44a62a6b4579490226c4830e00eea5fddf10ba2ee8270337f",
       "sources": [
         "game/data/perks/crowd_anchor.tres",
         "game/data/resources/perk_data.gd"
@@ -1588,7 +1588,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - demolitions.md": {
-      "sha256": "d625377bdc0abc60997f08faaf332b0f4939e9a212b933d3eac22bfec573d3e1",
+      "sha256": "cfce27163ef7952ed91f52fd5118b81c47fb079b4adef776a09d869b7b95ffdb",
       "sources": [
         "game/data/perks/demolitions.tres",
         "game/data/resources/perk_data.gd"
@@ -1599,7 +1599,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - first_find.md": {
-      "sha256": "c575dd4444481247bf7bd6081225eb771274a0d73fe2ab75efecf08202ce7951",
+      "sha256": "f7257da746689afe9760702af283eb6211113de1271dd444e0971e0df48bbdb5",
       "sources": [
         "game/data/perks/first_find.tres",
         "game/data/resources/perk_data.gd"
@@ -1610,7 +1610,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - fleet_footed.md": {
-      "sha256": "caa9de2597cdde9a5707785ca802bf41a08315bfff6c964adb964b36a5d8f567",
+      "sha256": "628aad9292f605aff0b6a08cad43c4b81507e7b8913d0688df6d8467e9cfffd6",
       "sources": [
         "game/data/perks/fleet_footed.tres",
         "game/data/resources/perk_data.gd"
@@ -1621,7 +1621,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - head_hunter.md": {
-      "sha256": "35d889a887cbf457347866aa70093a1e86c74a2abfd192c1228ee8f91bf31138",
+      "sha256": "e2bf6c47421377edce343015f9e96dd7c192a5dab82f1c96dcc337ad97d02320",
       "sources": [
         "game/data/perks/head_hunter.tres",
         "game/data/resources/perk_data.gd"
@@ -1632,7 +1632,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - heavy_impact.md": {
-      "sha256": "f9dd4292fb47dea6c6fc730f7e41e383af0025c5a6c3dce0b0e933842a33042a",
+      "sha256": "c92ab132173e5e0a0aa0b9f2e988c565777c0cbec453535710de58893e6833b6",
       "sources": [
         "game/data/perks/heavy_impact.tres",
         "game/data/resources/perk_data.gd"
@@ -1643,7 +1643,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - intimidating_cry.md": {
-      "sha256": "5110cbff5b3631650f04883c3a16295623a0d5efbcfeb9a22355f39f6c68164c",
+      "sha256": "7d25db0e82db3a70fc99ff656a3c4f3087c41973b4a096dfbc22499510772417",
       "sources": [
         "game/data/perks/intimidating_cry.tres",
         "game/data/resources/perk_data.gd"
@@ -1654,7 +1654,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - kill_chain.md": {
-      "sha256": "2053f8f437bdcc6651ee17cc51ffa7536c55c8738f3b5dd587b7e9a9ea7ed937",
+      "sha256": "c96827a1d9a37261d3012ffb95688a1043bcb7004b4d65a05fb06f5297861b58",
       "sources": [
         "game/data/perks/kill_chain.tres",
         "game/data/resources/perk_data.gd"
@@ -1665,7 +1665,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - long_breaker.md": {
-      "sha256": "b862c78b6c07b389ba43fdc8922ae2c0bf0b1d2d07681d31b86c2667fd8483e5",
+      "sha256": "cd49fcc80008d4481d5abb583bf986ac8829d44e9e90d8d51cfd275ff1c8eabe",
       "sources": [
         "game/data/perks/long_breaker.tres",
         "game/data/resources/perk_data.gd"
@@ -1676,7 +1676,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - opening_volley.md": {
-      "sha256": "47f008fc8fcb6a93f00f209c0122a003a8e3c1ef0762eb2e17c767a6ef6f4013",
+      "sha256": "8d1e229f1b18aaeb5da0c831f4f11fa62b3234730a1b04636cbe264545d8def5",
       "sources": [
         "game/data/perks/opening_volley.tres",
         "game/data/resources/perk_data.gd"
@@ -1687,7 +1687,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - pack_rat.md": {
-      "sha256": "37813a668dba25dfb56419fc4963eacec4344bb28f4a58db33c6f84c1dc9f184",
+      "sha256": "767bf7f7dac525cac2e0a5e793e6683de39dc53a678bb1d5b7fff9210b2eb158",
       "sources": [
         "game/data/perks/pack_rat.tres",
         "game/data/resources/perk_data.gd"
@@ -1698,7 +1698,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - quick_draw.md": {
-      "sha256": "86bc76dc39dbd86d33468df49ea82f33f0b1c3581186273417bd6bc94f10d939",
+      "sha256": "1a7b349543beff3a32e8ae0675a41ac15526ea6394948ab183c0fa8e1a8b259d",
       "sources": [
         "game/data/perks/quick_draw.tres",
         "game/data/resources/perk_data.gd"
@@ -1709,7 +1709,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - quick_hands.md": {
-      "sha256": "badd4d723914cfb56aa564b50a15515f3aa5e223e962250e3110547b87186af0",
+      "sha256": "d27de5f1828f613f805d9fae284411db8544c30e5e938ec91e1dd6763a0f9991",
       "sources": [
         "game/data/perks/quick_hands.tres",
         "game/data/resources/perk_data.gd"
@@ -1720,7 +1720,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - recovery.md": {
-      "sha256": "acf9d9c578a90dac91ab29b11a3e31e9636cc5dc523751d74289b39dabfe9b09",
+      "sha256": "33e078b74f5f33bad264b2cbcc326de5ed3307e8a91575e8345f8a5649b05b83",
       "sources": [
         "game/data/perks/recovery.tres",
         "game/data/resources/perk_data.gd"
@@ -1731,7 +1731,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - resupply_drop.md": {
-      "sha256": "e0d7464904ceb846dc9fdddf7c4cdbd8641f9e7f038583bbc8c110b9f87d0050",
+      "sha256": "11e4299ecf5fc1791f80531ea0f5d755e4dc9d0629b191463fb20f1c10648f05",
       "sources": [
         "game/data/perks/resupply_drop.tres",
         "game/data/resources/perk_data.gd"
@@ -1742,7 +1742,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - skirmisher.md": {
-      "sha256": "2cc125d73c196a87a0930140ddf89559314aa4b316271b38ea2bc22dc39713eb",
+      "sha256": "7949087e5df12cb8898a9d846b9405def1d6f1af4293d23012b50f0402cbdbf6",
       "sources": [
         "game/data/perks/skirmisher.tres",
         "game/data/resources/perk_data.gd"
@@ -1753,7 +1753,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - spare_rerolls.md": {
-      "sha256": "21782fd340753fac9232a472fcf342cdf53e266a8658fa27170654c3c52d77b0",
+      "sha256": "328ef8b4fa572bc7820c17f13b9694f234088c486da133fbcb91da5a42a1fb4b",
       "sources": [
         "game/data/perks/spare_rerolls.tres",
         "game/data/resources/perk_data.gd"
@@ -1764,7 +1764,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - steady_grip.md": {
-      "sha256": "cb623df6687cb548ffa9dbbaea07b535a3334847fbd9f8cc00440db7b626698c",
+      "sha256": "9b76f9805d3b252286ccc4706d4e753e2507c2e00694c4164e3edb9d597bb7ee",
       "sources": [
         "game/data/perks/steady_grip.tres",
         "game/data/resources/perk_data.gd"
@@ -1775,7 +1775,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - supply_run.md": {
-      "sha256": "2f28cd4bbe1a9b8b515c54432cbc9cadd1cc319ac5083fab42245a252b8233e1",
+      "sha256": "dd34ca92cda9f3c59d0bedf69070c135738fa0ff15936978f55ca3679e0de75e",
       "sources": [
         "game/data/perks/supply_run.tres",
         "game/data/resources/perk_data.gd"
@@ -1786,7 +1786,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - surveyor.md": {
-      "sha256": "4b531eb330c398fcc6a048d584a68ea0edac58878c47bd3e467e78b169a0d265",
+      "sha256": "16b40d1c4d45d13f763bc2e4b42f391cc66d521425a978c50f50e602454b72b3",
       "sources": [
         "game/data/perks/surveyor.tres",
         "game/data/resources/perk_data.gd"
@@ -1797,7 +1797,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - thick_skin.md": {
-      "sha256": "03f8e4bbd232231f039055634d8d0fc52adac53b70481c56ede382654675a302",
+      "sha256": "f0e2d35d76ed67522fd9ec549f845684a6566a7f5d8224613f379ceb158e7dc2",
       "sources": [
         "game/data/perks/thick_skin.tres",
         "game/data/resources/perk_data.gd"
@@ -1808,7 +1808,7 @@
       }
     },
     "02 Conteúdo/Perks/Perk - trail_rations.md": {
-      "sha256": "9e765c7d419d450eca2f2cef7a878e7a91c59cd2327a259188152330cb9a05e3",
+      "sha256": "b7aadea74119c279d389a83c52fd4cdbb270825ac3442b0ac56b5224eb79ba8e",
       "sources": [
         "game/data/perks/trail_rations.tres",
         "game/data/resources/perk_data.gd"
@@ -1819,7 +1819,7 @@
       }
     },
     "02 Conteúdo/Perks.md": {
-      "sha256": "b118935ae21248ebe1cb28eef84fc1eb44883426edd56375a9f2baec7b0c2ac2",
+      "sha256": "c7f4f540a7f361d9ad8b2b9c72cccff80b5e0c60b99d4be483d3cbf37f146e04",
       "sources": [
         "game/data/perks/archivist.tres",
         "game/data/perks/body_count.tres",
@@ -1878,7 +1878,7 @@
       }
     },
     "02 Conteúdo/Power-ups/Power-up - double_rewards.md": {
-      "sha256": "144f2e756ee2863a0ed5118577de64525cd980de8d4f7bba04f025b27ad09113",
+      "sha256": "694867b0bd2409924f294702e9c74db3e69eb01a492466fc2cdbd042ce63ae7f",
       "sources": [
         "game/data/power_ups/double_rewards.tres",
         "game/data/resources/power_up_data.gd"
@@ -1889,7 +1889,7 @@
       }
     },
     "02 Conteúdo/Power-ups/Power-up - extra_reroll.md": {
-      "sha256": "5871aec5cc2ff8bd9b1776dfce42f3d900bc3d8d7f2e8659dbb81dfeb247a273",
+      "sha256": "fce492992def25ae470901f9bc88f032966a89c236cf23edc7dbac96d7969544",
       "sources": [
         "game/data/power_ups/extra_reroll.tres",
         "game/data/resources/power_up_data.gd"
@@ -1900,7 +1900,7 @@
       }
     },
     "02 Conteúdo/Power-ups/Power-up - full_power.md": {
-      "sha256": "7ef3cdf9481cdcc7db885f5b43f9a01d0ed4668d4e0ab32cac75f78bd6f386ff",
+      "sha256": "142413f6fd32fbeb6ba467700fe4bba6496a4203d9430b73e549913b7fbce17e",
       "sources": [
         "game/data/power_ups/full_power.tres",
         "game/data/resources/power_up_data.gd"
@@ -1911,7 +1911,7 @@
       }
     },
     "02 Conteúdo/Power-ups/Power-up - insta_kill.md": {
-      "sha256": "e73c7b9c126a223e1a842598224958999a67310576814b2c6f6fbeabe018be47",
+      "sha256": "abfc9cbda687a47322a5e30f43cc3fee2881f8724de0adcd276f6803f3a0a66f",
       "sources": [
         "game/data/power_ups/insta_kill.tres",
         "game/data/resources/power_up_data.gd"
@@ -1922,7 +1922,7 @@
       }
     },
     "02 Conteúdo/Power-ups/Power-up - max_ammo.md": {
-      "sha256": "59e8978b859bbb3b1d4de592424c7ca933d7c3ea393bdb9d876d33c8c8c83307",
+      "sha256": "57c5cb126079e0f7963baa75080e6be6d0f246468bd23a89e137b0cfc4fb7084",
       "sources": [
         "game/data/power_ups/max_ammo.tres",
         "game/data/resources/power_up_data.gd"
@@ -1933,7 +1933,7 @@
       }
     },
     "02 Conteúdo/Power-ups/Power-up - max_shield.md": {
-      "sha256": "6fb152ac6d8df69d9ce6e6e575b0a2d21800f475c716a49fd0257d81f451d7e2",
+      "sha256": "454c9a316072ba80d10bf2675c361fa132bdd1c40d74d304a1ddf35200d924e8",
       "sources": [
         "game/data/power_ups/max_shield.tres",
         "game/data/resources/power_up_data.gd"
@@ -1944,7 +1944,7 @@
       }
     },
     "02 Conteúdo/Power-ups/Power-up - nuke.md": {
-      "sha256": "df7b061db8a3d0ac09b1fad89242558c5946b09b243177c7847040b10ef8fe43",
+      "sha256": "7db1a355124ca2d1b746b2e25544227310e003e60dce1613c4e021bdf32d6e94",
       "sources": [
         "game/data/power_ups/nuke.tres",
         "game/data/resources/power_up_data.gd"
@@ -1955,7 +1955,7 @@
       }
     },
     "02 Conteúdo/Power-ups.md": {
-      "sha256": "016c986cc7cc89083451ccf9f7fa3c522bb723576c0b51a14c452fe8898ec627",
+      "sha256": "de65f9c2c4aaa20e9b561de9098448f96abb36bd06fbc3a0d2de7d2ef101c8b9",
       "sources": [
         "game/data/power_ups/double_rewards.tres",
         "game/data/power_ups/extra_reroll.tres",
@@ -1976,7 +1976,7 @@
       }
     },
     "02 Conteúdo/Missões/Missão - activate.md": {
-      "sha256": "41609b7394b3e887a886cd6c1d65c8919b2f4ea7f255fb3d70774416d2559042",
+      "sha256": "2627434b9d6bcd40f55ba5312ccd1755055326e2e44e0bc19fec849c04851e42",
       "sources": [
         "game/data/missions/activate.tres",
         "game/data/resources/mission_data.gd"
@@ -1987,7 +1987,7 @@
       }
     },
     "02 Conteúdo/Missões/Missão - defend.md": {
-      "sha256": "f0e75baddab8daca84faccf1681af50fa6ad3b005a11608c886069e77c1ec753",
+      "sha256": "a958467c907c504caead644892a03cde6acfcc4879dbb58f313ca398421ea3bb",
       "sources": [
         "game/data/missions/defend.tres",
         "game/data/resources/mission_data.gd"
@@ -1998,7 +1998,7 @@
       }
     },
     "02 Conteúdo/Missões/Missão - escort.md": {
-      "sha256": "38a0280a1f94b9e00bd87a190f0dd46155bb8f36543ea0a79a7916fa66ebdfdf",
+      "sha256": "8c7416c76641653e9441ae89a8dc959708cdac2410334c353ae2ef9d6eacb63b",
       "sources": [
         "game/data/missions/escort.tres",
         "game/data/resources/mission_data.gd"
@@ -2009,7 +2009,7 @@
       }
     },
     "02 Conteúdo/Missões/Missão - fuel_run.md": {
-      "sha256": "8612ac30a6620d750e3242586bacaa0c961c3213b01e2498afe93079a5b40129",
+      "sha256": "e6ae4895f87f090732d180b2984c0856f2577ed45e87b1a9a015c6080f05ef77",
       "sources": [
         "game/data/missions/fuel_run.tres",
         "game/data/resources/mission_data.gd"
@@ -2020,7 +2020,7 @@
       }
     },
     "02 Conteúdo/Missões/Missão - hold_sequence.md": {
-      "sha256": "7f076d6547564709a85999192358db63ec6200114c48f615051407ac01b0c07d",
+      "sha256": "0839a8579cb75f96d61e50d857f66a9801ee7f52222132d8ed1d4db735b86fec",
       "sources": [
         "game/data/missions/hold_sequence.tres",
         "game/data/resources/mission_data.gd"
@@ -2031,7 +2031,7 @@
       }
     },
     "02 Conteúdo/Missões/Missão - holdout.md": {
-      "sha256": "f7136c39f3ce8f70f707d8f5c696a9382bc2c2223d96c62f205fc257606c1a7a",
+      "sha256": "4d032096630a8c96a98fa5eba51072d1dba023a986103eec42fc3fec610529bb",
       "sources": [
         "game/data/missions/holdout.tres",
         "game/data/resources/mission_data.gd"
@@ -2042,7 +2042,7 @@
       }
     },
     "02 Conteúdo/Missões/Missão - intel_search.md": {
-      "sha256": "cf40bd22ba89396e66b57149582b8b490915690aa965802bdbdaed2eebdfee88",
+      "sha256": "fdd6bf529669b91414b40f6d0353402104dcccfbbdca12de45a1d53aba7c4598",
       "sources": [
         "game/data/missions/intel_search.tres",
         "game/data/resources/mission_data.gd"
@@ -2053,7 +2053,7 @@
       }
     },
     "02 Conteúdo/Missões/Missão - nests.md": {
-      "sha256": "deb31977f61e427bb642ba8dba645d3a57940466b2ffd7da2984f16bcfe9fc8a",
+      "sha256": "6fd7970150956a8e7af930bb5dad0b0c8ce1da50597ef65a456d71ae1e20c5b6",
       "sources": [
         "game/data/missions/nests.tres",
         "game/data/resources/mission_data.gd"
@@ -2064,7 +2064,7 @@
       }
     },
     "02 Conteúdo/Missões/Missão - rescue.md": {
-      "sha256": "2371dd4f6e5dbcd618d4d851d15c80fdc7724a56e791acd4de148af93ece4061",
+      "sha256": "5d130c3e33901f6cd918c61ff8d3a14db434bd4a95a8b88d5589670331ea897d",
       "sources": [
         "game/data/missions/rescue.tres",
         "game/data/resources/mission_data.gd"
@@ -2075,7 +2075,7 @@
       }
     },
     "02 Conteúdo/Missões/Missão - sabotage.md": {
-      "sha256": "ac16c1448c9eb5500df95a3b1cdf7bf02d03bcb61123dd933a3bbf601aff3a8e",
+      "sha256": "f54818b3a7d28640c10f4b96cf940adf3bd8800318ee6b53478ee8e018f2319d",
       "sources": [
         "game/data/missions/sabotage.tres",
         "game/data/resources/mission_data.gd"
@@ -2086,7 +2086,7 @@
       }
     },
     "02 Conteúdo/Missões/Missão - signals.md": {
-      "sha256": "ee2a6399ee4eb52024b7e270739d8783c2d1e7cdaded47bae23fcba1a5dce479",
+      "sha256": "c16e499996adb049b97e20663f0856bdc7eac60b07842f81358db61ca86f7d51",
       "sources": [
         "game/data/missions/signals.tres",
         "game/data/resources/mission_data.gd"
@@ -2097,7 +2097,7 @@
       }
     },
     "02 Conteúdo/Missões.md": {
-      "sha256": "f03459e062fdb82bc98cd3e0fe3e764f718aac07c52bea4661b7953c9930e870",
+      "sha256": "a272dc24faee91463635541ceebe71616f3281774072de15bc9a5cf861bfa4ce",
       "sources": [
         "game/data/missions/activate.tres",
         "game/data/missions/defend.tres",
@@ -2126,7 +2126,7 @@
       }
     },
     "02 Conteúdo/Biomas/Bioma - beach.md": {
-      "sha256": "4f4f40efaefbfc2a08c1eb5bcf181c93fe253833d0817adf9e7e82dc02b494a0",
+      "sha256": "dd3e851ebb2e3b3c6a75842a22a77737438cb08c189bbf334198e877bd7c055f",
       "sources": [
         "game/data/biomes/beach.tres",
         "game/data/resources/biome_data.gd"
@@ -2137,7 +2137,7 @@
       }
     },
     "02 Conteúdo/Biomas/Bioma - jungle.md": {
-      "sha256": "2c5ae3cbfee7989e5724dec03ff66c0bd06229a5dba43bfb8ca36a85ffff1ea4",
+      "sha256": "17f5e7750223ae9f8e562690e63a8758f19fc93f31621e9766661d05e8e6eb10",
       "sources": [
         "game/data/biomes/jungle.tres",
         "game/data/resources/biome_data.gd"
@@ -2148,7 +2148,7 @@
       }
     },
     "02 Conteúdo/Biomas/Bioma - port.md": {
-      "sha256": "dbdf52d86bf03d1cda92f63de814e1443eef4ae7fe344df6a4af1317eb494b4d",
+      "sha256": "8f844e0bff1fc16b526798e1ee97721a99ca2fdf37bfa2f5d7497307a7637ccd",
       "sources": [
         "game/data/biomes/port.tres",
         "game/data/resources/biome_data.gd"
@@ -2159,7 +2159,7 @@
       }
     },
     "02 Conteúdo/Biomas/Bioma - town.md": {
-      "sha256": "401544a5488203dc79824beabf391e79c51aea894badcad387acac1fa6850de9",
+      "sha256": "caf6264504aa74f9e520749db483353b01823ae2f19f45c70eb3220ce6c8d516",
       "sources": [
         "game/data/biomes/town.tres",
         "game/data/resources/biome_data.gd"
@@ -2170,7 +2170,7 @@
       }
     },
     "02 Conteúdo/Biomas/Bioma - volcano.md": {
-      "sha256": "301c53e694b9160908b75aa255926c9afb2a4535669b4fdec2346b5f95182bb3",
+      "sha256": "b3dfe7a60f9bee5d210772a0bfd267d79c230196c12c22a50e38c1a44cf7b066",
       "sources": [
         "game/data/biomes/volcano.tres",
         "game/data/resources/biome_data.gd"
@@ -2181,7 +2181,7 @@
       }
     },
     "02 Conteúdo/Biomas.md": {
-      "sha256": "9e356ef143e1c9b88801e8cc44eea84fe6767382e5337f605de1c97b968c53d1",
+      "sha256": "3a623553569eec116ff4937c5a8cc9c067643045834912962ad95e47469d01c6",
       "sources": [
         "game/data/biomes/beach.tres",
         "game/data/biomes/jungle.tres",
@@ -2198,7 +2198,7 @@
       }
     },
     "02 Conteúdo/Modificadores/Modificador - calm.md": {
-      "sha256": "4adf3069b6e4aa7dd689d4a40b1c5731f4b8c2eea9c9821ab2f24578ff1e6f37",
+      "sha256": "d5393f3e14ca2d3c9ee6d9a6eabc89575b92d035a4809a46e63af38cada44bb7",
       "sources": [
         "game/data/modifiers/calm.tres",
         "game/data/resources/modifier_data.gd"
@@ -2209,7 +2209,7 @@
       }
     },
     "02 Conteúdo/Modificadores/Modificador - elite.md": {
-      "sha256": "a1c3ed77b5ec232eb447f5b835f0f073007aedecdfba30675ac640f429b4a310",
+      "sha256": "869579560fca8ad0ba6b5742582c286029baf0fe97fbd8aff24acc3422de48af",
       "sources": [
         "game/data/modifiers/elite.tres",
         "game/data/resources/modifier_data.gd"
@@ -2220,7 +2220,7 @@
       }
     },
     "02 Conteúdo/Modificadores/Modificador - fog.md": {
-      "sha256": "bb6b0000896fd62d3bb9fd4dc34fe8491130da7b0b0067b7fa0f8e4e7555c54d",
+      "sha256": "206218358318b1838289bc37017f86211a3b71ee7a89da99b9ec055533dd062b",
       "sources": [
         "game/data/modifiers/fog.tres",
         "game/data/resources/modifier_data.gd"
@@ -2231,7 +2231,7 @@
       }
     },
     "02 Conteúdo/Modificadores/Modificador - short.md": {
-      "sha256": "b8826d67669faa38cdb46a56ac2e74630e7eec00e181f6c3c6c1eb5e1a6d046e",
+      "sha256": "3dcc41018549e993bb5d3510979f0b454887992f186265eaa2f683d2ae299d5a",
       "sources": [
         "game/data/modifiers/short.tres",
         "game/data/resources/modifier_data.gd"
@@ -2242,7 +2242,7 @@
       }
     },
     "02 Conteúdo/Modificadores/Modificador - swarm.md": {
-      "sha256": "6fd276381c81f86d60e2b3cebaad74d2f7d2cac846f4fdce637b5278de346df5",
+      "sha256": "1b7ff7957c1b6debd4955cda9212e4062a5b1c3f8923c3d20864c37382c8c669",
       "sources": [
         "game/data/modifiers/swarm.tres",
         "game/data/resources/modifier_data.gd"
@@ -2253,7 +2253,7 @@
       }
     },
     "02 Conteúdo/Modificadores.md": {
-      "sha256": "c344aed9bcf6021aebde841b2e4199bc7b7a17c4453db2647c6d5b1716a7a9e1",
+      "sha256": "5ead56cf96aa46c3d779d99a480db219fdd2e89e39dfce250f2f4540b759c20d",
       "sources": [
         "game/data/modifiers/calm.tres",
         "game/data/modifiers/elite.tres",
@@ -2270,7 +2270,7 @@
       }
     },
     "05 Desenvolvimento/Mapa do código.md": {
-      "sha256": "3ade9ff94ec5ab610a96e6724408a63ecea01638401b6a8fe7b714094f3af28e",
+      "sha256": "ea93dff494a375a85229c088e195267b87b9da84f990a793c096f58f704c76ab",
       "sources": [
         "game/audio/ambience.gd",
         "game/audio/music.gd",
@@ -2385,35 +2385,35 @@
         "game/horde/flow_field.gd": "756023f65374b93e55f49fc003bd8c1d07fed37135723cc3e34c54b8188e2f8d",
         "game/horde/horde.gd": "ca1b29aad1e93c5896770cf93509fc2efd2216bf6bdc2fa1d146f3c6f3391c56",
         "game/main.gd": "5e98389307f896b389bd383b1267235ab72dd5f402d379c42304373fcbf1b339",
-        "game/states/armory.gd": "a601e7f753862558352500b10375943f744ebd95c98dca9cfab75e7816347347",
-        "game/states/boat.gd": "c25bca1c406803cbe79f5ef10303797cf8163dd4a73cd007b15745a1db8a3d7f",
+        "game/states/armory.gd": "44f2183f9a1d128af40dea43c843d5b068719a1a2680ee9faefdac7b51665134",
+        "game/states/boat.gd": "d1ba7c179575e8c2dd71225f4541b23285e6fa6fc64a7252d08bae938474a9e4",
         "game/states/camp.gd": "c2926f50e651a738a759da2fa31bcd705cea8a72b2a0b2335b2a841600ed8d75",
-        "game/states/debrief.gd": "ae52d30d6fd854757f899b3b6bdcdb88d1975ca49a8964ac83f447b0ae9d8ecf",
+        "game/states/debrief.gd": "ee261f3fb72fed58a4e8deaf136a75aecc5ce5be1ea46b084b29874a87794b48",
         "game/states/title.gd": "d83c49eebe9d77d5a89e7808b73749c7d000cdedb89f77d4c12a1e9507bd53c4",
         "game/ui/armory_art.gd": "62f59fb226c3fd5817e3913b94dd12d6f7a0d17771939b58be3e37647f4a22bb",
         "game/ui/armory_shelter.gd": "2581bb086f7254d19402a9e80c51356931517c167c8e98e4c5e7ca943f89f9b6",
         "game/ui/class_preview.gd": "553685309d05136ef4f3ae86d644bcd31463d949f65711821844337d92195bb4",
-        "game/ui/credits_panel.gd": "1ac192f253ac7b4fcfca8dd6bf402c29f6cd6729d8e7f2ec4d6b89972bf1b532",
+        "game/ui/credits_panel.gd": "ff52380aa59c1e062f04fd76599725965194f5b64149403400bf71a29e606557",
         "game/ui/dev_menu.gd": "e90a19eabec6b0feb8248eb4e4f02f9a63db2d9d11b3255b36ab9954da6873d5",
-        "game/ui/dev_sandbox.gd": "c6422fcba7af7da3de665bb3c07517433ef253a222f5c05296f24da0653dcc3c",
-        "game/ui/dev_test_panel.gd": "45a80192a9855b1c3097d33fcf59c7866fad55a94d0b20fe7fd975653d8ff0f1",
+        "game/ui/dev_sandbox.gd": "ef6aae32967294b903c515fbb645e0ce866a79e73848302820978c8c04e3296b",
+        "game/ui/dev_test_panel.gd": "5052f7b25072d1de00506e85af87d887abec117fed05c016bd6ba634ea1fc42d",
         "game/ui/dialogue_box.gd": "e968343c7c3b0b4c9c0344e759d632e8a3b34f445c99e9086f5226be62bb085f",
         "game/ui/dialogue_voice.gd": "dd68f4bae19eea9292a6ac31764069a82dc25916d562a0b68e480c170de3b904",
-        "game/ui/dossier.gd": "212e78e26a7ca73d3557bdff2175a4ba7e9604a723a5a05cd8dc8b50aab79307",
+        "game/ui/dossier.gd": "8ee988467828dee08e565a63cb613749857627fa4e7a8fa6823c84da5ca50959",
         "game/ui/focus_brackets.gd": "24a7faca0729790125dffb1958661fe1687d845f7104e3672b4df5dc6ab1477b",
-        "game/ui/hud.gd": "08ccfdaf29bc29e40e419edea6058f6fc80c345179ce9f9bc7ac0c2195457416",
+        "game/ui/hud.gd": "2cd2d2321d1d79404cb3a89046cca132ad11beb8a4f76f1941d447943546da7e",
         "game/ui/input_icons.gd": "618e18661ce81e6f6da8c8286a53632e43f6286d662dd4a2bd2c662773c2eeb3",
         "game/ui/island_end_panel.gd": "e3b0f0b396911cd3d851140c711671207fd43bf5ab7c37fe26b4ca953fb559ae",
         "game/ui/loading_screen.gd": "ac363f63bdcf9388c8b28efba9a8a1ea73f8a29ef352da04c11640684bbf4e09",
         "game/ui/marked_box.gd": "443388f2f38595440eb38fc7087ab904b0ac95bac6cc89d5ac6d09c5ac2b2493",
-        "game/ui/menu_dialog.gd": "0e3081994a4cb0ad349d4a59515e59a8fcfae92cb0dbee08e02f6b03d67c6467",
+        "game/ui/menu_dialog.gd": "3d18c647ea091e952f045f764a03c98fa4d860500386bf2b4392f7085e579162",
         "game/ui/minimap.gd": "6097ab28feca9ce520063f8a4c4fe6d013836f0497e14f4aafd26b54dfe478ca",
         "game/ui/perk_node_view.gd": "d03773671bd3a1d6b00e4fdd523cbdba98285ac0bd7f97ad6c729f59c00ac851",
         "game/ui/portrait.gd": "f9e6ab48173605c1701fc16e5a57b24abbc2620257eded1bea58508800b43968",
-        "game/ui/route_map.gd": "2a507af8537268a2ffffc976f9223ee66a271160f327cc8381a3987267bc8f1b",
+        "game/ui/route_map.gd": "d806825688dac494be976c1219ebf3828e8099db3ee0785ee1a618e1a5163224",
         "game/ui/route_preview.gd": "895c97326012874cc4479421a215d4566b9663c5248526610831f2efc143f978",
         "game/ui/scope_overlay.gd": "d11f3ba9ba562d6cb9dfe90ebd0b773a4a962350f10b5cd0e60bbb9f4618910e",
-        "game/ui/settings_panel.gd": "b7f1580bc9861b845abc6f664de710c72040e4facf070242eb517d69bf111ba8",
+        "game/ui/settings_panel.gd": "f9ac18d2dca91db0f1e61f4c8b0f8bb29f4cd56f0ad346be3698209fc292f5d6",
         "game/ui/typewriter.gd": "56e2afa45d07da6f93fb734f16c779239c82a1c33685cbbf4369c784755408d7",
         "game/ui/ui_sfx.gd": "10ee0c70f1f1bc45df47b3db73175f880cb56ebab74090287d891db5fb02705a",
         "game/ui/ui_theme.gd": "9b3af7a735b0a26ecc8227df54afbe19a6592b0fc07d99d10fdbd5ad1019227a",
@@ -2428,7 +2428,7 @@
         "game/world/grading.gd": "1607e9de7a389de453e256a1755040b49593f9764092a63fc88034891369ec3b",
         "game/world/handmade/handmade_island.gd": "03fe4dbb578d00d5fc3b10718bbccc602796ab580c96c53d09adaf00e481992b",
         "game/world/handmade/scatter.gd": "1c93e13a96500df9ede45d9a49af2a2065d593008d61ed4bf054b7d1864b4555",
-        "game/world/island.gd": "f702bc1adc85b7155ae39e19d5a996ee401a6ddb983d790edd274475dafd37f9",
+        "game/world/island.gd": "10d0ee44b645b5b1b71ae6b635e563f9cb530fdb2ff46484515a974c103e3062",
         "game/world/island_map.gd": "6a0265ebf027b566ab85efe3104b60e981719484af1b2bff73bfb7e178b9e217",
         "game/world/island_props.gd": "90056241144afe324f6b67e5404f4029a06977663265f458061397c08bbe19bf",
         "game/world/island_roads.gd": "67576f90957bf6543cecc0090768d722dfaa3ed4776068edd7a33edb7163f545",
@@ -2449,7 +2449,7 @@
       }
     },
     "05 Desenvolvimento/Inventário de testes.md": {
-      "sha256": "ee58eff81bbc383391751d6bc18c59bed199624e8afaff4b60da6e6d1bf39c3d",
+      "sha256": "3bc9e6e0775d7624f4975ae562166e0b42e6cc92e0e99e252cc65dfb3757c839",
       "sources": [
         "spikes/camera_medium/tests/test_camera_medium.gd",
         "spikes/director/tests/test_director.gd",
@@ -2588,7 +2588,7 @@
         "tests/test_horde_windup.gd": "733a954485321368ff7ea8af38242b06d16a3db406ed444cfc41c1c5148fd40b",
         "tests/test_horror_preset.gd": "3bf1604eb16a479ef3781caa952f4c56492ac853f30e1015b8012623a7e6a210",
         "tests/test_hud.gd": "8142b5dc623f29eba5c66fd17a93824d1aaf3df67d46de241c0bffb8a50934ea",
-        "tests/test_hud_redesign.gd": "11026cad896a9926d15135c3de245620b6ea9df07103446dbab889f735c917d9",
+        "tests/test_hud_redesign.gd": "1b72c9b4820691438ab62c591f957da1e15b38046a581b257597a98f9485494b",
         "tests/test_hud_weights.gd": "7a34cc96489460f411d300c23551345ba2817155235a34e6588da49fcf1e09a8",
         "tests/test_intel_search.gd": "06e29246484d8254db8a858c3a6eda8bc71e3564456f0ebaa5471b14971b5d21",
         "tests/test_island_end_panel.gd": "6467dfa686da9ba092d639720786c8775fbb4be3101cc238c30e9b34ed919ca1",
@@ -2634,7 +2634,7 @@
       }
     },
     "02 Conteúdo/Mapas/Mapa - beach_01.md": {
-      "sha256": "fde886793b354c7447e70a6849c75f63ad13c85cfa8896de6a440f8c90781467",
+      "sha256": "b4d988a5cf5d8518294106e755170af90fc53271766efab5203b4e297576bc2f",
       "sources": [
         "game/world/handmade/islands/beach_01.tscn"
       ],
@@ -2643,7 +2643,7 @@
       }
     },
     "02 Conteúdo/Mapas/Mapa - jungle_01.md": {
-      "sha256": "2c070250c0110679b38daae33b53c22108e0cbbeb6d99057a36dd779106f2c93",
+      "sha256": "48f28c692b5400a54858031adb5fb40e752cd8c069c5184c789509cff40d59ab",
       "sources": [
         "game/world/handmade/islands/jungle_01.tscn"
       ],
@@ -2652,7 +2652,7 @@
       }
     },
     "02 Conteúdo/Mapas/Mapa - port_01.md": {
-      "sha256": "9c45713f5f299e69d0dd30384631b45fa04fb09c2ba3bdf6ffa0aae909b98c35",
+      "sha256": "3eb55b3f73b9ed17520278f8a3a035bda6cd42321a16aed1939339d16c92b26d",
       "sources": [
         "game/world/handmade/islands/port_01.tscn"
       ],
@@ -2661,7 +2661,7 @@
       }
     },
     "02 Conteúdo/Mapas/Mapa - town_01.md": {
-      "sha256": "93f55c5b9699f878cf8276cbf4eba2974e81d5d25a959e1d291e833a1c4e37e7",
+      "sha256": "8d25cb6ee4607d7b06fe19e86a904d446279c149fccf93027b58fb63e73bdf9d",
       "sources": [
         "game/world/handmade/islands/town_01.tscn"
       ],
@@ -2670,7 +2670,7 @@
       }
     },
     "02 Conteúdo/Mapas/Mapa - volcano_01.md": {
-      "sha256": "5bbfd430e528aca72699c3372341324e2ffbdfec7c92d7f4109f6763c5d9dea9",
+      "sha256": "8aa2d535e451168d631ec5f449da87f7b918f6422fe47726b483cc06c36a4d9a",
       "sources": [
         "game/world/handmade/islands/volcano_01.tscn"
       ],
@@ -2679,7 +2679,7 @@
       }
     },
     "02 Conteúdo/Mapas/Mapa - exfil_test.md": {
-      "sha256": "4c487b0574c7d3156a1391ea8b33a777fcd8ae34897109cb266a2b8c99cc9352",
+      "sha256": "18b5bc84462c4cf7951b5d702e05d6ea9c0712c503fa98a64936bf3cba71f87c",
       "sources": [
         "game/world/handmade/test/exfil_test.tscn"
       ],
@@ -2688,18 +2688,18 @@
       }
     },
     "00 Início.md": {
-      "sha256": "921e8aff528ac9bcb79e5b7f0f45d11044bbd026f3c366394be5a08d455453a5",
+      "sha256": "d8d962f425ff2031721a7262ded4f760b3bf58aa38f98a3987db3ccfc457c91a",
       "sources": [
         "TODO.md",
         "docs/DECISIONS.md"
       ],
       "source_hashes": {
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e",
         "docs/DECISIONS.md": "cc0f8756406a674b97a51086e70a7e16dac231de0ec07f39b45963eb03497ea6"
       }
     },
     "01 Projeto/Projeto.md": {
-      "sha256": "80de0ca022bd00c1a9f4655761f9708731983a10c319a39266e857925fff42d7",
+      "sha256": "0eadbf50c723eefec252192cfa0eb5678e3a1c9817de9a7fdc48dcdd01fea60d",
       "sources": [
         "CLAUDE.md",
         "project.godot"
@@ -2710,7 +2710,7 @@
       }
     },
     "01 Projeto/Visão e pilares.md": {
-      "sha256": "d98c59e81527689cd2e11f26d538e59e08264158311dafb0be2353de6619fe15",
+      "sha256": "94b8c7c5f250a4dbd9cd955d2661644e89230d270e2e6762c258b3e276822507",
       "sources": [
         "docs/design/GDD.md",
         "docs/DECISIONS.md"
@@ -2721,19 +2721,19 @@
       }
     },
     "01 Projeto/Situação atual.md": {
-      "sha256": "b68cadd526fbee81e37ad8de6fd448fa909796c441916fde9d4a2e06e63613c5",
+      "sha256": "cc26b57da74a552b52b68854ded358f69691e4a2aaa7831e80d70dfbfe1da1ca",
       "sources": [
         "TODO.md",
         "docs/DECISIONS.md",
         "tests/run_all.gd"
       ],
       "source_hashes": {
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e",
         "docs/DECISIONS.md": "cc0f8756406a674b97a51086e70a7e16dac231de0ec07f39b45963eb03497ea6"
       }
     },
     "01 Projeto/Decisões e âmbito.md": {
-      "sha256": "da85315f045a621a69171e95a72614dcb3d7fd746bfc3f2f74a4475cdb04dc64",
+      "sha256": "a2c407fc6e2f6fddd7614db53b4be362f1a3d338649e475af842842ea4d835bc",
       "sources": [
         "docs/DECISIONS.md",
         "TODO.md",
@@ -2741,12 +2741,12 @@
       ],
       "source_hashes": {
         "docs/DECISIONS.md": "cc0f8756406a674b97a51086e70a7e16dac231de0ec07f39b45963eb03497ea6",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e",
         "AGENTS.md": "adab8d05f49a29db5299d59d78dd15c51e48b1b98d85d836677727ff67593d50"
       }
     },
     "01 Projeto/História e tom.md": {
-      "sha256": "c7f5ab834d58bde2b014cd13543d60029a8ce29054ebedc93a9f797e7f5fd1b6",
+      "sha256": "f754ad9fd3197c340365514ca977f2b8e9df67f7bd335436928a66169a0f064f",
       "sources": [
         "docs/design/GDD.md",
         "docs/design/BRAINSTORM.md"
@@ -2757,7 +2757,7 @@
       }
     },
     "01 Projeto/Fontes e divergências.md": {
-      "sha256": "53e55f7cb4e8bbbcfe2c3f2d66b15bbd1482590bfe191879df4054c65742c21d",
+      "sha256": "3d6463f07b8cb2bfc9e66d80a89915ccec9303b33051ef48719b63191e3f0ab0",
       "sources": [
         "docs/DECISIONS.md",
         "game/README.md",
@@ -2775,12 +2775,12 @@
       }
     },
     "02 Conteúdo/Conteúdo.md": {
-      "sha256": "7e04e4984e1687105530daebc15a65e6d3b5ea04dcedcd4a18b47849682cb1dc",
+      "sha256": "44584dff684970362b92ba42484d70cbb01d61e5049777cf5c45f77d7888203c",
       "sources": [],
       "source_hashes": {}
     },
     "02 Conteúdo/Mapas e expedições.md": {
-      "sha256": "68c50a55b0f9c02e0b52cd724ac06fc04cb670a4941d8ca7650cc8f4be1bff60",
+      "sha256": "649bbe5fda2cfc15189121f6fcbcbe8c0a3f210f3f4625c1fb8743e019d23814",
       "sources": [
         "docs/design/WORLD_AND_MISSIONS.md",
         "docs/design/BERLENGA_EXPEDITION.md",
@@ -2793,23 +2793,23 @@
       }
     },
     "02 Conteúdo/Berlenga.md": {
-      "sha256": "eefd9801c67d78f5d49df5db498b507e9eac74629c84736781ca97a430db5a6b",
+      "sha256": "41ade8996eef8ae8b8aff8860b951e8b5ab391cb2d6ce105614966e5cd1e79a7",
       "sources": [
         "docs/design/BERLENGA_EXPEDITION.md",
         "TODO.md"
       ],
       "source_hashes": {
         "docs/design/BERLENGA_EXPEDITION.md": "df79e195b43b2675965dba505dd05594b7e87d92cfd7c4985f3cb5a600f20e29",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e"
       }
     },
     "03 Sistemas/Sistemas.md": {
-      "sha256": "3561e7479dbad94726de72df8d7c129d01384d3c75b238c8345eb9ccbad54738",
+      "sha256": "32b7194b0eeb24e2aba5c9514a304f6cd60dbf77f3ea6744decc54236b98be72",
       "sources": [],
       "source_hashes": {}
     },
     "03 Sistemas/Fluxo da run.md": {
-      "sha256": "00500f65ac0df3279dce0230e79bb966f9a97e4669e1fdbd524527ebc2238eeb",
+      "sha256": "5996bb166444df859ab80f137475f5d28b6dec4a85c37abcc4d49fec4b338cdc",
       "sources": [
         "docs/DECISIONS.md",
         "game/README.md",
@@ -2822,7 +2822,7 @@
       }
     },
     "03 Sistemas/Combate e movimento.md": {
-      "sha256": "857f6951ce84ea5ec5290b85773fa19e9e517ad79b9b1a83b8f59627803b1441",
+      "sha256": "90413e5d91a7233404fc23678a3f0c6fd1c3a0af0bf7380305f4010f3481e9fe",
       "sources": [
         "game/data/game_data.gd",
         "game/world/island_run.gd",
@@ -2837,7 +2837,7 @@
       }
     },
     "03 Sistemas/XP e cartas.md": {
-      "sha256": "19860a4ac4303e26139d6663bb890417ad1388ec7a63070901aa0de2e7706220",
+      "sha256": "43b6c83236084a9128b3103a287c71901e2b8078ddee45d48165c321a41e32eb",
       "sources": [
         "game/data/game_data.gd",
         "game/world/island_run.gd",
@@ -2852,7 +2852,7 @@
       }
     },
     "03 Sistemas/Intel e perks.md": {
-      "sha256": "69d9cb40f56d7676b3d09e6211e3e1a8d6d9d0b95698101999ee556d6465f12a",
+      "sha256": "cb3fb4623fdddd7709a019a3b92327d7da07e35b2ad338354a3ec0d5e97679a7",
       "sources": [
         "game/data/game_data.gd",
         "game/data/resources/perk_data.gd",
@@ -2867,7 +2867,7 @@
       }
     },
     "03 Sistemas/Power-ups e pickups.md": {
-      "sha256": "6e2ea9eb165e8903358f0688acd9e246ffb89778d146a26a6b1be46181af8098",
+      "sha256": "9c71c1e4e2f343a578840a16f2c7392127732206e02bf5b6fc2bceb8e4d329c7",
       "sources": [
         "docs/tech/POWER_UPS_AND_DEFEAT.md",
         "docs/DECISIONS.md",
@@ -2880,7 +2880,7 @@
       }
     },
     "03 Sistemas/Horda e diretor.md": {
-      "sha256": "5a5ee9ff0f6a48b94032c353d56429ceb7c7df659e1358cc649772529a3f7362",
+      "sha256": "0f6391600c6571c5d03f39aceb9ae92eb9f5d14a2143045c9a6ef64f8984f5ce",
       "sources": [
         "game/world/director.gd",
         "game/world/island_run.gd",
@@ -2892,12 +2892,12 @@
         "game/world/director.gd": "318e36023d250df214ed4538b0bd84a7e3e21ecc8ae88589c8569db6a91984af",
         "game/world/island_run.gd": "6d9d5ab891f974ea0d0d92457b68dac4e6a16245a27391f7c5e693a48630319c",
         "game/world/zombie_model.gd": "7a92533c946f2efda55c8185675797b6bacbb4091adbf90d263817c76e4a0432",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e",
         "docs/tech/SPECIAL_ENEMY_MODELS.md": "8cdd4149b686dafba5de168472ea91633691b7792d793ad257d179af388c2777"
       }
     },
     "03 Sistemas/Missões e objetivos.md": {
-      "sha256": "be6a8abdd6ffeadad991c9cf2b4981b32e944ff51607fb59b707799f03eb9f79",
+      "sha256": "0fc69cae89be65f70675324d73c5241a5660717163df43a56b27848e189cbaa2",
       "sources": [
         "game/data/resources/mission_data.gd",
         "game/world/island_run.gd",
@@ -2907,12 +2907,12 @@
       "source_hashes": {
         "game/data/resources/mission_data.gd": "42e00a30d5b1652f3f145b7f4ddc14de9a9f5c566fa0a06d724dc0f6e909896b",
         "game/world/island_run.gd": "6d9d5ab891f974ea0d0d92457b68dac4e6a16245a27391f7c5e693a48630319c",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e",
         "docs/design/OBJECTIVES_PROPOSAL.md": "a575e4aaaaeadf47a08aee4ae1512f9b42488a28c80f44d4c35e10ba36dcbf9d"
       }
     },
     "03 Sistemas/Exfil.md": {
-      "sha256": "98ae205d729d2a7390b409a9964e0bc9e11db63f0195e70c92217a0d71683468",
+      "sha256": "3683933b466f15f1a27d04eae65d09439e84e9208bf8c707bd37f702ae99f70c",
       "sources": [
         "docs/DECISIONS.md",
         "docs/design/DEV_MENU.md",
@@ -2921,11 +2921,11 @@
       "source_hashes": {
         "docs/DECISIONS.md": "cc0f8756406a674b97a51086e70a7e16dac231de0ec07f39b45963eb03497ea6",
         "docs/design/DEV_MENU.md": "5639235808c5f82c4c73649560a1ded833272f62136277ca18a95a6881097cea",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e"
       }
     },
     "03 Sistemas/Perfil e telemetria.md": {
-      "sha256": "37cc22b943834fe9002319cbeab43c56ee21b7cc04633ec096a957a7652a1b95",
+      "sha256": "643ed2fd07aa969aee7336e7d67f1c39f4da3de32b7d24dc2524e4794e4b6e2a",
       "sources": [
         "game/core/profile.gd",
         "game/core/run_context.gd",
@@ -2936,11 +2936,11 @@
         "game/core/profile.gd": "b1d7db83319d3f35efb9e48e871c3699fab96d0b7b8bfb97b1dcb0ab8a9c85e3",
         "game/core/run_context.gd": "db4b46d58e0852411af03225dcca78e560a10414f49625313c9ce632ce1ea6ba",
         "docs/tech/COMBAT_CATALOG.md": "e594e5445e9ac3fbbb771703d2b502a924f29a536d89ed51a58e1ac3d26c83bc",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e"
       }
     },
     "04 Arte e interface/Arte e interface.md": {
-      "sha256": "5a391566ddee855a399fa7c2882a909022575c7f70a4bd5fa01454b92ec01d89",
+      "sha256": "29cad4117dc430cc74820cc88358583d0a51ef5abbec2dc1379a4794d0a5d1dc",
       "sources": [],
       "source_hashes": {}
     },
@@ -2963,12 +2963,12 @@
       }
     },
     "98 Anexos/Menus/armory_weapons.png": {
-      "sha256": "ab4575454bde0b8db797ac3113654f62672e8f01b0272adb50d58202f6dbd939",
+      "sha256": "95e09339be7b8a2a58741f0859a3ab25380570ef16a335739f79b76aa257dd04",
       "sources": [
         "docs/design/dossier_20261111/armory_weapons.png"
       ],
       "source_hashes": {
-        "docs/design/dossier_20261111/armory_weapons.png": "ab4575454bde0b8db797ac3113654f62672e8f01b0272adb50d58202f6dbd939"
+        "docs/design/dossier_20261111/armory_weapons.png": "95e09339be7b8a2a58741f0859a3ab25380570ef16a335739f79b76aa257dd04"
       }
     },
     "98 Anexos/Menus/armory_perks.png": {
@@ -2981,7 +2981,7 @@
       }
     },
     "04 Arte e interface/Menus e HUD.md": {
-      "sha256": "3479206e8519f850b70eafdb4c0e0ec22e158721e75e6231b42643f9c912f576",
+      "sha256": "2ebb4e03fa35d560a01a96ee1f25d84db107328a0c51c4002836ff939c8e0c1a",
       "sources": [
         "docs/DECISIONS.md",
         "TODO.md",
@@ -2990,13 +2990,13 @@
       ],
       "source_hashes": {
         "docs/DECISIONS.md": "cc0f8756406a674b97a51086e70a7e16dac231de0ec07f39b45963eb03497ea6",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e",
         "docs/design/MENUS.md": "f1c53268bda7159eafb1872543069261404487b31acb303e99c1bcba18daadcc",
         "docs/tech/ARMORY_REDESIGN.md": "093b47b276edd787cdcb476a0c324b58bcc3b73b244c283cb0694a6d922e5a09"
       }
     },
     "04 Arte e interface/Câmaras e controlos.md": {
-      "sha256": "4a6c7416b36ac978fb51580a2120c497d4865f9d9f9eed374de21ae23e67441f",
+      "sha256": "614eaff541818c091c78766156e4d0cf53118560d6888393cc7e5aceaf8dc427",
       "sources": [
         "game/README.md",
         "docs/DECISIONS.md",
@@ -3011,7 +3011,7 @@
       }
     },
     "04 Arte e interface/Modelos e animação.md": {
-      "sha256": "214fd1783092f35a3bbab1224fb9c8e356e34a208f1d3dd85f5339a950109f35",
+      "sha256": "e9d11e70174ebfe2eac7eb1200d890cc8c88f82bcf0fbf1b09dc0f59a16afd3f",
       "sources": [
         "docs/tech/RECRUIT_MODEL.md",
         "docs/tech/VANGUARD_MODEL.md",
@@ -3026,11 +3026,11 @@
         "docs/tech/WEAPON_MODELS.md": "5291d5164f724f40d374c9c088a6f4dcdd10b648e6840b169b6bcd619f35851d",
         "docs/tech/LOCOMOTION.md": "23d15aec8739b517874feadd8306553227ff74a7d5783631b6b35b7395d5bc3b",
         "docs/tech/MODELS_ROUND_BRIEF.md": "31c2e84843c0babc1d2b0e6e6cf3c8fa43e889015dad76b8db232329e03143ed",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e"
       }
     },
     "04 Arte e interface/Ilhas e cenário.md": {
-      "sha256": "fcb1f8fe366b2dccb0c3cc80384dba4d8c02e47384b617b916aba79bab322709",
+      "sha256": "71d0618a7acc75aa8cf7e6ee522a8c7e6f499c7290e9c2cc91d50e7a89d83d37",
       "sources": [
         "docs/DECISIONS.md",
         "TODO.md",
@@ -3039,13 +3039,13 @@
       ],
       "source_hashes": {
         "docs/DECISIONS.md": "cc0f8756406a674b97a51086e70a7e16dac231de0ec07f39b45963eb03497ea6",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e",
         "docs/tech/REALISTIC_PROPS.md": "1b8521044d9aca2d3d2585e3045e8e577f151089fc558ad260383aecd044f7bd",
         "docs/tech/MAPS_HANDOFF.md": "6b70d1dcdeadd7fe25e40ed7dd6b5cee1e6b094fdf07def7f3cadd987f90565c"
       }
     },
     "04 Arte e interface/Áudio e diálogos.md": {
-      "sha256": "9ad154e44dad4860952973d0e6720adcfc29d377776c1b792a71bf22e80a57f9",
+      "sha256": "14112bfa62950935d923f22adb31753da876921b16be6edf5de9ad7c2765f314",
       "sources": [
         "game/audio/sfx.gd",
         "game/audio/music.gd",
@@ -3058,7 +3058,7 @@
         "game/audio/music.gd": "73ba1aef61a4e88b8f81722e1763f0d2d6b4f614761382537b1d1afeabe5c281",
         "game/audio/ambience.gd": "57e43e252b862d30783626daf16bf28b3ec8d87bd2ab63916fdfeb9a1fd07609",
         "game/README.md": "29f864b2a11e4740a8a7ea09553072f9e2a5d045a3137d8aacef13057af02c27",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e"
       }
     },
     "04 Arte e interface/Assets e licenças.md": {
@@ -3079,12 +3079,12 @@
       }
     },
     "05 Desenvolvimento/Desenvolvimento.md": {
-      "sha256": "07b94feb135adb783dcdb3d36ab96e844a2b113fbec70d90f65b0f7c24855c03",
+      "sha256": "82a58bd67cf891e50e7e73940ea819884fc831ed01b84fba35b5badb9a732163",
       "sources": [],
       "source_hashes": {}
     },
     "05 Desenvolvimento/Arquitetura observada.md": {
-      "sha256": "5f6e1eaf52fb2a04ec696941c1a970546cf74cf3d92bd9c1b76ce9c37fc17223",
+      "sha256": "3c3a0f9bb5798f2d0ffd94e3e14b3c2fb59b32ded7b111cedc24b9e00ace010f",
       "sources": [
         "project.godot",
         "docs/tech/ARCHITECTURE.md",
@@ -3101,7 +3101,7 @@
       }
     },
     "05 Desenvolvimento/Testes e validação.md": {
-      "sha256": "76da6754bf44778aad45d5e99dd8b3cb3fd25e0eb35ccffaeac3e50cb9439ee3",
+      "sha256": "acda51304a82fe08959ae3b7c03b76c3f410c4553c89ebfce94705c8a92777eb",
       "sources": [
         "AGENTS.md",
         "tests/run_all.gd",
@@ -3109,11 +3109,11 @@
       ],
       "source_hashes": {
         "AGENTS.md": "adab8d05f49a29db5299d59d78dd15c51e48b1b98d85d836677727ff67593d50",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e"
       }
     },
     "05 Desenvolvimento/Desempenho.md": {
-      "sha256": "32ac1d2645a94309a45cf361b71599b243e8ce06859b5b298349957b6ec06c40",
+      "sha256": "280d760cec8c23742b9ad2e84644342d31a22dc062e8702527402a84b254c1d6",
       "sources": [
         "game/README.md",
         "TODO.md",
@@ -3121,12 +3121,12 @@
       ],
       "source_hashes": {
         "game/README.md": "29f864b2a11e4740a8a7ea09553072f9e2a5d045a3137d8aacef13057af02c27",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e",
         "docs/tech/ENGINE_MIGRATION.md": "15cf6ccff834d0f89f7438582cd7cdb9806b45daf8847b5e91f866b5d27db90c"
       }
     },
     "05 Desenvolvimento/Ferramentas e plugins.md": {
-      "sha256": "84a8853611d3e03c24f7e15ab30076068a00fb1feae3e64bb8ed05e33c41ef65",
+      "sha256": "1fa6761a75ea1da57fcbf667645b9d4adc9f646c40eaa66ded38a9c8f0b83471",
       "sources": [
         "project.godot",
         "docs/tech/AGENT_FRAMEWORK.md",
@@ -3139,7 +3139,7 @@
       }
     },
     "05 Desenvolvimento/Build e distribuição.md": {
-      "sha256": "c6be838a116b0bf00ad59f4a93208d51b401485241fed8825d2f09012f648eae",
+      "sha256": "31100aaaac2a1910a2c1537c2dbf267ab285476ed5090ca37f30ed946a582942",
       "sources": [
         "project.godot",
         "TODO.md",
@@ -3149,14 +3149,14 @@
       ],
       "source_hashes": {
         "project.godot": "aa5b2fb428c9f17fda4f92971a0e21a152317b13521b1a9567639367dedc3e7e",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e",
         "tools/export/README.md": "bddf4f37dd845007c61dcbe9386a561a9e87237e8aaac3860d926c37ced1774c",
         "docs/design/DEV_MENU.md": "5639235808c5f82c4c73649560a1ded833272f62136277ca18a95a6881097cea",
         "docs/tech/CREDITS.md": "6e165f2f120c653f46bdd1411032e312d500e5f5b4324b427eb4a4f086d3808f"
       }
     },
     "05 Desenvolvimento/Colaboração e regras.md": {
-      "sha256": "f0cafdfe1a30785b3eebb4cbae99fb7fe2ac7d425d2761095126efbd4e4681b3",
+      "sha256": "8255b28a78499c5670f2278e9c784b133f8d7267bc26fac4fedd45b17fab9861",
       "sources": [
         "CLAUDE.md",
         "AGENTS.md",
@@ -3165,61 +3165,61 @@
       "source_hashes": {
         "CLAUDE.md": "2eaf3ef4d42450666c3d60305b8f059f21ded96b21eab00882326880541d5757",
         "AGENTS.md": "adab8d05f49a29db5299d59d78dd15c51e48b1b98d85d836677727ff67593d50",
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e"
       }
     },
     "05 Desenvolvimento/Como usar e atualizar o cofre.md": {
-      "sha256": "7bade01c204178b04b2197fe1ee47156213d03773907c9c11c326a10dc6e5ee1",
+      "sha256": "dc26415ad0d4fa92e2843ebb6afb73394efa5df7cf7622b170365a034618c821",
       "sources": [
         "TODO.md",
         "AGENTS.md"
       ],
       "source_hashes": {
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e",
         "AGENTS.md": "adab8d05f49a29db5299d59d78dd15c51e48b1b98d85d836677727ff67593d50"
       }
     },
     "80 Trabalho/Painel de trabalho.md": {
-      "sha256": "aed557ea5d36abcc3f4e7285791b33deae343002920d6fbf843133813b82eb9f",
+      "sha256": "1f58c3c7c5bef319af01484e1d48bd710231da5f7537389e702f138bbb491bc6",
       "sources": [
         "TODO.md"
       ],
       "source_hashes": {
-        "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85"
+        "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e"
       }
     },
     "80 Trabalho/Ideias e propostas.md": {
-      "sha256": "bd83f4a21170f6c75502cb2854eccad967fa0e9d4a4205deaf51a6fb243f06d9",
+      "sha256": "d9531abbdfcd684cdf0cf793955c2e592ef6f80bb154731689e03819f1734dcb",
       "sources": [],
       "source_hashes": {}
     },
     "80 Trabalho/Notas/Primeira nota.md": {
-      "sha256": "7d853f17acac4de3af332e8dd4064340735a77efefb9f4f64b50d77bbf7ac91e",
+      "sha256": "484d6dc0745927d3d3c57baa7d10c90542afdab45e99d1b88c8f913f32bf5d3f",
       "sources": [],
       "source_hashes": {}
     },
     "99 Modelos/Registo de sessão.md": {
-      "sha256": "27b2804ca9780fb0f4fd50b0653186034697984d69c7c36428423f937011d479",
+      "sha256": "24a187df6ea9bae9cca5038e3de31af5847d3a14cf19f734236c11e862e1c51d",
       "sources": [],
       "source_hashes": {}
     },
     "99 Modelos/Ensaio de validação.md": {
-      "sha256": "07cb780ae005622deed5828253a86e4bb742d7798d92ac616be87a20f3c11c29",
+      "sha256": "24c392919cf8058d108b14fb2d1af6ec88c1949afcf31f11ca97560be887090a",
       "sources": [],
       "source_hashes": {}
     },
     "99 Modelos/Ficha de asset.md": {
-      "sha256": "5f112cebd06ebfb0ade9ec4b1f36105b0233f535efb74fbc6cd432b06e4701d6",
+      "sha256": "2393eef1593c5a221da4bba5b142ee98b8a18492edad6fa4ba41ea3caf1f769a",
       "sources": [],
       "source_hashes": {}
     },
     "99 Modelos/Proposta de decisão.md": {
-      "sha256": "a33b8339a16a69eeb5ed1852d5d0a18ff0fadfb694cc90b4c97c9ac71140599a",
+      "sha256": "67f71e25755b81806c5debf1c3f7c36cc6ef2dbc20cf295e5f5d55df2c24cdad",
       "sources": [],
       "source_hashes": {}
     },
     "90 Referências/Índice de fontes.md": {
-      "sha256": "0ed7ee667ec7a048d85877ae6de8f8e2f596dfa6ce13c81bee5ee67ddd29cd19",
+      "sha256": "a2c842ff156da7d826ad06e2c0f8669ac98594e171acf91f1593dd5184c6daf3",
       "sources": [],
       "source_hashes": {}
     },
@@ -3229,7 +3229,7 @@
       "source_hashes": {}
     },
     "90 Referências/assets/models/environment/extraction_test_arena/README.md": {
-      "sha256": "1fcf431e715a7e6c3714db62da8e95a949df7e9c6bde3f33f14703db3781a565",
+      "sha256": "cb8b4c82f97377656bc88cdaa4c87e552e199b7d7f4d6fe1d401ca7b4fa61add",
       "sources": [
         "assets/models/environment/extraction_test_arena/README.md"
       ],
@@ -3238,7 +3238,7 @@
       }
     },
     "90 Referências/docs/history/2026-11-14_ASSETS2GODOT_HANDOFF.md": {
-      "sha256": "032b867797cf241e765cc5ccba8261187ab7b91028c5fee526d6e583b28e89cd",
+      "sha256": "5f20b36613a9fa85ed48ce405acb5ec9bfd3f48f117a5f8d8cc4f63cdb37f0e2",
       "sources": [
         "docs/history/2026-11-14_ASSETS2GODOT_HANDOFF.md"
       ],
@@ -3247,7 +3247,7 @@
       }
     },
     "90 Referências/docs/history/2026-11-14_BEACH_VISUAL_PILOT_HANDOFF.md": {
-      "sha256": "b027d7c0c83ef548f3934c761decb2c6eaf80f4d87993da040f3ee18576e6c3e",
+      "sha256": "d5aa6e75da780de8efe5d72a2022bec8ef1db5063959cb227b8d97473019fb65",
       "sources": [
         "docs/history/2026-11-14_BEACH_VISUAL_PILOT_HANDOFF.md"
       ],
@@ -3256,7 +3256,7 @@
       }
     },
     "90 Referências/docs/history/beach_pilot_20261114/CLAUDE_PLAN.md": {
-      "sha256": "67d303340247bce6fbf84aeee574ecc53d06b3e6c9855e01c76c983bcb212d27",
+      "sha256": "8039d2a575e9378ceb4c967b87b0c991935ab16bce520a43787a589bdfb81f1e",
       "sources": [
         "docs/history/beach_pilot_20261114/CLAUDE_PLAN.md"
       ],
@@ -3265,7 +3265,7 @@
       }
     },
     "90 Referências/docs/history/beach_pilot_20261114/CLAUDE_REVIEW.md": {
-      "sha256": "e2f1b2ee85078fab6d92a6c0f2550fff614ca22330ee5be05e4b78476f8f9233",
+      "sha256": "500caff482c48ebb7fb72fa6ac98a8442b3c773825d86df94f37042244aab89f",
       "sources": [
         "docs/history/beach_pilot_20261114/CLAUDE_REVIEW.md"
       ],
@@ -3274,7 +3274,7 @@
       }
     },
     "90 Referências/docs/tech/ASSETS2GODOT.md": {
-      "sha256": "37a921a727a48261d5c7e621dc0556c5aab51e37b7c3b16b3d03db105dcb79de",
+      "sha256": "1107f5fe857a7f93dd52dc29b72fff9978b2418d42218247dc815299a95a03f1",
       "sources": [
         "docs/tech/ASSETS2GODOT.md"
       ],
@@ -3283,16 +3283,16 @@
       }
     },
     "90 Referências/docs/tech/BEACH_VISUAL_PILOT.md": {
-      "sha256": "b4275239a285a1eee9f0e38fa3f88cef79a14567b2a57b07348ad6bd82c1933c",
+      "sha256": "94b23c81ea7e0e20c89710d8ac8cfc274990cbec327334f417ae51f2df9ea652",
       "sources": [
         "docs/tech/BEACH_VISUAL_PILOT.md"
       ],
       "source_hashes": {
-        "docs/tech/BEACH_VISUAL_PILOT.md": "e64f04d38a4247d5ecbb8e1a372728b5a76f5a7be948b2260c82319c7d6de868"
+        "docs/tech/BEACH_VISUAL_PILOT.md": "1af86bf78ed7e4dc419f6a86a02f1c854973db18c0faac2fc19104dbaafd956b"
       }
     },
     "90 Referências/docs/tech/MAP_VISUAL_REWORK.md": {
-      "sha256": "ebe34eb14c1454c87d20219d7cbe18695795b8757c6ea0972efc9f2949e2051a",
+      "sha256": "809a9ab7d57279d12b464ea5e00d8994d94502c99a6264199e3e769db47c7a23",
       "sources": [
         "docs/tech/MAP_VISUAL_REWORK.md"
       ],
@@ -3305,7 +3305,7 @@
     "AGENTS.md": "adab8d05f49a29db5299d59d78dd15c51e48b1b98d85d836677727ff67593d50",
     "CLAUDE.md": "2eaf3ef4d42450666c3d60305b8f059f21ded96b21eab00882326880541d5757",
     "README.md": "91a76cd3408fb82e1d134bc8ac8ae49c5a5348bdd965f0fff04e25055e03214f",
-    "TODO.md": "e785aa86dbd4460667145e24e29226fb10c70b66d6da74eb0659ef4c8501cb85",
+    "TODO.md": "2c175e296f23df08043e9bc68c8922daa839451af45f49500fd012b25e8cd44e",
     "assets/LICENSES.md": "4af3fe9ae00415da9c94b08ddf0b7ef79815db163b8863767839fc79ccc90b98",
     "assets/models/characters/arms_firstperson_original/NOTES.md": "8c997ce5713f52e79713ce92d5fde9aacf834d076ac8833b23ca82828e182b01",
     "assets/models/characters/crawler_original/NOTES.md": "4b57bab84dd1ff1b71a80ca69f934884c5a9b834aca2e87fa19370bdd7e1fcbb",
@@ -3365,7 +3365,7 @@
     "docs/tech/ARMORY_REDESIGN.md": "093b47b276edd787cdcb476a0c324b58bcc3b73b244c283cb0694a6d922e5a09",
     "docs/tech/ASSETS.md": "248e12f46eab984818b026a31e61294948670ede842414023a2c32f622d1a06c",
     "docs/tech/ASSETS2GODOT.md": "5ab3131998e48a698693aaf2de2899629448f600a6535dbb2312e56aa0e033f3",
-    "docs/tech/BEACH_VISUAL_PILOT.md": "e64f04d38a4247d5ecbb8e1a372728b5a76f5a7be948b2260c82319c7d6de868",
+    "docs/tech/BEACH_VISUAL_PILOT.md": "1af86bf78ed7e4dc419f6a86a02f1c854973db18c0faac2fc19104dbaafd956b",
     "docs/tech/CARDS_IMPLEMENTATION.md": "008c2f05451add444cf081851196769a88dd2e6d137c540ffa41db5b37a8d3fc",
     "docs/tech/COMBAT_CATALOG.md": "e594e5445e9ac3fbbb771703d2b502a924f29a536d89ed51a58e1ac3d26c83bc",
     "docs/tech/CRAWLER_MODEL_BRIEF.md": "075d4307ae8e381244ef2689e5764c27ccac83e258e277aef5f5d4d15cb45b18",
@@ -3532,35 +3532,35 @@
     "game/horde/flow_field.gd": "756023f65374b93e55f49fc003bd8c1d07fed37135723cc3e34c54b8188e2f8d",
     "game/horde/horde.gd": "ca1b29aad1e93c5896770cf93509fc2efd2216bf6bdc2fa1d146f3c6f3391c56",
     "game/main.gd": "5e98389307f896b389bd383b1267235ab72dd5f402d379c42304373fcbf1b339",
-    "game/states/armory.gd": "a601e7f753862558352500b10375943f744ebd95c98dca9cfab75e7816347347",
-    "game/states/boat.gd": "c25bca1c406803cbe79f5ef10303797cf8163dd4a73cd007b15745a1db8a3d7f",
+    "game/states/armory.gd": "44f2183f9a1d128af40dea43c843d5b068719a1a2680ee9faefdac7b51665134",
+    "game/states/boat.gd": "d1ba7c179575e8c2dd71225f4541b23285e6fa6fc64a7252d08bae938474a9e4",
     "game/states/camp.gd": "c2926f50e651a738a759da2fa31bcd705cea8a72b2a0b2335b2a841600ed8d75",
-    "game/states/debrief.gd": "ae52d30d6fd854757f899b3b6bdcdb88d1975ca49a8964ac83f447b0ae9d8ecf",
+    "game/states/debrief.gd": "ee261f3fb72fed58a4e8deaf136a75aecc5ce5be1ea46b084b29874a87794b48",
     "game/states/title.gd": "d83c49eebe9d77d5a89e7808b73749c7d000cdedb89f77d4c12a1e9507bd53c4",
     "game/ui/armory_art.gd": "62f59fb226c3fd5817e3913b94dd12d6f7a0d17771939b58be3e37647f4a22bb",
     "game/ui/armory_shelter.gd": "2581bb086f7254d19402a9e80c51356931517c167c8e98e4c5e7ca943f89f9b6",
     "game/ui/class_preview.gd": "553685309d05136ef4f3ae86d644bcd31463d949f65711821844337d92195bb4",
-    "game/ui/credits_panel.gd": "1ac192f253ac7b4fcfca8dd6bf402c29f6cd6729d8e7f2ec4d6b89972bf1b532",
+    "game/ui/credits_panel.gd": "ff52380aa59c1e062f04fd76599725965194f5b64149403400bf71a29e606557",
     "game/ui/dev_menu.gd": "e90a19eabec6b0feb8248eb4e4f02f9a63db2d9d11b3255b36ab9954da6873d5",
-    "game/ui/dev_sandbox.gd": "c6422fcba7af7da3de665bb3c07517433ef253a222f5c05296f24da0653dcc3c",
-    "game/ui/dev_test_panel.gd": "45a80192a9855b1c3097d33fcf59c7866fad55a94d0b20fe7fd975653d8ff0f1",
+    "game/ui/dev_sandbox.gd": "ef6aae32967294b903c515fbb645e0ce866a79e73848302820978c8c04e3296b",
+    "game/ui/dev_test_panel.gd": "5052f7b25072d1de00506e85af87d887abec117fed05c016bd6ba634ea1fc42d",
     "game/ui/dialogue_box.gd": "e968343c7c3b0b4c9c0344e759d632e8a3b34f445c99e9086f5226be62bb085f",
     "game/ui/dialogue_voice.gd": "dd68f4bae19eea9292a6ac31764069a82dc25916d562a0b68e480c170de3b904",
-    "game/ui/dossier.gd": "212e78e26a7ca73d3557bdff2175a4ba7e9604a723a5a05cd8dc8b50aab79307",
+    "game/ui/dossier.gd": "8ee988467828dee08e565a63cb613749857627fa4e7a8fa6823c84da5ca50959",
     "game/ui/focus_brackets.gd": "24a7faca0729790125dffb1958661fe1687d845f7104e3672b4df5dc6ab1477b",
-    "game/ui/hud.gd": "08ccfdaf29bc29e40e419edea6058f6fc80c345179ce9f9bc7ac0c2195457416",
+    "game/ui/hud.gd": "2cd2d2321d1d79404cb3a89046cca132ad11beb8a4f76f1941d447943546da7e",
     "game/ui/input_icons.gd": "618e18661ce81e6f6da8c8286a53632e43f6286d662dd4a2bd2c662773c2eeb3",
     "game/ui/island_end_panel.gd": "e3b0f0b396911cd3d851140c711671207fd43bf5ab7c37fe26b4ca953fb559ae",
     "game/ui/loading_screen.gd": "ac363f63bdcf9388c8b28efba9a8a1ea73f8a29ef352da04c11640684bbf4e09",
     "game/ui/marked_box.gd": "443388f2f38595440eb38fc7087ab904b0ac95bac6cc89d5ac6d09c5ac2b2493",
-    "game/ui/menu_dialog.gd": "0e3081994a4cb0ad349d4a59515e59a8fcfae92cb0dbee08e02f6b03d67c6467",
+    "game/ui/menu_dialog.gd": "3d18c647ea091e952f045f764a03c98fa4d860500386bf2b4392f7085e579162",
     "game/ui/minimap.gd": "6097ab28feca9ce520063f8a4c4fe6d013836f0497e14f4aafd26b54dfe478ca",
     "game/ui/perk_node_view.gd": "d03773671bd3a1d6b00e4fdd523cbdba98285ac0bd7f97ad6c729f59c00ac851",
     "game/ui/portrait.gd": "f9e6ab48173605c1701fc16e5a57b24abbc2620257eded1bea58508800b43968",
-    "game/ui/route_map.gd": "2a507af8537268a2ffffc976f9223ee66a271160f327cc8381a3987267bc8f1b",
+    "game/ui/route_map.gd": "d806825688dac494be976c1219ebf3828e8099db3ee0785ee1a618e1a5163224",
     "game/ui/route_preview.gd": "895c97326012874cc4479421a215d4566b9663c5248526610831f2efc143f978",
     "game/ui/scope_overlay.gd": "d11f3ba9ba562d6cb9dfe90ebd0b773a4a962350f10b5cd0e60bbb9f4618910e",
-    "game/ui/settings_panel.gd": "b7f1580bc9861b845abc6f664de710c72040e4facf070242eb517d69bf111ba8",
+    "game/ui/settings_panel.gd": "f9ac18d2dca91db0f1e61f4c8b0f8bb29f4cd56f0ad346be3698209fc292f5d6",
     "game/ui/typewriter.gd": "56e2afa45d07da6f93fb734f16c779239c82a1c33685cbbf4369c784755408d7",
     "game/ui/ui_sfx.gd": "10ee0c70f1f1bc45df47b3db73175f880cb56ebab74090287d891db5fb02705a",
     "game/ui/ui_theme.gd": "9b3af7a735b0a26ecc8227df54afbe19a6592b0fc07d99d10fdbd5ad1019227a",
@@ -3575,7 +3575,7 @@
     "game/world/grading.gd": "1607e9de7a389de453e256a1755040b49593f9764092a63fc88034891369ec3b",
     "game/world/handmade/handmade_island.gd": "03fe4dbb578d00d5fc3b10718bbccc602796ab580c96c53d09adaf00e481992b",
     "game/world/handmade/scatter.gd": "1c93e13a96500df9ede45d9a49af2a2065d593008d61ed4bf054b7d1864b4555",
-    "game/world/island.gd": "f702bc1adc85b7155ae39e19d5a996ee401a6ddb983d790edd274475dafd37f9",
+    "game/world/island.gd": "10d0ee44b645b5b1b71ae6b635e563f9cb530fdb2ff46484515a974c103e3062",
     "game/world/island_map.gd": "6a0265ebf027b566ab85efe3104b60e981719484af1b2bff73bfb7e178b9e217",
     "game/world/island_props.gd": "90056241144afe324f6b67e5404f4029a06977663265f458061397c08bbe19bf",
     "game/world/island_roads.gd": "67576f90957bf6543cecc0090768d722dfaa3ed4776068edd7a33edb7163f545",
@@ -3639,7 +3639,7 @@
     "tests/test_horde_windup.gd": "733a954485321368ff7ea8af38242b06d16a3db406ed444cfc41c1c5148fd40b",
     "tests/test_horror_preset.gd": "3bf1604eb16a479ef3781caa952f4c56492ac853f30e1015b8012623a7e6a210",
     "tests/test_hud.gd": "8142b5dc623f29eba5c66fd17a93824d1aaf3df67d46de241c0bffb8a50934ea",
-    "tests/test_hud_redesign.gd": "11026cad896a9926d15135c3de245620b6ea9df07103446dbab889f735c917d9",
+    "tests/test_hud_redesign.gd": "1b72c9b4820691438ab62c591f957da1e15b38046a581b257597a98f9485494b",
     "tests/test_hud_weights.gd": "7a34cc96489460f411d300c23551345ba2817155235a34e6588da49fcf1e09a8",
     "tests/test_intel_search.gd": "06e29246484d8254db8a858c3a6eda8bc71e3564456f0ebaa5471b14971b5d21",
     "tests/test_island_end_panel.gd": "6467dfa686da9ba092d639720786c8775fbb4be3101cc238c30e9b34ed919ca1",
@@ -3690,20 +3690,16 @@
     "game/world/handmade/test/exfil_test.tscn": "fea35e914862f3b4eb5bb9dbb8f01aede11533b06aab29fb63c6c044983f6cfb",
     "docs/design/dossier_20261111/title.png": "8b4a029b744e7bbb62bedd251761eb1eb4e8a41c0b11b15745c172b953a26c3b",
     "docs/design/dossier_20261111/armory_class.png": "47fc07e6287711d7477a4224a3fce732f9efa8cf04dc651ab3cd12f7e8159014",
-    "docs/design/dossier_20261111/armory_weapons.png": "ab4575454bde0b8db797ac3113654f62672e8f01b0272adb50d58202f6dbd939",
+    "docs/design/dossier_20261111/armory_weapons.png": "95e09339be7b8a2a58741f0859a3ab25380570ef16a335739f79b76aa257dd04",
     "docs/design/dossier_20261111/armory_perks.png": "2964b7af7eb92fec4b19f2f6d801edd9c4909d9af7e67bec818f869e41534361"
   },
   "report": {
     "written": [
-      "90 Referências/TODO.md",
-      "90 Referências/assets/LICENSES.md",
-      "90 Referências/docs/tech/BEACH_VISUAL_PILOT.md",
-      "05 Desenvolvimento/Mapa do código.md"
-    ],
-    "unchanged": [
       "90 Referências/AGENTS - referência.md",
       "90 Referências/CLAUDE - referência.md",
       "90 Referências/README.md",
+      "90 Referências/TODO.md",
+      "90 Referências/assets/LICENSES.md",
       "90 Referências/assets/models/characters/arms_firstperson_original/NOTES.md",
       "90 Referências/assets/models/characters/crawler_original/NOTES.md",
       "90 Referências/assets/models/characters/weapon_grips_original/NOTES.md",
@@ -3762,6 +3758,7 @@
       "90 Referências/docs/tech/ARMORY_REDESIGN.md",
       "90 Referências/docs/tech/ASSETS.md",
       "90 Referências/docs/tech/ASSETS2GODOT.md",
+      "90 Referências/docs/tech/BEACH_VISUAL_PILOT.md",
       "90 Referências/docs/tech/CARDS_IMPLEMENTATION.md",
       "90 Referências/docs/tech/COMBAT_CATALOG.md",
       "90 Referências/docs/tech/CRAWLER_MODEL_BRIEF.md",
@@ -3912,6 +3909,7 @@
       "02 Conteúdo/Modificadores/Modificador - short.md",
       "02 Conteúdo/Modificadores/Modificador - swarm.md",
       "02 Conteúdo/Modificadores.md",
+      "05 Desenvolvimento/Mapa do código.md",
       "05 Desenvolvimento/Inventário de testes.md",
       "02 Conteúdo/Mapas/Mapa - beach_01.md",
       "02 Conteúdo/Mapas/Mapa - jungle_01.md",
@@ -3940,10 +3938,7 @@
       "03 Sistemas/Exfil.md",
       "03 Sistemas/Perfil e telemetria.md",
       "04 Arte e interface/Arte e interface.md",
-      "98 Anexos/Menus/title.png",
-      "98 Anexos/Menus/armory_class.png",
       "98 Anexos/Menus/armory_weapons.png",
-      "98 Anexos/Menus/armory_perks.png",
       "04 Arte e interface/Menus e HUD.md",
       "04 Arte e interface/Câmaras e controlos.md",
       "04 Arte e interface/Modelos e animação.md",
@@ -3964,7 +3959,12 @@
       "99 Modelos/Ensaio de validação.md",
       "99 Modelos/Ficha de asset.md",
       "99 Modelos/Proposta de decisão.md",
-      "90 Referências/Índice de fontes.md",
+      "90 Referências/Índice de fontes.md"
+    ],
+    "unchanged": [
+      "98 Anexos/Menus/title.png",
+      "98 Anexos/Menus/armory_class.png",
+      "98 Anexos/Menus/armory_perks.png",
       "Mapa do projeto.canvas"
     ],
     "protected_user_edits": [
@@ -3972,9 +3972,21 @@
     ],
     "source_changes": [
       "TODO.md",
-      "assets/LICENSES.md",
       "docs/tech/BEACH_VISUAL_PILOT.md",
-      "game/world/island.gd"
+      "game/states/armory.gd",
+      "game/states/boat.gd",
+      "game/states/debrief.gd",
+      "game/ui/credits_panel.gd",
+      "game/ui/dev_sandbox.gd",
+      "game/ui/dev_test_panel.gd",
+      "game/ui/dossier.gd",
+      "game/ui/hud.gd",
+      "game/ui/menu_dialog.gd",
+      "game/ui/route_map.gd",
+      "game/ui/settings_panel.gd",
+      "game/world/island.gd",
+      "tests/test_hud_redesign.gd",
+      "docs/design/dossier_20261111/armory_weapons.png"
     ]
   }
 }

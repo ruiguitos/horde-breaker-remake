@@ -2,7 +2,7 @@
 titulo: "docs/legacy/ARCHIPELAGO_GAMEPLAY_PLAN.md"
 tipo: "referencia"
 estado: "historico"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["docs/legacy/ARCHIPELAGO_GAMEPLAY_PLAN.md"]
 ---

@@ -2,7 +2,7 @@
 titulo: "Build e distribuição"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["project.godot", "TODO.md", "tools/export/README.md", "docs/design/DEV_MENU.md", "docs/tech/CREDITS.md"]
 ---

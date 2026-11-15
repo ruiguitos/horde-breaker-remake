@@ -2,7 +2,7 @@
 titulo: "spikes/horde_flowfield/README.md"
 tipo: "referencia"
 estado: "referencia_a_confrontar"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["spikes/horde_flowfield/README.md"]
 ---

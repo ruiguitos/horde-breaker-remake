@@ -2,7 +2,7 @@
 titulo: "Inimigo — Brute"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "enemies"]
 fontes: ["game/data/enemies/brute.tres", "game/data/resources/enemy_data.gd"]
 ---

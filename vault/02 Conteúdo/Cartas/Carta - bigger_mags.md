@@ -2,7 +2,7 @@
 titulo: "Carta — Ammo Reserves"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "cards"]
 fontes: ["game/data/cards/bigger_mags.tres", "game/data/resources/card_data.gd"]
 ---

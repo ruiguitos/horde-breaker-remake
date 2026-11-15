@@ -2,7 +2,7 @@
 titulo: "Horde Breaker — início"
 tipo: "mapa"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "navegacao"]
 fontes: ["TODO.md", "docs/DECISIONS.md"]
 ---
@@ -18,7 +18,7 @@ fontes: ["TODO.md", "docs/DECISIONS.md"]
 4. [[04 Arte e interface/Arte e interface|Arte e interface]] — modelos, animação, cenário, menus e áudio.
 5. [[05 Desenvolvimento/Desenvolvimento|Desenvolvimento]] — arquitetura, testes, ferramentas e distribuição.
 
-## Fotografia dos recursos — 2026-11-14
+## Fotografia dos recursos — 2026-11-15
 
 | Classes | Armas | Inimigos | Cartas | Perks | Missões | Biomas | Power-ups |
 |---:|---:|---:|---:|---:|---:|---:|---:|

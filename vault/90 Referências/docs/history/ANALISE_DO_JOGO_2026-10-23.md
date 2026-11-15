@@ -2,7 +2,7 @@
 titulo: "docs/history/ANALISE_DO_JOGO_2026-10-23.md"
 tipo: "referencia"
 estado: "relatorio_historico"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["docs/history/ANALISE_DO_JOGO_2026-10-23.md"]
 ---

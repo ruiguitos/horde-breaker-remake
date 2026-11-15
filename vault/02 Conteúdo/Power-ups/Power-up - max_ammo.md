@@ -2,7 +2,7 @@
 titulo: "Power-up — MAX AMMO"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "power_ups"]
 fontes: ["game/data/power_ups/max_ammo.tres", "game/data/resources/power_up_data.gd"]
 ---

@@ -2,7 +2,7 @@
 titulo: "Missão — Rescue"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "missions"]
 fontes: ["game/data/missions/rescue.tres", "game/data/resources/mission_data.gd"]
 ---

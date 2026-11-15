@@ -2,7 +2,7 @@
 titulo: "docs/legacy/SKILL_TREE_EXPANSION_PROPOSAL.md"
 tipo: "referencia"
 estado: "historico"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["docs/legacy/SKILL_TREE_EXPANSION_PROPOSAL.md"]
 ---

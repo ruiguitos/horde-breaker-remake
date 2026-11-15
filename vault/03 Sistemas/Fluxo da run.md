@@ -2,7 +2,7 @@
 titulo: "Fluxo da run"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["docs/DECISIONS.md", "game/README.md", "game/core/run_context.gd"]
 ---

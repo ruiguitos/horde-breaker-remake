@@ -2,7 +2,7 @@
 titulo: "Missões e objetivos"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["game/data/resources/mission_data.gd", "game/world/island_run.gd", "TODO.md", "docs/design/OBJECTIVES_PROPOSAL.md"]
 ---

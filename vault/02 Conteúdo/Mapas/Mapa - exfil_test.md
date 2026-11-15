@@ -2,7 +2,7 @@
 titulo: "Mapa — exfil_test"
 tipo: "mapa_cena"
 estado: "cena_observada"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["game/world/handmade/test/exfil_test.tscn"]
 ---

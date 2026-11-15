@@ -33,7 +33,7 @@ static func apply(island: HandmadeIsland) -> Array[String]:
 		old.free()
 	var dressing := Node3D.new()
 	dressing.name = "Dressing"
-	for label: String in ["Facades", "Shore", "RockSurfaces", "HorrorOnly"]:
+	for label: String in ["Facades", "Shore", "RockSurfaces", "HorrorOnly", "Plants"]:
 		var group := Node3D.new()
 		group.name = label
 		dressing.add_child(group)
@@ -42,6 +42,7 @@ static func apply(island: HandmadeIsland) -> Array[String]:
 	island.get_node("Decor").add_child(dressing)
 	_buildings(island, dressing, map)
 	_rocks(island, dressing, map)
+	_plants(island, dressing, map)
 	_shore(island, dressing, map)
 	_ground(island, map)
 	if not _problems.is_empty():
@@ -73,10 +74,15 @@ static func _save(resource: Resource, path: String) -> bool:
 static func _canonical_scene(path: String) -> void:
 	var text: String = FileAccess.get_file_as_string(path)
 	var ids := RegEx.create_from_string('\\[(?:sub|ext)_resource[^\\n]* id="([^"]+)"')
-	var index: int = 0
+	# Two passes: an id Godot kept from an earlier save can already read "BeachResource_006", and a
+	# one-pass renumbering then merged two resources into one id (the facades lost their textures).
+	var found: Array[String] = []
 	for match: RegExMatch in ids.search_all(text):
-		text = text.replace('"' + match.get_string(1) + '"', '"BeachResource_%03d"' % index)
-		index += 1
+		found.append(match.get_string(1))
+	for index in found.size():
+		text = text.replace('"' + found[index] + '"', '"@@canonical_%d@@"' % index)
+	for index in found.size():
+		text = text.replace('"@@canonical_%d@@"' % index, '"BeachResource_%03d"' % index)
 	text = RegEx.create_from_string(" unique_id=[0-9]+").sub(text, "", true)
 	var output := FileAccess.open(path, FileAccess.WRITE)
 	if output == null:
@@ -128,6 +134,7 @@ static func _buildings(island: HandmadeIsland, dressing: Node3D, map: IslandMap)
 			continue
 		house.get_node("Roof").material_override = tiles
 		var centre: Vector3 = house.position
+		_house_volume(house, dressing.get_node("Facades"), map, stone)
 		var face := Vector3(centre.x, 0, centre.z + 3.02)
 		# Facade pivots are centred on the wall contact face, not on the floor.
 		var door_y: float = map.ground_y(face) + 1.135
@@ -317,3 +324,101 @@ static func _ground(island: HandmadeIsland, map: IslandMap) -> void:
 			colors.set_pixel(x, z, Color(shade, shade, shade, 0.5))
 	data.call("import_images", [height, control, colors], Vector3.ZERO, 0.0, 1.0)
 	data.call("save_directory", terrain.get("data_directory"))
+
+
+## A hut's box made less plain without changing its footprint: a stone plinth along the base, a
+## stone quoin up each corner and a step at the door. They stand at most 6 cm proud of the walls,
+## so the grid (built from Buildings, which these are not part of) and the paths do not change.
+static func _house_volume(house: Node3D, parent: Node3D, map: IslandMap, stone: Material) -> void:
+	var body := house.get_node("Body") as MeshInstance3D
+	var box := body.mesh as BoxMesh
+	if box == null:
+		return
+	var half := Vector3(box.size.x, 0, box.size.z) * 0.5
+	var base: float = map.ground_y(house.position)
+	var parts: Array = []  # [size, centre]
+	parts.append([Vector3(box.size.x + 0.12, 0.55, box.size.z + 0.12), Vector3(0, 0.27, 0)])
+	for sx: float in [-1.0, 1.0]:
+		for sz: float in [-1.0, 1.0]:
+			parts.append([Vector3(0.42, box.size.y - 0.3, 0.42), Vector3(sx * (half.x - 0.15), (box.size.y - 0.3) * 0.5, sz * (half.z - 0.15))])
+	parts.append([Vector3(1.6, 0.18, 0.5), Vector3(0, 0.09, half.z + 0.25)])
+	for k in parts.size():
+		var size: Vector3 = parts[k][0]
+		var mesh := BoxMesh.new()
+		mesh.size = size
+		var piece := MeshInstance3D.new()
+		piece.name = "%s_Stone_%02d" % [house.name, k]
+		piece.mesh = mesh
+		piece.material_override = stone
+		parent.add_child(piece)
+		piece.owner = parent.owner
+		piece.position = Vector3(house.position.x, base, house.position.z) + parts[k][1]
+
+
+## Taller plants of the nature kit where vegetation gathers: against walls, cliffs and rocks, on
+## open ground. Low (bushes, ferns, big-leaf plants under 1.3 m), so they never read as cover; they
+## are decoration and the horde walks through them, like the grass.
+const PLANTS: Array = [["Bush_Common", 1.0], ["Bush_Common", 0.7], ["Bush_Common_Flowers", 0.9], ["Fern_1", 0.7], ["Plant_1_Big", 1.1]]  # no Plant_7: flat purple petals, out of place here
+const PLANT_COUNT: int = 140
+const PLANT_CLEAR_OF_MARKERS: float = 5.0
+
+static func _plants(island: HandmadeIsland, dressing: Node3D, map: IslandMap) -> void:
+	var f: FlowField = map.field
+	var spots: Array[Vector2i] = []
+	for z in range(2, f.height - 2):
+		for x in range(2, f.width - 2):
+			if f.is_blocked(x, z) or map.heights.size() == f.width * f.height and map.heights[z * f.width + x] < 0.2:
+				continue
+			var edge: bool = false
+			for o: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				var n := Vector2i(x, z) + o
+				if f.is_blocked(n.x, n.y) and map.heights[n.y * f.width + n.x] >= 0.0:
+					edge = true  # a wall, a cliff or a rock; not the sea
+			if edge:
+				spots.append(Vector2i(x, z))
+	# Half the plants go round the houses and the tower: the long river and cliff edges would
+	# otherwise take nearly all of them, and the village is where the camera looks.
+	var village: Array[Vector2i] = []
+	for building: Node3D in island.get_node("Buildings").get_children():
+		for cell: Vector2i in spots:
+			if Vector2(cell.x + 0.5 - building.position.x, cell.y + 0.5 - building.position.z).length() < 7.0:
+				village.append(cell)
+	var markers: Array[Vector3] = [map.boat, map.player_start]
+	markers.append_array(map.generators)
+	markers.append_array(map.caches)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 0x504c414e
+	var picked: Array = []
+	for model: Array in PLANTS:
+		picked.append([])
+	var tries: int = 0
+	while tries < PLANT_COUNT * 6 and spots.size() > 0 and (picked.map(func(a: Array) -> int: return a.size()).reduce(func(a: int, b: int) -> int: return a + b, 0)) < PLANT_COUNT:
+		tries += 1
+		var pool: Array[Vector2i] = village if tries % 2 == 0 and not village.is_empty() else spots
+		var cell: Vector2i = pool[rng.randi_range(0, pool.size() - 1)]
+		var at := Vector3(cell.x + rng.randf_range(0.2, 0.8), 0, cell.y + rng.randf_range(0.2, 0.8))
+		var near: bool = false
+		for m: Vector3 in markers:
+			near = near or Vector2(m.x - at.x, m.z - at.z).length() < PLANT_CLEAR_OF_MARKERS
+		if near:
+			continue
+		at.y = map.ground_y(at) - 0.05
+		picked[rng.randi_range(0, PLANTS.size() - 1)].append([at, rng.randf() * TAU, rng.randf_range(0.8, 1.2)])
+	# One node per plant, not a MultiMesh: this pass runs headless, where a MultiMesh keeps no
+	# instance transforms, and the saved plants all stood at the origin.
+	for k in PLANTS.size():
+		var mesh: Mesh = NatureKit.mesh(PLANTS[k][0])
+		if mesh == null:
+			continue
+		var base: float = NatureKit.scale_for(mesh, PLANTS[k][1])
+		for i in (picked[k] as Array).size():
+			var spec: Array = picked[k][i]
+			var node := MeshInstance3D.new()
+			node.name = "%s_%02d" % [PLANTS[k][0], i]
+			node.mesh = mesh
+			node.position = spec[0]
+			node.rotation.y = spec[1]
+			node.scale = Vector3.ONE * base * spec[2]
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			dressing.get_node("Plants").add_child(node)
+			node.owner = dressing

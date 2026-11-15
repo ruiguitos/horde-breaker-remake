@@ -2,7 +2,7 @@
 titulo: "XP e cartas"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["game/data/game_data.gd", "game/world/island_run.gd", "game/world/card_offers.gd", "docs/DECISIONS.md"]
 ---

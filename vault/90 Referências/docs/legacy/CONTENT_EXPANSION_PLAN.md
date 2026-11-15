@@ -2,7 +2,7 @@
 titulo: "docs/legacy/CONTENT_EXPANSION_PLAN.md"
 tipo: "referencia"
 estado: "historico"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["docs/legacy/CONTENT_EXPANSION_PLAN.md"]
 ---

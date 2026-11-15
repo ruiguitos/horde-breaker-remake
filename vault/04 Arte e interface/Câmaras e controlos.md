@@ -2,7 +2,7 @@
 titulo: "Câmaras e controlos"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["game/README.md", "docs/DECISIONS.md", "docs/design/CAMERA_CONTROLS_HUD.md", "docs/tech/SETTINGS_INPUT.md"]
 ---

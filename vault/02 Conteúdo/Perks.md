@@ -2,7 +2,7 @@
 titulo: "Perks"
 tipo: "mapa"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "perks"]
 fontes: ["game/data/perks/archivist.tres", "game/data/perks/body_count.tres", "game/data/perks/bulwark.tres", "game/data/perks/concussion_blast.tres", "game/data/perks/crowd_anchor.tres", "game/data/perks/demolitions.tres", "game/data/perks/first_find.tres", "game/data/perks/fleet_footed.tres", "game/data/perks/head_hunter.tres", "game/data/perks/heavy_impact.tres", "game/data/perks/intimidating_cry.tres", "game/data/perks/kill_chain.tres", "game/data/perks/long_breaker.tres", "game/data/perks/opening_volley.tres", "game/data/perks/pack_rat.tres", "game/data/perks/quick_draw.tres", "game/data/perks/quick_hands.tres", "game/data/perks/recovery.tres", "game/data/perks/resupply_drop.tres", "game/data/perks/skirmisher.tres", "game/data/perks/spare_rerolls.tres", "game/data/perks/steady_grip.tres", "game/data/perks/supply_run.tres", "game/data/perks/surveyor.tres", "game/data/perks/thick_skin.tres", "game/data/perks/trail_rations.tres"]
 ---

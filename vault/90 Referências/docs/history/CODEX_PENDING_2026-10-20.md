@@ -2,7 +2,7 @@
 titulo: "docs/history/CODEX_PENDING_2026-10-20.md"
 tipo: "referencia"
 estado: "relatorio_historico"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "referencia"]
 fontes: ["docs/history/CODEX_PENDING_2026-10-20.md"]
 ---

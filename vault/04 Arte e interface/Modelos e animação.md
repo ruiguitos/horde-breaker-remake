@@ -2,7 +2,7 @@
 titulo: "Modelos e animação"
 tipo: "nota"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker"]
 fontes: ["docs/tech/RECRUIT_MODEL.md", "docs/tech/VANGUARD_MODEL.md", "docs/tech/WEAPON_MODELS.md", "docs/tech/LOCOMOTION.md", "docs/tech/MODELS_ROUND_BRIEF.md", "TODO.md"]
 ---

@@ -2,7 +2,7 @@
 titulo: "Inimigos"
 tipo: "mapa"
 estado: "consulta"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "enemies"]
 fontes: ["game/data/enemies/behemoth.tres", "game/data/enemies/bloater.tres", "game/data/enemies/brute.tres", "game/data/enemies/crawler.tres", "game/data/enemies/grabber.tres", "game/data/enemies/runner.tres", "game/data/enemies/screamer.tres", "game/data/enemies/walker.tres"]
 ---

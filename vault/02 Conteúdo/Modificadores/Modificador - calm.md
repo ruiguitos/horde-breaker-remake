@@ -2,7 +2,7 @@
 titulo: "Modificador — Calm Waters"
 tipo: "conteudo"
 estado: "dados_observados"
-atualizado: "2026-11-14"
+atualizado: "2026-11-15"
 tags: ["horde-breaker", "modifiers"]
 fontes: ["game/data/modifiers/calm.tres", "game/data/resources/modifier_data.gd"]
 ---
