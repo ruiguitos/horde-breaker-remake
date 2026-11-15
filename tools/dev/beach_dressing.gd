@@ -42,6 +42,7 @@ static func apply(island: HandmadeIsland) -> Array[String]:
 	island.get_node("Decor").add_child(dressing)
 	_buildings(island, dressing, map)
 	_rocks(island, dressing, map)
+	_cliff_rocks(island, dressing, map)
 	_plants(island, dressing, map)
 	_shore(island, dressing, map)
 	_ground(island, map)
@@ -131,6 +132,7 @@ static func _buildings(island: HandmadeIsland, dressing: Node3D, map: IslandMap)
 		body.material_override = plaster
 		if not house.name.begins_with("Hut_"):
 			body.material_override = stone
+			_house_volume(house, dressing.get_node("Facades"), map, stone, true)
 			continue
 		house.get_node("Roof").material_override = tiles
 		var centre: Vector3 = house.position
@@ -329,7 +331,7 @@ static func _ground(island: HandmadeIsland, map: IslandMap) -> void:
 ## A hut's box made less plain without changing its footprint: a stone plinth along the base, a
 ## stone quoin up each corner and a step at the door. They stand at most 6 cm proud of the walls,
 ## so the grid (built from Buildings, which these are not part of) and the paths do not change.
-static func _house_volume(house: Node3D, parent: Node3D, map: IslandMap, stone: Material) -> void:
+static func _house_volume(house: Node3D, parent: Node3D, map: IslandMap, stone: Material, tower: bool = false) -> void:
 	var body := house.get_node("Body") as MeshInstance3D
 	var box := body.mesh as BoxMesh
 	if box == null:
@@ -342,6 +344,14 @@ static func _house_volume(house: Node3D, parent: Node3D, map: IslandMap, stone: 
 		for sz: float in [-1.0, 1.0]:
 			parts.append([Vector3(0.42, box.size.y - 0.3, 0.42), Vector3(sx * (half.x - 0.15), (box.size.y - 0.3) * 0.5, sz * (half.z - 0.15))])
 	parts.append([Vector3(1.6, 0.18, 0.5), Vector3(0, 0.09, half.z + 0.25)])
+	if tower:
+		# The tower: two string courses and a corbelled parapet under the spire, so the box reads
+		# as a built tower. The spire stands on the parapet's ring.
+		var top: float = body.position.y + box.size.y * 0.5 - (base - house.position.y)
+		for y: float in [top * 0.42, top * 0.74]:
+			parts.append([Vector3(box.size.x + 0.16, 0.22, box.size.z + 0.16), Vector3(0, y, 0)])
+		parts.append([Vector3(box.size.x + 0.5, 0.35, box.size.z + 0.5), Vector3(0, top - 0.1, 0)])
+		parts.append([Vector3(box.size.x + 0.7, 0.7, box.size.z + 0.7), Vector3(0, top + 0.42, 0)])
 	for k in parts.size():
 		var size: Vector3 = parts[k][0]
 		var mesh := BoxMesh.new()
@@ -422,3 +432,72 @@ static func _plants(island: HandmadeIsland, dressing: Node3D, map: IslandMap) ->
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			dressing.get_node("Plants").add_child(node)
 			node.owner = dressing
+
+
+## Scanned rock along the cliffs, where the terrain's texture stretches over a steep face: a
+## boulder half sunk into each stretch, every CLIFF_ROCK_SPACING metres. Only on blocked, dry
+## cells (never the sea, a building or a path), so the grid does not change.
+const CLIFF_ROCK_SPACING: float = 7.0
+const CLIFF_ROCK_MAX: int = 48
+const CLIFF_DROP: float = 0.8  ## metres of height between a cliff cell and the walkable cell beside it
+
+static func _cliff_rocks(island: HandmadeIsland, dressing: Node3D, map: IslandMap) -> void:
+	var f: FlowField = map.field
+	if map.heights.size() != f.width * f.height:
+		return
+	var buildings: Array[AABB] = []
+	for building: Node3D in island.get_node("Buildings").get_children():
+		buildings.append(island._box_of(building).grow(1.5))
+	var source: Node3D = (load(BOULDER) as PackedScene).instantiate()
+	var mesh: Mesh = source.find_children("*", "MeshInstance3D", true, false)[0].mesh
+	source.free()
+	var placed: Array[Vector2] = []
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 0x434c4946
+	for z in range(1, f.height - 1):
+		for x in range(1, f.width - 1):
+			if placed.size() >= CLIFF_ROCK_MAX or not f.is_blocked(x, z):
+				continue
+			var h: float = map.heights[z * f.width + x]
+			if h < 0.3:
+				continue
+			var drop: float = 0.0
+			var away := Vector2.ZERO  # from the walkable side into the cliff
+			for o: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				if not f.is_blocked(x + o.x, z + o.y):
+					drop = maxf(drop, absf(h - map.heights[(z + o.y) * f.width + x + o.x]))
+					away -= Vector2(o)
+			if drop < CLIFF_DROP:
+				continue
+			var at := Vector2(x + 0.5, z + 0.5) + away.normalized() * 0.9
+			var spaced: bool = true
+			for p: Vector2 in placed:
+				spaced = spaced and p.distance_to(at) >= CLIFF_ROCK_SPACING
+			var inside: bool = false
+			for box: AABB in buildings:
+				inside = inside or (at.x > box.position.x and at.x < box.end.x and at.y > box.position.z and at.y < box.end.z)
+			if not spaced or inside:
+				continue
+			var rock := MeshInstance3D.new()
+			rock.name = "CliffRock_%02d" % placed.size()
+			rock.mesh = mesh
+			rock.rotation.y = rng.randf() * TAU
+			dressing.get_node("RockSurfaces").add_child(rock)
+			rock.owner = dressing
+			# The largest size whose footprint stays on blocked cells (the dressing's rule for solids),
+			# its base sunk a fifth into the ground, set one cell into the cliff from the walkable side.
+			var fits: bool = false
+			for size: float in [1.6, 1.3, 1.0, 0.8, 0.65]:
+				rock.scale = Vector3.ONE * minf(size, maxf(0.65, drop * 0.6))
+				var embed: float = mesh.get_aabb().size.y * rock.scale.y * 0.2
+				rock.set_meta("ground_embed", embed)
+				rock.position = Vector3(at.x, 0, at.y)
+				rock.position.y = map.ground_y(rock.position) - embed
+				var box: AABB = island._box_of(rock)
+				if _blocked_box(box, map) and box.end.y >= map.ground_y(rock.position) + 0.5:
+					fits = true
+					break
+			if not fits:
+				rock.free()
+				continue
+			placed.append(at)

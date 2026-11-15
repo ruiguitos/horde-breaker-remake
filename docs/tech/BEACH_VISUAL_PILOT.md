@@ -201,6 +201,17 @@ kit CC0.
   juntava dois recursos num só, e as fachadas perdiam as texturas.
 - Captura: `houses_and_plants.png`. Os arbustos saem avermelhados; falta ver a jogar e decidir.
 
+**Torre e falésias (2026-11-15).**
+
+- A torre ganhou soco, cunhais, duas cintas de pedra e um parapeito em balanço sob o coruchéu
+  (`_house_volume` com `tower`). Captura: `tower_v2.png`.
+- 16 rochas digitalizadas (Boulder 01) nas falésias com mais de 0,8 m de desnível
+  (`_cliff_rocks`), uma célula para dentro da falésia, só em células bloqueadas: a grelha não muda.
+  Cobrem pouco: as faixas de falésia são estreitas e quase todas as rochas não cabem sem tocar
+  em chão jogável. As margens do rio continuam com a textura esticada.
+- O esticamento vem do Terrain3D 1.0: o shader incluído não tem projeção triplanar nas faces
+  íngremes. Resolver isto pede um shader próprio para o terreno, ou falésias modeladas.
+
 ### O que continua por fazer
 
 A costa conserva o contorno e o terreno anteriores; há transições de falésia
