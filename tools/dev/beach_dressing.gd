@@ -132,7 +132,7 @@ static func _buildings(island: HandmadeIsland, dressing: Node3D, map: IslandMap)
 		body.material_override = plaster
 		if not house.name.begins_with("Hut_"):
 			body.material_override = stone
-			_house_volume(house, dressing.get_node("Facades"), map, stone, true)
+			_house_volume(house, dressing.get_node("Facades"), map, stone, house.name.begins_with("Tower"))
 			continue
 		house.get_node("Roof").material_override = tiles
 		var centre: Vector3 = house.position

@@ -73,6 +73,15 @@ A principal nunca repete a mecânica de uma secundária na mesma ilha.
     testes que usavam a praia como parte de expedição de 256 m escalam agora a área de jogo.
   - Gerar a praia pelo `build_islands.gd` não deixa os materiais do dressing gravados nas casas;
     o `apply_beach_dressing.gd` sim. Depois de gerar, correr sempre o `apply_beach_dressing.gd`.
+- **Etapa 4, segunda passagem (2026-11-15): as três zonas** (`_open_zones` no gerador). Enseada a
+  leste (duas cabanas de pescadores; o sobrevivente), bosque a sudoeste (mata densa à volta de uma
+  clareira; o ninho) e ruína a nordeste (paredes partidas num pequeno alto; o esconderijo), cada
+  uma com o seu caminho. Cada secundária sorteia entre a sua zona e o sítio antigo escalado. Entre
+  as zonas, seis bosquetes, 110 rochas e quase quatro vezes mais erva. Resultado: 124 668 células
+  transitáveis, 123 edifícios, 487 árvores, Check map sem problemas. O dressing aplica o parapeito
+  só à torre (cabanas e ruínas ficam com o soco). Captura: `stage4_overview.png`.
+  - Ainda vazio a sul do rio, entre o desembarque e o bosque. Não se mediu o tempo a pé entre
+    objetivos (a meta de 40 s); fica para a etapa 5, com o desempenho.
 - As três decisões propostas abaixo ficaram por responder; a etapa 1 usa a recompensa da tabela.
 
 ## Etapas

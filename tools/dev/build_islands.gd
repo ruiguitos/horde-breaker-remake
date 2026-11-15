@@ -195,6 +195,37 @@ func _design_beach() -> void:
 	rock_count = 20
 	cover = [["Grass_Wispy_Tall", 900, 0.9], ["Grass_Wispy_Short", 900, 0.6], ["Bush_Common", 120, 1.2]]
 	_scale_open(2.0, Vector2(55, 117))
+	_open_zones()
+
+
+## The open-island pilot's three zones (docs/design/OPEN_ISLAND_PILOT.md, stage 4), one per side
+## task, each reached by its own path from the scaled 256 m layout, and the ground between them
+## filled: groves and rocks, so nothing open is far from cover or a landmark.
+##   Cove (east): two fishers' huts by the shore; the lost survivor.
+##   Woods (south-west): a dense wood round a clearing; the nest.
+##   Ruin (north-east): broken walls on a rise; the Intel stash.
+## Each side kind keeps a pool of two: its zone, and the old spot (scaled) as the other draw.
+func _open_zones() -> void:
+	markers["Side_Survivor_1"] = Vector2(418, 334)
+	markers["Side_Nest_1"] = Vector2(128, 404)
+	markers["Side_Cache_1"] = Vector2(382, 146)
+	# Cove: sheds facing the beach, a path along the east shore from the bridge.
+	for p in [Vector2(398, 318), Vector2(430, 316)]:
+		buildings.append([Rect2(p, Vector2(7, 6)), 3.2, Color(0.66, 0.58, 0.46), "hut"])
+	paths.append([_line([Vector2(256, 320), Vector2(320, 334), Vector2(380, 338), Vector2(416, 340)]), 5.0])
+	# Woods: a trail to the clearing; the wood round it.
+	paths.append([_line([Vector2(256, 384), Vector2(200, 396), Vector2(150, 404), Vector2(128, 404)]), 4.0])
+	forests.append([Vector2(108, 392), 42.0, 160, ["CommonTree_1", "CommonTree_3", "CommonTree_5"], 6.0, 9.0])
+	# Ruin: broken walls on a low rise north-east of the crossroads.
+	hills.append([Vector2(382, 150), 30.0, 3.0])
+	for wall in [[Vector2(368, 132), Vector2(14, 3)], [Vector2(392, 134), Vector2(3, 14)], [Vector2(366, 158), Vector2(3, 12)], [Vector2(380, 166), Vector2(12, 3)]]:
+		buildings.append([Rect2(wall[0], wall[1]), 2.2, Color(0.52, 0.5, 0.45), "ruin"])
+	paths.append([_line([Vector2(256, 226), Vector2(312, 196), Vector2(352, 168), Vector2(378, 150)]), 5.0])
+	# Between the zones: groves and boulders, so the open ground has landmarks and cover.
+	for grove in [[Vector2(330, 420), 22.0], [Vector2(190, 160), 20.0], [Vector2(440, 220), 18.0], [Vector2(70, 260), 18.0], [Vector2(300, 60), 16.0], [Vector2(190, 300 - 40), 14.0]]:
+		forests.append([grove[0], grove[1], int(grove[1] * 2.2), ["CommonTree_2", "CommonTree_4"], 5.0, 8.0])
+	rock_count = 110
+	cover = [["Grass_Wispy_Tall", 3200, 0.9], ["Grass_Wispy_Short", 3200, 0.6], ["Bush_Common", 600, 1.2]]
 
 
 ## The open-island pilot (docs/design/OPEN_ISLAND_PILOT.md, stage 4): the design above, laid out on
