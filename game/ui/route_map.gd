@@ -1,6 +1,8 @@
 class_name RouteMap
 extends Control
-## Decorative chart: selected markers correspond to the two offered routes.
+## The chart of the selected route: the real island it lands on, drawn from the hand-made scene's
+## grid picture (HandmadeIsland.grid_image, saved as <scene>_grid.png), as a nautical chart. A
+## biome with no hand-made island keeps the decorative chart of the two routes.
 ## Also home of the progress pips shared by the boat and the camp (StepPip):
 ## done = filled + tick, current = amber ring, ahead = dashed ring.
 
@@ -23,8 +25,69 @@ func _ready() -> void:
 	resized.connect(queue_redraw)
 
 
+## Chart colours: the sea is the panel's dark ground.
+const CHART_SEA := Color("141a15")
+const CHART_LAND := Color("33402b")
+const CHART_HIGH := Color("4a5a3d")  ## raised ground
+const CHART_CLIFF := Color("1f2719")
+const CHART_BUILDING := Color("8a8f7c")
+const CHART_COAST := Color(0.62, 0.68, 0.48)
+
+static var _charts: Dictionary = {}  ## biome -> [Texture2D, boat pixel] (or [] without an island)
+
+
+## The selected route's island as a chart texture, and where its boat is (in grid pixels).
+static func island_chart(biome: StringName) -> Array:
+	if _charts.has(biome):
+		return _charts[biome]
+	var out: Array = []
+	var paths: PackedStringArray = HandmadeIsland.island_paths(biome)
+	var path: String = paths[0].get_basename() + "_grid.png" if not paths.is_empty() else ""
+	if path != "" and ResourceLoader.exists(path):
+		var grid: Image = (load(path) as Texture2D).get_image()
+		grid.decompress()
+		var w: int = grid.get_width()
+		var h: int = grid.get_height()
+		var chart := Image.create_empty(w, h, false, Image.FORMAT_RGBA8)
+		var boat := Vector2.ZERO
+		var boat_n: int = 0
+		var sea := PackedByteArray()
+		sea.resize(w * h)
+		for z in h:
+			for x in w:
+				var c: Color = grid.get_pixel(x, z)
+				sea[z * w + x] = 1 if c.b > 0.6 and c.r < 0.3 and c.g < 0.5 else 0
+		for z in h:
+			for x in w:
+				if sea[z * w + x] == 1:
+					continue
+				var c: Color = grid.get_pixel(x, z)
+				var ink: Color = CHART_LAND.lerp(CHART_HIGH, clampf((c.r - 0.55) * 2.5, 0.0, 1.0))
+				if c.r > 0.9 and c.g > 0.9 and c.b < 0.3:
+					boat += Vector2(x, z)
+					boat_n += 1
+				elif c.r < 0.3 and c.g < 0.25 and c.b < 0.2:
+					ink = CHART_CLIFF
+				elif absf(c.r - c.g) < 0.03 and absf(c.g - c.b) < 0.03 and c.r > 0.5 and c.r < 0.7:
+					ink = CHART_BUILDING
+				var coast: bool = false
+				for o: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					var n := Vector2i(x, z) + o
+					if n.x >= 0 and n.y >= 0 and n.x < w and n.y < h and sea[n.y * w + n.x] == 1:
+						coast = true
+				chart.set_pixel(x, z, CHART_COAST if coast else ink)
+		out = [ImageTexture.create_from_image(chart), boat / maxi(boat_n, 1), Vector2(w, h)]
+	_charts[biome] = out
+	return out
+
+
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, size), Color("141a15"))
+	draw_rect(Rect2(Vector2.ZERO, size), CHART_SEA)
+	var shown: int = selected if selected >= 0 and selected < biomes.size() else 0
+	var chart: Array = island_chart(biomes[shown]) if shown < biomes.size() else []
+	if not chart.is_empty():
+		_draw_island(chart, shown)
+		return
 	for x in range(0, int(size.x), 28):
 		draw_line(Vector2(x, 0), Vector2(x, size.y), Color(0.5, 0.6, 0.45, 0.12))
 	for y in range(0, int(size.y), 28):
@@ -123,3 +186,27 @@ class StepPip extends Control:
 
 	func _draw() -> void:
 		RouteMap.draw_step(self, size * 0.5, 12.0, state, number)
+
+
+## The real island of route `shown`: the chart fitted in the panel, a grid over the sea, the
+## landing at the boat and the route line in from the bottom edge.
+func _draw_island(chart: Array, shown: int) -> void:
+	for x in range(0, int(size.x), 28):
+		draw_line(Vector2(x, 0), Vector2(x, size.y), Color(0.5, 0.6, 0.45, 0.12))
+	for y in range(0, int(size.y), 28):
+		draw_line(Vector2(0, y), Vector2(size.x, y), Color(0.5, 0.6, 0.45, 0.12))
+	var pixels: Vector2 = chart[2]
+	var room := Rect2(Vector2(12, 34), size - Vector2(24, 52))
+	var scale: float = minf(room.size.x / pixels.x, room.size.y / pixels.y)
+	var drawn := Rect2(room.position + (room.size - pixels * scale) * 0.5, pixels * scale)
+	draw_texture_rect(chart[0], drawn, false)
+	var boat: Vector2 = drawn.position + (chart[1] as Vector2) * scale
+	var entry := Vector2(boat.x, size.y - 4)
+	for segment in range(0, 12, 2):
+		draw_line(entry.lerp(boat, segment / 12.0), entry.lerp(boat, (segment + 1) / 12.0), UiTheme.ACCENT, 3.0, true)
+	draw_arc(boat, 10, 0, TAU, 32, UiTheme.ACCENT, 2.0, true)
+	draw_circle(boat, 4, UiTheme.ACCENT)
+	var font: Font = UiTheme.mono_bold_font()
+	var title: String = "N ↑ / %s · %s" % [LETTERS[shown] if shown < LETTERS.size() else "", String(GameData.BIOMES[biomes[shown]]["name"]).to_upper()]
+	draw_string(font, Vector2(10, 20), title, HORIZONTAL_ALIGNMENT_LEFT, size.x - 20, 13, UiTheme.ACCENT)
+	draw_string(UiTheme.mono_font(), Vector2(10, size.y - 8), "LANDING", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, UiTheme.MUTED)

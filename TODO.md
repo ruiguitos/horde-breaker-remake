@@ -108,7 +108,7 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
   CARDS próprio, três números por arma); o LOADOUT não foi estreitado porque a folha dos perks
   usa a mesma coluna. Barco e debrief em papel a 2026-11-15. Feitos o título e o armory (classe com a fotografia
   3D, armas como formulário de requisição, perks num quadro de cortiça), com a Special Elite e a
-  Libre Franklin; capturas em `docs/design/dossier_20261111/`. Por fazer: cartas,
+  Libre Franklin; capturas em `docs/design/dossier_20261111/`. Cartas de nível, pausa e diálogos em papel a 2026-11-15 (ferramentas DEV ficam escuras). Por fazer:
   diálogos (run, definições, arquivo) e pausa, que ainda usam o tema escuro. Nos cartões dos
   perks os nomes continuam na Barlow Condensed: dois nomes à máquina não cabem num cartão;
   o mockup tem um nome por cartão, e isso pede mudar o cartão (`game/ui/perk_node_view.gd`).
@@ -123,8 +123,9 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
   jogar. Barco de extração e cais preparados e em jogo a 2026-11-14 (todas as ilhas com barco):
   ver a jogar e decidir se a ponte usa as
   mesmas secções do cais. Seguem-se vegetação maior, casas e torre, e falésias.
-- [ ] Vista geral do mapa antes de partir: desenhar a ilha real a partir da grelha da cena
-  (`HandmadeIsland.grid_image`) em vez das manchas de `game/ui/route_map.gd`.
+- [ ] Vista geral do mapa antes de partir: feita a 2026-11-15. O barco desenha a ilha real da rota
+  escolhida como carta náutica, a partir do `<cena>_grid.png` (`RouteMap.island_chart`). Por fazer:
+  regenerar o `_grid.png` sempre que a ilha muda (hoje é o Check map que o grava), e ver a jogar.
 - [ ] Objetivos variados: feito em 2026-11-10 na `beach_01` (seis geradores, cada run usa três,
   `IslandRun.pick_generators`) e no Exfil (três pontos de extração, um por seed, revelado aos
   10:00); teste em `tests/test_objective_pools.gd`. Por fazer: ver os três sítios novos da
