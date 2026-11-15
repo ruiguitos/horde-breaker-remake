@@ -153,6 +153,7 @@ func _design_beach() -> void:
 		"Generator1": Vector2(55, 117), "Generator2": Vector2(206, 88), "Generator3": Vector2(132, 46),
 		"Generator4": Vector2(165, 125), "Generator5": Vector2(90, 180), "Generator6": Vector2(170, 60),  # a pool: each run draws 3
 		"Side_Cache_1": Vector2(100, 190), "Side_Cache_2": Vector2(150, 100),  # open-island pilot: one Intel stash per run
+		"Side_Survivor_1": Vector2(224, 140), "Side_Survivor_2": Vector2(32, 158), "Side_Nest_1": Vector2(146, 176), "Side_Nest_2": Vector2(200, 134),  # open-island pilot: one survivor and one nest per run
 		"Cache1": Vector2(92, 62), "Cache2": Vector2(184, 176), "Cache3": Vector2(60, 186), "Cache4": Vector2(186, 60),
 		"Choke_Bridge": Vector2(128, 149), "Choke_DuneGap": Vector2(197, 95), "Choke_BluffRamp": Vector2(128, 80),
 		"Arena_Crossroads": Vector2(128, 113), "Arena_Village": Vector2(55, 117),

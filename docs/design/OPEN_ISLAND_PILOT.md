@@ -48,6 +48,13 @@ A principal nunca repete a mecânica de uma secundária na mesma ilha.
   se trabalha nela e um visto quando acaba. O minimapa marca-a com um losango dourado e põe
   OPTIONAL na legenda. O ecrã de fim de ilha e o debrief contam as secundárias feitas. Captura:
   `docs/design/open_island_pilot/stage2_hud.png`. Testes no mesmo `tests/test_side_tasks.gd`.
+- **Etapa 3 feita (2026-11-15).** Duas secundárias novas na `beach_01` atual, cada uma sorteada
+  entre dois marcadores: **sobrevivente perdido** (`Side_Survivor_*`, 3 s ao lado dele; dá uma
+  carta para escolher logo ali, e não no barco, como o plano dizia, porque usa o mecanismo de
+  cartas que já existe) e **ninho** (`Side_Nest_*`, 8 s a armar a carga; o primeiro momento chama
+  um pico da horda de 12 s; dá vida e munição cheias). A ilha tem agora três secundárias. Uma
+  missão principal com a mesma mecânica tira a secundária correspondente (`side_kinds_left_out`):
+  Rescue e Escort tiram o sobrevivente, Nests tira o ninho, Intel Search tira o esconderijo.
 - As três decisões propostas abaixo ficaram por responder; a etapa 1 usa a recompensa da tabela.
 
 ## Etapas

@@ -193,6 +193,10 @@ func build_map(problems: Array[String] = []) -> IslandMap:
 	for node in _children_of("Markers"):
 		if node.name.begins_with("Side_Cache"):
 			map.side_caches.append(_flat(_local(node).origin))
+		elif node.name.begins_with("Side_Survivor"):
+			map.side_survivors.append(_flat(_local(node).origin))
+		elif node.name.begins_with("Side_Nest"):
+			map.side_nests.append(_flat(_local(node).origin))
 		elif node.name.begins_with("ExfilPoint"):
 			map.exfil_points.append(_flat(_local(node).origin))  # the EXFIL mode draws one of them
 		elif node.name.begins_with("Generator"):

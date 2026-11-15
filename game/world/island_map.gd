@@ -65,6 +65,9 @@ var exfil := Vector3(-1, 0, -1)
 var exfil_points: Array[Vector3] = []
 ## Side_Cache* markers: the open island's Intel stash, one drawn by seed (IslandRun.side_tasks).
 var side_caches: Array[Vector3] = []
+## Side_Survivor* and Side_Nest* markers: the open island's other side tasks, one of each by seed.
+var side_survivors: Array[Vector3] = []
+var side_nests: Array[Vector3] = []
 ## Escort: the cart's route (EscortRoute_* markers in number order; the
 ## first is where it waits; empty = the run picks a route,
 ## pick_escort_route), the stops on the way (EscortStop_* markers in number

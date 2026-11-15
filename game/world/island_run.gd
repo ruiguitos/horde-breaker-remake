@@ -831,17 +831,31 @@ static func pick_generators(pool: Array[Vector3], seed_value: int) -> Array[Vect
 
 
 ## Open islands (docs/design/OPEN_ISLAND_PILOT.md): the optional side tasks. A map with
-## Side_Cache* markers gets one Intel stash among them, drawn by seed; other maps get none.
+## Side_Cache*, Side_Survivor* or Side_Nest* markers gets one task of each kind, drawn by seed;
+## other maps get none. A kind the main mission already plays is left out (set_mission).
 var side_tasks: Array[SideTask] = []
 
 
 func _build_side_tasks(seed_value: int) -> void:
 	side_tasks.clear()
-	if map.side_caches.is_empty():
-		return
 	var draw := RandomNumberGenerator.new()
 	draw.seed = seed_value ^ 0x53494445
-	side_tasks.append(SideTask.new(&"cache", map.side_caches[draw.randi_range(0, map.side_caches.size() - 1)]))
+	for pair: Array in [[&"cache", map.side_caches], [&"survivor", map.side_survivors], [&"nest", map.side_nests]]:
+		var pool: Array[Vector3] = pair[1]
+		if not pool.is_empty():
+			side_tasks.append(SideTask.new(pair[0], pool[draw.randi_range(0, pool.size() - 1)]))
+
+
+## The side kinds a main mission already plays (the plan: never the same mechanic twice).
+static func side_kinds_left_out(main: StringName) -> Array[StringName]:
+	match main:
+		&"rescue", &"escort":
+			return [&"survivor"]
+		&"nests":
+			return [&"nest"]
+		&"intel_search":
+			return [&"cache"]
+	return []
 
 
 ## How many side tasks are done.
@@ -854,12 +868,30 @@ func _update_side_tasks(dt: float) -> void:
 	if objective == Objective.WON or objective == Objective.LOST:
 		return
 	for task: SideTask in side_tasks:
-		if task.update(dt, player_pos):
-			messages.append("Intel stash emptied: +%d Intel" % GameData.SIDE_CACHE_INTEL)
+		var finished: bool = task.update(dt, player_pos)
+		if task.kind == &"nest" and not task.alarmed and task.progress > 0.0:
+			task.alarmed = true  # the first moment of work on the charge wakes the nest
+			director.trigger_peak(GameData.SIDE_NEST_PEAK)
+			messages.append("The nest stirs: the horde is coming!")
+		if finished:
+			match task.kind:
+				&"survivor":
+					_pending_levels += 1  # a card to pick now
+					messages.append("Survivor sent to the boat: pick a card")
+				&"nest":
+					hp = max_hp
+					for w in weapons.size():
+						if weapons[w].max_ammo > 0:
+							ammo[w] = max_ammo(w)
+					messages.append("Nest destroyed: health and ammo full")
+				_:
+					messages.append("Intel stash emptied: +%d Intel" % GameData.SIDE_CACHE_INTEL)
 
 
 func set_mission(id: StringName) -> void:
 	mission = id
+	var left_out: Array[StringName] = side_kinds_left_out(id)
+	side_tasks = side_tasks.filter(func(t: SideTask) -> bool: return not left_out.has(t.kind))
 	var marker: Vector3 = map.rescue_target if mission == &"rescue" else map.defend_zone
 	if mission in [&"rescue", &"defend", &"holdout"] and marker.x >= 0.0:
 		site = marker
