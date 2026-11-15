@@ -34,6 +34,17 @@ Todas reaproveitam mecânicas que já existem; nenhum sistema de combate novo.
 
 A principal nunca repete a mecânica de uma secundária na mesma ilha.
 
+## Estado
+
+- **Etapa 1 feita (2026-11-15).** `game/world/side_task.gd` (classe `SideTask`), lista
+  `IslandRun.side_tasks`, um esconderijo de Intel sorteado entre dois marcadores `Side_Cache_*` da
+  `beach_01` atual, anel dourado no mundo, Intel no total da ilha e no `island_log`
+  (`side_tasks`, `side_done`). Teste: `tests/test_side_tasks.gd`. Valores provisórios em
+  `game/data/game_data.gd` (`SIDE_TASK_RADIUS` 3 m, `SIDE_CACHE_SECONDS` 4 s,
+  `SIDE_CACHE_INTEL` 25). A fixture da praia ganhou os dois marcadores novos; os antigos
+  continuam todos verificados.
+- As três decisões propostas abaixo ficaram por responder; a etapa 1 usa a recompensa da tabela.
+
 ## Etapas
 
 Cada etapa acaba com testes a passar, a suite completa verde e um commit. Nenhuma toca nas

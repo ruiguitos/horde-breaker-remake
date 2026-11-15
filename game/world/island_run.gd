@@ -389,6 +389,7 @@ func _init(rng_seed: int = 7, biome: StringName = &"beach", custom_map: IslandMa
 	limb_rng.seed = rng_seed ^ 0x4c494d42
 	map = custom_map if custom_map != null else IslandMap.build(rng_seed, biome)
 	map.generators = pick_generators(map.generators, rng_seed)
+	_build_side_tasks(rng_seed)
 	field = map.field
 	horde = Horde.new(field)
 	if field.max_distance > 0:
@@ -550,6 +551,7 @@ func save_to_context(ctx: RunContext) -> void:
 		"power_ups": power_ups_picked.map(func(x: StringName) -> String: return String(x)),
 		"power_up_intel_bonus": _power_up_intel_bonus, "shield_left": int(shield),
 		"cause": String(death_cause), "shots": _shots_log(), "xp_earned": xp_earned,
+		"side_tasks": side_tasks.size(), "side_done": side_tasks.filter(func(t: SideTask) -> bool: return t.done).size(),
 	})
 	ctx.intel += intel_earned()
 	ctx.hazard_pay = false  # one island only
@@ -826,6 +828,29 @@ static func pick_generators(pool: Array[Vector3], seed_value: int) -> Array[Vect
 	for i in best:
 		out.append(pool[i])
 	return out
+
+
+## Open islands (docs/design/OPEN_ISLAND_PILOT.md): the optional side tasks. A map with
+## Side_Cache* markers gets one Intel stash among them, drawn by seed; other maps get none.
+var side_tasks: Array[SideTask] = []
+
+
+func _build_side_tasks(seed_value: int) -> void:
+	side_tasks.clear()
+	if map.side_caches.is_empty():
+		return
+	var draw := RandomNumberGenerator.new()
+	draw.seed = seed_value ^ 0x53494445
+	side_tasks.append(SideTask.new(&"cache", map.side_caches[draw.randi_range(0, map.side_caches.size() - 1)]))
+
+
+## Works the side tasks while the island is being played; each pays once (intel_earned).
+func _update_side_tasks(dt: float) -> void:
+	if objective == Objective.WON or objective == Objective.LOST:
+		return
+	for task: SideTask in side_tasks:
+		if task.update(dt, player_pos):
+			messages.append("Intel stash emptied: +%d Intel" % GameData.SIDE_CACHE_INTEL)
 
 
 func set_mission(id: StringName) -> void:
@@ -1892,6 +1917,8 @@ func _intel_base() -> int:
 			base += done * 15
 	base += 20 if boss_killed else 0
 	base += cache_intel
+	for task: SideTask in side_tasks:
+		base += task.intel()
 	return base
 
 
@@ -2009,6 +2036,7 @@ func step(dt: float, move: Vector2, aim: Vector3, breaker: bool, sprint: bool = 
 	_recycle_far(dt)
 	_update_orbs(dt)
 	_update_mission(dt)
+	_update_side_tasks(dt)
 	_update_caches(dt)
 	_update_lava(dt)
 	_regenerate(dt)

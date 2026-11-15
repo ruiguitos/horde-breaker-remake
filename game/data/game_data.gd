@@ -408,6 +408,10 @@ const GENERATOR_COUNT: int = 3
 ## A map with more Generator markers than GENERATOR_COUNT is a pool: each run draws its generators
 ## from it by seed, at least this far apart (metres) when the pool allows it.
 const GENERATOR_MIN_SPACING: float = 50.0
+## Open islands (docs/design/OPEN_ISLAND_PILOT.md): optional side tasks. Proposals, to tune by play.
+const SIDE_TASK_RADIUS: float = 3.0  ## metres: stand this close to work on a side task
+const SIDE_CACHE_SECONDS: float = 4.0  ## seconds to empty an Intel stash
+const SIDE_CACHE_INTEL: int = 25  ## Intel an emptied stash pays
 const GENERATOR_HOLD_SECONDS: float = 8.0
 const GENERATOR_RADIUS: float = 3.5
 const BOAT_RADIUS: float = 4.0

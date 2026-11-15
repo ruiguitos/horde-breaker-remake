@@ -134,6 +134,7 @@ var _generators: Array[MeshInstance3D] = []
 var _generator_rings: Array[MeshInstance3D] = []
 var _boat_ring: MeshInstance3D
 var _boat: MeshInstance3D
+var _side_rings: Array[MeshInstance3D] = []  ## one per run.side_tasks, hidden once done
 var _pier: Node3D  ## the pier's sections; null without the prepared models
 var _moor_out: float = 3.0  ## metres from the Boat marker out to the moored boat (see _build_pier)
 var _moor_side: float = 1.0  ## which side of the pier the boat is on: the one clear of rocks
@@ -482,6 +483,11 @@ func _build_world() -> void:
 	# The extraction ring: at the Exit on expedition parts, else at the boat.
 	_boat_ring = _ring(run.extraction_point(), GameData.BOAT_RADIUS, Color(0.3, 1, 0.4))
 	_boat_ring.visible = false
+	# Open-island side tasks (stage 1 of the pilot): a gold ring at each until it is done.
+	for task: SideTask in run.side_tasks:
+		var ring := _ring(task.position, GameData.SIDE_TASK_RADIUS, Color(1.0, 0.78, 0.25))
+		ring.name = "SideTask_" + String(task.kind)
+		_side_rings.append(ring)
 	if run.has_exit():
 		_exit_post = MeshInstance3D.new()
 		var pm := CylinderMesh.new()
@@ -3052,6 +3058,8 @@ func _draw_mission() -> void:
 	if run.mission == &"holdout":
 		# The rescue boat sails in from the sea to the pier once called.
 		_boat.visible = run.shows_boat()
+		for k in mini(_side_rings.size(), run.side_tasks.size()):
+			_side_rings[k].visible = not run.side_tasks[k].done
 		if _pier != null:
 			_pier.visible = _boat.visible and run.mission != &"holdout"
 		_boat.position = _boat_spot()

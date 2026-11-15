@@ -63,6 +63,8 @@ var machine_points: Array[Vector3] = []
 var exfil := Vector3(-1, 0, -1)
 ## Every ExfilPoint* marker (ExfilPoint, ExfilPoint2...): the EXFIL mode draws its extraction from them.
 var exfil_points: Array[Vector3] = []
+## Side_Cache* markers: the open island's Intel stash, one drawn by seed (IslandRun.side_tasks).
+var side_caches: Array[Vector3] = []
 ## Escort: the cart's route (EscortRoute_* markers in number order; the
 ## first is where it waits; empty = the run picks a route,
 ## pick_escort_route), the stops on the way (EscortStop_* markers in number
