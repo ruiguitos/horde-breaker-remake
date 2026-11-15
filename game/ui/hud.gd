@@ -58,6 +58,7 @@ var _survivor_row: HBoxContainer
 var _survivor_bar: ProgressBar
 var _survivor_text: Label
 var _boss_row: VBoxContainer
+var _side_list: VBoxContainer  ## the open island's side tasks (see _update_side_tasks)
 var _boss_name: Label
 var _boss_bar: ProgressBar
 var _map_box: VBoxContainer
@@ -661,6 +662,11 @@ func _build_field_hud(field: Control) -> void:
 	_survivor_bar = _meter(_survivor_row, UiTheme.SUCCESS, 8)
 	_survivor_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_survivor_row.visible = false
+	# Open-island side tasks: one line each under the objective, optional, with what they pay.
+	_side_list = _column(_objective_box, 2)
+	_side_list.name = "SideTasks"
+	_side_list.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_side_list.visible = false
 	_boss_row = _column(_objective_box, 3)
 	_boss_row.custom_minimum_size.x = 380
 	_boss_row.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -789,13 +795,36 @@ func _build_field_hud(field: Control) -> void:
 	_alerts.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_alerts.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_place(field, _alerts, Control.PRESET_CENTER_BOTTOM, Vector2(-170, -200), Vector2(340, 80))
-	_plate(_objective_box, [words, _objective_pips, _survivor_row, _boss_row])
+	_plate(_objective_box, [words, _objective_pips, _side_list, _survivor_row, _boss_row])
 	_plate(_map_box, [_legend])  # the key only: the map's dark island would vanish on a plate
 	_plate(_status_panel)
 	_plate(_radio_panel)
 	_plate(_abilities_panel, [tiles, _sprint_row])
 	_plate(_weapon_panel)
 	_apply_weights()
+
+
+## The side tasks' lines: "OPTIONAL · INTEL STASH · +25 INTEL · 120 m", the seconds while one is
+## being worked, and a tick once done. Hidden on islands without side tasks.
+func _update_side_tasks(run: IslandRun) -> void:
+	_side_list.visible = not run.side_tasks.is_empty()
+	if not _side_list.visible:
+		return
+	while _side_list.get_child_count() < run.side_tasks.size():
+		var line := _label("", 14, UiTheme.ACCENT, true)
+		line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_side_list.add_child(line)
+	for k in run.side_tasks.size():
+		var task: SideTask = run.side_tasks[k]
+		var line := _side_list.get_child(k) as Label
+		var far: int = int(Vector2(task.position.x - run.player_pos.x, task.position.z - run.player_pos.z).length())
+		if task.done:
+			line.text = "✓ %s · %s" % [task.title(), task.reward_text()]
+			line.add_theme_color_override("font_color", UiTheme.SUCCESS)
+		elif task.progress > 0.0 and far <= int(GameData.SIDE_TASK_RADIUS):
+			line.text = "%s · %d / %d s" % [task.title(), int(task.progress), int(task.seconds())]
+		else:
+			line.text = "OPTIONAL · %s · %s · %d m" % [task.title(), task.reward_text(), far]
 
 
 ## Ring + [name, key, state] column. Returns [ring, name, key, state].
@@ -1740,6 +1769,7 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_alerts.size.y = alerts_h
 	_alerts.position.y = _abilities_panel.position.y - 10.0 - alerts_h
 	_update_objective(run, island_text)
+	_update_side_tasks(run)
 
 	_update_radio(run)
 	for box: Control in _plates:

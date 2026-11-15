@@ -148,6 +148,8 @@ func open(run: IslandRun, ctx: RunContext, gamepad: bool) -> void:
 	level_gain.text = "+%d" % s["levels_gained"] if s["levels_gained"] > 0 else ""
 	cards.text = s["cards"] if s["cards"] != "" else "none this island"
 	power_ups.text = s["power_ups"] if s["power_ups"] != "" else "none this island"
+	if s["side"] != "":
+		power_ups.text += "  ·  " + s["side"]
 	run_totals.text = s["run_totals"]
 	run_totals.visible = s["run_totals"] != ""
 	next_step.text = "›  " + s["next"]
@@ -226,6 +228,7 @@ static func summary(run: IslandRun, ctx: RunContext) -> Dictionary:
 		"intel": intel_here, "level": run.level, "levels_gained": maxi(0, run.level - level_before),
 		"cards": _cards_text(run), "power_ups": _power_ups_text(run),
 		"run_totals": totals, "next": next_text(ctx),
+		"side": "" if run.side_tasks.is_empty() else "%d / %d optional done" % [run.side_done(), run.side_tasks.size()],
 	}
 
 

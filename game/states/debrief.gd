@@ -304,7 +304,8 @@ func _island_card(i: int, entry: Dictionary) -> PanelContainer:
 		box.add_child(foot)
 		var seconds: int = int(float(entry.get("seconds", 0.0)))
 		foot.add_child(_line("%02d:%02d" % [seconds / 60, seconds % 60], Dossier.TEXT))
-		var kills := _line("%d kills" % int(entry.get("kills", 0)), Dossier.TEXT)
+		var side: String = "  ·  %d/%d opt." % [int(entry["side_done"]), int(entry["side_tasks"])] if int(entry.get("side_tasks", 0)) > 0 else ""
+		var kills := _line("%d kills%s" % [int(entry.get("kills", 0)), side], Dossier.TEXT)
 		kills.name = "Kills"
 		kills.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		kills.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

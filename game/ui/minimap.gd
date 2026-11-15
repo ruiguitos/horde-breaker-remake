@@ -22,6 +22,7 @@ const SURVIVOR_COLOR := Color(1.0, 0.55, 0.1)
 const GENERATOR_COLOR := Color(1, 0.85, 0.2)
 const GENERATOR_ON_COLOR := Color(0.3, 1, 0.4)
 const CACHE_COLOR := Color(0.4, 0.95, 1.0)
+const SIDE_COLOR := Color(1.0, 0.78, 0.25)  ## an optional side task, as its ring in the world
 ## Fuel Run cans and their delivery point (the world uses the same colour).
 const FUEL_COLOR := Color(1.0, 0.6, 0.15)
 ## Horde nests (the glowing core in the world uses the same colour).
@@ -214,6 +215,9 @@ func _draw() -> void:
 	for c in run.map.caches.size():
 		if run.cache_progress[c] < GameData.CACHE_OPEN_TIME:
 			_mark(&"cache", _px(run.map.caches[c]))
+	for task: SideTask in run.side_tasks:
+		if not task.done:
+			_mark(&"side", _px(task.position))
 	if run.has_exit():
 		_mark(&"exit", _px(run.map.exit))
 	if run.power_ups.ground_kind != &"":
@@ -297,6 +301,10 @@ static func draw_marker(item: CanvasItem, kind: StringName, p: Vector2, s: float
 			item.draw_circle(p + Vector2(0, 1) * s, 3.0 * s, SIGNAL_LIT_COLOR)
 			item.draw_colored_polygon(PackedVector2Array([p + Vector2(-2.6, 0) * s, p + Vector2(0, -5) * s, p + Vector2(2.6, 0) * s]), SIGNAL_LIT_COLOR)
 			item.draw_circle(p + Vector2(0, 1) * s, 1.3 * s, SIGNAL_COLOR)
+		&"side":
+			# An optional side task: a gold diamond outline.
+			var d := PackedVector2Array([p + Vector2(0, -5) * s, p + Vector2(5, 0) * s, p + Vector2(0, 5) * s, p + Vector2(-5, 0) * s, p + Vector2(0, -5) * s])
+			item.draw_polyline(d, SIDE_COLOR, 2.0 * s, true)
 		&"power":
 			# The power switch: a cyan lightning bolt.
 			item.draw_colored_polygon(PackedVector2Array([p + Vector2(1, -5) * s, p + Vector2(-3, 1) * s, p + Vector2(0, 1) * s,
@@ -355,6 +363,8 @@ static func legend_entries(r: IslandRun) -> Array[Array]:
 		return out
 	if r.has_boss:
 		out.append([&"boss", "BEHEMOTH"])
+	if r.side_tasks.any(func(t: SideTask) -> bool: return not t.done):
+		out.append([&"side", "OPTIONAL"])
 	match r.mission:
 		&"defend":
 			out.append([&"site", "UPLINK"])

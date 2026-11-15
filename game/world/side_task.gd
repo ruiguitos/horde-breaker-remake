@@ -15,6 +15,16 @@ func _init(task_kind: StringName, at: Vector3) -> void:
 	position = at
 
 
+## The task's name, as the HUD and the end screens show it.
+func title() -> String:
+	return "INTEL STASH"
+
+
+## What it pays, in words ("+25 INTEL").
+func reward_text() -> String:
+	return "+%d INTEL" % GameData.SIDE_CACHE_INTEL
+
+
 ## Seconds of standing in the circle the task needs.
 func seconds() -> float:
 	return GameData.SIDE_CACHE_SECONDS

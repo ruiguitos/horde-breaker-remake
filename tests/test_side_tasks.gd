@@ -69,6 +69,38 @@ func _run() -> void:
 	_check(_run_on(map).side_tasks[0].position == task.position, "the same seed draws the same stash")
 	var plain := IslandRun.new(7)
 	_check(plain.side_tasks.is_empty(), "a map without Side_Cache markers has no side task")
+	await _test_screens(map)
 	print("TEST: side tasks, %d failures" % _failures)
 	await create_timer(0.3).timeout
 	quit(1 if _failures > 0 else 0)
+
+
+## Stage 2: the HUD lists the side task under the objective, the minimap marks it and keys it,
+## and the end-of-island panel says how many were done.
+func _test_screens(map: IslandMap) -> void:
+	var run := _run_on(map)
+	var hud := Hud.new()
+	root.add_child(hud)
+	await process_frame
+	hud.refresh(run, null, 0.0)
+	var list: VBoxContainer = hud.get("_side_list")
+	var line: Label = list.get_child(0) as Label if list.get_child_count() > 0 else null
+	_check(list.visible and line != null and line.text.begins_with("OPTIONAL · INTEL STASH · +%d INTEL" % GameData.SIDE_CACHE_INTEL), "the HUD lists the side task under the objective (%s)" % [line.text if line != null else "none"])
+	var keys: Array = Minimap.legend_entries(run).map(func(e: Array) -> StringName: return e[0])
+	_check(keys.has(&"side"), "the minimap's key has the optional task while it is not done")
+	run.player_pos = run.side_tasks[0].position
+	run._update_side_tasks(GameData.SIDE_CACHE_SECONDS + 0.1)
+	hud.refresh(run, null, 0.0)
+	_check(line.text.begins_with("✓ INTEL STASH"), "a done side task shows a tick (%s)" % line.text)
+	keys = Minimap.legend_entries(run).map(func(e: Array) -> StringName: return e[0])
+	_check(not keys.has(&"side"), "a done side task leaves the minimap")
+	var summary: Dictionary = IslandEndPanel.summary(run, RunContext.new(5))
+	_check(summary["side"] == "1 / 1 optional done", "the end-of-island panel counts the side tasks (%s)" % summary["side"])
+	hud.queue_free()
+	var plain := Hud.new()
+	root.add_child(plain)
+	await process_frame
+	plain.refresh(IslandRun.new(7), null, 0.0)
+	_check(not (plain.get("_side_list") as Control).visible, "an island without side tasks shows no optional line")
+	plain.queue_free()
+	await process_frame

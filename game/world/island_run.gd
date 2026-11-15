@@ -844,6 +844,11 @@ func _build_side_tasks(seed_value: int) -> void:
 	side_tasks.append(SideTask.new(&"cache", map.side_caches[draw.randi_range(0, map.side_caches.size() - 1)]))
 
 
+## How many side tasks are done.
+func side_done() -> int:
+	return side_tasks.filter(func(t: SideTask) -> bool: return t.done).size()
+
+
 ## Works the side tasks while the island is being played; each pays once (intel_earned).
 func _update_side_tasks(dt: float) -> void:
 	if objective == Objective.WON or objective == Objective.LOST:

@@ -43,6 +43,11 @@ A principal nunca repete a mecânica de uma secundária na mesma ilha.
   `game/data/game_data.gd` (`SIDE_TASK_RADIUS` 3 m, `SIDE_CACHE_SECONDS` 4 s,
   `SIDE_CACHE_INTEL` 25). A fixture da praia ganhou os dois marcadores novos; os antigos
   continuam todos verificados.
+- **Etapa 2 feita (2026-11-15).** O HUD mostra, por baixo do objetivo e dentro da mesma placa,
+  uma linha por secundária: «OPTIONAL · INTEL STASH · +25 INTEL · 111 m», os segundos enquanto
+  se trabalha nela e um visto quando acaba. O minimapa marca-a com um losango dourado e põe
+  OPTIONAL na legenda. O ecrã de fim de ilha e o debrief contam as secundárias feitas. Captura:
+  `docs/design/open_island_pilot/stage2_hud.png`. Testes no mesmo `tests/test_side_tasks.gd`.
 - As três decisões propostas abaixo ficaram por responder; a etapa 1 usa a recompensa da tabela.
 
 ## Etapas
