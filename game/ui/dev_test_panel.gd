@@ -65,6 +65,7 @@ static func result_for(log_text: String, test_path: String) -> String:
 ## Opens the test panel over `parent`, in a dialog like the title's other dev entries.
 static func open(parent: Node) -> MenuDialog:
 	var dialog := MenuDialog.new()
+	dialog.plain = true  # a development tool: the dark look, sized for it
 	parent.add_child(dialog)
 	dialog.content.add_child(UiTheme.title("DEV · TESTS", 36))
 	dialog.content.add_child(UiTheme.label("Development builds only. Each test runs as its own headless process, as in run_all.", 14, UiTheme.MUTED))

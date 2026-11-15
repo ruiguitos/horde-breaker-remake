@@ -66,6 +66,7 @@ static func apply(config: Dictionary, base: RunContext) -> RunContext:
 ## Opens the sandbox form over `parent`. `on_start` receives the chosen config.
 static func open(parent: Node, on_start: Callable) -> MenuDialog:
 	var dialog := MenuDialog.new()
+	dialog.plain = true  # a development tool: the dark look, sized for it
 	parent.add_child(dialog)
 	var start: Dictionary = default_config()
 	dialog.content.add_child(UiTheme.title("DEV SANDBOX", 36))

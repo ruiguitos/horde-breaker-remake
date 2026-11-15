@@ -32,7 +32,7 @@ func _ready() -> void:
 	_panel.name = "SettingsFrame"
 	get_viewport().size_changed.connect(_size_panel)
 	_size_panel()
-	content.add_child(UiTheme.title("SETTINGS", 36))
+	content.add_child(Dossier.title("SETTINGS", 36))
 	var tabs := HBoxContainer.new()
 	content.add_child(tabs)
 	for t in TABS:
@@ -51,7 +51,7 @@ func _ready() -> void:
 	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body.add_theme_constant_override("separation", 10)
 	_body_scroll.add_child(_body)
-	content.add_child(UiTheme.label("Changes apply immediately and are saved to your profile.", 16, UiTheme.MUTED))
+	content.add_child(Dossier.label("Changes apply immediately and are saved to your profile.", 16, Dossier.MUTED))
 	UiTheme.button(content, "DONE", _close, true)
 	closed.connect(func() -> void: profile.save())
 	_show(tab)
@@ -114,15 +114,15 @@ func _restore_scroll_focus(scroll: int, control_name: String) -> void:
 func _style_tab(b: Button, selected: bool) -> void:
 	b.theme_type_variation = &""
 	var box := StyleBoxFlat.new()
-	box.bg_color = UiTheme.PANEL_RAISED if selected else Color(0, 0, 0, 0)
-	box.border_color = UiTheme.ACCENT if selected else UiTheme.LINE
+	box.bg_color = Dossier.PANEL_RAISED if selected else Color(0, 0, 0, 0)
+	box.border_color = Dossier.ACCENT if selected else Dossier.LINE
 	box.set_border_width_all(0)
 	box.border_width_bottom = 3 if selected else 1
 	box.content_margin_top = 6
 	box.content_margin_bottom = 6
 	for state in ["normal", "hover", "pressed", "focus"]:
 		b.add_theme_stylebox_override(state, box)
-	b.add_theme_color_override("font_color", UiTheme.ACCENT if selected else UiTheme.MUTED)
+	b.add_theme_color_override("font_color", Dossier.ACCENT if selected else Dossier.MUTED)
 
 func _focus_tab(t: String) -> void:
 	for b in _tab_buttons:
@@ -158,7 +158,7 @@ func _display() -> void:
 
 
 func _graphics() -> void:
-	var info := UiTheme.label(GraphicsSettings.QUALITY_INFO[profile.quality], 16, UiTheme.MUTED)
+	var info := Dossier.label(GraphicsSettings.QUALITY_INFO[profile.quality], 16, Dossier.MUTED)
 	_options("Quality", GraphicsSettings.QUALITY_NAMES, profile.quality, func(i: int) -> void:
 		profile.quality = i
 		info.text = GraphicsSettings.QUALITY_INFO[i]
@@ -175,7 +175,7 @@ func _graphics() -> void:
 		profile.fov = v
 		profile.save()
 	_percent_row("Field of view", profile.fov, 60, set_fov, 120, "°")
-	_body.add_child(UiTheme.label("First person: 60°–120°. Third person and fixed camera: up to %d°." % Profile.THIRD_PERSON_MAX_FOV, 16, UiTheme.MUTED))
+	_body.add_child(Dossier.label("First person: 60°–120°. Third person and fixed camera: up to %d°." % Profile.THIRD_PERSON_MAX_FOV, 16, Dossier.MUTED))
 
 
 func _audio() -> void:
@@ -212,7 +212,7 @@ func _controls() -> void:
 	headings.add_theme_constant_override("separation", 10)
 	_body.add_child(headings)
 	for column: Array in [["ACTION", 180], ["KEY / MOUSE", 80], ["PAD", 80]]:
-		var heading := UiTheme.label(column[0], 12, UiTheme.MUTED, true)
+		var heading := Dossier.label(column[0], 12, Dossier.MUTED, true)
 		heading.custom_minimum_size.x = column[1]
 		headings.add_child(heading)
 	var list := VBoxContainer.new()

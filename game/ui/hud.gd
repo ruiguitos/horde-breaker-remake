@@ -867,18 +867,26 @@ func _build_cards(root: Control) -> void:
 	_cards_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_cards_panel.visible = false
 	root.add_child(_cards_panel)
+	_cards_panel.theme = Dossier.theme()
 	_cards_panel.add_child(_blur(0.4))
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.offset_bottom = -64  # room for the build strip
 	_cards_panel.add_child(center)
+	# The file's back sheet behind the cards (the dossier look): ink reads on it, not on the blur.
+	var sheet := PanelContainer.new()
+	var cards_sheet := Dossier.sheet_box(Dossier.PAPER_DARK, 14.0)
+	cards_sheet.content_margin_top = 6  # the cards are tall: the sheet must fit 1600 x 900 above the build strip
+	cards_sheet.content_margin_bottom = 8
+	sheet.add_theme_stylebox_override("panel", cards_sheet)
+	center.add_child(sheet)
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 14)
-	center.add_child(col)
-	_cards_title = _label("LEVEL UP / 2", 14, UiTheme.ACCENT, true)
+	col.add_theme_constant_override("separation", 8)
+	sheet.add_child(col)
+	_cards_title = _plain("LEVEL UP / 2", 14, Dossier.ACCENT, true)
 	_cards_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(_cards_title)
-	var choose := MenuDialog.ink(UiTheme.title("CHOOSE ONE", 42))
+	var choose := Dossier.title("CHOOSE ONE", 42)
 	col.add_child(choose)
 	_card_row = HBoxContainer.new()
 	_card_row.add_theme_constant_override("separation", 26)
@@ -890,11 +898,11 @@ func _build_cards(root: Control) -> void:
 	hints.alignment = BoxContainer.ALIGNMENT_CENTER
 	var browse := _row(hints, 6)
 	browse.add_child(_keycap("← →"))
-	browse.add_child(_label("BROWSE", 14, UiTheme.TEXT, true))
+	browse.add_child(_plain("BROWSE", 14, Dossier.TEXT, true))
 	var take := _row(hints, 6)
 	_take_key = _keycap("ENTER")
 	take.add_child(_take_key)
-	take.add_child(_label("TAKE", 14, UiTheme.TEXT, true))
+	take.add_child(_plain("TAKE", 14, Dossier.TEXT, true))
 	_reroll_button = Button.new()
 	_reroll_button.name = "Reroll"
 	_reroll_button.focus_mode = Control.FOCUS_NONE  # Y / R or a click: keeps the card row clean
@@ -902,10 +910,10 @@ func _build_cards(root: Control) -> void:
 	_reroll_button.add_theme_font_size_override("font_size", 17)
 	_reroll_button.pressed.connect(_request_reroll)
 	hints.add_child(_reroll_button)
-	_reroll_reason = _label("", 14, UiTheme.TEXT_MUTED, true)
+	_reroll_reason = _plain("", 14, Dossier.TEXT_MUTED, true)
 	hints.add_child(_reroll_reason)
 	# The current build: small chips at the bottom left.
-	var strip_box := MenuDialog.glass_box(_cards_panel, 0.8)
+	var strip_box := _paper_box(_cards_panel, 0.8)
 	strip_box.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	strip_box.offset_left = 20
 	strip_box.offset_right = -20
@@ -924,7 +932,7 @@ func _build_cards(root: Control) -> void:
 
 func _card_style(border: Color, width: int) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
-	s.bg_color = Color(UiTheme.PANEL, 0.97)
+	s.bg_color = Color(Dossier.PANEL, 0.97)
 	s.border_color = border
 	s.set_border_width_all(width)
 	s.set_corner_radius_all(6)
@@ -941,8 +949,8 @@ func _card_view(i: int) -> CardView:
 	v.button.name = "Card%d" % i
 	v.button.position = Vector2(0, 14)
 	v.button.size = Vector2(270, 410)
-	v.style_idle = _card_style(UiTheme.LINE, 1)
-	v.style_focus = _card_style(UiTheme.ACCENT, 2)
+	v.style_idle = _card_style(Dossier.LINE, 1)
+	v.style_focus = _card_style(Dossier.ACCENT, 2)
 	for state in ["normal", "hover", "pressed", "hover_pressed"]:
 		v.button.add_theme_stylebox_override(state, v.style_idle)
 	v.button.pressed.connect(_take_card.bind(i))
@@ -964,26 +972,26 @@ func _card_view(i: int) -> CardView:
 	col.add_theme_constant_override("separation", 8)
 	margin.add_child(col)
 	var top := _row(col, 8)
-	v.category = _plain("", 13, UiTheme.ACCENT, true)
-	v.category.add_theme_font_override("font", UiTheme.mono_bold_font())
+	v.category = _plain("", 13, Dossier.ACCENT, true)
+	v.category.add_theme_font_override("font", Dossier.typed_font())
 	v.category.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(v.category)
-	v.tag = UiTheme.chip("NEW", UiTheme.SUCCESS, 12)
+	v.tag = UiTheme.chip("NEW", Dossier.SUCCESS, 12)
 	top.add_child(v.tag)
 	var art := PanelContainer.new()
 	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	art.custom_minimum_size.y = 64
 	var art_style := StyleBoxFlat.new()
-	art_style.bg_color = UiTheme.PANEL_RAISED
+	art_style.bg_color = Dossier.PANEL_RAISED
 	art_style.set_corner_radius_all(4)
 	art.add_theme_stylebox_override("panel", art_style)
 	col.add_child(art)
 	v.icon = CategoryIcon.new()
 	art.add_child(v.icon)
-	v.title = UiTheme.label("", 28)
-	v.title.add_theme_font_override("font", UiTheme.title_font())
+	v.title = Dossier.label("", 28)
+	v.title.add_theme_font_override("font", Dossier.typed_font())
 	col.add_child(v.title)
-	v.text = UiTheme.label("", 16)
+	v.text = Dossier.label("", 16)
 	v.text.max_lines_visible = 4
 	v.text.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	col.add_child(v.text)
@@ -993,15 +1001,15 @@ func _card_view(i: int) -> CardView:
 	col.add_child(spacer)
 	col.add_child(HSeparator.new())
 	var rank_row := _row(col, 6)
-	rank_row.add_child(_plain("RANK", 12, UiTheme.TEXT_MUTED, true))
+	rank_row.add_child(_plain("RANK", 12, Dossier.TEXT_MUTED, true))
 	v.pips = Pips.new(true)
 	rank_row.add_child(v.pips)
 	var gap := Control.new()
 	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rank_row.add_child(gap)
-	v.rank = _plain("", 13, UiTheme.TEXT_MUTED, true)
+	v.rank = _plain("", 13, Dossier.TEXT_MUTED, true)
 	rank_row.add_child(v.rank)
-	v.synergy = UiTheme.label("", 14, UiTheme.TEXT_MUTED)
+	v.synergy = Dossier.label("", 14, Dossier.TEXT_MUTED)
 	v.synergy.max_lines_visible = 1
 	v.synergy.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	col.add_child(v.synergy)
@@ -1011,9 +1019,9 @@ func _card_view(i: int) -> CardView:
 static func category_color(category: StringName) -> Color:
 	match category:
 		&"breaker":
-			return UiTheme.ACCENT
+			return Dossier.ACCENT
 		&"primary_weapon":
-			return UiTheme.INFO
+			return Dossier.INFO
 		&"elements":
 			return Color(0.72, 0.58, 1.0)
 		&"defense":
@@ -1022,7 +1030,7 @@ static func category_color(category: StringName) -> Color:
 			return Color(1.0, 0.59, 0.28)
 		&"class_vanguard":
 			return Color(0.88, 0.77, 0.48)
-	return UiTheme.SUCCESS
+	return Dossier.SUCCESS
 
 
 static func roman(n: int) -> String:
@@ -1035,7 +1043,7 @@ func _fill_card(v: CardView, c: GameData.Card, run: IslandRun) -> void:
 	var color: Color = category_color(category)
 	v.category.text = "%s %s" % [CATEGORY_GLYPH[category], String(category).replace("_", " ").to_upper()]
 	v.category.add_theme_color_override("font_color", color)
-	var tag_color: Color = UiTheme.ACCENT if owned > 0 else UiTheme.SUCCESS
+	var tag_color: Color = Dossier.ACCENT if owned > 0 else Dossier.SUCCESS
 	v.tag.text = "UPGRADE" if owned > 0 else "NEW"
 	v.tag.add_theme_color_override("font_color", tag_color)
 	(v.tag.get_theme_stylebox("normal") as StyleBoxFlat).border_color = tag_color
@@ -1131,7 +1139,7 @@ func _update_cards(run: IslandRun) -> void:
 func _fill_build_strip(run: IslandRun) -> void:
 	for child in _build_strip.get_children():
 		child.queue_free()
-	_build_strip.add_child(_plain("BUILD", 13, UiTheme.TEXT_MUTED, true))
+	_build_strip.add_child(_plain("BUILD", 13, Dossier.TEXT_MUTED, true))
 	var any: bool = false
 	for c in run.all_cards:
 		var n: int = run.stacks(c.id)
@@ -1139,11 +1147,11 @@ func _fill_build_strip(run: IslandRun) -> void:
 			continue
 		any = true
 		var category: StringName = GameData.card_category(c.id)
-		var chip := UiTheme.chip("%s %s %s" % [CATEGORY_GLYPH[category], c.title, roman(n)], UiTheme.TEXT, 13)
+		var chip := UiTheme.chip("%s %s %s" % [CATEGORY_GLYPH[category], c.title, roman(n)], Dossier.TEXT, 13)
 		(chip.get_theme_stylebox("normal") as StyleBoxFlat).border_color = category_color(category)
 		_build_strip.add_child(chip)
 	if not any:
-		_build_strip.add_child(_plain("No cards yet: this is your first.", 13, UiTheme.TEXT, true))
+		_build_strip.add_child(_plain("No cards yet: this is your first.", 13, Dossier.TEXT, true))
 
 
 # --- Pause ------------------------------------------------------------------
@@ -1158,14 +1166,19 @@ func _build_pause(root: Control) -> void:
 	root.add_child(_pause_panel)
 	var blur := _blur(0.55)
 	_pause_panel.add_child(blur)
+	_pause_panel.theme = Dossier.theme()
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_pause_panel.add_child(center)
+	# The file's back sheet (the dossier look): ink reads on it, not on the blurred game.
+	var sheet := PanelContainer.new()
+	sheet.add_theme_stylebox_override("panel", Dossier.sheet_box(Dossier.PAPER_DARK, 26.0))
+	center.add_child(sheet)
 	_pause_content = VBoxContainer.new()
 	_pause_content.name = "PauseContent"
 	_pause_content.custom_minimum_size = Vector2(820, 0)
 	_pause_content.add_theme_constant_override("separation", 14)
-	center.add_child(_pause_content)
+	sheet.add_child(_pause_content)
 
 	var head := HBoxContainer.new()
 	_pause_content.add_child(head)
@@ -1173,11 +1186,11 @@ func _build_pause(root: Control) -> void:
 	title_col.add_theme_constant_override("separation", 0)
 	title_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(title_col)
-	title_col.add_child(MenuDialog.ink(UiTheme.label("SALVAGE & CO. / PROJECT TIDE", 13, UiTheme.TEXT_MUTED, true)))
-	var paused_title := MenuDialog.ink(UiTheme.title("PAUSED", 46), 5)
+	title_col.add_child(Dossier.label("SALVAGE & CO. / PROJECT TIDE", 13, Dossier.TEXT_MUTED, true))
+	var paused_title := Dossier.title("PAUSED", 46)
 	paused_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	title_col.add_child(paused_title)
-	_pause_where = MenuDialog.ink(UiTheme.label("", 14, UiTheme.TEXT_MUTED, true))
+	_pause_where = Dossier.label("", 14, Dossier.TEXT_MUTED, true)
 	_pause_where.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_pause_where.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_pause_where.size_flags_vertical = Control.SIZE_SHRINK_END
@@ -1197,15 +1210,13 @@ func _build_pause(root: Control) -> void:
 	_resume_button.custom_minimum_size.y = 54
 	var settings := UiTheme.button(menu, "SETTINGS", _settings)
 	settings.name = "Settings"
-	MenuDialog.glass_button(settings)
 	var push := Control.new()
 	push.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	menu.add_child(push)
 	_abandon_button = UiTheme.button(menu, "ABANDON RUN…", _open_abandon)
 	_abandon_button.name = "Abandon"
 	_abandon_button.theme_type_variation = &"DangerButton"
-	MenuDialog.glass_button(_abandon_button, true)
-	menu.add_child(MenuDialog.ink(UiTheme.label("Asks you to confirm.", 14, UiTheme.TEXT_MUTED)))
+	menu.add_child(Dossier.label("Asks you to confirm.", 14, Dossier.TEXT_MUTED))
 	# A closed focus loop: Tab, Shift+Tab and the d-pad never leave the menu
 	# (a card offer may be open underneath).
 	var loop: Array[Button] = [_resume_button, settings, _abandon_button]
@@ -1219,27 +1230,27 @@ func _build_pause(root: Control) -> void:
 		loop[i].focus_neighbor_left = loop[i].get_path_to(loop[i])
 		loop[i].focus_neighbor_right = loop[i].get_path_to(loop[i])
 
-	var build_box := MenuDialog.glass_box(body)
+	var build_box := _paper_box(body)
 	build_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var build := VBoxContainer.new()
 	build.add_theme_constant_override("separation", 10)
 	build_box.add_child(build)
 	var build_head := HBoxContainer.new()
 	build.add_child(build_head)
-	var build_title := MenuDialog.ink(UiTheme.label("YOUR BUILD", 24))
-	build_title.add_theme_font_override("font", UiTheme.heading_font())
+	var build_title := Dossier.label("YOUR BUILD", 24)
+	build_title.add_theme_font_override("font", Dossier.typed_font())
 	build_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	build_head.add_child(build_title)
-	_pause_stats = MenuDialog.ink(UiTheme.label("", 14, UiTheme.TEXT_MUTED, true))
+	_pause_stats = Dossier.label("", 14, Dossier.TEXT_MUTED, true)
 	_pause_stats.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_pause_stats.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	build_head.add_child(_pause_stats)
-	build.add_child(MenuDialog.ink(UiTheme.label("WEAPONS", 12, UiTheme.TEXT_MUTED, true)))
+	build.add_child(Dossier.label("WEAPONS", 12, Dossier.TEXT_MUTED, true))
 	_pause_weapons = HFlowContainer.new()
 	_pause_weapons.add_theme_constant_override("h_separation", 8)
 	_pause_weapons.add_theme_constant_override("v_separation", 8)
 	build.add_child(_pause_weapons)
-	build.add_child(MenuDialog.ink(UiTheme.label("CARDS", 12, UiTheme.TEXT_MUTED, true)))
+	build.add_child(Dossier.label("CARDS", 12, Dossier.TEXT_MUTED, true))
 	_pause_cards = GridContainer.new()
 	_pause_cards.columns = 2
 	_pause_cards.add_theme_constant_override("h_separation", 8)
@@ -1258,11 +1269,11 @@ func _build_pause(root: Control) -> void:
 	var intel := HBoxContainer.new()
 	intel.add_theme_constant_override("separation", 22)
 	build.add_child(intel)
-	_pause_banked = _intel_stat(intel, "INTEL BANKED", UiTheme.SUCCESS)
-	_pause_island = _intel_stat(intel, "THIS ISLAND (KEPT)", UiTheme.TEXT)
-	_pause_bonus = _intel_stat(intel, "EXTRACTION BONUS AT RISK", UiTheme.ACCENT)
+	_pause_banked = _intel_stat(intel, "INTEL BANKED", Dossier.SUCCESS)
+	_pause_island = _intel_stat(intel, "THIS ISLAND (KEPT)", Dossier.TEXT)
+	_pause_bonus = _intel_stat(intel, "EXTRACTION BONUS AT RISK", Dossier.ACCENT)
 
-	_pause_hints = MenuDialog.ink(UiTheme.label("", 13, UiTheme.TEXT_MUTED, true))
+	_pause_hints = Dossier.label("", 13, Dossier.TEXT_MUTED, true)
 	_pause_hints.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_pause_content.add_child(_pause_hints)
 
@@ -1271,9 +1282,9 @@ func _intel_stat(parent: Control, caption: String, color: Color) -> Label:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 0)
 	parent.add_child(col)
-	col.add_child(MenuDialog.ink(_plain(caption, 12, UiTheme.TEXT_MUTED, true)))
-	var number := MenuDialog.ink(_plain("0", 22, color, true))
-	number.add_theme_font_override("font", UiTheme.mono_bold_font())
+	col.add_child(_plain(caption, 12, Dossier.TEXT_MUTED, true))
+	var number := _plain("0", 22, color, true)
+	number.add_theme_font_override("font", Dossier.typed_font())
 	col.add_child(number)
 	return number
 
@@ -1308,15 +1319,15 @@ func _fill_pause(run: IslandRun) -> void:
 			continue
 		var w: GameData.Weapon = run.weapons[i]
 		var ammo: String = ammo_text(run, i)
-		var chip := MenuDialog.glass_box(_pause_weapons, 0.6)
+		var chip := _paper_box(_pause_weapons, 0.6)
 		var s := chip.get_theme_stylebox("panel") as StyleBoxFlat
-		s.bg_color = Color(UiTheme.PANEL_RAISED, 0.6)
-		s.border_color = UiTheme.ACCENT if i == run.weapon_index else Color(UiTheme.LINE, 0.9)
+		s.bg_color = Color(Dossier.PANEL_RAISED, 0.6)
+		s.border_color = Dossier.ACCENT if i == run.weapon_index else Color(Dossier.LINE, 0.9)
 		s.content_margin_top = 4
 		s.content_margin_bottom = 4
 		s.content_margin_left = 10
 		s.content_margin_right = 10
-		chip.add_child(MenuDialog.ink(_plain("%d · %s %s" % [i + 1, w.display_name, ammo], 16)))
+		chip.add_child(_plain("%d · %s %s" % [i + 1, w.display_name, ammo], 16, Dossier.TEXT))
 	for child in _pause_cards.get_children():
 		child.queue_free()
 	var owned: int = 0
@@ -1326,7 +1337,7 @@ func _fill_pause(run: IslandRun) -> void:
 			continue
 		owned += 1
 		var category: StringName = GameData.card_category(c.id)
-		var box := MenuDialog.glass_box(_pause_cards, 0.0)
+		var box := _paper_box(_pause_cards, 0.0)
 		box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var s := box.get_theme_stylebox("panel") as StyleBoxFlat
 		s.content_margin_top = 5
@@ -1335,17 +1346,17 @@ func _fill_pause(run: IslandRun) -> void:
 		s.content_margin_right = 10
 		var row := HBoxContainer.new()
 		box.add_child(row)
-		var glyph := MenuDialog.ink(_plain(CATEGORY_GLYPH[category], 15, category_color(category), true))
+		var glyph := _plain(CATEGORY_GLYPH[category], 15, category_color(category), true)
 		row.add_child(glyph)
-		var name_label := MenuDialog.ink(UiTheme.label(c.title, 16))
+		var name_label := Dossier.label(c.title, 16)
 		name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(name_label)
-		row.add_child(MenuDialog.ink(_plain("%s / %s" % [roman(n), roman(c.max_stacks)], 13, UiTheme.TEXT_MUTED, true)))
+		row.add_child(_plain("%s / %s" % [roman(n), roman(c.max_stacks)], 13, Dossier.TEXT_MUTED, true))
 	if owned == 0:
 		# No autowrap: alone in a grid cell a wrapping label gets no width and
 		# stacks one letter per line.
-		var none := MenuDialog.ink(UiTheme.label("No cards yet: level up to draw some.", 16, UiTheme.TEXT_MUTED))
+		var none := Dossier.label("No cards yet: level up to draw some.", 16, Dossier.TEXT_MUTED)
 		none.autowrap_mode = TextServer.AUTOWRAP_OFF
 		_pause_cards.add_child(none)
 	var intel: Dictionary = _intel(run)
@@ -1418,6 +1429,20 @@ func _settings() -> void:
 
 
 ## Defeat is a personnel report: what happened, what survives, one exit.
+## A paper box inside the cards or the pause (the dossier look). `_alpha` is ignored: it was the
+## see-through amount of the old glass boxes, and paper is opaque.
+func _paper_box(parent: Control, _alpha: float = 1.0) -> PanelContainer:
+	var box := PanelContainer.new()
+	var s := Dossier.sheet_box(Dossier.PAPER, 12.0)
+	s.shadow_size = 0
+	s.border_color = Dossier.LINE
+	s.set_border_width_all(1)
+	box.add_theme_stylebox_override("panel", s)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(box)
+	return box
+
+
 func _build_death(root: Control) -> void:
 	_death_panel = Control.new()
 	_death_panel.name = "Defeat"

@@ -11,6 +11,9 @@ const GLASS_ALPHA: float = 0.55
 ## the tree. No dark dim and no panel: the blurred game behind shows
 ## through, text carries a dark shadow and inner boxes are translucent.
 var glass: bool = false
+## Development tools (sandbox, tests) keep the dark UiTheme look they were sized for; every other
+## dialog is a sheet of the field dossier (Dossier). Set before the dialog enters the tree.
+var plain: bool = false
 var content: VBoxContainer
 var _previous_focus: Control
 
@@ -18,15 +21,14 @@ var _previous_focus: Control
 func _ready() -> void:
 	_previous_focus = get_viewport().gui_get_focus_owner()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	theme = UiTheme.get_theme()
+	theme = UiTheme.get_theme() if plain else Dossier.theme()
 	var dim := ColorRect.new()
 	# Glass keeps the dim invisible: it still stops clicks reaching the game.
 	dim.color = Color(0, 0, 0, 0.0 if glass else 0.78)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(dim)
 	content = UiTheme.centered_panel(self, 620)
-	if glass:
-		(content.get_parent() as Control).add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+	# Glass dialogs (abandon) are paper too in the dossier look: no see-through panel.
 	call_deferred("_trap_focus")
 
 
@@ -93,8 +95,8 @@ static func credits(parent: Node) -> MenuDialog:
 static func archive(parent: Node, profile: Profile) -> MenuDialog:
 	var dialog := MenuDialog.new()
 	parent.add_child(dialog)
-	dialog.content.add_child(UiTheme.title("INTEL ARCHIVE", 36))
-	dialog.content.add_child(UiTheme.label("RECOVERED FILES  %02d / %02d" % [profile.lore_pages, Story.FILES.size()], 16, UiTheme.ACCENT, true))
+	dialog.content.add_child(Dossier.title("INTEL ARCHIVE", 36))
+	dialog.content.add_child(Dossier.label("RECOVERED FILES  %02d / %02d" % [profile.lore_pages, Story.FILES.size()], 16, Dossier.ACCENT, true))
 	var body := HBoxContainer.new()
 	body.add_theme_constant_override("separation", 18)
 	dialog.content.add_child(body)
@@ -107,8 +109,8 @@ static func archive(parent: Node, profile: Profile) -> MenuDialog:
 	reader.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	reader.add_theme_constant_override("separation", 10)
 	body.add_child(reader)
-	var heading := UiTheme.title("", 22)
-	var text := UiTheme.label("", 16, UiTheme.TEXT)
+	var heading := Dossier.title("", 22)
+	var text := Dossier.label("", 16, Dossier.TEXT)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	reader.add_child(heading)
 	reader.add_child(text)
@@ -116,7 +118,7 @@ static func archive(parent: Node, profile: Profile) -> MenuDialog:
 		var recovered: bool = i < profile.lore_pages
 		heading.text = Story.FILES[i]["title"] if recovered else "FILE %02d / ENCRYPTED" % (i + 1)
 		text.text = Story.FILES[i]["text"] if recovered else "Recover this file from supply caches or the Behemoth."
-		text.add_theme_color_override("font_color", UiTheme.TEXT if recovered else UiTheme.MUTED)
+		text.add_theme_color_override("font_color", Dossier.TEXT if recovered else Dossier.MUTED)
 	for i in Story.FILES.size():
 		var recovered: bool = i < profile.lore_pages
 		var label: String = Story.FILES[i]["title"] if recovered else "FILE %02d / ENCRYPTED" % (i + 1)
@@ -133,10 +135,10 @@ static func archive(parent: Node, profile: Profile) -> MenuDialog:
 static func controls(parent: Node) -> MenuDialog:
 	var dialog := MenuDialog.new()
 	parent.add_child(dialog)
-	dialog.content.add_child(UiTheme.title("CONTROLS", 36))
+	dialog.content.add_child(Dossier.title("CONTROLS", 36))
 	var list := _scroll(dialog.content, 300)
-	list.add_child(UiTheme.label("Your weapon fires automatically at enemies in front of you. Turn your body to choose a target.", 18, UiTheme.ACCENT))
-	list.add_child(UiTheme.label("MOVE       WASD / arrows / left stick\nAIM        Right mouse / left trigger (first person)\nBREAKER    Space / A / RB\nABILITY    G / MMB / LB\nSPRINT     Shift / L3\nWEAPONS    1–2 / D-pad\nPAUSE      Esc / Start\nMENUS      Enter / A · Esc / B back\nSUPPLIES   1–3 / X · Y · B\nROUTES     4–5 / LB · RB", 18, UiTheme.TEXT, true))
+	list.add_child(Dossier.label("Your weapon fires automatically at enemies in front of you. Turn your body to choose a target.", 18, Dossier.ACCENT))
+	list.add_child(Dossier.label("MOVE       WASD / arrows / left stick\nAIM        Right mouse / left trigger (first person)\nBREAKER    Space / A / RB\nABILITY    G / MMB / LB\nSPRINT     Shift / L3\nWEAPONS    1–2 / D-pad\nPAUSE      Esc / Start\nMENUS      Enter / A · Esc / B back\nSUPPLIES   1–3 / X · Y · B\nROUTES     4–5 / LB · RB", 18, Dossier.TEXT, true))
 	UiTheme.button(dialog.content, "BACK", dialog.close, true)
 	return dialog
 
@@ -147,7 +149,7 @@ static func controls(parent: Node) -> MenuDialog:
 static func run_choice(parent: Node, on_pick: Callable) -> MenuDialog:
 	var dialog := MenuDialog.new()
 	parent.add_child(dialog)
-	dialog.content.add_child(UiTheme.title("CHOOSE YOUR RUN", 36))
+	dialog.content.add_child(Dossier.title("CHOOSE YOUR RUN", 36))
 	var runs: Array = [[&"", "ARCHIPELAGO", "By boat: two routes at every landing, %d islands, the volcano last." % RunContext.ISLAND_COUNT]]
 	for id: StringName in Expeditions.INFO:
 		runs.append([id, Expeditions.display_name(id).to_upper(), String(Expeditions.INFO[id]["text"])])
@@ -174,8 +176,8 @@ static func run_choice(parent: Node, on_pick: Callable) -> MenuDialog:
 static func test_island(parent: Node, on_pick: Callable) -> MenuDialog:
 	var dialog := MenuDialog.new()
 	parent.add_child(dialog)
-	dialog.content.add_child(UiTheme.title("TEST ISLAND", 36))
-	dialog.content.add_child(UiTheme.label("Development builds only: one island, no run around it.", 16, UiTheme.MUTED))
+	dialog.content.add_child(Dossier.title("TEST ISLAND", 36))
+	dialog.content.add_child(Dossier.label("Development builds only: one island, no run around it.", 16, Dossier.MUTED))
 	var mission := OptionButton.new()
 	mission.name = "Mission"
 	for id: StringName in GameData.MISSIONS:
@@ -215,28 +217,28 @@ static func abandon(parent: Node, keep: int, keep_note: String, lose: int, lose_
 	head.add_theme_constant_override("separation", 12)
 	dialog.content.add_child(head)
 	head.add_child(WarningIcon.new())
-	var title := ink(UiTheme.title("ABANDON THE RUN?", 38))
+	var title := Dossier.title("ABANDON THE RUN?", 38)
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	head.add_child(title)
-	dialog.content.add_child(ink(UiTheme.label("The boat leaves without you. Your build and the extraction bonus are lost; the Intel you earned is kept.", 18)))
+	dialog.content.add_child(Dossier.label("The boat leaves without you. Your build and the extraction bonus are lost; the Intel you earned is kept.", 18))
 	var boxes := HBoxContainer.new()
 	boxes.add_theme_constant_override("separation", 12)
 	dialog.content.add_child(boxes)
-	var sides: Array = [["YOU KEEP", keep, keep_note, UiTheme.SUCCESS, "Keep"], ["YOU LOSE", lose, lose_note, UiTheme.DANGER, "Lose"]]
+	var sides: Array = [["YOU KEEP", keep, keep_note, Dossier.SUCCESS, "Keep"], ["YOU LOSE", lose, lose_note, Dossier.DANGER, "Lose"]]
 	for side: Array in sides:
-		var box := glass_box(boxes)
+		var box := UiTheme.panel(boxes).get_parent() as PanelContainer
 		box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var col := VBoxContainer.new()
 		col.add_theme_constant_override("separation", 2)
 		box.add_child(col)
-		col.add_child(ink(UiTheme.label(side[0], 13, UiTheme.TEXT_MUTED, true)))
-		var number := ink(UiTheme.label("%d INTEL" % side[1], 26, side[3]))
+		col.add_child(Dossier.label(side[0], 13, Dossier.TEXT_MUTED, true))
+		var number := Dossier.label("%d INTEL" % side[1], 26, side[3])
 		number.name = side[4]
-		number.add_theme_font_override("font", UiTheme.mono_bold_font())
+		number.add_theme_font_override("font", Dossier.typed_font())
 		col.add_child(number)
-		col.add_child(ink(UiTheme.label(side[2], 14, UiTheme.TEXT_MUTED)))
+		col.add_child(Dossier.label(side[2], 14, Dossier.TEXT_MUTED))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 14)
 	dialog.content.add_child(row)
@@ -250,14 +252,13 @@ static func abandon(parent: Node, keep: int, keep_note: String, lose: int, lose_
 	hold.custom_minimum_size.y = 54
 	hold.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hold.theme_type_variation = &"DangerButton"
-	glass_button(hold, true)
 	hold.held.connect(func() -> void:
 		dialog.close()
 		on_abandon.call())
 	row.add_child(hold)
 	var accept: String = "%s / %s" % [GameInput.prompt(&"ui_accept", false), GameInput.prompt(&"ui_accept", true)]
 	var back: String = "%s / %s" % [GameInput.prompt(&"ui_cancel", false), GameInput.prompt(&"ui_cancel", true)]
-	var hints := ink(UiTheme.label("[ %s ] HOLD 1 s     [ %s ] BACK" % [accept, back], 14, UiTheme.TEXT_MUTED, true))
+	var hints := Dossier.label("[ %s ] HOLD 1 s     [ %s ] BACK" % [accept, back], 14, Dossier.TEXT_MUTED, true)
 	hints.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	dialog.content.add_child(hints)
 	return dialog

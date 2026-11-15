@@ -114,6 +114,8 @@ static func theme() -> Theme:
 				t.set_font(item, type, typed_font())
 				if t.has_font_size("font_size", type):
 					t.set_font_size("font_size", type, roundi(t.get_font_size("font_size", type) * TYPED_SCALE))
+	# The dropdown arrow is drawn white for the dark look: an ink one on paper.
+	t.set_icon("arrow", "OptionButton", _arrow())
 	_theme = t
 	return t
 
@@ -296,3 +298,12 @@ static func pin(color: Color = STAMP) -> Panel:
 	head.offset_top = -7
 	head.offset_bottom = 7
 	return head
+
+
+## A dropdown chevron in ink.
+static func _arrow() -> Texture2D:
+	var img := Image.new()
+	var svg := "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M3 6l5 5 5-5' fill='none' stroke='#%s' stroke-width='2.5'/></svg>" % INK.to_html(false)
+	if img.load_svg_from_string(svg, 1.0) != OK:
+		return null
+	return ImageTexture.create_from_image(img)
