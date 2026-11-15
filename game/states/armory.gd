@@ -92,7 +92,7 @@ func _ready() -> void:
 	nav.custom_minimum_size.x = 150
 	nav.add_theme_constant_override("separation", 10)
 	body.add_child(nav)
-	for category in ["CLASS", "WEAPONS", "PERKS"]:
+	for category in CATEGORIES:
 		var b := UiTheme.button(nav, category + "   ›", _select_category.bind(category))
 		_nav_style(b, 22)
 		_nav.append(b)
@@ -296,11 +296,12 @@ func _rebuild() -> void:
 	_shelter.call("set_weapon", profile.selected_primary)
 	_shelter.call("show_character", _category == "CLASS")
 	for i in _nav.size():
-		_nav[i].theme_type_variation = &"PrimaryButton" if ["CLASS", "WEAPONS", "PERKS"][i] == _category else &""
+		_nav[i].theme_type_variation = &"PrimaryButton" if CATEGORIES[i] == _category else &""
 	match _category:
 		"CLASS": _classes()
 		"WEAPONS": _weapons()
 		"PERKS": _perks()
+		"CARDS": _cards_tab()
 	if perks:
 		_perk_detail()
 	else:
@@ -573,9 +574,28 @@ func _weapons() -> void:
 			b.focus_entered.connect(_show_weapon.bind(detail, weapon.id))
 			b.mouse_entered.connect(_show_weapon.bind(detail, weapon.id))
 	_show_weapon(detail, profile.selected_primary)
-	# Priced cards: Intel buys them, and they join the level-up offers.
-	list.add_child(HSeparator.new())
-	list.add_child(Dossier.label("ADDENDUM · CARDS", 12, Dossier.MUTED, true))
+
+
+## CARDS: the priced cards, one sheet. Intel buys them, and they join the level-up offers.
+func _cards_tab() -> void:
+	_content.add_theme_constant_override("separation", 8)
+	var sheet := PanelContainer.new()
+	sheet.name = "CardSheet"
+	sheet.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	sheet.add_theme_stylebox_override("panel", Dossier.sheet_box(Dossier.PAPER, 16.0))
+	_content.add_child(sheet)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	sheet.add_child(scroll)
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 4)
+	scroll.add_child(list)
+	var heading := Dossier.title("ADDENDUM · CARDS", 26)
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	list.add_child(heading)
+	list.add_child(Dossier.label("Bought cards join the level-up offers in every run.", 14, Dossier.MUTED))
 	for card in GameData.cards():
 		if card.unlock_cost <= 0:
 			continue
@@ -583,15 +603,16 @@ func _weapons() -> void:
 		var buy := UiTheme.button(list, card.title, _choose_card.bind(card.id))
 		buy.name = "Card_" + String(card.id)
 		buy.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		_compact(buy, 34, 15)
+		_compact(buy, 38, 17)
 		buy.disabled = bought or profile.intel < card.unlock_cost
 		buy.tooltip_text = card.description
-		var price := Dossier.typed("BOUGHT" if bought else "%d INTEL" % card.unlock_cost, 11, Dossier.OLIVE if bought else Dossier.INK_MUTED)
+		var price := Dossier.typed("BOUGHT" if bought else "%d INTEL" % card.unlock_cost, 12, Dossier.OLIVE if bought else Dossier.INK_MUTED)
 		price.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		price.offset_right = -10
 		price.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		price.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		buy.add_child(price)
+		list.add_child(Dossier.label(card.description, 13, Dossier.MUTED))
 
 
 ## The issue form's second sheet: the item's number, name, photograph, figures and role.
@@ -643,12 +664,11 @@ func _show_weapon(detail: VBoxContainer, id: StringName) -> void:
 	else:
 		photo.add_child(Art.weapon_image(id, 320, 120, Dossier.PAPER))
 	var figures := GridContainer.new()
-	figures.columns = 4
+	figures.columns = 3
 	figures.add_theme_constant_override("h_separation", 18)
 	detail.add_child(figures)
 	var damage: String = "%d × %d" % [int(weapon.damage), weapon.pellets] if weapon.pellets > 1 else "%d" % int(weapon.damage)
-	for figure: Array in [["DAMAGE", damage], ["SHOTS / S", "%.1f" % weapon.fire_rate], ["RANGE", "%d m" % int(weapon.range_m)],
-			["MAGAZINE", "%d" % weapon.magazine if weapon.magazine > 0 else "—"]]:
+	for figure: Array in [["DAMAGE", damage], ["SHOTS / S", "%.1f" % weapon.fire_rate], ["RANGE", "%d m" % int(weapon.range_m)]]:
 		var cell := VBoxContainer.new()
 		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		cell.add_theme_constant_override("separation", 0)
@@ -679,6 +699,7 @@ func _choose_weapon(id: StringName) -> void:
 ## A opens the actions, B goes back to the tree.
 const BRANCH_COLORS: Dictionary = {&"combat": Dossier.INFO, &"survival": Dossier.SUCCESS, &"breaker": Dossier.ACCENT,
 	&"logistics": Color("7a5a2c")}  ## warm sand: the fourth branch, apart from the amber of the actions
+const CATEGORIES: Array[String] = ["CLASS", "WEAPONS", "PERKS", "CARDS"]
 const NUMERAL_WIDTH := 24.0  ## the tier numeral's column: four branches need the width
 
 
