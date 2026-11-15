@@ -182,8 +182,8 @@ kit CC0.
   mar, em secções de 2,9 m (8 no máximo); o barco fica amarrado ao lado, na ponta.
 - É decoração: o cais não muda a grelha e não se anda nele. Na Holdout o cais não aparece e o
   barco chega como antes.
-- Captura: `docs/design/beach_pilot_20261114/boat_and_pier.png`. Nessa captura o barco toca num
-  afloramento do dressing; falta afastar um do outro.
+- Captura: `docs/design/beach_pilot_20261114/boat_and_pier.png`. O barco amarra do lado do cais
+  mais afastado das rochas (`_clear_side`).
 - A pasta de origem do barco chama-se `assets/source/polyhaven/venus_a_shetland_fourareen`, mas o
   modelo não é do Poly Haven: a licença que o acompanha indica o Sketchfab.
 

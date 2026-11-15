@@ -136,6 +136,7 @@ var _boat_ring: MeshInstance3D
 var _boat: MeshInstance3D
 var _pier: Node3D  ## the pier's sections; null without the prepared models
 var _moor_out: float = 3.0  ## metres from the Boat marker out to the moored boat (see _build_pier)
+var _moor_side: float = 1.0  ## which side of the pier the boat is on: the one clear of rocks
 ## Expedition parts: a post with a ring at the Exit (the path to the next part).
 var _exit_post: MeshInstance3D
 var _defend_ring: MeshInstance3D
@@ -2950,7 +2951,33 @@ func _build_pier() -> void:
 		var piece: Node3D = section.instantiate()
 		piece.position.z = PIER_SECTION_LENGTH * (k + 0.5)
 		_pier.add_child(piece)
+	_moor_side = _clear_side()
 	_boat.position = _boat_spot()  # now beside the pier, out where the water is
+
+
+## The side of the pier (1 or -1) whose mooring is farther from the hand-made island's rocks
+## and outcrops, so the hull does not cut through one.
+func _clear_side() -> float:
+	if _handmade == null:
+		return 1.0
+	var rocks: Array[Node] = []
+	for path: String in ["Rocks", "Decor/Dressing/RockSurfaces"]:
+		var group: Node = _handmade.get_node_or_null(path)
+		if group != null:
+			rocks.append_array(group.get_children())
+	var best: float = 1.0
+	var best_gap: float = -1.0
+	for side: float in [1.0, -1.0]:
+		var p: Vector3 = run.map.boat + run.map.boat_dir * _moor_out + Vector3(run.map.boat_dir.z, 0, -run.map.boat_dir.x) * BOAT_BESIDE_PIER * side
+		var gap: float = INF
+		for rock: Node in rocks:
+			if rock is Node3D:
+				var r: Vector3 = (rock as Node3D).global_position
+				gap = minf(gap, Vector2(r.x - p.x, r.z - p.z).length())
+		if gap > best_gap:
+			best_gap = gap
+			best = side
+	return best
 
 
 ## Where the boat model floats: moored 3 m out from the Boat marker; the
@@ -2962,7 +2989,7 @@ func _boat_spot() -> Vector3:
 		out = lerpf(90.0, _moor_out, 1.0 - (1.0 - t) * (1.0 - t))  # eases into the pier
 	var p: Vector3 = run.map.boat + run.map.boat_dir * out
 	if _pier != null and _pier.visible:
-		p += Vector3(run.map.boat_dir.z, 0, -run.map.boat_dir.x) * BOAT_BESIDE_PIER  # alongside the pier
+		p += Vector3(run.map.boat_dir.z, 0, -run.map.boat_dir.x) * BOAT_BESIDE_PIER * _moor_side  # alongside the pier
 	return Vector3(p.x, 0.3 + sin(Time.get_ticks_msec() * 0.0015) * 0.08, p.z)
 
 
