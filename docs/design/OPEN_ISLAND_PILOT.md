@@ -82,6 +82,28 @@ A principal nunca repete a mecânica de uma secundária na mesma ilha.
   só à torre (cabanas e ruínas ficam com o soco). Captura: `stage4_overview.png`.
   - Ainda vazio a sul do rio, entre o desembarque e o bosque. Não se mediu o tempo a pé entre
     objetivos (a meta de 40 s); fica para a etapa 5, com o desempenho.
+- **Etapa 5 feita (2026-11-15): medição.** Desempenho com `tools/dev/bench_frame.gd` (novos
+  argumentos: número de inimigos e cena da ilha), no PC do utilizador, 1600×900, sem vsync, 10 s
+  por medição, contra a `beach_01` de 256 m (commit `6346ff7`, numa cópia à parte). Tempo médio
+  por frame em ms (p95 entre parênteses):
+
+  | Câmara | 512 m, 150 | 256 m, 150 | 512 m, 300 | 256 m, 300 |
+  |---|---|---|---|---|
+  | Primeira pessoa | 6,5 (12,5) | 6,1 (14,0) | 6,4 (16,2) | 6,4 (15,6) |
+  | Terceira pessoa | 6,0 (12,5) | 6,1 (12,5) | 8,0 (16,7) | 6,5 (15,6) |
+  | Fixa | 6,4 (13,2) | 6,1 (13,7) | 6,2 (15,3) | 6,6 (14,0) |
+
+  Draw calls: 1467 a 1642 na ilha nova, 1185 a 1590 na antiga. A diferença está dentro do ruído
+  entre medições (só a terceira pessoa com 300 saiu 1,5 ms acima, numa medição só). A ilha 4×
+  maior não custa mais por frame: o Terrain3D só desenha o que está perto e a horda só calcula
+  caminhos à volta do jogador (`horde_radius` 140). A memória não foi medida.
+
+  Tempo a pé com `tools/dev/measure_walks.gd` (caminho mais curto no chão transitável, 8
+  vizinhos, a 6 m/s): do barco ao ponto de interesse mais longe, 59 s (antes 37 s). Do chão aberto
+  ao ponto mais próximo (barco, os 6 sítios de gerador e os 6 de secundária): mediana 9 s, p95
+  20 s, máximo 28 s (antes 4, 12 e 17 s). Nenhuma célula passa dos 40 s do plano, por isso o vazio
+  a sul do rio é visual (pouco para ver), não de caminhada. A ilha não tem pontos de EXFIL, que
+  ficaram fora da conta.
 - As três decisões propostas abaixo ficaram por responder; a etapa 1 usa a recompensa da tabela.
 
 ## Etapas
