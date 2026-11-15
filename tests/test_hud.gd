@@ -81,7 +81,11 @@ func _test() -> void:
 	_run.scream_progress = 1.5
 	_hud.refresh(_run, null, 0)
 	_check(_hud._ability_name.text == "WAR CRY" and _hud._ability_icon.kind == &"war_cry", "Vanguard uses the War Cry tile")
-	_check(_hud._alerts.text.contains("GRABBED") and _hud._alerts.text.contains("SCREAMER") and _hud._alerts.text.contains("WAR CRY"), "grab, scream and buff warnings survive the redesign")
+	_check(_hud._alerts.text == "GRABBED! USE BREAKER", "with grab, scream and buff at once, the HUD shows the most urgent alert only (%s)" % _hud._alerts.text)
+	_run.horde.grabbed_by = -1
+	_hud.refresh(_run, null, 0)
+	_check(_hud._alerts.text.contains("SCREAMER"), "the next alert shows once the grab is over")
+	_run.horde.grabbed_by = 0
 	var joy := InputEventJoypadButton.new()
 	joy.button_index = JOY_BUTTON_RIGHT_SHOULDER
 	joy.pressed = true

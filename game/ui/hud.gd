@@ -586,6 +586,13 @@ func _keycap(text: String) -> Label:
 	return label
 
 
+## How long the weapon slots stay after a switch, and the minimap key after landing.
+const SLOTS_SECONDS: float = 2.0
+const LEGEND_SECONDS: float = 10.0
+var _shown_weapon: int = -1
+var _slots_time: float = 0.0
+
+
 ## Padding (px) of a plate around its block, and its colours: the menus' panel, see-through.
 const PLATE_PAD: float = 10.0
 const PLATE_BG := Color(UiTheme.PANEL, 0.66)
@@ -710,7 +717,7 @@ func _build_field_hud(field: Control) -> void:
 	_xp_bonus.name = "XpBonus"
 	_xp_bonus.visible = false
 	protection.add_child(_xp_bonus)
-	_xp_bar = _meter(_status_panel, UiTheme.INFO, 5)
+	_xp_bar = _meter(_status_panel, UiTheme.INFO, 3)
 	_xp_bar.step = 0.0  # fractional XP must move the gauge too
 	var progression := _row(_status_panel, 8)
 	_xp_text = _label("", 14, UiTheme.TEXT_MUTED, true)
@@ -718,6 +725,7 @@ func _build_field_hud(field: Control) -> void:
 	progression.add_child(_xp_text)
 	_stats = _label("", 14, UiTheme.TEXT_MUTED, true)
 	progression.add_child(_stats)
+	progression.visible = false  # XP numbers and kills: in the pause and the reports, not in the fight
 	_power_up_timers = _label("", 16, UiTheme.SUCCESS, true)
 	_power_up_timers.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_place(field, _power_up_timers, Control.PRESET_CENTER_TOP, Vector2(-240, 115), Vector2(480, 44))
@@ -731,15 +739,15 @@ func _build_field_hud(field: Control) -> void:
 	_radio_portrait = Portrait.new()
 	_radio_portrait.name = "RadioPortrait"
 	_radio_portrait.framed = false  # the field HUD has no panel backgrounds
-	_radio_portrait.custom_minimum_size = Vector2(52, 52)
+	_radio_portrait.custom_minimum_size = Vector2(40, 40)
 	_radio_portrait.size_flags_vertical = Control.SIZE_SHRINK_END
 	_radio_panel.add_child(_radio_portrait)
 	var radio_col := VBoxContainer.new()
 	radio_col.add_theme_constant_override("separation", 2)
 	_radio_panel.add_child(radio_col)
-	_radio_header = _label("RADIO / DIRECTOR HALE", 13, UiTheme.ACCENT, true)
+	_radio_header = _label("RADIO / DIRECTOR HALE", 12, UiTheme.ACCENT, true)
 	radio_col.add_child(_radio_header)
-	_radio_text = _label("", 17)
+	_radio_text = _label("", 16)  # body text stays at 16 px at least
 	_radio_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_radio_text.custom_minimum_size.x = 320
 	radio_col.add_child(_radio_text)
@@ -796,11 +804,8 @@ func _build_field_hud(field: Control) -> void:
 	_alerts.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_place(field, _alerts, Control.PRESET_CENTER_BOTTOM, Vector2(-170, -200), Vector2(340, 80))
 	_plate(_objective_box, [words, _objective_pips, _side_list, _survivor_row, _boss_row])
-	_plate(_map_box, [_legend])  # the key only: the map's dark island would vanish on a plate
-	_plate(_status_panel)
-	_plate(_radio_panel)
-	_plate(_abilities_panel, [tiles, _sprint_row])
-	_plate(_weapon_panel)
+	# Only the objective keeps a plate (decision of 2026-11-15): the other blocks are inked text
+	# (outline and shadow), so the HUD covers less of the island.
 	_apply_weights()
 
 
@@ -839,10 +844,14 @@ func _ability_tile(parent: Control, kind: StringName, title: String) -> Array:
 	words.custom_minimum_size.x = 92
 	tile.add_child(words)
 	var name_label := _heading(words, title, 19)
+	name_label.visible = false  # the icon says which; the name is in the pause
+	words.custom_minimum_size.x = 0
+	words.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var key := _keycap("—")
 	words.add_child(key)
 	var state := _label("READY", 13, UiTheme.ACCENT, true)
 	words.add_child(state)
+	state.visible = false  # the ring fills as it recharges; only special states show (DROP CAN)
 	return [ring, name_label, key, state]
 
 
@@ -1340,7 +1349,7 @@ func _fill_pause(run: IslandRun) -> void:
 	var mission: String = String(GameData.MISSIONS.get(run.mission, {"name": run.mission})["name"]).to_upper()
 	var on_island: int = int(run.time_alive - run.landed_time)
 	_pause_where.text = "%s · %s (%s)\n%02d:%02d ON THE ISLAND" % [where, mission, _mission_progress(run), on_island / 60, on_island % 60]
-	_pause_stats.text = "%s · LVL %d · HP %d/%d" % [String(GameData.CLASS_INFO[run.player_class]["name"]).to_upper(), run.level, ceili(run.hp), ceili(run.max_hp)]
+	_pause_stats.text = "%s · LVL %d · XP %d/%d · HP %d/%d · %d KILLS · %d HS" % [String(GameData.CLASS_INFO[run.player_class]["name"]).to_upper(), run.level, run.xp, run.xp_needed(), ceili(run.hp), ceili(run.max_hp), run.kills, run.headshots]
 	for child in _pause_weapons.get_children():
 		child.queue_free()
 	for i in run.weapons.size():
@@ -1705,12 +1714,14 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_last_hp = run.hp
 	_damage_flash.color.a = maxf(0.0, _damage_flash.color.a - get_process_delta_time() * 1.5)
 
-	_info.text = "%s · LVL %d" % [String(GameData.CLASS_INFO[run.player_class]["name"]).to_upper(), run.level]
+	_info.text = "LVL %d" % run.level
 	_hp_bar.max_value = run.max_hp
 	_hp_bar.value = run.hp
 	_shield_bar.max_value = run.max_shield
 	_shield_bar.value = run.shield
 	_shield_text.text = "◇ SHIELD %d / %d" % [ceili(run.shield), ceili(run.max_shield)]
+	_shield_bar.visible = run.shield > 0.0
+	_shield_text.visible = run.shield > 0.0
 	var buffs := PackedStringArray()
 	if run.power_ups.insta_time > 0.0:
 		buffs.append("%s INSTA-KILL  %ds" % [GameData.power_up_icon(&"insta_kill"), ceili(run.power_ups.insta_time)])
@@ -1741,6 +1752,7 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 		# down (IslandRun.use_ability), so the slot says that instead of READY.
 		_ability_status.text = "DROP CAN"
 		_ability_status.add_theme_color_override("font_color", UiTheme.INFO)
+	_ability_status.visible = run.is_carrying()
 	# The grenade / War Cry icon dims while it cannot be used.
 	_ability_ring.modulate.a = 0.4 if run.is_carrying() else 1.0
 	match run.player_class:
@@ -1760,6 +1772,13 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_fire_status.text = "HANDS FULL" if run.is_carrying() else "NO AMMO" if w.max_ammo >= 0 and run.ammo[run.weapon_index] == 0 		else "RELOADING" if run.reload_left > 0.0 else "AUTO-FIRE"
 	_fire_status.add_theme_color_override("font_color", UiTheme.DANGER if _fire_status.text == "NO AMMO" else UiTheme.TEXT_MUTED if run.is_carrying() else UiTheme.ACCENT)
 	_update_weapon_slots(run)
+	if run.weapon_index != _shown_weapon:
+		_slots_time = SLOTS_SECONDS if _shown_weapon >= 0 else 0.0  # not for the first weapon
+		_shown_weapon = run.weapon_index
+	_slots_time -= get_process_delta_time()
+	_weapon_slots.visible = _slots_time > 0.0
+	_switch_hint.visible = _weapon_slots.visible
+	_fire_status.visible = _fire_status.text != "AUTO-FIRE"
 
 	var warnings := PackedStringArray()
 	if run.horde.grabbed_by != -1:
@@ -1773,7 +1792,7 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	_alerts.add_theme_color_override("font_color", UiTheme.SUCCESS if warnings.is_empty() else UiTheme.DANGER)
 	if run.war_cry_time > 0.0:
 		warnings.append("WAR CRY / -40%% DAMAGE / %.1f s" % run.war_cry_time)
-	_alerts.text = "\n".join(warnings)
+	_alerts.text = warnings[0] if not warnings.is_empty() else ""  # the most urgent only
 	# Even simultaneous warnings grow upwards rather than covering abilities.
 	# (positions, not offsets: a block taller than planned grows past its offsets)
 	var alerts_h: float = _alerts.get_combined_minimum_size().y
@@ -1788,6 +1807,7 @@ func refresh(run: IslandRun, camera: Camera3D, sim_ms: float, paused: bool = fal
 	if _minimap.run != run:
 		_minimap.set_run(run)
 		_legend.run = run
+	_legend.visible = run.time_alive < LEGEND_SECONDS
 	_boss_row.visible = run.objective == IslandRun.Objective.BOSS
 	_boss_bar.value = run.boss_hp_fraction()
 	_boss_name.text = "BEHEMOTH / PHASE 2" if run.boss_enraged else "BEHEMOTH"
@@ -1851,7 +1871,11 @@ func _update_weapon_slots(run: IslandRun) -> void:
 
 
 func _update_objective(run: IslandRun, island_text: String) -> void:
-	var detail: String = island_text.to_upper() if island_text != "" else "HALVARD OPERATIONS"
+	# The island line lives in the pause; here only the route modifier ("[Sea Fog]", it changes how
+	# the island plays) and the live counts and timers.
+	var detail: String = ""
+	if island_text.contains("["):
+		detail = island_text.get_slice("[", 1).trim_suffix("]").to_upper()
 	var pips: int = 0
 	var pips_done: int = _generators_done(run)
 	match run.objective:
@@ -1964,7 +1988,8 @@ func _update_objective(run: IslandRun, island_text: String) -> void:
 			_objective.text = "EXTRACTION COMPLETE"
 		IslandRun.Objective.LOST:
 			_objective.text = "CONTRACT TERMINATED"
-	_objective_detail.text = detail
+	_objective_detail.text = detail.trim_prefix(" · ")
+	_objective_detail.visible = _objective_detail.text != ""
 	_objective_pips.set_state(pips, pips_done, UiTheme.INFO)
 	_objective_pips.visible = pips > 0
 	if run.mission == &"escort":

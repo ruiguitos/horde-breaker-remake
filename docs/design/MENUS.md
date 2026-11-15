@@ -103,7 +103,9 @@ Breaker UI Proposals", as 7 propostas abaixo. A decisão foi registada em
      proposta de design própria.
 5. **HUD sem fundos escuros** (**substituído em 2026-11-10**: o utilizador aprovou placas
    escuras por trás dos blocos do HUD, porque o texto solto se lia mal em cenário claro;
-   o minimapa continua sem fundo, só a legenda tem placa; `Hud._plate`)**:**
+   o minimapa continua sem fundo, só a legenda tem placa; `Hud._plate`; **substituído em
+   parte em 2026-11-15**: só o objetivo mantém placa, e o HUD mostra menos — ver
+   `docs/DECISIONS.md`, linha «HUD mais leve»)**:**
    - texto com sombra diretamente sobre o jogo;
    - o marcador do gerador e os outros marcadores do mundo mantêm a sua
      pastilha;

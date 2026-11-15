@@ -58,6 +58,7 @@ registadas as decisões dessa data.
 | 2026-11-15 | **Torre e falésias da `beach_01` atual acabam-se antes do piloto da ilha aberta.** | Escolha do utilizador. |
 | 2026-11-15 | **Plano do piloto da ilha aberta aprovado** ([OPEN_ISLAND_PILOT.md](design/OPEN_ISLAND_PILOT.md)), seis etapas. | Aprovado pelo utilizador («aprovado, avança com a etapa 1»). As três decisões propostas no plano ficam em aberto. |
 | 2026-11-15 | **Piloto da ilha aberta: recompensas da tabela do plano** (esconderijo: Intel; sobrevivente: uma carta; ninho: vida e munição cheias), **missões opcionais visíveis no minimapa desde o início**, e **meta de 12 a 15 minutos por ilha**. | Respostas do utilizador às três decisões propostas em [OPEN_ISLAND_PILOT.md](design/OPEN_ISLAND_PILOT.md) («1. sim 2. desde o início 3. sim»). |
+| 2026-11-15 | **HUD mais leve**: sai «ISLAND 1/3» do objetivo, a classe, o texto de XP, abates e tiros na cabeça (vão para a pausa), os nomes e o «READY» das habilidades, o «AUTO-FIRE»; o escudo só aparece quando existe, os slots das armas só 2 s depois de trocar, a legenda do minimapa só nos primeiros 10 s, um alerta de cada vez, rádio mais pequeno. **Só o objetivo mantém placa escura.** | Pedido do utilizador («demasiada informação no HUD»), sobre a análise proposta («1. sim 2. fica só a do objetivo»). Substitui em parte a decisão das placas de 2026-11-10 (MENUS.md, ponto 5). Os menus de fim de ilha, derrota, carregamento, acampamento e rádio do briefing passaram ao «field dossier». |
 
 ## Em aberto
 

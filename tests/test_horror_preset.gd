@@ -11,6 +11,7 @@ const ISLAND: String = "res://game/world/island.tscn"
 const BEACH_HANDMADE: String = "res://game/world/handmade/islands/beach_01.tscn"
 ## The HUD the preset keeps: visible, not transparent.
 const KEPT: Array[String] = ["_hp_bar", "_shield_bar", "_ammo_text", "_breaker_ring", "_ability_ring"]
+## (the shield bar shows only while there is a shield: the test gives the player one.)
 ## The HUD the preset makes transparent (the same list as Hud._minimal_controls()): the
 ## radio, the objective, the minimap, the XP, the counters, the alerts and the rest.
 const HIDDEN: Array[String] = ["_objective_box", "_survivor_row", "_boss_row", "_map_box", "_radio_panel",
@@ -135,6 +136,9 @@ func _hud_checks(horror: Node) -> void:
 	key.pressed = true
 	# A radio line on the air, as the game plays it.
 	hud._radio_queue.append({"speaker": "Director Hale", "text": "Three generators, contractor."})
+	if hud._run != null:
+		hud._run.max_shield = maxf(hud._run.max_shield, 50.0)
+		hud._run.shield = 20.0  # the shield bar shows only while there is a shield
 	await _settle(2)
 	_check(hud.minimal, "the horror preset starts with the minimal HUD")
 	var hidden_ok: bool = true
