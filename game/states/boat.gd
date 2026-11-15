@@ -67,8 +67,10 @@ var _hazard: Button  ## between islands: hazard pay toggle (the briefing's offer
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_rng.seed = context.island_seed() + 1
-	theme = UiTheme.get_theme()
-	UiTheme.backdrop(self)
+	theme = Dossier.theme()
+	var desk := Dossier.sheet(Dossier.PAPER_DARK)  # the file's back sheet: ink reads on it, and the cards are paper on it
+	desk.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(desk)
 	_make_options()
 	_make_routes()
 	var transit: bool = in_transit()
@@ -344,12 +346,12 @@ func _screen() -> VBoxContainer:
 func _header(screen: VBoxContainer, kicker: String, heading_text: String) -> void:
 	var row := HBoxContainer.new()
 	screen.add_child(row)
-	var left := UiTheme.label(kicker, 13, UiTheme.MUTED, true)
+	var left := Dossier.label(kicker, 13, Dossier.MUTED, true)
 	left.autowrap_mode = TextServer.AUTOWRAP_OFF
 	left.custom_minimum_size.x = 230
 	left.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(left)
-	var heading := UiTheme.title(heading_text, 32)
+	var heading := Dossier.title(heading_text, 32)
 	heading.name = "Heading"
 	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	heading.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -374,12 +376,12 @@ func _body(screen: VBoxContainer) -> HBoxContainer:
 func _chart_panel(body: HBoxContainer) -> VBoxContainer:
 	var plate := PanelContainer.new()
 	plate.custom_minimum_size.x = 300
-	plate.add_theme_stylebox_override("panel", _style(UiTheme.PANEL, UiTheme.LINE, 1, 12))
+	plate.add_theme_stylebox_override("panel", _style(Dossier.PANEL, Dossier.LINE, 1, 12))
 	body.add_child(plate)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	plate.add_child(box)
-	_status = UiTheme.label("", 14, UiTheme.MUTED, true)
+	_status = Dossier.label("", 14, Dossier.MUTED, true)
 	_status.name = "Status"
 	box.add_child(_status)
 	_refresh_status()
@@ -416,7 +418,7 @@ func _route_card(i: int) -> Button:
 	var name_row := HBoxContainer.new()
 	name_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card.add_child(name_row)
-	var title := UiTheme.title("%s · %s" % [RouteMap.LETTERS[i], biome_name.to_upper()], 26)
+	var title := Dossier.title("%s · %s" % [RouteMap.LETTERS[i], biome_name.to_upper()], 26)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -430,10 +432,10 @@ func _route_card(i: int) -> Button:
 	card.add_child(HSeparator.new())
 	# Calm Waters is no penalty: neutral dot, not a red triangle.
 	if mod.id == &"calm":
-		card.add_child(_tagged_line("● " + mod.title.to_upper(), UiTheme.TEXT_MUTED, "no modifier"))
+		card.add_child(_tagged_line("● " + mod.title.to_upper(), Dossier.TEXT_MUTED, "no modifier"))
 	else:
-		card.add_child(_tagged_line("▲ " + mod.title.to_upper(), UiTheme.DANGER, mod.description))
-	var intel := _tagged_line("◆ INTEL ×%.1f" % mod.intel_mult, UiTheme.ACCENT if mod.intel_mult > 1.0 else UiTheme.TEXT_MUTED,
+		card.add_child(_tagged_line("▲ " + mod.title.to_upper(), Dossier.DANGER, mod.description))
+	var intel := _tagged_line("◆ INTEL ×%.1f" % mod.intel_mult, Dossier.ACCENT if mod.intel_mult > 1.0 else Dossier.TEXT_MUTED,
 		"more Intel for the risk" if mod.intel_mult > 1.0 else "standard pay")
 	card.add_child(intel)
 	_route_buttons.append(rb)
@@ -446,11 +448,11 @@ func _mission_lines(mission: StringName, text: String) -> VBoxContainer:
 	box.name = "Mission"
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_theme_constant_override("separation", 2)
-	var chip := UiTheme.label("● " + Expeditions.mission_name(mission).to_upper(), 13, UiTheme.INFO)
-	chip.add_theme_font_override("font", UiTheme.mono_bold_font())
+	var chip := Dossier.label("● " + Expeditions.mission_name(mission).to_upper(), 13, Dossier.INFO)
+	chip.add_theme_font_override("font", Dossier.typed_font())
 	chip.name = "MissionName"
 	box.add_child(chip)
-	var about := UiTheme.label(text, 16)
+	var about := Dossier.label(text, 16)
 	about.name = "MissionText"
 	box.add_child(about)
 	return box
@@ -464,7 +466,7 @@ func _tagged_line(tag: String, color: Color, text: String) -> RichTextLabel:
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	line.focus_mode = Control.FOCUS_NONE
-	line.push_font(UiTheme.mono_bold_font(), 13)
+	line.push_font(Dossier.typed_font(), 13)
 	line.push_color(color)
 	line.add_text(tag)
 	line.pop()
@@ -482,14 +484,14 @@ func _tick_tag(text: String) -> HBoxContainer:
 	tag.add_theme_constant_override("separation", 4)
 	var icon := TextureRect.new()
 	icon.texture = UiTheme.tick_icon()
-	icon.modulate = UiTheme.SUCCESS
+	icon.modulate = Dossier.SUCCESS
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	tag.add_child(icon)
 	if text != "":
-		var word := UiTheme.label(text, 12, UiTheme.SUCCESS)
-		word.add_theme_font_override("font", UiTheme.mono_bold_font())
+		var word := Dossier.label(text, 12, Dossier.SUCCESS)
+		word.add_theme_font_override("font", Dossier.typed_font())
 		word.autowrap_mode = TextServer.AUTOWRAP_OFF
 		word.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		tag.add_child(word)
@@ -519,7 +521,7 @@ func _supply_row(parent: VBoxContainer, caption: String = "QUARTERMASTER / ONE S
 	parent.add_child(box)
 	var heading := HBoxContainer.new()
 	box.add_child(heading)
-	var head := UiTheme.label(caption, 12, UiTheme.MUTED, true)
+	var head := Dossier.label(caption, 12, Dossier.MUTED, true)
 	head.name = "SupplyCaption"
 	head.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	heading.add_child(head)
@@ -555,18 +557,18 @@ func _supply_row(parent: VBoxContainer, caption: String = "QUARTERMASTER / ONE S
 		mark.name = "SelectionState"
 		mark.visible = false
 		title_row.add_child(mark)
-		var title := UiTheme.label(option["title"], 20, UiTheme.TEXT_MUTED if useless else UiTheme.TEXT)
+		var title := Dossier.label(option["title"], 20, Dossier.TEXT_MUTED if useless else Dossier.TEXT)
 		title.name = "SupplyTitle"
-		title.add_theme_font_override("font", UiTheme.heading_font())
+		title.add_theme_font_override("font", Dossier.typed_font())
 		title.autowrap_mode = TextServer.AUTOWRAP_OFF
 		title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		title_row.add_child(title)
 		if option.has("meta"):
-			var meta := UiTheme.label(option["meta"], 11, Hud.category_color((option["card"] as GameData.Card).category), true)
+			var meta := Dossier.label(option["meta"], 11, Hud.category_color((option["card"] as GameData.Card).category), true)
 			meta.name = "CardMeta"
 			card.add_child(meta)
-		var text := UiTheme.label(option["reason"] if useless else option["text"], 14, UiTheme.TEXT_MUTED if useless else UiTheme.TEXT)
+		var text := Dossier.label(option["reason"] if useless else option["text"], 14, Dossier.TEXT_MUTED if useless else Dossier.TEXT)
 		text.name = "Reason" if useless else "Effect"
 		text.max_lines_visible = 2
 		text.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -622,20 +624,20 @@ func _footer(screen: VBoxContainer, routes: bool) -> void:
 	words.add_theme_constant_override("separation", 0)
 	words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	inner.add_child(words)
-	_land_title = UiTheme.label("", 26, UiTheme.ON_ACCENT)
+	_land_title = Dossier.label("", 26, Dossier.ON_ACCENT)
 	_land_title.name = "DeployTitle"
-	_land_title.add_theme_font_override("font", UiTheme.title_font())
+	_land_title.add_theme_font_override("font", Dossier.typed_font())
 	_land_title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	words.add_child(_land_title)
-	_land_sub = UiTheme.label("", 14, UiTheme.ON_ACCENT)
+	_land_sub = Dossier.label("", 14, Dossier.ON_ACCENT)
 	_land_sub.name = "DeploySub"
 	_land_sub.add_theme_font_override("font", UiTheme.body_bold_font())
 	_land_sub.autowrap_mode = TextServer.AUTOWRAP_OFF
 	words.add_child(_land_sub)
-	var key := UiTheme.label(_key_name(&"ui_accept", pad), 14, UiTheme.ACCENT)
+	var key := Dossier.label(_key_name(&"ui_accept", pad), 14, Dossier.ACCENT)
 	key.name = "DeployKey"
-	key.add_theme_font_override("font", UiTheme.mono_bold_font())
-	key.add_theme_stylebox_override("normal", _style(UiTheme.ON_ACCENT, UiTheme.ON_ACCENT, 0, 6, 12))
+	key.add_theme_font_override("font", Dossier.typed_font())
+	key.add_theme_stylebox_override("normal", _style(Dossier.ON_ACCENT, Dossier.ON_ACCENT, 0, 6, 12))
 	key.autowrap_mode = TextServer.AUTOWRAP_OFF
 	key.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	inner.add_child(key)
@@ -653,7 +655,7 @@ func _hint(parent: HBoxContainer, keys: Array, word: String) -> void:
 		cap.add_theme_font_size_override("font_size", 13)
 		cap.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		hint.add_child(cap)
-	var label := UiTheme.label(word, 13, UiTheme.MUTED, true)
+	var label := Dossier.label(word, 13, Dossier.MUTED, true)
 	label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	hint.add_child(label)
 
@@ -700,11 +702,11 @@ func _paint(b: Button, selected: bool, selected_color: Color) -> void:
 	var base: StyleBoxFlat
 	var hover: StyleBoxFlat
 	if selected:
-		base = _style(UiTheme.PANEL_RAISED, selected_color, 2, 0)
-		hover = _style(UiTheme.PANEL_RAISED.lightened(0.05), selected_color, 2, 0)
+		base = _style(Dossier.PANEL_RAISED, selected_color, 2, 0)
+		hover = _style(Dossier.PANEL_RAISED.lightened(0.05), selected_color, 2, 0)
 	else:
-		base = _style(UiTheme.PANEL, UiTheme.LINE, 1, 0)
-		hover = _style(UiTheme.PANEL_RAISED, UiTheme.TEXT, 1, 0)
+		base = _style(Dossier.PANEL, Dossier.LINE, 1, 0)
+		hover = _style(Dossier.PANEL_RAISED, Dossier.TEXT, 1, 0)
 	b.add_theme_stylebox_override("normal", base)
 	b.add_theme_stylebox_override("hover", hover)
 	b.add_theme_stylebox_override("pressed", base)
@@ -740,7 +742,7 @@ func _select_supply(i: int) -> bool:
 	_supply = i
 	for k in _buttons.size():
 		if not _buttons[k].disabled:
-			_paint(_buttons[k], k == i, UiTheme.SUCCESS)
+			_paint(_buttons[k], k == i, Dossier.SUCCESS)
 	_update_land()
 	return true
 
@@ -761,7 +763,7 @@ func _select_route(i: int) -> void:
 	context.mission = _route_missions[i]
 	_map.selected = i
 	for k in _route_buttons.size():
-		_paint(_route_buttons[k], k == i, UiTheme.ACCENT)
+		_paint(_route_buttons[k], k == i, Dossier.ACCENT)
 	_update_land()
 
 
@@ -838,10 +840,10 @@ func _back() -> void:
 	_exit_dialog = MenuDialog.new()
 	_exit_dialog.name = "RunExitDialog"
 	add_child(_exit_dialog)
-	_exit_dialog.content.add_child(UiTheme.title("LEAVE THE RUN?", 36))
-	var note := UiTheme.label("Returning to the Armory or main menu ends this run. Your level, cards and build are lost.", 18)
+	_exit_dialog.content.add_child(Dossier.title("LEAVE THE RUN?", 36))
+	var note := Dossier.label("Returning to the Armory or main menu ends this run. Your level, cards and build are lost.", 18)
 	_exit_dialog.content.add_child(note)
-	var intel := UiTheme.label("You keep %d Intel earned so far. The extraction bonus is not awarded." % context.intel, 18, UiTheme.SUCCESS)
+	var intel := Dossier.label("You keep %d Intel earned so far. The extraction bonus is not awarded." % context.intel, 18, Dossier.SUCCESS)
 	intel.name = "ExitConsequences"
 	_exit_dialog.content.add_child(intel)
 	var keep := UiTheme.button(_exit_dialog.content, "KEEP PLAYING", _exit_dialog.close, true)
@@ -850,7 +852,7 @@ func _back() -> void:
 	armory.name = "ReturnToArmory"
 	var title := UiTheme.button(_exit_dialog.content, "MAIN MENU", _request_exit.bind(true))
 	title.name = "ReturnToTitle"
-	_exit_dialog.content.add_child(UiTheme.label("ESC / B: stay in this run", 14, UiTheme.MUTED, true))
+	_exit_dialog.content.add_child(Dossier.label("ESC / B: stay in this run", 14, Dossier.MUTED, true))
 
 
 func _request_exit(to_title: bool) -> void:
@@ -867,8 +869,8 @@ func _update_land() -> void:
 	_land.disabled = not _can_land()
 	_land_title.text = _land_text()
 	_land_sub.text = _land_detail()
-	_land_title.add_theme_color_override("font_color", UiTheme.TEXT_MUTED if _land.disabled else UiTheme.ON_ACCENT)
-	_land_sub.add_theme_color_override("font_color", UiTheme.TEXT_MUTED if _land.disabled else UiTheme.ON_ACCENT)
+	_land_title.add_theme_color_override("font_color", Dossier.TEXT_MUTED if _land.disabled else Dossier.ON_ACCENT)
+	_land_sub.add_theme_color_override("font_color", Dossier.TEXT_MUTED if _land.disabled else Dossier.ON_ACCENT)
 	_land.accessibility_name = "%s, %s" % [_land_title.text, _land_sub.text]
 	# A Button does not grow with its children: size it to the longest text.
 	_land.custom_minimum_size.x = maxf(400, _land_content.get_combined_minimum_size().x)

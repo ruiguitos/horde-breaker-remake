@@ -29,9 +29,9 @@ var _breakdown: Dictionary = {}
 func _ready() -> void:
 	# The parent is a plain Node: the anchors then follow the window.
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	theme = UiTheme.get_theme()
+	theme = Dossier.theme()
 	var bg := ColorRect.new()
-	bg.color = UiTheme.BG
+	bg.color = Dossier.PAPER_DARK  # the file's back sheet: ink reads on it, and the cards are paper on it
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
@@ -192,7 +192,7 @@ func _header(parent: Control) -> void:
 	var result := HBoxContainer.new()
 	result.add_theme_constant_override("separation", 12)
 	left.add_child(result)
-	var color: Color = UiTheme.SUCCESS if context.won else UiTheme.DANGER
+	var color: Color = Dossier.SUCCESS if context.won else Dossier.DANGER
 	var icon := TextureRect.new()
 	icon.texture = UiTheme.tick_icon() if context.won else _cross_icon()
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -201,7 +201,7 @@ func _header(parent: Control) -> void:
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	icon.modulate = color
 	result.add_child(icon)
-	var heading := UiTheme.title("EXTRACTED" if context.won else "RUN LOST", 46)
+	var heading := Dossier.title("EXTRACTED" if context.won else "RUN LOST", 46)
 	heading.name = "Result"
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	heading.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -213,7 +213,7 @@ func _header(parent: Control) -> void:
 	row.add_child(stats)
 	_stat(stats, "KILLS", context.kills)
 	if profile.new_best_kills:
-		var record := _pill("RECORD", UiTheme.ACCENT, UiTheme.ON_ACCENT)
+		var record := _pill("RECORD", Dossier.ACCENT, Dossier.ON_ACCENT)
 		record.name = "Record"
 		stats.get_child(0).add_child(record)
 	_stat(stats, "HEADSHOTS", context.headshots)
@@ -226,12 +226,12 @@ func _stat(parent: Control, key: String, value: int) -> void:
 	cell.name = "Stat" + key.capitalize()
 	cell.add_theme_constant_override("separation", 7)
 	parent.add_child(cell)
-	var k := UiTheme.label(key, 15, UiTheme.TEXT_MUTED, true)
+	var k := Dossier.label(key, 15, Dossier.TEXT_MUTED, true)
 	k.autowrap_mode = TextServer.AUTOWRAP_OFF
 	cell.add_child(k)
-	var v := UiTheme.label(str(value), 15, UiTheme.TEXT)
+	var v := Dossier.label(str(value), 15, Dossier.TEXT)
 	v.autowrap_mode = TextServer.AUTOWRAP_OFF
-	v.add_theme_font_override("font", UiTheme.mono_bold_font())
+	v.add_theme_font_override("font", Dossier.typed_font())
 	cell.add_child(v)
 
 
@@ -268,7 +268,7 @@ func _island_card(i: int, entry: Dictionary) -> PanelContainer:
 		var mark := TextureRect.new()
 		mark.name = "Result"
 		mark.texture = UiTheme.tick_icon() if cleared else _cross_icon()
-		mark.modulate = UiTheme.SUCCESS if cleared else UiTheme.DANGER
+		mark.modulate = Dossier.SUCCESS if cleared else Dossier.DANGER
 		mark.tooltip_text = "Cleared" if cleared else "Lost here"
 		mark.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
 		top.add_child(mark)
@@ -280,19 +280,19 @@ func _island_card(i: int, entry: Dictionary) -> PanelContainer:
 		place = String(GameData.BIOMES.get(StringName(entry["biome"]), {}).get("name", String(entry["biome"]).capitalize()))
 	else:
 		place = "Not reached" if not reached else "Island %d" % (i + 1)
-	var name_label := UiTheme.label(place.to_upper(), 24 if part.is_empty() else 19, UiTheme.TEXT if reached else UiTheme.TEXT_MUTED)
+	var name_label := Dossier.label(place.to_upper(), 24 if part.is_empty() else 19, Dossier.TEXT if reached else Dossier.TEXT_MUTED)
 	name_label.name = "Place"
-	name_label.add_theme_font_override("font", UiTheme.title_font() if part.is_empty() else UiTheme.heading_font())
+	name_label.add_theme_font_override("font", Dossier.typed_font() if part.is_empty() else Dossier.typed_font())
 	box.add_child(name_label)
 	var mission: String = String(entry.get("mission", part.get("mission", "")))
 	if mission != "":
-		box.add_child(_trimmed(_line("● " + Expeditions.mission_name(StringName(mission)).to_upper(), UiTheme.INFO if reached else UiTheme.TEXT_MUTED, true)))
+		box.add_child(_trimmed(_line("● " + Expeditions.mission_name(StringName(mission)).to_upper(), Dossier.INFO if reached else Dossier.TEXT_MUTED, true)))
 	if reached:
 		var modifier := StringName(entry.get("modifier", "calm"))
 		var calm: bool = modifier == &"calm"
-		box.add_child(_trimmed(_line(("– " if calm else "▲ ") + GameData.modifier(modifier).title.to_upper(), UiTheme.TEXT_MUTED if calm else UiTheme.DANGER)))
+		box.add_child(_trimmed(_line(("– " if calm else "▲ ") + GameData.modifier(modifier).title.to_upper(), Dossier.TEXT_MUTED if calm else Dossier.DANGER)))
 		if bool(entry.get("hazard_pay", false)):
-			box.add_child(_line("◆ HAZARD PAY", UiTheme.ACCENT))
+			box.add_child(_line("◆ HAZARD PAY", Dossier.ACCENT))
 		var gap := Control.new()
 		gap.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		box.add_child(gap)
@@ -303,17 +303,17 @@ func _island_card(i: int, entry: Dictionary) -> PanelContainer:
 		foot.add_theme_constant_override("separation", 6)
 		box.add_child(foot)
 		var seconds: int = int(float(entry.get("seconds", 0.0)))
-		foot.add_child(_line("%02d:%02d" % [seconds / 60, seconds % 60], UiTheme.TEXT))
-		var kills := _line("%d kills" % int(entry.get("kills", 0)), UiTheme.TEXT)
+		foot.add_child(_line("%02d:%02d" % [seconds / 60, seconds % 60], Dossier.TEXT))
+		var kills := _line("%d kills" % int(entry.get("kills", 0)), Dossier.TEXT)
 		kills.name = "Kills"
 		kills.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		kills.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		foot.add_child(kills)
-		var intel := _line("+%d" % int(entry.get("intel", 0)), UiTheme.ACCENT)
+		var intel := _line("+%d" % int(entry.get("intel", 0)), Dossier.ACCENT)
 		intel.name = "Intel"
 		foot.add_child(intel)
 	elif not part.is_empty():
-		box.add_child(_line("NOT REACHED", UiTheme.TEXT_MUTED))
+		box.add_child(_line("NOT REACHED", Dossier.TEXT_MUTED))
 	return card
 
 
@@ -322,14 +322,14 @@ func _card_style(reached: bool) -> StyleBox:
 		var dashed := MarkedBox.new(StyleBoxFlat.new())
 		dashed.base.bg_color = Color.TRANSPARENT
 		dashed.dashed = true
-		dashed.dash_color = UiTheme.LINE.lightened(0.2)
+		dashed.dash_color = Dossier.LINE.lightened(0.2)
 		for side: int in [SIDE_LEFT, SIDE_RIGHT, SIDE_TOP, SIDE_BOTTOM]:
 			dashed.base.set_content_margin(side, 13)
 		dashed.sync_margins()
 		return dashed
 	var s := StyleBoxFlat.new()
-	s.bg_color = UiTheme.PANEL
-	s.border_color = UiTheme.LINE
+	s.bg_color = Dossier.PANEL
+	s.border_color = Dossier.LINE
 	s.set_border_width_all(1)
 	s.set_corner_radius_all(UiTheme.RADIUS)
 	s.set_content_margin_all(13)
@@ -355,7 +355,7 @@ func _in_reach(parent: Control) -> void:
 		plate.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var s := StyleBoxFlat.new()
 		s.bg_color = Color.TRANSPARENT
-		s.border_color = UiTheme.ACCENT
+		s.border_color = Dossier.ACCENT
 		s.set_border_width_all(1)
 		s.set_corner_radius_all(UiTheme.RADIUS)
 		s.content_margin_left = 13
@@ -370,13 +370,13 @@ func _in_reach(parent: Control) -> void:
 		text.add_theme_constant_override("separation", 0)
 		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(text)
-		var title := UiTheme.label(String(item["name"]), 19)
-		title.add_theme_font_override("font", UiTheme.heading_font())
+		var title := Dossier.label(String(item["name"]), 19)
+		title.add_theme_font_override("font", Dossier.typed_font())
 		text.add_child(title)
-		text.add_child(UiTheme.label(String(item["kind"]), 14, UiTheme.TEXT_MUTED))
-		var cost := UiTheme.label(str(item["cost"]), 15, UiTheme.ACCENT)
+		text.add_child(Dossier.label(String(item["kind"]), 14, Dossier.TEXT_MUTED))
+		var cost := Dossier.label(str(item["cost"]), 15, Dossier.ACCENT)
 		cost.autowrap_mode = TextServer.AUTOWRAP_OFF
-		cost.add_theme_font_override("font", UiTheme.mono_bold_font())
+		cost.add_theme_font_override("font", Dossier.typed_font())
 		cost.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(cost)
 
@@ -400,24 +400,24 @@ func _intel_panel(parent: Control) -> void:
 	if context.won:
 		_intel_row("Extraction ×%.1f" % GameData.EXTRACTION_INTEL_MULTIPLIER, "+%d", int(b["extraction"]), "Extraction")
 	var files: int = int(b["files"])
-	_intel_row("Intel files found", "%d new" if files > 0 else "%d", files, "Files", UiTheme.INFO if files > 0 else UiTheme.TEXT_MUTED, false)
+	_intel_row("Intel files found", "%d new" if files > 0 else "%d", files, "Files", Dossier.INFO if files > 0 else Dossier.TEXT_MUTED, false)
 	box.add_child(HSeparator.new())
 	var earned_row := HBoxContainer.new()
 	box.add_child(earned_row)
-	var earned_key := UiTheme.label("EARNED", 22)
-	earned_key.add_theme_font_override("font", UiTheme.heading_font())
+	var earned_key := Dossier.label("EARNED", 22)
+	earned_key.add_theme_font_override("font", Dossier.typed_font())
 	earned_key.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	earned_row.add_child(earned_key)
-	var earned := UiTheme.label("+0", 30, UiTheme.ACCENT)
+	var earned := Dossier.label("+0", 30, Dossier.ACCENT)
 	earned.autowrap_mode = TextServer.AUTOWRAP_OFF
 	earned.name = "Earned"
-	earned.add_theme_font_override("font", UiTheme.mono_bold_font())
+	earned.add_theme_font_override("font", Dossier.typed_font())
 	earned.set_meta(&"format", "+%d")
 	earned.set_meta(&"target", int(b["earned"]))
 	earned_row.add_child(earned)
 	var total_row := HBoxContainer.new()
 	box.add_child(total_row)
-	var total_key := UiTheme.label("TOTAL", 15, UiTheme.TEXT_MUTED, true)
+	var total_key := Dossier.label("TOTAL", 15, Dossier.TEXT_MUTED, true)
 	total_key.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	total_row.add_child(total_key)
 	_total = RichTextLabel.new()
@@ -427,38 +427,38 @@ func _intel_panel(parent: Control) -> void:
 	_total.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_total.scroll_active = false
 	_total.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_total.add_theme_font_override("normal_font", UiTheme.mono_font())
-	_total.add_theme_font_override("bold_font", UiTheme.mono_bold_font())
+	_total.add_theme_font_override("normal_font", Dossier.typed_font())
+	_total.add_theme_font_override("bold_font", Dossier.typed_font())
 	_total.add_theme_font_size_override("normal_font_size", 15)
 	_total.add_theme_font_size_override("bold_font_size", 15)
-	_total.add_theme_color_override("default_color", UiTheme.TEXT_MUTED)
+	_total.add_theme_color_override("default_color", Dossier.TEXT_MUTED)
 	total_row.add_child(_total)
 	_set_total(int(b["before"]))
 	if not context.won and int(b["lost"]) > 0:
 		# Under the total, not in the sum: dying keeps the Intel but loses
 		# the extraction bonus.
-		var lost := UiTheme.label("Extraction bonus not earned: %d Intel (no ×%.1f)" % [int(b["lost"]), GameData.EXTRACTION_INTEL_MULTIPLIER], 14, UiTheme.DANGER)
+		var lost := Dossier.label("Extraction bonus not earned: %d Intel (no ×%.1f)" % [int(b["lost"]), GameData.EXTRACTION_INTEL_MULTIPLIER], 14, Dossier.DANGER)
 		lost.name = "RowLost"
 		box.add_child(lost)
 	var gap := Control.new()
 	gap.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(gap)
-	_meta = UiTheme.label(_meta_text(), 14, UiTheme.TEXT_MUTED)
+	_meta = Dossier.label(_meta_text(), 14, Dossier.TEXT_MUTED)
 	_meta.name = "Meta"
 	box.add_child(_meta)
 
 
-func _intel_row(key: String, format: String, value: int, id: String, color: Color = UiTheme.TEXT, count: bool = true) -> void:
+func _intel_row(key: String, format: String, value: int, id: String, color: Color = Dossier.TEXT, count: bool = true) -> void:
 	var row := HBoxContainer.new()
 	row.name = "Row" + id
 	_intel_rows.add_child(row)
-	var k := UiTheme.label(key, 16)
+	var k := Dossier.label(key, 16)
 	k.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(k)
-	var v := UiTheme.label(format % (0 if count else value), 16, color)
+	var v := Dossier.label(format % (0 if count else value), 16, color)
 	v.name = "Value"
 	v.autowrap_mode = TextServer.AUTOWRAP_OFF
-	v.add_theme_font_override("font", UiTheme.mono_bold_font())
+	v.add_theme_font_override("font", Dossier.typed_font())
 	if count:
 		v.set_meta(&"format", format)
 		v.set_meta(&"target", value)
@@ -466,7 +466,7 @@ func _intel_row(key: String, format: String, value: int, id: String, color: Colo
 
 
 func _set_total(value: int) -> void:
-	_total.text = "%d → [b][color=#%s]%d[/color][/b]" % [int(_breakdown["before"]), UiTheme.TEXT.to_html(false), value]
+	_total.text = "%d → [b][color=#%s]%d[/color][/b]" % [int(_breakdown["before"]), Dossier.TEXT.to_html(false), value]
 
 
 func _meta_text() -> String:
@@ -498,7 +498,7 @@ func _footer(parent: Control) -> void:
 	_back = UiTheme.button(_buttons, "BACK TO ARMORY", func() -> void: new_run_requested.emit(), true)
 	_back.name = "BackToArmory"
 	_back.custom_minimum_size = Vector2(0, 50)
-	_back.add_theme_font_override("font", UiTheme.title_font())
+	_back.add_theme_font_override("font", Dossier.typed_font())
 	_back.add_theme_font_size_override("font_size", 23)
 	for b: Button in [_redeploy, _back]:
 		b.focus_neighbor_top = b.get_path_to(b)
@@ -522,19 +522,19 @@ func _count_up() -> void:
 
 
 func _caption(text: String) -> Label:
-	var l := UiTheme.label(text, 13, UiTheme.TEXT_MUTED)
+	var l := Dossier.label(text, 13, Dossier.TEXT_MUTED)
 	l.autowrap_mode = TextServer.AUTOWRAP_OFF
 	var font := FontVariation.new()
-	font.base_font = UiTheme.mono_font()
+	font.base_font = Dossier.typed_font()
 	font.spacing_glyph = 1
 	l.add_theme_font_override("font", font)
 	return l
 
 
 func _line(text: String, color: Color, bold: bool = false) -> Label:
-	var l := UiTheme.label(text, 13, color)
+	var l := Dossier.label(text, 13, color)
 	l.autowrap_mode = TextServer.AUTOWRAP_OFF
-	l.add_theme_font_override("font", UiTheme.mono_bold_font() if bold else UiTheme.mono_font())
+	l.add_theme_font_override("font", Dossier.typed_font() if bold else Dossier.typed_font())
 	return l
 
 
@@ -548,10 +548,10 @@ func _trimmed(l: Label) -> Label:
 
 
 func _pill(text: String, bg: Color, ink: Color) -> Label:
-	var l := UiTheme.label(text, 12, ink)
+	var l := Dossier.label(text, 12, ink)
 	l.autowrap_mode = TextServer.AUTOWRAP_OFF
 	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	l.add_theme_font_override("font", UiTheme.mono_bold_font())
+	l.add_theme_font_override("font", Dossier.typed_font())
 	var s := StyleBoxFlat.new()
 	s.bg_color = bg
 	s.set_corner_radius_all(3)
@@ -579,7 +579,7 @@ func _refresh_after_ending() -> void:
 	profile.save()
 	if profile.ending == "":
 		return
-	_intel_row("Story ending", "+%d", OriginEnding.BONUS_INTEL, "Ending", UiTheme.ACCENT, false)
+	_intel_row("Story ending", "+%d", OriginEnding.BONUS_INTEL, "Ending", Dossier.ACCENT, false)
 	_breakdown["after"] = profile.intel
 	_set_total(profile.intel)
 	_meta.text = _meta_text()

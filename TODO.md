@@ -106,9 +106,9 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
 
 - [ ] Menus na direção A («field dossier»): armas simplificadas a 2026-11-15 (cartas num separador
   CARDS próprio, três números por arma); o LOADOUT não foi estreitado porque a folha dos perks
-  usa a mesma coluna. Feitos o título e o armory (classe com a fotografia
+  usa a mesma coluna. Barco e debrief em papel a 2026-11-15. Feitos o título e o armory (classe com a fotografia
   3D, armas como formulário de requisição, perks num quadro de cortiça), com a Special Elite e a
-  Libre Franklin; capturas em `docs/design/dossier_20261111/`. Por fazer: barco, debrief, cartas,
+  Libre Franklin; capturas em `docs/design/dossier_20261111/`. Por fazer: cartas,
   diálogos (run, definições, arquivo) e pausa, que ainda usam o tema escuro. Nos cartões dos
   perks os nomes continuam na Barlow Condensed: dois nomes à máquina não cabem num cartão;
   o mockup tem um nome por cartão, e isso pede mudar o cartão (`game/ui/perk_node_view.gd`).
