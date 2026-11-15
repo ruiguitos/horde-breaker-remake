@@ -57,6 +57,7 @@ registadas as decisões dessa data.
 | 2026-11-15 | **Ilhas abertas, com piloto na `beach_01` a 512 × 512 m**: uma missão principal e 2 a 3 missões opcionais com recompensa própria; a extração abre quando a principal acaba. As Berlengas ficam como estão. | Escolha do utilizador entre três caminhos (só maior, ilha aberta, open world completo). Só se alarga às outras ilhas se o piloto resultar. |
 | 2026-11-15 | **Torre e falésias da `beach_01` atual acabam-se antes do piloto da ilha aberta.** | Escolha do utilizador. |
 | 2026-11-15 | **Plano do piloto da ilha aberta aprovado** ([OPEN_ISLAND_PILOT.md](design/OPEN_ISLAND_PILOT.md)), seis etapas. | Aprovado pelo utilizador («aprovado, avança com a etapa 1»). As três decisões propostas no plano ficam em aberto. |
+| 2026-11-15 | **Piloto da ilha aberta: recompensas da tabela do plano** (esconderijo: Intel; sobrevivente: uma carta; ninho: vida e munição cheias), **missões opcionais visíveis no minimapa desde o início**, e **meta de 12 a 15 minutos por ilha**. | Respostas do utilizador às três decisões propostas em [OPEN_ISLAND_PILOT.md](design/OPEN_ISLAND_PILOT.md) («1. sim 2. desde o início 3. sim»). |
 
 ## Em aberto
 

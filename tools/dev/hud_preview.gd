@@ -30,7 +30,7 @@ func _initialize() -> void:
 
 func _process(_delta: float) -> bool:
 	_frames += 1
-	if _frames == 2:
+	if _frames == 402:
 		var run: IslandRun = _island.get("run")
 		run.objective = IslandRun.Objective.RETURN_TO_BOAT
 		run.survivor_found = true
@@ -64,18 +64,18 @@ func _process(_delta: float) -> bool:
 			var cell: Vector2i = run.field.world_to_cell(enemy_pos)
 			if not run.field.is_blocked(cell.x, cell.y):
 				run.horde.add(enemy_pos, GameData.EnemyKind.WALKER, run.rng)
-	if _frames == 12:
+	if _frames == 412:
 		var run: IslandRun = _island.get("run")
 		run.radio.clear()
 		var hud: Hud = _island.get("hud")
 		hud._radio_queue.clear()
 		hud._radio_time = 0.0
 		run.radio.append(&"survivor_found")
-	if _frames >= 18:
+	if _frames >= 418:
 		var hud: Hud = _island.get("hud")
 		hud._radio_text.visible_ratio = 1.0
 		# Wait for the next draw, so the screenshot includes complete subtitles.
-		if _frames == 18:
+		if _frames == 418:
 			return false
 		var screenshot := root.get_texture().get_image()
 		var error: Error = screenshot.save_png(_out)

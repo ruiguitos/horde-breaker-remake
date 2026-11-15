@@ -79,10 +79,10 @@ func _ready() -> void:
 	_root = Control.new()
 	_root.name = "LoadingRoot"
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.theme = UiTheme.get_theme()
+	_root.theme = Dossier.theme()
 	add_child(_root)
 	var bg := ColorRect.new()
-	bg.color = UiTheme.BG
+	bg.color = Dossier.BG
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.add_child(bg)
 	var margin := MarginContainer.new()
@@ -119,12 +119,12 @@ func _top_row(parent: Control) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
 	parent.add_child(row)
-	var kicker := UiTheme.label(tr("DEPLOYING"), 14, UiTheme.MUTED, true)
+	var kicker := Dossier.label(tr("DEPLOYING"), 14, Dossier.MUTED, true)
 	kicker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(kicker)
 	if bool(info.get("hazard_pay", false)):
-		row.add_child(UiTheme.chip(tr("HAZARD PAY"), UiTheme.DANGER))
-	var threat := UiTheme.chip(tr("THREAT %d") % int(info.get("threat", 1)), UiTheme.DANGER if int(info.get("threat", 1)) >= 3 else UiTheme.MUTED)
+		row.add_child(UiTheme.chip(tr("HAZARD PAY"), Dossier.DANGER))
+	var threat := UiTheme.chip(tr("THREAT %d") % int(info.get("threat", 1)), Dossier.DANGER if int(info.get("threat", 1)) >= 3 else Dossier.MUTED)
 	threat.name = "Threat"
 	row.add_child(threat)
 
@@ -147,10 +147,10 @@ func _destination(parent: Control) -> void:
 		where = tr("TEST ISLAND / %s") % String(info.get("test_file", "")).to_upper()
 	else:
 		where = tr("ARCHIPELAGO / ISLAND %d OF %d") % [int(info.get("part", 1)), int(info.get("count", 1))]
-	var run_line := UiTheme.label(where, 16, UiTheme.MUTED, true)
+	var run_line := Dossier.label(where, 16, Dossier.MUTED, true)
 	run_line.name = "RunLine"
 	col.add_child(run_line)
-	var place := UiTheme.title(String(info.get("place", "")).to_upper(), 64)
+	var place := Dossier.title(String(info.get("place", "")).to_upper(), 64)
 	place.name = "Place"
 	place.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	place.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -158,11 +158,11 @@ func _destination(parent: Control) -> void:
 	var mission_row := HBoxContainer.new()
 	mission_row.add_theme_constant_override("separation", 12)
 	col.add_child(mission_row)
-	var mission := UiTheme.chip(String(info.get("mission", "")).to_upper(), UiTheme.INFO, 16)
+	var mission := UiTheme.chip(String(info.get("mission", "")).to_upper(), Dossier.INFO, 16)
 	mission.name = "Mission"
 	mission.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	mission_row.add_child(mission)
-	var objective := UiTheme.label(String(info.get("objective", "")), 20)
+	var objective := Dossier.label(String(info.get("objective", "")), 20)
 	objective.name = "Objective"
 	objective.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	objective.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -196,9 +196,9 @@ func _radio_row(parent: Control) -> void:
 	col.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	col.add_theme_constant_override("separation", 2)
 	row.add_child(col)
-	_radio_header = UiTheme.label("", 13, UiTheme.ACCENT, true)
+	_radio_header = Dossier.label("", 13, Dossier.ACCENT, true)
 	col.add_child(_radio_header)
-	_radio_text = UiTheme.label("", 18)
+	_radio_text = Dossier.label("", 18)
 	_radio_text.name = "RadioText"
 	_radio_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_radio_text)
@@ -207,11 +207,11 @@ func _radio_row(parent: Control) -> void:
 func _progress_rows(parent: Control) -> void:
 	var row := HBoxContainer.new()
 	parent.add_child(row)
-	_phase_label = UiTheme.label("", 15, UiTheme.TEXT, true)
+	_phase_label = Dossier.label("", 15, Dossier.TEXT, true)
 	_phase_label.name = "Phase"
 	_phase_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(_phase_label)
-	_percent = UiTheme.label("0%", 15, UiTheme.TEXT, true)
+	_percent = Dossier.label("0%", 15, Dossier.TEXT, true)
 	_percent.name = "Percent"
 	_percent.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_percent.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -234,7 +234,7 @@ func _error_overlay() -> void:
 	_error_panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	_root.add_child(_error_panel)
 	var dim := ColorRect.new()
-	dim.color = Color(UiTheme.BG, 0.8)
+	dim.color = Color(Dossier.BG, 0.8)
 	_error_panel.add_child(dim)
 	var center := CenterContainer.new()
 	_error_panel.add_child(center)
@@ -244,8 +244,8 @@ func _error_overlay() -> void:
 	col.custom_minimum_size.x = 520
 	col.add_theme_constant_override("separation", 12)
 	box.add_child(col)
-	col.add_child(UiTheme.title(tr("DEPLOYMENT FAILED"), 36))
-	_error_text = UiTheme.label("", 18)
+	col.add_child(Dossier.title(tr("DEPLOYMENT FAILED"), 36))
+	_error_text = Dossier.label("", 18)
 	_error_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_error_text)
 	_back = UiTheme.button(col, tr("BACK TO TITLE"), func() -> void: back_requested.emit(), true)
@@ -371,7 +371,7 @@ func _set_phase(p: Phase) -> void:
 		Phase.BUILDING: _phase_label.text = tr("BUILDING THE ISLAND")
 		Phase.READY: _phase_label.text = tr("READY")
 		Phase.FAILED: _phase_label.text = tr("DEPLOYMENT FAILED")
-	_phase_label.add_theme_color_override("font_color", UiTheme.DANGER if p == Phase.FAILED else UiTheme.TEXT)
+	_phase_label.add_theme_color_override("font_color", Dossier.DANGER if p == Phase.FAILED else Dossier.TEXT)
 	if _bar != null:
 		_bar.failed = p == Phase.FAILED
 		_bar.queue_redraw()
@@ -400,7 +400,7 @@ class SegmentBar extends Control:
 		for i in SEGMENTS:
 			var r := Rect2(Vector2(i * (w + GAP), 0), Vector2(w, size.y))
 			if i < lit:
-				draw_rect(r, UiTheme.DANGER if failed else UiTheme.TEXT)
+				draw_rect(r, Dossier.DANGER if failed else Dossier.TEXT)
 			else:
-				draw_rect(r, UiTheme.PANEL)
-				draw_rect(r, UiTheme.LINE, false, 1.0)
+				draw_rect(r, Dossier.PANEL)
+				draw_rect(r, Dossier.LINE, false, 1.0)

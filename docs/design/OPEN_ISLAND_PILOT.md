@@ -104,7 +104,8 @@ A principal nunca repete a mecânica de uma secundária na mesma ilha.
   20 s, máximo 28 s (antes 4, 12 e 17 s). Nenhuma célula passa dos 40 s do plano, por isso o vazio
   a sul do rio é visual (pouco para ver), não de caminhada. A ilha não tem pontos de EXFIL, que
   ficaram fora da conta.
-- As três decisões propostas abaixo ficaram por responder; a etapa 1 usa a recompensa da tabela.
+- As três decisões propostas abaixo foram respondidas a 2026-11-15 (`docs/DECISIONS.md`): recompensas da
+  tabela, secundárias no minimapa desde o início (como já está), 12 a 15 minutos por ilha.
 
 ## Etapas
 
@@ -155,7 +156,7 @@ A telemetria já grava o `island_log` de cada ilha; acrescentam-se as secundári
 - **Trabalho perdido:** o dressing e o terreno da praia atual são refeitos na etapa 4. O script
   de autoria guarda as regras; as posições mudam.
 
-## Decisões propostas (para o utilizador)
+## Decisões propostas (respondidas a 2026-11-15; ver `docs/DECISIONS.md`)
 
 1. As recompensas da tabela acima, ou outras?
 2. As secundárias veem-se no minimapa desde o início, ou só quando o jogador se aproxima?

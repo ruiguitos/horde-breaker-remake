@@ -129,7 +129,7 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
   `docs/design/OPEN_ISLAND_PILOT.md`, aprovado; etapas 1 a 3 feitas a 2026-11-15. Etapa 4: a
   ilha já tem 512 m com as três zonas (enseada, bosque, ruína). Etapa 5 medida: desempenho
   igual ao da praia de 256 m, nada a mais de 28 s a pé de um ponto de interesse. Segue a etapa 6:
-  o utilizador joga e decide. Três decisões do plano ainda por responder.
+  o utilizador joga e decide. As três decisões do plano foram respondidas (DECISIONS, 2026-11-15).
 - [ ] Vista geral do mapa antes de partir: feita a 2026-11-15. O barco desenha a ilha real da rota
   escolhida como carta náutica, a partir do `<cena>_grid.png` (`RouteMap.island_chart`). Por fazer:
   regenerar o `_grid.png` sempre que a ilha muda (hoje é o Check map que o grava), e ver a jogar.

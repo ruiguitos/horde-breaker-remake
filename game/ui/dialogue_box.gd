@@ -42,7 +42,7 @@ func _ready() -> void:
 	layer = 50
 	var root := Control.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.theme = UiTheme.get_theme()
+	root.theme = Dossier.theme()
 	add_child(root)
 	var dim := ColorRect.new()
 	dim.color = Color(0, 0, 0, 0.55)
@@ -56,6 +56,7 @@ func _ready() -> void:
 		margin.add_theme_constant_override("margin_" + edge, 40)
 	root.add_child(margin)
 	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", Dossier.sheet_box(Dossier.PAPER, 18.0))  # a typed page, as in the menus
 	panel.gui_input.connect(_on_click)
 	margin.add_child(panel)
 	var row := HBoxContainer.new()
@@ -72,7 +73,7 @@ func _ready() -> void:
 	row.add_child(col)
 	var head := HBoxContainer.new()
 	col.add_child(head)
-	_speaker = UiTheme.label("", 18, UiTheme.ACCENT, true)
+	_speaker = Dossier.label("", 18, Dossier.ACCENT, true)
 	_speaker.name = "Speaker"
 	_speaker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(_speaker)
@@ -90,10 +91,10 @@ func _ready() -> void:
 	_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_text.custom_minimum_size.y = 60
-	_text.add_theme_font_override("normal_font", UiTheme.body_font())
+	_text.add_theme_font_override("normal_font", Dossier.body_font())
 	_text.add_theme_font_size_override("normal_font_size", 22)
 	_text.add_theme_font_size_override("italics_font_size", 22)
-	_text.add_theme_color_override("default_color", UiTheme.TEXT)
+	_text.add_theme_color_override("default_color", Dossier.TEXT)
 	col.add_child(_text)
 	_choices = VBoxContainer.new()
 	_choices.name = "Choices"

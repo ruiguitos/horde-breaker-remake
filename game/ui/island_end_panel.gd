@@ -1,8 +1,8 @@
 class_name IslandEndPanel
 extends Control
 ## End-of-island report, shown when an island or an expedition part is won.
-## Same "glass" family as the pause and defeat screens: the blurred island
-## stays behind, no dark plate, text with a shadow, one translucent box.
+## Same dossier family as the pause: the blurred island stays behind, and the
+## report is typed on the file's back sheet, with one paper box for this island.
 ##
 ## It answers three questions, in this order: did I make it (header with a
 ## tick, shape + colour), how did THIS island go (big numbers) and what is
@@ -37,17 +37,21 @@ func _init() -> void:
 	name = "IslandEnd"
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	visible = false
+	theme = Dossier.theme()
 	add_child(Hud._blur(0.42))
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(center)
+	var sheet := PanelContainer.new()
+	sheet.add_theme_stylebox_override("panel", Dossier.sheet_box(Dossier.PAPER_DARK, 26.0))
+	center.add_child(sheet)
 	var content := VBoxContainer.new()
 	content.name = "Content"
 	content.custom_minimum_size.x = 720
 	content.add_theme_constant_override("separation", 10)
-	center.add_child(content)
+	sheet.add_child(content)
 
-	content.add_child(_text("SALVAGE & CO.  /  FIELD REPORT", 13, UiTheme.TEXT_MUTED, true))
+	content.add_child(_text("SALVAGE & CO.  /  FIELD REPORT", 13, Dossier.TEXT_MUTED, true))
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 12)
 	content.add_child(head)
@@ -57,23 +61,29 @@ func _init() -> void:
 	_tick.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_tick.custom_minimum_size = Vector2(40, 40)
 	_tick.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_tick.modulate = UiTheme.SUCCESS
+	_tick.modulate = Dossier.SUCCESS
 	head.add_child(_tick)
-	title = MenuDialog.ink(UiTheme.title("ISLAND CLEARED", 52), 5)
+	title = Dossier.title("ISLAND CLEARED", 52)
 	title.name = "Title"
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	title.add_theme_color_override("font_color", UiTheme.SUCCESS)
+	title.add_theme_color_override("font_color", Dossier.SUCCESS)
 	head.add_child(title)
-	where = _text("", 15, UiTheme.TEXT_MUTED, true)
+	where = _text("", 15, Dossier.TEXT_MUTED, true)
 	where.name = "Where"
 	content.add_child(where)
 
 	# This island: the numbers that matter, big, in one translucent box.
-	scope = _text("THIS ISLAND", 13, UiTheme.TEXT_MUTED, true)
+	scope = _text("THIS ISLAND", 13, Dossier.TEXT_MUTED, true)
 	scope.name = "Scope"
 	content.add_child(scope)
-	var box := MenuDialog.glass_box(content)
+	var box := PanelContainer.new()
+	var paper := Dossier.sheet_box(Dossier.PAPER, 14.0)
+	paper.shadow_size = 0
+	paper.border_color = Dossier.LINE
+	paper.set_border_width_all(1)
+	box.add_theme_stylebox_override("panel", paper)
+	content.add_child(box)
 	box.name = "ThisIsland"
 	var inside := VBoxContainer.new()
 	inside.add_theme_constant_override("separation", 8)
@@ -81,17 +91,17 @@ func _init() -> void:
 	var stats := HBoxContainer.new()
 	stats.add_theme_constant_override("separation", 16)
 	inside.add_child(stats)
-	kills = _stat(stats, "KILLS", UiTheme.TEXT)
-	headshots = _stat(stats, "HEADSHOTS", UiTheme.TEXT)
-	intel = _stat(stats, "INTEL EARNED", UiTheme.SUCCESS)
+	kills = _stat(stats, "KILLS", Dossier.TEXT)
+	headshots = _stat(stats, "HEADSHOTS", Dossier.TEXT)
+	intel = _stat(stats, "INTEL EARNED", Dossier.SUCCESS)
 	var level_col: VBoxContainer = _column(stats, "LEVEL REACHED")
 	var level_row := HBoxContainer.new()
 	level_row.add_theme_constant_override("separation", 8)
 	level_col.add_child(level_row)
-	level = _number(UiTheme.TEXT)
+	level = _number(Dossier.TEXT)
 	level.name = "Level"
 	level_row.add_child(level)
-	level_gain = _text("", 16, UiTheme.INFO, true)
+	level_gain = _text("", 16, Dossier.INFO, true)
 	level_gain.name = "LevelGain"
 	level_gain.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	level_row.add_child(level_gain)
@@ -100,7 +110,7 @@ func _init() -> void:
 	power_ups = _detail(inside, "POWER-UPS")
 
 	# Whole run: smaller, and labelled, so it never reads as this island.
-	run_totals = _text("", 14, UiTheme.TEXT_MUTED, true)
+	run_totals = _text("", 14, Dossier.TEXT_MUTED, true)
 	run_totals.name = "RunTotals"
 	content.add_child(run_totals)
 	content.add_child(HSeparator.new())
@@ -112,12 +122,12 @@ func _init() -> void:
 	next_col.add_theme_constant_override("separation", 0)
 	next_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom.add_child(next_col)
-	next_col.add_child(_text("NEXT", 13, UiTheme.TEXT_MUTED, true))
-	next_step = MenuDialog.ink(UiTheme.label("", 24, UiTheme.INFO), 5)
+	next_col.add_child(_text("NEXT", 13, Dossier.TEXT_MUTED, true))
+	next_step = Dossier.label("", 24, Dossier.INFO)
 	next_step.name = "Next"
 	next_step.autowrap_mode = TextServer.AUTOWRAP_OFF
 	next_step.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	next_step.add_theme_font_override("font", UiTheme.heading_font())
+	next_step.add_theme_font_override("font", Dossier.typed_font())
 	next_col.add_child(next_step)
 	var action := VBoxContainer.new()
 	action.add_theme_constant_override("separation", 4)
@@ -129,7 +139,7 @@ func _init() -> void:
 	# The only button: focus never leaves it (d-pad, Tab).
 	for side in ["focus_neighbor_top", "focus_neighbor_bottom", "focus_neighbor_left", "focus_neighbor_right", "focus_next", "focus_previous"]:
 		continue_button.set(side, NodePath("."))
-	hint = _text("", 13, UiTheme.TEXT_MUTED, true)
+	hint = _text("", 13, Dossier.TEXT_MUTED, true)
 	hint.name = "Hint"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	action.add_child(hint)
@@ -282,9 +292,9 @@ static func _power_ups_text(run: IslandRun) -> String:
 # --- Builders -------------------------------------------------------------------
 
 func _text(text: String, font_size: int, color: Color, mono: bool = false) -> Label:
-	var l := UiTheme.label(text, font_size, color, mono)
+	var l := Dossier.label(text, font_size, color, mono)
 	l.autowrap_mode = TextServer.AUTOWRAP_OFF
-	return MenuDialog.ink(l)
+	return l
 
 
 func _column(parent: Control, caption: String) -> VBoxContainer:
@@ -292,14 +302,14 @@ func _column(parent: Control, caption: String) -> VBoxContainer:
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	col.add_theme_constant_override("separation", 0)
 	parent.add_child(col)
-	col.add_child(_text(caption, 12, UiTheme.TEXT_MUTED, true))
+	col.add_child(_text(caption, 12, Dossier.TEXT_MUTED, true))
 	return col
 
 
 func _number(color: Color) -> Label:
-	var n := MenuDialog.ink(UiTheme.label("0", 34, color), 5)
+	var n := Dossier.label("0", 34, color)
 	n.autowrap_mode = TextServer.AUTOWRAP_OFF
-	n.add_theme_font_override("font", UiTheme.mono_bold_font())
+	n.add_theme_font_override("font", Dossier.typed_font())
 	return n
 
 
@@ -315,10 +325,10 @@ func _detail(parent: Control, caption: String) -> Label:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	parent.add_child(row)
-	var key := _text(caption, 12, UiTheme.TEXT_MUTED, true)
+	var key := _text(caption, 12, Dossier.TEXT_MUTED, true)
 	key.custom_minimum_size.x = 92
 	row.add_child(key)
-	var value := MenuDialog.ink(UiTheme.label("", 16, UiTheme.TEXT))
+	var value := Dossier.label("", 16, Dossier.TEXT)
 	value.name = caption.capitalize().replace(" ", "").replace("-", "")
 	value.autowrap_mode = TextServer.AUTOWRAP_OFF
 	value.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS

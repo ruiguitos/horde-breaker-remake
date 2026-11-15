@@ -18,7 +18,7 @@ const FALLBACK_TEXT: Dictionary = {
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_rng.seed = context.island_seed() + 1
-	theme = UiTheme.get_theme()
+	theme = Dossier.theme()
 	_camp_backdrop()
 	_make_options()
 	var screen := _screen()
@@ -39,28 +39,12 @@ func _ready() -> void:
 	add_child(Ambience.create(&"town", -14.0))  # wind on the plateau, not the boat's sea
 
 
-## Night camp instead of the boat's deck: dark ground and a fire glow.
+## The field file's back sheet, as on the boat (the dossier look of the title): ink reads on it,
+## and the plates are paper on it.
 func _camp_backdrop() -> void:
-	var bg := ColorRect.new()
-	bg.color = Color("0c1012")
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
-	var gradient := Gradient.new()
-	gradient.set_color(0, Color(0.95, 0.45, 0.12, 0.35))
-	gradient.set_color(1, Color(0.95, 0.45, 0.12, 0.0))
-	var glow := GradientTexture2D.new()
-	glow.gradient = gradient
-	glow.fill = GradientTexture2D.FILL_RADIAL
-	glow.fill_from = Vector2(0.5, 1.0)
-	glow.fill_to = Vector2(0.5, 0.25)
-	var rect := TextureRect.new()
-	rect.texture = glow
-	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	rect.stretch_mode = TextureRect.STRETCH_SCALE
-	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(rect)
+	var desk := Dossier.sheet(Dossier.PAPER_DARK)
+	desk.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(desk)
 
 
 ## The expedition's parts as a trail: done (tick), next (amber ring), ahead
@@ -69,7 +53,7 @@ func _trail() -> Control:
 	var box := VBoxContainer.new()
 	box.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_theme_constant_override("separation", 6)
-	box.add_child(UiTheme.label(Expeditions.display_name(context.expedition).to_upper(), 12, UiTheme.MUTED, true))
+	box.add_child(Dossier.typed(Expeditions.display_name(context.expedition).to_upper(), 12, Dossier.MUTED))
 	for i in context.expedition_parts.size():
 		var part: Dictionary = context.expedition_parts[i]
 		var done: bool = i < context.island_index
@@ -81,8 +65,7 @@ func _trail() -> Control:
 		box.add_child(row)
 		var state: RouteMap.Step = RouteMap.Step.DONE if done else (RouteMap.Step.CURRENT if here else RouteMap.Step.AHEAD)
 		row.add_child(RouteMap.StepPip.new(state, str(i + 1)))
-		var label := UiTheme.label(String(part["name"]).to_upper(), 15, UiTheme.SUCCESS if done else (UiTheme.ACCENT if here else UiTheme.MUTED))
-		label.add_theme_font_override("font", UiTheme.mono_bold_font() if here else UiTheme.mono_font())
+		var label := Dossier.typed(String(part["name"]).to_upper(), 15, Dossier.SUCCESS if done else (Dossier.ACCENT if here else Dossier.MUTED), here)
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		label.name = "Trail_%d" % (i + 1)
@@ -96,7 +79,7 @@ func _trail_link(walked: bool) -> Control:
 	holder.custom_minimum_size = Vector2(26, 14)
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var line := ColorRect.new()
-	line.color = UiTheme.SUCCESS if walked else UiTheme.LINE
+	line.color = Dossier.SUCCESS if walked else Dossier.LINE
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	line.position = Vector2(12, 0)
 	line.size = Vector2(2, 14)
@@ -110,7 +93,7 @@ func _next_part() -> Control:
 	var plate := PanelContainer.new()
 	plate.name = "NextPart"
 	plate.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	plate.add_theme_stylebox_override("panel", _style(UiTheme.PANEL_RAISED, UiTheme.ACCENT, 2, 12))
+	plate.add_theme_stylebox_override("panel", _style(Dossier.PAPER, Dossier.ACCENT, 2, 12))
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	plate.add_child(box)
@@ -123,8 +106,8 @@ func _next_part() -> Control:
 	preview.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(preview)
 	var tag: String = "FINAL PART" if context.is_last_island() else "NEXT PART"
-	box.add_child(UiTheme.label("%s / %d OF %d" % [tag, context.island_index + 1, context.island_count()], 12, UiTheme.MUTED, true))
-	var heading := UiTheme.title(context.part_name().to_upper(), 32)
+	box.add_child(Dossier.typed("%s / %d OF %d" % [tag, context.island_index + 1, context.island_count()], 12, Dossier.MUTED))
+	var heading := Dossier.title(context.part_name().to_upper(), 32)
 	heading.name = "PartName"
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -132,7 +115,7 @@ func _next_part() -> Control:
 	var text: String = String(GameData.MISSIONS.get(context.mission, {}).get("text", FALLBACK_TEXT.get(context.mission, "")))
 	box.add_child(_mission_lines(context.mission, text))
 	box.add_child(HSeparator.new())
-	box.add_child(_tagged_line("● ON FOOT", UiTheme.TEXT_MUTED, "no route modifiers; your HP, level and cards carry over"))
+	box.add_child(_tagged_line("● ON FOOT", Dossier.TEXT_MUTED, "no route modifiers; your HP, level and cards carry over"))
 	return plate
 
 

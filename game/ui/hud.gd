@@ -1479,16 +1479,27 @@ func _build_death(root: Control) -> void:
 	_death_panel.visible = false
 	root.add_child(_death_panel)
 	_death_panel.add_child(_blur(0.32))
-	var content: VBoxContainer = UiTheme.centered_panel(_death_panel, 620)
+	_death_panel.theme = Dossier.theme()
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_death_panel.add_child(center)
+	# The file's back sheet, as in the pause and the end-of-island report.
+	var sheet := PanelContainer.new()
+	sheet.add_theme_stylebox_override("panel", Dossier.sheet_box(Dossier.PAPER_DARK, 26.0))
+	center.add_child(sheet)
+	var content := VBoxContainer.new()
+	content.custom_minimum_size.x = 620
+	sheet.add_child(content)
 	content.add_theme_constant_override("separation", 12)
-	content.add_child(_plain("SALVAGE & CO.  /  PERSONNEL REPORT", 13, UiTheme.TEXT_MUTED, true))
-	content.add_child(UiTheme.chip("CONTRACTOR LOST", UiTheme.DANGER))
-	var title := UiTheme.title("CONTRACT TERMINATED", 48)
+	content.add_child(Dossier.typed("SALVAGE & CO.  /  PERSONNEL REPORT", 13, Dossier.TEXT_MUTED))
+	content.add_child(UiTheme.chip("CONTRACTOR LOST", Dossier.DANGER))
+	var title := Dossier.title("CONTRACT TERMINATED", 48)
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	content.add_child(title)
-	_death_where = UiTheme.label("", 14, UiTheme.TEXT_MUTED, true)
+	_death_where = Dossier.label("", 14, Dossier.TEXT_MUTED, true)
 	content.add_child(_death_where)
-	_death_reason = UiTheme.label("", 18)
+	_death_reason = Dossier.label("", 18)
 	content.add_child(_death_reason)
 	content.add_child(HSeparator.new())
 	var stats := HBoxContainer.new()
@@ -1503,20 +1514,20 @@ func _build_death(root: Control) -> void:
 	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	text.add_theme_constant_override("separation", 2)
 	intel.add_child(text)
-	text.add_child(_plain("INTEL RETAINED", 15, UiTheme.SUCCESS, true))
-	_death_intel_detail = _plain("", 13, UiTheme.TEXT_MUTED, true)
+	text.add_child(Dossier.typed("INTEL RETAINED", 15, Dossier.SUCCESS))
+	_death_intel_detail = Dossier.typed("", 13, Dossier.TEXT_MUTED)
 	text.add_child(_death_intel_detail)
-	_death_intel = UiTheme.title("0", 46)
+	_death_intel = Dossier.title("0", 46)
 	_death_intel.autowrap_mode = TextServer.AUTOWRAP_OFF
-	_death_intel.add_theme_color_override("font_color", UiTheme.SUCCESS)
+	_death_intel.add_theme_color_override("font_color", Dossier.SUCCESS)
 	intel.add_child(_death_intel)
-	_death_bonus = _plain("", 14, UiTheme.DANGER, true)
+	_death_bonus = Dossier.typed("", 14, Dossier.DANGER)
 	content.add_child(_death_bonus)
 	_death_continue = UiTheme.button(content, "CONTINUE TO DEBRIEF  ›", request_continue, true)
 	_death_continue.name = "ContinueToDebrief"
 	_death_continue.focus_neighbor_top = _death_continue.get_path_to(_death_continue)
 	_death_continue.focus_neighbor_bottom = _death_continue.get_path_to(_death_continue)
-	_death_hints = _plain("", 12, UiTheme.TEXT_MUTED, true)
+	_death_hints = Dossier.typed("", 12, Dossier.TEXT_MUTED)
 	_death_hints.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(_death_hints)
 
@@ -1526,8 +1537,8 @@ func _death_stat(parent: Control, caption: String) -> Label:
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	col.add_theme_constant_override("separation", 2)
 	parent.add_child(col)
-	col.add_child(_plain(caption, 12, UiTheme.TEXT_MUTED, true))
-	var value := UiTheme.title("0", 32)
+	col.add_child(Dossier.typed(caption, 12, Dossier.TEXT_MUTED))
+	var value := Dossier.title("0", 32)
 	col.add_child(value)
 	return value
 
