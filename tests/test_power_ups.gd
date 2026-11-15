@@ -390,7 +390,10 @@ func _test_carry() -> void:
 
 func _test_handmade() -> void:
 	var island: HandmadeIsland = (load(HandmadeIsland.ISLANDS_DIR + "beach_01.tscn") as PackedScene).instantiate()
-	island.play_area = PackedVector2Array([Vector2(50, 0), Vector2(256, 0), Vector2(256, 256), Vector2(50, 256)])
+	# beach_01 as a stand-in part: west of x = 50 (of the 256 m beach it was written for) is out;
+	# the open-island beach is larger, so the same share of it is out.
+	var k: float = island.size / 256.0
+	island.play_area = PackedVector2Array([Vector2(50, 0) * k, Vector2(256, 0) * k, Vector2(256, 256) * k, Vector2(50, 256) * k])
 	var problems: Array[String] = []
 	var map: IslandMap = island.build_map(problems)
 	var run := IslandRun.new(71, &"beach", map)

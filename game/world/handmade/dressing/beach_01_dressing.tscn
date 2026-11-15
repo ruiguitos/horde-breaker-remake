@@ -1,16 +1,16 @@
 [gd_scene format=4]
 
 [ext_resource type="Material" path="res://game/world/handmade/dressing/stone_wall_02.tres" id="BeachResource_000"]
-[ext_resource type="Texture2D" path="res://assets/models/nature_megakit/Leaves_TwistedTree_C.png" id="BeachResource_001"]
-[ext_resource type="Texture2D" path="res://assets/models/nature_megakit/Leaves_NormalTree_C.png" id="BeachResource_002"]
-[ext_resource type="Texture2D" path="res://assets/models/nature_megakit/Flowers.png" id="BeachResource_003"]
-[ext_resource type="Texture2D" path="res://assets/models/nature_megakit/Leaves.png" id="BeachResource_004"]
-[ext_resource type="Texture2D" path="res://assets/models/environment/scenery_kit/textures/scenery_albedo.png" id="BeachResource_005"]
-[ext_resource type="Texture2D" path="res://assets/models/environment/scenery_kit/textures/scenery_normal.png" id="BeachResource_006"]
-[ext_resource type="Texture2D" path="res://assets/models/environment/scenery_kit/textures/scenery_orm.png" id="BeachResource_007"]
-[ext_resource type="Texture2D" path="res://assets/models/polyhaven/boulder_01/boulder_01_game_boulder_01_diff_1k.jpg" id="BeachResource_008"]
-[ext_resource type="Texture2D" path="res://assets/models/polyhaven/boulder_01/boulder_01_game_boulder_01_arm_1k.jpg" id="BeachResource_009"]
-[ext_resource type="Texture2D" path="res://assets/models/polyhaven/boulder_01/boulder_01_game_boulder_01_nor_gl_1k.jpg" id="BeachResource_010"]
+[ext_resource type="Texture2D" path="res://assets/models/environment/scenery_kit/textures/scenery_albedo.png" id="BeachResource_001"]
+[ext_resource type="Texture2D" path="res://assets/models/environment/scenery_kit/textures/scenery_normal.png" id="BeachResource_002"]
+[ext_resource type="Texture2D" path="res://assets/models/environment/scenery_kit/textures/scenery_orm.png" id="BeachResource_003"]
+[ext_resource type="Texture2D" path="res://assets/models/polyhaven/boulder_01/boulder_01_game_boulder_01_diff_1k.jpg" id="BeachResource_004"]
+[ext_resource type="Texture2D" path="res://assets/models/polyhaven/boulder_01/boulder_01_game_boulder_01_arm_1k.jpg" id="BeachResource_005"]
+[ext_resource type="Texture2D" path="res://assets/models/polyhaven/boulder_01/boulder_01_game_boulder_01_nor_gl_1k.jpg" id="BeachResource_006"]
+[ext_resource type="Texture2D" path="res://assets/models/nature_megakit/Leaves_TwistedTree_C.png" id="BeachResource_007"]
+[ext_resource type="Texture2D" path="res://assets/models/nature_megakit/Leaves_NormalTree_C.png" id="BeachResource_008"]
+[ext_resource type="Texture2D" path="res://assets/models/nature_megakit/Flowers.png" id="BeachResource_009"]
+[ext_resource type="Texture2D" path="res://assets/models/nature_megakit/Leaves.png" id="BeachResource_010"]
 
 [sub_resource type="BoxMesh" id="BeachResource_011"]
 size = Vector3(7.12, 0.55, 6.12)
@@ -31,10 +31,10 @@ size = Vector3(0.42, 2.9, 0.42)
 size = Vector3(1.6, 0.18, 0.5)
 
 [sub_resource type="ORMMaterial3D" id="BeachResource_017"]
-albedo_texture = ExtResource("BeachResource_005")
-orm_texture = ExtResource("BeachResource_007")
+albedo_texture = ExtResource("BeachResource_001")
+orm_texture = ExtResource("BeachResource_003")
 normal_enabled = true
-normal_texture = ExtResource("BeachResource_006")
+normal_texture = ExtResource("BeachResource_002")
 ao_enabled = true
 texture_filter = 5
 
@@ -497,13 +497,13 @@ shadow_mesh = SubResource("BeachResource_076")
 [sub_resource type="StandardMaterial3D" id="BeachResource_078"]
 resource_name = "boulder_01"
 cull_mode = 2
-albedo_texture = ExtResource("BeachResource_008")
-metallic_texture = ExtResource("BeachResource_009")
+albedo_texture = ExtResource("BeachResource_004")
+metallic_texture = ExtResource("BeachResource_005")
 metallic_texture_channel = 2
-roughness_texture = ExtResource("BeachResource_009")
+roughness_texture = ExtResource("BeachResource_005")
 roughness_texture_channel = 1
 normal_enabled = true
-normal_texture = ExtResource("BeachResource_010")
+normal_texture = ExtResource("BeachResource_006")
 metadata/_gltf_primary_texture_coord = 0
 
 [sub_resource type="ArrayMesh" id="BeachResource_079"]
@@ -580,7 +580,7 @@ transparency = 2
 alpha_scissor_threshold = 0.2
 alpha_antialiasing_mode = 0
 cull_mode = 2
-albedo_texture = ExtResource("BeachResource_001")
+albedo_texture = ExtResource("BeachResource_007")
 metadata/_gltf_primary_texture_coord = 0
 
 [sub_resource type="ArrayMesh" id="BeachResource_084"]
@@ -623,7 +623,7 @@ transparency = 2
 alpha_scissor_threshold = 0.2
 alpha_antialiasing_mode = 0
 cull_mode = 2
-albedo_texture = ExtResource("BeachResource_002")
+albedo_texture = ExtResource("BeachResource_008")
 metadata/_gltf_primary_texture_coord = 0
 
 [sub_resource type="StandardMaterial3D" id="BeachResource_087"]
@@ -633,7 +633,7 @@ alpha_scissor_threshold = 0.2
 alpha_antialiasing_mode = 0
 cull_mode = 2
 vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("BeachResource_003")
+albedo_texture = ExtResource("BeachResource_009")
 metadata/_gltf_primary_texture_coord = 0
 
 [sub_resource type="ArrayMesh" id="BeachResource_088"]
@@ -698,7 +698,7 @@ transparency = 2
 alpha_scissor_threshold = 0.2
 alpha_antialiasing_mode = 0
 cull_mode = 2
-albedo_texture = ExtResource("BeachResource_004")
+albedo_texture = ExtResource("BeachResource_010")
 metadata/_gltf_primary_texture_coord = 0
 
 [sub_resource type="ArrayMesh" id="BeachResource_091"]
@@ -741,7 +741,7 @@ transparency = 2
 alpha_scissor_threshold = 0.2
 alpha_antialiasing_mode = 0
 cull_mode = 2
-albedo_texture = ExtResource("BeachResource_004")
+albedo_texture = ExtResource("BeachResource_010")
 metadata/_gltf_primary_texture_coord = 0
 
 [sub_resource type="ArrayMesh" id="BeachResource_094"]
@@ -783,447 +783,447 @@ shadow_mesh = SubResource("BeachResource_094")
 [node name="Facades" type="Node3D" parent="."]
 
 [node name="Hut_01_Stone_00" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.5, 0.9328419, 95)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.5, 1.2222866, 212)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_011")
 
 [node name="Hut_01_Stone_01" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.15, 2.112842, 92.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103.15, 2.4022865, 209.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_012")
 
 [node name="Hut_01_Stone_02" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.15, 2.112842, 97.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 103.15, 2.4022865, 214.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_013")
 
 [node name="Hut_01_Stone_03" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.85, 2.112842, 92.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 109.85, 2.4022865, 209.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_014")
 
 [node name="Hut_01_Stone_04" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54.85, 2.112842, 97.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 109.85, 2.4022865, 214.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_015")
 
 [node name="Hut_01_Stone_05" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.5, 0.75284195, 98.25)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.5, 1.0422866, 215.25)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_016")
 
 [node name="DoorFrame_06" type="Node3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.5, 1.7969803, 98.02)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.5, 2.078065, 215.02)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/DoorFrame_06"]
 mesh = SubResource("BeachResource_019")
 
 [node name="WindowShutters_07" type="Node3D" parent="Facades"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 49.5, 2.312842, 98.025)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 104.5, 2.6022866, 215.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_07"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WindowShutters_08" type="Node3D" parent="Facades"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 53.5, 2.312842, 98.025)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 108.5, 2.6022866, 215.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_08"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WallLantern_09" type="Node3D" parent="Facades"]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 52.45, 3.062842, 98.025)
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 107.45, 3.3522868, 215.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WallLantern_09"]
 mesh = SubResource("BeachResource_023")
 
 [node name="Chimney_10" type="Node3D" parent="Facades"]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 53.8, 4.962842, 94.2)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 108.8, 5.252287, 211.2)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/Chimney_10"]
 mesh = SubResource("BeachResource_025")
 
 [node name="CanvasAwning_11" type="Node3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.5, 3.212842, 98.025)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.5, 3.5022864, 215.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/CanvasAwning_11"]
 mesh = SubResource("BeachResource_027")
 
 [node name="Hut_02_Stone_00" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.5, 1.3208598, 95)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 118.5, 1.3682103, 212)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_028")
 
 [node name="Hut_02_Stone_01" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.15, 2.5008597, 92.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 115.15, 2.5482104, 209.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_029")
 
 [node name="Hut_02_Stone_02" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.15, 2.5008597, 97.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 115.15, 2.5482104, 214.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_030")
 
 [node name="Hut_02_Stone_03" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.85, 2.5008597, 92.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 121.85, 2.5482104, 209.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_031")
 
 [node name="Hut_02_Stone_04" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.85, 2.5008597, 97.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 121.85, 2.5482104, 214.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_032")
 
 [node name="Hut_02_Stone_05" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.5, 1.1408598, 98.25)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 118.5, 1.1882104, 215.25)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_033")
 
 [node name="DoorFrame_18" type="Node3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.5, 2.1775916, 98.02)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 118.5, 2.2292194, 215.02)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/DoorFrame_18"]
 mesh = SubResource("BeachResource_019")
 
 [node name="WindowShutters_19" type="Node3D" parent="Facades"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 61.5, 2.7008598, 98.025)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 116.5, 2.7482104, 215.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_19"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WindowShutters_20" type="Node3D" parent="Facades"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 65.5, 2.7008598, 98.025)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 120.5, 2.7482104, 215.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_20"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WallLantern_21" type="Node3D" parent="Facades"]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 64.45, 3.45086, 98.025)
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 119.45, 3.4982104, 215.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WallLantern_21"]
 mesh = SubResource("BeachResource_023")
 
 [node name="Chimney_22" type="Node3D" parent="Facades"]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 65.8, 5.35086, 94.2)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 120.8, 5.3982105, 211.2)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/Chimney_22"]
 mesh = SubResource("BeachResource_025")
 
 [node name="Hut_03_Stone_00" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 75.5, 1.2305248, 95)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 130.5, 1.3992509, 212)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_034")
 
 [node name="Hut_03_Stone_01" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 72.15, 2.4105248, 92.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 127.15, 2.5792508, 209.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_035")
 
 [node name="Hut_03_Stone_02" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 72.15, 2.4105248, 97.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 127.15, 2.5792508, 214.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_036")
 
 [node name="Hut_03_Stone_03" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 78.85, 2.4105248, 92.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 133.85, 2.5792508, 209.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_037")
 
 [node name="Hut_03_Stone_04" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 78.85, 2.4105248, 97.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 133.85, 2.5792508, 214.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_038")
 
 [node name="Hut_03_Stone_05" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 75.5, 1.0505248, 98.25)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 130.5, 1.2192509, 215.25)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_039")
 
 [node name="DoorFrame_29" type="Node3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 75.5, 2.0942173, 98.02)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 130.5, 2.2569463, 215.02)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/DoorFrame_29"]
 mesh = SubResource("BeachResource_019")
 
 [node name="WindowShutters_30" type="Node3D" parent="Facades"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 73.5, 2.6105247, 98.025)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 128.5, 2.7792509, 215.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_30"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WindowShutters_31" type="Node3D" parent="Facades"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 77.5, 2.6105247, 98.025)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 132.5, 2.7792509, 215.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_31"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WallLantern_32" type="Node3D" parent="Facades"]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 76.45, 3.360525, 98.025)
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 131.45, 3.529251, 215.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WallLantern_32"]
 mesh = SubResource("BeachResource_023")
 
 [node name="Chimney_33" type="Node3D" parent="Facades"]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 77.8, 5.2605247, 94.2)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 132.8, 5.429251, 211.2)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/Chimney_33"]
 mesh = SubResource("BeachResource_025")
 
 [node name="Hut_04_Stone_00" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 77.5, 1.0491501, 107)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 132.5, 1.1694535, 224)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_040")
 
 [node name="Hut_04_Stone_01" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.15, 2.2291503, 104.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 129.15, 2.3494534, 221.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_041")
 
 [node name="Hut_04_Stone_02" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.15, 2.2291503, 109.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 129.15, 2.3494534, 226.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_042")
 
 [node name="Hut_04_Stone_03" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80.85, 2.2291503, 104.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 135.85, 2.3494534, 221.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_043")
 
 [node name="Hut_04_Stone_04" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80.85, 2.2291503, 109.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 135.85, 2.3494534, 226.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_044")
 
 [node name="Hut_04_Stone_05" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 77.5, 0.86915016, 110.25)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 132.5, 0.98945343, 227.25)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_045")
 
 [node name="DoorFrame_40" type="Node3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 77.5, 1.9105611, 110.02)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 132.5, 2.0317292, 227.02)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/DoorFrame_40"]
 mesh = SubResource("BeachResource_019")
 
 [node name="WindowShutters_41" type="Node3D" parent="Facades"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 75.5, 2.42915, 110.025)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 130.5, 2.5494535, 227.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_41"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WindowShutters_42" type="Node3D" parent="Facades"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 79.5, 2.42915, 110.025)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 134.5, 2.5494535, 227.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_42"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WallLantern_43" type="Node3D" parent="Facades"]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 78.45, 3.17915, 110.025)
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 133.45, 3.2994535, 227.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WallLantern_43"]
 mesh = SubResource("BeachResource_023")
 
 [node name="Chimney_44" type="Node3D" parent="Facades"]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 79.8, 5.07915, 106.2)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 134.8, 5.199454, 223.2)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/Chimney_44"]
 mesh = SubResource("BeachResource_025")
 
 [node name="CanvasAwning_45" type="Node3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 77.5, 3.3291502, 110.025)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 132.5, 3.4494534, 227.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/CanvasAwning_45"]
 mesh = SubResource("BeachResource_027")
 
 [node name="TavernSign_46" type="Node3D" parent="Facades"]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 73.98, 3.12915, 108)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 128.98, 3.2494533, 225)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/TavernSign_46"]
 mesh = SubResource("BeachResource_047")
 
 [node name="Hut_05_Stone_00" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 79.5, 1.2401096, 124)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 134.5, 1.1557878, 241)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_048")
 
 [node name="Hut_05_Stone_01" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76.15, 2.4201095, 121.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 131.15, 2.3357878, 238.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_049")
 
 [node name="Hut_05_Stone_02" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76.15, 2.4201095, 126.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 131.15, 2.3357878, 243.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_050")
 
 [node name="Hut_05_Stone_03" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82.85, 2.4201095, 121.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 137.85, 2.3357878, 238.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_051")
 
 [node name="Hut_05_Stone_04" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 82.85, 2.4201095, 126.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 137.85, 2.3357878, 243.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_052")
 
 [node name="Hut_05_Stone_05" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 79.5, 1.0601095, 127.25)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 134.5, 0.97578776, 244.25)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_053")
 
 [node name="DoorFrame_53" type="Node3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 79.5, 2.1047177, 127.02)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 134.5, 2.0272353, 244.02)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/DoorFrame_53"]
 mesh = SubResource("BeachResource_019")
 
 [node name="WindowShutters_54" type="Node3D" parent="Facades"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 77.5, 2.6201096, 127.025)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 132.5, 2.5357878, 244.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_54"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WindowShutters_55" type="Node3D" parent="Facades"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 81.5, 2.6201096, 127.025)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 136.5, 2.5357878, 244.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_55"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WallLantern_56" type="Node3D" parent="Facades"]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 80.45, 3.3701096, 127.025)
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 135.45, 3.2857878, 244.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WallLantern_56"]
 mesh = SubResource("BeachResource_023")
 
 [node name="Chimney_57" type="Node3D" parent="Facades"]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 81.8, 5.2701097, 123.2)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 136.8, 5.185788, 240.2)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/Chimney_57"]
 mesh = SubResource("BeachResource_025")
 
 [node name="Hut_06_Stone_00" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 87.5, 1.1769935, 99)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 142.5, 1.2657051, 216)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_054")
 
 [node name="Hut_06_Stone_01" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84.15, 2.3569934, 96.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 139.15, 2.4457052, 213.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_055")
 
 [node name="Hut_06_Stone_02" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 84.15, 2.3569934, 101.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 139.15, 2.4457052, 218.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_056")
 
 [node name="Hut_06_Stone_03" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90.85, 2.3569934, 96.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 145.85, 2.4457052, 213.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_057")
 
 [node name="Hut_06_Stone_04" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90.85, 2.3569934, 101.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 145.85, 2.4457052, 218.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_058")
 
 [node name="Hut_06_Stone_05" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 87.5, 0.9969934, 102.25)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 142.5, 1.0857052, 219.25)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_059")
 
 [node name="DoorFrame_64" type="Node3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 87.5, 2.040129, 102.02)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 142.5, 2.1265821, 219.02)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/DoorFrame_64"]
 mesh = SubResource("BeachResource_019")
 
 [node name="WindowShutters_65" type="Node3D" parent="Facades"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 85.5, 2.5569935, 102.025)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 140.5, 2.6457052, 219.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_65"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WindowShutters_66" type="Node3D" parent="Facades"]
-transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 89.5, 2.5569935, 102.025)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 144.5, 2.6457052, 219.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_66"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WallLantern_67" type="Node3D" parent="Facades"]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 88.45, 3.3069935, 102.025)
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 143.45, 3.3957052, 219.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WallLantern_67"]
 mesh = SubResource("BeachResource_023")
 
 [node name="Chimney_68" type="Node3D" parent="Facades"]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 89.8, 5.2069936, 98.2)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 144.8, 5.2957053, 215.2)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/Chimney_68"]
 mesh = SubResource("BeachResource_025")
 
 [node name="Tower_01_Stone_00" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 121.5, 7.27, 39.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 249.5, 7.27, 89.5)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_060")
 
 [node name="Tower_01_Stone_01" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 118.15, 11.85, 36.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 246.15, 11.85, 86.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_061")
 
 [node name="Tower_01_Stone_02" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 118.15, 11.85, 42.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 246.15, 11.85, 92.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_062")
 
 [node name="Tower_01_Stone_03" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 124.85, 11.85, 36.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 252.85, 11.85, 86.15)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_063")
 
 [node name="Tower_01_Stone_04" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 124.85, 11.85, 42.85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 252.85, 11.85, 92.85)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_064")
 
 [node name="Tower_01_Stone_05" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 121.5, 7.09, 43.25)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 249.5, 7.09, 93.25)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_065")
 
 [node name="Tower_01_Stone_06" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 121.5, 11.073999, 39.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 249.5, 11.073999, 89.5)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_066")
 
 [node name="Tower_01_Stone_07" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 121.5, 14.1779995, 39.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 249.5, 14.1779995, 89.5)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_067")
 
 [node name="Tower_01_Stone_08" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 121.5, 16.599998, 39.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 249.5, 16.599998, 89.5)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_068")
 
 [node name="Tower_01_Stone_09" type="MeshInstance3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 121.5, 17.119999, 39.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 249.5, 17.119999, 89.5)
 material_override = ExtResource("BeachResource_000")
 mesh = SubResource("BeachResource_069")
 
 [node name="SmallBalcony_79" type="Node3D" parent="Facades"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 121.5, 12.5, 43.02)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 249.5, 12.5, 93.02)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/SmallBalcony_79"]
 mesh = SubResource("BeachResource_071")
 
 [node name="WindowShutters_80" type="Node3D" parent="Facades"]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 121.5, 9, 43.025)
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 249.5, 9, 93.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_80"]
 mesh = SubResource("BeachResource_021")
 
 [node name="WindowShutters_81" type="Node3D" parent="Facades"]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 121.5, 13.2, 43.025)
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 249.5, 13.2, 93.025)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Facades/WindowShutters_81"]
 mesh = SubResource("BeachResource_021")
@@ -1231,31 +1231,31 @@ mesh = SubResource("BeachResource_021")
 [node name="Shore" type="Node3D" parent="."]
 
 [node name="StrandedHull_00" type="Node3D" parent="Shore"]
-transform = Transform3D(0.9393727, 0, -0.3428978, 0, 1, 0, 0.3428978, 0, 0.9393727, 110, -0.3, 223)
+transform = Transform3D(0.9393727, 0, -0.3428978, 0, 1, 0, 0.3428978, 0, 0.9393727, 238, -0.3, 451.49466)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Shore/StrandedHull_00"]
 mesh = SubResource("BeachResource_073")
 
 [node name="Driftwood_01" type="Node3D" parent="Shore"]
-transform = Transform3D(0.6967067, 0, 0.7173561, 0, 1, 0, -0.7173561, 0, 0.6967067, 156.5, -0.3, 223.52628)
+transform = Transform3D(0.6967067, 0, 0.7173561, 0, 1, 0, -0.7173561, 0, 0.6967067, 279, -0.3, 454.49466)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Shore/Driftwood_01"]
 mesh = SubResource("BeachResource_075")
 
 [node name="Driftwood_02" type="Node3D" parent="Shore"]
-transform = Transform3D(0.8253356, 0, -0.5646425, 0, 1, 0, 0.5646425, 0, 0.8253356, 102, -0.3, 219.4641)
+transform = Transform3D(0.8253356, 0, -0.5646425, 0, 1, 0, 0.5646425, 0, 0.8253356, 232, -0.3, 447.49466)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Shore/Driftwood_02"]
 mesh = SubResource("BeachResource_075")
 
 [node name="CrookedDockPost_03" type="Node3D" parent="Shore"]
-transform = Transform3D(0.9887711, 0, 0.14943814, 0, 1, 0, -0.14943814, 0, 0.9887711, 117, -0.3, 223)
+transform = Transform3D(0.9887711, 0, 0.14943814, 0, 1, 0, -0.14943814, 0, 0.9887711, 244.5, -0.12749255, 449.3607)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Shore/CrookedDockPost_03"]
 mesh = SubResource("BeachResource_077")
 
 [node name="CrookedDockPost_04" type="Node3D" parent="Shore"]
-transform = Transform3D(0.9887711, 0, -0.14943814, 0, 1, 0, 0.14943814, 0, 0.9887711, 141, -0.22789553, 225.4641)
+transform = Transform3D(0.9887711, 0, -0.14943814, 0, 1, 0, 0.14943814, 0, 0.9887711, 267, -0.27945888, 453.49466)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="Shore/CrookedDockPost_04"]
 mesh = SubResource("BeachResource_077")
@@ -1263,122 +1263,147 @@ mesh = SubResource("BeachResource_077")
 [node name="RockSurfaces" type="Node3D" parent="."]
 
 [node name="CoastalOutcrop_00" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, 99, -0.5589311, 220)
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, 227, -0.5589311, 447.49466)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.25893111709700634
 
 [node name="CoastalOutcrop_01" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(0.6437503, 0, 1.5192384, 0, 1.65, 0, -1.5192384, 0, 0.6437503, 107, -0.62864333, 223)
+transform = Transform3D(0.6437503, 0, 1.5192384, 0, 1.65, 0, -1.5192384, 0, 0.6437503, 235, -0.62864333, 450.49466)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.32864334823661356
 
 [node name="CoastalOutcrop_02" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-1.3911265, 0, 1.4369297, 0, 2, 0, -1.4369297, 0, -1.3911265, 115, -0.69835556, 225)
+transform = Transform3D(-1.3911265, 0, 1.4369297, 0, 2, 0, -1.4369297, 0, -1.3911265, 243, -0.69835556, 452.49466)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.39835557937622074
 
 [node name="CoastalOutcrop_03" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-1.2127727, 0, -0.46816912, 0, 1.3, 0, 0.46816912, 0, -1.2127727, 124.5, -0.5589311, 225.59808)
+transform = Transform3D(-1.2127727, 0, -0.46816912, 0, 1.3, 0, 0.46816912, 0, -1.2127727, 251, -0.5589311, 452.49466)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.25893111709700634
 
 [node name="CoastalOutcrop_04" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.05343276, 0, -1.6491346, 0, 1.65, 0, 1.6491346, 0, -0.05343276, 131, -0.62864333, 227)
+transform = Transform3D(-0.05343276, 0, -1.6491346, 0, 1.65, 0, 1.6491346, 0, -0.05343276, 259, -0.62864333, 453.49466)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.32864334823661356
 
 [node name="CoastalOutcrop_05" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(1.8152665, 0, -0.8395282, 0, 2, 0, 0.8395282, 0, 1.8152665, 141.5, -0.69835556, 227.33012)
+transform = Transform3D(1.8152665, 0, -0.8395282, 0, 2, 0, 0.8395282, 0, 1.8152665, 267, -0.69835556, 455.49466)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.39835557937622074
 
 [node name="CoastalOutcrop_06" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(0.9627964, 0, 0.87351185, 0, 1.3, 0, -0.87351185, 0, 0.9627964, 147, -0.5589311, 226)
+transform = Transform3D(0.9627964, 0, 0.87351185, 0, 1.3, 0, -0.87351185, 0, 0.9627964, 275, -0.5589311, 454.49466)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.25893111709700634
 
 [node name="CoastalOutcrop_07" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.5440551, 0, 1.557724, 0, 1.65, 0, -1.557724, 0, -0.5440551, 155.86603, -0.62864333, 223.5)
+transform = Transform3D(-0.5440551, 0, 1.557724, 0, 1.65, 0, -1.557724, 0, -0.5440551, 285, -0.62864333, 453.95877)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.32864334823661356
 
 [node name="CliffRock_00" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.27781063, 0, 0.5876404, 0, 0.65, 0, -0.5876404, 0, -0.27781063, 124.5, 3.0529556, 29.6)
+transform = Transform3D(-0.27781063, 0, 0.5876404, 0, 0.65, 0, -0.5876404, 0, -0.27781063, 252.5, 3.2395809, 79.6)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_01" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.39547288, 0, -0.51584995, 0, 0.65, 0, 0.51584995, 0, -0.39547288, 131.5, 3.067003, 29.6)
+transform = Transform3D(-0.64963526, 0, 0.021771615, 0, 0.65, 0, -0.021771615, 0, -0.64963526, 242.4, 3.6491578, 84.5)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_02" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.64963526, 0, 0.021771615, 0, 0.65, 0, -0.021771615, 0, -0.64963526, 114.5, 3.4522796, 34.4)
+transform = Transform3D(0.20344892, 0, 0.6173399, 0, 0.65, 0, -0.6173399, 0, 0.20344892, 269.86362, 4.5575523, 85.1364)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_03" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(0.20344892, 0, 0.6173399, 0, 0.65, 0, -0.6173399, 0, 0.20344892, 141.5, 3.5792694, 34.4)
+transform = Transform3D(-0.04064421, 0, 0.648728, 0, 0.65, 0, -0.648728, 0, -0.04064421, 286.5, 3.1285355, 90.4)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_04" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.04064421, 0, 0.648728, 0, 0.65, 0, -0.648728, 0, -0.04064421, 158.5, 2.902354, 40.4)
+transform = Transform3D(-0.5147532, 0, 0.39689937, 0, 0.65, 0, -0.39689937, 0, -0.5147532, 284.5, 2.896453, 109.4)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_05" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.33441067, 0, 0.55737734, 0, 0.65, 0, -0.55737734, 0, -0.33441067, 107.6, 3.2538614, 46.5)
+transform = Transform3D(0.4118276, 0, -0.50288963, 0, 0.65, 0, 0.50288963, 0, 0.4118276, 241.1364, 4.5341983, 113.8636)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_06" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.5147532, 0, 0.39689937, 0, 0.65, 0, -0.39689937, 0, -0.5147532, 156.5, 2.7977078, 59.4)
+transform = Transform3D(0.108765006, 0, 0.6408355, 0, 0.65, 0, -0.6408355, 0, 0.108765006, 270.86362, 4.639331, 113.8636)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_07" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.2217655, 0, 0.6109992, 0, 0.65, 0, -0.6109992, 0, -0.2217655, 110.4, 4.0705876, 60.5)
+transform = Transform3D(0.58481544, 0, -0.2837091, 0, 0.65, 0, 0.2837091, 0, 0.58481544, 247.4, 3.2884133, 126.5)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_08" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(0.108765006, 0, 0.6408355, 0, 0.65, 0, -0.6408355, 0, 0.108765006, 142.8636, 4.685391, 63.863605)
+transform = Transform3D(-0.4458076, 0, -0.47302806, 0, 0.65, 0, 0.47302806, 0, -0.4458076, 264.6, 3.3900087, 126.5)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_09" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.6497876, 0, -0.016612958, 0, 0.65, 0, 0.016612958, 0, -0.6497876, 136.6, 3.4885502, 76.5)
+transform = Transform3D(-0.6497876, 0, -0.016612958, 0, 0.65, 0, 0.016612958, 0, -0.6497876, 390.13638, 1.8372943, 185.1364)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_10" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(0.6381019, 0, 0.123798035, 0, 0.65, 0, -0.123798035, 0, 0.6381019, 118.6, 2.6210504, 78.5)
+transform = Transform3D(0.6499993, 0, -0.00092073006, 0, 0.65, 0, 0.00092073006, 0, 0.6499993, 396.5, 3.2738144, 196.4)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_11" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.5904022, 0, 0.27189198, 0, 0.65, 0, -0.27189198, 0, -0.5904022, 193.1364, 1.6683928, 90.1364)
+transform = Transform3D(-0.6086825, 0, 0.2280473, 0, 0.65, 0, -0.2280473, 0, -0.6086825, 398.6, 1.7450547, 210.5)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_12" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(0.6499993, 0, -0.00092073006, 0, 0.65, 0, 0.00092073006, 0, 0.6499993, 201.5, 3.0995588, 100.4)
+transform = Transform3D(-0.6466321, 0, -0.06608309, 0, 0.65, 0, 0.06608309, 0, -0.6466321, 408.6, 3.2484055, 215.5)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_13" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.6086825, 0, 0.2280473, 0, 0.65, 0, -0.2280473, 0, -0.6086825, 208.4, 1.8859572, 111.5)
+transform = Transform3D(0.030548932, 0, -0.64928174, 0, 0.65, 0, 0.64928174, 0, 0.030548932, 405.4, 3.6241212, 224.5)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_14" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.6466321, 0, -0.06608309, 0, 0.65, 0, 0.06608309, 0, -0.6466321, 211.6, 3.2255208, 120.5)
+transform = Transform3D(-0.6423589, 0, -0.09937302, 0, 0.65, 0, 0.09937302, 0, -0.6423589, 415.4, 2.1665165, 229.5)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
 [node name="CliffRock_15" type="MeshInstance3D" parent="RockSurfaces"]
-transform = Transform3D(-0.6423589, 0, -0.09937302, 0, 0.65, 0, 0.09937302, 0, -0.6423589, 215.4, 1.9294971, 134.5)
+transform = Transform3D(-0.6256683, 0, -0.1761794, 0, 0.65, 0, 0.1761794, 0, -0.6256683, 417.4, 3.3505712, 254.5)
+mesh = SubResource("BeachResource_080")
+metadata/ground_embed = 0.12946555854850317
+
+[node name="CliffRock_16" type="MeshInstance3D" parent="RockSurfaces"]
+transform = Transform3D(-0.021094454, 0, 0.6496576, 0, 0.65, 0, -0.6496576, 0, -0.021094454, 425.4, 1.7230308, 259.5)
+mesh = SubResource("BeachResource_080")
+metadata/ground_embed = 0.12946555854850317
+
+[node name="CliffRock_17" type="MeshInstance3D" parent="RockSurfaces"]
+transform = Transform3D(-0.624351, 0, 0.18079205, 0, 0.65, 0, -0.18079205, 0, -0.624351, 118.4, -0.42946556, 285.5)
+mesh = SubResource("BeachResource_080")
+metadata/ground_embed = 0.12946555854850317
+
+[node name="CliffRock_18" type="MeshInstance3D" parent="RockSurfaces"]
+transform = Transform3D(-0.5837539, 0, 0.28588703, 0, 0.65, 0, -0.28588703, 0, -0.5837539, 101.6, -0.42946556, 286.5)
+mesh = SubResource("BeachResource_080")
+metadata/ground_embed = 0.12946555854850317
+
+[node name="CliffRock_19" type="MeshInstance3D" parent="RockSurfaces"]
+transform = Transform3D(0.64062136, 0, -0.110019475, 0, 0.65, 0, 0.110019475, 0, 0.64062136, 422.6, 1.9721433, 294.5)
+mesh = SubResource("BeachResource_080")
+metadata/ground_embed = 0.12946555854850317
+
+[node name="CliffRock_20" type="MeshInstance3D" parent="RockSurfaces"]
+transform = Transform3D(-0.22709319, 0, -0.6090391, 0, 0.65, 0, 0.6090391, 0, -0.22709319, 425.5, 1.8512996, 302.4)
 mesh = SubResource("BeachResource_080")
 metadata/ground_embed = 0.12946555854850317
 
@@ -1386,721 +1411,709 @@ metadata/ground_embed = 0.12946555854850317
 visible = false
 
 [node name="DeadTree_00" type="Node3D" parent="HorrorOnly"]
-transform = Transform3D(0.921061, 0, 0.38941833, 0, 1, 0, -0.38941833, 0, 0.921061, 152, -0.3, 224.9282)
+transform = Transform3D(0.921061, 0, 0.38941833, 0, 1, 0, -0.38941833, 0, 0.921061, 420, -0.3, 505.49466)
 
 [node name="Geometry_00" type="MeshInstance3D" parent="HorrorOnly/DeadTree_00"]
-mesh = SubResource("BeachResource_082")
-
-[node name="DeadTree_01" type="Node3D" parent="HorrorOnly"]
-transform = Transform3D(0.921061, 0, 0.38941833, 0, 1, 0, -0.38941833, 0, 0.921061, 108, -0.3, 152)
-
-[node name="Geometry_00" type="MeshInstance3D" parent="HorrorOnly/DeadTree_01"]
-mesh = SubResource("BeachResource_082")
-
-[node name="DeadTree_02" type="Node3D" parent="HorrorOnly"]
-transform = Transform3D(0.921061, 0, 0.38941833, 0, 1, 0, -0.38941833, 0, 0.921061, 147, -0.3, 140.73206)
-
-[node name="Geometry_00" type="MeshInstance3D" parent="HorrorOnly/DeadTree_02"]
 mesh = SubResource("BeachResource_082")
 
 [node name="Plants" type="Node3D" parent="."]
 
 [node name="Bush_Common_00" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.32782438, 0, -0.45130637, 0, 0.5578049, 0, 0.45130637, 0, -0.32782438, 83.78756, 0.8913298, 121.68956)
+transform = Transform3D(-0.32782438, 0, -0.45130637, 0, 0.5578049, 0, 0.45130637, 0, -0.32782438, 138.78757, 0.82743824, 238.68956)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_01" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.36044687, 0, 0.6433163, 0, 0.7374129, 0, -0.6433163, 0, -0.36044687, 156.76825, 1.4532653, 196.7652)
+transform = Transform3D(-0.36044687, 0, 0.6433163, 0, 0.7374129, 0, -0.6433163, 0, -0.36044687, 253.76825, 0.83080596, 298.7652)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_02" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.51152104, 0, 0.26895037, 0, 0.57791704, 0, -0.26895037, 0, -0.51152104, 52.418457, 0.61435246, 98.39238)
+transform = Transform3D(-0.51152104, 0, 0.26895037, 0, 0.57791704, 0, -0.26895037, 0, -0.51152104, 107.41846, 0.8872969, 215.39238)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_03" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.62828803, 0, 0.110963084, 0, 0.6380115, 0, -0.110963084, 0, -0.62828803, 100.46576, 0.7849417, 54.40672)
+transform = Transform3D(-0.62828803, 0, 0.110963084, 0, 0.6380115, 0, -0.110963084, 0, -0.62828803, 363.46576, 1.0871384, 166.40672)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_04" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.20738788, 0, -0.5690084, 0, 0.6056239, 0, 0.5690084, 0, -0.20738788, 77.51554, 0.91573733, 91.556145)
+transform = Transform3D(-0.20738788, 0, -0.5690084, 0, 0.6056239, 0, 0.5690084, 0, -0.20738788, 132.51555, 1.0730568, 208.55615)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_05" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.20499879, 0, 0.57392573, 0, 0.6094385, 0, -0.57392573, 0, 0.20499879, 177.2377, 0.58866394, 209.78659)
+transform = Transform3D(0.20499879, 0, 0.57392573, 0, 0.6094385, 0, -0.57392573, 0, 0.20499879, 406.2377, 4.7464557, 222.78659)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_06" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.20761167, 0, 0.6934423, 0, 0.7238541, 0, -0.6934423, 0, 0.20761167, 86.212074, 0.8518315, 102.2474)
+transform = Transform3D(0.20761167, 0, 0.6934423, 0, 0.7238541, 0, -0.6934423, 0, 0.20761167, 141.21207, 0.9377285, 219.24739)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_07" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.2949944, 0, -0.6831067, 0, 0.74408096, 0, 0.6831067, 0, -0.2949944, 209.28691, 4.5927143, 130.57349)
+transform = Transform3D(-0.2949944, 0, -0.6831067, 0, 0.74408096, 0, 0.6831067, 0, -0.2949944, 136.28691, 0.83093613, 237.57349)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_08" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.19845165, 0, 0.6173031, 0, 0.6484182, 0, -0.6173031, 0, 0.19845165, 91.408775, 0.8732214, 96.49107)
+transform = Transform3D(0.19845165, 0, 0.6173031, 0, 0.6484182, 0, -0.6173031, 0, 0.19845165, 146.40878, 0.9503504, 213.49107)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_09" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.6102833, 0, 0.007773312, 0, 0.61033285, 0, -0.007773312, 0, 0.6102833, 107.4102, 0.80098265, 159.53716)
+transform = Transform3D(0.6102833, 0, 0.007773312, 0, 0.61033285, 0, -0.007773312, 0, 0.6102833, 414.4102, 1.0326746, 253.53716)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_10" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.0046130167, 0, -0.5887642, 0, 0.58878225, 0, 0.5887642, 0, 0.0046130167, 48.764156, 0.71818125, 150.26144)
+transform = Transform3D(0.0046130167, 0, -0.5887642, 0, 0.58878225, 0, 0.5887642, 0, 0.0046130167, 364.76416, 0.6758867, 313.26144)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_11" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.3687318, 0, -0.46472862, 0, 0.5932418, 0, 0.46472862, 0, -0.3687318, 71.34889, 0.9088537, 93.364265)
+transform = Transform3D(-0.3687318, 0, -0.46472862, 0, 0.5932418, 0, 0.46472862, 0, -0.3687318, 310.3489, 0.9611172, 149.36427)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_12" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.21264632, 0, 0.5913512, 0, 0.62842244, 0, -0.5913512, 0, -0.21264632, 75.211815, 0.52337676, 206.78435)
+transform = Transform3D(-0.21264632, 0, 0.5913512, 0, 0.62842244, 0, -0.5913512, 0, -0.21264632, 220.21182, 0.92707914, 309.78436)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_13" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.23226927, 0, -0.46733436, 0, 0.52187204, 0, 0.46733436, 0, 0.23226927, 62.756977, 1.0374335, 91.23427)
+transform = Transform3D(0.23226927, 0, -0.46733436, 0, 0.52187204, 0, 0.46733436, 0, 0.23226927, 117.75698, 1.0411791, 208.23427)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_14" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.3304844, 0, -0.5593715, 0, 0.6497049, 0, 0.5593715, 0, 0.3304844, 74.759476, 3.9101775, 74.46484)
+transform = Transform3D(0.3304844, 0, -0.5593715, 0, 0.6497049, 0, 0.5593715, 0, 0.3304844, 409.7595, 4.377116, 220.46484)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_15" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.41216248, 0, 0.3605287, 0, 0.5475937, 0, -0.3605287, 0, 0.41216248, 59.341053, 0.9691252, 97.51737)
+transform = Transform3D(0.41216248, 0, 0.3605287, 0, 0.5475937, 0, -0.3605287, 0, 0.41216248, 114.34105, 1.0192745, 214.51736)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_16" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.5063209, 0, 0.27735496, 0, 0.57730985, 0, -0.27735496, 0, -0.5063209, 171.30171, 3.2725103, 199.61241)
+transform = Transform3D(-0.5063209, 0, 0.27735496, 0, 0.57730985, 0, -0.27735496, 0, -0.5063209, 274.3017, 0.8415547, 286.6124)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_17" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.26932296, 0, 0.45237, 0, 0.5264727, 0, -0.45237, 0, 0.26932296, 205.47601, 4.3697643, 109.622505)
+transform = Transform3D(0.26932296, 0, 0.45237, 0, 0.5264727, 0, -0.45237, 0, 0.26932296, 266.476, 0.9523037, 315.6225)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_18" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.48547566, 0, 0.55557644, 0, 0.737802, 0, -0.55557644, 0, -0.48547566, 73.44903, 0.9202182, 91.73375)
+transform = Transform3D(-0.48547566, 0, 0.55557644, 0, 0.737802, 0, -0.55557644, 0, -0.48547566, 128.44902, 1.0791525, 208.73375)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_19" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.7359603, 0, -0.15311244, 0, 0.7517187, 0, 0.15311244, 0, 0.7359603, 60.68649, 1.0599313, 139.51627)
+transform = Transform3D(0.7359603, 0, -0.15311244, 0, 0.7517187, 0, 0.15311244, 0, 0.7359603, 178.6865, 0.8317739, 92.51626)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_20" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.3605898, 0, 0.5151856, 0, 0.62884116, 0, -0.5151856, 0, 0.3605898, 100.4801, 0.73980075, 58.41536)
+transform = Transform3D(0.3605898, 0, 0.5151856, 0, 0.62884116, 0, -0.5151856, 0, 0.3605898, 231.4801, 0.8469856, 112.41536)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_21" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.5948981, 0, -0.05932575, 0, 0.5978489, 0, 0.05932575, 0, -0.5948981, 83.38416, 0.8491514, 99.694824)
+transform = Transform3D(-0.5948981, 0, -0.05932575, 0, 0.5978489, 0, 0.05932575, 0, -0.5948981, 427.38416, 0.6986554, 264.69482)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_22" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.6483871, 0, -0.36164218, 0, 0.7424223, 0, 0.36164218, 0, 0.6483871, 80.78738, 0.92529863, 127.36497)
+transform = Transform3D(0.6483871, 0, -0.36164218, 0, 0.7424223, 0, 0.36164218, 0, 0.6483871, 135.78737, 0.84691703, 244.36497)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_23" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.7165586, 0, -0.20639864, 0, 0.745692, 0, 0.20639864, 0, -0.7165586, 212.22603, 0.76592827, 116.44308)
+transform = Transform3D(-0.7165586, 0, -0.20639864, 0, 0.745692, 0, 0.20639864, 0, -0.7165586, 363.22604, 0.45956957, 420.44308)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@11" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.32036597, 0, 0.37264287, 0, 0.49142352, 0, -0.37264287, 0, 0.32036597, 176.58092, 2.542196, 195.599)
+transform = Transform3D(0.32036597, 0, 0.37264287, 0, 0.49142352, 0, -0.37264287, 0, 0.32036597, 419.58093, 0.81307316, 285.599)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@12" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.3759669, 0, -0.26578346, 0, 0.46042585, 0, 0.26578346, 0, 0.3759669, 190.65245, 0.39049053, 201.22827)
+transform = Transform3D(0.3759669, 0, -0.26578346, 0, 0.46042585, 0, 0.26578346, 0, 0.3759669, 114.65245, 1.0400039, 211.22827)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@13" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.49009016, 0, 0.18187845, 0, 0.52275056, 0, -0.18187845, 0, 0.49009016, 77.45851, 0.9402022, 199.29741)
+transform = Transform3D(0.49009016, 0, 0.18187845, 0, 0.52275056, 0, -0.18187845, 0, 0.49009016, 379.4585, 0.66745216, 361.29742)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@14" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.28713405, 0, 0.24177651, 0, 0.37536895, 0, -0.24177651, 0, 0.28713405, 84.710014, 1.3731636, 61.67008)
+transform = Transform3D(0.28713405, 0, 0.24177651, 0, 0.37536895, 0, -0.24177651, 0, 0.28713405, 326.71002, 2.0414574, 392.67007)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@15" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.23005562, 0, -0.4060824, 0, 0.466721, 0, 0.4060824, 0, -0.23005562, 55.212746, 0.62939245, 97.7907)
+transform = Transform3D(-0.23005562, 0, -0.4060824, 0, 0.466721, 0, 0.4060824, 0, -0.23005562, 110.212746, 0.8945428, 214.7907)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@16" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.20969726, 0, 0.39269003, 0, 0.44517234, 0, -0.39269003, 0, 0.20969726, 212.62111, 4.541456, 133.34473)
+transform = Transform3D(0.20969726, 0, 0.39269003, 0, 0.44517234, 0, -0.39269003, 0, 0.20969726, 152.62111, 0.69127524, 99.344734)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@17" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.2749603, 0, 0.285264, 0, 0.3962054, 0, -0.285264, 0, 0.2749603, 80.64856, 0.73410577, 103.774086)
+transform = Transform3D(0.2749603, 0, 0.285264, 0, 0.3962054, 0, -0.285264, 0, 0.2749603, 135.64856, 0.859613, 220.77408)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@18" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.33005783, 0, -0.24652424, 0, 0.41196162, 0, 0.24652424, 0, -0.33005783, 90.4813, 0.87458193, 102.76769)
+transform = Transform3D(-0.33005783, 0, -0.24652424, 0, 0.41196162, 0, 0.24652424, 0, -0.33005783, 145.48131, 0.9397981, 219.76768)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@19" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.054249067, 0, -0.48762298, 0, 0.49063134, 0, 0.48762298, 0, 0.054249067, 119.39823, 6.95, 43.759953)
+transform = Transform3D(0.054249067, 0, -0.48762298, 0, 0.49063134, 0, 0.48762298, 0, 0.054249067, 247.39824, 6.95, 93.75995)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@20" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.4120827, 0, -0.12416269, 0, 0.43038183, 0, 0.12416269, 0, 0.4120827, 81.38256, 1.1020962, 138.42941)
+transform = Transform3D(0.4120827, 0, -0.12416269, 0, 0.43038183, 0, 0.12416269, 0, 0.4120827, 145.38257, 3.8423624, 149.42941)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@21" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.49105963, 0, -0.09448733, 0, 0.5000674, 0, 0.09448733, 0, -0.49105963, 83.78345, 0.92453194, 125.26837)
+transform = Transform3D(-0.49105963, 0, -0.09448733, 0, 0.5000674, 0, 0.09448733, 0, -0.49105963, 138.78345, 0.8420207, 242.26837)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@22" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.4263796, 0, 0.1957999, 0, 0.46918777, 0, -0.1957999, 0, -0.4263796, 135.5379, 1.1332835, 156.5229)
+transform = Transform3D(-0.4263796, 0, 0.1957999, 0, 0.46918777, 0, -0.1957999, 0, -0.4263796, 415.5379, 0.92785376, 258.5229)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@23" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.35543227, 0, 0.20358557, 0, 0.40960857, 0, -0.20358557, 0, -0.35543227, 62.577923, 1.0282251, 91.36516)
+transform = Transform3D(-0.35543227, 0, 0.20358557, 0, 0.40960857, 0, -0.20358557, 0, -0.35543227, 117.57792, 1.0426048, 208.36516)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@24" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.35127354, 0, 0.12902327, 0, 0.37421933, 0, -0.12902327, 0, -0.35127354, 86.59656, 0.8644416, 95.22401)
+transform = Transform3D(-0.35127354, 0, 0.12902327, 0, 0.37421933, 0, -0.12902327, 0, -0.35127354, 357.59656, 1.2109481, 371.224)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@25" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.42797735, 0, 0.18361002, 0, 0.46570083, 0, -0.18361002, 0, -0.42797735, 48.537537, 0.60411596, 91.58052)
+transform = Transform3D(-0.42797735, 0, 0.18361002, 0, 0.46570083, 0, -0.18361002, 0, -0.42797735, 103.53754, 0.91724694, 208.58052)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@26" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.24136536, 0, -0.37112042, 0, 0.4427049, 0, 0.37112042, 0, -0.24136536, 135.68576, 4.843596, 78.62646)
+transform = Transform3D(-0.24136536, 0, -0.37112042, 0, 0.4427049, 0, 0.37112042, 0, -0.24136536, 155.68576, 0.49766767, 89.62646)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@27" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.28080925, 0, -0.42786795, 0, 0.5117859, 0, 0.42786795, 0, 0.28080925, 110.597664, 6.95, 44.577)
+transform = Transform3D(0.28080925, 0, -0.42786795, 0, 0.5117859, 0, 0.42786795, 0, 0.28080925, 355.59766, 0.8015253, 294.577)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@28" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.08836985, 0, 0.3848071, 0, 0.3948237, 0, -0.3848071, 0, -0.08836985, 218.56583, 0.63018405, 144.35603)
+transform = Transform3D(-0.08836985, 0, 0.3848071, 0, 0.3948237, 0, -0.3848071, 0, -0.08836985, 362.56583, 1.1068058, 165.35603)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@29" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.44667363, 0, 0.2787344, 0, 0.52650756, 0, -0.2787344, 0, 0.44667363, 146.37578, 0.93274105, 37.44529)
+transform = Transform3D(0.44667363, 0, 0.2787344, 0, 0.52650756, 0, -0.2787344, 0, 0.44667363, 367.3758, 1.0768157, 170.4453)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@30" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.17998356, 0, -0.48144057, 0, 0.51398355, 0, 0.48144057, 0, -0.17998356, 118.526375, 6.95, 43.285454)
+transform = Transform3D(-0.17998356, 0, -0.48144057, 0, 0.51398355, 0, 0.48144057, 0, -0.17998356, 246.52637, 6.95, 93.28545)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@31" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.44739825, 0, 0.15433228, 0, 0.47326908, 0, -0.15433228, 0, 0.44739825, 73.44364, 0.9330336, 91.303955)
+transform = Transform3D(0.44739825, 0, 0.15433228, 0, 0.47326908, 0, -0.15433228, 0, 0.44739825, 128.44363, 1.0774873, 208.30396)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@32" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.06112472, 0, -0.46993476, 0, 0.47389337, 0, 0.46993476, 0, 0.06112472, 73.45681, 0.93098015, 91.34495)
+transform = Transform3D(0.06112472, 0, -0.46993476, 0, 0.47389337, 0, 0.46993476, 0, 0.06112472, 128.4568, 1.0778216, 208.34496)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@33" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.03390286, 0, -0.46119115, 0, 0.4624356, 0, 0.46119115, 0, 0.03390286, 122.59883, 6.95, 35.376656)
+transform = Transform3D(0.03390286, 0, -0.46119115, 0, 0.4624356, 0, 0.46119115, 0, 0.03390286, 250.59883, 6.95, 85.376656)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="@MeshInstance3D@34" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.19221543, 0, -0.42255923, 0, 0.4642231, 0, 0.42255923, 0, 0.19221543, 54.432014, 0.6570356, 91.360176)
+transform = Transform3D(0.19221543, 0, -0.42255923, 0, 0.4642231, 0, 0.42255923, 0, 0.19221543, 109.432014, 0.92690074, 208.36017)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_24" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.04898454, 0, 0.42764038, 0, 0.43043673, 0, -0.42764038, 0, 0.04898454, 61.575386, 0.94492793, 142.49414)
+transform = Transform3D(0.04898454, 0, 0.42764038, 0, 0.43043673, 0, -0.42764038, 0, 0.04898454, 241.5754, 6.95, 88.49413)
 cast_shadow = 0
 mesh = SubResource("BeachResource_085")
 
 [node name="Bush_Common_Flowers_00" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.5684447, 0, -0.27759948, 0, 0.63260645, 0, 0.27759948, 0, 0.5684447, 138.70992, 2.3618274, 82.72812)
+transform = Transform3D(0.5684447, 0, -0.27759948, 0, 0.63260645, 0, 0.27759948, 0, 0.5684447, 396.70993, 0.35037494, 303.72812)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_01" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.18911837, 0, -0.6075015, 0, 0.6362577, 0, 0.6075015, 0, 0.18911837, 73.37191, 0.90768236, 98.21437)
+transform = Transform3D(0.18911837, 0, -0.6075015, 0, 0.6362577, 0, 0.6075015, 0, 0.18911837, 378.37192, 4.373612, 171.21437)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_02" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.5156631, 0, -0.17367217, 0, 0.54412353, 0, 0.17367217, 0, 0.5156631, 55.499554, 0.6351921, 96.25676)
+transform = Transform3D(0.5156631, 0, -0.17367217, 0, 0.54412353, 0, 0.17367217, 0, 0.5156631, 110.49956, 0.89983356, 213.25676)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_03" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.42209834, 0, 0.35439467, 0, 0.5511466, 0, -0.35439467, 0, 0.42209834, 89.63075, 0.8630088, 102.39225)
+transform = Transform3D(0.42209834, 0, 0.35439467, 0, 0.5511466, 0, -0.35439467, 0, 0.42209834, 263.63077, 6.9477296, 83.39225)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_04" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.020905359, 0, -0.55292326, 0, 0.5533183, 0, 0.55292326, 0, 0.020905359, 109.67193, 0.89258915, 169.6663)
+transform = Transform3D(0.020905359, 0, -0.55292326, 0, 0.5533183, 0, 0.55292326, 0, 0.020905359, 314.67194, 0.87746894, 348.66632)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_05" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.60511506, 0, -0.16855629, 0, 0.62815243, 0, 0.16855629, 0, 0.60511506, 47.55878, 0.59358793, 97.301796)
+transform = Transform3D(0.60511506, 0, -0.16855629, 0, 0.62815243, 0, 0.16855629, 0, 0.60511506, 102.55878, 0.8887349, 214.3018)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_06" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.016567629, 0, -0.5295955, 0, 0.5298546, 0, 0.5295955, 0, -0.016567629, 130.55913, 1.1064731, 150.5496)
+transform = Transform3D(-0.016567629, 0, -0.5295955, 0, 0.5298546, 0, 0.5295955, 0, -0.016567629, 402.5591, 4.500124, 214.5496)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_07" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.4285082, 0, 0.46264747, 0, 0.63060445, 0, -0.46264747, 0, -0.4285082, 61.374817, 0.98365474, 98.38392)
+transform = Transform3D(-0.4285082, 0, 0.46264747, 0, 0.63060445, 0, -0.46264747, 0, -0.4285082, 136.37482, 0.37498128, 100.38392)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_08" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.6293673, 0, 0.15974034, 0, 0.64932287, 0, -0.15974034, 0, -0.6293673, 118.64046, 6.95, 35.264473)
+transform = Transform3D(-0.6293673, 0, 0.15974034, 0, 0.64932287, 0, -0.15974034, 0, -0.6293673, 246.64046, 6.95, 85.26447)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_09" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.5039319, 0, 0.42230335, 0, 0.6574857, 0, -0.42230335, 0, 0.5039319, 85.61159, 0.8574137, 95.60782)
+transform = Transform3D(0.5039319, 0, 0.42230335, 0, 0.6574857, 0, -0.42230335, 0, 0.5039319, 140.61159, 0.9481628, 212.60782)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_10" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.49022254, 0, 0.41834873, 0, 0.64446396, 0, -0.41834873, 0, 0.49022254, 79.23489, 0.74326724, 103.38589)
+transform = Transform3D(0.49022254, 0, 0.41834873, 0, 0.64446396, 0, -0.41834873, 0, 0.49022254, 134.2349, 0.86072654, 220.3859)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_11" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.4097356, 0, -0.5167864, 0, 0.65950847, 0, 0.5167864, 0, -0.4097356, 90.71532, 0.8744711, 95.42866)
+transform = Transform3D(-0.4097356, 0, -0.5167864, 0, 0.65950847, 0, 0.5167864, 0, -0.4097356, 145.71532, 0.9552113, 212.42865)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_12" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.58487475, 0, 0.31812313, 0, 0.66579336, 0, -0.31812313, 0, 0.58487475, 93.28198, 1.0067925, 70.500175)
+transform = Transform3D(0.58487475, 0, 0.31812313, 0, 0.66579336, 0, -0.31812313, 0, 0.58487475, 119.28198, 0.5740929, 418.50018)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_13" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.56166565, 0, 0.14595826, 0, 0.5803207, 0, -0.14595826, 0, 0.56166565, 81.255104, 0.72976416, 107.560394)
+transform = Transform3D(0.56166565, 0, 0.14595826, 0, 0.5803207, 0, -0.14595826, 0, 0.56166565, 136.2551, 0.8443078, 224.5604)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_14" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.325611, 0, -0.44299287, 0, 0.5497865, 0, 0.44299287, 0, 0.325611, 75.79601, 0.91161865, 126.61795)
+transform = Transform3D(0.325611, 0, -0.44299287, 0, 0.5497865, 0, 0.44299287, 0, 0.325611, 130.796, 0.83704525, 243.61795)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_15" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.5711946, 0, 0.35040465, 0, 0.67010945, 0, -0.35040465, 0, -0.5711946, 130.69101, 0.3504608, 27.503605)
+transform = Transform3D(-0.5711946, 0, 0.35040465, 0, 0.67010945, 0, -0.35040465, 0, -0.5711946, 332.691, 0.9890591, 146.5036)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_16" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.43085918, 0, -0.20989418, 0, 0.47926527, 0, 0.20989418, 0, 0.43085918, 62.26255, 1.0143133, 91.71482)
+transform = Transform3D(0.43085918, 0, -0.20989418, 0, 0.47926527, 0, 0.20989418, 0, 0.43085918, 117.26255, 1.0447814, 208.71483)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_17" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.35619828, 0, 0.39577636, 0, 0.53246236, 0, -0.39577636, 0, -0.35619828, 49.420326, 0.698366, 147.45534)
+transform = Transform3D(-0.35619828, 0, 0.39577636, 0, 0.53246236, 0, -0.39577636, 0, -0.35619828, 179.42033, 0.8029291, 290.45532)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_18" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.3032649, 0, 0.45662564, 0, 0.54815745, 0, -0.45662564, 0, 0.3032649, 83.4705, 0.84417444, 101.391716)
+transform = Transform3D(0.3032649, 0, 0.45662564, 0, 0.54815745, 0, -0.45662564, 0, 0.3032649, 138.4705, 0.9392183, 218.39172)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_19" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.04169123, 0, -0.48443368, 0, 0.48622438, 0, 0.48443368, 0, 0.04169123, 59.702934, 0.99584585, 94.36942)
+transform = Transform3D(0.04169123, 0, -0.48443368, 0, 0.48622438, 0, 0.48443368, 0, 0.04169123, 114.702934, 1.0402735, 211.36943)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_20" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.5502074, 0, 0.19980969, 0, 0.5853649, 0, -0.19980969, 0, 0.5502074, 151.22531, 1.0280175, 60.468735)
+transform = Transform3D(0.5502074, 0, 0.19980969, 0, 0.5853649, 0, -0.19980969, 0, 0.5502074, 340.2253, 1.5233347, 370.46875)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_21" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.19232827, 0, 0.59412223, 0, 0.62447685, 0, -0.59412223, 0, 0.19232827, 155.64816, 0.67751694, 35.236618)
+transform = Transform3D(0.19232827, 0, 0.59412223, 0, 0.62447685, 0, -0.59412223, 0, 0.19232827, 394.64816, 0.77423054, 204.23662)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_22" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.528057, 0, -0.116244934, 0, 0.5407005, 0, 0.116244934, 0, -0.528057, 125.28282, 6.95, 40.54176)
+transform = Transform3D(-0.528057, 0, -0.116244934, 0, 0.5407005, 0, 0.116244934, 0, -0.528057, 253.28282, 6.95, 90.541756)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Bush_Common_Flowers_23" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.5118183, 0, -0.019195097, 0, 0.5121781, 0, 0.019195097, 0, -0.5118183, 78.68943, 0.723734, 110.286415)
+transform = Transform3D(-0.5118183, 0, -0.019195097, 0, 0.5121781, 0, 0.019195097, 0, -0.5118183, 133.68942, 0.84264404, 227.2864)
 cast_shadow = 0
 mesh = SubResource("BeachResource_089")
 
 [node name="Fern_1_00" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.63208723, 0, 0.475125, 0, 0.79074526, 0, -0.475125, 0, -0.63208723, 62.590233, 0.9793513, 98.561966)
+transform = Transform3D(-0.63208723, 0, 0.475125, 0, 0.79074526, 0, -0.475125, 0, -0.63208723, 117.59023, 1.0351477, 215.56197)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_01" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.5687743, 0, 0.6843866, 0, 0.88988155, 0, -0.6843866, 0, 0.5687743, 71.41951, 0.9058013, 95.36497)
+transform = Transform3D(0.5687743, 0, 0.6843866, 0, 0.88988155, 0, -0.6843866, 0, 0.5687743, 126.41951, 1.0828753, 212.36496)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_02" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.37848815, 0, -0.6771084, 0, 0.77571195, 0, 0.6771084, 0, -0.37848815, 166.5908, 1.1261657, 179.31436)
+transform = Transform3D(-0.37848815, 0, -0.6771084, 0, 0.77571195, 0, 0.6771084, 0, -0.37848815, 311.59082, 1.1409993, 174.31436)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_03" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.75421405, 0, -0.43378213, 0, 0.8700608, 0, 0.43378213, 0, -0.75421405, 210.53885, 0.7028619, 111.24215)
+transform = Transform3D(-0.75421405, 0, -0.43378213, 0, 0.8700608, 0, 0.43378213, 0, -0.75421405, 378.53885, 0.59103066, 358.24216)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_04" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.4811054, 0, -0.83629966, 0, 0.9648106, 0, 0.83629966, 0, 0.4811054, 93.32745, 0.64932853, 44.336136)
+transform = Transform3D(0.4811054, 0, -0.83629966, 0, 0.9648106, 0, 0.83629966, 0, 0.4811054, 428.32745, 4.4741898, 293.33615)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_05" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.049472213, 0, 0.7102399, 0, 0.7119608, 0, -0.7102399, 0, 0.049472213, 55.782818, 0.65729463, 96.29185)
+transform = Transform3D(0.049472213, 0, 0.7102399, 0, 0.7119608, 0, -0.7102399, 0, 0.049472213, 110.782814, 0.8994664, 213.29184)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_06" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.3813462, 0, -0.6263785, 0, 0.7333314, 0, 0.6263785, 0, 0.3813462, 83.79975, 0.89787626, 122.29818)
+transform = Transform3D(0.3813462, 0, -0.6263785, 0, 0.7333314, 0, 0.6263785, 0, 0.3813462, 144.79974, 0.9526248, 212.29817)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_07" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.71675414, 0, -0.46605635, 0, 0.8549532, 0, 0.46605635, 0, -0.71675414, 74.3072, 0.920714, 91.68625)
+transform = Transform3D(-0.71675414, 0, -0.46605635, 0, 0.8549532, 0, 0.46605635, 0, -0.71675414, 129.30719, 1.0796868, 208.68625)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_08" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.18212228, 0, -0.9465426, 0, 0.96390426, 0, 0.9465426, 0, -0.18212228, 97.51125, 0.8540423, 67.42039)
+transform = Transform3D(-0.18212228, 0, -0.9465426, 0, 0.96390426, 0, 0.9465426, 0, -0.18212228, 358.51126, 1.2224445, 372.42038)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_09" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.30518344, 0, 0.6837801, 0, 0.7487938, 0, -0.6837801, 0, 0.30518344, 78.6288, 0.96884465, 198.64525)
+transform = Transform3D(0.30518344, 0, 0.6837801, 0, 0.7487938, 0, -0.6837801, 0, 0.30518344, 421.62878, 0.9946534, 297.64526)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_10" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.602044, 0, -0.4998435, 0, 0.78249633, 0, 0.4998435, 0, -0.602044, 73.608765, 0.7259765, 109.34832)
+transform = Transform3D(-0.602044, 0, -0.4998435, 0, 0.78249633, 0, 0.4998435, 0, -0.602044, 128.60876, 0.8384038, 226.34831)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_11" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.56000066, 0, -0.6159351, 0, 0.83245224, 0, 0.6159351, 0, -0.56000066, 48.35811, 0.6000388, 98.261345)
+transform = Transform3D(-0.56000066, 0, -0.6159351, 0, 0.83245224, 0, 0.6159351, 0, -0.56000066, 103.35811, 0.88427466, 215.26134)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_12" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.6629614, 0, -0.08310916, 0, 0.6681504, 0, 0.08310916, 0, 0.6629614, 172.73988, 0.92311364, 178.2523)
+transform = Transform3D(0.6629614, 0, -0.08310916, 0, 0.6681504, 0, 0.08310916, 0, 0.6629614, 164.73988, 1.3413936, 159.2523)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_13" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.35008267, 0, -0.5770331, 0, 0.674926, 0, 0.5770331, 0, 0.35008267, 133.22794, 6.9429193, 67.30126)
+transform = Transform3D(0.35008267, 0, -0.5770331, 0, 0.674926, 0, 0.5770331, 0, 0.35008267, 302.22794, 1.1196033, 269.30127)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_14" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.5133236, 0, 0.51705295, 0, 0.728591, 0, -0.51705295, 0, 0.5133236, 76.765686, 0.91246283, 127.54826)
+transform = Transform3D(0.5133236, 0, 0.51705295, 0, 0.728591, 0, -0.51705295, 0, 0.5133236, 131.76569, 0.846354, 244.54826)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_15" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.6402316, 0, -0.29110974, 0, 0.70330745, 0, 0.29110974, 0, 0.6402316, 79.52371, 0.9205152, 127.614784)
+transform = Transform3D(0.6402316, 0, -0.29110974, 0, 0.70330745, 0, 0.29110974, 0, 0.6402316, 134.52371, 0.8524878, 244.61478)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_16" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.25561675, 0, -0.8972506, 0, 0.9329515, 0, 0.8972506, 0, 0.25561675, 47.738567, 0.5987611, 92.635704)
+transform = Transform3D(0.25561675, 0, -0.8972506, 0, 0.9329515, 0, 0.8972506, 0, 0.25561675, 365.73856, 0.82124764, 320.6357)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_17" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.57345223, 0, -0.58750117, 0, 0.8209781, 0, 0.58750117, 0, -0.57345223, 48.486774, 0.6048708, 91.70481)
+transform = Transform3D(-0.57345223, 0, -0.58750117, 0, 0.8209781, 0, 0.58750117, 0, -0.57345223, 103.48677, 0.9152315, 208.7048)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_18" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.40119058, 0, -0.9004035, 0, 0.9857385, 0, 0.9004035, 0, -0.40119058, 179.74341, 1.030629, 84.48889)
+transform = Transform3D(-0.40119058, 0, -0.9004035, 0, 0.9857385, 0, 0.9004035, 0, -0.40119058, 117.74341, 1.0428935, 208.48889)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_19" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.84546405, 0, 0.33117402, 0, 0.9080119, 0, -0.33117402, 0, -0.84546405, 71.62884, 0.912924, 92.7402)
+transform = Transform3D(-0.84546405, 0, 0.33117402, 0, 0.9080119, 0, -0.33117402, 0, -0.84546405, 126.62884, 1.078902, 209.7402)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_20" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.97461027, 0, 0.06827829, 0, 0.97699904, 0, -0.06827829, 0, 0.97461027, 83.744865, 0.9204847, 124.50875)
+transform = Transform3D(0.97461027, 0, 0.06827829, 0, 0.97699904, 0, -0.06827829, 0, 0.97461027, 138.74486, 0.83733547, 241.50874)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_21" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.04276722, 0, 0.8368569, 0, 0.83794904, 0, -0.8368569, 0, 0.04276722, 71.4535, 2.9706726, 61.361904)
+transform = Transform3D(0.04276722, 0, 0.8368569, 0, 0.83794904, 0, -0.8368569, 0, 0.04276722, 360.4535, 0.7164287, 413.3619)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_22" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.7709111, 0, 0.25399458, 0, 0.81167555, 0, -0.25399458, 0, 0.7709111, 89.46038, 0.86199373, 102.35636)
+transform = Transform3D(0.7709111, 0, 0.25399458, 0, 0.81167555, 0, -0.25399458, 0, 0.7709111, 144.46039, 0.9419167, 219.35635)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_23" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.7316886, 0, -0.2624195, 0, 0.7773237, 0, 0.2624195, 0, 0.7316886, 47.62944, 0.45030534, 192.72481)
+transform = Transform3D(0.7316886, 0, -0.2624195, 0, 0.7773237, 0, 0.2624195, 0, 0.7316886, 244.62944, 0.47519106, 436.72482)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_24" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.516929, 0, 0.45883355, 0, 0.6911901, 0, -0.45883355, 0, 0.516929, 63.38708, 1.0165062, 91.71339)
+transform = Transform3D(0.516929, 0, 0.45883355, 0, 0.6911901, 0, -0.45883355, 0, 0.516929, 118.38708, 1.0432993, 208.71338)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_25" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.4689472, 0, -0.8149037, 0, 0.9402018, 0, 0.8149037, 0, -0.4689472, 73.228775, 0.71890926, 107.703445)
+transform = Transform3D(-0.4689472, 0, -0.8149037, 0, 0.9402018, 0, 0.8149037, 0, -0.4689472, 128.22878, 0.82543397, 224.70345)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_26" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.58754957, 0, -0.60339844, 0, 0.842202, 0, 0.60339844, 0, -0.58754957, 71.27975, 0.9033537, 94.49696)
+transform = Transform3D(-0.58754957, 0, -0.60339844, 0, 0.842202, 0, 0.60339844, 0, -0.58754957, 126.27975, 1.0843545, 211.49696)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_27" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.5228104, 0, -0.59558165, 0, 0.79249495, 0, 0.59558165, 0, -0.5228104, 122.312645, 6.95, 43.589405)
+transform = Transform3D(-0.5228104, 0, -0.59558165, 0, 0.79249495, 0, 0.59558165, 0, -0.5228104, 250.31264, 6.95, 93.58941)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_28" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.8089533, 0, 0.33789572, 0, 0.87668633, 0, -0.33789572, 0, -0.8089533, 77.40477, 0.9154872, 120.36505)
+transform = Transform3D(-0.8089533, 0, 0.33789572, 0, 0.87668633, 0, -0.33789572, 0, -0.8089533, 132.40477, 0.8257032, 237.36505)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_29" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.8512904, 0, 0.4658513, 0, 0.9704189, 0, -0.4658513, 0, -0.8512904, 162.70845, 0.9631972, 90.4844)
+transform = Transform3D(-0.8512904, 0, 0.4658513, 0, 0.9704189, 0, -0.4658513, 0, -0.8512904, 298.70844, 0.68652266, 300.4844)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_30" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.5835738, 0, -0.3784959, 0, 0.69556993, 0, 0.3784959, 0, 0.5835738, 81.43572, 0.73321337, 104.24754)
+transform = Transform3D(0.5835738, 0, -0.3784959, 0, 0.69556993, 0, 0.3784959, 0, 0.5835738, 377.43573, 0.9290631, 401.24756)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_31" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.9130364, 0, 0.10977252, 0, 0.9196116, 0, -0.10977252, 0, 0.9130364, 72.66626, 0.9357384, 91.24091)
+transform = Transform3D(0.9130364, 0, 0.10977252, 0, 0.9196116, 0, -0.10977252, 0, 0.9130364, 127.66626, 1.0776092, 208.2409)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Fern_1_32" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.3613421, 0, -0.5976237, 0, 0.6983711, 0, 0.5976237, 0, 0.3613421, 120.69246, 0.65506166, 141.59279)
+transform = Transform3D(0.3613421, 0, -0.5976237, 0, 0.6983711, 0, 0.5976237, 0, 0.3613421, 194.69246, 0.4540539, 310.5928)
 cast_shadow = 0
 mesh = SubResource("BeachResource_092")
 
 [node name="Plant_1_Big_00" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.2503796, 0, 0.33351237, 0, 0.4170377, 0, -0.33351237, 0, 0.2503796, 60.472584, 0.95552164, 98.75991)
+transform = Transform3D(0.2503796, 0, 0.33351237, 0, 0.4170377, 0, -0.33351237, 0, 0.2503796, 115.47259, 1.0094306, 215.7599)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_01" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.29473278, 0, 0.29043105, 0, 0.4137845, 0, -0.29043105, 0, -0.29473278, 72.55527, 0.90623045, 98.41971)
+transform = Transform3D(-0.29473278, 0, 0.29043105, 0, 0.4137845, 0, -0.29043105, 0, -0.29473278, 127.55527, 1.0694988, 215.41971)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_02" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.48898795, 0, -0.19046922, 0, 0.524774, 0, 0.19046922, 0, -0.48898795, 59.66876, 0.9943336, 94.72132)
+transform = Transform3D(-0.48898795, 0, -0.19046922, 0, 0.524774, 0, 0.19046922, 0, -0.48898795, 114.668755, 1.0395817, 211.72131)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_03" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.096065305, 0, -0.40749943, 0, 0.4186697, 0, 0.40749943, 0, -0.096065305, 79.559746, 0.90878576, 92.681854)
+transform = Transform3D(-0.096065305, 0, -0.40749943, 0, 0.4186697, 0, 0.40749943, 0, -0.096065305, 134.55974, 1.0722713, 209.68185)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_04" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.5077859, 0, -0.14850792, 0, 0.52905685, 0, 0.14850792, 0, 0.5077859, 106.30515, 0.65264356, 41.34996)
+transform = Transform3D(0.5077859, 0, -0.14850792, 0, 0.52905685, 0, 0.14850792, 0, 0.5077859, 425.30515, 4.135156, 276.34995)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_05" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.3383391, 0, 0.22434232, 0, 0.40595913, 0, -0.22434232, 0, 0.3383391, 47.344654, 0.5843265, 92.58799)
+transform = Transform3D(0.3383391, 0, 0.22434232, 0, 0.40595913, 0, -0.22434232, 0, 0.3383391, 102.34465, 0.9086408, 209.58798)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_06" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.47774777, 0, -0.028255455, 0, 0.4785826, 0, 0.028255455, 0, 0.47774777, 79.53257, 0.723759, 110.23953)
+transform = Transform3D(0.47774777, 0, -0.028255455, 0, 0.4785826, 0, 0.028255455, 0, 0.47774777, 319.53256, 1.0253083, 172.23953)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_07" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.031649727, 0, -0.48115277, 0, 0.48219258, 0, 0.48115277, 0, 0.031649727, 80.77718, 0.7221836, 110.39083)
+transform = Transform3D(0.031649727, 0, -0.48115277, 0, 0.48219258, 0, 0.48115277, 0, 0.031649727, 135.77719, 0.83494616, 227.39084)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_08" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.13758332, 0, -0.36869606, 0, 0.39353013, 0, 0.36869606, 0, -0.13758332, 55.26687, 0.6297294, 96.35897)
+transform = Transform3D(-0.13758332, 0, -0.36869606, 0, 0.39353013, 0, 0.36869606, 0, -0.13758332, 110.26687, 0.9002645, 213.35898)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_09" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.43880883, 0, 0.3023421, 0, 0.5328827, 0, -0.3023421, 0, -0.43880883, 211.23413, 4.4634223, 125.375175)
+transform = Transform3D(-0.43880883, 0, 0.3023421, 0, 0.5328827, 0, -0.3023421, 0, -0.43880883, 162.23413, 0.9392315, 402.37518)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_10" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.38065124, 0, 0.08811289, 0, 0.3907163, 0, -0.08811289, 0, -0.38065124, 117.5132, 6.95, 36.49826)
+transform = Transform3D(-0.38065124, 0, 0.08811289, 0, 0.3907163, 0, -0.08811289, 0, -0.38065124, 245.5132, 6.95, 86.49826)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_11" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.5499265, 0, 0.04179958, 0, 0.55151284, 0, -0.04179958, 0, -0.5499265, 81.41215, 0.7311129, 105.292305)
+transform = Transform3D(-0.5499265, 0, 0.04179958, 0, 0.55151284, 0, -0.04179958, 0, -0.5499265, 266.41214, 0.8566726, 287.2923)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_12" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.28538197, 0, -0.3318479, 0, 0.43768242, 0, 0.3318479, 0, 0.28538197, 75.230606, 0.7454434, 103.28564)
+transform = Transform3D(0.28538197, 0, -0.3318479, 0, 0.43768242, 0, 0.3318479, 0, 0.28538197, 130.2306, 0.8515143, 220.28564)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_13" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.20587097, 0, -0.44314635, 0, 0.48863232, 0, 0.44314635, 0, -0.20587097, 216.26366, 0.9433993, 132.27348)
+transform = Transform3D(-0.20587097, 0, -0.44314635, 0, 0.48863232, 0, 0.44314635, 0, -0.20587097, 402.26364, 0.9530534, 303.2735)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_14" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.48680273, 0, -0.22718059, 0, 0.5372038, 0, 0.22718059, 0, -0.48680273, 76.27736, 0.72495496, 110.28035)
+transform = Transform3D(-0.48680273, 0, -0.22718059, 0, 0.5372038, 0, 0.22718059, 0, -0.48680273, 131.27736, 0.8458753, 227.28035)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_15" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.3383408, 0, 0.41033503, 0, 0.5318358, 0, -0.41033503, 0, 0.3383408, 51.617634, 0.6202522, 91.51472)
+transform = Transform3D(0.3383408, 0, 0.41033503, 0, 0.5318358, 0, -0.41033503, 0, 0.3383408, 106.61763, 0.9206881, 208.51472)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_16" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.38961035, 0, 0.18546599, 0, 0.43150187, 0, -0.18546599, 0, -0.38961035, 216.33852, 0.9184499, 132.52895)
+transform = Transform3D(-0.38961035, 0, 0.18546599, 0, 0.43150187, 0, -0.18546599, 0, -0.38961035, 163.33852, 0.9829786, 407.52893)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_17" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.24220532, 0, 0.38341913, 0, 0.45351255, 0, -0.38341913, 0, 0.24220532, 78.47716, 0.7385204, 103.63451)
+transform = Transform3D(0.24220532, 0, 0.38341913, 0, 0.45351255, 0, -0.38341913, 0, 0.24220532, 133.47716, 0.85535526, 220.6345)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_18" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.24255332, 0, -0.34968108, 0, 0.425569, 0, 0.34968108, 0, -0.24255332, 145.71397, 0.8520238, 132.57489)
+transform = Transform3D(-0.24255332, 0, -0.34968108, 0, 0.425569, 0, 0.34968108, 0, -0.24255332, 146.71397, 2.2351794, 158.57489)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_19" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.13923724, 0, -0.40247676, 0, 0.4258809, 0, 0.40247676, 0, 0.13923724, 60.599754, 1.0147489, 91.436386)
+transform = Transform3D(0.13923724, 0, -0.40247676, 0, 0.4258809, 0, 0.40247676, 0, 0.13923724, 115.599754, 1.0460385, 208.43639)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_20" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.3476532, 0, -0.33857185, 0, 0.48527688, 0, 0.33857185, 0, 0.3476532, 54.40223, 0.6538407, 91.38925)
+transform = Transform3D(0.3476532, 0, -0.33857185, 0, 0.48527688, 0, 0.33857185, 0, 0.3476532, 109.40223, 0.9252572, 208.38925)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_21" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.05106031, 0, 0.49935746, 0, 0.5019612, 0, -0.49935746, 0, -0.05106031, 189.6819, 4.3244076, 90.75045)
+transform = Transform3D(-0.05106031, 0, 0.49935746, 0, 0.5019612, 0, -0.49935746, 0, -0.05106031, 145.6819, 0.81705326, 323.75046)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_22" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.3508443, 0, -0.17083971, 0, 0.39022806, 0, 0.17083971, 0, -0.3508443, 88.79244, 0.865425, 95.48213)
+transform = Transform3D(-0.3508443, 0, -0.17083971, 0, 0.39022806, 0, 0.17083971, 0, -0.3508443, 276.79245, 6.8916473, 95.48213)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_23" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.02037329, 0, -0.37989166, 0, 0.38043755, 0, 0.37989166, 0, -0.02037329, 150.61554, 0.63789177, 154.58696)
+transform = Transform3D(-0.02037329, 0, -0.37989166, 0, 0.38043755, 0, 0.37989166, 0, -0.02037329, 368.61554, 0.54898983, 415.58694)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_24" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.4820291, 0, -0.0116321035, 0, 0.48216945, 0, 0.0116321035, 0, -0.4820291, 125.36474, 6.95, 42.457207)
+transform = Transform3D(-0.4820291, 0, -0.0116321035, 0, 0.48216945, 0, 0.0116321035, 0, -0.4820291, 253.36473, 6.95, 92.45721)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_25" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.1353236, 0, -0.3538443, 0, 0.37883806, 0, 0.3538443, 0, 0.1353236, 83.374146, 0.8492324, 96.595436)
+transform = Transform3D(0.1353236, 0, -0.3538443, 0, 0.37883806, 0, 0.3538443, 0, 0.1353236, 425.37415, 4.386247, 300.59543)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_26" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.5419292, 0, 0.106762536, 0, 0.5523454, 0, -0.106762536, 0, -0.5419292, 207.51883, 0.9729928, 146.60449)
+transform = Transform3D(-0.5419292, 0, 0.106762536, 0, 0.5523454, 0, -0.106762536, 0, -0.5419292, 317.51883, 1.0737447, 324.6045)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_27" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.2056584, 0, -0.4846671, 0, 0.5264956, 0, 0.4846671, 0, 0.2056584, 50.580257, 0.61402583, 91.78135)
+transform = Transform3D(0.2056584, 0, -0.4846671, 0, 0.5264956, 0, 0.4846671, 0, 0.2056584, 105.58025, 0.916038, 208.78134)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_28" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.42500755, 0, -0.21903805, 0, 0.47813082, 0, 0.21903805, 0, -0.42500755, 125.730675, 6.95, 42.51932)
+transform = Transform3D(-0.42500755, 0, -0.21903805, 0, 0.47813082, 0, 0.21903805, 0, -0.42500755, 163.73068, 0.85930395, 419.51932)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_29" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.3081028, 0, -0.32053488, 0, 0.44460088, 0, 0.32053488, 0, 0.3081028, 67.6665, 0.9146248, 135.44925)
+transform = Transform3D(0.3081028, 0, -0.32053488, 0, 0.44460088, 0, 0.32053488, 0, 0.3081028, 314.6665, 0.819449, 164.44925)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_30" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(0.052914243, 0, 0.44504604, 0, 0.44818065, 0, -0.44504604, 0, 0.052914243, 203.2538, 1.0001091, 98.65383)
+transform = Transform3D(0.052914243, 0, 0.44504604, 0, 0.44818065, 0, -0.44504604, 0, 0.052914243, 371.25378, 1.0876781, 160.65384)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_31" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.27678284, 0, -0.35509366, 0, 0.45022243, 0, 0.35509366, 0, -0.27678284, 77.38606, 0.7404483, 103.44)
+transform = Transform3D(-0.27678284, 0, -0.35509366, 0, 0.45022243, 0, 0.35509366, 0, -0.27678284, 132.38606, 0.8543582, 220.44)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_32" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.016897025, 0, 0.4984471, 0, 0.49873343, 0, -0.4984471, 0, -0.016897025, 213.3246, 4.4596405, 137.42168)
+transform = Transform3D(-0.016897025, 0, 0.4984471, 0, 0.49873343, 0, -0.4984471, 0, -0.016897025, 424.3246, 4.158409, 267.4217)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")
 
 [node name="Plant_1_Big_33" type="MeshInstance3D" parent="Plants"]
-transform = Transform3D(-0.5104764, 0, 0.09801496, 0, 0.519801, 0, -0.09801496, 0, -0.5104764, 75.62974, 0.91312337, 125.78648)
+transform = Transform3D(-0.5104764, 0, 0.09801496, 0, 0.519801, 0, -0.09801496, 0, -0.5104764, 130.62973, 0.835348, 242.78648)
 cast_shadow = 0
 mesh = SubResource("BeachResource_095")

@@ -214,7 +214,7 @@ static func _rocks(island: HandmadeIsland, dressing: Node3D, map: IslandMap) -> 
 		rock.set_meta("ground_embed", mesh.get_aabb().size.y * rock.scale.y * 0.2)
 		dressing.get_node("RockSurfaces").add_child(rock)
 		rock.owner = dressing
-		var target := Vector2(99 + i * 8, 220 + (i % 2) * 3)
+		var target := Vector2(99 + i * 8, 220 + (i % 2) * 3) + _landing_shift(island)
 		if not _shore_position(rock, target, -1.1, island, map):
 			rock.free()
 	source.free()
@@ -239,11 +239,12 @@ static func _shore(island: HandmadeIsland, dressing: Node3D, map: IslandMap) -> 
 		["crooked_dock_post", Vector2(139, 222), -0.15, -0.4],
 	]:
 		_place_shore(spec, shore, island, map)
-	for point: Vector2 in [Vector2(148, 218), Vector2(108, 152), Vector2(146, 139)]:
+	for point: Vector2 in [Vector2(148, 218) + _landing_shift(island), Vector2(108, 152) * _scale(island), Vector2(146, 139) * _scale(island)]:
 		_place_shore(["dead_tree", point, 0.4, -0.35], dressing.get_node("HorrorOnly"), island, map)
 
 static func _place_shore(spec: Array, parent: Node3D, island: HandmadeIsland, map: IslandMap) -> void:
 	var target: Vector2 = spec[1]
+	target += _landing_shift(island)  # authored round the 256 m beach's landing
 	var node: Node3D = _piece(spec[0], parent, Vector3(target.x, 0, target.y), spec[2])
 	if not _shore_position(node, target, spec[3], island, map):
 		node.free()
@@ -286,8 +287,8 @@ static func _ground(island: HandmadeIsland, map: IslandMap) -> void:
 	_save(assets, assets.resource_path)
 	terrain.set("assets", assets)
 	var data: Object = terrain.get("data")
-	var region: Object = data.call("get_region", Vector2i.ZERO)
-	var height: Image = region.get("height_map")
+	# Every region as one picture (the open-island beach is 512 m: four regions of 256 m).
+	var height: Image = data.call("layered_to_image", 0)  # Terrain3DRegion.TYPE_HEIGHT
 	if height.get_width() != map.field.width or height.get_height() != map.field.height:
 		_problems.append("Beach terrain and gameplay map dimensions differ")
 		return
@@ -308,7 +309,7 @@ static func _ground(island: HandmadeIsland, map: IslandMap) -> void:
 				slope = maxf(slope, absf(cell_height - map.heights[nz * map.field.width + nx]))
 			var n: float = noise.get_noise_2d(x, z)
 			var forest: float = 0.0
-			for patch: Vector2 in [Vector2(80, 62), Vector2(176, 196), Vector2(160, 80), Vector2(80, 200)]:
+			for patch: Vector2 in [Vector2(80, 62) * _scale(island), Vector2(176, 196) * _scale(island), Vector2(160, 80) * _scale(island), Vector2(80, 200) * _scale(island)]:
 				forest = maxf(forest, 1.0 - Vector2(x, z).distance_to(patch) / 30.0)
 			var overlay: int = 2
 			var base: int = 0
@@ -501,3 +502,17 @@ static func _cliff_rocks(island: HandmadeIsland, dressing: Node3D, map: IslandMa
 				rock.free()
 				continue
 			placed.append(at)
+
+
+## The open-island pilot: how many times wider this beach is than the 256 m one it was authored on.
+static func _scale(island: HandmadeIsland) -> float:
+	return island.size / 256.0
+
+
+## How far the landing (the Boat marker) moved from the 256 m beach's: the shore pieces were
+## authored round it, and keep their places beside it.
+static func _landing_shift(island: HandmadeIsland) -> Vector2:
+	var boat: Node3D = island.get_node_or_null("Markers/Boat")
+	if boat == null:
+		return Vector2.ZERO
+	return Vector2(boat.position.x, boat.position.z) - Vector2(128.0, 216.5)

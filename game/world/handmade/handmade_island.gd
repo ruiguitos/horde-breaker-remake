@@ -496,9 +496,19 @@ func _lay_roads(cover: PackedByteArray) -> PackedByteArray:
 				var z1: int = clampi(ceili(maxf(a.y, maxf(b.y, c.y))), 0, size - 1)
 				for z in range(z0, z1 + 1):
 					for x in range(x0, x1 + 1):
-						if Geometry2D.point_is_inside_triangle(Vector2(x + 0.5, z + 0.5), a, b, c):
+						# Four points round the centre, not the centre alone: on a mesh laid on the grid every
+						# triangle is half a cell, and a centre on its diagonal is inside neither half.
+						if _cell_in_triangle(x, z, a, b, c):
 							cover[z * size + x] = IslandMap.COVER_ROAD
 	return cover
+
+## True when a point a quarter cell from the centre of cell (x, z) lies in the triangle.
+static func _cell_in_triangle(x: int, z: int, a: Vector2, b: Vector2, c: Vector2) -> bool:
+	for o: Vector2 in [Vector2(0.25, 0.25), Vector2(0.75, 0.25), Vector2(0.25, 0.75), Vector2(0.75, 0.75)]:
+		if Geometry2D.point_is_inside_triangle(Vector2(x, z) + o, a, b, c):
+			return true
+	return false
+
 
 
 ## Bridges/: every cell whose centre lies under a deck gets the height of the

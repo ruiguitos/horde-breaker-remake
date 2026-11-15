@@ -55,6 +55,24 @@ A principal nunca repete a mecânica de uma secundária na mesma ilha.
   um pico da horda de 12 s; dá vida e munição cheias). A ilha tem agora três secundárias. Uma
   missão principal com a mesma mecânica tira a secundária correspondente (`side_kinds_left_out`):
   Rescue e Escort tiram o sobrevivente, Nests tira o ninho, Intel Search tira o esconderijo.
+- **Etapa 4, primeira passagem (2026-11-15).** A `beach_01` foi reconstruída a 512 × 512 m (quatro
+  regiões de Terrain3D). O gerador (`tools/dev/build_islands.gd`) passou a aceitar o tamanho por
+  desenho (`N`, `C`); a praia é o desenho de 256 m escalado ×2 (`_scale_open`): posições, costa,
+  rio, caminhos, marcadores e florestas escalam, mas larguras, casas e folgas não, e a aldeia e a
+  torre mantêm o seu próprio espaçamento. `horde_radius` 140 na ilha aberta. O dressing segue o
+  barco e a escala (`_landing_shift`, `_scale`) e pinta as quatro regiões. Resultado: 125 310
+  células transitáveis (antes 28 035), sem problemas no Check map. Capturas:
+  `stage4_overview.png` e `stage4_landing.png`.
+  - **O que falta nesta etapa:** a ilha está vazia entre os objetivos (era o risco anunciado). As
+    três zonas próprias (enseada, bosque, ruína) ainda não foram desenhadas: as secundárias estão
+    nos sítios antigos ×2. A erva e as florestas ficaram ralas para a área.
+  - Corrigido pelo caminho: as estradas desenhadas em malha alinhada com a grelha não marcavam as
+    células de estrada (um centro na diagonal não cai em nenhum dos dois triângulos), e o som dos
+    passos no início do caminho era areia (`HandmadeIsland._cell_in_triangle`).
+  - A fixture da praia foi regravada de propósito (`tools/dev/capture_beach_baseline.gd`). Dois
+    testes que usavam a praia como parte de expedição de 256 m escalam agora a área de jogo.
+  - Gerar a praia pelo `build_islands.gd` não deixa os materiais do dressing gravados nas casas;
+    o `apply_beach_dressing.gd` sim. Depois de gerar, correr sempre o `apply_beach_dressing.gd`.
 - As três decisões propostas abaixo ficaram por responder; a etapa 1 usa a recompensa da tabela.
 
 ## Etapas

@@ -38,7 +38,10 @@ var _phase: int = 0
 ## outside the play area, Exit and DefendZone markers on two generators.
 func _part_scene(mission: StringName) -> Node:
 	var island: HandmadeIsland = (load(HandmadeIsland.ISLANDS_DIR + "beach_01.tscn") as PackedScene).instantiate()
-	island.play_area = PackedVector2Array([Vector2(50, 0), Vector2(256, 0), Vector2(256, 256), Vector2(50, 256)])
+	# beach_01 as a stand-in part: west of x = 50 (of the 256 m beach it was written for) is out;
+	# the open-island beach is larger, so the same share of it is out.
+	var k: float = island.size / 256.0
+	island.play_area = PackedVector2Array([Vector2(50, 0) * k, Vector2(256, 0) * k, Vector2(256, 256) * k, Vector2(50, 256) * k])
 	island.mission = mission
 	var markers: Node = island.get_node("Markers")
 	for spot: Array in [["Exit", "Generator2"], ["DefendZone", "Generator3"]]:
@@ -82,7 +85,7 @@ func _process(_delta: float) -> bool:
 				for px in img.get_width():
 					if img.get_pixel(px, pz).is_equal_approx(Color("232b24")):
 						dark += 1
-						if px * step >= 50:
+						if px * step >= 50.0 * run.field.width / 256.0:  # the stand-in part's edge, scaled with the beach
 							dark_inside += 1
 			_check(dark > 0 and dark_inside == 0, "minimap: land outside the play area is darkened (%d px), none inside" % dark)
 			for g in GameData.GENERATOR_COUNT:

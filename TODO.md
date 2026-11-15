@@ -126,8 +126,8 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
   ver a jogar e medir as draw calls. Torre com cintas e parapeito, e 16 rochas nas falésias, a
   2026-11-15; as margens do rio continuam esticadas (o Terrain3D 1.0 não tem triplanar).
   Seguinte: piloto da ilha aberta a 512 m (decisão de 2026-11-15); plano em
-  `docs/design/OPEN_ISLAND_PILOT.md`, aprovado; etapas 1 a 3 feitas a 2026-11-15, segue a
-  etapa 4 (a ilha redesenhada a 512 m). Três decisões do plano ainda por responder.
+  `docs/design/OPEN_ISLAND_PILOT.md`, aprovado; etapas 1 a 3 feitas a 2026-11-15. Etapa 4: a
+  ilha já tem 512 m (desenho escalado); faltam as três zonas próprias e encher o vazio. Três decisões do plano ainda por responder.
 - [ ] Vista geral do mapa antes de partir: feita a 2026-11-15. O barco desenha a ilha real da rota
   escolhida como carta náutica, a partir do `<cena>_grid.png` (`RouteMap.island_chart`). Por fazer:
   regenerar o `_grid.png` sempre que a ilha muda (hoje é o Check map que o grava), e ver a jogar.

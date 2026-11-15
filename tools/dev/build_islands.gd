@@ -15,8 +15,13 @@ const OUT: String = "res://game/world/handmade/islands/"
 const TRIALS: String = "res://game/world/handmade/trials/"
 const RG: String = "res://addons/road-generator/nodes/"
 const KIT: String = "res://assets/models/nature_megakit/"
-const N: int = 256  ## island size = one Terrain3D region (256 m)
-const C: float = N * 0.5
+## Island size and centre: 256 m (one Terrain3D region) unless a design sets `N` (the open-island
+## pilot's beach is 512 m: four regions). Set by _reset and by the design; read everywhere below.
+var N: int = 256
+var C: float = 128.0
+## Navigation radius (cells) of the horde on an open island: its flow field covers this much round
+## the player, so the cost does not grow with the island (HandmadeIsland.horde_radius).
+const HORDE_RADIUS_OPEN: int = 140
 ## Clearances per object kind, in metres (see _spot_problem).
 const COAST_CLEAR: Dictionary = {"building": 10.0, "rock": 8.0, "tree": 8.0, "cover": 3.0, "lava": 8.0}
 const RIVER_CLEAR: Dictionary = {"building": 3.5, "rock": 3.5, "tree": 3.5, "cover": 1.5, "lava": 3.5}
@@ -85,6 +90,7 @@ func _start_next() -> void:
 		return
 	_reset(StringName(_pending.pop_front()))
 	call("_design_" + String(biome))
+	C = N * 0.5
 	_prepare_paths()
 	_sculpt()
 	_place_lava()
@@ -92,6 +98,8 @@ func _start_next() -> void:
 	_root.name = String(biome).capitalize() + "Island"
 	_root.size = N
 	_root.biome = biome
+	if N > 256:
+		_root.horde_radius = HORDE_RADIUS_OPEN  # the horde's paths only round the player, as on the Berlenga
 	root.add_child(_root)
 	_terrain = ClassDB.instantiate(&"Terrain3D")
 	_terrain.name = "Terrain3D"
@@ -118,6 +126,7 @@ func _process(_delta: float) -> bool:
 
 func _reset(b: StringName) -> void:
 	biome = b
+	N = 256
 	_rng.seed = hash(String(b))
 	coast_r0 = 100.0
 	coast_waves = []
@@ -185,6 +194,59 @@ func _design_beach() -> void:
 	]
 	rock_count = 20
 	cover = [["Grass_Wispy_Tall", 900, 0.9], ["Grass_Wispy_Short", 900, 0.6], ["Bush_Common", 120, 1.2]]
+	_scale_open(2.0, Vector2(55, 117))
+
+
+## The open-island pilot (docs/design/OPEN_ISLAND_PILOT.md, stage 4): the design above, laid out on
+## an island `k` times as wide. Every position and the coast scale by `k`; widths, building sizes and
+## clearances do not, so paths stay paths and huts stay huts. The village keeps its own spacing round
+## `village` (its huts and plaza are not spread out), the tower stays on its plateau, and forests,
+## rocks and cover grow with the area.
+func _scale_open(k: float, village: Vector2) -> void:
+	N = int(256 * k)
+	coast_r0 *= k
+	for w in coast_waves:
+		w[0] *= k
+	for m: String in markers.keys():
+		markers[m] = markers[m] * k
+	for hill in hills:
+		hill[0] *= k
+		hill[1] *= k * 0.75
+	for plateau in plateaus:
+		plateau[0] *= k
+	for river in rivers:
+		river[0] = _scaled(river[0], k)
+	for crossing in crossings:
+		crossing[0] *= k
+	for ridge in ridges:
+		ridge[0] = _scaled(ridge[0], k)
+		for i in ridge[3].size():
+			ridge[3][i] *= k
+	for path in paths:
+		path[0] = _scaled(path[0], k)
+	var moved := village * (k - 1.0)  # the village's own offset: its layout keeps its size
+	for i in plazas.size():
+		plazas[i] = Rect2(plazas[i].position + plazas[i].get_center() * (k - 1.0), plazas[i].size)
+	for b in buildings:
+		var rect: Rect2 = b[0]
+		var anchor: Vector2 = moved
+		if b[3] == "tower" and not plateaus.is_empty():
+			anchor = plateaus[0][0] - plateaus[0][0] / k  # with the plateau it stands on
+		b[0] = Rect2(rect.position + anchor, rect.size)
+	for forest in forests:
+		forest[0] *= k
+		forest[1] *= k * 0.8
+		forest[2] = int(forest[2] * k * 1.25)
+	rock_count = int(rock_count * k * 1.5)
+	for c in cover:
+		c[1] = int(c[1] * k)
+
+
+func _scaled(points: PackedVector2Array, k: float) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for q in points:
+		out.append(q * k)
+	return out
 
 
 ## Old Town. A canal splits the old quarter (north) from the harbour side.
