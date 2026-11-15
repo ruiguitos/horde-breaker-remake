@@ -1,0 +1,198 @@
+{
+  "passed": true,
+  "model": "marksman_realistic",
+  "source_geometry": "tactical_original/marksman.glb",
+  "license_new_work": "CC0-1.0",
+  "units": "metres",
+  "forward": "-Z",
+  "triangles": 7708,
+  "triangle_budget": [
+    7000,
+    9000
+  ],
+  "mesh_nodes": 60,
+  "length_m": 1.12,
+  "length_target_m": 1.12,
+  "bounds_min_m": [
+    -0.03200000151991844,
+    -0.08652230352163315,
+    -0.7599999904632568
+  ],
+  "bounds_max_m": [
+    0.057999998331069946,
+    0.2639999985694885,
+    0.35999998450279236
+  ],
+  "muzzle_m": [
+    0.0,
+    0.12300000339746475,
+    -0.7599999904632568
+  ],
+  "bone_count": 0,
+  "materials": [
+    "bore",
+    "gunmetal",
+    "polymer",
+    "steel",
+    "wood"
+  ],
+  "material_count": 5,
+  "textures": [
+    {
+      "name": "bore_albedo",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "name": "bore_normal",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "name": "bore_orm",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "name": "gunmetal_albedo",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "gunmetal_normal",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "gunmetal_orm",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "polymer_albedo",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "polymer_normal",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "polymer_orm",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "steel_albedo",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "steel_normal",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "steel_orm",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "wood_albedo",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "wood_DIFFUSE",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "wood_NORMAL",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "wood_normal",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "wood_orm",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "wood_ROUGHNESS",
+      "width": 1024,
+      "height": 1024
+    }
+  ],
+  "texture_sources": {
+    "gunmetal/steel/polymer/bore": "assault_rifle_realistic/textures (CC0, this project)",
+    "wood": "procedural bake in build_realistic.py (CC0)"
+  },
+  "parts": [
+    "Bore shadow",
+    "Cheek rest screw",
+    "Cheek rest screw.001",
+    "Curved trigger",
+    "DMR barrel",
+    "DMR bolt carrier",
+    "DMR bolt handle",
+    "DMR cocking knob",
+    "DMR gas tube",
+    "DMR milled receiver",
+    "DMR muzzle brake",
+    "DMR receiver cover",
+    "DMR receiver pin",
+    "DMR receiver pin.001",
+    "DMR recoil pad",
+    "DMR selector lever",
+    "Elevation turret",
+    "Eyepiece lens",
+    "Gas block",
+    "Handguard retaining band",
+    "Magazine floor plate",
+    "Magazine pressed stiffener",
+    "Magazine pressed stiffener.001",
+    "Magazine pressed stiffener.002",
+    "Magazine pressed stiffener.003",
+    "Magazine pressed stiffener.004",
+    "Magazine pressed stiffener.005",
+    "Objective lens",
+    "Ocular rubber collar",
+    "Raised cheek rest",
+    "Scope mounting ring",
+    "Scope mounting ring.001",
+    "Scope optical housing",
+    "Scope ring screw",
+    "Scope ring screw.001",
+    "Scope ring screw.002",
+    "Scope ring screw.003",
+    "Scope side dovetail",
+    "Scope support",
+    "Scope support.001",
+    "Stock through bolt",
+    "Stock through bolt.001",
+    "Ten round DMR magazine",
+    "Trigger guard",
+    "Turret knurl",
+    "Turret knurl.001",
+    "Turret knurl.002",
+    "Turret knurl.003",
+    "Turret knurl.004",
+    "Turret knurl.005",
+    "Turret knurl.006",
+    "Turret knurl.007",
+    "Turret knurl.008",
+    "Turret knurl.009",
+    "Turret knurl.010",
+    "Turret knurl.011",
+    "Walnut grip web",
+    "Walnut thumbhole stock",
+    "Walnut ventilated handguard",
+    "Windage turret"
+  ]
+}

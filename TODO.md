@@ -90,8 +90,10 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
 
 ## Modelos (Codex)
 
-- [ ] Ronda de modelos pedida em 2026-11-10: quatro armas realistas e seis inimigos.
-  Pedidos e contratos em `docs/tech/MODELS_ROUND_BRIEF.md`; à espera das entregas do Codex.
+- [ ] Ronda de modelos pedida em 2026-11-10: quatro armas realistas e seis inimigos
+  (contratos em `docs/tech/MODELS_ROUND_BRIEF.md`). Armas feitas pelo Claude no Blender a
+  2026-11-15 (`assets/models/weapons/realistic_build/`), na variante `realistic` do DEV;
+  falta o utilizador vê-las no editor antes de passarem a omissão. Inimigos: em curso.
 
 - [ ] `crawler.glb`: reconfirmar os testes e ver no editor. Todos os crawlers
   partilham cabeça e corpo; 4 814 triângulos cada (walker 708).

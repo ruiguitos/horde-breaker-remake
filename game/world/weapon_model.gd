@@ -39,7 +39,13 @@ const FILES: Dictionary = {
 ## A variant brings its own materials and textures, so it skips the Poly Haven maps
 ## of TEXTURED. The weapon's own GLB (FILES) is the default.
 const VARIANTS: Dictionary = {
-	&"realistic": {&"rifle": "res://assets/models/weapons/assault_rifle_realistic/assault_rifle_realistic.glb"},
+	&"realistic": {
+		&"rifle": "res://assets/models/weapons/assault_rifle_realistic/assault_rifle_realistic.glb",
+		&"smg": "res://assets/models/weapons/smg_realistic/smg_realistic.glb",
+		&"machine_gun": "res://assets/models/weapons/machine_gun_realistic/machine_gun_realistic.glb",
+		&"shotgun": "res://assets/models/weapons/shotgun_realistic/shotgun_realistic.glb",
+		&"marksman": "res://assets/models/weapons/marksman_realistic/marksman_realistic.glb",
+	},
 }
 ## Palm contact on the underside of each model's forearm, in grip space.
 const SUPPORT_POINTS: Dictionary = {

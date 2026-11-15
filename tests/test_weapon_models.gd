@@ -33,7 +33,7 @@ func _initialize() -> void:
 			_check(false, "weapon tests finished in time")
 			_finish())
 	_test_models()
-	_test_realistic_rifle()
+	_test_realistic_variants()
 	_test_soldiers()
 	_test_view_model()
 	call_deferred("_scene_tests")
@@ -80,28 +80,36 @@ func _test_models() -> void:
 	_check(WeaponModel.material("gunmetal") == WeaponModel.material("gunmetal"), "materials are shared between guns")
 
 
-## The realistic rifle (DEV visual test, WeaponModel.VARIANTS): the same parts, muzzle,
-## grip and support point as the current rifle, and its own textures; the current
+## The realistic variants (DEV visual test, WeaponModel.VARIANTS): the same parts, muzzle,
+## grip and support point as the current weapons, and their own textures; the current
 ## rifle keeps its Poly Haven maps.
-func _test_realistic_rifle() -> void:
+func _test_realistic_variants() -> void:
 	_check(WeaponModel.model_path(&"rifle", &"realistic").ends_with("assault_rifle_realistic.glb"), "the realistic variant is its own GLB")
 	_check(WeaponModel.model_path(&"rifle") == WeaponModel.MODEL_DIR + "assault_rifle.glb", "the rifle without a variant is the current GLB")
-	_check(WeaponModel.model_path(&"smg", &"realistic") == WeaponModel.model_path(&"smg"), "a variant replaces only the rifle")
+	# Every weapon's realistic GLB (built from the tactical one, assets/models/weapons/realistic_build/)
+	# keeps the tactical parts, muzzle, support point and length, and gets its own textures.
+	for id: StringName in WeaponModel.IDS:
+		var path: String = WeaponModel.model_path(id, &"realistic")
+		_check(path.ends_with("%s_realistic.glb" % ("assault_rifle" if id == &"rifle" else String(id))), "%s: the realistic variant is its own GLB" % id)
+		var cur := WeaponModel.build_parts(id)
+		var rl := WeaponModel.build_parts(id, &"realistic")
+		var same_parts: bool = rl.parts.size() == cur.parts.size()
+		for part_name: String in cur.parts:
+			same_parts = same_parts and rl.parts.has(part_name)
+		_check(same_parts, "%s: the realistic model has the same %d named parts" % [id, cur.parts.size()])
+		_check(rl.muzzle.position.distance_to(cur.muzzle.position) < 0.001, "%s: the realistic muzzle is where the current one is" % id)
+		_check(rl.support_point.distance_to(cur.support_point) < 0.0001, "%s: the realistic support point is the current one" % id)
+		_check(absf(rl.length - cur.length) < 0.001, "%s: the realistic model is as long as the current one (%.3f m)" % [id, rl.length])
+		var textured: int = 0
+		for part_name: String in rl.parts:
+			var material := (rl.parts[part_name] as MeshInstance3D).get_surface_override_material(0) as StandardMaterial3D
+			if material != null and material.albedo_texture != null and material.normal_texture != null:
+				textured += 1
+		_check(textured == rl.parts.size(), "%s: every realistic part has albedo and normal maps (%d of %d)" % [id, textured, rl.parts.size()])
+		cur.free()
+		rl.free()
 	var current := WeaponModel.build_parts(&"rifle")
 	var real := WeaponModel.build_parts(&"rifle", &"realistic")
-	var same_parts: bool = real.parts.size() == current.parts.size()
-	for part_name: String in current.parts:
-		same_parts = same_parts and real.parts.has(part_name)
-	_check(same_parts, "the realistic rifle has the same %d named parts" % current.parts.size())
-	_check(real.muzzle.position.distance_to(Vector3(0, 0.105, -0.62)) < 0.001, "the realistic muzzle is at (0, 0.105, -0.62)")
-	_check(real.support_point.distance_to(Vector3(0, 0.07718, -0.26)) < 0.0001, "the realistic support point is at (0, 0.07718, -0.26)")
-	_check(absf(real.length - current.length) < 0.001, "the realistic rifle is as long as the current one (%.3f m)" % real.length)
-	var textured: int = 0
-	for part_name: String in real.parts:
-		var material := (real.parts[part_name] as MeshInstance3D).get_surface_override_material(0) as StandardMaterial3D
-		if material != null and material.albedo_texture != null and material.normal_texture != null:
-			textured += 1
-	_check(textured == real.parts.size(), "every part of the realistic rifle has its own albedo and normal maps (%d of %d)" % [textured, real.parts.size()])
 	var poly_haven: StandardMaterial3D = (current.parts["Upper receiver"] as MeshInstance3D).get_surface_override_material(0) as StandardMaterial3D
 	_check(poly_haven != null and poly_haven.normal_texture != null, "the current rifle keeps its Poly Haven normal map")
 	var world := WeaponModel.build(&"rifle", &"realistic")

@@ -1,5 +1,7 @@
 # Pedido ao Codex: acabar os modelos de armas e de inimigos (2026-11-10)
 
+**Atualização 2026-11-15:** o pedido 1 foi feito pelo Claude no Blender 5.2 (MCP), com a mesma receita da Assault Rifle realista: a geometria de `tactical_original/` (origem, `Muzzle`, nomes e comprimentos já calibrados) com UVs à escala do mundo e materiais PBR. O guião é `assets/models/weapons/realistic_build/build_realistic.py`. A ferrugem da Machine Gun passou a `steel`; a madeira é gerada no Blender. A Shotgun ganhou chanfros para chegar aos 5 000 triângulos (5 529).
+
 Para colar numa sessão do Codex com escrita (ele trabalha no Blender 5.2; a integração no jogo é do Claude). São dois pedidos independentes: fazer primeiro o das armas.
 
 Estado de hoje, para contexto:

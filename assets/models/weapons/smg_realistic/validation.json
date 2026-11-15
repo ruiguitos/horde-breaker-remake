@@ -1,0 +1,177 @@
+{
+  "passed": true,
+  "model": "smg_realistic",
+  "source_geometry": "tactical_original/smg.glb",
+  "license_new_work": "CC0-1.0",
+  "units": "metres",
+  "forward": "-Z",
+  "triangles": 6292,
+  "triangle_budget": [
+    6000,
+    8000
+  ],
+  "mesh_nodes": 70,
+  "length_m": 0.74,
+  "length_target_m": 0.74,
+  "bounds_min_m": [
+    -0.045499999076128006,
+    -0.14800000190734863,
+    -0.4399999976158142
+  ],
+  "bounds_max_m": [
+    0.03200000151991844,
+    0.1770000010728836,
+    0.29999998211860657
+  ],
+  "muzzle_m": [
+    0.0,
+    0.10599999874830246,
+    -0.4399999976158142
+  ],
+  "bone_count": 0,
+  "materials": [
+    "bore",
+    "gunmetal",
+    "polymer",
+    "steel"
+  ],
+  "material_count": 4,
+  "textures": [
+    {
+      "name": "bore_albedo",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "name": "bore_normal",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "name": "bore_orm",
+      "width": 256,
+      "height": 256
+    },
+    {
+      "name": "gunmetal_albedo",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "gunmetal_normal",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "gunmetal_orm",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "polymer_albedo",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "polymer_normal",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "polymer_orm",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "steel_albedo",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "steel_normal",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "steel_orm",
+      "width": 1024,
+      "height": 1024
+    }
+  ],
+  "texture_sources": {
+    "gunmetal/steel/polymer/bore": "assault_rifle_realistic/textures (CC0, this project)",
+    "wood": "procedural bake in build_realistic.py (CC0)"
+  },
+  "parts": [
+    "Bore shadow",
+    "Cocking lever",
+    "Cocking lever grip",
+    "Cocking tube",
+    "Curved 9mm magazine",
+    "Curved trigger",
+    "Diopter sight drum",
+    "Diopter sight pedestal",
+    "Fixed polymer shoulder stock",
+    "Front sight blade",
+    "Front sight protective hood",
+    "Front sight support",
+    "Front trunnion",
+    "Grip moulded insert",
+    "Grip moulded insert.001",
+    "Grip traction rib",
+    "Grip traction rib.001",
+    "Grip traction rib.002",
+    "Grip traction rib.003",
+    "Grip traction rib.004",
+    "Grip traction rib.005",
+    "Grip traction rib.006",
+    "Grip traction rib.007",
+    "Grip traction rib.008",
+    "Grip traction rib.009",
+    "Grip traction rib.010",
+    "Grip traction rib.011",
+    "Magazine floor plate",
+    "Magazine pressed stiffener",
+    "Magazine pressed stiffener.001",
+    "Magazine pressed stiffener.002",
+    "Magazine pressed stiffener.003",
+    "Magazine pressed stiffener.004",
+    "Magazine pressed stiffener.005",
+    "Magazine release paddle",
+    "Muzzle mounting lug",
+    "Muzzle mounting lug.001",
+    "Muzzle mounting lug.002",
+    "Pistol grip",
+    "Rail cross lug 00",
+    "Rail cross lug 01",
+    "Rail cross lug 02",
+    "Rail cross lug 03",
+    "Rail cross lug 04",
+    "Rail cross lug 05",
+    "Rail cross lug 06",
+    "Rail cross lug 07",
+    "Rail cross lug 08",
+    "Rail cross lug 09",
+    "Rail cross lug 10",
+    "Rail cross lug 11",
+    "Rail cross lug 12",
+    "Rail cross lug 13",
+    "Rail dovetail",
+    "SMG lower trigger housing",
+    "SMG receiver pin",
+    "SMG receiver pin.001",
+    "SMG recoil pad",
+    "SMG selector",
+    "SMG selector.001",
+    "Selector axle",
+    "Selector axle.001",
+    "Short exposed barrel",
+    "Stamped upper receiver",
+    "Stock retaining pin",
+    "Stock retaining pin.001",
+    "Three lug muzzle",
+    "Trigger guard",
+    "Visible bolt",
+    "Wide polymer forearm"
+  ]
+}
