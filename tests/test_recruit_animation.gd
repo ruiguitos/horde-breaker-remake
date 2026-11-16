@@ -326,7 +326,7 @@ func _test_soldier(class_id: StringName) -> void:
 		var delivered_tip: Node3D = soldier.get("_rifle_muzzle")
 		var grip_from_hand: Transform3D = delivered_tip.transform * Transform3D(Basis.IDENTITY, WeaponModel.GRIP_FROM_MUZZLE)
 		var held_gun: WeaponModel = soldier.get("_gun_node") as WeaponModel
-		var foregrip: Vector3 = right * grip_from_hand * held_gun.support_point
+		var foregrip: Vector3 = right * grip_from_hand * (held_gun.basis * (held_gun.support_point + Vector3(0, 0, float(soldier.get("_support").get("slide")))))  # TP_GUN_SCALE and the support slide (WeaponSupportHold)
 		support_check[0] = maxf(support_check[0], palm.distance_to(foregrip))
 	skeleton.skeleton_updated.connect(probe)
 	var foot_before: Transform3D = skeleton.get_bone_global_pose(foot)

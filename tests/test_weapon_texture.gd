@@ -22,7 +22,7 @@ func _surface_materials(w: WeaponModel) -> Array[StandardMaterial3D]:
 
 
 func _initialize() -> void:
-	var rifle: WeaponModel = WeaponModel.build(&"rifle")
+	var rifle: WeaponModel = WeaponModel.build(&"rifle", WeaponModel.TACTICAL)
 	var rifle_mats: Array[StandardMaterial3D] = _surface_materials(rifle)
 	var with_normal: int = 0
 	var with_colour_map: int = 0
@@ -39,7 +39,7 @@ func _initialize() -> void:
 			roughness_ok = roughness_ok and m.roughness_texture != null and m.uv1_triplanar
 	_check(roughness_ok, "textured rifle surfaces have a roughness map and triplanar mapping")
 
-	var again: WeaponModel = WeaponModel.build(&"rifle")
+	var again: WeaponModel = WeaponModel.build(&"rifle", WeaponModel.TACTICAL)
 	var first_textured: StandardMaterial3D = null
 	var second_textured: StandardMaterial3D = null
 	for m: StandardMaterial3D in rifle_mats:
@@ -53,7 +53,7 @@ func _initialize() -> void:
 	_check(first_textured != null and first_textured == second_textured,
 		"a second rifle reuses the textured material (no new material per gun)")
 
-	var smg: WeaponModel = WeaponModel.build(&"smg")
+	var smg: WeaponModel = WeaponModel.build(&"smg", WeaponModel.TACTICAL)
 	var smg_textured: int = 0
 	for m: StandardMaterial3D in _surface_materials(smg):
 		if m != null and m.normal_texture != null:
