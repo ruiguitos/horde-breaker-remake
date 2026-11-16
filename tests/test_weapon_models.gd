@@ -46,7 +46,7 @@ func _finish() -> void:
 
 func _test_models() -> void:
 	for id: StringName in WeaponModel.IDS:
-		var w := WeaponModel.build(id)
+		var w := WeaponModel.build(id, WeaponModel.TACTICAL)  # the old models' source GLB counts (the realistic ones: below)
 		var range_ok: Vector2 = LENGTHS[id]
 		_check(w.weapon_id == id and w.muzzle != null and w.muzzle.position.z < -0.4 and absf(w.muzzle.position.y) < 0.16,
 			"%s: muzzle ahead of the grip (%.2f m)" % [id, -w.muzzle.position.z])
@@ -85,13 +85,14 @@ func _test_models() -> void:
 ## rifle keeps its Poly Haven maps.
 func _test_realistic_variants() -> void:
 	_check(WeaponModel.model_path(&"rifle", &"realistic").ends_with("assault_rifle_realistic.glb"), "the realistic variant is its own GLB")
-	_check(WeaponModel.model_path(&"rifle") == WeaponModel.MODEL_DIR + "assault_rifle.glb", "the rifle without a variant is the current GLB")
+	_check(WeaponModel.model_path(&"rifle") == WeaponModel.model_path(&"rifle", &"realistic"), "the rifle without a variant is the realistic GLB (the default since 2026-11-16)")
+	_check(WeaponModel.model_path(&"rifle", WeaponModel.TACTICAL) == WeaponModel.MODEL_DIR + "assault_rifle.glb", "the tactical variant is the old GLB")
 	# Every weapon's realistic GLB (built from the tactical one, assets/models/weapons/realistic_build/)
 	# keeps the tactical parts, muzzle, support point and length, and gets its own textures.
 	for id: StringName in WeaponModel.IDS:
 		var path: String = WeaponModel.model_path(id, &"realistic")
 		_check(path.ends_with("%s_realistic.glb" % ("assault_rifle" if id == &"rifle" else String(id))), "%s: the realistic variant is its own GLB" % id)
-		var cur := WeaponModel.build_parts(id)
+		var cur := WeaponModel.build_parts(id, WeaponModel.TACTICAL)
 		var rl := WeaponModel.build_parts(id, &"realistic")
 		var same_parts: bool = rl.parts.size() == cur.parts.size()
 		for part_name: String in cur.parts:
@@ -108,7 +109,7 @@ func _test_realistic_variants() -> void:
 		_check(textured == rl.parts.size(), "%s: every realistic part has albedo and normal maps (%d of %d)" % [id, textured, rl.parts.size()])
 		cur.free()
 		rl.free()
-	var current := WeaponModel.build_parts(&"rifle")
+	var current := WeaponModel.build_parts(&"rifle", WeaponModel.TACTICAL)
 	var real := WeaponModel.build_parts(&"rifle", &"realistic")
 	var poly_haven: StandardMaterial3D = (current.parts["Upper receiver"] as MeshInstance3D).get_surface_override_material(0) as StandardMaterial3D
 	_check(poly_haven != null and poly_haven.normal_texture != null, "the current rifle keeps its Poly Haven normal map")
@@ -119,13 +120,13 @@ func _test_realistic_variants() -> void:
 	_check(charging.size() == 2 and charging.has("Charging handle stem") and charging.has("Charging handle T latch"), "the charging handle prefix finds both of the realistic rifle's parts")
 	var unknown := WeaponModel.build_parts(&"rifle", &"nonexistent")
 	var unknown_normal: Texture2D = (unknown.parts["Upper receiver"] as MeshInstance3D).get_surface_override_material(0).normal_texture
-	_check(unknown.variant == &"" and unknown_normal != null and unknown_normal.resource_path.ends_with("_nor_gl.res"), "an unknown variant is the current rifle, with its Poly Haven maps")
+	_check(unknown.variant == WeaponModel.TACTICAL and unknown_normal != null and unknown_normal.resource_path.ends_with("_nor_gl.res"), "an unknown variant is the current rifle, with its Poly Haven maps")
 	unknown.free()
 	var poly: StandardMaterial3D = (current.parts["Upper receiver"] as MeshInstance3D).get_surface_override_material(0)
 	_check(poly.normal_texture != null and poly.normal_texture.resource_path.ends_with("blue_metal_plate_nor_gl.res") and poly.albedo_texture == null, "the current rifle's normal map is the Poly Haven blue metal plate, and its colour stays the Blender one")
-	var first := WeaponModel.build(&"rifle")
+	var first := WeaponModel.build(&"rifle", WeaponModel.TACTICAL)
 	var second := WeaponModel.build(&"rifle", &"realistic")
-	var third := WeaponModel.build(&"rifle")
+	var third := WeaponModel.build(&"rifle", WeaponModel.TACTICAL)
 	_check(_world_texture(first, false) and not _world_texture(first, true) and _world_texture(second, true) and _world_texture(third, false) and not _world_texture(third, true), "the cache keeps the current and the realistic rifle apart, in either order")
 	first.free()
 	second.free()

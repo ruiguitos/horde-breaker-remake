@@ -2208,8 +2208,8 @@ func _horror() -> bool:
 	return context != null and context.atmosphere == &"horror"
 
 
-## The weapons' GLB variant of this run (RunContext.rifle_model; &"" is the current models,
-## &"realistic" the Blender ones of every weapon).
+## The weapons' GLB variant of this run (RunContext.rifle_model; &"" is the default, the
+## realistic Blender GLBs; &"tactical" the old ones).
 func _rifle_variant() -> StringName:
 	return context.rifle_model if context != null else &""
 

@@ -47,6 +47,10 @@ const VARIANTS: Dictionary = {
 		&"marksman": "res://assets/models/weapons/marksman_realistic/marksman_realistic.glb",
 	},
 }
+## The variant a weapon gets when none is asked for: the realistic Blender GLBs, the default
+## since 2026-11-16 (user's choice). TACTICAL asks for the old flat-colour models of FILES.
+const DEFAULT_VARIANT: StringName = &"realistic"
+const TACTICAL: StringName = &"tactical"
 ## Palm contact on the underside of each model's forearm, in grip space.
 const SUPPORT_POINTS: Dictionary = {
 	&"rifle": Vector3(0, 0.077180013, -0.26), &"smg": Vector3(0, 0.065170571, -0.23),
@@ -63,7 +67,7 @@ var length: float = 0.0  ## muzzle to butt (metres)
 ## build_parts only: each named part of the GLB by its node name.
 var parts: Dictionary = {}
 var support_point: Vector3  ## left palm contact, in grip space
-var variant: StringName = &""  ## the VARIANTS entry this copy is built from; &"" is the default
+var variant: StringName = &""  ## the VARIANTS entry this copy is built from, or TACTICAL for the old models
 
 
 static func build(id: StringName, variant: StringName = &"") -> WeaponModel:
@@ -152,12 +156,14 @@ static func _add_surface_maps(m: StandardMaterial3D, d: Dictionary) -> void:
 ## The variant a weapon is really built from: a variant without this weapon (or an
 ## unknown one) is the weapon's own model, with its own materials.
 static func effective_variant(id: StringName, variant: StringName) -> StringName:
-	return variant if VARIANTS.get(variant, {}).has(id) else &""
+	if variant == &"":
+		variant = DEFAULT_VARIANT
+	return variant if VARIANTS.get(variant, {}).has(id) else TACTICAL
 
 
 ## The GLB a weapon is built from: its variant's file when the variant has one.
 static func model_path(id: StringName, variant: StringName = &"") -> String:
-	var alternative: Dictionary = VARIANTS.get(variant, {})
+	var alternative: Dictionary = VARIANTS.get(effective_variant(id, variant), {})
 	if alternative.has(id):
 		return String(alternative[id])
 	return MODEL_DIR + String(FILES[id])
@@ -198,7 +204,7 @@ static func _asset(id: StringName, variant: StringName = &"") -> Dictionary:
 ## the GLB material itself for the rest, for weapons not in TEXTURED, and for
 ## every variant (a variant brings its own maps).
 static func _surface_material(id: StringName, mat: Material, variant: StringName = &"") -> Material:
-	if variant != &"" or not TEXTURED.has(id) or not mat is StandardMaterial3D:
+	if variant != TACTICAL or not TEXTURED.has(id) or not mat is StandardMaterial3D:
 		return mat
 	var key: String = String(mat.resource_name)
 	if not MATERIALS.has(key) or String(MATERIALS[key]["id"]) == "":

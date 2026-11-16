@@ -13,8 +13,9 @@ const HORROR_PATH: String = HandmadeIsland.ISLANDS_DIR + "beach_01.tscn"
 ## The map of the EXFIL mode: every EXFIL run plays this scene, whatever the seed (test/, never drawn).
 const EXFIL_PATH: String = "res://game/world/handmade/test/exfil_test.tscn"
 const MODES: Array[StringName] = [&"expedition", &"exfil"]
-## The Models choice for the Blender models under test (RunContext.rifle_model).
-const NEW_MODELS: StringName = &"realistic"
+## The Weapons choice for the old flat-colour models (RunContext.rifle_model); the realistic
+## Blender weapons are the default since 2026-11-16.
+const NEW_MODELS: StringName = &"tactical"
 
 
 ## The weapons the form offers for the primary slot (`primary` true) or the secondary.
@@ -97,9 +98,9 @@ static func open(parent: Node, on_start: Callable) -> MenuDialog:
 	row.add_child(seed_box)
 	# The mode sits with the seed, so the two-column grid keeps its height (the form must fit 960 x 540).
 	var mode := _choice(row, "Mode", _mode_items(), &"expedition")
-	# The Blender weapons under test: every weapon's realistic GLB (WeaponModel.VARIANTS). The enemies
-	# use their Blender models by default (ZombieModel.glb_walker). In the row too, for the same reason.
-	var models := _choice(row, "Models", [["Current", &""], ["New weapons (Blender)", NEW_MODELS]], &"")
+	# The old tactical weapons, to compare (the realistic Blender GLBs are the default). In the row
+	# too, for the same reason.
+	var models := _choice(row, "Weapons", [["Realistic", &""], ["Old tactical", NEW_MODELS]], &"")
 	# The form's values as a config.
 	var read_config := func() -> Dictionary:
 		var config: Dictionary = {
@@ -111,7 +112,7 @@ static func open(parent: Node, on_start: Callable) -> MenuDialog:
 			"threat": threat.get_item_metadata(threat.selected),
 			"seed": int(seed_box.value),
 		}
-		# Only the new models and the EXFIL mode add a key: the START config keeps its usual keys otherwise.
+		# Only the old weapons and the EXFIL mode add a key: the START config keeps its usual keys otherwise.
 		if models.get_item_metadata(models.selected) == NEW_MODELS:
 			config["rifle_model"] = NEW_MODELS
 		if mode.get_item_metadata(mode.selected) == &"exfil":
