@@ -109,6 +109,9 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
 
 ## Conteúdo e apresentação
 
+- [ ] **Refazer os menus (pedido de 2026-11-16)**: 18 ecrãs por refazer, inventário em
+  `docs/design/MENUS.md` («Menus a refazer»). Próximo passo: apresentar uma proposta de menus
+  super simples, depois dos inimigos.
 - [ ] Menus na direção A («field dossier»): armas simplificadas a 2026-11-15 (cartas num separador
   CARDS próprio, três números por arma); o LOADOUT não foi estreitado porque a folha dos perks
   usa a mesma coluna. Barco e debrief em papel a 2026-11-15. Feitos o título e o armory (classe com a fotografia

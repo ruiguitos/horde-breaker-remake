@@ -4,6 +4,37 @@ A implementação segue a imagem aprovada pelo utilizador: equipamento militar
 sóbrio, painéis escuros, tipografia condensada, contornos finos e destaque âmbar.
 O texto do jogo continua em inglês.
 
+## Menus a refazer (pedido do utilizador, 2026-11-16)
+
+O utilizador quer voltar a refazer os menus. Primeiro passo pedido: **uma só
+proposta em que os menus são super simples**, para ele decidir. Até lá, nada
+abaixo se considera fechado. Inventário dos ecrãs (código em `game/states/` e
+`game/ui/`), **18 no total**: 15 do jogador e 3 de desenvolvimento.
+
+| # | Ecrã | Ficheiro | Hoje |
+|---|------|----------|------|
+| 1 | Título | `states/title.gd` | dossier |
+| 2 | Definições | `ui/settings_panel.gd` | dossier |
+| 3 | Créditos | `ui/credits_panel.gd` | dossier |
+| 4 | Armory: classe, armas, cartas, perks | `states/armory.gd`, `ui/armory_*.gd`, `ui/perk_node_view.gd`, `ui/class_preview.gd` | dossier (o mais carregado) |
+| 5 | Barco: rota e briefing | `states/boat.gd`, `ui/route_map.gd`, `ui/route_preview.gd` | dossier; carta náutica escura |
+| 6 | Acampamento | `states/camp.gd` | dossier |
+| 7 | Ecrã de carregamento | `ui/loading_screen.gd` | dossier |
+| 8 | Rádio / diálogo | `ui/dialogue_box.gd`, `ui/portrait.gd` | dossier |
+| 9 | HUD | `ui/hud.gd` | simplificado a 2026-11-15 |
+| 10 | Minimapa | `ui/minimap.gd` | tema antigo (`UiTheme`) |
+| 11 | Pausa | `ui/hud.gd` | dossier |
+| 12 | Escolha de cartas ao subir de nível | `ui/hud.gd`, `world/island.gd` | misto |
+| 13 | Fim de ilha | `ui/island_end_panel.gd` | dossier |
+| 14 | Derrota | `ui/hud.gd` | dossier |
+| 15 | Debrief | `states/debrief.gd` | dossier |
+| 16 | DEV menu | `ui/dev_menu.gd` | tema antigo |
+| 17 | DEV sandbox | `ui/dev_sandbox.gd` | tema antigo |
+| 18 | DEV test panel | `ui/dev_test_panel.gd` | tema antigo |
+
+Peças partilhadas que o redesenho toca: `ui/dossier.gd`, `ui/ui_theme.gd`,
+`ui/menu_dialog.gd`, `ui/focus_brackets.gd`, `ui/marked_box.gd`, `ui/typewriter.gd`.
+
 ## Os quatro ecrãs
 
 | Ecrã | Ação principal | Dados reais |
