@@ -336,13 +336,16 @@ func _test_pause() -> void:
 	var bonus: int = int(kept * GameData.EXTRACTION_INTEL_MULTIPLIER) - kept
 	_check((_hud.get("_pause_banked") as Label).text == "40" and (_hud.get("_pause_island") as Label).text == "+%d" % _run.intel_earned() and (_hud.get("_pause_bonus") as Label).text == "+%d" % bonus,
 		"pause shows Intel banked, this island and the extraction bonus at risk")
-	# The field dossier look (2026-11-11): the pause is a paper sheet over the blurred game.
-	var paper: int = 0
+	# The simple look (2026-11-16): no sheet or box behind the pause, only the dimmed game
+	# (the small weapon and card chips of the build are content, not frames).
+	var boxes: int = 0
 	for node in pause.find_children("*", "PanelContainer", true, false):
+		if node.get_parent() is HFlowContainer or node.get_parent() is GridContainer:
+			continue
 		var box := (node as PanelContainer).get_theme_stylebox("panel") as StyleBoxFlat
-		if box != null and box.bg_color.is_equal_approx(Dossier.PAPER_DARK):
-			paper += 1
-	_check(paper == 1, "the pause sits on one paper sheet (%d)" % paper)
+		if box != null and box.bg_color.a > 0.0:
+			boxes += 1
+	_check(boxes == 0, "the pause draws no sheet or box (%d)" % boxes)
 
 
 func _test_abandon() -> void:

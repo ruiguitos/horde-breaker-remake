@@ -906,14 +906,14 @@ func _build_cards(root: Control) -> void:
 	_cards_panel.visible = false
 	root.add_child(_cards_panel)
 	_cards_panel.theme = Dossier.theme()
-	_cards_panel.add_child(_blur(0.4))
+	_cards_panel.add_child(_blur(0.18))
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.offset_bottom = -64  # room for the build strip
 	_cards_panel.add_child(center)
-	# The file's back sheet behind the cards (the dossier look): ink reads on it, not on the blur.
+	# No visible sheet (the simple look): the dim behind is dark enough; the box keeps the margins.
 	var sheet := PanelContainer.new()
-	var cards_sheet := Dossier.sheet_box(Dossier.PAPER_DARK, 14.0)
+	var cards_sheet := Dossier.sheet_box(Color.TRANSPARENT, 14.0)
 	cards_sheet.content_margin_top = 6  # the cards are tall: the sheet must fit 1600 x 900 above the build strip
 	cards_sheet.content_margin_bottom = 8
 	sheet.add_theme_stylebox_override("panel", cards_sheet)
@@ -1202,15 +1202,15 @@ func _build_pause(root: Control) -> void:
 	_pause_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_pause_panel.visible = false
 	root.add_child(_pause_panel)
-	var blur := _blur(0.55)
+	var blur := _blur(0.18)  # the simple look: the game dimmed far down, the menu straight on it
 	_pause_panel.add_child(blur)
-	_pause_panel.theme = Dossier.theme()
+	_pause_panel.theme = Dossier.lined_theme()  # the menu as lines of text; the chosen one amber
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_pause_panel.add_child(center)
-	# The file's back sheet (the dossier look): ink reads on it, not on the blurred game.
+	# No sheet (the simple look): the dim behind is dark enough for the text.
 	var sheet := PanelContainer.new()
-	sheet.add_theme_stylebox_override("panel", Dossier.sheet_box(Dossier.PAPER_DARK, 26.0))
+	sheet.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	center.add_child(sheet)
 	_pause_content = VBoxContainer.new()
 	_pause_content.name = "PauseContent"
@@ -1471,7 +1471,7 @@ func _settings() -> void:
 ## see-through amount of the old glass boxes, and paper is opaque.
 func _paper_box(parent: Control, _alpha: float = 1.0) -> PanelContainer:
 	var box := PanelContainer.new()
-	var s := Dossier.sheet_box(Dossier.PAPER, 12.0)
+	var s := Dossier.sheet_box(Color.TRANSPARENT, 12.0)  # no boxes in the simple look; the margins stay
 	s.shadow_size = 0
 	s.border_color = Dossier.LINE
 	s.set_border_width_all(1)

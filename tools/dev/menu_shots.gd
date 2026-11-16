@@ -1,7 +1,7 @@
 extends SceneTree
 ## Dev tool: pictures of the screens outside the main menus, to check they share the title's
 ## dossier look: the expedition camp, the loading screen, the end-of-island panel, the boat
-## briefing dialogue and the defeat report. Needs a window (not headless):
+## briefing dialogue, the defeat report, the pause and the level-up cards (empty, no run). Needs a window (not headless):
 ##   godot --path . --resolution 1600x900 --windowed --position 3000,3000 --script res://tools/dev/menu_shots.gd -- <out dir>
 
 var _out: String
@@ -32,7 +32,7 @@ func _process(_d: float) -> bool:
 	if _f == 200:
 		var image: Image = root.get_viewport().get_texture().get_image()
 		image.convert(Image.FORMAT_RGB8)
-		image.save_png(_out.path_join("%d_%s.png" % [_step, ["camp", "loading", "end_panel", "briefing", "defeat"][_step]]))
+		image.save_png(_out.path_join("%d_%s.png" % [_step, ["camp", "loading", "end_panel", "briefing", "defeat", "pause", "cards"][_step]]))
 		_node.queue_free()
 		_node = null
 		_step += 1
@@ -74,5 +74,10 @@ func _make(step: int) -> Node:
 		4:
 			var hud := Hud.new()
 			hud.ready.connect(func() -> void: (hud.get("_death_panel") as Control).visible = true)
+			return hud
+		5, 6:
+			var hud := Hud.new()
+			var panel: String = "_pause_panel" if step == 5 else "_cards_panel"
+			hud.ready.connect(func() -> void: (hud.get(panel) as Control).visible = true)
 			return hud
 	return null
