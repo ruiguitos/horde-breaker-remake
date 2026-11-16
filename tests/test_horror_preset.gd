@@ -49,7 +49,7 @@ func _run() -> void:
 		_check(_ambience_count(normal) == 1, "a normal island has only the sea ambience")
 		_check(not normal.music.silenced(), "a normal island plays its music from the start")
 		_check(not normal.hud.minimal and not normal.hud._survivor_row.visible and not normal.hud._boss_row.visible, "a normal island has the full HUD, with its survivor and boss rows still hidden")
-		_check(normal.get("_player").get("_gun_node").get("variant") == &"", "a normal island holds the current rifle")
+		_check(normal.get("_player").get("_gun_node").get("variant") == WeaponModel.DEFAULT_VARIANT, "a normal island holds the default (realistic) rifle")
 		var normal_surface: MeshInstance3D = normal.find_child("Roads", true, false).find_child("Surface", true, false) as MeshInstance3D
 		_check(normal_surface != null and normal_surface.material_override is StandardMaterial3D and (normal_surface.material_override as StandardMaterial3D).albedo_color.get_luminance() > 0.4, "a normal island keeps its usual, light road surface")
 		await _free(normal)
