@@ -6,9 +6,10 @@ O texto do jogo continua em inglês.
 
 ## Menus a refazer (pedido do utilizador, 2026-11-16)
 
-O utilizador quer voltar a refazer os menus. Primeiro passo pedido: **uma só
-proposta em que os menus são super simples**, para ele decidir. Até lá, nada
-abaixo se considera fechado. Inventário dos ecrãs (código em `game/states/` e
+O utilizador quer voltar a refazer os menus. **Direção aprovada a 2026-11-16: menus
+super simples** (ver `docs/DECISIONS.md` e a maqueta
+https://claude.ai/artifact/Lne35hVdZyNNmzme1sBUWj). Substitui a direção «field dossier»
+descrita mais abaixo, que fica como histórico. Inventário dos ecrãs (código em `game/states/` e
 `game/ui/`), **18 no total**: 15 do jogador e 3 de desenvolvimento.
 
 | # | Ecrã | Ficheiro | Hoje |

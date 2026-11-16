@@ -65,3 +65,4 @@ registadas as decisões dessa data.
 - Valores de jogo (HP, dano, velocidades, cooldowns): hipóteses de playtest em `game/data/catalog.gd`.
 - Humor DRG: onde aparece (texto, rádio, nomes).
 - Dificuldade à Hazard: depois do slice.
+| 2026-11-16 | **Menus super simples**: fundo escuro liso, uma família de letra (Barlow Condensed nos títulos, Inter no texto), um só destaque âmbar, sem painéis, papel nem molduras; cada ecrã é uma lista curta, a opção escolhida a âmbar com ▸, as teclas em baixo. Maqueta: https://claude.ai/artifact/Lne35hVdZyNNmzme1sBUWj | O utilizador pediu para refazer os menus e gostou da proposta («gostei da proposta»). Substitui a direção «field dossier» (2026-11-11) nos 18 ecrãs de [MENUS.md](design/MENUS.md). |
