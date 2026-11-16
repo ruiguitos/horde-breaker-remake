@@ -58,7 +58,7 @@ func _build_exhibit() -> void:
 	photo.offset_right = -34
 	photo.offset_bottom = -(FOOTER_HEIGHT + 58)
 	_root.add_child(photo)
-	var caption := Dossier.typed("EXHIBIT A · ARRIVAL, PIER 2", 13, Dossier.PAPER_DARK)
+	var caption := Dossier.typed("EXHIBIT A · ARRIVAL, PIER 2", 13, Dossier.INK_MUTED)
 	caption.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	caption.position = Vector2(COLUMN_WIDTH + 38, -(FOOTER_HEIGHT + 40))
 	_root.add_child(caption)

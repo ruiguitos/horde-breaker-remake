@@ -1,32 +1,34 @@
 class_name Dossier
 extends RefCounted
-## The "field dossier" look of the menus (visual direction A, chosen by the user on 2026-11-10):
-## the company's case file. Paper and ink, typewriter text, a stamp, photographs clipped to the
-## page. Only the menus outside the island use it: the HUD and the dialogs keep UiTheme, whose
-## light text is made for dark plates over the world.
-## Fonts: Special Elite, a worn typewriter face (Apache 2.0, accepted by the user for this font on
-## 2026-11-11), for everything typed; Libre Franklin (OFL) for running text.
+## The menus' look: "super simple" (chosen by the user on 2026-11-16, replacing the field
+## dossier of 2026-11-10; see docs/DECISIONS.md and docs/design/MENUS.md). One flat dark ground,
+## one type family, one amber accent; no paper, frames, stamps or photographs. The class keeps
+## the dossier's names (PAPER is now the ground, INK the text, STAMP the accent) so every screen
+## built on it changes at once; the names are historical.
+## Fonts (OFL, in assets/fonts): Barlow Condensed SemiBold for titles and choices, Barlow for
+## running text.
 
-const DESK := Color("3b3a33")  ## the table under the file
-const PAPER := Color("e9e2d0")
-const PAPER_DARK := Color("d8cfb8")  ## a second sheet, a hovered line
-const PAPER_LINE := Color("b9ae93")  ## ruled lines and dashes
-const INK := Color("1e1b16")
-const INK_MUTED := Color("5a5345")  ## 5.4:1 on PAPER
-const STAMP := Color("8e2019")  ## the red of a rubber stamp
-const PHOTO_BORDER := Color("f4efe2")
-const CORK := Color("a58a63")  ## the pin board of the perks
-const TYPED_FONT := "res://assets/fonts/special_elite/SpecialElite-Regular.ttf"
-const BODY_FONT := "res://assets/fonts/libre_franklin/LibreFranklin-Variable.ttf"
-const TYPED_SCALE := 0.82  ## a size meant for the condensed face, in the typewriter face
-const OLIVE := Color("3f5a34")  ## "ok": owned, equipped (5.9:1 on PAPER)
-const INK_BLUE := Color("27496b")  ## information, the combat branch
+const DESK := Color("0e0f11")  ## behind the ground (was the table under the file)
+const PAPER := Color("121315")  ## the ground
+const PAPER_DARK := Color("1c1d20")  ## a hovered line, a quiet block
+const PAPER_LINE := Color("34353a")  ## thin rules
+const INK := Color("eceae4")  ## text, 15:1 on PAPER
+const INK_MUTED := Color("9a978f")  ## secondary text, 6.5:1 on PAPER
+const STAMP := Color("e0a43a")  ## the accent: the chosen line, the main action
+const PHOTO_BORDER := Color("121315")
+const CORK := Color("1c1d20")  ## the perks' board, now a quiet block
+const TYPED_FONT := "res://assets/fonts/barlow_condensed/BarlowCondensed-SemiBold.ttf"
+const BODY_FONT := "res://assets/fonts/barlow/Barlow-Regular.ttf"
+const BODY_BOLD_FONT := "res://assets/fonts/barlow/Barlow-SemiBold.ttf"
+const TYPED_SCALE := 1.0  ## the layouts were sized for the condensed face
+const OLIVE := Color("8fbf6a")  ## "ok": owned, equipped (8.8:1 on PAPER)
+const INK_BLUE := Color("7fb3d5")  ## information, the combat branch (8.4:1)
 
 ## UiTheme's names with the page's colours, so a menu's code reads the same in either look.
 const TEXT := INK
 const TEXT_MUTED := INK_MUTED
 const MUTED := INK_MUTED
-const LINE := PAPER_LINE
+const LINE := Color(0, 0, 0, 0)  ## no frames in the simple look: a border drawn in LINE disappears
 const ACCENT := STAMP
 const ON_ACCENT := PAPER
 const BG := PAPER
@@ -41,22 +43,20 @@ static var _lined: Theme
 static var _fonts: Dictionary = {}  ## key -> Font
 
 
-## The typewriter face (one weight: a typewriter has no bold).
+## The title face (Barlow Condensed SemiBold); the name stays from the typewriter of the dossier.
 static func typed_font() -> Font:
 	if not _fonts.has("typed"):
 		_fonts["typed"] = load(TYPED_FONT) if ResourceLoader.exists(TYPED_FONT) else UiTheme.mono_bold_font()
 	return _fonts["typed"]
 
 
-## Running text, at a weight of the variable face (400 regular, 600 semibold).
+## Running text: Barlow Regular, or SemiBold from weight 500 up.
 static func body_font(weight: int = 400) -> Font:
 	var key: String = "body%d" % weight
 	if not _fonts.has(key):
-		if ResourceLoader.exists(BODY_FONT):
-			var v := FontVariation.new()
-			v.base_font = load(BODY_FONT)
-			v.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): weight}
-			_fonts[key] = v
+		var path: String = BODY_BOLD_FONT if weight >= 500 else BODY_FONT
+		if ResourceLoader.exists(path):
+			_fonts[key] = load(path)
 		else:
 			_fonts[key] = UiTheme.body_font()
 	return _fonts[key]
@@ -70,19 +70,20 @@ static func lined_theme() -> Theme:
 	t.default_font = typed_font()
 	for state: String in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 		var line := StyleBoxFlat.new()
-		line.bg_color = PAPER_DARK if state in ["hover", "pressed", "hover_pressed"] else Color.TRANSPARENT
-		line.border_color = PAPER_LINE
-		line.border_width_bottom = 1
+		line.bg_color = Color.TRANSPARENT
 		line.content_margin_left = 10
 		line.content_margin_right = 10
 		line.content_margin_top = 8
 		line.content_margin_bottom = 8
 		t.set_stylebox(state, "Button", line)
-	t.set_stylebox("focus", "Button", _frame(INK, 2))
-	t.set_stylebox("focus", "PrimaryButton", _frame(STAMP, 3))
+	# The chosen line is amber, with a thin amber mark on its left (colour and shape, not colour alone).
+	for item: String in ["font_hover_color", "font_focus_color", "font_pressed_color", "font_hover_pressed_color"]:
+		t.set_color(item, "Button", STAMP)
+	t.set_stylebox("focus", "Button", _mark())
+	t.set_stylebox("focus", "PrimaryButton", _mark())
 	var rule := StyleBoxLine.new()
-	rule.color = INK
-	rule.thickness = 2
+	rule.color = PAPER_LINE
+	rule.thickness = 1
 	t.set_stylebox("separator", "HSeparator", rule)
 	_lined = t
 	return t
@@ -131,21 +132,21 @@ static func _to_paper(box: StyleBox) -> void:
 	elif box is MarkedBox:
 		var marked := box as MarkedBox
 		_to_paper(marked.base)
-		marked.dash_color = INK_MUTED
+		marked.dash_color = PAPER_LINE  # a faint outline: no frames, but an empty slot still reads as empty
 		marked.mark_color = ink_of(marked.mark_color)
 		marked.badge_ink = PAPER
 	elif box is FocusBrackets:
 		(box as FocusBrackets).color = STAMP
 
 
-## A fill or a border of the dark look, on paper: the amber of an action is inked in, panels are
-## sheets, lines are ruled lines.
+## A fill or a border of UiTheme's dark look, in the simple look: the amber of an action stays
+## amber, panels sink into the ground, lines are thin rules.
 static func paper_of(c: Color, border: bool = false) -> Color:
 	if c.a <= 0.0:
 		return c
 	var out: Color
 	if c.is_equal_approx(Color(UiTheme.ACCENT, c.a)):
-		out = INK
+		out = STAMP
 	elif c.is_equal_approx(Color(UiTheme.SUCCESS, c.a)):
 		out = OLIVE
 	elif c.is_equal_approx(Color(UiTheme.DANGER, c.a)):
@@ -153,9 +154,9 @@ static func paper_of(c: Color, border: bool = false) -> Color:
 	elif c.is_equal_approx(Color(UiTheme.INFO, c.a)):
 		out = INK_BLUE
 	elif c.r > 0.75 and c.g > 0.45 and c.b < 0.5:
-		out = INK.lightened(0.14)  # a hovered or pressed amber: still inked in
+		out = STAMP.lightened(0.14)  # a hovered or pressed amber
 	elif border:
-		out = INK if c.get_luminance() > 0.6 else PAPER_LINE
+		return Color.TRANSPARENT  # no frames: only accent, success, danger and info borders stay
 	elif c.is_equal_approx(Color(UiTheme.PANEL_RAISED, c.a)):
 		out = PAPER_DARK
 	elif c.get_luminance() < 0.35:
@@ -237,37 +238,20 @@ static func sheet(color: Color = PAPER) -> ColorRect:
 	return r
 
 
-## A rubber stamp: boxed red capitals, a few degrees off the line.
-static func stamp(text: String, font_size: int = 18, degrees: float = -4.0) -> Label:
-	var l := typed(text, font_size, STAMP, true)
-	var box := StyleBoxFlat.new()
-	box.bg_color = Color.TRANSPARENT
-	box.border_color = STAMP
-	box.set_border_width_all(3)
-	box.content_margin_left = 12
-	box.content_margin_right = 12
-	box.content_margin_top = 4
-	box.content_margin_bottom = 4
-	l.add_theme_stylebox_override("normal", box)
-	l.rotation_degrees = degrees
-	return l
+## A status word (was the dossier's rubber stamp): plain amber capitals, level with the line.
+static func stamp(text: String, font_size: int = 18, _degrees: float = 0.0) -> Label:
+	return typed(text, font_size, STAMP, true)
 
 
 ## A photograph clipped to the page: the picture in a pale border, slightly turned. The caller
 ## places it; it turns about its centre whatever its size.
-static func photo(path: String, degrees: float = -1.2) -> PanelContainer:
+static func photo(path: String, _degrees: float = 0.0) -> PanelContainer:
 	var frame := PanelContainer.new()
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var border := StyleBoxFlat.new()
-	border.bg_color = PHOTO_BORDER
-	border.set_content_margin_all(10)
-	border.shadow_color = Color(0, 0, 0, 0.35)
-	border.shadow_size = 6
-	frame.add_theme_stylebox_override("panel", border)
+	frame.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	var picture := UiTheme.texture(path)
 	picture.clip_contents = true
 	frame.add_child(picture)
-	frame.rotation_degrees = degrees
 	frame.resized.connect(func() -> void: frame.pivot_offset = frame.size * 0.5)
 	return frame
 
@@ -277,14 +261,13 @@ static func sheet_box(color: Color = PAPER, margin: float = 14.0) -> StyleBoxFla
 	var box := StyleBoxFlat.new()
 	box.bg_color = color
 	box.set_content_margin_all(margin)
-	box.shadow_color = Color(0, 0, 0, 0.3)
-	box.shadow_size = 4
-	return box
+	return box  # flat: no shadow in the simple look
 
 
 ## A pin holding a card to the board: a round red head, centred on the card's top edge.
 static func pin(color: Color = STAMP) -> Panel:
 	var head := Panel.new()
+	head.visible = false  # no pins in the simple look
 	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var dot := StyleBoxFlat.new()
 	dot.bg_color = color
@@ -298,6 +281,17 @@ static func pin(color: Color = STAMP) -> Panel:
 	head.offset_top = -7
 	head.offset_bottom = 7
 	return head
+
+
+## The chosen line's mark: a 3 px amber bar on its left edge.
+static func _mark() -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = Color.TRANSPARENT
+	s.border_color = STAMP
+	s.border_width_left = 3
+	s.set_expand_margin_all(0)
+	s.expand_margin_left = 8
+	return s
 
 
 ## A dropdown chevron in ink.

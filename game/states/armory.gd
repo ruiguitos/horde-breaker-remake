@@ -166,6 +166,7 @@ func _build_header_band() -> void:
 		tile.name = "AzulejoRight" if right else "AzulejoLeft"
 		tile.texture = Art.tile(int(HEADER_HEIGHT))
 		tile.modulate = Color(1, 1, 1, 0.5)  # discreet: the azulejo frames the header, it does not compete with the character
+		tile.visible = false  # the simple look (2026-11-16) has no ornaments; kept in the tree for the tests
 		tile.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tile.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT if right else Control.PRESET_TOP_LEFT)
@@ -350,9 +351,9 @@ func _classes() -> void:
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	heading.add_theme_constant_override("outline_size", 6)
 	heading.add_theme_color_override("font_outline_color", Color(UiTheme.BG, 0.6))
-	heading.add_theme_color_override("font_color", Dossier.PAPER)  # over the shelter, not on a sheet
+	heading.add_theme_color_override("font_color", Dossier.INK)  # light text over the shelter
 	_content.add_child(heading)
-	var role := Dossier.label(_role(profile.selected_class, 0), 16, Dossier.PAPER_DARK)
+	var role := Dossier.label(_role(profile.selected_class, 0), 16, Dossier.INK_MUTED)
 	role.name = "ClassRole"
 	role.add_theme_font_override("font", UiTheme._spaced(Dossier.typed_font(), 2))
 	role.autowrap_mode = TextServer.AUTOWRAP_OFF
