@@ -31,7 +31,7 @@ func _run() -> void:
 		var probe := func() -> void:
 			var gun: WeaponModel = soldier.get("_gun_node") as WeaponModel
 			var palm: Vector3 = skeleton.get_bone_global_pose(left) * PALM_LOCAL
-			var target: Vector3 = skeleton.get_bone_global_pose(right) * grip_from_hand * gun.support_point
+			var target: Vector3 = skeleton.get_bone_global_pose(right) * grip_from_hand * (gun.basis * (gun.support_point + Vector3(0, 0, float(soldier.get("_support").get("slide")))))  # the gun may be drawn larger (SoldierModel.TP_GUN_SCALE); the palm may slide back along the handguard (WeaponSupportHold.MAX_SLIDE)
 			_max_error = maxf(_max_error, palm.distance_to(target))
 			_samples += 1
 		skeleton.skeleton_updated.connect(probe)

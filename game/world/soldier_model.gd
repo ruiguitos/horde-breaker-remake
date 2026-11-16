@@ -66,6 +66,10 @@ const MAX_CYCLES: float = 2.2  ## cycles/s cap (the Breaker dash is ~20 m/s)
 ## A carried fuel can's handle in the soldier's space: island.gd hangs the
 ## can at CARRY_OFFSET (0.38, 0.25, 0.05) and the can is 0.5 m tall.
 const CARRY_HAND := Vector3(0.36, 0.8, 0.05)
+## The guns in the soldier's hands are drawn larger than real: the blocky soldier's hands and
+## shoulders are oversized, and at real size the guns read as toys (user's request, 2026-11-16).
+## First person keeps real size (ViewModel.GUN_SCALE), where the arms are real size too.
+static var TP_GUN_SCALE: float = 1.15
 
 const PALETTES: Dictionary = {
 	&"recruit": {
@@ -98,6 +102,7 @@ var _tree: AnimationTree
 var _rig: LocomotionRig
 var _hold: SkeletonModifier3D
 var _support: SkeletonModifier3D
+var _shoulder: Node  ## RifleShoulderHold: the stock in the right shoulder
 var _feet: SkeletonModifier3D
 ## Optional rendered terrain sampler, receiving a world point (metres).
 var ground_height: Callable
@@ -241,6 +246,11 @@ func _build_model(scene: PackedScene) -> void:
 	if class_id == &"vanguard":
 		_hold.set("pose_file", VANGUARD_HOLD)
 	_skeleton.add_child(_hold)
+	# The stock goes to the right shoulder (not the sternum) before the support hand finds the gun.
+	_shoulder = (load("res://game/world/rifle_shoulder_hold.gd") as Script).new()
+	_shoulder.name = "RifleShoulderHold"
+	_shoulder.set("grip_from_hand", _rifle_muzzle.transform * Transform3D(Basis.IDENTITY, WeaponModel.GRIP_FROM_MUZZLE))
+	_skeleton.add_child(_shoulder)
 	_support = (load("res://game/world/weapon_support_hold.gd") as Script).new()
 	_support.name = "WeaponSupportHold"
 	_support.set("grip_from_hand", _rifle_muzzle.transform * Transform3D(Basis.IDENTITY, WeaponModel.GRIP_FROM_MUZZLE))
@@ -377,8 +387,11 @@ func set_weapon(id: StringName) -> void:
 	_gun_node = gun
 	if _support != null:
 		_support.set("weapon", gun)
+	if _shoulder != null:
+		_shoulder.set("weapon", gun)
 	if _skeleton != null:
 		gun.position = WeaponModel.GRIP_FROM_MUZZLE
+		gun.scale = Vector3.ONE * TP_GUN_SCALE
 		_gun_mount.add_child(gun)
 	else:
 		gun.position = Vector3(0.18, -0.24, -0.34)  # grip in the right glove
