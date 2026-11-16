@@ -1,5 +1,6 @@
 extends SceneTree
-## Windowed captures of the zombie and weapon art (needs a GPU; not a test).
+## Windowed captures of the zombie and weapon art (needs a GPU; not a test). Add "glb" after
+## the shot to draw the walkers with the Blender walker.glb.
 ##   godot --path . --script res://tools/dev/zombie_preview.gd -- <PNG path> <shot>
 ## Shots: lineup (Recruit + the 4 zombie variants), walk (mid-stride, side
 ## view), closeup (faces, gore and missing parts), back, corpses, variety
@@ -35,6 +36,8 @@ var _bench_draw: float = 0.0
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
+	# A third argument "glb" draws the walkers with the Blender walker.glb (the DEV new models).
+	ZombieModel.glb_walker = args.has("glb")
 	if args.is_empty():
 		print("Usage: zombie_preview.gd -- <PNG path> [lineup|walk|closeup|back|corpses|variety|crowd|weapons|hands|fp_<id>|bench|bench_empty]")
 		quit(1)

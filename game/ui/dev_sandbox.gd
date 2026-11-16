@@ -13,8 +13,8 @@ const HORROR_PATH: String = HandmadeIsland.ISLANDS_DIR + "beach_01.tscn"
 ## The map of the EXFIL mode: every EXFIL run plays this scene, whatever the seed (test/, never drawn).
 const EXFIL_PATH: String = "res://game/world/handmade/test/exfil_test.tscn"
 const MODES: Array[StringName] = [&"expedition", &"exfil"]
-## The primary-weapon item for the assault rifle with the realistic model (WeaponModel.VARIANTS).
-const REALISTIC_RIFLE: StringName = &"rifle_realistic"
+## The Models choice for the Blender models under test (RunContext.rifle_model).
+const NEW_MODELS: StringName = &"realistic"
 
 
 ## The weapons the form offers for the primary slot (`primary` true) or the secondary.
@@ -80,11 +80,7 @@ static func open(parent: Node, on_start: Callable) -> MenuDialog:
 	var island := _choice(grid, "Island", _island_items(), start["path"])
 	var mission := _choice(grid, "Mission", _mission_items(), start["mission"])
 	var class_id := _choice(grid, "Class", _class_items(), start["class"])
-	# The realistic rifle is a primary weapon of its own in the list (a visual test of the same weapon),
-	# so the form keeps its height at 960 x 540.
-	var primaries: Array = _weapon_items(true)
-	primaries.insert(1, ["Assault Rifle (realistic test)", REALISTIC_RIFLE])
-	var primary := _choice(grid, "Primary weapon", primaries, start["primary"])
+	var primary := _choice(grid, "Primary weapon", _weapon_items(true), start["primary"])
 	var secondary := _choice(grid, "Secondary weapon", _weapon_items(false), start["secondary"])
 	var threat := _choice(grid, "Threat", _threat_items(), start["threat"])
 	var row := HBoxContainer.new()
@@ -101,21 +97,23 @@ static func open(parent: Node, on_start: Callable) -> MenuDialog:
 	row.add_child(seed_box)
 	# The mode sits with the seed, so the two-column grid keeps its height (the form must fit 960 x 540).
 	var mode := _choice(row, "Mode", _mode_items(), &"expedition")
+	# The Blender models under test: every weapon's realistic GLB and the walker (WeaponModel.VARIANTS,
+	# ZombieModel.glb_walker). In the row too, for the same reason.
+	var models := _choice(row, "Models", [["Current", &""], ["New (Blender test)", NEW_MODELS]], &"")
 	# The form's values as a config.
 	var read_config := func() -> Dictionary:
-		var picked: StringName = primary.get_item_metadata(primary.selected)
 		var config: Dictionary = {
 			"path": island.get_item_metadata(island.selected),
 			"mission": mission.get_item_metadata(mission.selected),
 			"class": class_id.get_item_metadata(class_id.selected),
-			"primary": &"rifle" if picked == REALISTIC_RIFLE else picked,
+			"primary": primary.get_item_metadata(primary.selected),
 			"secondary": secondary.get_item_metadata(secondary.selected),
 			"threat": threat.get_item_metadata(threat.selected),
 			"seed": int(seed_box.value),
 		}
-		# Only the realistic rifle and the EXFIL mode add a key: the START config keeps its usual keys otherwise.
-		if picked == REALISTIC_RIFLE:
-			config["rifle_model"] = &"realistic"
+		# Only the new models and the EXFIL mode add a key: the START config keeps its usual keys otherwise.
+		if models.get_item_metadata(models.selected) == NEW_MODELS:
+			config["rifle_model"] = NEW_MODELS
 		if mode.get_item_metadata(mode.selected) == &"exfil":
 			config["mode"] = &"exfil"
 		return config

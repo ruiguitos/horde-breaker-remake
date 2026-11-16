@@ -38,7 +38,8 @@ var atmosphere: StringName = &"normal"
 ## Game mode: &"expedition" (the normal run) or &"exfil" (DEV sandbox only: endless waves, the
 ## extraction opens at EXFIL_OPEN_SECONDS). No mission is made for exfil.
 var mode: StringName = &"expedition"
-## The assault rifle's model in this run: &"realistic" for the DEV visual test, &"" for the current one.
+## The models in this run: &"realistic" for the DEV visual test (the Blender GLB of every weapon
+## and the Blender walker), &"" for the current ones.
 var rifle_model: StringName = &""
 ## Story pages recovered during this run.
 var lore_found: int = 0

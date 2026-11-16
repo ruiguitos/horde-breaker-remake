@@ -154,6 +154,26 @@ const STUMP_LENGTHS: Array[float] = [0.16, 0.1, 0.13, 0.08]
 static var _meshes: Array[ArrayMesh] = []
 static var _materials: Array[ShaderMaterial] = []
 
+## The Blender walker (enemies_build/build_enemy.py, CC0): when glb_walker is on (the DEV
+## sandbox's new models), every walker variant draws this one mesh instead of the boxes
+## above. It is read into the same packed format, so zombie.gdshader poses and recolours
+## it like the boxes: each triangle takes its part from its GLB node (split at the elbow
+## and the knee), and its layer, palette slot and kind from its material.
+const GLB_WALKER: String = "res://assets/models/characters/walker_original/walker.glb"
+const GLB_ELBOW_Y: float = 1.21
+const GLB_KNEE_Y: float = 0.52
+const GLB_WAIST_Y: float = 1.04
+## Material name -> [layer, slot, kind, gore].
+const GLB_MATERIALS: Dictionary = {
+	"skin_rot": [Layer.SKIN, Slot.SKIN, Kind.SURFACE, 0.25],
+	"cloth_shirt": [Layer.JERSEY, Slot.SHIRT, Kind.SURFACE, 0.2],
+	"cloth_trousers": [Layer.DENIM, Slot.TROUSERS, Kind.SURFACE, 0.15],
+	"flesh_wound": [Layer.SKIN, Slot.FIXED, Kind.FLESH, 0.0],
+}
+static var glb_walker: bool = false
+static var _glb_mesh: ArrayMesh = null
+static var _glb_tried: bool = false
+
 
 ## The per-zombie seed. The horde uses the enemy's rolled base speed
 ## (Horde.speeds), which travels with it when indices are compacted, so the
@@ -284,6 +304,8 @@ static func shows(b: Dictionary, mask: int) -> bool:
 
 ## The shared mesh of one variant (built once, then cached).
 static func mesh(variant: int) -> ArrayMesh:
+	if glb_walker and glb_mesh() != null:
+		return _glb_mesh
 	if _meshes.is_empty():
 		for v in VARIANTS:
 			_meshes.append(_build_mesh(v))
@@ -585,6 +607,123 @@ static func boxes(variant: int) -> Array[Dictionary]:
 	add.call(Vector3(0, 1.85, -0.11), Vector3(0.27, 0.12, 0.06), Part.HEAD, Layer.LEATHER, Slot.HAIR, 0.0, Kind.SURFACE, Show.HAIR)
 	add.call(Vector3(0, 1.74, -0.125), Vector3(0.25, 0.2, 0.05), Part.HEAD, Layer.LEATHER, Slot.HAIR, 0.0, Kind.SURFACE, Show.HAIR, Show.LONG_HAIR)
 	return out
+
+
+## The Blender walker in the packed format, built once; null if the GLB does not load.
+static func glb_mesh() -> ArrayMesh:
+	if not _glb_tried:
+		_glb_tried = true
+		_glb_mesh = build_glb(GLB_WALKER)
+		if _glb_mesh == null:
+			push_warning("walker.glb did not load: the walkers keep the box models")
+	return _glb_mesh
+
+
+## Reads a walker GLB (nodes Head, Torso, Arm_Left/Right, Leg_Left/Right) into the
+## packed format. The GLB faces -Z with its left on -X; the model frame faces +Z with
+## its left on +X, so every point turns 180 degrees about Y.
+static func build_glb(path: String) -> ArrayMesh:
+	var bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
+	if bytes.is_empty():
+		return null
+	var doc := GLTFDocument.new()
+	var state := GLTFState.new()
+	if doc.append_from_buffer(bytes, "", state) != OK:
+		return null
+	var scene: Node = doc.generate_scene(state)
+	if scene == null:
+		return null
+	var by_layer: Dictionary = {}
+	var found: int = 0
+	for mi: MeshInstance3D in scene.find_children("*", "MeshInstance3D", true, false):
+		var node_name: String = String(mi.name)
+		if not node_name in ["Head", "Torso", "Arm_Left", "Arm_Right", "Leg_Left", "Leg_Right"]:
+			continue
+		found += 1
+		var chain := Transform3D()
+		var cur: Node = mi
+		while cur is Node3D:
+			chain = (cur as Node3D).transform * chain
+			cur = cur.get_parent()
+		var source: ArrayMesh = mi.mesh as ArrayMesh
+		for s in source.get_surface_count():
+			var mat: Material = source.surface_get_material(s)
+			var spec: Array = GLB_MATERIALS.get(mat.resource_name if mat else "", GLB_MATERIALS["skin_rot"])
+			var layer: int = spec[0]
+			if not by_layer.has(layer):
+				var st := SurfaceTool.new()
+				st.begin(Mesh.PRIMITIVE_TRIANGLES)
+				st.set_custom_format(0, SurfaceTool.CUSTOM_RGBA_FLOAT)
+				st.set_custom_format(1, SurfaceTool.CUSTOM_RGBA_FLOAT)
+				st.set_custom_format(2, SurfaceTool.CUSTOM_RG_FLOAT)
+				by_layer[layer] = st
+			var st: SurfaceTool = by_layer[layer]
+			var arrays: Array = source.surface_get_arrays(s)
+			var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+			var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+			var order: PackedInt32Array = arrays[Mesh.ARRAY_INDEX] if arrays[Mesh.ARRAY_INDEX] != null else PackedInt32Array(range(verts.size()))
+			for t in range(0, order.size(), 3):
+				var p: Array[Vector3] = []
+				var outward := Vector3.ZERO
+				for k in 3:
+					var g: Vector3 = chain * verts[order[t + k]]
+					p.append(Vector3(-g.x, g.y, -g.z))
+					var gn: Vector3 = chain.basis * normals[order[t + k]]
+					outward += Vector3(-gn.x, gn.y, -gn.z)
+				var n: Vector3 = (p[1] - p[0]).cross(p[2] - p[0])
+				if n.length_squared() < 1e-14:
+					continue
+				# Godot's front faces are clockwise seen from outside: (p1 - p0) x (p2 - p0) points in.
+				var facing_out: bool = n.dot(outward) > 0.0
+				if facing_out:
+					p = [p[0], p[2], p[1]]
+				n = n.normalized() * (1.0 if facing_out else -1.0)  # the face normal, outward
+				var centre: Vector3 = (p[0] + p[1] + p[2]) / 3.0
+				var part: int = _glb_part(node_name, centre.y)
+				var leg: bool = node_name.begins_with("Leg")
+				var info := Color(float(part), 3.1, float(spec[3]), float(spec[2]))
+				var extra := Color(1, 1, 1, float(spec[1]))
+				var show := Color(float(Show.LEGS if leg else Show.ALWAYS), float(Show.ALWAYS), 0.0, 0.0)
+				# UVs in metres on the face's main plane, as the boxes (the shader scales them).
+				var ax: int = n.abs().max_axis_index()
+				for q: Vector3 in p:
+					var uv: Vector2 = [Vector2(q.z, -q.y), Vector2(q.x, q.z), Vector2(q.x, -q.y)][ax]
+					st.set_normal(n)
+					st.set_uv(uv)
+					st.set_custom(0, info)
+					st.set_custom(1, extra)
+					st.set_custom(2, show)
+					st.add_vertex(q)
+	scene.free()
+	if found < 6:
+		return null
+	var m := ArrayMesh.new()
+	var layers: Array = by_layer.keys()
+	layers.sort()
+	for l: int in layers:
+		var st: SurfaceTool = by_layer[l]
+		st.index()
+		st.generate_tangents()
+		st.commit(m)
+		m.surface_set_material(m.get_surface_count() - 1, material(l))
+	return m
+
+
+## The shader part of a walker GLB triangle: arms split at the elbow, legs at the
+## knee, the torso at the waist (model frame: left on +X).
+static func _glb_part(node_name: String, y: float) -> int:
+	match node_name:
+		"Head":
+			return Part.HEAD
+		"Torso":
+			return Part.PELVIS if y < GLB_WAIST_Y else Part.TORSO
+		"Arm_Left":
+			return Part.ARM_UPPER_L if y > GLB_ELBOW_Y else Part.ARM_LOWER_L
+		"Arm_Right":
+			return Part.ARM_UPPER_R if y > GLB_ELBOW_Y else Part.ARM_LOWER_R
+		"Leg_Left":
+			return Part.LEG_UPPER_L if y > GLB_KNEE_Y else Part.LEG_LOWER_L
+	return Part.LEG_UPPER_R if y > GLB_KNEE_Y else Part.LEG_LOWER_R
 
 
 static func _build_mesh(variant: int) -> ArrayMesh:

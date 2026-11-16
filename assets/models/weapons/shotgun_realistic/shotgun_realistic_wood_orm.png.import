@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dptp8om4msgi7"
-path="res://.godot/imported/shotgun_realistic_wood_orm.png-11fac4a54af49f6dc15cf2144cde6ee4.ctex"
+path.s3tc="res://.godot/imported/shotgun_realistic_wood_orm.png-11fac4a54af49f6dc15cf2144cde6ee4.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "43c61624004e3ae4b28a1bd2cb30f3cf"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/shotgun_realistic/shotgun_realistic_wood_orm.png"
-dest_files=["res://.godot/imported/shotgun_realistic_wood_orm.png-11fac4a54af49f6dc15cf2144cde6ee4.ctex"]
+dest_files=["res://.godot/imported/shotgun_realistic_wood_orm.png-11fac4a54af49f6dc15cf2144cde6ee4.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

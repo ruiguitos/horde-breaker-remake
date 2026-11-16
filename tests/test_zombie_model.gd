@@ -26,6 +26,7 @@ func _initialize() -> void:
 	_test_head()
 	_test_view()
 	_test_timing()
+	_test_glb_walker()
 	quit(1 if _failures > 0 else 0)
 
 
@@ -433,3 +434,44 @@ func _test_timing() -> void:
 		ZombieModel.mesh(v)
 	print("PERF: building the 4 variant meshes = %.1f ms (once per session)" % ((Time.get_ticks_usec() - t1) / 1000.0))
 	view.free()
+
+
+## The Blender walker (DEV new models): it loads into the packed format with every
+## part the shader poses, stands on the ground at about 1.95 m, keeps its skull where
+## headshots aim (HEAD_CENTER), hides its legs for a Crawler and is drawn only when on.
+func _test_glb_walker() -> void:
+	var m: ArrayMesh = ZombieModel.build_glb(ZombieModel.GLB_WALKER)
+	_check(m != null, "walker.glb loads into the packed format")
+	if m == null:
+		return
+	var parts: Dictionary = {}
+	var head_y: Array[float] = []
+	var low: float = INF
+	var high: float = -INF
+	var legs_shown_by_legs: bool = true
+	var triangles: int = 0
+	for s in m.get_surface_count():
+		var arrays: Array = m.surface_get_arrays(s)
+		var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		var c0: PackedFloat32Array = arrays[Mesh.ARRAY_CUSTOM0]
+		var c2: PackedFloat32Array = arrays[Mesh.ARRAY_CUSTOM2]
+		triangles += (arrays[Mesh.ARRAY_INDEX] as PackedInt32Array).size() / 3
+		for i in verts.size():
+			var part: int = int(c0[i * 4])
+			parts[part] = true
+			low = minf(low, verts[i].y)
+			high = maxf(high, verts[i].y)
+			if part == ZombieModel.Part.HEAD:
+				head_y.append(verts[i].y)
+			if part >= ZombieModel.Part.LEG_UPPER_L and int(c2[i * 2]) != ZombieModel.Show.LEGS:
+				legs_shown_by_legs = false
+	_check(parts.size() == ZombieModel.Part.size(), "every shader part is in the Blender walker (%d of %d)" % [parts.size(), ZombieModel.Part.size()])
+	_check(absf(low) < 0.005 and absf(high - 1.95) < 0.05, "it stands on the ground at about 1.95 m (%.3f to %.3f)" % [low, high])
+	var head_mid: float = (head_y.min() + head_y.max()) * 0.5
+	_check(absf(head_mid - ZombieModel.HEAD_CENTER.y) < 0.05, "its skull centre (%.2f m) is where headshots aim (%.2f m)" % [head_mid, ZombieModel.HEAD_CENTER.y])
+	_check(legs_shown_by_legs, "its leg triangles need the LEGS condition (hidden on a Crawler)")
+	_check(triangles >= 1500 and triangles <= 2500, "it keeps the walker budget (%d triangles)" % triangles)
+	_check(ZombieModel.mesh(0) != ZombieModel.glb_mesh(), "the box walker is drawn while the Blender one is off")
+	ZombieModel.glb_walker = true
+	_check(ZombieModel.mesh(2) == ZombieModel.glb_mesh(), "with the new models every walker variant draws the Blender walker")
+	ZombieModel.glb_walker = false

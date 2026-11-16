@@ -196,9 +196,9 @@ func _sandbox_buttons() -> void:
 	(horror.find_child("StartHorror", true, false) as Button).emit_signal("pressed")
 	var rifle: MenuDialog = DevSandbox.open(root, func(config: Dictionary) -> void: sent.append(config))
 	await process_frame
-	# The primary weapon is the fourth choice of the form; its second item is the realistic rifle.
+	# Models is the eighth choice of the form (after Mode); its second item is the Blender test models.
 	var choices: Array = rifle.find_children("*", "OptionButton", true, false)
-	(choices[3] as OptionButton).select(1)
+	(choices[7] as OptionButton).select(1)  # Models: New (Blender test)
 	(rifle.find_child("StartIsland", true, false) as Button).emit_signal("pressed")
 	_check(sent.size() == 3, "all three sandbox buttons send a config (%d)" % sent.size())
 	if sent.size() != 3:
@@ -206,14 +206,14 @@ func _sandbox_buttons() -> void:
 	var plain: Dictionary = sent[0]
 	var preset: Dictionary = sent[1]
 	var realistic: Dictionary = sent[2]
-	_check(plain.size() == 7 and not plain.has("atmosphere") and not plain.has("rifle_model"), "START sends the form's seven values and no atmosphere or test rifle")
+	_check(plain.size() == 7 and not plain.has("atmosphere") and not plain.has("rifle_model"), "START sends the form's seven values and no atmosphere or test models")
 	_check(preset.get("atmosphere") == &"horror" and preset.get("path") == BEACH_HANDMADE, "HORROR sends beach_01 with the horror atmosphere")
 	_check(preset.get("mission") == plain.get("mission") and preset.get("class") == plain.get("class") and preset.get("seed") == plain.get("seed"), "HORROR keeps the form's mission, class and seed")
-	_check(realistic.get("primary") == &"rifle" and realistic.get("rifle_model") == &"realistic" and realistic.size() == 8, "the realistic rifle is sent as the rifle with its test model")
+	_check(realistic.get("primary") == plain.get("primary") and realistic.get("rifle_model") == &"realistic" and realistic.size() == 8, "the new models are sent as one extra key, with the same weapons")
 	var ctx: RunContext = DevSandbox.apply(preset, RunContext.new(1))
 	_check(ctx.atmosphere == &"horror" and ctx.biome == &"beach" and ctx.rifle_model == &"", "the horror config starts a beach run with the horror atmosphere")
 	var real_ctx: RunContext = DevSandbox.apply(realistic, RunContext.new(1))
-	_check(real_ctx.rifle_model == &"realistic" and real_ctx.atmosphere == &"normal", "the realistic rifle is set on the run and the atmosphere stays normal")
+	_check(real_ctx.rifle_model == &"realistic" and real_ctx.atmosphere == &"normal", "the new models are set on the run and the atmosphere stays normal")
 	await _settle(2)
 
 

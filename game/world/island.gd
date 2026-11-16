@@ -525,6 +525,8 @@ func _build_world() -> void:
 	chunk.size = Vector3(0.25, 0.25, 0.25)
 	_setup_multimesh(_debris_mm, chunk, true)
 	_setup_multimesh(_head_debris_mm, _sphere(0.24), true)
+	# The DEV sandbox's new models also draw the walkers with the Blender walker.glb.
+	ZombieModel.glb_walker = _rifle_variant() == &"realistic"
 	add_child(_zombies)
 
 	var tracer := MeshInstance3D.new()
@@ -2208,7 +2210,8 @@ func _horror() -> bool:
 	return context != null and context.atmosphere == &"horror"
 
 
-## The assault rifle's GLB variant of this run (RunContext.rifle_model; &"" is the current model).
+## The weapons' GLB variant of this run (RunContext.rifle_model; &"" is the current models,
+## &"realistic" the Blender ones of every weapon, plus the Blender walker).
 func _rifle_variant() -> StringName:
 	return context.rifle_model if context != null else &""
 
