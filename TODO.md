@@ -96,7 +96,9 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
   falta o utilizador vê-las no editor antes de passarem a omissão. Walker feito no Blender
   (`enemies_build/build_enemy.py`, 2 200 triângulos, 1,95 m), lido pelo `ZombieModel` no formato
   das caixas. Teste no jogo: DEV SANDBOX, Models = New (Blender test), que liga as cinco armas
-  realistas e o Walker. Os outros cinco inimigos esperam pela opinião do utilizador.
+  realistas e o Walker. Brute, Grabber, Bloater, Screamer e Behemoth feitos a 2026-11-16 no
+  mesmo gerador, nas articulações de `special_enemy_model.gd` (o Runner usa o Walker); falta
+  o utilizador vê-los no jogo antes de passarem a omissão.
 
 - [ ] `crawler.glb`: reconfirmar os testes e ver no editor. Todos os crawlers
   partilham cabeça e corpo; 4 814 triângulos cada (walker 708).

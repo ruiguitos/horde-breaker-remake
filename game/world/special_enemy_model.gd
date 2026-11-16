@@ -8,6 +8,12 @@ const KINDS: Array[int] = [GameData.EnemyKind.RUNNER, GameData.EnemyKind.BRUTE, 
 	GameData.EnemyKind.BOSS, GameData.EnemyKind.BLOATER, GameData.EnemyKind.SCREAMER]
 const NAMES: Array[String] = ["runner", "brute", "grabber", "behemoth", "bloater", "screamer"]
 static var _meshes: Dictionary = {}
+static var _glb_meshes: Dictionary = {}
+## The Blender GLB of each kind (enemies_build/build_enemy.py), drawn instead of the boxes when
+## ZombieModel.glb_walker is on (the DEV sandbox's new models). The specials are exported at their
+## game height and scaled back to model space; the Runner uses the walker, already in model space.
+const GLB_DIR: String = "res://assets/models/characters/"
+const GLB_FILES: Array[String] = ["walker", "brute", "grabber", "behemoth", "bloater", "screamer"]
 
 
 static func profile(kind: int) -> Dictionary:
@@ -41,9 +47,46 @@ static func profile(kind: int) -> Dictionary:
 
 
 static func mesh(kind: int) -> ArrayMesh:
+	if ZombieModel.glb_walker:
+		var glb: ArrayMesh = glb_mesh(kind)
+		if glb != null:
+			return glb
 	if _meshes.has(kind):
 		return _meshes[kind]
 	assert(kind in KINDS)
+	var result: ArrayMesh = ZombieModel.build_parts(parts(kind), _materials(kind))
+	# Include reaching arms and fallen bodies in shader animation bounds.
+	result.custom_aabb = AABB(Vector3(-2, -0.6, -2.5), Vector3(4, 3.2, 5))
+	result.resource_name = NAMES[KINDS.find(kind)]
+	_meshes[kind] = result
+	return result
+
+
+## The kind's Blender GLB in model space, on the kind's joints and with its fixed colours;
+## null if the file does not load.
+static func glb_mesh(kind: int) -> ArrayMesh:
+	if _glb_meshes.has(kind):
+		return _glb_meshes[kind]
+	var name: String = GLB_FILES[KINDS.find(kind)]
+	var type: GameData.EnemyType = GameData.enemy_types()[kind]
+	var p: Dictionary = profile(kind)
+	var colours: Dictionary = _colours(kind)
+	var tints: Dictionary = {"skin_rot": colours.skin, "cloth_shirt": colours.cloth, "cloth_trousers": colours.cloth,
+		"scrap_metal": Color(0.36, 0.31, 0.26)}
+	var joints: Dictionary = {"elbow": (p.elbow as Vector3).y, "knee": (p.knee as Vector3).y, "waist": (p.waist as Vector3).y}
+	var result: ArrayMesh = ZombieModel.build_glb(GLB_DIR + name + "_original/" + name + ".glb",
+		1.0 if kind == GameData.EnemyKind.RUNNER else ZombieModel.MODEL_HEIGHT / type.height, joints, tints, _materials(kind))
+	if result == null:
+		push_warning("%s.glb did not load: this kind keeps its box model" % name)
+	else:
+		result.custom_aabb = AABB(Vector3(-2, -0.6, -2.5), Vector3(4, 3.2, 5))
+		result.resource_name = NAMES[KINDS.find(kind)] + "_glb"
+	_glb_meshes[kind] = result
+	return result
+
+
+## The kind's shader materials (one per layer), carrying its creature type and joints.
+static func _materials(kind: int) -> Array[ShaderMaterial]:
 	var p: Dictionary = profile(kind)
 	var materials: Array[ShaderMaterial] = []
 	for layer in ZombieModel.LAYERS.size():
@@ -55,12 +98,7 @@ static func mesh(kind: int) -> ArrayMesh:
 			if String(pair[0]).ends_with("_L"):
 				mat.set_shader_parameter(String(pair[0]).trim_suffix("_L") + "_R", Vector3(-point.x, point.y, point.z))
 		materials.append(mat)
-	var result: ArrayMesh = ZombieModel.build_parts(parts(kind), materials)
-	# Include reaching arms and fallen bodies in shader animation bounds.
-	result.custom_aabb = AABB(Vector3(-2, -0.6, -2.5), Vector3(4, 3.2, 5))
-	result.resource_name = NAMES[KINDS.find(kind)]
-	_meshes[kind] = result
-	return result
+	return materials
 
 
 static func _add(out: Array[Dictionary], c: Vector3, size: Vector3, part: int, layer: int,
@@ -72,39 +110,33 @@ static func _add(out: Array[Dictionary], c: Vector3, size: Vector3, part: int, l
 		"taper": taper, "rotation": rotation})
 
 
+## Each kind's skin and cloth colours, limb width and hand height (the boxes and the GLB tints).
+static func _colours(kind: int) -> Dictionary:
+	var c: Dictionary = {"skin": Color(0.49, 0.53, 0.43), "cloth": Color(0.20, 0.22, 0.23), "width": 0.15, "hand_y": 0.87}
+	match kind:
+		GameData.EnemyKind.RUNNER:
+			c.merge({"skin": Color(0.50, 0.47, 0.42), "cloth": Color(0.28, 0.19, 0.17), "width": 0.125}, true)
+		GameData.EnemyKind.BRUTE:
+			c.merge({"skin": Color(0.42, 0.39, 0.33), "width": 0.23, "hand_y": 0.78}, true)
+		GameData.EnemyKind.GRABBER:
+			c.merge({"skin": Color(0.42, 0.37, 0.46), "width": 0.11, "hand_y": 0.48}, true)
+		GameData.EnemyKind.BOSS:
+			c.merge({"skin": Color(0.38, 0.27, 0.26), "cloth": Color(0.16, 0.14, 0.13), "width": 0.25, "hand_y": 0.68}, true)
+		GameData.EnemyKind.BLOATER:
+			c.merge({"skin": Color(0.47, 0.54, 0.30), "width": 0.19, "hand_y": 0.79}, true)
+		GameData.EnemyKind.SCREAMER:
+			c.merge({"skin": Color(0.63, 0.57, 0.38), "cloth": Color(0.34, 0.29, 0.15), "width": 0.12}, true)
+	return c
+
+
 static func parts(kind: int) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	var p: Dictionary = profile(kind)
-	var skin := Color(0.49, 0.53, 0.43)
-	var cloth := Color(0.20, 0.22, 0.23)
-	var width: float = 0.15
-	var hand_y: float = 0.87
-	match kind:
-		GameData.EnemyKind.RUNNER:
-			skin = Color(0.50, 0.47, 0.42)
-			cloth = Color(0.28, 0.19, 0.17)
-			width = 0.125
-		GameData.EnemyKind.BRUTE:
-			skin = Color(0.42, 0.39, 0.33)
-			width = 0.23
-			hand_y = 0.78
-		GameData.EnemyKind.GRABBER:
-			skin = Color(0.42, 0.37, 0.46)
-			width = 0.11
-			hand_y = 0.48
-		GameData.EnemyKind.BOSS:
-			skin = Color(0.38, 0.27, 0.26)
-			cloth = Color(0.16, 0.14, 0.13)
-			width = 0.25
-			hand_y = 0.68
-		GameData.EnemyKind.BLOATER:
-			skin = Color(0.47, 0.54, 0.30)
-			width = 0.19
-			hand_y = 0.79
-		GameData.EnemyKind.SCREAMER:
-			skin = Color(0.63, 0.57, 0.38)
-			cloth = Color(0.34, 0.29, 0.15)
-			width = 0.12
+	var colours: Dictionary = _colours(kind)
+	var skin: Color = colours.skin
+	var cloth: Color = colours.cloth
+	var width: float = colours.width
+	var hand_y: float = colours.hand_y
 	# Individually proportioned legs and arms, with matching shader pivots.
 	for sign: float in [1.0, -1.0]:
 		var thigh: int = Part.LEG_UPPER_L if sign > 0 else Part.LEG_UPPER_R

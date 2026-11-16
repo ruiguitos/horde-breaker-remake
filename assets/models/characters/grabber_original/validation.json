@@ -1,0 +1,63 @@
+{
+  "model": "grabber",
+  "license": "CC0-1.0",
+  "units": "metres",
+  "forward": "-Z",
+  "up": "+Y",
+  "triangles": 2384,
+  "triangle_budget": [
+    2000,
+    3500
+  ],
+  "height_m": 2.1448,
+  "model_space_scale": 1.1176,
+  "game_height_m": 1.9,
+  "lowest_point_m": 0.0,
+  "width_m": 0.9634,
+  "depth_m": 0.4104,
+  "materials": [
+    "skin_rot",
+    "cloth_trousers",
+    "flesh_wound",
+    "bone"
+  ],
+  "pivots_m_godot": {
+    "Torso": [
+      0.0,
+      0.0,
+      -0.0
+    ],
+    "Head": [
+      0.0,
+      1.7533,
+      -0.0224
+    ],
+    "Arm_Left": [
+      -0.3018,
+      1.6653,
+      -0.0
+    ],
+    "Arm_Right": [
+      0.3018,
+      1.6653,
+      -0.0
+    ],
+    "Leg_Left": [
+      -0.1341,
+      1.0282,
+      -0.0
+    ],
+    "Leg_Right": [
+      0.1341,
+      1.0282,
+      -0.0
+    ]
+  },
+  "textures": [
+    "textures/grabber_basecolor.png",
+    "textures/grabber_roughness.png",
+    "textures/grabber_normal.png"
+  ],
+  "texture_source": "numpy noise in build_enemy.py (CC0)",
+  "passed": true
+}

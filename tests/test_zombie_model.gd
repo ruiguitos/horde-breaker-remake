@@ -475,3 +475,27 @@ func _test_glb_walker() -> void:
 	ZombieModel.glb_walker = true
 	_check(ZombieModel.mesh(2) == ZombieModel.glb_mesh(), "with the new models every walker variant draws the Blender walker")
 	ZombieModel.glb_walker = false
+	# The specials' Blender GLBs: each loads on its kind's joints, its skull where the game
+	# aims a headshot for that kind (profile head_y), and is drawn only with the new models.
+	var Specials: GDScript = load("res://game/world/special_enemy_model.gd")
+	for kind: int in Specials.KINDS:
+		var sm: ArrayMesh = Specials.glb_mesh(kind)
+		var label: String = Specials.NAMES[Specials.KINDS.find(kind)]
+		_check(sm != null, "%s: its Blender GLB loads" % label)
+		if sm == null:
+			continue
+		var ys: Array[float] = []
+		for s in sm.get_surface_count():
+			var arrays: Array = sm.surface_get_arrays(s)
+			var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+			var c0: PackedFloat32Array = arrays[Mesh.ARRAY_CUSTOM0]
+			for i in verts.size():
+				if int(c0[i * 4]) == ZombieModel.Part.HEAD:
+					ys.append(verts[i].y)
+		var want: float = Specials.profile(kind).head_y
+		var mid: float = (ys.min() + ys.max()) * 0.5 if not ys.is_empty() else 0.0
+		_check(absf(mid - want) < 0.12, "%s: its skull centre (%.2f m, model space) is near the aim (%.2f m)" % [label, mid, want])
+		_check(Specials.mesh(kind) != sm, "%s: the box model is drawn while the new models are off" % label)
+	ZombieModel.glb_walker = true
+	_check(Specials.mesh(GameData.EnemyKind.BRUTE) == Specials.glb_mesh(GameData.EnemyKind.BRUTE), "with the new models the specials draw their Blender GLBs")
+	ZombieModel.glb_walker = false

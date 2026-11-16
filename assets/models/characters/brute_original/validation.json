@@ -1,0 +1,68 @@
+{
+  "model": "brute",
+  "license": "CC0-1.0",
+  "units": "metres",
+  "forward": "-Z",
+  "up": "+Y",
+  "triangles": 3000,
+  "triangle_budget": [
+    2500,
+    4000
+  ],
+  "height_m": 2.7085,
+  "model_space_scale": 1.4118,
+  "game_height_m": 2.4,
+  "lowest_point_m": 0.0,
+  "width_m": 1.5247,
+  "depth_m": 0.7189,
+  "materials": [
+    "skin_rot",
+    "cloth_trousers",
+    "flesh_wound",
+    "scrap_metal"
+  ],
+  "pivots_m_godot": {
+    "Torso": [
+      0.0,
+      0.0,
+      -0.0
+    ],
+    "Head": [
+      0.0,
+      2.2315,
+      -0.0282
+    ],
+    "Arm_Left": [
+      -0.5365,
+      2.0894,
+      -0.0
+    ],
+    "Arm_Right": [
+      0.5365,
+      2.0894,
+      -0.0
+    ],
+    "Leg_Left": [
+      -0.2541,
+      1.2988,
+      -0.0
+    ],
+    "Leg_Right": [
+      0.2541,
+      1.2988,
+      -0.0
+    ],
+    "Armor_Front": [
+      0.0,
+      1.44,
+      -0.0
+    ]
+  },
+  "textures": [
+    "textures/brute_basecolor.png",
+    "textures/brute_roughness.png",
+    "textures/brute_normal.png"
+  ],
+  "texture_source": "numpy noise in build_enemy.py (CC0)",
+  "passed": true
+}

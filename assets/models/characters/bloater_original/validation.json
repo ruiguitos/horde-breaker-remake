@@ -1,0 +1,68 @@
+{
+  "model": "bloater",
+  "license": "CC0-1.0",
+  "units": "metres",
+  "forward": "-Z",
+  "up": "+Y",
+  "triangles": 3672,
+  "triangle_budget": [
+    2500,
+    4000
+  ],
+  "height_m": 1.854,
+  "model_space_scale": 0.9412,
+  "game_height_m": 1.6,
+  "lowest_point_m": 0.0,
+  "width_m": 1.0555,
+  "depth_m": 0.6071,
+  "materials": [
+    "skin_rot",
+    "cloth_shirt",
+    "cloth_trousers",
+    "flesh_wound"
+  ],
+  "pivots_m_godot": {
+    "Torso": [
+      0.0,
+      0.0,
+      -0.0
+    ],
+    "Head": [
+      0.0,
+      1.5384,
+      -0.0188
+    ],
+    "Arm_Left": [
+      -0.4047,
+      1.3365,
+      -0.0
+    ],
+    "Arm_Right": [
+      0.4047,
+      1.3365,
+      -0.0
+    ],
+    "Leg_Left": [
+      -0.2165,
+      0.6306,
+      -0.0
+    ],
+    "Leg_Right": [
+      0.2165,
+      0.6306,
+      -0.0
+    ],
+    "Belly": [
+      0.0,
+      0.7529,
+      -0.0
+    ]
+  },
+  "textures": [
+    "textures/bloater_basecolor.png",
+    "textures/bloater_roughness.png",
+    "textures/bloater_normal.png"
+  ],
+  "texture_source": "numpy noise in build_enemy.py (CC0)",
+  "passed": true
+}

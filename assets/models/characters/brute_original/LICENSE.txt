@@ -1,0 +1,1 @@
+CC0-1.0. Original work for Horde Breaker Remake; built by enemies_build/build_enemy.py.

@@ -156,7 +156,7 @@ static var _materials: Array[ShaderMaterial] = []
 
 ## The Blender walker (enemies_build/build_enemy.py, CC0): when glb_walker is on (the DEV
 ## sandbox's new models), every walker variant draws this one mesh instead of the boxes
-## above. It is read into the same packed format, so zombie.gdshader poses and recolours
+## above, and SpecialEnemyModel draws the specials' Blender GLBs. It is read into the same packed format, so zombie.gdshader poses and recolours
 ## it like the boxes: each triangle takes its part from its GLB node (split at the elbow
 ## and the knee), and its layer, palette slot and kind from its material.
 const GLB_WALKER: String = "res://assets/models/characters/walker_original/walker.glb"
@@ -169,7 +169,11 @@ const GLB_MATERIALS: Dictionary = {
 	"cloth_shirt": [Layer.JERSEY, Slot.SHIRT, Kind.SURFACE, 0.2],
 	"cloth_trousers": [Layer.DENIM, Slot.TROUSERS, Kind.SURFACE, 0.15],
 	"flesh_wound": [Layer.SKIN, Slot.FIXED, Kind.FLESH, 0.0],
+	"bone": [Layer.SKIN, Slot.FIXED, Kind.BONE, 0.0],
+	"scrap_metal": [Layer.LEATHER, Slot.FIXED, Kind.SURFACE, 0.1],
 }
+## Torso nodes of the specials: the bloater's Belly and the brute's Armor_Front move with the torso.
+const GLB_NODES: Array[String] = ["Head", "Torso", "Belly", "Armor_Front", "Arm_Left", "Arm_Right", "Leg_Left", "Leg_Right"]
 static var glb_walker: bool = false
 static var _glb_mesh: ArrayMesh = null
 static var _glb_tried: bool = false
@@ -613,16 +617,24 @@ static func boxes(variant: int) -> Array[Dictionary]:
 static func glb_mesh() -> ArrayMesh:
 	if not _glb_tried:
 		_glb_tried = true
-		_glb_mesh = build_glb(GLB_WALKER)
+		_glb_mesh = build_glb(GLB_WALKER, 1.0, {})
 		if _glb_mesh == null:
 			push_warning("walker.glb did not load: the walkers keep the box models")
 	return _glb_mesh
 
 
-## Reads a walker GLB (nodes Head, Torso, Arm_Left/Right, Leg_Left/Right) into the
-## packed format. The GLB faces -Z with its left on -X; the model frame faces +Z with
-## its left on +X, so every point turns 180 degrees about Y.
-static func build_glb(path: String) -> ArrayMesh:
+## Reads an enemy GLB (nodes Head, Torso, Arm_Left/Right, Leg_Left/Right, and Belly or
+## Armor_Front) into the packed format. The GLB faces -Z with its left on -X; the model
+## frame faces +Z with its left on +X, so every point turns 180 degrees about Y. `scale`
+## brings a special from its game size to model space (MODEL_HEIGHT / its height);
+## `joints` holds the heights where its parts split ("elbow", "knee", "waist");
+## `tints` gives a material a fixed colour (the specials) instead of the zombie's palette;
+## `materials` are the specials' own shader materials (by layer).
+static func build_glb(path: String, scale: float = 1.0, joints: Dictionary = {}, tints: Dictionary = {},
+		materials: Array[ShaderMaterial] = []) -> ArrayMesh:
+	var elbow_y: float = joints.get("elbow", GLB_ELBOW_Y)
+	var knee_y: float = joints.get("knee", GLB_KNEE_Y)
+	var waist_y: float = joints.get("waist", GLB_WAIST_Y)
 	var bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
 	if bytes.is_empty():
 		return null
@@ -637,9 +649,10 @@ static func build_glb(path: String) -> ArrayMesh:
 	var found: int = 0
 	for mi: MeshInstance3D in scene.find_children("*", "MeshInstance3D", true, false):
 		var node_name: String = String(mi.name)
-		if not node_name in ["Head", "Torso", "Arm_Left", "Arm_Right", "Leg_Left", "Leg_Right"]:
+		if not node_name in GLB_NODES:
 			continue
-		found += 1
+		if node_name in ["Head", "Torso", "Arm_Left", "Arm_Right", "Leg_Left", "Leg_Right"]:
+			found += 1
 		var chain := Transform3D()
 		var cur: Node = mi
 		while cur is Node3D:
@@ -648,7 +661,10 @@ static func build_glb(path: String) -> ArrayMesh:
 		var source: ArrayMesh = mi.mesh as ArrayMesh
 		for s in source.get_surface_count():
 			var mat: Material = source.surface_get_material(s)
-			var spec: Array = GLB_MATERIALS.get(mat.resource_name if mat else "", GLB_MATERIALS["skin_rot"])
+			var mat_name: String = mat.resource_name if mat else ""
+			var spec: Array = GLB_MATERIALS.get(mat_name, GLB_MATERIALS["skin_rot"])
+			var tinted: bool = tints.has(mat_name)
+			var tint: Color = tints.get(mat_name, Color.WHITE)
 			var layer: int = spec[0]
 			if not by_layer.has(layer):
 				var st := SurfaceTool.new()
@@ -666,7 +682,7 @@ static func build_glb(path: String) -> ArrayMesh:
 				var p: Array[Vector3] = []
 				var outward := Vector3.ZERO
 				for k in 3:
-					var g: Vector3 = chain * verts[order[t + k]]
+					var g: Vector3 = chain * verts[order[t + k]] * scale
 					p.append(Vector3(-g.x, g.y, -g.z))
 					var gn: Vector3 = chain.basis * normals[order[t + k]]
 					outward += Vector3(-gn.x, gn.y, -gn.z)
@@ -679,10 +695,10 @@ static func build_glb(path: String) -> ArrayMesh:
 					p = [p[0], p[2], p[1]]
 				n = n.normalized() * (1.0 if facing_out else -1.0)  # the face normal, outward
 				var centre: Vector3 = (p[0] + p[1] + p[2]) / 3.0
-				var part: int = _glb_part(node_name, centre.y)
+				var part: int = _glb_part(node_name, centre.y, elbow_y, knee_y, waist_y)
 				var leg: bool = node_name.begins_with("Leg")
 				var info := Color(float(part), 3.1, float(spec[3]), float(spec[2]))
-				var extra := Color(1, 1, 1, float(spec[1]))
+				var extra := Color(tint.r, tint.g, tint.b, float(Slot.FIXED if tinted else spec[1]))
 				var show := Color(float(Show.LEGS if leg else Show.ALWAYS), float(Show.ALWAYS), 0.0, 0.0)
 				# UVs in metres on the face's main plane, as the boxes (the shader scales them).
 				var ax: int = n.abs().max_axis_index()
@@ -705,25 +721,26 @@ static func build_glb(path: String) -> ArrayMesh:
 		st.index()
 		st.generate_tangents()
 		st.commit(m)
-		m.surface_set_material(m.get_surface_count() - 1, material(l))
+		m.surface_set_material(m.get_surface_count() - 1, materials[l] if not materials.is_empty() else material(l))
 	return m
 
 
-## The shader part of a walker GLB triangle: arms split at the elbow, legs at the
-## knee, the torso at the waist (model frame: left on +X).
-static func _glb_part(node_name: String, y: float) -> int:
+## The shader part of a GLB triangle: arms split at the elbow, legs at the knee, the
+## torso (and a belly or armour plate) at the waist (model frame: left on +X).
+static func _glb_part(node_name: String, y: float, elbow_y: float = GLB_ELBOW_Y, knee_y: float = GLB_KNEE_Y,
+		waist_y: float = GLB_WAIST_Y) -> int:
 	match node_name:
 		"Head":
 			return Part.HEAD
-		"Torso":
-			return Part.PELVIS if y < GLB_WAIST_Y else Part.TORSO
+		"Torso", "Belly", "Armor_Front":
+			return Part.PELVIS if y < waist_y else Part.TORSO
 		"Arm_Left":
-			return Part.ARM_UPPER_L if y > GLB_ELBOW_Y else Part.ARM_LOWER_L
+			return Part.ARM_UPPER_L if y > elbow_y else Part.ARM_LOWER_L
 		"Arm_Right":
-			return Part.ARM_UPPER_R if y > GLB_ELBOW_Y else Part.ARM_LOWER_R
+			return Part.ARM_UPPER_R if y > elbow_y else Part.ARM_LOWER_R
 		"Leg_Left":
-			return Part.LEG_UPPER_L if y > GLB_KNEE_Y else Part.LEG_LOWER_L
-	return Part.LEG_UPPER_R if y > GLB_KNEE_Y else Part.LEG_LOWER_R
+			return Part.LEG_UPPER_L if y > knee_y else Part.LEG_LOWER_L
+	return Part.LEG_UPPER_R if y > knee_y else Part.LEG_LOWER_R
 
 
 static func _build_mesh(variant: int) -> ArrayMesh:

@@ -10,7 +10,8 @@
     2500
   ],
   "height_m": 1.9576,
-  "height_target_m": 1.95,
+  "model_space_scale": 1.0,
+  "game_height_m": 1.7,
   "lowest_point_m": 0.0,
   "width_m": 0.67,
   "depth_m": 0.3929,

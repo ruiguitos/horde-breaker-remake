@@ -1,0 +1,63 @@
+{
+  "model": "behemoth",
+  "license": "CC0-1.0",
+  "units": "metres",
+  "forward": "-Z",
+  "up": "+Y",
+  "triangles": 7452,
+  "triangle_budget": [
+    6000,
+    9000
+  ],
+  "height_m": 4.7751,
+  "model_space_scale": 2.4706,
+  "game_height_m": 4.2,
+  "lowest_point_m": 0.0,
+  "width_m": 3.2612,
+  "depth_m": 1.4752,
+  "materials": [
+    "skin_rot",
+    "flesh_wound",
+    "bone",
+    "scrap_metal"
+  ],
+  "pivots_m_godot": {
+    "Torso": [
+      0.0,
+      0.0,
+      -0.0
+    ],
+    "Head": [
+      0.0,
+      3.9212,
+      -0.0494
+    ],
+    "Arm_Left": [
+      -1.0871,
+      3.6071,
+      -0.0
+    ],
+    "Arm_Right": [
+      1.0871,
+      3.6071,
+      -0.0
+    ],
+    "Leg_Left": [
+      -0.4941,
+      2.2729,
+      -0.0
+    ],
+    "Leg_Right": [
+      0.4941,
+      2.2729,
+      -0.0
+    ]
+  },
+  "textures": [
+    "textures/behemoth_basecolor.png",
+    "textures/behemoth_roughness.png",
+    "textures/behemoth_normal.png"
+  ],
+  "texture_source": "numpy noise in build_enemy.py (CC0)",
+  "passed": true
+}
