@@ -63,6 +63,7 @@ static func build(palette: Dictionary, weapon: StringName = &"rifle") -> FirstPe
 	assert(arms.skeleton != null, "The arms file has no skeleton")
 	arms._read_rest()
 	arms._colour(model, palette)
+	arms._block_sleeves(palette)
 	arms._player = model.find_child("AnimationPlayer", true, false) as AnimationPlayer
 	var clip: StringName = RELOAD_CLIPS.get(arms.grip_weapon, &"")
 	if arms._player != null and arms._player.has_animation(clip):
@@ -153,6 +154,44 @@ func _pose_bone(bone: int, head: Vector3, rest_basis: Basis, from: Vector3, to: 
 		turn = Basis(Quaternion(from.normalized(), to.normalized()))
 	var pose := Transform3D(turn * rest_basis, head)
 	skeleton.set_bone_global_pose_override(bone, pose, 1.0, true)
+
+
+## Blocky sleeves over the file's thin arms, in the class's cloth colour, so the arms in first
+## person read like the blocky soldier's (user's request, 2026-11-16). Each box rides its bone
+## (BoneAttachment3D), so the IK and the reload clips move it; the hands keep the file's fingers,
+## which close on the grip. Widths in metres; the forearm box stops short of the wrist.
+const SLEEVES: Array = [["UpperArm", "Forearm", 0.15, 1.0], ["Forearm", "Hand", 0.125, 0.86]]
+
+
+func _block_sleeves(palette: Dictionary) -> void:
+	var cloth := StandardMaterial3D.new()
+	cloth.albedo_color = palette.get(CLOTH_KEY, Color(0.55, 0.5, 0.36))
+	cloth.roughness = 0.95
+	for side: String in ["_L", "_R"]:
+		for seg: Array in SLEEVES:
+			var bone: int = skeleton.find_bone(String(seg[0]) + side)
+			var child: int = skeleton.find_bone(String(seg[1]) + side)
+			if bone < 0 or child < 0:
+				continue
+			var rest: Transform3D = skeleton.get_bone_global_rest(bone)
+			var along: Vector3 = rest.affine_inverse() * skeleton.get_bone_global_rest(child).origin  # bone space
+			var length: float = along.length() * float(seg[3])
+			if length < 0.01:
+				continue
+			var attach := BoneAttachment3D.new()
+			attach.name = "Sleeve" + String(seg[0]) + side
+			attach.bone_name = String(seg[0]) + side
+			skeleton.add_child(attach)
+			var box := MeshInstance3D.new()
+			var mesh := BoxMesh.new()
+			mesh.size = Vector3(float(seg[2]), length, float(seg[2]))
+			box.mesh = mesh
+			box.material_override = cloth
+			var y: Vector3 = along.normalized()
+			var x: Vector3 = y.cross(Vector3.FORWARD if absf(y.dot(Vector3.FORWARD)) < 0.9 else Vector3.RIGHT).normalized()
+			box.transform = Transform3D(Basis(x, y, x.cross(y)), y * length * 0.5)
+			box.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			attach.add_child(box)
 
 
 ## Gives the sleeve and the glove the class colours. Other materials keep the file's.

@@ -254,3 +254,21 @@ verifica os cinco renders, as imagens no loadout, o texto da Shotgun e o título
 só se não couberem), as duas alternativas empilham-se com a letra A/B, o ícone e o
 nome, e os pips correm em linha por baixo. O ícone desceu de 30 para 18 px para
 caber a altura da árvore a 1152 × 648; fica por ver no editor se 18 px se lê bem.
+
+## 2026-11-16: armas realistas por omissão, pega em terceira pessoa e braços em bloco
+
+Pedido do utilizador (melhorar os modelos das armas e a maneira como os bonecos as seguram):
+
+- **Modelos.** As armas realistas do Blender passam a ser as do jogo (`WeaponModel.DEFAULT_VARIANT`);
+  as antigas ficam como `TACTICAL`, para comparar na opção «Weapons» do DEV SANDBOX.
+- **Terceira pessoa.** Antes, a coronha ficava encostada ao esterno, 20 cm à esquerda do ombro
+  direito (medido com `tools/dev/measure_hold.gd`), o que parecia uma pistola. `RifleShoulderHold`
+  leva a mão direita (IK de dois ossos, sem esticar) para pôr a coronha alta, à direita do centro do
+  peito. Os braços dos bonecos em blocos são curtos: com a coronha mesmo no ombro, a mão esquerda
+  ficava 4 a 18 cm aquém do guarda-mão. Por isso a posição é um meio-termo, e a mão de apoio recua
+  até 16 cm ao longo do guarda-mão quando não chega (Rifle 0,5 cm; armas compridas 7 a 16 cm).
+  As armas são desenhadas 15 % maiores nas mãos do soldado (`SoldierModel.TP_GUN_SCALE`), para
+  acompanharem as proporções em blocos.
+- **Primeira pessoa.** A arma fica 6 cm mais longe (`ViewModel.REST`), e os braços finos do
+  ficheiro ganham mangas em bloco na cor da classe, presas aos ossos (`FirstPersonArms.SLEEVES`).
+  As mãos do ficheiro ficam, porque fecham os dedos na arma.

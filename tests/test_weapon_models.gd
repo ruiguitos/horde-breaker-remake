@@ -184,7 +184,7 @@ func _test_view_model() -> void:
 	# The former half-scale limit would make the authored hands oversized again.
 	vm.set_weapon(&"marksman")
 	var reach: float = -(vm.position.z + vm.tip.position.z * vm.scale.z)
-	_check(absf(reach - 1.21) < 0.02 and vm.scale.is_equal_approx(Vector3.ONE),
+	_check(absf(reach - 1.27) < 0.02 and vm.scale.is_equal_approx(Vector3.ONE),  # 1.27 since the gun sits 6 cm further out (2026-11-16)
 		"first-person marksman keeps metre scale and the expected camera-space reach (%.2f m)" % reach)
 	vm.free()
 

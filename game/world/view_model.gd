@@ -6,7 +6,7 @@ extends Node3D
 
 ## Hip-fire grip position in camera space: below and right of the centre line,
 ## with the elbows outside the bottom edge of the first-person frame.
-const REST: Vector3 = Vector3(0.16, -0.23, -0.42)
+const REST: Vector3 = Vector3(0.17, -0.235, -0.48)
 ## Sights: while aiming down sights the front sight is put on the centre of the
 ## view, with the rear sight `EYE_TO_REAR` metres from the eye (see sight_rest).
 ## Used only when a gun has no sight parts in LAYOUT.
