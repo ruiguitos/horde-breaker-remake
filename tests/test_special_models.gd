@@ -61,7 +61,7 @@ func _test_meshes(view: ZombieHordeView) -> void:
 				valid = valid and (vertices[indices[i + 1]] - vertices[indices[i]]).cross(vertices[indices[i + 2]] - vertices[indices[i]]).length_squared() > 0.000000000001
 			signature = hash([signature, vertices])
 			valid = valid and mesh.surface_get_material(surface) is ShaderMaterial
-		_check(valid and triangles >= 300 and triangles <= 6000, "%s has valid textured geometry with normals/tangents (%d triangles)" % [node.name, triangles])
+		_check(valid and triangles >= 300 and triangles <= 9000, "%s has valid textured geometry with normals/tangents (%d triangles)" % [node.name, triangles])
 		if String(node.name) in ["Zombies_runner", "Zombies_brute", "Zombies_grabber", "Zombies_behemoth", "Zombies_bloater", "Zombies_screamer"]:
 			shapes[signature] = true
 	_check(shapes.size() == 6, "The six specials have six different geometries")

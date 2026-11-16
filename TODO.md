@@ -97,8 +97,8 @@ Bloqueados por mecânica (não são animação pendente; motivo em `docs/tech/LO
   (`enemies_build/build_enemy.py`, 2 200 triângulos, 1,95 m), lido pelo `ZombieModel` no formato
   das caixas. Teste no jogo: DEV SANDBOX, Models = New (Blender test), que liga as cinco armas
   realistas e o Walker. Brute, Grabber, Bloater, Screamer e Behemoth feitos a 2026-11-16 no
-  mesmo gerador, nas articulações de `special_enemy_model.gd` (o Runner usa o Walker); falta
-  o utilizador vê-los no jogo antes de passarem a omissão.
+  mesmo gerador, nas articulações de `special_enemy_model.gd` (o Runner usa o Walker); são os modelos
+  por omissão desde 2026-11-16 (+0,67 ms com 150 vivos). As armas realistas continuam na opção DEV.
 
 - [ ] `crawler.glb`: reconfirmar os testes e ver no editor. Todos os crawlers
   partilham cabeça e corpo; 4 814 triângulos cada (walker 708).

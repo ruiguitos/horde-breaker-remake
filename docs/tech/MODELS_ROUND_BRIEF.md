@@ -4,6 +4,8 @@
 
 **Atualização 2026-11-16:** o pedido 2 também foi feito pelo Claude no Blender (`assets/models/characters/enemies_build/build_enemy.py`). Diferenças ao contrato: as alturas seguem o jogo (`game/data/enemies/*.tres`), não a lista abaixo, porque os especiais são desenhados no espaço do modelo (1,7) com as articulações de `special_enemy_model.gd` e exportados à altura do jogo; o Walker tem 1,95 m para o crânio ficar onde os tiros à cabeça apontam. As texturas do atlas só servem para o Blender: no jogo, o `ZombieModel` lê os GLB no formato das caixas e usa as texturas e as paletas que já tinha.
 
+**2026-11-16, por omissão:** a pedido do utilizador, os inimigos do Blender passaram a ser os modelos do jogo (`ZombieModel.glb_walker = true`; as caixas ficam como recurso e nos testes). A cabeça de cada GLB é alinhada ao carregar com o ponto dos tiros à cabeça (erro de 0 mm nos testes). Custo medido com `tools/dev/bench_frame.gd` (câmara de ombro, `beach_01`, 10 s, janela 1600×900): 150 vivos 5,55 → 6,22 ms de média (+0,67 ms), 300 vivos 6,27 → 7,28 ms (+1,0 ms). Referência: o Crawler custou +0,52 ms com 150.
+
 Para colar numa sessão do Codex com escrita (ele trabalha no Blender 5.2; a integração no jogo é do Claude). São dois pedidos independentes: fazer primeiro o das armas.
 
 Estado de hoje, para contexto:

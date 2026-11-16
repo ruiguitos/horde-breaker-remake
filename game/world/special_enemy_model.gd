@@ -10,7 +10,7 @@ const NAMES: Array[String] = ["runner", "brute", "grabber", "behemoth", "bloater
 static var _meshes: Dictionary = {}
 static var _glb_meshes: Dictionary = {}
 ## The Blender GLB of each kind (enemies_build/build_enemy.py), drawn instead of the boxes when
-## ZombieModel.glb_walker is on (the DEV sandbox's new models). The specials are exported at their
+## ZombieModel.glb_walker is on (the default). The specials are exported at their
 ## game height and scaled back to model space; the Runner uses the walker, already in model space.
 const GLB_DIR: String = "res://assets/models/characters/"
 const GLB_FILES: Array[String] = ["walker", "brute", "grabber", "behemoth", "bloater", "screamer"]
@@ -73,7 +73,8 @@ static func glb_mesh(kind: int) -> ArrayMesh:
 	var colours: Dictionary = _colours(kind)
 	var tints: Dictionary = {"skin_rot": colours.skin, "cloth_shirt": colours.cloth, "cloth_trousers": colours.cloth,
 		"scrap_metal": Color(0.36, 0.31, 0.26)}
-	var joints: Dictionary = {"elbow": (p.elbow as Vector3).y, "knee": (p.knee as Vector3).y, "waist": (p.waist as Vector3).y}
+	var joints: Dictionary = {"elbow": (p.elbow as Vector3).y, "knee": (p.knee as Vector3).y, "waist": (p.waist as Vector3).y,
+		"head": p.head_y}
 	var result: ArrayMesh = ZombieModel.build_glb(GLB_DIR + name + "_original/" + name + ".glb",
 		1.0 if kind == GameData.EnemyKind.RUNNER else ZombieModel.MODEL_HEIGHT / type.height, joints, tints, _materials(kind))
 	if result == null:

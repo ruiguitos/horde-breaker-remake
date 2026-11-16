@@ -154,8 +154,8 @@ const STUMP_LENGTHS: Array[float] = [0.16, 0.1, 0.13, 0.08]
 static var _meshes: Array[ArrayMesh] = []
 static var _materials: Array[ShaderMaterial] = []
 
-## The Blender walker (enemies_build/build_enemy.py, CC0): when glb_walker is on (the DEV
-## sandbox's new models), every walker variant draws this one mesh instead of the boxes
+## The Blender walker (enemies_build/build_enemy.py, CC0): while glb_walker is on (the default
+## since 2026-11-16; false draws the old boxes, kept as the fallback and for tests), every walker variant draws this one mesh instead of the boxes
 ## above, and SpecialEnemyModel draws the specials' Blender GLBs. It is read into the same packed format, so zombie.gdshader poses and recolours
 ## it like the boxes: each triangle takes its part from its GLB node (split at the elbow
 ## and the knee), and its layer, palette slot and kind from its material.
@@ -174,7 +174,7 @@ const GLB_MATERIALS: Dictionary = {
 }
 ## Torso nodes of the specials: the bloater's Belly and the brute's Armor_Front move with the torso.
 const GLB_NODES: Array[String] = ["Head", "Torso", "Belly", "Armor_Front", "Arm_Left", "Arm_Right", "Leg_Left", "Leg_Right"]
-static var glb_walker: bool = false
+static var glb_walker: bool = true
 static var _glb_mesh: ArrayMesh = null
 static var _glb_tried: bool = false
 
@@ -635,6 +635,7 @@ static func build_glb(path: String, scale: float = 1.0, joints: Dictionary = {},
 	var elbow_y: float = joints.get("elbow", GLB_ELBOW_Y)
 	var knee_y: float = joints.get("knee", GLB_KNEE_Y)
 	var waist_y: float = joints.get("waist", GLB_WAIST_Y)
+	var head_y: float = joints.get("head", HEAD_CENTER.y)
 	var bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
 	if bytes.is_empty():
 		return null
@@ -645,6 +646,20 @@ static func build_glb(path: String, scale: float = 1.0, joints: Dictionary = {},
 	var scene: Node = doc.generate_scene(state)
 	if scene == null:
 		return null
+	# The head is lifted (a few cm at most) so its centre is exactly where the game aims headshots.
+	var head_low: float = INF
+	var head_high: float = -INF
+	for mi: MeshInstance3D in scene.find_children("Head", "MeshInstance3D", true, false):
+		var chain := Transform3D()
+		var cur: Node = mi
+		while cur is Node3D:
+			chain = (cur as Node3D).transform * chain
+			cur = cur.get_parent()
+		for v: Vector3 in (mi.mesh as ArrayMesh).get_faces():
+			var y: float = (chain * v).y * scale
+			head_low = minf(head_low, y)
+			head_high = maxf(head_high, y)
+	var head_lift: float = head_y - (head_low + head_high) * 0.5 if head_low < head_high else 0.0
 	var by_layer: Dictionary = {}
 	var found: int = 0
 	for mi: MeshInstance3D in scene.find_children("*", "MeshInstance3D", true, false):
@@ -683,7 +698,7 @@ static func build_glb(path: String, scale: float = 1.0, joints: Dictionary = {},
 				var outward := Vector3.ZERO
 				for k in 3:
 					var g: Vector3 = chain * verts[order[t + k]] * scale
-					p.append(Vector3(-g.x, g.y, -g.z))
+					p.append(Vector3(-g.x, g.y + (head_lift if node_name == "Head" else 0.0), -g.z))
 					var gn: Vector3 = chain.basis * normals[order[t + k]]
 					outward += Vector3(-gn.x, gn.y, -gn.z)
 				var n: Vector3 = (p[1] - p[0]).cross(p[2] - p[0])

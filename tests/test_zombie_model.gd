@@ -471,9 +471,10 @@ func _test_glb_walker() -> void:
 	_check(absf(head_mid - ZombieModel.HEAD_CENTER.y) < 0.05, "its skull centre (%.2f m) is where headshots aim (%.2f m)" % [head_mid, ZombieModel.HEAD_CENTER.y])
 	_check(legs_shown_by_legs, "its leg triangles need the LEGS condition (hidden on a Crawler)")
 	_check(triangles >= 1500 and triangles <= 2500, "it keeps the walker budget (%d triangles)" % triangles)
+	ZombieModel.glb_walker = false
 	_check(ZombieModel.mesh(0) != ZombieModel.glb_mesh(), "the box walker is drawn while the Blender one is off")
 	ZombieModel.glb_walker = true
-	_check(ZombieModel.mesh(2) == ZombieModel.glb_mesh(), "with the new models every walker variant draws the Blender walker")
+	_check(ZombieModel.mesh(2) == ZombieModel.glb_mesh(), "with the Blender models on (the default) every walker variant draws the Blender walker")
 	ZombieModel.glb_walker = false
 	# The specials' Blender GLBs: each loads on its kind's joints, its skull where the game
 	# aims a headshot for that kind (profile head_y), and is drawn only with the new models.
@@ -498,4 +499,4 @@ func _test_glb_walker() -> void:
 		_check(Specials.mesh(kind) != sm, "%s: the box model is drawn while the new models are off" % label)
 	ZombieModel.glb_walker = true
 	_check(Specials.mesh(GameData.EnemyKind.BRUTE) == Specials.glb_mesh(GameData.EnemyKind.BRUTE), "with the new models the specials draw their Blender GLBs")
-	ZombieModel.glb_walker = false
+	ZombieModel.glb_walker = true  # the default

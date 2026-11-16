@@ -29,6 +29,10 @@ var _done: bool = false
 
 func _initialize() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
+	# "boxes" anywhere in the arguments draws the old box enemies (to compare with the Blender GLBs).
+	ZombieModel.glb_walker = not args.has("boxes")
+	if args.has("boxes"):
+		args.remove_at(args.find("boxes"))
 	_camera = args[0] if args.size() > 0 else "third"
 	_seconds = float(args[1]) if args.size() > 1 else 10.0
 	if args.size() > 2 and args[2] != "current":

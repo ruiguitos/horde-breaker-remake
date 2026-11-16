@@ -97,9 +97,9 @@ static func open(parent: Node, on_start: Callable) -> MenuDialog:
 	row.add_child(seed_box)
 	# The mode sits with the seed, so the two-column grid keeps its height (the form must fit 960 x 540).
 	var mode := _choice(row, "Mode", _mode_items(), &"expedition")
-	# The Blender models under test: every weapon's realistic GLB and the walker (WeaponModel.VARIANTS,
-	# ZombieModel.glb_walker). In the row too, for the same reason.
-	var models := _choice(row, "Models", [["Current", &""], ["New (Blender test)", NEW_MODELS]], &"")
+	# The Blender weapons under test: every weapon's realistic GLB (WeaponModel.VARIANTS). The enemies
+	# use their Blender models by default (ZombieModel.glb_walker). In the row too, for the same reason.
+	var models := _choice(row, "Models", [["Current", &""], ["New weapons (Blender)", NEW_MODELS]], &"")
 	# The form's values as a config.
 	var read_config := func() -> Dictionary:
 		var config: Dictionary = {
